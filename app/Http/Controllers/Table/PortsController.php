@@ -199,14 +199,14 @@ class PortsController extends TableController
             'Out Error Rate',
             'Description',
             'Last Change',
-            'Connector Present'
+            'Connector Present',
         ];
     }
 
     /**
      * Format a row for CSV export
      *
-     * @param Port $port
+     * @param  Port  $port
      * @return array
      */
     protected function formatExportRow($port)
@@ -214,7 +214,7 @@ class PortsController extends TableController
         $status = $port->ifOperStatus;
         $adminStatus = $port->ifAdminStatus;
         $speed = Number::formatSi($port->ifSpeed);
-        
+
         return [
             'device_id' => $port->device_id,
             'hostname' => $port->device->hostname,
@@ -233,7 +233,7 @@ class PortsController extends TableController
             'out_errors_rate' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
             'description' => $port->ifAlias,
             'last_change' => $port->device ? ($port->device->uptime - ($port->ifLastChange / 100)) : 'N/A',
-            'connector_present' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no'
+            'connector_present' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
         ];
     }
 }

@@ -152,20 +152,20 @@ class MempoolsController extends TableController
             'Free',
             'Total',
             'Percentage',
-            'Warning Threshold'
+            'Warning Threshold',
         ];
     }
 
     /**
      * Format a row for CSV export
      *
-     * @param Mempool $mempool
+     * @param  Mempool  $mempool
      * @return array
      */
     protected function formatExportRow($mempool)
     {
         $is_percent = $mempool->mempool_total == 100;
-        
+
         return [
             'device_id' => $mempool->device_id,
             'hostname' => $mempool->device->hostname,
@@ -174,7 +174,7 @@ class MempoolsController extends TableController
             'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),
             'total' => $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total),
             'percentage' => $mempool->mempool_perc . '%',
-            'warning_threshold' => $mempool->mempool_perc_warn ?? '-'
+            'warning_threshold' => $mempool->mempool_perc_warn ?? '-',
         ];
     }
 }

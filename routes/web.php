@@ -332,7 +332,7 @@ Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('
 Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
 
 // Add the legacy table export route
-Route::get('/ajax_table_export.php', function() {
+Route::get('/ajax_table_export.php', function () {
     return include base_path('html/ajax_table_export.php');
 })->middleware('auth')->name('ajax_table_export');
 

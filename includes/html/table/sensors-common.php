@@ -72,7 +72,7 @@ if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
         'Low Limit',
         'High Limit',
     ];
-    
+
     fputcsv($output, $headers);
 }
 
@@ -129,14 +129,14 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
-    
+
     if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
         $device_name = $sensor['hostname'];
         $sensor_descr = $sensor['sensor_descr'];
         $current_val = strip_tags($sensor_current);
         $limit_low = is_null($sensor['sensor_limit_low']) ? '' : $sensor['sensor_limit_low'] . $unit;
         $limit_high = is_null($sensor['sensor_limit']) ? '' : $sensor['sensor_limit'] . $unit;
-        
+
         fputcsv($output, [
             $device_name,
             $sensor_descr,
@@ -158,7 +158,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         ];
     }
 
-    if ($vars['view'] == 'graphs' && !isset($_REQUEST['export'])) {
+    if ($vars['view'] == 'graphs' && ! isset($_REQUEST['export'])) {
         $daily_graph = 'graph.php?id=' . $sensor['sensor_id'] . '&amp;type=' . $graph_type . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=211&amp;height=100';
         $daily_url = 'graph.php?id=' . $sensor['sensor_id'] . '&amp;type=' . $graph_type . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=400&amp;height=150';
 
@@ -186,7 +186,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     } //end if
 }//end foreach
 
-if (!isset($_REQUEST['export'])) {
+if (! isset($_REQUEST['export'])) {
     $output = [
         'current' => $current,
         'rowCount' => $rowCount,
