@@ -127,6 +127,7 @@ class Ospfv3 implements Module
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3AreaTable')
                 ->mapTable(function ($ospf_area, $ospfv3AreaId) use ($context_name, $os) {
+                    $ospf_area['ospfv3AreaScopeLsaCksumSum'] ??= 0;
                     return Ospfv3Area::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
                         'ospfv3AreaId' => $ospfv3AreaId,
@@ -152,9 +153,8 @@ class Ospfv3 implements Module
                     // find port_id
                     $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ospfv3IfIndex, $os->getDeviceId());
                     $ospf_port['ospfv3_instance_id'] = $ospfv3IfInstId;
-                    $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter']);
-                    $ospf_port['ospfv3IfBackupDesignatedRouter'] = long2ip($ospf_port['ospfv3IfBackupDesignatedRouter']);
-                    $ospf_port['ospfv3AreaScopeLsaCksumSum'] ??= 0;
+                    $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter'] ?? 0);
+                    $ospf_port['ospfv3IfBackupDesignatedRouter'] = long2ip($ospf_port['ospfv3IfBackupDesignatedRouter'] ?? 0);
                     $ospf_port['ospfv3IfIndex'] ??= 0;
 
                     unset($ospf_port['ospfv3IfInstId']);
@@ -189,6 +189,7 @@ class Ospfv3 implements Module
                     $ospf_nbr['port_id'] = PortCache::getIdFromIp($ospf_nbr['ospfv3NbrAddress'], $context_name); // search all devices
                     $ospf_nbr['ospfv3_instance_id'] = $ospfv3NbrIfInstId;
                     $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospfv3NbrRtrId);
+                    $ospf_nbr['ospfv3NbrHelloSuppressed'] = $ospf_nbr['ospfv3NbrHelloSuppressed'] ?? '';
 
                     return Ospfv3Nbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),

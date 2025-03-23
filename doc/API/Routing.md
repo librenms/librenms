@@ -472,6 +472,7 @@ Output:
         {
             "device_id": "1",
             "port_id": "0",
+            "ospfv3_instance_id": "0",
             "ospfv3_nbr_id": "2",
             "ospfv3NbrIfId: "1147535360",
             "ospfv3NbrIfInstId": "0",
