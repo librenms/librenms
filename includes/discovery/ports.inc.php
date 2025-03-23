@@ -27,6 +27,11 @@ if ($device['os'] == 'nokia-isam') {
     require base_path('includes/discovery/ports/nokia-isam.inc.php');
 }
 
+//Get Bison ports
+if ($device['os'] == 'bison') {
+    require base_path('includes/discovery/ports/bison.inc.php');
+}
+
 // Get adva-fsp150cp
 if ($device['os'] == 'adva-fsp150cp') {
     require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
@@ -105,9 +110,9 @@ $ports_db = $ports_mapped['ports'];
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
     foreach (['', '-adsl', '-dot3'] as $suffix) {
         $old_rrd_name = "port-$ifIndex$suffix.rrd";
-        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
+        $new_rrd_name = Rrd::portName($port_id, ltrim($suffix, '-'));
 
-        \Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
+        Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
     }
 }
 
