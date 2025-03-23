@@ -239,8 +239,10 @@
 
                         @if($custommaps->isNotEmpty())
                             <li role="presentation" class="divider"></li>
+                                @if($custommaps->count() == 1)
                                 <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
                                     <ul class="dropdown-menu scrollable-menu">
+                                @endif
                                         @foreach($custommaps as $map_group => $group_maps)
                                             @if($map_group)
                                             <li class="dropdown-submenu">
@@ -255,8 +257,10 @@
                                             @endforeach
                                         @if($map_group)</ul></li>@endif
                                         @endforeach
+                                @if($custommaps->count() == 1)
                                     </ul>
                                 </li>
+                                @endif
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>
