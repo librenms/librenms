@@ -4,12 +4,12 @@ namespace LibreNMS\Data\Store;
 
 use App\Facades\DeviceCache;
 use App\Polling\Measure\Measurement;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
 use RdKafka\Producer;
-use Carbon\Carbon;
 
 class Kafka extends BaseDatastore
 {
@@ -24,7 +24,7 @@ class Kafka extends BaseDatastore
         // Set the kafka broker servers
         $conf->set('bootstrap.servers', Config::get('kafka.broker.list', 'kafka:9092'));
         // Set the idempotence
-        $conf->set('enable.idempotence', (Config::get('kafka.idempotence') ? 'true' : 'false'));
+        $conf->set('enable.idempotence', Config::get('kafka.idempotence') ? 'true' : 'false');
         // Max queue allowed messages in poller memory
         $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 100_000));
         // Num of messages each call to kafka
@@ -64,19 +64,15 @@ class Kafka extends BaseDatastore
         $this->client = new Producer($conf);
 
         // Register shutdown function
-        register_shutdown_function(function() {
+        register_shutdown_function(function () {
             $this->isShuttingDown = true;
             $this->safeFlush();
         });
     }
 
-   /**
-    * Safe flush kafka messages in queue
-    * before terminate this instance.
-    */
    public function __destruct()
     {
-        if (!$this->isShuttingDown) {
+        if (! $this->isShuttingDown) {
             $this->safeFlush();
         }
         // Clear reference
@@ -86,7 +82,7 @@ class Kafka extends BaseDatastore
     private function safeFlush()
     {
         // check if client instance exists
-        if (!$this->client) {
+        if (! $this->client) {
             return;
         }
 
@@ -103,7 +99,7 @@ class Kafka extends BaseDatastore
                         'error' => Library::rd_kafka_err2str($result),
                         'code' => $result,
                         'device_id' => $this->device_id,
-                        'remaining' => $this->client->getOutQLen()
+                        'remaining' => $this->client->getOutQLen(),
                     ]);
                 }
             }
@@ -111,7 +107,7 @@ class Kafka extends BaseDatastore
             Log::error('KAFKA: safeFlush failed with exception', [
                 'device_id' => $this->device_id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -292,4 +288,5 @@ class Kafka extends BaseDatastore
     {
         return false;
     }
+    
 }
