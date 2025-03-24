@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileWriteFailedException.php
  *

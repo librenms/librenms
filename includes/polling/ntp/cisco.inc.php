@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture statistics from the CISCO-NTP-MIB
  *

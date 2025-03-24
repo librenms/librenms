@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CustomMapController.php
  *
@@ -335,7 +336,7 @@ class CustomMapController extends Controller
     /**
      * Return the default legend colours
      */
-    private function getDefaultLegendColours(): array|null
+    private function getDefaultLegendColours(): ?array
     {
         $ret = Config::get('custom_map.legend_colours', null);
 

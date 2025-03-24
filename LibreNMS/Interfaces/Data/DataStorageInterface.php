@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DataStorageInterface.php
  *

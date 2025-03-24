@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MoxaEtherdevice.php
  *
