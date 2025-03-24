@@ -112,7 +112,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
         $old_rrd_name = "port-$ifIndex$suffix.rrd";
         $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
 
-        Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
+        \Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
     }
 }
 
