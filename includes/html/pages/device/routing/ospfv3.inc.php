@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Blade;
+
 $i = 0;
 
 echo '
@@ -109,7 +111,7 @@ foreach ($instances as $instance) {
         echo '
                   <tbody>
                     <tr>
-                      <td>' . \LibreNMS\Util\Url::portLink($ospfPort->port) . '</td>
+                      <td>' . Blade::render('<x-port-link :port="$port"/>', ['port' => $ospfPort->port]) . '</td>
                       <td>' . $ospfPort->ospfv3IfType . '</td>
                       <td>' . $ospfPort->ospfv3IfState . '</td>
                       <td>' . $ospfPort->ospfv3IfMetricValue . '</td>
@@ -137,7 +139,7 @@ foreach ($instances as $instance) {
     foreach ($instance->nbrs as $nbr) {
         $rtr_id = 'unknown';
         if ($nbr->port) {
-            $rtr_id = \LibreNMS\Util\Url::deviceLink(DeviceCache::get($nbr->port->device_id));
+            $rtr_id = Blade::render('<x-device-link :device="$device" tab="routing" section="ospfv3"/>', ['device' => $nbr->port->device_id]);
         }
 
         $ospfnbr_status_color = 'default';
