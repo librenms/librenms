@@ -2552,6 +2552,22 @@
             },
             "type": "graph"
         },
+        "graph_types.device.bison_pppoe_sessions": {
+            "default": {
+                "section": "netstats",
+                "order": 0,
+                "descr": "Active Users"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.bison_ipoe_sessions": {
+            "default": {
+                "section": "netstats",
+                "order": 0,
+                "descr": "Active Sessions"
+            },
+            "type": "graph"
+        },
         "graph_types.device.bits": {
             "default": {
                 "section": "netstats",

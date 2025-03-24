@@ -6,14 +6,6 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-poller_modules:
-    bgp-peers: false
-    ospf: false
-    stp: false
-discovery_modules:
-    applications: true
-    bgp-peers: false
-    stp: false
 mib_dir: bison
 discovery:
     -
