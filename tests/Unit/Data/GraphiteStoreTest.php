@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraphiteStoreTest.php
  *

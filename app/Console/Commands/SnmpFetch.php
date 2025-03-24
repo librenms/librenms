@@ -16,7 +16,7 @@ abstract class SnmpFetch extends LnmsCommand
 {
     protected string $type;
     protected array $oids;
-    protected bool|null $numeric;
+    protected ?bool $numeric;
     private string $outputFormat;
     protected int $depth;
     protected string $deviceSpec;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IntegerType.php
  *

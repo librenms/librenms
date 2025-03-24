@@ -1,4 +1,5 @@
 <?php
+
 /**
  * fortigate.inc.php
  *

@@ -18,7 +18,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected Connection|null $ldap_connection = null;
+    protected ?Connection $ldap_connection = null;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
     public function authenticate($credentials)

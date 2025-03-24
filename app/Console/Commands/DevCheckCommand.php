@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DevCheckCommand.php
  *
