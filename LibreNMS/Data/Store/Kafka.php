@@ -9,10 +9,112 @@ use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
 use RdKafka\Producer;
+use Carbon\Carbon;
 
 class Kafka extends BaseDatastore
 {
-    private const PRODUCER_MAXIMUM_QUEUE_ACUMULATED_MESSAGES = 1000;
+    private $client;
+    private $device_id;
+    private $isShuttingDown = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $conf = new Conf();
+        // Set the kafka broker servers
+        $conf->set('bootstrap.servers', Config::get('kafka.broker.list', 'kafka:9092'));
+        // Set the idempotence
+        $conf->set('enable.idempotence', (Config::get('kafka.idempotence') ? 'true' : 'false'));
+        // Max queue allowed messages in poller memory
+        $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 100_000));
+        // Num of messages each call to kafka
+        $conf->set('batch.num.messages', Config::get('kafka.batch.max.message', 25));
+        // Max wait time to acumulate before sending the batch
+        $conf->set('linger.ms', Config::get('kafka.linger.ms', default: 500));
+        // Change ACK
+        $conf->set('request.required.acks', Config::get('kafka.request.required.acks', default: 1));
+
+        // check if debug for ssl was set and enable it
+        $confKafkaSSLDebug = Config::get('kafka.security.debug', null);
+        $confKafkaSSLDebug != null || strlen($confKafkaSSLDebug) !== 0 ? $conf->set('debug', $confKafkaSSLDebug) : null;
+
+        // config ssl
+        $isSslEnabled = Config::get('kafka.ssl.enable', false);
+        if ($isSslEnabled) {
+            $conf->set('security.protocol', Config::get('kafka.ssl.protocol', 'ssl'));
+            $conf->set('ssl.endpoint.identification.algorithm', 'none');
+
+            // prepare all necessary librenms kafka config with associated rdkafka key
+            $kafkaSSLConfigs = [
+                'kafka.ssl.keystore.location' => 'ssl.keystore.location',
+                'kafka.ssl.keystore.password' => 'ssl.keystore.password',
+                'kafka.ssl.ca.location' => 'ssl.ca.location',
+                'kafka.ssl.certificate.location' => 'ssl.certificate.location',
+                'kafka.ssl.key.location' => 'ssl.key.location',
+                'kafka.ssl.key.password' => 'ssl.key.password',
+            ];
+
+            // fetch kafka config values, if exists, associate its value to rdkafka key
+            foreach ($kafkaSSLConfigs as $configKey => $kafkaKey) {
+                $configValue = Config::get($configKey, null);
+                $configValue != null || strlen($configValue) !== 0 ? $conf->set($kafkaKey, $configValue) : null;
+            }
+        }
+
+        $this->client = new Producer($conf);
+
+        // Register shutdown function
+        register_shutdown_function(function() {
+            $this->isShuttingDown = true;
+            $this->safeFlush();
+        });
+    }
+
+   /**
+    * Safe flush kafka messages in queue
+    * before terminate this instance.
+    */
+   public function __destruct()
+    {
+        if (!$this->isShuttingDown) {
+            $this->safeFlush();
+        }
+        // Clear reference
+        $this->client = null;
+    }
+
+    private function safeFlush()
+    {
+        // check if client instance exists
+        if (!$this->client) {
+            return;
+        }
+
+        try {
+            // get total number of messages in the queue
+            $outQLen = $this->client->getOutQLen();
+
+            if ($outQLen > 0) {
+                Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
+                $result = $this->client->flush(self::getKafkaFlushTimeout());
+
+                if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
+                    Log::error('KAFKA: Flush failed', [
+                        'error' => Library::rd_kafka_err2str($result),
+                        'code' => $result,
+                        'device_id' => $this->device_id,
+                        'remaining' => $this->client->getOutQLen()
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('KAFKA: safeFlush failed with exception', [
+                'device_id' => $this->device_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
 
     public function getName()
     {
@@ -49,7 +151,8 @@ class Kafka extends BaseDatastore
         try {
             // get the singleton instance of the produced
             /** @var Producer $producer */
-            $producer = app('RdKafka\Producer');
+            $producer = $this->client;
+            $this->device_id = $device['device_id'];
             $topic = $producer->newTopic(Kafka::getTopicName());
 
             $device_data = DeviceCache::get($device['device_id']);
@@ -94,6 +197,10 @@ class Kafka extends BaseDatastore
 
             $tmp_fields = [];
             $tmp_tags = [];
+            // NETMETRIX-LIBRENMS-CUSTOM-ADDED-BEGIN
+            // REASON: Add groups as tags
+            $tmp_tags['device_groups'] = implode('|', $device_data->groups->pluck('name')->toArray());
+            // NETMETRIX-LIBRENMS-CUSTOM-ADDED-END
 
             foreach ($tags as $k => $v) {
                 if (empty($v)) {
@@ -112,45 +219,46 @@ class Kafka extends BaseDatastore
             }
 
             if (empty($tmp_fields)) {
-                Log::warning('KAFKA: All fields empty, skipping update', ['orig_fields' => $fields]);
+                Log::warning('KAFKA: All fields empty, skipping update', [
+                    'orig_fields' => $fields,
+                    'device_id' => $this->device_id,
+                ]);
 
                 return;
             }
 
             // create and organize data
             $filteredDeviceData = array_diff_key($device, array_flip($excluded_device_fields_arr));
+            // add current time to the data
+            $filteredDeviceData['current_polled_time'] = Carbon::now();
 
-            $resultArr['measurement'] = $measurement;
-            $resultArr['device'] = $filteredDeviceData;
-            $resultArr['fields'] = $tmp_fields;
-            $resultArr['tags'] = $tmp_tags;
+            $resultArr = [
+                'measurement' => $measurement,
+                'device' => $filteredDeviceData,
+                'fields' => $tmp_fields,
+                'tags' => $tmp_tags,
+            ];
 
             if (Config::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
+                    'device_id' => $this->device_id,
                     'measurement' => $measurement,
                     'fields' => $tmp_fields,
                 ]);
             }
 
-            // end
-            $this->recordStatistic($stat->end());
-
             $dataArr = json_encode($resultArr);
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
             $producer->poll(0);
 
-            // flush when it reaches 100messages
-            if ($producer->getOutQLen() >= Kafka::PRODUCER_MAXIMUM_QUEUE_ACUMULATED_MESSAGES) {
-                // flush remaining message in the queue
-                $result = $producer->flush(self::getKafkaFlushTimeout());
-
-                if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-                    Log::warning('KAFKA: Was unable to flush ( ' . $result . ' ), messages might be lost!');
-                    Log::warning(Library::rd_kafka_err2str($result));
-                }
-            }
-        } catch (\Throwable $th) {
-            Log::warning($th);
+            // end
+            $this->recordStatistic($stat->end());
+        } catch (\Throwable $e) {
+            Log::error('KAFKA: Put failed with exception', [
+                'device_id' => $this->device_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
 
@@ -168,47 +276,6 @@ class Kafka extends BaseDatastore
         }
 
         return $data === 'U' ? null : $data;
-    }
-
-    /**
-     * Create a instance of Kafka Producer
-     *
-     * @return Producer
-     */
-    public static function createFromConfig()
-    {
-        $conf = new Conf();
-        $conf->set('bootstrap.servers', Config::get('kafka.broker.list', 'kafka:9092'));
-        $conf->set('enable.idempotence', Config::get('kafka.idempotence', 'false'));
-
-        // check if debug for ssl was set and enable it
-        $confKafkaSSLDebug = Config::get('kafka.security.debug', null);
-        $confKafkaSSLDebug != null || strlen($confKafkaSSLDebug) !== 0 ? $conf->set('debug', $confKafkaSSLDebug) : null;
-
-        // config ssl
-        $isSslEnabled = Config::get('kafka.ssl.enable', false);
-        if ($isSslEnabled) {
-            $conf->set('security.protocol', Config::get('kafka.ssl.protocol', 'ssl'));
-            $conf->set('ssl.endpoint.identification.algorithm', 'none');
-
-            // prepare all necessary librenms kafka config with associated rdkafka key
-            $kafkaSSLConfigs = [
-                'kafka.ssl.keystore.location' => 'ssl.keystore.location',
-                'kafka.ssl.keystore.password' => 'ssl.keystore.password',
-                'kafka.ssl.ca.location' => 'ssl.ca.location',
-                'kafka.ssl.certificate.location' => 'ssl.certificate.location',
-                'kafka.ssl.key.location' => 'ssl.key.location',
-                'kafka.ssl.key.password' => 'ssl.key.password',
-            ];
-
-            // fetch kafka config values, if exists, associate its value to rdkafka key
-            foreach ($kafkaSSLConfigs as $configKey => $kafkaKey) {
-                $configValue = Config::get($configKey, null);
-                $configValue != null || strlen($configValue) !== 0 ? $conf->set($kafkaKey, $configValue) : null;
-            }
-        }
-
-        return new Producer($conf);
     }
 
     public static function getTopicName()

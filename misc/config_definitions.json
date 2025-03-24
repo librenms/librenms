@@ -4513,6 +4513,34 @@
             "section": "kafka",
             "order": 17
         },
+        "kafka.buffer.max.message": {
+            "default": 100000,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 18
+        },
+        "kafka.batch.max.message": {
+            "default": 25,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 19
+        },
+        "kafka.linger.ms": {
+            "default": 500,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 20
+        },
+        "kafka.request.required.acks": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 21
+        },
         "influxdbv2.timeout": {
             "default": 1,
             "type": "integer",
