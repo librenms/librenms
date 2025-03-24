@@ -138,10 +138,12 @@ class Ipv6Addresses implements Module
             $ips = $ips->merge(SnmpQuery::context($context_name)
                 ->enumStrings()
                 ->walk([
-                    'IP-MIB::ipAddressIfIndex.ipv6',
-                    'IP-MIB::ipAddressOrigin.ipv6',
-                    'IP-MIB::ipAddressPrefix.ipv6',
+                    'IP-MIB::ipAddressTable',
                 ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device) {
+                    if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
+                        return null;
+                    }
+
                     try {
                         Log::debug("Attempting to parse $ipAddressAddr");
                         $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
