@@ -77,7 +77,7 @@ foreach ($sagan['data'] as $instance => $stats) {
     }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 $old_instances = $app->app['instances'] ?? [];

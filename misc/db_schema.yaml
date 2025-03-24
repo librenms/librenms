@@ -911,7 +911,7 @@ ipv6_addresses:
     - { Field: ipv6_compressed, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_prefixlen, Type: int, 'Null': false, Extra: '' }
     - { Field: ipv6_origin, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: ipv6_network_id, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
@@ -1488,7 +1488,6 @@ ospfv3_nbrs:
     - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_nbr_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfId, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrIfIndex, Type: 'int', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfInstId, Type: 'int', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrAddressType, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrAddress, Type: varchar(39), 'Null': false, Extra: '' }

@@ -136,7 +136,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // name choosen based on this is the second group of variables
 $rrd_name = ['app', $name, $app->app_id, '_____group2'];
@@ -267,7 +267,7 @@ $gauges_to_check_for = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // process additional info returned
@@ -301,7 +301,7 @@ foreach ($zfs['pools'] as $pool) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $pool_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     // insert flattened pool metrics into the metrics array
     foreach ($fields as $field => $value) {
@@ -317,7 +317,7 @@ foreach ($zfs['pools'] as $pool) {
                 'data' => $pool[$gauge_var],
             ];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_gauge, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
         }
     }
 
