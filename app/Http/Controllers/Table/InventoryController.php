@@ -33,6 +33,8 @@ use Illuminate\Support\Facades\Blade;
 
 class InventoryController extends TableController
 {
+    protected $model = EntPhysical::class;
+
     public function rules()
     {
         return [
@@ -94,4 +96,38 @@ class InventoryController extends TableController
             'serial' => htmlspecialchars($entPhysical->entPhysicalSerialNum),
         ];
     }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device',
+            'Description',
+            'Name',
+            'Model',
+            'Serial Number',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  EntPhysical  $entPhysical
+     * @return array
+     */
+    protected function formatExportRow($entPhysical)
+    {
+        return [
+            $entPhysical->device ? $entPhysical->device->displayName() : '',
+            $entPhysical->entPhysicalDescr,
+            $entPhysical->entPhysicalName,
+            $entPhysical->entPhysicalModelName,
+            $entPhysical->entPhysicalSerialNum,
+        ];
+    }
+
 }
