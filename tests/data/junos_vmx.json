@@ -13190,5 +13190,20 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0004",
+                    "ipv6_compressed": "fec0::a:0:0:4",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 24
+                }
+            ]
+        }
     }
 }

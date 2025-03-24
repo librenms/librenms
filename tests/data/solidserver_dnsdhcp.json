@@ -1037,8 +1037,8 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2876,5 +2876,38 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0010",
+                    "ipv6_compressed": "2a0b:6880:0:1::10",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "2a0b:6880:0:1::/64",
+                    "ifIndex": 6
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0000:0000:0000:0001",
+                    "ipv6_compressed": "fe80::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:6e2b:59ff:fe86:3f1e",
+                    "ipv6_compressed": "fe80::6e2b:59ff:fe86:3f1e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 6
+                }
+            ]
+        }
     }
 }

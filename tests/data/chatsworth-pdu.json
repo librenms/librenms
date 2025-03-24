@@ -7247,5 +7247,20 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:020e:d3ff:fe00:ad21",
+                    "ipv6_compressed": "fe80::20e:d3ff:fe00:ad21",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

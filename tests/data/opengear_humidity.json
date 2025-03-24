@@ -2065,5 +2065,29 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2001:0400:e600:2420:0000:0000:0000:0002",
+                    "ipv6_compressed": "2001:400:e600:2420::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:400:e600:2420::/64",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0213:c6ff:fe05:ffed",
+                    "ipv6_compressed": "fe80::213:c6ff:fe05:ffed",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }
