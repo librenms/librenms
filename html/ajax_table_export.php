@@ -26,7 +26,17 @@ $_REQUEST['export'] = true;
 $current = $_REQUEST['current'];
 settype($current, 'integer');
 $rowCount = -1;
+$sort = '';
 
+if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
+    foreach ($_REQUEST['sort'] as $k => $v) {
+        $k = preg_replace('/[^A-Za-z0-9_]/', '', $k); // only allow plain columns
+        $v = strtolower($v) == 'desc' ? 'DESC' : 'ASC';
+        $sort .= " $k $v";
+    }
+}
+
+$searchPhrase = $_REQUEST['searchPhrase'];
 $id = basename($_REQUEST['id']);
 
 if ($id && file_exists("includes/html/table/$id.inc.php")) {

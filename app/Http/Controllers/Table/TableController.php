@@ -101,6 +101,11 @@ abstract class TableController extends PaginatedAjaxController
     public function export(Request $request)
     {
         $query = $this->prepareExportQuery($request);
+        
+        if ($request->has('sort')) {
+            $this->sort($request, $query);
+        }
+        
         $data = $query->get();
 
         // Check if model property is set and is a valid class
