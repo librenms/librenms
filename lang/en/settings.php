@@ -1119,7 +1119,7 @@ return [
             ],
             'debug' => [
                 'description' => 'Debug',
-                'help' => 'To enable or disable verbose output to CLI',
+                'help' => 'A comma-separated list of debug contexts to enable. Detailed Producer debugging: broker,topic,msg. Consumer: consumer,cgrp,topic,fetch Type: CSV flags',
             ],
             'security' => [
                 'debug' => [
@@ -1129,13 +1129,13 @@ return [
             ],
             'broker' => [
                 'list' => [
-                    'description' => 'Broker\'s servers list',
-                    'help' => 'List as csv of kafka broker\'s servers',
+                    'description' => 'Initial list of kakfa brokers as a CSV list of broker host or host:port',
+                    'help' => 'Initial list of kakfa brokers as a CSV list of broker host or host:port. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
                 ],
             ],
             'idempotence' => [
                 'description' => 'Idempotence',
-                'help' => 'Producer idempotence ensures that duplicates are not introduced due to unexpected retries',
+                'help' => 'When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order',
             ],
             'topic' => [
                 'description' => 'Topic',
@@ -1148,38 +1148,38 @@ return [
                 ],
                 'protocol' => [
                     'description' => 'SSL Protocol',
-                    'help' => 'The SSL protocol to be used in Kafka. Default "ssl"',
+                    'help' => 'Protocol used to communicate with brokers',
                 ],
                 'ca' => [
                     'location' => [
                         'description' => 'SSL Certificate Authority Location',
-                        'help' => 'The SSL CA file path location to be used in Kafka',
+                        'help' => 'File or directory path to CA certificate(s) for verifying the broker\'s key.',
                     ],
                 ],
                 'certificate' => [
                     'location' => [
                         'description' => 'SSL Certificate Location',
-                        'help' => ' The SSL Certificate file location to be used in Kafka',
+                        'help' => 'Path to client\'s public key (PEM) used for authentication.',
                     ],
                 ],
                 'key' => [
                     'location' => [
                         'description' => 'SSL Certificate Key Location',
-                        'help' => 'The SSL certificate key file location to be used in Kafka',
+                        'help' => 'Path to client\'s private key (PEM) used for authentication.',
                     ],
                     'password' => [
                         'description' => 'SSL Certificate Key Password',
-                        'help' => 'The SSL certificate key\'s password to be used in Kafka',
+                        'help' => 'Private key passphrase (to be used with kafka.ssl.key.location).',
                     ],
                 ],
                 'keystore' => [
                     'location' => [
                         'description' => 'SSL Keystore Certificate Location',
-                        'help' => 'The SSL Keystore file location to be used in kafka',
+                        'help' => 'Path to client\'s keystore (PKCS#12) used for authentication.',
                     ],
                     'password' => [
                         'description' => 'SSL Keystore Key Password',
-                        'help' => 'The SSL Keystore file key password to be used in kafka',
+                        'help' => 'Client\'s keystore (PKCS#12) password.',
                     ],
                 ],
             ],
@@ -1187,6 +1187,36 @@ return [
                 'timeout' => [
                     'description' => 'Kafka Flush Timeout',
                     'help' => 'Kafka wait this timeout to flush messages in queue',
+                ],
+            ],
+            'buffer' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Kafka buffer maximum number of messages hold in poller memory',
+                        'help' => 'Kafka buffer maximum number of allowed messages hold in poller memory',
+                    ],
+                ],
+            ],
+            'batch' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Kafka batch maximum number of messages sent each call to kafka servers',
+                        'help' => 'Kafka batch maximum number of messages sent each call to kafka servers',
+                    ],
+                ],
+            ],
+            'linger' => [
+                'ms' => [
+                    'description' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
+                    'help' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
+                ],
+            ],
+            'request' => [
+                'required' => [
+                    'acks' => [
+                        'description' => 'Kafka request required acks',
+                        'help' => 'Kafka request required acks',
+                    ],
                 ],
             ],
         ],
