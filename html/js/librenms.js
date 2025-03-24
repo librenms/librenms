@@ -139,7 +139,7 @@ function resizeend() {
         newW=$(window).width();
         timeout = false;
         if(Math.abs(oldW - newW) >= 200)
-        {
+{
             refresh = true;
         }
         else {
@@ -240,25 +240,30 @@ $(document).ready(function () {
 });
 
 // Add export button to bootgrid tables
-$(document).on('initialized.rs.jquery.bootgrid', function(e) {
+$(document).on('initialized.rs.jquery.bootgrid', function (e) {
     var grid = $(e.target);
     var tableId = grid.attr('id');
-    
+
     if ($('#' + tableId + '-export-button').length === 0) {
         var exportUrl = grid.data('ajaxurl');
-        // legacy table
-        if (exportUrl && exportUrl.indexOf('ajax_table_export.php') === -1) {
+        var isLegacy = exportUrl && exportUrl.indexOf('ajax_table_export.php') !== -1;
+
+        if (exportUrl && !isLegacy) {
             exportUrl += '/export';
         }
 
         if (exportUrl) {
             var actionsContainer = null;
-            var panel = grid.closest('.panel');
-            
-            if (panel.length) {
-                actionsContainer = panel.find('div.actions');
+
+            if (isLegacy) {
+                actionsContainer = grid.closest('div.col-md-12').find('div.bootgrid-header div.actions');
+            } else {
+                var panel = grid.closest('div.panel');
+                if (panel.length) {
+                    actionsContainer = panel.find('div.actions');
+                }
             }
-            
+
             if (actionsContainer && actionsContainer.length) {
                 var exportButton = $(
                     '<div id="' + tableId + '-export-button" class="btn-group mr-2 bootgrid-export-button">' +
@@ -270,7 +275,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function(e) {
                     '</ul>' +
                     '</div>'
                 );
-                
+
                 actionsContainer.prepend(exportButton);
             }
         }
