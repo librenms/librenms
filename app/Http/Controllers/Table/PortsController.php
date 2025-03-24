@@ -217,7 +217,7 @@ class PortsController extends TableController
 
         return [
             'device_id' => $port->device_id,
-            'hostname' => $port->device->hostname,
+            'hostname' => $port->device->displayName(),
             'port' => $port->ifName ?: $port->ifDescr,
             'ifindex' => $port->ifIndex,
             'status' => $status,

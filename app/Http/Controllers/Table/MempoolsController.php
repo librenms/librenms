@@ -165,10 +165,9 @@ class MempoolsController extends TableController
     protected function formatExportRow($mempool)
     {
         $is_percent = $mempool->mempool_total == 100;
-
         return [
             'device_id' => $mempool->device_id,
-            'hostname' => $mempool->device->hostname,
+            'hostname' => $mempool->device->displayName(),
             'description' => $mempool->mempool_descr,
             'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
             'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),

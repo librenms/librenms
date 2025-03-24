@@ -17,6 +17,7 @@
 */
 
 use LibreNMS\Config;
+use App\Facades\DeviceCache;
 
 $graph_type = $vars['graph_type'];
 $unit = $vars['unit'];
@@ -66,6 +67,7 @@ $sql = "SELECT * $sql";
 
 if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
     $headers = [
+        'Device ID',
         'Device',
         'Sensor',
         'Current',
@@ -131,14 +133,16 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
 
     if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
-        $device_name = $sensor['hostname'];
+        $deviceModel = DeviceCache::get((int) $sensor['device_id']);
+        $device_id = $sensor['device_id'];
         $sensor_descr = $sensor['sensor_descr'];
         $current_val = strip_tags($sensor_current);
         $limit_low = is_null($sensor['sensor_limit_low']) ? '' : $sensor['sensor_limit_low'] . $unit;
         $limit_high = is_null($sensor['sensor_limit']) ? '' : $sensor['sensor_limit'] . $unit;
 
         fputcsv($output, [
-            $device_name,
+            $device_id,
+            $deviceModel->displayName(),
             $sensor_descr,
             $current_val,
             $limit_low,

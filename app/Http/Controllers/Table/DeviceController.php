@@ -401,7 +401,7 @@ class DeviceController extends TableController
 
         return [
             'device_id' => $device->device_id,
-            'hostname' => $device->hostname,
+            'hostname' => $device->displayName(),
             'ip' => $device->ip,
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => Config::getOsSetting($device->os, 'text', $device->os),
