@@ -204,7 +204,9 @@ abstract class TableController extends PaginatedAjaxController
         return response()->stream(
             function () use ($data, $headers) {
                 $output = fopen('php://output', 'w');
-
+                
+                fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+                
                 fputcsv($output, $headers);
 
                 foreach ($data as $item) {
@@ -216,7 +218,7 @@ abstract class TableController extends PaginatedAjaxController
             },
             200,
             [
-                'Content-Type' => 'text/csv',
+                'Content-Type' => 'text/csv; charset=UTF-8',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
                 'Pragma' => 'no-cache',
                 'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',

@@ -30,13 +30,15 @@ $rowCount = -1;
 $id = basename($_REQUEST['id']);
 
 if ($id && file_exists("includes/html/table/$id.inc.php")) {
-    // Set proper headers for CSV download
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=' . $id . '-' . date('Y-m-d') . '.csv');
 
     $output = fopen('php://output', 'w');
-
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+    mb_internal_encoding('UTF-8');
     include_once "includes/html/table/$id.inc.php";
+    
+    fclose($output);
 } else {
     http_response_code(404);
     echo 'Table not found';
