@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InventoryController.php
  *
@@ -128,5 +129,4 @@ class InventoryController extends TableController
             $entPhysical->entPhysicalSerialNum,
         ];
     }
-
 }

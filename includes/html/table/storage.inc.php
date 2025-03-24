@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -15,8 +16,8 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Util\Number;
 use App\Facades\DeviceCache;
+use LibreNMS\Util\Number;
 
 $graph_type = 'storage_usage';
 

@@ -1,5 +1,4 @@
 <?php
-use App\Facades\DeviceCache;
 
 $device_id = $vars['device_id'];
 
