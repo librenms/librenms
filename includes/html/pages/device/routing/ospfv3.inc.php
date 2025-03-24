@@ -26,7 +26,7 @@ $instances = DeviceCache::getPrimary()->ospfv3Instances()
     ->with([
         'areas.ospfv3Ports',
         'nbrs.port',
-        'ospfv3Ports.port'
+        'ospfv3Ports.port',
     ])->get();
 
 foreach ($instances as $instance) {

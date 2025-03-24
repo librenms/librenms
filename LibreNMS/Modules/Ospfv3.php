@@ -66,7 +66,7 @@ class Ospfv3 implements Module
      */
     public function discover(OS $os): void
     {
-        Log::info("Processes: ");
+        Log::info('Processes: ');
         $instances = new Collection;
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
             // Check for instance data
@@ -326,8 +326,8 @@ class Ospfv3 implements Module
         $ospf_port->context_name = $instance->context_name;
 
         // only search for port during discovery
-        if(count($data) > 5) {
-            $ospf_port->port_id = (int)PortCache::getIdFromIfIndex($ospfv3IfIndex, $instance->device_id);
+        if (count($data) > 5) {
+            $ospf_port->port_id = (int) PortCache::getIdFromIfIndex($ospfv3IfIndex, $instance->device_id);
         }
 
         if (array_key_exists('ospfv3IfDesignatedRouter', $data)) {
@@ -359,7 +359,7 @@ class Ospfv3 implements Module
 
         $ospfv3NbrAddress = $this->parseNeighborAddress($data);
         // only search for port during discovery
-        if(count($data) > 2) {
+        if (count($data) > 2) {
             // Needs searching by Link-Local addressing, but those do not appear to be indexed.
             $ospf_nbr->port_id = PortCache::getIdFromIp($ospfv3NbrAddress, $instance->context_name); // search all devices
         }
@@ -415,8 +415,7 @@ class Ospfv3 implements Module
         $ospf_port['ospfv3IfBackupDesignatedRouter'] ??= '';  // missing on some devices
 
         $port->fill($ospf_port);
-        $port->port_id = (int)PortCache::getIdFromIfIndex($port->ospfv3IfIndex, $port->device_id); // this was skipped in initial poll
-
+        $port->port_id = (int) PortCache::getIdFromIfIndex($port->ospfv3IfIndex, $port->device_id); // this was skipped in initial poll
     }
 
     public function fetchAndFillNeighbor(Ospfv3Nbr $nbr): void

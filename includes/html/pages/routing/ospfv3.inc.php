@@ -22,7 +22,7 @@ echo '
         </thead>
         <tbody>';
 $instances = Ospfv3Instance::with([
-    'device'
+    'device',
 ])->withCount([
     'areas',
     'ospfv3Ports',
