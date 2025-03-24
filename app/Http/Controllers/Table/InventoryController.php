@@ -129,5 +129,4 @@ class InventoryController extends TableController
             $entPhysical->entPhysicalSerialNum,
         ];
     }
-
 }

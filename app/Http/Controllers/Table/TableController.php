@@ -101,11 +101,11 @@ abstract class TableController extends PaginatedAjaxController
     public function export(Request $request)
     {
         $query = $this->prepareExportQuery($request);
-        
+
         if ($request->has('sort')) {
             $this->sort($request, $query);
         }
-        
+
         $data = $query->get();
 
         // Check if model property is set and is a valid class
@@ -209,9 +209,9 @@ abstract class TableController extends PaginatedAjaxController
         return response()->stream(
             function () use ($data, $headers) {
                 $output = fopen('php://output', 'w');
-                
-                fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
-                
+
+                fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
                 fputcsv($output, $headers);
 
                 foreach ($data as $item) {

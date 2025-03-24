@@ -44,10 +44,10 @@ if ($id && file_exists("includes/html/table/$id.inc.php")) {
     header('Content-Disposition: attachment; filename=' . $id . '-' . date('Y-m-d-His') . '.csv');
 
     $output = fopen('php://output', 'w');
-    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+    fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
     mb_internal_encoding('UTF-8');
     include_once "includes/html/table/$id.inc.php";
-    
+
     fclose($output);
 } else {
     http_response_code(404);

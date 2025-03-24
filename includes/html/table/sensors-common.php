@@ -16,8 +16,8 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
 use App\Facades\DeviceCache;
+use LibreNMS\Config;
 
 $graph_type = $vars['graph_type'];
 $unit = $vars['unit'];

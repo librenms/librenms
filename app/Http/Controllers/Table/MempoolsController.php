@@ -165,6 +165,7 @@ class MempoolsController extends TableController
     protected function formatExportRow($mempool)
     {
         $is_percent = $mempool->mempool_total == 100;
+
         return [
             'device_id' => $mempool->device_id,
             'hostname' => $mempool->device->displayName(),
