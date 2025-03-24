@@ -1,4 +1,5 @@
 <?php
+
 /**
  * applications.inc.php
  *

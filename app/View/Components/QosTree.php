@@ -16,9 +16,9 @@ class QosTree extends Component
      */
     public function __construct(
         public Collection $qosItems,
-        public int|null $parentPortId = null,
-        public int|null $parentQosId = null,
-        public int|null $show = null,
+        public ?int $parentPortId = null,
+        public ?int $parentQosId = null,
+        public ?int $show = null,
     ) {
         if (! is_null($parentQosId)) {
             $this->listItems = $qosItems->where('parent_id', $parentQosId)->sortBy('title');

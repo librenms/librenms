@@ -1,4 +1,5 @@
 <?php
+
 /**
  * nokia-isam.inc.php
  *

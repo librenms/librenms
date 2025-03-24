@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HostUnreachableSnmpException.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rewrite.php
  *

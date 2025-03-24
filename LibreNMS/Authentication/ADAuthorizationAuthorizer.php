@@ -16,7 +16,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     protected static $AUTH_IS_EXTERNAL = true;
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected Connection|null $ldap_connection = null;
+    protected ?Connection $ldap_connection = null;
 
     public function __construct()
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * AuthenticateGraph.php
  *

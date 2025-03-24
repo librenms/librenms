@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ErrorReportingProvider.php
  *

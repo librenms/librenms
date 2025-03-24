@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-notes.inc.php
  *

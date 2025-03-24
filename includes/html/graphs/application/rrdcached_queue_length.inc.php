@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rrdcached_queue_length.inc.php
  *

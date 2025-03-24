@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HostUnreachablePingException.php
  *

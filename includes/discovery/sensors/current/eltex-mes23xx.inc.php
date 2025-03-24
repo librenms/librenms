@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-mes23xx SFP current
  *

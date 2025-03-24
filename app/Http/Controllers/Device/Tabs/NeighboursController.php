@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NeighboursController.php
  *

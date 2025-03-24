@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RunAlertRulesAction.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SnmpQueryMock.php
  *

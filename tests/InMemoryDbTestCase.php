@@ -1,4 +1,5 @@
 <?php
+
 /*
  * InMemoryDbTestCase.php
  *

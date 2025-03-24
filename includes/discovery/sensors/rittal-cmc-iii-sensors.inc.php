@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rittal-cmc-iii-sensors.inc.php
  *

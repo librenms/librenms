@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SimpleTemplate.php
  *

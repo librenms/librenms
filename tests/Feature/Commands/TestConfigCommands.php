@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TestSetConfigCommand.php
  *

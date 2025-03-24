@@ -1,4 +1,5 @@
 <?php
+
 /**
  * YamlSchemaTest.php
  *

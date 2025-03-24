@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * composer_wrapper.php
  *

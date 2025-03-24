@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VmwPowerStateTest.php
  * -Description-

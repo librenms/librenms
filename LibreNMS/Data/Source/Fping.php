@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Fping.php
  *

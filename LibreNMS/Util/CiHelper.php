@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiHelper.php
  *
@@ -34,7 +35,7 @@ class CiHelper
     private ?array $os = null;
     private array $unitEnv = [];
     private array $duskEnv = ['APP_ENV' => 'testing'];
-    private Snmpsim|null $snmpsim = null;
+    private ?Snmpsim $snmpsim = null;
 
     private array $completedChecks = [
         'lint' => false,

@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
  * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
  * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
