@@ -53,7 +53,7 @@ class Ospfv3 implements Module
      */
     public function dependencies(): array
     {
-        return ['ports'];
+        return ['ports', 'vrf'];
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
