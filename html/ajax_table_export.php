@@ -31,7 +31,7 @@ $id = basename($_REQUEST['id']);
 
 if ($id && file_exists("includes/html/table/$id.inc.php")) {
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=' . $id . '-' . date('Y-m-d') . '.csv');
+    header('Content-Disposition: attachment; filename=' . $id . '-' . date('Y-m-d-His') . '.csv');
 
     $output = fopen('php://output', 'w');
     fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
