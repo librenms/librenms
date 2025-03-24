@@ -16,6 +16,7 @@
 */
 
 use LibreNMS\Util\Number;
+use App\Facades\DeviceCache;
 
 $graph_type = 'storage_usage';
 
@@ -64,6 +65,7 @@ $sql = "SELECT * $sql";
 
 if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
     $headers = [
+        'Device ID',
         'Device',
         'Storage',
         'Size',
@@ -96,11 +98,13 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
-        $device_name = $drive['hostname'];
+        $deviceModel = DeviceCache::get((int) $drive['device_id']);
+        $device_id = $drive['device_id'];
         $storage_descr = $drive['storage_descr'];
 
         fputcsv($output, [
-            $device_name,
+            $device_id,
+            $deviceModel->displayName(),
             $storage_descr,
             $total,
             $used,

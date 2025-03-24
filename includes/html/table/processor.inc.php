@@ -15,6 +15,8 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Facades\DeviceCache;
+
 $graph_type = 'processor_usage';
 $where = 1;
 $sql = ' FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id`';
@@ -57,6 +59,7 @@ $sql = "SELECT * $sql";
 
 if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
     $headers = [
+        'Device ID',
         'Device',
         'Processor',
         'Usage',
@@ -82,12 +85,14 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, $perc . '%', 'ffffff', $background['left'], (100 - $perc) . '%', 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
-        $device_name = $processor['hostname'];
+        $deviceModel = DeviceCache::get((int) $processor['device_id']);
+        $device_id = $processor['device_id'];
         $processor_descr = $processor['processor_descr'];
         $usage = $perc . '%';
 
         fputcsv($output, [
-            $device_name,
+            $device_id,
+            $deviceModel->displayName(),
             $processor_descr,
             $usage,
         ]);
