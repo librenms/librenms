@@ -3,7 +3,7 @@
 echo 'Datacom';
 
 $multiplier = 1;
-$divisor = 100;
+$divisor = 1;
 foreach ($pre_cache['datacom_oids'] as $index => $entry) {
     if (is_numeric(str_replace('dBm', '', $entry['ddTransceiversRxPower']))) {
         $oid = '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.' . $index;
