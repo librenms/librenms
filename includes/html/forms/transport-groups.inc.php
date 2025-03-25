@@ -1,4 +1,5 @@
 <?php
+
 /**
  * transport-groups.inc.php
  *
@@ -45,7 +46,7 @@ foreach ((array) $vars['members'] as $target) {
 if (empty($name)) {
     $status = 'error';
     $message = 'No transport group name provided';
-} elseif (sizeof($target_members) < 1) {
+} elseif (count($target_members) < 1) {
     // Not enough members for a group; requires 1 at least
     $status = 'error';
     $message = 'Not enough group members';

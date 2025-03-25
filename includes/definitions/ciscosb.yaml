@@ -42,6 +42,10 @@ discovery:
             - .1.3.6.1.4.1.9.6.1.34. # ciscowap
             - .1.3.6.1.4.1.9.6.1.37. # ciscowlc
     -
+        sysDescr:
+            - 'Catalyst 1200 Series'
+            - 'Catalyst 1300 Series'
+    -
         sysDescr_regex:
             - '/^Linksys SLM/'
     -

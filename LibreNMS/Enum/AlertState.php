@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alert.php
  *
@@ -32,5 +33,6 @@ abstract class AlertState
     const ACKNOWLEDGED = 2;
     const WORSE = 3;
     const BETTER = 4;
+    const CHANGED = 5;
     const RECOVERED = 0;
 }

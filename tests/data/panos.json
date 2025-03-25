@@ -5994,89 +5994,56 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1040",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Config Partition",
                     "storage_size": 8522227712,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3710603264,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1040",
+                    "storage_free": 4811624448,
+                    "storage_free_oid": null,
+                    "storage_perc": 44,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1041",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Log Partition",
                     "storage_size": 5326372864,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3974123520,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1041",
+                    "storage_free": 1352249344,
+                    "storage_free_oid": null,
+                    "storage_perc": 75,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1042",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Root Partition",
                     "storage_size": 7456874496,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3548856320,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1042",
+                    "storage_free": 3908018176,
+                    "storage_free_oid": null,
+                    "storage_perc": 48,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1040",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Config Partition",
-                    "storage_size": 8522227712,
-                    "storage_units": 1024,
-                    "storage_used": 3710603264,
-                    "storage_free": 4811624448,
-                    "storage_perc": 44,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1041",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Log Partition",
-                    "storage_size": 5326372864,
-                    "storage_units": 1024,
-                    "storage_used": 3974123520,
-                    "storage_free": 1352249344,
-                    "storage_perc": 75,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1042",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Root Partition",
-                    "storage_size": 7456874496,
-                    "storage_units": 1024,
-                    "storage_used": 3548856320,
-                    "storage_free": 3908018176,
-                    "storage_perc": 48,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

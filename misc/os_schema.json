@@ -132,6 +132,9 @@
                 "ospf": {
                     "type": "boolean"
                 },
+                "ospfv3": {
+                    "type": "boolean"
+                },
                 "ucd-diskio": {
                     "type": "boolean"
                 },
@@ -160,9 +163,6 @@
                     "type": "boolean"
                 },
                 "aruba-controller": {
-                    "type": "boolean"
-                },
-                "cisco-asa-firewall": {
                     "type": "boolean"
                 },
                 "mib": {
@@ -457,6 +457,18 @@
             "type": "boolean"
         },
         "ignore_mount_string": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ignore_mount_regexp": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ignore_mount_type": {
             "type": "array",
             "items": {
                 "type": "string"

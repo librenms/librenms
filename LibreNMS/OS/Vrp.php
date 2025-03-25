@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Vrp.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -55,6 +57,7 @@ use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -99,14 +102,11 @@ class Vrp extends OS implements
 
     public function discoverTransceivers(): Collection
     {
-        // Get a map of ifIndex to port_id for proper association with ports
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         // EntityPhysicalIndex to ifIndex
         $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
         // Walk through the MIB table for transceiver information
-        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex, $ifIndexToPortId) {
+        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
             // Skip inactive transceivers
             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
                 return null;
@@ -146,7 +146,7 @@ class Vrp extends OS implements
                 $wavelength = null;
             }
             $ifIndex = $entityToIfIndex[$entIndex];
-            $port_id = $ifIndexToPortId->get($ifIndex) ?? null;
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
             if (is_null($port_id)) {
                 // Invalid
                 return null;
@@ -482,21 +482,20 @@ class Vrp extends OS implements
             foreach ($hwAccessOids as $hwAccessOid) {
                 $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), $hwAccessOid, $portAuthSessionEntry, 'HUAWEI-AAA-MIB');
             }
-            // We cache a port_ifName -> port_id map
-            $ifName_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
 
             // update the DB
             foreach ($portAuthSessionEntry as $authId => $portAuthSessionEntryParameters) {
                 if (! array_key_exists('hwAccessInterface', $portAuthSessionEntryParameters) || ! array_key_exists('hwAccessMACAddress', $portAuthSessionEntryParameters)) {
                     continue;
                 }
-                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['hwAccessMACAddress']))));
-                $port_id = $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0);
-                if ($port_id <= 0) {
+
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['hwAccessMACAddress'])->hex();
+                $port_id = PortCache::getIdFromIfName($portAuthSessionEntryParameters['hwAccessInterface'], $this->getDevice());
+                if ($port_id === null) {
                     continue; //this would happen for an SSH session for instance
                 }
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
+                    'port_id' => (int) $port_id,
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
                     'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? '',

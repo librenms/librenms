@@ -24,7 +24,7 @@ foreach ($log_sets as $index => $log_set) {
     }
 }
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant log set RRDs found');
 }
 

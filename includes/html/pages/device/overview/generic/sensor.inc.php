@@ -1,6 +1,9 @@
 <?php
 
-$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver'); // cache all sensors on device and exclude transceivers
+$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
+    ['group', 'asc'],
+    ['sensor_descr', 'asc'],
+]); // cache all sensors on device and exclude transceivers
 
 if ($sensors->isNotEmpty()) {
     $icons = \App\Models\Sensor::getIconMap();
@@ -66,7 +69,7 @@ if ($sensors->isNotEmpty()) {
         $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
         echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class) . '</div>
             </div></td></tr>';

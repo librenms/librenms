@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Ospfv3Nbr;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -332,6 +333,8 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+            } elseif ($device['os'] == 'routeros') {
+                $ifIndex = $entry_key;
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
@@ -401,7 +404,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
                 if ($remote_device['os'] == 'xos') {
                     $slot_port = explode(':', $remote_port_name);
-                    if (sizeof($slot_port) == 2) {
+                    if (count($slot_port) == 2) {
                         $n_slot = (int) $slot_port[0];
                         $n_port = (int) $slot_port[1];
                     } else {
@@ -480,6 +483,35 @@ if (Config::get('autodiscovery.ospf') === true) {
 
             $name = gethostbyaddr($ip);
             $remote_device_id = discover_new_device($name, $device, 'OSPF');
+        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+            //
+        }
+    }
+    echo PHP_EOL;
+}
+
+if (Config::get('autodiscovery.ospfv3') === true) {
+    echo ' OSPFv3 Discovery: ';
+    $ospf_nbrs = Ospfv3Nbr::select('ospfv3NbrAddress', 'device_id')
+       ->distinct()
+       ->where('device_id', $device['device_id'])
+       ->get();
+    foreach ($ospf_nbrs as $nbr) {
+        try {
+            $ip = IP::parse($nbr->ospfv3NbrAddress);
+
+            if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+                echo 'x';
+                continue;
+            }
+
+            if (! $ip->inNetworks(Config::get('nets'))) {
+                echo 'i';
+                continue;
+            }
+
+            $name = gethostbyaddr($ip);
+            $remote_device_id = discover_new_device($name, $device, 'OSPFv3');
         } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
             //
         }

@@ -363,7 +363,10 @@ fapPoeMode OBJECT-TYPE
                           ieee8023Af(1),
                           ieee8023At(2),
                           powerAdapter(3),
-                          acControlled(4) }
+                          acControlled(4),
+                          fullPowerMode(5),
+                          highPowerMode(6),
+                          lowPowerMode(7) }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -409,7 +412,10 @@ fapPoeModeOper OBJECT-TYPE
                               ieee8023Af(1),
                               ieee8023At(2),
                               powerAdapter(3),
-                              acControlled(4) }
+                              acControlled(4),
+                              fullPowerMode(5),
+                              highPowerMode(6),
+                              lowPowerMode(7) }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -647,7 +653,8 @@ fapDataChannelStatus OBJECT-TYPE
 fapDataChannelSecurityOper OBJECT-TYPE
         SYNTAX      INTEGER { clear(0),
                               dtls(1),
-                              ipsec(2) }
+                              ipsec(2),
+                              ipsecsn(3) }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -685,6 +692,14 @@ fapWtpLocation OBJECT-TYPE
     DESCRIPTION
         "Physical location of the FortiAP."
     ::= { fapWTPStatus 36 }
+
+fapFortiPresenceServerFQDN OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The Forti presence server(fqdn) name."
+        ::= { fapWTPStatus 37 }
 
 -- fortinet.fnFortiAPMib.fapRadioTables
 fapRadioTables OBJECT IDENTIFIER
@@ -742,8 +757,8 @@ FapRadioEntry ::= SEQUENCE {
     }
 
 fapRadioIndex OBJECT-TYPE
-        SYNTAX      Integer32 (0..2)
-        MAX-ACCESS  not-accessible 
+        SYNTAX      Integer32 (0..3)
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
             "Radio index number."
@@ -798,7 +813,14 @@ fapRadioType OBJECT-TYPE
                               ieee80211n(7),
                               ieee80211ax24G(8),
                               ieee80211ax5G(9),
-                              ieee80211ax(10) }
+                              ieee80211ax(10),
+                              ieee80211ax6G(11),
+
+                              ieee80211be24G(12),
+                              ieee80211be5G(13),
+                              ieee80211be(14),
+                              ieee80211be6G(15),
+                              radioTypeInvalid(255) }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
@@ -850,11 +872,14 @@ fapRadioChannelWidth OBJECT-TYPE
         SYNTAX      INTEGER { bw20Mhz(0),
                               bw40Mhz(1),
                               bw80Mhz(2),
-                              bw160Mhz(3) }
+                              bw160Mhz(3),
+                              bw8080Mhz(4),
+                              bw240Mhz(5),
+                              bw320Mhz(6) }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Channel bandwidth: 160, 80, 40, or 20MHz."
+            "Channel bandwidth: 320, 240, 80_80, 160, 80, 40, or 20MHz."
         ::= { fapRadioEntry 12 }
 
 fapRadioSGI OBJECT-TYPE
@@ -1006,7 +1031,7 @@ fapRadioHwChannelList OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Hareware supported channel list."
+        "Hardware supported channel list."
     ::= { fapRadioEntry 29 }
 
 fapRadioNolChannelList OBJECT-TYPE
@@ -1134,12 +1159,14 @@ FapVapEntry ::= SEQUENCE {
         fapVapSecondaryWag       DisplayString,
         fapVapCurrentWag         DisplayString,
         fapVapTunEchoIntv        Integer32,
-        fapVapTunFallbackTimeout Integer32
+        fapVapTunFallbackTimeout Integer32,
+        fapVap80211k             INTEGER,
+        fapVap80211v             INTEGER
     }
 
 fapVapRadioId OBJECT-TYPE
     SYNTAX      Integer32 (0..2)
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "Index number of the radio."
@@ -1147,7 +1174,7 @@ fapVapRadioId OBJECT-TYPE
 
 fapVapWlanId OBJECT-TYPE
     SYNTAX      Integer32 (0..15)
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "Index number of the WLAN."
@@ -1618,6 +1645,24 @@ fapVapTunFallbackTimeout OBJECT-TYPE
          the configured primary tunnel."
     ::= { fapVapEntry 56 }
 
+fapVap80211k OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable 80211k on the VAP."
+    ::= { fapVapEntry 57 }
+
+fapVap80211v OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable 80211v on the VAP."
+    ::= { fapVapEntry 58 }
+
 -- fortinet.fnFortiAPMib.fapStationTables
 fapStationTables OBJECT IDENTIFIER
     ::= { fnFortiAPMib 8 }
@@ -1652,7 +1697,7 @@ FapStationEntry ::= SEQUENCE {
 
 fapStaRadioId OBJECT-TYPE
     SYNTAX      Integer32 (0..2)
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "Index number of the radio."
@@ -1668,7 +1713,7 @@ fapStaWlanId OBJECT-TYPE
 
 fapStaMacAddr OBJECT-TYPE
     SYNTAX      PhysAddress  (SIZE(6|8))
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "MAC address of the connected station."
@@ -1752,7 +1797,7 @@ FapWagEntry ::= SEQUENCE {
 
 fapWagTunType OBJECT-TYPE
     SYNTAX      INTEGER { l2tp(1), gre(2) }
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "The tunnel type of the WAG. It's one of indexes for the WAG entry."
@@ -1865,18 +1910,32 @@ fapWagDhcpAddr OBJECT-TYPE
 --
 -- fortinet.fnFortiAPMib.fapModel
 --
--- Model_number(e.g. 221, 249 for 24J) + FAP_family(FAP=1, FAP-U=2, FAP-S=3, FAP-C=4) + 
--- FAP_Generation (E=1, F=2, G=3, …)
+-- Model_number(e.g. 221, 249 for 24J) + FAP_family(FAP=1, FAP-U=2, FAP-S=3, FAP-C=4) +
+-- FAP_Generation (E=1, F=2, G=3, K=4, …) + FAP_Variant (Light=1, Rugged=2)
 fapModel OBJECT IDENTIFIER ::= { fnFortiAPMib 10 }
 
 -- fapModel start
 
 fap231f          OBJECT IDENTIFIER ::= { fapModel 23112 }
+fap231fl         OBJECT IDENTIFIER ::= { fapModel 231121 }
+fap231g          OBJECT IDENTIFIER ::= { fapModel 23113 }
+fap233g          OBJECT IDENTIFIER ::= { fapModel 23313 }
 fap234f          OBJECT IDENTIFIER ::= { fapModel 23412 }
+fap234g          OBJECT IDENTIFIER ::= { fapModel 23413 }
 fap23jf          OBJECT IDENTIFIER ::= { fapModel 23912 }
+fap241k          OBJECT IDENTIFIER ::= { fapModel 24114 }
+fap243k          OBJECT IDENTIFIER ::= { fapModel 24314 }
 fap431f          OBJECT IDENTIFIER ::= { fapModel 43112 }
+fap431fl         OBJECT IDENTIFIER ::= { fapModel 431121 }
+fap431g          OBJECT IDENTIFIER ::= { fapModel 43113 }
 fap432f          OBJECT IDENTIFIER ::= { fapModel 43212 }
+fap432fr         OBJECT IDENTIFIER ::= { fapModel 432122 }
+fap432g          OBJECT IDENTIFIER ::= { fapModel 43213 }
 fap433f          OBJECT IDENTIFIER ::= { fapModel 43312 }
+fap433fl         OBJECT IDENTIFIER ::= { fapModel 433121 }
+fap433g          OBJECT IDENTIFIER ::= { fapModel 43313 }
+fap441k          OBJECT IDENTIFIER ::= { fapModel 44114 }
+fap443k          OBJECT IDENTIFIER ::= { fapModel 44314 }
 fap831f          OBJECT IDENTIFIER ::= { fapModel 83112 }
 
 fap221e          OBJECT IDENTIFIER ::= { fapModel 22111 }
@@ -1931,8 +1990,8 @@ fapTrapObjectGroup OBJECT-GROUP
     ::= { fapMibConformance 2 }
 
 fapSysCommGroup OBJECT-GROUP
-    OBJECTS { fapVersion, fapSerialNum, fapHostName, 
-              fapRegionCode, fapBaseMacAddr, fapBiosVer, 
+    OBJECTS { fapVersion, fapSerialNum, fapHostName,
+              fapRegionCode, fapBaseMacAddr, fapBiosVer,
               fapBiosDataVer, fapSysPartNum}
     STATUS      current
     DESCRIPTION
@@ -1955,14 +2014,14 @@ fapWtpConfGroup OBJECT-GROUP
 
 fapWtpStatusGroup OBJECT-GROUP
     OBJECTS { fapAcDiscoveryType, fapCtlmsgOffload, fapAcCertVersion, fapPoeModeOper,
-              fapLedMode, fapAllowAccess, fapLldpAccess, fapRadioCount, fapStationInfo, 
+              fapLedMode, fapAllowAccess, fapLldpAccess, fapRadioCount, fapStationInfo,
               fapEchoInterval, fapKeepAliveInterval, fapRetransmitMax, fapDcDeadInterval,
               fapDiscoveryInterval, fapReportInterval, fapStationStatsInterval, fapVapStatsInterval,
-              fapRadioStatsInterval, fapStationCapInterval, fapIdleTimeout, fapStatisticsInterval, 
+              fapRadioStatsInterval, fapStationCapInterval, fapIdleTimeout, fapStatisticsInterval,
               fapFortiPresenceInterval, fapFsmState, fapWtpIpAddr, fapAcIpAddr, fapAcPort,
               fapIpFragmentPrevent, fapAeroScout, fapLanMode, fapLanPortCount, fapDataChannelStatus,
-              fapDataChannelSecurityOper, fapFortiPresenceServer, fapFortiPresencePort, fapFortiPresenceProject, 
-              fapWtpLocation }
+              fapDataChannelSecurityOper, fapFortiPresenceServer, fapFortiPresencePort, fapFortiPresenceProject,
+              fapWtpLocation, fapFortiPresenceServerFQDN}
     STATUS      current
     DESCRIPTION
         "Object pertaining to the status of the AP."
@@ -1970,12 +2029,12 @@ fapWtpStatusGroup OBJECT-GROUP
 
 fapRadioGroup OBJECT-GROUP
     OBJECTS { fapRadioMode, fapRadioCountry, fapRadioCountryId, fapRadioStationInfo,
-              fapRadioType, fapRadioHT2040Coexist, fapRadioBeaconInterval, fapRadioTxPowerConfig, 
-              fapRadioTxPowerOper, fapRadioTxPowerMax, fapRadioChannelWidth, fapRadioSGI, 
+              fapRadioType, fapRadioHT2040Coexist, fapRadioBeaconInterval, fapRadioTxPowerConfig,
+              fapRadioTxPowerOper, fapRadioTxPowerMax, fapRadioChannelWidth, fapRadioSGI,
               fapRadioChannelOper, fapRadioChannelUtil, fapRadioSensorMode, fapRadioApScan,
-              fapRadioApScanPeriod, fapRadioApScanInterval, fapRadioApScanDuration, fapRadioApScanIdleTime, 
+              fapRadioApScanPeriod, fapRadioApScanInterval, fapRadioApScanDuration, fapRadioApScanIdleTime,
               fapRadioApScanReportTimer, fapRadioDARRP, fapRadioSpectralAnalysis, fapRadioWIDS,
-              fapRadioFortiPresence, fapRadioAirFairness, fapRadioConfigChannelList, fapRadioHwChannelList, 
+              fapRadioFortiPresence, fapRadioAirFairness, fapRadioConfigChannelList, fapRadioHwChannelList,
               fapRadioNolChannelList }
     STATUS      current
     DESCRIPTION
@@ -1985,18 +2044,18 @@ fapRadioGroup OBJECT-GROUP
 fapVapGroup OBJECT-GROUP
     OBJECTS { fapVapBSSID, fapVapSSID, fapVapAdmin, fapVapStatus,
               fapVapMeshBackhaul, fapVapLocalAuth, fapVapLocalStandAlone, fapVapNatMode,
-              fapVapLocalBridging, fapVapSplitTunnel, fapVapLanIsolation, fapVapIntraSsidPriv,              
-              fapVapMacAuth, fapVapMacAuthFailThrough, fapVapTunnelType, fapVapVlanId, 
+              fapVapLocalBridging, fapVapSplitTunnel, fapVapLanIsolation, fapVapIntraSsidPriv,
+              fapVapMacAuth, fapVapMacAuthFailThrough, fapVapTunnelType, fapVapVlanId,
               fapVapAuth, fapVapProbRespSuppress, fapVapProbRespThresh, fapVapRxSop,
               fapVapRx5GThresh, fapVapRx2GThresh, fapVapLdpcType, fapVapDhcpOp82Insert,
               fapVapDhcpOp82CircId, fapVapDhcpOp82RemId, fapVapBcSuppression, fapVapKeyId,
               fapVapKeyLength, fapVapPMF, fapVapOKC, fapVapDynamicVLAN, fapVapExternRoaming,
               fapVapVoiceEnterprise, fapVapFastBssTrans, fapVapCpAuth, fapVapWebAuthServer,
-              fapVapAtfWeight, fapVapRadServer, fapVapRadAcctServer, fapVapRadAcctInterimIntv,              
+              fapVapAtfWeight, fapVapRadServer, fapVapRadAcctServer, fapVapRadAcctInterimIntv,
               fapVapRadCoA, fapVapStaInfoCount, fapVapStaInfoMax, fapVapRateLimitUL,
               fapVapRateLimitDL, fapVapRateLimitUlUser, fapVapRateLimitDLUser, fapVapRateLimitBurst,
-              fapVapPrimaryWag, fapVapSecondaryWag, fapVapCurrentWag, fapVapTunEchoIntv, 
-              fapVapTunFallbackTimeout }
+              fapVapPrimaryWag, fapVapSecondaryWag, fapVapCurrentWag, fapVapTunEchoIntv,
+              fapVapTunFallbackTimeout, fapVap80211k, fapVap80211v }
     STATUS      current
     DESCRIPTION
         "Object pertaining to the VAP information of the AP."
@@ -2042,23 +2101,23 @@ fapMibCompliance MODULE-COMPLIANCE
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."
-        GROUP  fapWtpStatusGroup 
+        GROUP  fapWtpStatusGroup
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."
-        GROUP  fapRadioGroup 
+        GROUP  fapRadioGroup
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."
-        GROUP  fapVapGroup 
+        GROUP  fapVapGroup
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."
-        GROUP  fapWagGroup 
+        GROUP  fapWagGroup
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."
-        GROUP  fapStationGroup 
+        GROUP  fapStationGroup
         DESCRIPTION
               "This group is mandatory for all Fortinet network appliances
               supporting this MIB."

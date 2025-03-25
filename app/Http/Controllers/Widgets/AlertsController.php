@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertsController.php
  *
@@ -70,6 +71,7 @@ class AlertsController extends WidgetController
             'acknowledged' => '2',
             'worse' => '3',
             'better' => '4',
+            'changed' => '5',
         ];
 
         return view('widgets.settings.alerts', $data);

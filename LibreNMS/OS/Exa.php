@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exa.php
  *
@@ -25,23 +26,29 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
-        $device->version = $info['e7CardSoftwareVersion'] ?? null;
-        $device->serial = $info['e7CardSerialNumber'] ?? null;
+        $response = SnmpQuery::next([
+            'E7-Calix-MIB::e7CardSoftwareVersion',
+            'E7-Calix-MIB::e7CardSerialNumber',
+        ]);
+
+        $device->version = $response->value('E7-Calix-MIB::e7CardSoftwareVersion') ?: null;
+        $device->serial = $response->value('E7-Calix-MIB::e7CardSerialNumber') ?: null;
         $device->hardware = 'Calix ' . $device->sysDescr;
 
-        $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));
+        $cards = SnmpQuery::enumStrings()->walk('E7-Calix-MIB::e7CardProvType')->values();
         $card_count = [];
         foreach ($cards as $card) {
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;
@@ -53,9 +60,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) use ($ifIndexToPortId) {
+        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) {
             if ($data['E7-Calix-MIB::e7OltPonPortStatus'] == 0) {
                 return null;
             }
@@ -63,7 +68,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
             $ifIndex = self::getIfIndex($shelf, $card, $port, 'gpon');
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => "$shelf.$card.$port",
                 'entity_physical_index' => $ifIndex,
             ]);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RuckusSzApReboot.php
  *

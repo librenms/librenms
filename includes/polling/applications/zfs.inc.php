@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -134,7 +136,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // name choosen based on this is the second group of variables
 $rrd_name = ['app', $name, $app->app_id, '_____group2'];
@@ -265,7 +267,7 @@ $gauges_to_check_for = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // process additional info returned
@@ -299,7 +301,7 @@ foreach ($zfs['pools'] as $pool) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $pool_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     // insert flattened pool metrics into the metrics array
     foreach ($fields as $field => $value) {
@@ -315,7 +317,7 @@ foreach ($zfs['pools'] as $pool) {
                 'data' => $pool[$gauge_var],
             ];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_gauge, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
         }
     }
 
@@ -331,9 +333,9 @@ if (isset($zfs['health'])) {
     $health = $zfs['health'];
     if ($old_health != $zfs['health']) {
         if ($zfs['health'] == 1) {
-            log_event('ZFS pool(s) now healthy', $device, 'application', 1);
+            Eventlog::log('ZFS pool(s) now healthy', $device['device_id'], 'application', Severity::Ok);
         } else {
-            log_event('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device, 'application', 5);
+            Eventlog::log('ZFS pool(s) DEGRADED, FAULTED, UNAVAIL, REMOVED, or unknown', $device['device_id'], 'application', Severity::Error);
         }
     }
 } else {
@@ -344,7 +346,7 @@ if (isset($zfs['health'])) {
 $old_l2_errors = $app->data['l2_errors'] ?? 0;
 if (isset($zfs['l2_errors'])) {
     if ($old_l2_errors != $zfs['l2_errors']) {
-        log_event('ZFS L2 cache has experienced errors', $device, 'application', 5);
+        Eventlog::log('ZFS L2 cache has experienced errors', $device['device_id'], 'application', Severity::Error);
     }
 }
 
@@ -358,7 +360,7 @@ if (count($added_pools) > 0 || count($removed_pools) > 0) {
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // update the app data

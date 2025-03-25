@@ -1,5 +1,14 @@
+mib: VIPTELA-OPER-SYSTEM:VIPTELA-HARDWARE
 modules:
     os:
-        serial: .1.3.6.1.4.1.41916.3.1.1.1.5.1.0
-        version: .1.3.6.1.4.1.41916.11.1.2.0
-        hardware: .1.3.6.1.4.1.41916.11.1.47.0
+        serial: VIPTELA-HARDWARE::hardwareInventorySerialNumber.chassis.0
+        version: VIPTELA-OPER-SYSTEM::systemStatusVersion.0
+        hardware: VIPTELA-OPER-SYSTEM::systemStatusModel.0
+    mempools:
+        data:
+            -
+                total: VIPTELA-OPER-SYSTEM::systemStatusMemTotal
+                used: VIPTELA-OPER-SYSTEM::systemStatusMemUsed
+                free: VIPTELA-OPER-SYSTEM::systemStatusMemFree
+                precision: 1024
+

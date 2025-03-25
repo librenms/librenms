@@ -1,4 +1,5 @@
 <?php
+
 /**
  * voss.inc.php
  *
@@ -41,7 +42,6 @@ if (is_array($voss_fan)) {
         create_state_index($state_name, $states);
 
         discover_sensor(null, 'state', $device, $current_oid, "rcVossSystemFanInfoOperStatus.$tray_num.$fan_num", $state_name, $descr, 1, 1, null, null, 3, 3, $state);
-        create_sensor_to_state_index($device, $state_name, "rcVossSystemFanInfoOperStatus.$tray_num.$fan_num");
     }
 } elseif (is_array($fan)) {
     foreach ($fan as $oid => $array) {
@@ -61,7 +61,6 @@ if (is_array($voss_fan)) {
         create_state_index($state_name, $states);
 
         discover_sensor(null, 'state', $device, $current_oid, "rcChasFanOperStatus.$index", $state_name, $descr, 1, 1, null, null, 3, 3, $state);
-        create_sensor_to_state_index($device, $state_name, "rcChasFanOperStatus.$index");
     }
 }
 
@@ -92,6 +91,5 @@ if (is_array($power_supply)) {
         create_state_index($state_name, $states);
 
         discover_sensor(null, 'state', $device, $current_oid, "rcChasPowerSupplyOperStatus.$index", $state_name, $descr, 1, 1, null, null, 4, 4, $state);
-        create_sensor_to_state_index($device, $state_name, "rcChasPowerSupplyOperStatus.$index");
     }
 }

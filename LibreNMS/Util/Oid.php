@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Snmp.php
  *
@@ -59,6 +60,11 @@ class Oid
         return (bool) preg_match('/^[.\d]+$/', $this->oid);
     }
 
+    public function isFullTextualOid(): bool
+    {
+        return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+/', $this->oid);
+    }
+
     public function hasMib(): bool
     {
         return str_contains($this->oid, '::');
@@ -79,6 +85,11 @@ class Oid
     public function hasNumericRoot(): bool
     {
         return (bool) preg_match('/^\.?1/', $this->oid);
+    }
+
+    public function isValid(string $oid): bool
+    {
+        return $this->isNumeric() || $this->isFullTextualOid();
     }
 
     public static function hasNumeric(array $oids): bool
@@ -107,7 +118,7 @@ class Oid
      *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public function toNumeric(string $mib = 'ALL', int $cache = 1800): string
+    public function toNumeric(?string $mib = 'ALL'): string
     {
         if ($this->isNumeric()) {
             return $this->oid;
@@ -120,7 +131,8 @@ class Oid
 
         $key = 'Oid:toNumeric:' . $this->oid . '/' . $mib;
 
-        $numeric_oid = Cache::remember($key, $cache, function () use ($mib) {
+        // only cache for this runtime
+        $numeric_oid = Cache::driver('array')->remember($key, null, function () use ($mib) {
             $snmpQuery = \SnmpQuery::numeric();
 
             if ($mib) {

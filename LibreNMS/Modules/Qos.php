@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Qos.php
  *
@@ -199,7 +200,7 @@ class Qos implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'qos' => $device->qos()->orderBy('title')
+            'qos' => $device->qos()->orderBy('title')->orderBy('snmp_idx')
                 ->get()->map->makeHidden(['qos_id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
         ];
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * serverscheck.inc.php
  *
@@ -53,7 +54,6 @@ foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
             create_state_index($state_name, $states);
 
             discover_sensor(null, 'state', $device, $serverscheck_oids[$tmp_oid], $index, $state_name, $descr, 1, 1, null, null, null, null, 1);
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

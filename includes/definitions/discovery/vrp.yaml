@@ -27,6 +27,16 @@ modules:
                         oid: hwEntityCpuUsageThreshold
                         op: '='
                         value: 0
+    storage:
+        data:
+            -
+                oid: HUAWEI-FLASH-MAN-MIB::hwStorageTable
+                descr: HUAWEI-FLASH-MAN-MIB::hwStorageName
+                type: HUAWEI-FLASH-MAN-MIB::hwStorageType
+                size: HUAWEI-FLASH-MAN-MIB::hwStorageSpace
+                free: HUAWEI-FLASH-MAN-MIB::hwStorageSpaceFree
+                free_num_oid: '.1.3.6.1.4.1.2011.6.9.1.4.2.1.4.{{ $index }}'
+                units: 1024
     sensors:
         pre-cache:
             data:
@@ -696,3 +706,15 @@ modules:
                         - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
                         - { descr: 'Major', graph: 1, value: 3, generic: 2 }
                         - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: hwPwrStatusTable
+                    value: hwEntityPwrState
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.{{ $index }}'
+                    group: 'Power Supply'
+                    descr: 'PWR{{ $hwEntityPwrSlot }}'
+                    states:
+                        - { descr: 'Supply', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Not Supply', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Sleep', graph: 1, value: 3, generic: 1 }
+                        - { descr: 'Unknown', graph: 1, value: 4, generic: 3 }

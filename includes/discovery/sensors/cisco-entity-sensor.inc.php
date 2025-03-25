@@ -200,6 +200,14 @@ if ($device['os_group'] == 'cisco') {
 
                         $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
                         $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
+                        $transceivers = \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
+                        if (! empty($transceivers)) {
+                            // If we already have a mapping done in transceivers, let's use it.
+                            $entPhysicalIndex = $phys_index;
+                            $entry['entSensorMeasuredEntity'] = 'ports';
+                            $group = 'transceiver';
+                            break;
+                        }
                         //either sensor is contained by a port class entity.
                         if ($entPhysicalClass === 'port') {
                             $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
@@ -207,7 +215,7 @@ if ($device['os_group'] == 'cisco') {
                                 [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
                             }
                             break;
-                        //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
+                            //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
                         } elseif ($entPhysicalClass === 'module' && array_key_exists($entPhysicalName, $port_reverse_array)) {
                             $tmp_ifindex = $port_reverse_array[$entPhysicalName]['ifIndex'];
                             break;
@@ -218,7 +226,7 @@ if ($device['os_group'] == 'cisco') {
                     if ($tmp_ifindex != 0) {
                         $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                         if (is_array($tmp_port)) {
-                            $entPhysicalIndex = $tmp_ifindex;
+                            $entPhysicalIndex = $phys_index;
                             $entry['entSensorMeasuredEntity'] = 'ports';
                             $group = 'transceiver';
                         }

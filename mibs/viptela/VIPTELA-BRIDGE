@@ -1,0 +1,1160 @@
+-- Namespace: http://viptela.com/bridge
+
+VIPTELA-BRIDGE DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-bridge MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for Bridge management"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 10 }
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+-- Configure a bridge instance
+-- tagpath /bridge
+bridge OBJECT IDENTIFIER ::= { viptela-bridge 1 }
+
+-- tagpath /bridge/table
+bridgeTableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BridgeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display bridge table"
+    ::= { bridge 4 }
+
+-- tagpath /bridge/table
+bridgeTableEntry OBJECT-TYPE
+    SYNTAX      BridgeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bridgeTableBridgeId }
+        ::= { bridgeTableTable 1 }
+
+BridgeTableEntry ::=
+    SEQUENCE {
+        bridgeTableBridgeId Unsigned32,
+        bridgeTableName String,
+        bridgeTableVlan UnsignedShort,
+        bridgeTableRoutingInterface String,
+        bridgeTableMaxMacs Unsigned32,
+        bridgeTableNumMacs Unsigned32,
+        bridgeTableAgeTime Unsigned32,
+        bridgeTableRxPackets Counter64,
+        bridgeTableRxOctets Counter64,
+        bridgeTableTxPackets Counter64,
+        bridgeTableTxOctets Counter64,
+        bridgeTableFloodPackets Counter64,
+        bridgeTableFloodOctets Counter64,
+        bridgeTableRxRoutedPackets Counter64,
+        bridgeTableTxRoutedPackets Counter64,
+        bridgeTableLearn Unsigned32,
+        bridgeTableAge Unsigned32,
+        bridgeTableMove Unsigned32
+    }
+
+-- tagpath /bridge/table/bridge-id
+bridgeTableBridgeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Bridge ID"
+    ::= { bridgeTableEntry 1 }
+
+-- tagpath /bridge/table/name
+bridgeTableName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 2 }
+
+-- tagpath /bridge/table/vlan
+bridgeTableVlan OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 3 }
+
+-- tagpath /bridge/table/routing-interface
+bridgeTableRoutingInterface OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 4 }
+
+-- tagpath /bridge/table/max-macs
+bridgeTableMaxMacs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 5 }
+
+-- tagpath /bridge/table/num-macs
+bridgeTableNumMacs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of MACs the bridge has learnt"
+    ::= { bridgeTableEntry 6 }
+
+-- tagpath /bridge/table/age-time
+bridgeTableAgeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 7 }
+
+-- tagpath /bridge/table/rx-packets
+bridgeTableRxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 8 }
+
+-- tagpath /bridge/table/rx-octets
+bridgeTableRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 9 }
+
+-- tagpath /bridge/table/tx-packets
+bridgeTableTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 10 }
+
+-- tagpath /bridge/table/tx-octets
+bridgeTableTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 11 }
+
+-- tagpath /bridge/table/flood-packets
+bridgeTableFloodPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 12 }
+
+-- tagpath /bridge/table/flood-octets
+bridgeTableFloodOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 13 }
+
+-- tagpath /bridge/table/rx-routed-packets
+bridgeTableRxRoutedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 14 }
+
+-- tagpath /bridge/table/tx-routed-packets
+bridgeTableTxRoutedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 15 }
+
+-- tagpath /bridge/table/learn
+bridgeTableLearn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 16 }
+
+-- tagpath /bridge/table/age
+bridgeTableAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 17 }
+
+-- tagpath /bridge/table/move
+bridgeTableMove OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeTableEntry 18 }
+
+-- tagpath /bridge/interface
+bridgeInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BridgeInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display bridge interface information"
+    ::= { bridge 5 }
+
+-- tagpath /bridge/interface
+bridgeInterfaceEntry OBJECT-TYPE
+    SYNTAX      BridgeInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bridgeInterfaceBridgeId, IMPLIED bridgeInterfaceIfName }
+        ::= { bridgeInterfaceTable 1 }
+
+BridgeInterfaceEntry ::=
+    SEQUENCE {
+        bridgeInterfaceBridgeId Unsigned32,
+        bridgeInterfaceIfName String,
+        bridgeInterfaceVlan UnsignedShort,
+        bridgeInterfaceNativeVlan String,
+        bridgeInterfaceAdminStatus String,
+        bridgeInterfaceOperStatus String,
+        bridgeInterfaceEncapType INTEGER,
+        bridgeInterfaceIfindex Unsigned32,
+        bridgeInterfaceMtu Unsigned32,
+        bridgeInterfaceRxPackets Counter64,
+        bridgeInterfaceRxOctets Counter64,
+        bridgeInterfaceTxPackets Counter64,
+        bridgeInterfaceTxOctets Counter64,
+        bridgeInterfaceRxErrors Counter64,
+        bridgeInterfaceRxDrops Counter64,
+        bridgeInterfaceTxErrors Counter64,
+        bridgeInterfaceTxDrops Counter64,
+        bridgeInterfaceRxPps Counter64,
+        bridgeInterfaceRxKbps Counter64,
+        bridgeInterfaceTxPps Counter64,
+        bridgeInterfaceTxKbps Counter64,
+        bridgeInterfaceRxArpRequests Counter64,
+        bridgeInterfaceTxArpReplies Counter64,
+        bridgeInterfaceTxArpRequests Counter64,
+        bridgeInterfaceRxArpReplies Counter64,
+        bridgeInterfaceArpAddFails Counter64,
+        bridgeInterfaceRxArpReplyDrops Counter64,
+        bridgeInterfaceRxArpRateLimitDrops Counter64,
+        bridgeInterfaceTxArpRateLimitDrops Counter64,
+        bridgeInterfaceRxArpNonLocalDrops Counter64,
+        bridgeInterfaceTxArpRequestFail Counter64,
+        bridgeInterfaceTxNoArpDrops Counter64,
+        bridgeInterfaceRxIpTtlExpired Counter64,
+        bridgeInterfaceRxIpErrors Counter64,
+        bridgeInterfaceInterfaceDisabled Counter64,
+        bridgeInterfaceRxPolicerDrops Counter64,
+        bridgeInterfaceRxNonIpDrops Counter64,
+        bridgeInterfaceFilterDrops Counter64,
+        bridgeInterfaceMirrorDrops Counter64,
+        bridgeInterfaceCpuPolicerDrops Counter64,
+        bridgeInterfaceTxIcmpPolicerDrops Counter64,
+        bridgeInterfaceTxIcmpMirroredDrops Counter64,
+        bridgeInterfaceSplitHorizonDrops Counter64,
+        bridgeInterfaceRouteLookupFail Counter64,
+        bridgeInterfaceBadLabel Counter64,
+        bridgeInterfaceTxInterfaceDisabled Counter64,
+        bridgeInterfaceRxMulticastPkts Counter64,
+        bridgeInterfaceRxBroadcastPkts Counter64,
+        bridgeInterfaceTxMulticastPkts Counter64,
+        bridgeInterfaceTxBroadcastPkts Counter64,
+        bridgeInterfaceRxPausePkts Counter64,
+        bridgeInterfaceRxDmacFilterDrops Counter64,
+        bridgeInterfaceRxWredDrops Counter64,
+        bridgeInterfaceRxInterfaceNotFound Counter64,
+        bridgeInterfaceRxInbErrors Counter64,
+        bridgeInterfaceRxOversizeErrors Counter64,
+        bridgeInterfaceRxFcsAlignErrors Counter64,
+        bridgeInterfaceRxUndersizeErrors Counter64,
+        bridgeInterfaceTxUnderflowPkts Counter64,
+        bridgeInterfaceTxCollisionDrops Counter64,
+        bridgeInterfaceTxPausePkts Counter64,
+        bridgeInterfaceTxFragmentsNeeded Counter64,
+        bridgeInterfaceTxFragments Counter64,
+        bridgeInterfaceTxFragmentDrops Counter64,
+        bridgeInterfaceTxTailRedDrops Counter64,
+        bridgeInterfaceLlqDrops Counter64,
+        bridgeInterfaceRxPktSize64 Counter64,
+        bridgeInterfaceRxPktSizeLt64 Counter64,
+        bridgeInterfaceRxPktSize65127 Counter64,
+        bridgeInterfaceRxPktSize128255 Counter64,
+        bridgeInterfaceRxPktSize256511 Counter64,
+        bridgeInterfaceRxPktSize5121023 Counter64,
+        bridgeInterfaceRxPktSize10241518 Counter64,
+        bridgeInterfaceRxPktSizeGt1518 Counter64,
+        bridgeInterfaceTxPktSize64 Counter64,
+        bridgeInterfaceTxPktSizeLt64 Counter64,
+        bridgeInterfaceTxPktSize65127 Counter64,
+        bridgeInterfaceTxPktSize128255 Counter64,
+        bridgeInterfaceTxPktSize256511 Counter64,
+        bridgeInterfaceTxPktSize5121023 Counter64,
+        bridgeInterfaceTxPktSize10241518 Counter64,
+        bridgeInterfaceTxPktSizeGt1518 Counter64,
+        bridgeInterfaceRxPolicerRemark Counter64
+    }
+
+-- tagpath /bridge/interface/bridge-id
+bridgeInterfaceBridgeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "BRIDGE ID"
+    ::= { bridgeInterfaceEntry 1 }
+
+-- tagpath /bridge/interface/if-name
+bridgeInterfaceIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { bridgeInterfaceEntry 2 }
+
+-- tagpath /bridge/interface/vlan
+bridgeInterfaceVlan OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN ID associated with the bridge"
+    ::= { bridgeInterfaceEntry 3 }
+
+-- tagpath /bridge/interface/native-vlan
+bridgeInterfaceNativeVlan OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Native VLAN enabled"
+    ::= { bridgeInterfaceEntry 4 }
+
+-- tagpath /bridge/interface/admin-status
+bridgeInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface administrative status"
+    ::= { bridgeInterfaceEntry 5 }
+
+-- tagpath /bridge/interface/oper-status
+bridgeInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface operational status"
+    ::= { bridgeInterfaceEntry 6 }
+
+-- tagpath /bridge/interface/encap-type
+bridgeInterfaceEncapType OBJECT-TYPE
+    SYNTAX      INTEGER {null(0),vlan(1),ppp(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation type"
+    ::= { bridgeInterfaceEntry 7 }
+
+-- tagpath /bridge/interface/ifindex
+bridgeInterfaceIfindex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface index"
+    ::= { bridgeInterfaceEntry 8 }
+
+-- tagpath /bridge/interface/mtu
+bridgeInterfaceMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MTU"
+    ::= { bridgeInterfaceEntry 9 }
+
+-- tagpath /bridge/interface/rx-packets
+bridgeInterfaceRxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received"
+    ::= { bridgeInterfaceEntry 10 }
+
+-- tagpath /bridge/interface/rx-octets
+bridgeInterfaceRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of octets received"
+    ::= { bridgeInterfaceEntry 11 }
+
+-- tagpath /bridge/interface/tx-packets
+bridgeInterfaceTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets transmitted"
+    ::= { bridgeInterfaceEntry 12 }
+
+-- tagpath /bridge/interface/tx-octets
+bridgeInterfaceTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of octets transmitted"
+    ::= { bridgeInterfaceEntry 13 }
+
+-- tagpath /interface/rx-errors
+bridgeInterfaceRxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 14 }
+
+-- tagpath /interface/rx-drops
+bridgeInterfaceRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 15 }
+
+-- tagpath /interface/tx-errors
+bridgeInterfaceTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 16 }
+
+-- tagpath /interface/tx-drops
+bridgeInterfaceTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 17 }
+
+-- tagpath /interface/rx-pps
+bridgeInterfaceRxPps OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 18 }
+
+-- tagpath /interface/rx-kbps
+bridgeInterfaceRxKbps OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 19 }
+
+-- tagpath /interface/tx-pps
+bridgeInterfaceTxPps OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 20 }
+
+-- tagpath /interface/tx-kbps
+bridgeInterfaceTxKbps OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 21 }
+
+-- tagpath /interface/rx-arp-requests
+bridgeInterfaceRxArpRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 22 }
+
+-- tagpath /interface/tx-arp-replies
+bridgeInterfaceTxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 23 }
+
+-- tagpath /interface/tx-arp-requests
+bridgeInterfaceTxArpRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 24 }
+
+-- tagpath /interface/rx-arp-replies
+bridgeInterfaceRxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 25 }
+
+-- tagpath /interface/arp-add-fails
+bridgeInterfaceArpAddFails OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 26 }
+
+-- tagpath /interface/rx-arp-reply-drops
+bridgeInterfaceRxArpReplyDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 27 }
+
+-- tagpath /interface/rx-arp-rate-limit-drops
+bridgeInterfaceRxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 28 }
+
+-- tagpath /interface/tx-arp-rate-limit-drops
+bridgeInterfaceTxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 29 }
+
+-- tagpath /interface/rx-arp-non-local-drops
+bridgeInterfaceRxArpNonLocalDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 30 }
+
+-- tagpath /interface/tx-arp-request-fail
+bridgeInterfaceTxArpRequestFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 31 }
+
+-- tagpath /interface/tx-no-arp-drops
+bridgeInterfaceTxNoArpDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 32 }
+
+-- tagpath /interface/rx-ip-ttl-expired
+bridgeInterfaceRxIpTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 33 }
+
+-- tagpath /interface/rx-ip-errors
+bridgeInterfaceRxIpErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 34 }
+
+-- tagpath /interface/interface-disabled
+bridgeInterfaceInterfaceDisabled OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 35 }
+
+-- tagpath /interface/rx-policer-drops
+bridgeInterfaceRxPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 36 }
+
+-- tagpath /interface/rx-non-ip-drops
+bridgeInterfaceRxNonIpDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 37 }
+
+-- tagpath /interface/filter-drops
+bridgeInterfaceFilterDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 38 }
+
+-- tagpath /interface/mirror-drops
+bridgeInterfaceMirrorDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 39 }
+
+-- tagpath /interface/cpu-policer-drops
+bridgeInterfaceCpuPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 40 }
+
+-- tagpath /interface/tx-icmp-policer-drops
+bridgeInterfaceTxIcmpPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 41 }
+
+-- tagpath /interface/tx-icmp-mirrored-drops
+bridgeInterfaceTxIcmpMirroredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 42 }
+
+-- tagpath /interface/split-horizon-drops
+bridgeInterfaceSplitHorizonDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 43 }
+
+-- tagpath /interface/route-lookup-fail
+bridgeInterfaceRouteLookupFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 44 }
+
+-- tagpath /interface/bad-label
+bridgeInterfaceBadLabel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 45 }
+
+-- tagpath /interface/tx-interface-disabled
+bridgeInterfaceTxInterfaceDisabled OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 46 }
+
+-- tagpath /interface/rx-multicast-pkts
+bridgeInterfaceRxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 47 }
+
+-- tagpath /interface/rx-broadcast-pkts
+bridgeInterfaceRxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 48 }
+
+-- tagpath /interface/tx-multicast-pkts
+bridgeInterfaceTxMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 49 }
+
+-- tagpath /interface/tx-broadcast-pkts
+bridgeInterfaceTxBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 50 }
+
+-- tagpath /interface/rx-pause-pkts
+bridgeInterfaceRxPausePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 51 }
+
+-- tagpath /interface/rx-dmac-filter-drops
+bridgeInterfaceRxDmacFilterDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 52 }
+
+-- tagpath /interface/rx-wred-drops
+bridgeInterfaceRxWredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 53 }
+
+-- tagpath /interface/rx-interface-not-found
+bridgeInterfaceRxInterfaceNotFound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 54 }
+
+-- tagpath /interface/rx-inb-errors
+bridgeInterfaceRxInbErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 55 }
+
+-- tagpath /interface/rx-oversize-errors
+bridgeInterfaceRxOversizeErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 56 }
+
+-- tagpath /interface/rx-fcs-align-errors
+bridgeInterfaceRxFcsAlignErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 57 }
+
+-- tagpath /interface/rx-undersize-errors
+bridgeInterfaceRxUndersizeErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 58 }
+
+-- tagpath /interface/tx-underflow-pkts
+bridgeInterfaceTxUnderflowPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 59 }
+
+-- tagpath /interface/tx-collision-drops
+bridgeInterfaceTxCollisionDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 60 }
+
+-- tagpath /interface/tx-pause-pkts
+bridgeInterfaceTxPausePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 61 }
+
+-- tagpath /interface/tx-fragments-needed
+bridgeInterfaceTxFragmentsNeeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 62 }
+
+-- tagpath /interface/tx-fragments
+bridgeInterfaceTxFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 63 }
+
+-- tagpath /interface/tx-fragment-drops
+bridgeInterfaceTxFragmentDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 64 }
+
+-- tagpath /interface/tx-tail-red-drops
+bridgeInterfaceTxTailRedDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 65 }
+
+-- tagpath /interface/llq-drops
+bridgeInterfaceLlqDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 66 }
+
+-- tagpath /interface/rx-pkt-size-64
+bridgeInterfaceRxPktSize64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 67 }
+
+-- tagpath /interface/rx-pkt-size-lt-64
+bridgeInterfaceRxPktSizeLt64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 68 }
+
+-- tagpath /interface/rx-pkt-size-65-127
+bridgeInterfaceRxPktSize65127 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 69 }
+
+-- tagpath /interface/rx-pkt-size-128-255
+bridgeInterfaceRxPktSize128255 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 70 }
+
+-- tagpath /interface/rx-pkt-size-256-511
+bridgeInterfaceRxPktSize256511 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 71 }
+
+-- tagpath /interface/rx-pkt-size-512-1023
+bridgeInterfaceRxPktSize5121023 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 72 }
+
+-- tagpath /interface/rx-pkt-size-1024-1518
+bridgeInterfaceRxPktSize10241518 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 73 }
+
+-- tagpath /interface/rx-pkt-size-gt-1518
+bridgeInterfaceRxPktSizeGt1518 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 74 }
+
+-- tagpath /interface/tx-pkt-size-64
+bridgeInterfaceTxPktSize64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 75 }
+
+-- tagpath /interface/tx-pkt-size-lt-64
+bridgeInterfaceTxPktSizeLt64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 76 }
+
+-- tagpath /interface/tx-pkt-size-65-127
+bridgeInterfaceTxPktSize65127 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 77 }
+
+-- tagpath /interface/tx-pkt-size-128-255
+bridgeInterfaceTxPktSize128255 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 78 }
+
+-- tagpath /interface/tx-pkt-size-256-511
+bridgeInterfaceTxPktSize256511 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 79 }
+
+-- tagpath /interface/tx-pkt-size-512-1023
+bridgeInterfaceTxPktSize5121023 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 80 }
+
+-- tagpath /interface/tx-pkt-size-1024-1518
+bridgeInterfaceTxPktSize10241518 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 81 }
+
+-- tagpath /interface/tx-pkt-size-gt-1518
+bridgeInterfaceTxPktSizeGt1518 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 82 }
+
+-- tagpath /interface/rx-policer-remark
+bridgeInterfaceRxPolicerRemark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeInterfaceEntry 83 }
+
+-- tagpath /bridge/mac
+bridgeMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BridgeMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display MAC addresses"
+    ::= { bridge 6 }
+
+-- tagpath /bridge/mac
+bridgeMacEntry OBJECT-TYPE
+    SYNTAX      BridgeMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bridgeMacBridgeId, bridgeMacInterface, bridgeMacMacAddress }
+        ::= { bridgeMacTable 1 }
+
+BridgeMacEntry ::=
+    SEQUENCE {
+        bridgeMacBridgeId Unsigned32,
+        bridgeMacInterface String,
+        bridgeMacMacAddress String,
+        bridgeMacType String,
+        bridgeMacExpiryTime String,
+        bridgeMacRxPackets Counter64,
+        bridgeMacRxOctets Counter64,
+        bridgeMacTxPackets Counter64,
+        bridgeMacTxOctets Counter64
+    }
+
+-- tagpath /bridge/mac/bridge-id
+bridgeMacBridgeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "BRIDGE ID"
+    ::= { bridgeMacEntry 1 }
+
+-- tagpath /bridge/mac/interface
+bridgeMacInterface OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { bridgeMacEntry 2 }
+
+-- tagpath /bridge/mac/mac-address
+bridgeMacMacAddress OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware Address"
+    ::= { bridgeMacEntry 3 }
+
+-- tagpath /bridge/mac/type
+bridgeMacType OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address type: static/dynamic"
+    ::= { bridgeMacEntry 4 }
+
+-- tagpath /bridge/mac/expiry-time
+bridgeMacExpiryTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time left for the entry to be aged out."
+    ::= { bridgeMacEntry 5 }
+
+-- tagpath /bridge/mac/rx-packets
+bridgeMacRxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeMacEntry 6 }
+
+-- tagpath /bridge/mac/rx-octets
+bridgeMacRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeMacEntry 7 }
+
+-- tagpath /bridge/mac/tx-packets
+bridgeMacTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeMacEntry 8 }
+
+-- tagpath /bridge/mac/tx-octets
+bridgeMacTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { bridgeMacEntry 9 }
+
+END

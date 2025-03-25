@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -57,7 +59,7 @@ $fields = [
     'wrong_prog' => $returned['wrong_prog'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_general, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = $fields;
 
 // aggregate dropped files stats
@@ -88,7 +90,7 @@ $fields = [
     's9dropped_files' => $returned['sdp.dropped_files'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_dropped_files, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate running procs stats
@@ -119,7 +121,7 @@ $fields_running_processes = [
     's9running_processes' => $returned['sdp.running_processes'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_running_processes, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields_running_processes);
+app('Datastore')->put($device, 'app', $tags, $fields_running_processes);
 $metrics = array_merge($metrics, $fields_running_processes);
 
 // aggregate api calls stats
@@ -150,7 +152,7 @@ $fields_api_calls = [
     's9api_calls' => $returned['sdp.api_calls'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_api_calls, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields_api_calls);
+app('Datastore')->put($device, 'app', $tags, $fields_api_calls);
 $metrics = array_merge($metrics, $fields_api_calls);
 
 // aggregate domains stats
@@ -181,7 +183,7 @@ $fields_domains = [
     's9domains' => $returned['sdp.domains'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_domains, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields_domains);
+app('Datastore')->put($device, 'app', $tags, $fields_domains);
 $metrics = array_merge($metrics, $fields_domains);
 
 // aggregate signatures total stats
@@ -212,7 +214,7 @@ $fields_signatures_total = [
     's9signatures_total' => $returned['sdp.signatures_total'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_total, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields_signatures_total);
+app('Datastore')->put($device, 'app', $tags, $fields_signatures_total);
 $metrics = array_merge($metrics, $fields_signatures_total);
 
 // aggregate signatures alert stats
@@ -243,7 +245,7 @@ $fields = [
     's9signatures_alert' => $returned['sdp.signatures_alert'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_alert, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate reg keys mod stats
@@ -274,7 +276,7 @@ $fields = [
     's9regkeysmod' => $returned['sdp.registry_keys_modified'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_reg_keys_mod, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate crash issues stats
@@ -305,7 +307,7 @@ $fields = [
     's9crash_issues' => $returned['sdp.crash_issues'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_crash_issues, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate anti issues stats
@@ -336,7 +338,7 @@ $fields = [
     's9anti_issues' => $returned['sdp.anti_issues'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_anti_issues, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate files written stats
@@ -367,7 +369,7 @@ $fields = [
     's9files_written' => $returned['sdp.files_written'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_files_written, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate malscore stats
@@ -398,7 +400,7 @@ $fields = [
     's9malscore' => $returned['sdp.malscore'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_malscore, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate severity stats
@@ -429,7 +431,7 @@ $fields = [
     's9severity' => $returned['sdp.severity'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_severity, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate confidence stats
@@ -460,7 +462,7 @@ $fields = [
     's9confidence' => $returned['sdp.confidence'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_confidence, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 // aggregate weight stats
@@ -491,7 +493,7 @@ $fields = [
     's9weight' => $returned['sdp.weight'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_weight, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 $metrics = array_merge($metrics, $fields);
 
 //
@@ -528,7 +530,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         'failed_processing' => $returned['pkg_stats'][$pkg]['failed_processing'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_pkg, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-dropped_files___-___', $pkg];
     $fields = [
@@ -545,7 +547,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9dropped_files' => $returned['pkg_stats'][$pkg]['sdp.dropped_files'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_dropped_files, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-running_processes___-___', $pkg];
     $fields = [
@@ -562,7 +564,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9running_processes' => $returned['pkg_stats'][$pkg]['sdp.running_processes'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_running_processes, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-api_calls___-___', $pkg];
     $fields = [
@@ -579,7 +581,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9api_calls' => $returned['pkg_stats'][$pkg]['sdp.api_calls'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_api_calls, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-domains___-___', $pkg];
     $fields = [
@@ -596,7 +598,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9domains' => $returned['pkg_stats'][$pkg]['sdp.domains'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_domains, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-signatures_total___-___', $pkg];
     $fields = [
@@ -613,7 +615,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9signatures_total' => $returned['pkg_stats'][$pkg]['sdp.signatures_total'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_total, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-signatures_alert___-___', $pkg];
     $fields = [
@@ -630,7 +632,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9signatures_alert' => $returned['pkg_stats'][$pkg]['sdp.signatures_alert'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_alert, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-reg_keys_mod___-___', $pkg];
     $fields = [
@@ -647,7 +649,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9regkeysmod' => $returned['pkg_stats'][$pkg]['sdp.registry_keys_modified'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_reg_keys_mod, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-crash_issues___-___', $pkg];
     $fields = [
@@ -664,7 +666,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9crash_issues' => $returned['pkg_stats'][$pkg]['sdp.crash_issues'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_crash_issues, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-anti_issues___-___', $pkg];
     $fields = [
@@ -681,7 +683,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9anti_issues' => $returned['pkg_stats'][$pkg]['sdp.anti_issues'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_anti_issues, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-files_written___-___', $pkg];
     $fields = [
@@ -698,7 +700,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9files_written' => $returned['pkg_stats'][$pkg]['sdp.files_written'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_files_written, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-malscore___-___', $pkg];
     $fields = [
@@ -715,7 +717,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9malscore' => $returned['pkg_stats'][$pkg]['sdp.malscore'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_malscore, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-confidence___-___', $pkg];
     $fields = [
@@ -732,7 +734,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9confidence' => $returned['pkg_stats'][$pkg]['sdp.confidence'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_confidence, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-weight___-___', $pkg];
     $fields = [
@@ -749,7 +751,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
         's9weight' => $returned['pkg_stats'][$pkg]['sdp.weight'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_weight, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // zero any rrds for existing packages
@@ -773,7 +775,7 @@ foreach ($current_packages as $index => $current_package) {
             'failed_processing' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_pkg, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-dropped_files___-___', $pkg];
         $fields = [
@@ -790,7 +792,7 @@ foreach ($current_packages as $index => $current_package) {
             's9dropped_files' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_dropped_files, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-running_processes___-___', $pkg];
         $fields = [
@@ -807,7 +809,7 @@ foreach ($current_packages as $index => $current_package) {
             's9running_processes' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_running_processes, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-api_calls___-___', $pkg];
         $fields = [
@@ -824,7 +826,7 @@ foreach ($current_packages as $index => $current_package) {
             's9api_calls' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_api_calls, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-domains___-___', $pkg];
         $fields = [
@@ -841,7 +843,7 @@ foreach ($current_packages as $index => $current_package) {
             's9domains' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_domains, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-signatures_total___-___', $pkg];
         $fields = [
@@ -858,7 +860,7 @@ foreach ($current_packages as $index => $current_package) {
             's9signatures_total' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_total, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-signatures_alert___-___', $pkg];
         $fields = [
@@ -875,7 +877,7 @@ foreach ($current_packages as $index => $current_package) {
             's9signatures_alert' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_signatures_alert, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-reg_keys_mod___-___', $pkg];
         $fields = [
@@ -892,7 +894,7 @@ foreach ($current_packages as $index => $current_package) {
             's9regkeysmod' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_reg_keys_mod, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-crash_issues___-___', $pkg];
         $fields = [
@@ -909,7 +911,7 @@ foreach ($current_packages as $index => $current_package) {
             's9crash_issues' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_crash_issues, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-anti_issues___-___', $pkg];
         $fields = [
@@ -926,7 +928,7 @@ foreach ($current_packages as $index => $current_package) {
             's9anti_issues' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_anti_issues, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-files_written___-___', $pkg];
         $fields = [
@@ -943,7 +945,7 @@ foreach ($current_packages as $index => $current_package) {
             's9files_written' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_files_written, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-malscore___-___', $pkg];
         $fields = [
@@ -960,7 +962,7 @@ foreach ($current_packages as $index => $current_package) {
             's9malscore' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_malscore, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-confidence___-___', $pkg];
         $fields = [
@@ -977,7 +979,7 @@ foreach ($current_packages as $index => $current_package) {
             's9confidence' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_confidence, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $rrd_name = ['app', $name, $app->app_id, 'pkg-weight___-___', $pkg];
         $fields = [
@@ -994,28 +996,28 @@ foreach ($current_packages as $index => $current_package) {
             's9weight' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_weight, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     } else {
         echo $pkg . " handled, skipping zeroing this timeslot\n";
     }
 }
 
 // log any warnings
-if (sizeof($returned['warnings']) > 0) {
+if (count($returned['warnings']) > 0) {
     $log_message = 'CAPE Warns: ' . json_encode($returned['warnings']);
-    log_event($log_message, $device, 'application', 4);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Warning);
 }
 
 // log any criticals
-if (sizeof($returned['criticals']) > 0) {
+if (count($returned['criticals']) > 0) {
     $log_message = 'CAPE Criticals: ' . json_encode($returned['criticals']);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log any criticals
-if (sizeof($returned['errors']) > 0) {
+if (count($returned['errors']) > 0) {
     $log_message = 'CAPE Errors: ' . json_encode($returned['errors']);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 update_application($app, 'OK', $metrics);

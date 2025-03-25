@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -26,9 +27,6 @@ if (is_numeric($temp)) {
     $descr = 'UPS Battery Replacement Status';
     //Discover Sensors
     discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp, 'snmp', $index);
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
@@ -46,7 +44,6 @@ foreach ($cooling_status as $index => $data) {
     create_state_index($state_name, $states);
 
     discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 unset($cooling_status);
@@ -66,7 +63,6 @@ foreach ($cooling_unit as $index => $data) {
     create_state_index($state_name, $states);
 
     discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
-    create_sensor_to_state_index($device, $state_name, $index);
 }
 
 unset($cooling_unit);
@@ -84,7 +80,6 @@ foreach ($relays as $index => $data) {
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
         discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
 unset(
@@ -106,7 +101,6 @@ foreach ($switched as $index => $data) {
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
         discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $cur_oid);
     }
 }
 unset(
@@ -133,7 +127,6 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $multiplier = 1;
     if (is_numeric($current)) {
         discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 
     if ($data['memSensorsAlarmStatus']) {
@@ -153,7 +146,6 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $multiplier = 1;
     if (is_numeric($current)) {
         discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 }
 
@@ -192,7 +184,6 @@ if ($apcContactData['uioInputContactStatusTableSize'] > 0) {
             }
 
             discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-            create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
         }
     }
 } else {
@@ -226,7 +217,6 @@ if ($apcContactData['uioInputContactStatusTableSize'] > 0) {
             create_state_index($state_name, $states);
 
             discover_sensor(null, 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
-            create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * devices_groups.inc.php
  *

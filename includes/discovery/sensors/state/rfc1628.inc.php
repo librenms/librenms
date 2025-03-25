@@ -1,4 +1,5 @@
 <?php
+
 /*
  *
  * @link       https://www.librenms.org
@@ -42,9 +43,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 // Output Source (Value : 1 other, 2 none, 3 normal, 4 bypass, 5 battery, 6 booster, 7 reducer)
@@ -84,9 +82,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 // UPS battery test status
@@ -125,7 +120,4 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

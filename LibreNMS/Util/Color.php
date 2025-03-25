@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Color.php
  *
@@ -85,7 +86,7 @@ class Color
         ];
     }
 
-    public static function percent(int|float $numerator = null, int|float $denominator = null, int|float $percent = null): string
+    public static function percent(int|float|null $numerator = null, int|float|null $denominator = null, int|float|null $percent = null): string
     {
         $percent = $percent ? round($percent) : Number::calculatePercent($numerator, $denominator, 0);
         $r = min(255, 5 * ($percent - 25));

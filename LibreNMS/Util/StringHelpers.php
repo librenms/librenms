@@ -1,4 +1,5 @@
 <?php
+
 /**
  * StringHelpers.php
  *
@@ -27,22 +28,6 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
-    /**
-     * Shorten text over 50 chars, if shortened, add ellipsis
-     *
-     * @param  string  $string
-     * @param  int  $max
-     * @return string
-     */
-    public static function shortenText($string, $max = 30)
-    {
-        if (strlen($string) > 50) {
-            return substr($string, 0, $max) . '...';
-        }
-
-        return $string;
-    }
-
     public static function niceCase($string)
     {
         $replacements = [
@@ -199,6 +184,14 @@ class StringHelpers
         $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
 
         return preg_replace($regex, '', str_replace("\n", '', $string));
+    }
+
+    /**
+     * If string has a number at the start (excluding whitespace) that can be extraced by Number::cast()
+     */
+    public static function hasNumber(string $string): bool
+    {
+        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
     }
 
     public static function isHex(string $string): bool

@@ -924,190 +924,61 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "31",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 14982447104,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 2562895872,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.31",
+                    "storage_free": 12419551232,
+                    "storage_free_oid": null,
+                    "storage_perc": 17,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "35",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 48939008,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/lock",
-                    "storage_size": 5242880,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "55",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/boot",
                     "storage_size": 264289280,
+                    "storage_size_oid": null,
                     "storage_units": 512,
                     "storage_used": 55915008,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "56",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/0",
-                    "storage_size": 97079296,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.55",
+                    "storage_free": 208374272,
+                    "storage_free_oid": null,
+                    "storage_perc": 21,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 14982447104,
-                    "storage_units": 4096,
-                    "storage_used": 2562895872,
-                    "storage_free": 12419551232,
-                    "storage_perc": 17,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv6_address": "2a02:810a:8140:4571:ba27:ebff:fe43:f11e",
+                    "ipv6_compressed": "2a02:810a:8140:4571:ba27:ebff:fe43:f11e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "2a02:810a:8140:4571::/64",
+                    "ifIndex": 2
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "35",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 485412864,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 48939008,
-                    "storage_free": 436473856,
-                    "storage_perc": 10,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/lock",
-                    "storage_size": 5242880,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 5242880,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 485412864,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 485412864,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "55",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/boot",
-                    "storage_size": 264289280,
-                    "storage_units": 512,
-                    "storage_used": 55915008,
-                    "storage_free": 208374272,
-                    "storage_perc": 21,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "56",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/user/0",
-                    "storage_size": 97079296,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 97079296,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv6_address": "fe80:0000:0000:0000:ba27:ebff:fe43:f11e",
+                    "ipv6_compressed": "fe80::ba27:ebff:fe43:f11e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 2
                 }
             ]
         }

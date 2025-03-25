@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SmokepingCliTest.php
  *
@@ -99,7 +100,7 @@ class SmokepingCliTest extends DBTestCase
         // We need an app instance available for these tests to load the translation machinary
         $this->app = $this->createApplication();
 
-        $this->instance = new SmokePingGenerateCommand();
+        $this->instance = new SmokepingGenerateCommand();
         $this->instance->disableDNSLookup();
         parent::setUp();
     }

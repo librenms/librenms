@@ -1,4 +1,5 @@
 <?php
+
 /*
  * RunAlerts.php
  *
@@ -141,6 +142,8 @@ class RunAlerts
                 $obj['title'] .= ' Has worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
                 $obj['title'] .= ' Has improved';
+            } elseif ($alert['state'] == AlertState::CHANGED) {
+                $obj['title'] .= ' changed';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -308,28 +311,45 @@ class RunAlerts
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later
-                $cnt = count($chk);
-                for ($i = 0; $i < $cnt; $i++) {
+                $current_alert_count = count($chk);
+                for ($i = 0; $i < $current_alert_count; $i++) {
                     if (isset($chk[$i]['ip'])) {
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
                 $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
-                $o = count($alert['details']['rule']);
-                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
-                if ($n > $o) {
-                    $ret .= ' Worsens';
+
+                // Get the added and resolved items
+                [$added_diff, $resolved_diff] = $this->diffBetweenFaults($alert['details']['rule'], $chk);
+                $previous_alert_count = count($alert['details']['rule']);
+
+                if (! empty($added_diff) && ! empty($resolved_diff)) {
+                    $ret .= ' Changed';
+                    $state = AlertState::CHANGED;
+                    $alert['details']['diff'] = ['added' => $added_diff, 'resolved' => $resolved_diff];
+                } elseif (! empty($added_diff)) {
+                    $ret .= ' Worse';
                     $state = AlertState::WORSE;
-                    $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
-                } elseif ($n < $o) {
-                    $ret .= ' Betters';
+                    $alert['details']['diff'] = ['added' => $added_diff];
+                } elseif (! empty($resolved_diff)) {
+                    $ret .= ' Better';
                     $state = AlertState::BETTER;
-                    $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
+                    $alert['details']['diff'] = ['resolved' => $resolved_diff];
+                    // Failsafe if the diff didn't return any results
+                } elseif ($current_alert_count > $previous_alert_count) {
+                    $ret .= ' Worse';
+                    $state = AlertState::WORSE;
+                    Eventlog::log('Alert got worse but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
+                    // Failsafe if the diff didn't return any results
+                } elseif ($current_alert_count < $previous_alert_count) {
+                    $ret .= ' Better';
+                    $state = AlertState::BETTER;
+                    Eventlog::log('Alert got better but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
-                if ($state > AlertState::CLEAR && $n > 0) {
+                if ($state > AlertState::CLEAR && $current_alert_count > 0) {
                     $alert['details']['rule'] = $chk;
                     if (dbInsert([
                         'state' => $state,
@@ -340,10 +360,81 @@ class RunAlerts
                         dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                     }
 
-                    echo $ret . ' (' . $o . '/' . $n . ")\r\n";
+                    echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
                 }
             }
         }
+    }
+
+    /**
+     * Extract the fields that are used to identify the elements in the array of a "fault"
+     *
+     * @param  array  $element
+     * @return array
+     */
+    private function extractIdFieldsForFault($element)
+    {
+        return array_filter(array_keys($element), function ($key) {
+            // Exclude location_id as it is not relevant for the comparison
+            return ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id';
+        });
+    }
+
+    /**
+     * Generate a comparison key for an element based on the fields that identify it for a "fault"
+     *
+     * @param  array  $element
+     * @param  array  $idFields
+     * @return string
+     */
+    private function generateComparisonKeyForFault($element, $idFields)
+    {
+        $keyParts = [];
+        foreach ($idFields as $field) {
+            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
+        }
+
+        return implode('|', $keyParts);
+    }
+
+    /**
+     * Find new elements in the array for faults
+     * PHP array_diff is not working well for it
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return array [$added, $removed]
+     */
+    private function diffBetweenFaults($array1, $array2)
+    {
+        $array1_keys = [];
+        $added_elements = [];
+        $removed_elements = [];
+
+        // Create associative array for quick lookup of $array1 elements
+        foreach ($array1 as $element1) {
+            $element1_ids = $this->extractIdFieldsForFault($element1);
+            $element1_key = $this->generateComparisonKeyForFault($element1, $element1_ids);
+            $array1_keys[$element1_key] = $element1;
+        }
+
+        // Iterate through $array2 and determine added elements
+        foreach ($array2 as $element2) {
+            $element2_ids = $this->extractIdFieldsForFault($element2);
+            $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
+
+            if (! isset($array1_keys[$element2_key])) {
+                $added_elements [] = $element2;
+            } else {
+                // Remove matched elements
+                unset($array1_keys[$element2_key]);
+            }
+        }
+
+        // Remaining elements in $array1_keys are the removed elements
+        $removed_elements = array_values($array1_keys);
+
+        return [$added_elements, $removed_elements];
     }
 
     public function loadAlerts($where)
@@ -439,7 +530,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     // We don't want -1 alert rule count alarms to get muted because of the current alert count
                     if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
@@ -556,6 +647,7 @@ class RunAlerts
             AlertState::ACKNOWLEDGED => 'acknowledgment',
             AlertState::WORSE => 'worsened',
             AlertState::BETTER => 'improved',
+            AlertState::CHANGED => 'changed',
         ];
 
         $severity = match ($obj['state']) {

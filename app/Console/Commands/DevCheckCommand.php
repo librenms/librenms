@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DevCheckCommand.php
  *
@@ -42,7 +43,7 @@ class DevCheckCommand extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, dusk]']), 'all');
+        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, web]']), 'all');
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('module', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('fail-fast', 'f', InputOption::VALUE_NONE);
@@ -96,10 +97,13 @@ class DevCheckCommand extends LnmsCommand
                 'lint_enable' => false,
                 'unit_enable' => true,
                 'web_enable' => false,
-                'os-modules-only' => $this->option('os-modules-only'),
             ]);
             $this->helper->setOS(explode(',', $os));
         }
+
+        $this->helper->setFlags([
+            'os-modules-only' => $this->option('os-modules-only'),
+        ]);
 
         if ($modules = $this->option('module')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);

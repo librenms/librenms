@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Graph.php
  *
@@ -157,6 +158,8 @@ class Graph
             require base_path('/includes/html/graphs/customoid/customoid.inc.php');
         } elseif (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
             require base_path("/includes/html/graphs/$type/$subtype.inc.php");
+        } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
+            require base_path("/includes/html/graphs/$type/generic.inc.php");
         } else {
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }

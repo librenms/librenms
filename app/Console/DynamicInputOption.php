@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DynamicInputOption.php
  *
@@ -34,7 +35,7 @@ class DynamicInputOption extends InputOption
     /** @var callable|null */
     private $defaultCallable;
 
-    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null, ?callable $defaultCallable = null, ?callable $descriptionCallable = null)
+    public function __construct(string $name, $shortcut = null, ?int $mode = null, string $description = '', $default = null, ?callable $defaultCallable = null, ?callable $descriptionCallable = null)
     {
         $this->descriptionCallable = $descriptionCallable;
         $this->defaultCallable = $defaultCallable;

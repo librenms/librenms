@@ -110,9 +110,9 @@ class Datastore implements DataStorageInterface
     public function put($device, $measurement, $tags, $fields)
     {
         // convenience conversion to allow calling with a single value, so, e.g., these are equivalent:
-        // data_update($device, 'mymeasurement', $tags, 1234);
+        // put($device, 'mymeasurement', $tags, 1234);
         //     AND
-        // data_update($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
+        // put($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
         if (! is_array($fields)) {
             $fields = [$measurement => $fields];
         }

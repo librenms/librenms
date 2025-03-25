@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
@@ -120,7 +121,7 @@ foreach ($interface_client_map as $interface => $client_list) {
                 $client,
             ],
         ];
-        data_update($device, $polling_type, $tags_intfclient, $fields_intfclient);
+        app('Datastore')->put($device, $polling_type, $tags_intfclient, $fields_intfclient);
     }
 
     // create interface fields
@@ -138,7 +139,7 @@ foreach ($interface_client_map as $interface => $client_list) {
         'rrd_def' => $rrd_def_intf,
         'rrd_name' => [$polling_type, $name, $app->app_id, $interface],
     ];
-    data_update($device, $polling_type, $tags_intf, $fields_intf);
+    app('Datastore')->put($device, $polling_type, $tags_intf, $fields_intf);
 }
 
 // create total fields
@@ -156,7 +157,7 @@ $tags_all = [
     'rrd_def' => $rrd_def_total,
     'rrd_name' => [$polling_type, $name, $app->app_id],
 ];
-data_update($device, $polling_type, $tags_all, $fields_all);
+app('Datastore')->put($device, $polling_type, $tags_all, $fields_all);
 
 // variable tracks whether we updated mappings so it only happens once
 $mappings_updated = false;
@@ -181,7 +182,7 @@ if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
         count($removed_interfaces) > 0
             ? ' Removed ' . implode(',', $removed_interfaces)
             : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // check for client changes
@@ -204,7 +205,7 @@ foreach ($mappings as $interface => $client_list) {
             count($removed_clients) > 0
                 ? ' Removed ' . implode(',', $removed_clients)
                 : '';
-        log_event($log_message, $device, 'application');
+        Eventlog::log($log_message, $device['device_id'], 'application');
     }
 }
 

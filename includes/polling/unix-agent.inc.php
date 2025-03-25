@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
@@ -53,7 +54,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         $fields = [
             'time' => $agent_time,
         ];
-        data_update($device, 'agent', $tags, $fields);
+        app('Datastore')->put($device, 'agent', $tags, $fields);
 
         $os->enableGraph('agent');
 
@@ -74,7 +75,6 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
-        global $agent_data;
         $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
             if (empty($section)) {
@@ -203,6 +203,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         }
         DeviceCache::getPrimary()->save();
     }
+
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';

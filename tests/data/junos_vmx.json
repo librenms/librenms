@@ -12640,141 +12640,88 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1",
                     "storage_type": "hrStorageFlashMemory",
                     "storage_descr": "/dev/gpt/junos: root file system, mounted on: /.mount",
                     "storage_size": 21403592704,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1227826176,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "storage_free": 20175766528,
+                    "storage_free_oid": null,
+                    "storage_perc": 6,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "16",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/ada1s1e, mounted on: /.mount/config",
                     "storage_size": 316487680,
+                    "storage_size_oid": null,
                     "storage_units": 2048,
                     "storage_used": 34816,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.16",
+                    "storage_free": 316452864,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "17",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/ada1s1f, mounted on: /.mount/var",
                     "storage_size": 5957548032,
+                    "storage_size_oid": null,
                     "storage_units": 2048,
                     "storage_used": 89348096,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.17",
+                    "storage_free": 5868199936,
+                    "storage_free_oid": null,
+                    "storage_perc": 1,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "18",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "tmpfs, mounted on: /.mount/tmp",
                     "storage_size": 3234828288,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 12288,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.18",
+                    "storage_free": 3234816000,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "50",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "tmpfs, mounted on: /.mount/mfs",
                     "storage_size": 171216896,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 1617920,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.50",
+                    "storage_free": 169598976,
+                    "storage_free_oid": null,
+                    "storage_perc": 1,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1",
-                    "storage_type": "hrStorageFlashMemory",
-                    "storage_descr": "/dev/gpt/junos: root file system, mounted on: /.mount",
-                    "storage_size": 21403592704,
-                    "storage_units": 1024,
-                    "storage_used": 1227826176,
-                    "storage_free": 20175766528,
-                    "storage_perc": 6,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "16",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/ada1s1e, mounted on: /.mount/config",
-                    "storage_size": 316487680,
-                    "storage_units": 2048,
-                    "storage_used": 34816,
-                    "storage_free": 316452864,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "17",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/ada1s1f, mounted on: /.mount/var",
-                    "storage_size": 5957548032,
-                    "storage_units": 2048,
-                    "storage_used": 89348096,
-                    "storage_free": 5868199936,
-                    "storage_perc": 1,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "18",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "tmpfs, mounted on: /.mount/tmp",
-                    "storage_size": 3234828288,
-                    "storage_units": 4096,
-                    "storage_used": 12288,
-                    "storage_free": 3234816000,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "50",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "tmpfs, mounted on: /.mount/mfs",
-                    "storage_size": 171216896,
-                    "storage_units": 4096,
-                    "storage_used": 1617920,
-                    "storage_free": 169598976,
-                    "storage_perc": 1,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "bgp-peers": {
         "discovery": {
@@ -13243,5 +13190,20 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0004",
+                    "ipv6_compressed": "fec0::a:0:0:4",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 24
+                }
+            ]
+        }
     }
 }
