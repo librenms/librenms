@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
 use LibreNMS\Alert\AlertDB;
 
 if (! Auth::user()->hasGlobalAdmin()) {
@@ -33,7 +34,7 @@ $proc = isset($_POST['proc']) ? strip_tags($_POST['proc']) : '';
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
-} elseif (validate_device_id($_POST['device_id']) || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
+} elseif (Device::where('device_id', $_POST['device_id'])->exists() || $_POST['device_id'] == '-1' || $_POST['device_id'][0] == ':') {
     $device_id = $_POST['device_id'];
     if (! is_numeric($count)) {
         $count = '-1';

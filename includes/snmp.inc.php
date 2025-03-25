@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS - SNMP Functions
  *
@@ -332,45 +333,6 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 
     return false;
 }
-
-/**
- * Calls snmpgetnext for multiple OIDs.  Getnext returns the next oid after the specified oid.
- * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
- *
- * @param  array  $device  Target device
- * @param  array  $oids  The oids to getnext
- * @param  string  $options  Options to pass to snmpgetnext (-OQUs for example)
- * @param  string  $mib  The MIB to use
- * @param  string  $mibdir  Optional mib directory to search
- * @return array|false the output or false if the data could not be fetched
- */
-function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
-{
-    $measure = Measurement::start('snmpgetnext');
-    if (! is_array($oids)) {
-        $oids = explode(' ', $oids);
-    }
-    $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
-    $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
-
-    foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value, "\" \n\r");
-        $oid = explode('.', $oid, 2)[0] ?? null;
-        if (! Str::contains($value, 'at this OID')) {
-            if (empty($oid)) {
-                continue; // no index or oid
-            } else {
-                $array[$oid] = $value;
-            }
-        }
-    }
-    $measure->manager()->recordSnmp($measure->end());
-
-    return $array;
-}//end snmp_getnext_multi()
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {

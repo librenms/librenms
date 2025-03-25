@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validator.php
  *
@@ -137,7 +138,7 @@ class Validator
      * @param  string|null  $validation_group
      * @return ValidationResult[]
      */
-    public function getResults(string $validation_group = null): array
+    public function getResults(?string $validation_group = null): array
     {
         if (isset($validation_group)) {
             return $this->results[$validation_group] ?? [];
@@ -162,7 +163,7 @@ class Validator
      *
      * @param  string|null  $validation_group
      */
-    public function printResults(string $validation_group = null): void
+    public function printResults(?string $validation_group = null): void
     {
         $results = $this->getResults($validation_group);
 
@@ -189,7 +190,7 @@ class Validator
      * @param  ValidationResult  $result
      * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function result(ValidationResult $result, string $group = null): void
+    public function result(ValidationResult $result, ?string $group = null): void
     {
         // get the name of the validation that submitted this result
         if (empty($group)) {
@@ -213,7 +214,7 @@ class Validator
      * @param  string|null  $fix
      * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function ok(string $message, string $fix = null, string $group = null): void
+    public function ok(string $message, ?string $fix = null, ?string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::SUCCESS, $fix), $group);
     }
@@ -225,7 +226,7 @@ class Validator
      * @param  string|null  $fix
      * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function warn(string $message, string $fix = null, string $group = null): void
+    public function warn(string $message, ?string $fix = null, ?string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::WARNING, $fix), $group);
     }
@@ -237,7 +238,7 @@ class Validator
      * @param  string|null  $fix
      * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function fail(string $message, string $fix = null, string $group = null): void
+    public function fail(string $message, ?string $fix = null, ?string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::FAILURE, $fix), $group);
     }
@@ -248,7 +249,7 @@ class Validator
      * @param  string  $message
      * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function info(string $message, string $group = null): void
+    public function info(string $message, ?string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::INFO), $group);
     }
@@ -261,7 +262,7 @@ class Validator
      * @param  array|null  $output  will hold the output of the command
      * @param  int|null  $code  will hold the return code from the command
      */
-    public function execAsUser(string $command, array &$output = null, int &$code = null): void
+    public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
         if (self::getUsername() === 'root') {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';

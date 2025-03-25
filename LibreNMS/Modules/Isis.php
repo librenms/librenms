@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Isis.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Observers\ModuleModelObserver;
@@ -115,7 +117,6 @@ class Isis implements Module
 
         if (! empty($circuits)) {
             $adjacencies_data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'ISIS-MIB::isisISAdj', [], null, null, '-OQUstx');
-            $ifIndex_port_id_map = $os->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
             // No ISIS enabled interfaces -> delete the component
             foreach ($circuits as $circuit_id => $circuit_data) {
@@ -132,7 +133,7 @@ class Isis implements Module
                 $attributes = [
                     'device_id' => $os->getDeviceId(),
                     'ifIndex' => $circuit_data['isisCircIfIndex'],
-                    'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
+                    'port_id' => PortCache::getIdFromIfIndex($circuit_data['isisCircIfIndex'], $os->getDevice()),
                     'isisCircAdminState' => $circuit_data['isisCircAdminState'] ?? 'down',
                     'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
                 ];

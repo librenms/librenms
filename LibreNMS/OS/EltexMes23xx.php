@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EltexMes23xx.php
  *
@@ -24,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
@@ -69,12 +71,10 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
-            ->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            ->mapTable(function ($data, $ifIndex) {
                 return new Transceiver([
-                    'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                     'index' => $ifIndex,
                     'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
                     'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,

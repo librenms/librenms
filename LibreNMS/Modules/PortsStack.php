@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsStack.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\PortStack;
 use App\Observers\ModuleModelObserver;
@@ -73,18 +75,16 @@ class PortsStack implements Module
             return;
         }
 
-        $ifIndexToPortIdMap = $os->getDevice()->ports()->pluck('port_id', 'ifIndex')->toArray();
-
-        $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex) use ($ifIndexToPortIdMap) {
+        $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex) use ($os) {
             if ($lowIfIndex == '0' || $highIfIndex == '0') {
                 return null;  // we don't care about the default entries for ports that have stacking enabled
             }
 
             return new PortStack([
                 'high_ifIndex' => $highIfIndex,
-                'high_port_id' => $ifIndexToPortIdMap[$highIfIndex] ?? null,
+                'high_port_id' => PortCache::getIdFromIfIndex($highIfIndex, $os->getDevice()),
                 'low_ifIndex' => $lowIfIndex,
-                'low_port_id' => $ifIndexToPortIdMap[$lowIfIndex] ?? null,
+                'low_port_id' => PortCache::getIdFromIfIndex($lowIfIndex, $os->getDevice()),
                 'ifStackStatus' => $data['IF-MIB::ifStackStatus'],
             ]);
         });

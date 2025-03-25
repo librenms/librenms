@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BridgeMib.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Facades\PortCache;
 use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
@@ -98,13 +100,20 @@ trait BridgeMib
     public function discoverStpPorts(Collection $stpInstances): Collection
     {
         $ports = new Collection;
+
+        // prep base port to port_id map if we have instances
+        $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
+        $basePortIdMap = array_map(function ($ifIndex) {
+            return PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+        }, $baseIfIndex);
+
         foreach ($stpInstances as $instance) {
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
-                ->mapTable(function ($data, $port) use ($instance) {
+                ->mapTable(function ($data, $port) use ($instance, $basePortIdMap) {
                     return new PortStp([
                         'vlan' => $instance->vlan,
-                        'port_id' => $this->basePortToId($port),
+                        'port_id' => $basePortIdMap[$port] ?? 0,
                         'port_index' => $port,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',

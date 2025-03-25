@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -76,7 +77,7 @@ foreach ($sagan['data'] as $instance => $stats) {
     }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 $old_instances = $app->app['instances'] ?? [];
@@ -88,11 +89,11 @@ $added_instances = array_values(array_diff($instances, $old_instances));
 $removed_instances = array_values(array_diff($old_instances, $instances));
 
 // if we have any instance changes, log it
-if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
+if (count($added_instances) > 0 or count($removed_instances) > 0) {
     $log_message = 'Sagan Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 $app->data = ['instances' => $instances];

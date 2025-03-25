@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -168,7 +170,7 @@ foreach ($data['disks'] as $disk_id => $disk) {
         'selective' => is_numeric($disk['selective']) ? $disk['selective'] : null,
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $metrics['disk_' . $disk_id . '_id5'] = $fields['id5'];
     $metrics['disk_' . $disk_id . '_id10'] = $fields['id10'];
@@ -198,21 +200,21 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
     $fields_id9 = ['id9' => $disk['9']];
     $tags_id9 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id9, 'rrd_name' => $rrd_name_id9];
-    data_update($device, 'app', $tags_id9, $fields_id9);
+    app('Datastore')->put($device, 'app', $tags_id9, $fields_id9);
 
     $metrics['disk_' . $disk_id . '_id9'] = $disk['9'];
 
     $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
     $fields_id232 = ['id232' => $disk['232']];
     $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
-    data_update($device, 'app', $tags_id232, $fields_id232);
+    app('Datastore')->put($device, 'app', $tags_id232, $fields_id232);
 
     $metrics['disk_' . $disk_id . '_id232'] = $disk['232'];
 
     $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
     $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
     $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
-    data_update($device, 'app', $tags_maxtemp, $fields_maxtemp);
+    app('Datastore')->put($device, 'app', $tags_maxtemp, $fields_maxtemp);
 
     $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
 
@@ -261,27 +263,27 @@ foreach ($data['disks'] as $disk_id => $disk) {
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_tests) > 0) {
+if (count($new_disks_with_failed_tests) > 0) {
     $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_tests']) == 0 && sizeof($old_data['disks_with_failed_tests']) > 0) {
+if (count($data['disks_with_failed_tests']) == 0 && count($old_data['disks_with_failed_tests']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed tests';
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any disks with failed tests found
-if (sizeof($new_disks_with_failed_health) > 0) {
+if (count($new_disks_with_failed_health) > 0) {
     $log_message = 'SMART found new disks with failed health checks: ' . json_encode($new_disks_with_failed_health);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log when there when we go to having no failed disks from having them previously
-if (sizeof($data['disks_with_failed_health']) == 0 && sizeof($old_data['disks_with_failed_health']) > 0) {
+if (count($data['disks_with_failed_health']) == 0 && count($old_data['disks_with_failed_health']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed health checks';
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 $app->data = $data;

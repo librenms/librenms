@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for RouterOS IPv6 Routes introduced in ROSv7
  *
@@ -41,7 +42,7 @@ foreach ($oids as $dst => $data) {
 
     //portId from ifIndex
     $ifIndex = $data['IPV6-MIB::ipv6RouteIfIndex'][$PfxLen][$RouteIndex];
-    $portId = get_port_by_index_cache($device['device_id'], $ifIndex)['port_id'];
+    $portId = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
 
     //populate array with data
     unset($entryClean);

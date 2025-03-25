@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -46,7 +48,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $new_slugs = [];
 $seen_slugs = [];
@@ -65,7 +67,7 @@ foreach ($data['slugs'] as $slug => $slug_data) {
     ];
     $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     if (! isset($app_data['slugs'][$slug])) {
         array_push($new_slugs, $slug);
     }
@@ -92,7 +94,7 @@ foreach ($app_data['slugs'] as $slug => $slug_data) {
         ];
         $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
         if (! isset($app_data['slugs'][$slug])) {
             array_push($new_slugs, $slug);
         }
@@ -101,11 +103,11 @@ foreach ($app_data['slugs'] as $slug => $slug_data) {
 }
 
 if ($data['totals']['hash_changed'] >= 1) {
-    log_event('Mojo Cape Submit has recieved submissions with changed hashes: ' . json_encode($data['changed_hashes']), $device, 'application', 5);
+    Eventlog::log('Mojo Cape Submit has recieved submissions with changed hashes: ' . json_encode($data['changed_hashes']), $device['device_id'], 'application', Severity::Error);
 }
 
 if (isset($new_slugs[0])) {
-    log_event('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device, 'application', 1);
+    Eventlog::log('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device['device_id'], 'application', Severity::Ok);
 }
 
 uasort($app_data['slugs'], function ($a, $b) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckInstalled.php
  *

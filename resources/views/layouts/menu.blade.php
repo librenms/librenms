@@ -74,6 +74,11 @@
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
+                                @config('mac_oui.enabled')
+                                <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
+                                                                                              aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
+                                </li>
+                                @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
@@ -234,20 +239,28 @@
 
                         @if($custommaps->isNotEmpty())
                             <li role="presentation" class="divider"></li>
-                                    @foreach($custommaps as $map_group => $group_maps)
-                                        @if($map_group)
-                                        <li class="dropdown-submenu">
-                                        <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
-                                        </a>
-                                            <ul class="dropdown-menu scrollable-menu">
-                                        @endif
-                                        @foreach($group_maps as $map)
-                                        <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($map->name) }}
-                                            </a></li>
-                                        @endforeach
+                                @if($custommaps->count() == 1)
+                                <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
+                                    <ul class="dropdown-menu scrollable-menu">
+                                @endif
+                                        @foreach($custommaps as $map_group => $group_maps)
+                                            @if($map_group)
+                                            <li class="dropdown-submenu">
+                                            <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
+                                            </a>
+                                                <ul class="dropdown-menu scrollable-menu">
+                                            @endif
+                                            @foreach($group_maps as $map)
+                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                    {{ ucfirst($map->name) }}
+                                                </a></li>
+                                            @endforeach
                                         @if($map_group)</ul></li>@endif
-                                    @endforeach
+                                        @endforeach
+                                @if($custommaps->count() == 1)
+                                    </ul>
+                                </li>
+                                @endif
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>

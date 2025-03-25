@@ -198,18 +198,20 @@ Output:
 
 ### `list_ip_addresses`
 
-List all IPv4 and IPv6 addresses.
+List all IPv4 and IPv6 or only version specific addresses.
 
-Route: `/api/v0/resources/ip/addresses`
+Route: `/api/v0/resources/ip/addresses/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv6
 ```
 
 Output:
@@ -272,18 +274,20 @@ Output:
 
 ### `list_ip_networks`
 
-List all IPv4 and IPv6 networks.
+List all IPv4 and IPv6 or only version specific networks.
 
-Route: `/api/v0/resources/ip/networks`
+Route: `/api/v0/resources/ip/networks/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv6
 ```
 
 Output:
@@ -436,6 +440,98 @@ Output:
           "ospfIfMetricTOS": 0,
           "ospfIfMetricValue": 10,
           "ospfIfMetricStatus": "active",
+          "context_name": null
+        }
+    ],
+    "count": 1
+}
+```
+### `list_ospfv3`
+
+List the current OSPFv3 neighbours.
+
+Route: `/api/v0/ospfv3`
+
+Input:
+
+- hostname = Either the devices hostname or id.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospfv3
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospfv3?hostname=host.example.com
+```
+
+Output:
+
+```json
+{
+ "status": "ok",
+ "ospfv3_neighbours": [
+        {
+            "device_id": "1",
+            "port_id": "0",
+            "ospfv3_nbr_id": "2",
+            "ospfv3NbrIfId: "1147535360",
+            "ospfv3NbrIfInstId": "0",
+            "ospfv3NbrRtrId": "167797515",
+            "ospfv3NbrAddressType": "ipv6",
+            "ospfv3NbrAddress": "fe80::bcd7:a501:98cf:af80",
+            "ospfv3NbrOptions": "19",
+            "ospfv3NbrPriority": "50",
+            "ospfv3NbrState": "full",
+            "ospfv3NbrEvents": "6",
+            "ospfv3NbrLsRetransQLen": "0",
+            "ospfv3NbrHelloSuppressed": "false",
+            "context_name": ""
+
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_ospfv3_ports`
+
+List the current OSPFv3 ports.
+
+Route: `/api/v0/ospfv3_ports`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospfv3_ports
+```
+
+Output:
+
+```json
+{
+ "status": "ok",
+ "ospf_ports": [
+        {
+          "id": 189086,
+          "device_id": 43,
+          "port_id": 2838,
+          "ospfv3_port_id": "2",
+          "ospfv3IfIndex": "2",
+          "ospfv3IfAreaId": "0",
+          "ospfv3IfType": "broadcast",
+          "ospfv3IfAdminStatus": "enabled",
+          "ospfv3IfRtrPriority": 128,
+          "ospfv3IfTransitDelay": 1,
+          "ospfv3IfRetransInterval": 5,
+          "ospfv3IfHelloInterval": 10,
+          "ospfv3IfRtrDeadInterval": 40,
+          "ospfv3IfPollInterval": 90,
+          "ospfv3IfState": "backupDesignatedRouter",
+          "ospfv3IfDesignatedRouter": "167797515",
+          "ospfv3IfBackupDesignatedRouter": "167797515",
+          "ospfv3IfEvents": 33,
+          "ospfv3IfStatus": "active",
+          "ospfv3IfDemand": "false",
+          "ospfv3IfMetricValue": 10,
           "context_name": null
         }
     ],

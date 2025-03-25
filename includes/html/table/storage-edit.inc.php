@@ -2,7 +2,7 @@
 
 $device_id = $vars['device_id'];
 
-$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0';
+$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
 $param[] = $device_id;
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {

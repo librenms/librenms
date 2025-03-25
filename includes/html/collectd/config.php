@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configuration file for Collectd graph browser
  */

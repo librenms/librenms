@@ -88,7 +88,7 @@ return [
         'active_directory' => [
             'users_purge' => [
                 'description' => 'Keep inactive users for',
-                'help' => 'Users will be deleted from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.',
+                'help' => 'Users will be deleted from LibreNMS after this many days of not logging in. 0 means never and users will be recreated if the user logs back in.',
             ],
         ],
         'addhost_alwayscheckip' => [
@@ -916,7 +916,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [
@@ -1082,6 +1082,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1108,9 +1111,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Cisco ACE Serverfarms',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Cisco ASA Firewall',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',

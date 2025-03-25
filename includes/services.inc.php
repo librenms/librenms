@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
@@ -112,7 +114,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        log_event('Autodiscovered service: type ' . $service, $device, 'service', 2);
+        Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
         echo '+';
     }
     echo "$service ";
@@ -182,7 +184,7 @@ function poll_service($service)
 
         $tags = compact('service_id', 'rrd_name', 'rrd_def');
         //TODO not sure if we have $device at this point, if we do replace faked $device
-        data_update(['hostname' => $service['hostname']], 'services', $tags, $fields);
+        app('Datastore')->put(['hostname' => $service['hostname']], 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {
@@ -196,11 +198,11 @@ function poll_service($service)
         $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
         $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
 
-        log_event(
+        Eventlog::log(
             "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
             $service['device_id'],
             'service',
-            4,
+            Severity::Warning,
             $service['service_id']
         );
 

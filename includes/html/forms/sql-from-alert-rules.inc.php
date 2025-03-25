@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-rules.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SNMP.php
  *
@@ -416,11 +417,18 @@ class NetSnmpQuery implements SnmpQueryInterface
             $key = $this->getCacheKey($command, $oids);
 
             if (Debug::isEnabled()) {
+                $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
+                $cache_performance[$key] ??= 0;
+
                 if (Cache::driver($driver)->has($key)) {
                     Log::debug("Cache hit for $command " . implode(',', $oids));
+                    $cache_performance[$key]++;
                 } else {
                     Log::debug("Cache miss for $command " . implode(',', $oids) . ', grabbing fresh data.');
                 }
+
+                // update cache performance
+                Cache::driver($driver)->put('SnmpQuery_cache_performance', $cache_performance);
             }
         }
 

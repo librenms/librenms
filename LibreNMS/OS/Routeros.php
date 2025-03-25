@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Routeros.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Qos;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
@@ -515,9 +517,6 @@ class Routeros extends OS implements
         $this->qosIdxToParent = new Collection();
         $qos = new Collection();
 
-        // Map QoS index to port
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleTable')->mapTable(function ($data, $qosIndex) {
             return new Qos([
                 'device_id' => $this->getDeviceId(),
@@ -531,10 +530,10 @@ class Routeros extends OS implements
         }));
 
         $this->qosIdxToParent->put('routeros_tree', new Collection());
-        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeTable')->mapTable(function ($data, $qosIndex) use ($ifIndexToPortId) {
+        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeTable')->mapTable(function ($data, $qosIndex) {
             $thisQos = new Qos([
                 'device_id' => $this->getDeviceId(),
-                'port_id' => $ifIndexToPortId->get(hexdec($data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']), null),
+                'port_id' => PortCache::getIdFromIfIndex(hexdec($data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']), $this->getDevice()),
                 'type' => 'routeros_tree',
                 'title' => $data['MIKROTIK-MIB::mtxrQueueTreeName'],
                 'snmp_idx' => $qosIndex,
@@ -653,13 +652,11 @@ class Routeros extends OS implements
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
-        return \SnmpQuery::walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+        return \SnmpQuery::walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
             $wavelength = isset($data['MIKROTIK-MIB::mtxrOpticalWavelength']) && $data['MIKROTIK-MIB::mtxrOpticalWavelength'] != '.00' ? Number::cast($data['MIKROTIK-MIB::mtxrOpticalWavelength']) : null;
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'vendor' => $data['MIKROTIK-MIB::mtxrOpticalVendorName'] ?? null,
                 'serial' => $data['MIKROTIK-MIB::mtxrOpticalVendorSerial'] ?? null,

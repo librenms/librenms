@@ -759,115 +759,24 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "35",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 55504896,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 48922624,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "54",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 26831990784,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 4381347840,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.54",
+                    "storage_free": 22450642944,
+                    "storage_free_oid": null,
+                    "storage_perc": 16,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "35",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 55504896,
-                    "storage_free": 375177216,
-                    "storage_perc": 13,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 48922624,
-                    "storage_free": 381759488,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "38",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 430682112,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 430682112,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "54",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 26831990784,
-                    "storage_units": 4096,
-                    "storage_used": 4381347840,
-                    "storage_free": 22450642944,
-                    "storage_perc": 16,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "applications": {
         "discovery": {
@@ -915,6 +824,30 @@
                     "value": 0,
                     "value_prev": null,
                     "app_type": "icecast"
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:9041:75ff:fed5:143c",
+                    "ipv6_compressed": "fe80::9041:75ff:fed5:143c",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:d40e:32ff:fe94:e0a0",
+                    "ipv6_compressed": "fe80::d40e:32ff:fe94:e0a0",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 2
                 }
             ]
         }

@@ -57,7 +57,7 @@ if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name]
     $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-if ($proxmox) {
+if (! empty($proxmox)) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
@@ -99,7 +99,7 @@ if ($proxmox) {
                 ],
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
 
             if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate([

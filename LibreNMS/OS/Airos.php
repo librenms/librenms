@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Airos.php
  *
@@ -58,15 +59,16 @@ class Airos extends OS implements
 {
     public function discoverOS(Device $device): void
     {
-        $oids = ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'];
-        $data = snmp_getnext_multi($this->getDeviceArray(), $oids, '-OQUs', 'IEEE802dot11-MIB');
+        $response = \SnmpQuery::next([
+            'IEEE802dot11-MIB::dot11manufacturerProductName',
+            'IEEE802dot11-MIB::dot11manufacturerProductVersion',
+        ]);
 
-        $device->hardware = $data['dot11manufacturerProductName'] ?? null;
+        $device->hardware = $response->value('IEEE802dot11-MIB::dot11manufacturerProductName') ?: null;
 
-        if (isset($data['dot11manufacturerProductVersion'])) {
-            preg_match('/\.v(.*)$/', $data['dot11manufacturerProductVersion'], $matches);
-            $device->version = $matches[1] ?? null;
-        }
+        $version = $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion');
+        preg_match('/\.v(.*)$/', $version, $matches);
+        $device->version = $matches[1] ?? null;
     }
 
     public function fetchLocation(): Location

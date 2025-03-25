@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to Graph Juniper RPM IcmpTimeStamp metrics
  *

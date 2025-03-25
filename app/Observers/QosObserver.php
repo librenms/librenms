@@ -16,7 +16,7 @@ class QosObserver
     {
         if ($qos->isDirty('last_polled')) {
             $poll_interval = $qos->last_polled - $qos->getOriginal('last_polled');
-            if ($poll_interval > 0) {
+            if ($poll_interval > 0 && $qos->getOriginal('last_polled') > 0) {
                 $qos->bytes_out_rate = $this->calcRate($qos->last_bytes_out, $qos->getOriginal('last_bytes_out'), $poll_interval);
                 $qos->bytes_in_rate = $this->calcRate($qos->last_bytes_in, $qos->getOriginal('last_bytes_in'), $poll_interval);
                 $qos->bytes_drop_out_rate = $this->calcRate($qos->last_bytes_drop_out, $qos->getOriginal('last_bytes_drop_out'), $poll_interval);
@@ -33,7 +33,7 @@ class QosObserver
         }
     }
 
-    private function calcRate(int|null $val, int|null $lastval, int $interval): int|null
+    private function calcRate(?int $val, ?int $lastval, int $interval): ?int
     {
         if (is_null($val)) {
             return null;
@@ -50,7 +50,7 @@ class QosObserver
         return intval(($val - $lastval) / $interval);
     }
 
-    private function calcPct(int|null $dividend, int|null $divisor, int $precision): float|null
+    private function calcPct(?int $dividend, ?int $divisor, int $precision): ?float
     {
         if (is_null($dividend) || is_null($divisor)) {
             return null;

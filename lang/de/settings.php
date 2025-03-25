@@ -523,7 +523,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Standard Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Standard Stat',
         ],
         'nfsen_order_default' => [

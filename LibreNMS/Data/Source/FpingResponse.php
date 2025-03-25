@@ -1,4 +1,5 @@
 <?php
+
 /*
  * FpingResponse.php
  *
@@ -64,12 +65,12 @@ class FpingResponse
     {
     }
 
-    public static function artificialUp(string $host = null): static
+    public static function artificialUp(?string $host = null): static
     {
         return new static(1, 1, 0, 0, 0, 0, 0, 0, $host, true);
     }
 
-    public static function artificialDown(string $host = null): static
+    public static function artificialDown(?string $host = null): static
     {
         return new static(1, 0, 100, 0, 0, 0, 0, 0, $host, false);
     }
@@ -87,7 +88,7 @@ class FpingResponse
         return $this->skipped;
     }
 
-    public static function parseLine(string $output, int $code = null): FpingResponse
+    public static function parseLine(string $output, ?int $code = null): FpingResponse
     {
         $matched = preg_match('#(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed);
 

@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -66,7 +68,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key => $value) {
@@ -87,11 +89,11 @@ $added_checks = array_values(array_diff($new_checks, $old_checks));
 $removed_checks = array_values(array_diff($old_checks, $new_checks));
 
 // if we have any check changes, log it
-if (sizeof($added_checks) > 0 || sizeof($removed_checks) > 0) {
+if (count($added_checks) > 0 || count($removed_checks) > 0) {
     $log_message = 'Sneck Check Change:';
     $log_message .= count($added_checks) > 0 ? ' Added ' . json_encode($added_checks) : '';
     $log_message .= count($removed_checks) > 0 ? ' Removed ' . json_encode($added_checks) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // go through and looking for status changes
@@ -132,27 +134,27 @@ foreach ($new_checks as $check) {
 }
 
 // log any clears
-if (sizeof($cleared) > 0) {
+if (count($cleared) > 0) {
     $log_message = 'Sneck Check Clears: ' . json_encode($cleared);
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any warnings
-if (sizeof($warned) > 0) {
+if (count($warned) > 0) {
     $log_message = 'Sneck Check Warns: ' . json_encode($warned);
-    log_event($log_message, $device, 'application', 4);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Warning);
 }
 
 // log any alerts
-if (sizeof($alerted) > 0) {
+if (count($alerted) > 0) {
     $log_message = 'Sneck Check Alerts: ' . json_encode($alerted);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log any unknowns
-if (sizeof($unknowned) > 0) {
+if (count($unknowned) > 0) {
     $log_message = 'Sneck Check Unknowns: ' . json_encode($unknownwed);
-    log_event($log_message, $device, 'application', 6);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Unknown);
 }
 
 // update it here as we are done with this mostly

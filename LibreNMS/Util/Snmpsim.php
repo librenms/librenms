@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Snmpsim.php
  *
@@ -68,7 +69,15 @@ class Snmpsim extends Process
 
     public function isVenvSetUp(): bool
     {
-        return is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'));
+        if (! is_executable($this->getVenvPath('bin/snmpsim-command-responder-lite'))) {
+            return false;
+        }
+
+        // check that snmpsim package actually exists
+        $pipCheck = new Process([$this->getVenvPath('bin/pip'), 'show', 'snmpsim']);
+        $pipCheck->run();
+
+        return $pipCheck->isSuccessful();
     }
 
     public function setupVenv($print_output = false): void

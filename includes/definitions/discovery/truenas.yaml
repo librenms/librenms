@@ -2,6 +2,26 @@ mib: FREENAS-MIB        # Used for FreeNAS and TrueNAS-CORE
 modules:
     os:
         sysDescr_regex: '/(?:TrueNAS-|FreeNAS-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\. Software.*/'
+    storage:
+        data:
+            -
+                oid: FREENAS-MIB::zpoolTable
+                poller_type: freenas-zpool
+                type: zpool
+                descr: FREENAS-MIB::zpoolDescr
+                units: FREENAS-MIB::zpoolAllocationUnits
+                size: FREENAS-MIB::zpoolSize
+                used: FREENAS-MIB::zpoolUsed
+                used_num_oid: '.1.3.6.1.4.1.50536.1.1.1.1.5.{{ $index }}'
+            -
+                oid: FREENAS-MIB::datasetTable
+                poller_type: freenas-dataset
+                type: dataset
+                descr: FREENAS-MIB::datasetDescr
+                units: FREENAS-MIB::datasetAllocationUnits
+                size: FREENAS-MIB::datasetSize
+                free: FREENAS-MIB::datasetAvailable
+                free_num_oid: '.1.3.6.1.4.1.50536.1.2.1.1.6.{{ $index }}'
     sensors:
         count:
             data:

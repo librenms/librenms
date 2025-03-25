@@ -23,7 +23,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     ];
 
     $tags = compact('rrd_name', 'rrd_def');
-    data_update($device, 'aruba-controller', $tags, $fields);
+    app('Datastore')->put($device, 'aruba-controller', $tags, $fields);
 
     // get AP data
     $aruba_apstats = SnmpQuery::enumStrings()->walk([
@@ -48,7 +48,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 'nummonclients' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredClients'] ?? null,
                 'numactbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumActiveBSSIDs'] ?? null,
                 'nummonbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredBSSIDs'] ?? null,
-                'interference' => $data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] ?? null,
+                'interference' => isset($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex']) ? ($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] / 600) : null,
             ]);
 
             Log::debug(<<<DEBUG
@@ -91,7 +91,7 @@ DEBUG);
                     'rrd_def' => $rrd_def,
                 ];
 
-                data_update($device, 'aruba', $tags, $fields);
+                app('Datastore')->put($device, 'aruba', $tags, $fields);
 
                 // sync to DB
                 $ap_key = $ap->getCompositeKey();

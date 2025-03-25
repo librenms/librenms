@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ciscosb.inc.php
  *
@@ -42,9 +43,6 @@ if (is_array($temp)) {
         if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }
