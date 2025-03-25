@@ -10,4 +10,4 @@ mib_dir: bison
 discovery:
     -
         sysDescr_regex:
-            - '/bison/'
+            - '/Linux bison/'
