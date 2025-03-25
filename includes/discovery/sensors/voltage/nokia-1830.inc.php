@@ -21,7 +21,7 @@
 // *************************************************************
 
 if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12') !== false) {
-  d_echo('Nokia PSD DDM Current Sensors\n');
+  d_echo('Nokia PSD DDM Voltage Sensors\n');
   $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
   $ifAdminStatus = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifAdminStatus')->pluck();
   $ifDdmValues = SnmpQuery::cache()->hideMib()->walk('TROPIC-PSD-MIB::tnPsdDdmDataValue')->table(2);
@@ -29,7 +29,7 @@ if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12') !== false) {
   foreach ($ifDdmValues as $ifIndex => $ddmvalue) {
     $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
     if (! empty($ddmvalue['ddmVoltage']['tnPsdDdmDataValue']) && $ifAdminStatus[$ifIndex] == 'up') {
-          $divisor = 1000000;
+          $divisor = 10000;
           $descr = $ifName;
           app('sensor-discovery')->discover(new \App\Models\Sensor([
               'poller_type' => 'snmp',
