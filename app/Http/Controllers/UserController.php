@@ -37,6 +37,7 @@ use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -58,7 +59,7 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::with('preferences')->orderBy('username')->get(),
+            'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
         ]);
     }
@@ -187,7 +188,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->has('roles')) {
+        if ($request->user()->can('manage', Role::class)) {
             $user->syncRoles($request->get('roles', []));
         }
 

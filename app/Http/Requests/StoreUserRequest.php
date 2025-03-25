@@ -47,7 +47,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
             'roles' => 'array',
-            'roles.*' => Rule::in(Role::query()->pluck('name')),
+            'roles.*' => 'exists:roles,name',
             'new_password' => 'required|confirmed|min:' . Config::get('password.min_length', 8),
             'dashboard' => 'int',
         ];
