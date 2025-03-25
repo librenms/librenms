@@ -17,69 +17,52 @@
  **/
 
 // *************************************************************
-// ***** dBm Sensors for Nokia PSD
+// ***** Current Sensors for Nokia PSD
 // *************************************************************
-$multiplier = 1;
-$divisor = 10;
 
-if (is_array($pre_cache['ddmvalues']) && is_array($pre_cache['iftable'])) {
-    d_echo('Nokia PSD DDM dBm Sensors\n');
-    foreach (array_keys($pre_cache['iftable']) as $index) {
-        $ddmIndexTx = "$index.4";
-        $ddmIndexRx = "$index.5";
-        if ($pre_cache['iftable'][$index]['ifAdminStatus'] == 'up') {
-            if ($pre_cache['ddmvalues'][$ddmIndexTx]) {
-                $oid = '.1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.' . $ddmIndexTx;
-                $descr = $pre_cache['ifnames'][$index]['ifName'];
-                $current = $pre_cache['ddmvalues'][$ddmIndexTx]['tnPsdDdmDataValue'] / $divisor;
-                discover_sensor(
-                    null,
-                    'dbm',
-                    $device,
-                    $oid,
-                    $ddmIndexTx,
-                    'nokia-1830',
-                    $descr,
-                    $divisor,
-                    $multiplier,
-                    null,
-                    null,
-                    null,
-                    null,
-                    $current,
-                    'snmp',
-                    null,
-                    null,
-                    null,
-                    'Transceivers'
-                );
-            }
-            if ($pre_cache['ddmvalues'][$ddmIndexRx]) {
-                $oid = '.1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.' . $ddmIndexRx;
-                $descr = $pre_cache['ifnames'][$index]['ifName'];
-                $current = $pre_cache['ddmvalues'][$ddmIndexRx]['tnPsdDdmDataValue'] / $divisor;
-                discover_sensor(
-                    null,
-                    'dbm',
-                    $device,
-                    $oid,
-                    $ddmIndexRx,
-                    'nokia-1830',
-                    $descr,
-                    $divisor,
-                    $multiplier,
-                    null,
-                    null,
-                    null,
-                    null,
-                    $current,
-                    'snmp',
-                    null,
-                    null,
-                    null,
-                    'Transceivers'
-                );
-            }
+if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12') !== false) {
+  d_echo('Nokia PSD DDM Current Sensors\n');
+  $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+  $ifAdminStatus = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifAdminStatus')->pluck();
+  $ifDdmValues = SnmpQuery::cache()->hideMib()->walk('TROPIC-PSD-MIB::tnPsdDdmDataValue')->table(2);
+
+  foreach ($ifDdmValues as $ifIndex => $ddmvalue) {
+    $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
+    if (! empty($ddmvalue['ddmTransmittedPower']['tnPsdDdmDataValue']) && $ifAdminStatus[$ifIndex] == 'up') {
+          $divisor = 10;
+          $descr = $ifName;
+          app('sensor-discovery')->discover(new \App\Models\Sensor([
+              'poller_type' => 'snmp',
+              'sensor_class' => 'dbm',
+              'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.4",
+              'sensor_index' => "$ifIndex.4",
+              'sensor_type' => 'nokia-1830',
+              'sensor_descr' => $descr,
+              'sensor_divisor' => $divisor,
+              'sensor_multiplier' => 1,
+              'sensor_current' => $ddmvalue['ddmTransmittedPower']['tnPsdDdmDataValue'] / $divisor,
+              'entPhysicalIndex' => $ifIndex,
+              'entPhysicalIndex_measured' => 'port',
+              'group' => 'Transceivers',
+          ]));
+      }
+      if (! empty($ddmvalue['ddmReceivedPower']['tnPsdDdmDataValue']) && $ifAdminStatus[$ifIndex] == 'up') {
+            $divisor = 10;
+            $descr = $ifName;
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'dbm',
+                'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.5",
+                'sensor_index' => "$ifIndex.5",
+                'sensor_type' => 'nokia-1830',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $ddmvalue['ddmReceivedPower']['tnPsdDdmDataValue'] / $divisor,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'port',
+                'group' => 'Transceivers',
+            ]));
         }
-    }
-} //  ************** End of Sensors for Nokia PSD **********
+  }
+}   //  ************** End of Sensors for Nokia PSD **********
