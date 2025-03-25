@@ -1,5 +1,4 @@
 <?php
-
 /**
  * infinera-groove.inc.php
  *
@@ -30,10 +29,15 @@ if (! isset($pre_cache['infineragroove_portTable']) || ! is_array($pre_cache['in
     $pre_cache['infineragroove_portTable'] = snmpwalk_cache_multi_oid($device, 'portTable', $pre_cache['infineragroove_portTable'], 'CORIANT-GROOVE-MIB');
     echo ' OchOsTable';
     $pre_cache['infineragroove_portTable'] = snmpwalk_cache_multi_oid($device, 'OchOsTable', $pre_cache['infineragroove_portTable'], 'CORIANT-GROOVE-MIB');
+    echo ' bitErrorRatePostFecTable';
+    $pre_cache['infineragroove_portTable'] = snmpwalk_cache_multi_oid($device, 'bitErrorRatePostFecTable', $pre_cache['infineragroove_portTable'], 'CORIANT-GROOVE-MIB');
+    echo ' bitErrorRatePreFecTable';
+    $pre_cache['infineragroove_portTable'] = snmpwalk_cache_multi_oid($device, 'bitErrorRatePreFecTable', $pre_cache['infineragroove_portTable'], 'CORIANT-GROOVE-MIB');
 }
 
 foreach (array_keys($pre_cache['infineragroove_portTable']) as $index) {
     $indexids = explode('.', $index);
+
 
     if (isset($pre_cache['infineragroove_portTable'][$index]['ochOsAdminStatus'])) {
         $pre_cache['infineragroove_portTable'][$index]['portAlias'] = 'och-os-';
@@ -52,5 +56,3 @@ if (! isset($pre_cache['infineragroove_slotTable']) || ! is_array($pre_cache['in
     echo ' cardTable';
     $pre_cache['infineragroove_slotTable'] = snmpwalk_cache_multi_oid($device, 'cardTable', $pre_cache['infineragroove_slotTable'], 'CORIANT-GROOVE-MIB');
 }
-
-echo "\n";
