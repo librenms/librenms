@@ -47,27 +47,26 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'];
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.1.1')->toNumeric();
-            discover_sensor(
-                null,
-                'temperature',
-                $device,
-                $oid,
-                'SfpTemp' . $ifIndex,
-                'ELTEX-PHY-MIB',
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                'Transceiver'
-            );
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'temperature',
+                'sensor_oid' => $oid,
+                'sensor_index' => 'SfpTemp' . $ifIndex,
+                'sensor_type' => 'ELTEX-PHY-MIB',
+                'sensor_descr' => 'SfpTemp-' . $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $low_limit,
+                'sensor_limit_low_warn' => $low_warn_limit,
+                'sensor_limit_warn' => $high_warn_limit,
+                'sensor_limit' => $high_limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'port',
+                'user_func' => null,
+                'group' => 'transceiver',
+            ]));
         }
     }
 }
