@@ -32,11 +32,12 @@
                 </thead>
                 <tbody id="users_rows">
                     @foreach($users as $user)
+                        @php /** @var \App\Models\User $user */ @endphp
                         <tr>
                             <td>{{ $user->user_id }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->realname }}</td>
-                            <td>{{ $user->roles->pluck('title') }}</td>
+                            <td>{{ $user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>

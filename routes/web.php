@@ -198,7 +198,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
             Route::get('device-group', 'DeviceGroupController')->name('ajax.select.device-group');
             Route::get('port-group', 'PortGroupController')->name('ajax.select.port-group');
-            Route::get('role', 'RoleController')->name('ajax.select.role');
             Route::get('eventlog', 'EventlogController')->name('ajax.select.eventlog');
             Route::get('graph', 'GraphController')->name('ajax.select.graph');
             Route::get('graph-aggregate', 'GraphAggregateController')->name('ajax.select.graph-aggregate');

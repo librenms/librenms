@@ -1,11 +1,8 @@
 <?php
 
-use App\Models\User;
-use Database\Seeders\RolesSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 return new class extends Migration
 {
@@ -14,25 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        (new RolesSeeder)->run(); // make sure roles have been created.
+        // create default roles, skip abilities as we ignore those later anyway
+        DB::table('roles')->insert([
+            ['name' => 'admin', 'title' => 'Admin'],
+            ['name' => 'global-read', 'title' => 'Global Read'],
+            ['name' => 'user', 'title' => 'User'],
+        ]);
 
-        User::all()->each(function (User $user) {
-            $role = match ($user->getAttribute('level')) {
+        $roles = DB::table('roles')->pluck('id', 'name')->all();
+
+        foreach (DB::table('users')->select(['user_id', 'level'])->get() as $user) {
+            $role = match ($user->level) {
                 1 => 'user',
                 5 => 'global-read',
                 10 => 'admin',
                 default => null,
             };
 
-            if ($role) {
-                Bouncer::assign($role)->to($user);
+            if (isset($roles[$role])) {
+                DB::table('assigned_roles')->insert([
+                    'role_id' => $roles[$role],
+                    'entity_id' => $user->user_id,
+                    'entity_type' => 'App\Models\User',
+                ]);
             }
-        });
-
-        try {
-            Bouncer::refresh(); // clear cache
-        } catch (Exception $e) {
-            // if this fails, there was no cache anyway
         }
 
         Schema::table('users', function (Blueprint $table) {
@@ -51,29 +53,42 @@ return new class extends Migration
             });
         }
 
-        User::whereIs('admin', 'global-read', 'user')->get()->each(function (User $user) {
-            $user->setAttribute('level', $this->getLevel($user));
-            $user->save();
-        });
+        $rolesByUserId = DB::table('assigned_roles')
+            ->join('roles', 'assigned_roles.role_id', '=', 'roles.id')
+            ->where('assigned_roles.entity_type', 'App\\Models\\User') // Adjust namespace if needed
+            ->select(
+                'assigned_roles.entity_id as user_id',
+                DB::raw('GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ",c") as roles')
+            )
+            ->groupBy('assigned_roles.entity_id')
+            ->pluck('roles', 'user_id')->map(function ($roles) {
+                return explode(',', $roles);
+            })->all();
 
-        try {
-            Bouncer::refresh(); // clear cache
-        } catch (Exception $e) {
-            // if this fails, there was no cache anyway
+        foreach (DB::table('users')->select('user_id')->get() as $user) {
+            DB::table('users')->where('user_id', $user->user_id)->update([
+                'level' => $this->getLevel($rolesByUserId, $user->user_id),
+            ]);
         }
     }
 
-    private function getLevel(User $user): int
+    private function getLevel(array $rolesByUserId, int $user_id): int
     {
-        if ($user->isA('admin')) {
+        if (! isset($rolesByUserId[$user_id])) {
+            return 0;
+        }
+
+        $userRoles = $rolesByUserId[$user_id];
+
+        if (in_array('admin', $userRoles)) {
             return 10;
         }
 
-        if ($user->isA('global-read')) {
+        if (in_array('global-read', $userRoles)) {
             return 7;
         }
 
-        if ($user->isA('user')) {
+        if (in_array('user', $userRoles)) {
             return 1;
         }
 
