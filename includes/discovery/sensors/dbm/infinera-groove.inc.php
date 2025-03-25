@@ -1,5 +1,4 @@
 <?php
-
 /**
  * infinera-groove.inc.php
  *
@@ -24,16 +23,21 @@
  * @author     Nick Hilliard <nick@foobar.org>
  */
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
-    if (is_numeric($data['portRxOpticalPower']) && $data['portRxOpticalPower'] != -99) {
-        $descr = $data['portAlias'] . ' Receive Power';
+    $group = (string)$data['portAlias']; 
+
+    // Discover Rx Power
+    if (is_numeric($data['portRxOpticalPower']) && $data['portOperStatus'] == "up") {
+        $descr = 'Port Receive Power';
         $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.4.' . $index;
         $value = $data['portRxOpticalPower'];
-        discover_sensor(null, 'dbm', $device, $oid, 'portRxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
+        discover_sensor(null, 'dbm', $device, $oid, 'portRxOpticalPower.' . $index, 'infinera-groove', $descr, $divisor, '1', null, null, null, null, $value, 'snmp', null, null, null, $group, 'GAUGE');
     }
-    if (is_numeric($data['portTxOpticalPower']) && $data['portTxOpticalPower'] != -99) {
-        $descr = $data['portAlias'] . ' Transmit Power';
+
+    // Discover Tx Power
+    if (is_numeric($data['portTxOpticalPower']) && $data['portOperStatus'] == "up") {
+        $descr = 'Port Transmit Power';
         $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.5.' . $index;
         $value = $data['portTxOpticalPower'];
-        discover_sensor(null, 'dbm', $device, $oid, 'portTxOpticalPower.' . $index, 'infinera-groove', $descr, null, '1', null, null, null, null, $value);
+        discover_sensor(null, 'dbm', $device, $oid, 'portTxOpticalPower.' . $index, 'infinera-groove', $descr, $divisor, '1', null, null, null, null, $value, 'snmp', null, null, null, $group, 'GAUGE');
     }
 }
