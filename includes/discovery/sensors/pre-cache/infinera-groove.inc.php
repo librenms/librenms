@@ -39,7 +39,6 @@ if (! isset($pre_cache['infineragroove_portTable']) || ! is_array($pre_cache['in
 foreach (array_keys($pre_cache['infineragroove_portTable']) as $index) {
     $indexids = explode('.', $index);
 
-
     if (isset($pre_cache['infineragroove_portTable'][$index]['ochOsAdminStatus'])) {
         $pre_cache['infineragroove_portTable'][$index]['portAlias'] = 'och-os-';
     } else {
