@@ -24,10 +24,10 @@
  * @author     Nick Hilliard <nick@foobar.org>
  */
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
-    $group = (string)$data['portAlias']; 
+    $group = (string) $data['portAlias']; 
 
     // Discover Rx Power
-    if (is_numeric($data['portRxOpticalPower']) && $data['portOperStatus'] == "up") {
+    if (is_numeric($data['portRxOpticalPower']) && $data['portOperStatus'] == 'up') {
         $descr = 'Port Receive Power';
         $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.4.' . $index;
         $value = $data['portRxOpticalPower'];
@@ -35,7 +35,7 @@ foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
     }
 
     // Discover Tx Power
-    if (is_numeric($data['portTxOpticalPower']) && $data['portOperStatus'] == "up") {
+    if (is_numeric($data['portTxOpticalPower']) && $data['portOperStatus'] == 'up') {
         $descr = 'Port Transmit Power';
         $oid = '.1.3.6.1.4.1.42229.1.2.3.6.1.1.5.' . $index;
         $value = $data['portTxOpticalPower'];
