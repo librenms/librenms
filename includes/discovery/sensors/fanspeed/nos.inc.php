@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module for Brocade NOS fanspeed sensor
  *

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ConnectivityHelper.php
  *

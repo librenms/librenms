@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RuckusSzEventTest.php
  *

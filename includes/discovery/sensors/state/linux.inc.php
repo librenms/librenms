@@ -1,4 +1,5 @@
 <?php
+
 /*
  * codec states for raspberry pi
  * requires snmp extend agent script from librenms-agent

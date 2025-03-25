@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckRrdcachedConnectivity.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018_07_03_091314_create_alert_transport_groups_table.php
  *

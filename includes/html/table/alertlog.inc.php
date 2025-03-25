@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -102,11 +103,11 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         if ($last_active_state) {
             $alert_log_id = $last_active_state[0]['id'];
             [$fault_detail, $max_row_length] = alert_details($last_active_state[0]['details']);
-        // It's a rule created log
+            // It's a rule created log
         } else {
             $fault_detail = 'Rule created, no faults found';
         }
-    // We will display the details of the log in question
+        // We will display the details of the log in question
     } else {
         $alert_log_id = $alertlog['alert_log_id'];
         [$fault_detail, $max_row_length] = alert_details($alertlog['alert_log_details']);

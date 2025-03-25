@@ -1,4 +1,5 @@
 <?php
+
 /**
  * poller_modules_perf.inc.php
  *
