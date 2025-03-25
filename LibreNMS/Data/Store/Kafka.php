@@ -288,5 +288,4 @@ class Kafka extends BaseDatastore
     {
         return false;
     }
-    
 }
