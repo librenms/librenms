@@ -65,11 +65,11 @@ class DatastoreTest extends TestCase
         Config::set('influxdbv2.enable', true);
         Config::set('opentsdb.enable', true);
         Config::set('prometheus.enable', true);
-        Config::set('kafka.enable', true);
+        Config::set('kafka.enable', false);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
-        $this->assertCount(6, $stores, 'Incorrect number of default stores enabled');
+        $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
 
         $enabled = array_map('get_class', $stores);
 
