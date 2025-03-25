@@ -70,7 +70,7 @@ class Kafka extends BaseDatastore
         });
     }
 
-   public function __destruct()
+    public function __destruct()
     {
         if (! $this->isShuttingDown) {
             $this->safeFlush();
@@ -253,7 +253,7 @@ class Kafka extends BaseDatastore
             Log::error('KAFKA: Put failed with exception', [
                 'device_id' => $this->device_id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
