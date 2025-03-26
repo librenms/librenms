@@ -10,8 +10,6 @@ use Mockery;
 use RdKafka\Producer;
 use RdKafka\ProducerTopic;
 
-
-
 class KafkaDBStoreTest extends TestCase
 {
     protected function setUp(): void

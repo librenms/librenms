@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
-use \RdKafka\Message;
+use RdKafka\Message;
 use RdKafka\Producer;
 
 class Kafka extends BaseDatastore
