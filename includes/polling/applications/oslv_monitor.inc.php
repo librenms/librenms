@@ -136,7 +136,7 @@ foreach ($stat_vars as $key => $stat) {
         $fields = ['data' => $value];
         $metrics[$var_name] = $value;
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 
@@ -161,7 +161,7 @@ foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
             $fields = ['data' => $value];
             $metrics[$var_name] = $value;
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
         }
     }
 }

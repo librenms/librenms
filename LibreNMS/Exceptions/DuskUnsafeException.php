@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DuskUnsafeException.php
  *

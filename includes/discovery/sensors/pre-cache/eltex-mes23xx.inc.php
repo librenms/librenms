@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS pre-cache module for Eltex-mes23xx OS
  *

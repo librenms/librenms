@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Poller.php
  *

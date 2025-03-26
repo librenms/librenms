@@ -27,7 +27,7 @@ if ($device['os_group'] == 'cisco') {
             ];
 
             $tags = compact('type', 'rrd_name', 'rrd_def');
-            data_update($device, 'vpdn', $tags, $fields);
+            app('Datastore')->put($device, 'vpdn', $tags, $fields);
 
             $os->enableGraph("vpdn_sessions_$type");
             $os->enableGraph("vpdn_tunnels_$type");

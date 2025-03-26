@@ -1,4 +1,5 @@
 <?php
+
 /**
  * app/Models/AlertRule.php
  *

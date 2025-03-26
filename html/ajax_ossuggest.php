@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2017 Oscar Ekeroth <zmegolaz@gmail.com>
  * This program is free software: you can redistribute it and/or modify
