@@ -18,7 +18,13 @@ class KafkaDBStoreTest extends TestCase
 
         // Create mock cluster
         $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(null);
+        $clusterConf->setLogCb(
+            function (Producer $producer, int $level, string $facility, string $message): void {
+                if ($level <= LOG_ERR) {
+                    d_echo($message);
+                }
+            }
+        );
         $numberOfBrokers = 3;
         $cluster = \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
 
