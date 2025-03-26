@@ -1,4 +1,4 @@
-mib: PDU-MIB
+mib: EATON-EPDU-MIB
 modules:
     os:
         hardware:
@@ -15,28 +15,45 @@ modules:
         power:
             data:
                 -
-                    oid: outletTable
-                    value: outletActivePower
-                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.7.{{ $index }}'
+                    oid: inputs
+                    value: inputWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.4.{{ $index }}'
                     multiplier: 1
-                    descr: 'S{{ $index }} {{ $outletLabel }} Output'
-                    index: 'outletActivePower.{{ $index }}'
+                    descr: 'Input Feed {{ $inputPhaseDesignator }}'
+                    index: 'inputWatts.{{ $index }}'
+                -
+                    oid: outlets
+                    value: outletWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.6.5.1.3.{{ $index }}'
+                    multiplier: 1
+                    descr: 'Outlet {{ $outletDesignator }}: {{ $outletName }}'
+                    index: 'outletWatts.{{ $index }}'
         current:
             data:
                 -
-                    oid: outletTable
-                    value: outletCurrent
-                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.4.{{ $index }}'
+                    oid: inputs
+                    value: inputCurrent
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.3.1.4.{{ $index }}'
                     divisor: 1000
-                    descr: 'S{{ $index }} {{ $outletLabel }} Current'
+                    descr: 'Input Feed {{ $inputPhaseDesignator }}'
+                    index: 'inputCurrent.{{ $index }}'
+                    high_limit: inputCurrentThUpperCritical
+                    warn_limit: inputCurrentThUpperWarning
+                -
+                    oid: outlets
+                    value: outletCurrent
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.6.4.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Outlet {{ $outletDesignator }}: {{ $outletName }}'
                     index: 'outletCurrent.{{ $index }}'
-                    high_limit: outletCurrentUpperCritical
-                    warn_limit: outletCurrentUpperWarning
+                    high_limit: outletCurrentThUpperCritical
+                    warn_limit: outletCurrentThUpperWarning
         voltage:
             data:
                 -
-                    oid: outletTable
-                    value: outletVoltage
-                    num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.6.{{ $index }}'
-                    descr: 'S{{ $index }} {{ $outletLabel }} Voltage'
-                    index: 'outletVoltage.{{ $index }}'
+                    oid: inputs
+                    value: inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Input'
+                    index: 'inputVoltage.{{ $index }}'
