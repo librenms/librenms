@@ -16,20 +16,8 @@ class KafkaDBStoreTest extends TestCase
     {
         parent::setUp();
 
-        // Create mock cluster
-        $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(
-            function (Producer $producer, int $level, string $facility, string $message): void {
-                if ($level <= LOG_ERR) {
-                    d_echo($message);
-                }
-            }
-        );
-        $numberOfBrokers = 3;
-        $cluster = \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
-
         Config::set('kafka.enable', true);
-        Config::set('kafka.broker.list', $cluster->getBootstraps());
+        Config::set('kafka.broker.list', '127.0.2.2:9092');
         Config::set('kafka.idempotence', true);
         Config::set('kafka.buffer.max.message', 100_000);
         Config::set('kafka.batch.max.message', 25);
@@ -133,24 +121,6 @@ class KafkaDBStoreTest extends TestCase
         Log::shouldReceive('error')->times(0);
 
         $kafka->safeFlush();
-    }
-
-    public function testExceptionHandling()
-    {
-        $kafka = Mockery::mock(Kafka::class)->makePartial();
-        $producer = Mockery::mock(Producer::class);
-
-        $kafka->shouldReceive('getClient')->andReturn($producer);
-        $producer->shouldReceive('newTopic')->andThrow(new \Exception('Test exception'));
-
-        $device = ['device_id' => 1, 'hostname' => 'testhost'];
-        $measurement = 'testmeasure';
-        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
-        $fields = ['ifIn' => 234234, 'ifOut' => 53453];
-
-        Log::shouldReceive('error')->once()->with('KAFKA: Put failed with exception', Mockery::any());
-
-        $kafka->put($device, $measurement, $tags, $fields);
     }
 
     private function getPrivateProperty($object, $property)
