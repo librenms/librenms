@@ -46,7 +46,7 @@ class DispatchPollingWork implements ShouldQueue
                 $query->whereNull('last_polled')
                     ->orWhereNull('last_discovered')
                     ->orWhereRaw('`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)', [$this->find_time])
-                    ->orWhereRaw('`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND', [$this->discovery_find_time]);
+                    ->orWhereRaw('`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND)', [$this->discovery_find_time]);
             })
             ->orderBy('last_polled_timetaken', 'desc')
             ->get();
