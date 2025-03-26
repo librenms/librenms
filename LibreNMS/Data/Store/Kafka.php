@@ -10,6 +10,7 @@ use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
 use RdKafka\Producer;
+use \RdKafka\Message;
 
 class Kafka extends BaseDatastore
 {
@@ -20,11 +21,73 @@ class Kafka extends BaseDatastore
     public function __construct()
     {
         parent::__construct();
+
+        $this->client = self::getClient();
+
+        // Register shutdown function
+        register_shutdown_function(function () {
+            $this->isShuttingDown = true;
+            $this->safeFlush();
+        });
+    }
+
+    public function __destruct()
+    {
+        if (!$this->isShuttingDown) {
+            $this->safeFlush();
+        }
+        // Clear reference
+        $this->client = null;
+    }
+
+    /**
+     * Generate producer instance
+     * base on kafka configuration
+     * @return Producer
+     */
+    private function getClient(): Producer
+    {
         $conf = new Conf();
+        # Set the log level
+        $conf->set('log_level', (string) LOG_DEBUG);
+        # Set the log callback for exceptions
+        $conf->setDrMsgCb(
+            function (Producer $producer, Message $message): void {
+                if ($message->err !== RD_KAFKA_RESP_ERR_NO_ERROR) {
+                    Log::error($message->err);
+                }
+            }
+        );
+        # Set the log callback for logs
+        $conf->setLogCb(
+            function (Producer $producer, int $level, string $facility, string $message): void {
+                switch ($level) {
+                    case LOG_CRIT:
+                        Log::critical($message);
+                        break;
+                    case LOG_ERR:
+                        Log::warning($message);
+                        break;
+                    case LOG_WARNING:
+                        Log::warning($message);
+                        break;
+                    case LOG_NOTICE:
+                        Log::notice($message);
+                        break;
+                    case LOG_INFO:
+                        Log::info($message);
+                        break;
+                    default:
+                        Log::debug($message);
+                        break;
+                }
+            }
+        );
+
         // Set the kafka broker servers
-        $conf->set('bootstrap.servers', Config::get('kafka.broker.list', 'kafka:9092'));
+        $conf->set('bootstrap.servers', Config::get('kafka.broker.list', '127.0.2.2:9092'));
         // Set the idempotence
-        $conf->set('enable.idempotence', Config::get('kafka.idempotence') ? 'true' : 'false');
+        $conf->set('enable.idempotence', Config::get('kafka.idempotence', false) ? 'true' : 'false');
         // Max queue allowed messages in poller memory
         $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 100_000));
         // Num of messages each call to kafka
@@ -32,7 +95,13 @@ class Kafka extends BaseDatastore
         // Max wait time to acumulate before sending the batch
         $conf->set('linger.ms', Config::get('kafka.linger.ms', default: 500));
         // Change ACK
-        $conf->set('request.required.acks', Config::get('kafka.request.required.acks', default: 1));
+        $conf->set(
+            'request.required.acks',
+            Config::get(
+                'kafka.request.required.acks',
+                Config::get('kafka.idempotence', false) ? 'all' : '1'
+            )
+        );
 
         // check if debug for ssl was set and enable it
         $confKafkaSSLDebug = Config::get('kafka.security.debug', null);
@@ -61,28 +130,13 @@ class Kafka extends BaseDatastore
             }
         }
 
-        $this->client = new Producer($conf);
-
-        // Register shutdown function
-        register_shutdown_function(function () {
-            $this->isShuttingDown = true;
-            $this->safeFlush();
-        });
-    }
-
-    public function __destruct()
-    {
-        if (! $this->isShuttingDown) {
-            $this->safeFlush();
-        }
-        // Clear reference
-        $this->client = null;
+        return new Producer($conf);
     }
 
     private function safeFlush()
     {
         // check if client instance exists
-        if (! $this->client) {
+        if (!$this->client) {
             return;
         }
 

@@ -4519,7 +4519,7 @@
             "order": 5
         },
         "kafka.broker.list": {
-            "default": "localhost:9092",
+            "default": "127.0.2.2:9092",
             "type": "text",
             "group": "poller",
             "section": "kafka",
