@@ -797,6 +797,18 @@ eventlog:
     PRIMARY: { Name: PRIMARY, Columns: [event_id], Unique: true, Type: BTREE }
     eventlog_datetime_index: { Name: eventlog_datetime_index, Columns: [datetime], Unique: false, Type: BTREE }
     eventlog_device_id_index: { Name: eventlog_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+failed_jobs:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: uuid, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: connection, Type: text, 'Null': false, Extra: '' }
+    - { Field: queue, Type: text, 'Null': false, Extra: '' }
+    - { Field: payload, Type: longtext, 'Null': false, Extra: '' }
+    - { Field: exception, Type: longtext, 'Null': false, Extra: '' }
+    - { Field: failed_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    failed_jobs_uuid_unique: { Name: failed_jobs_uuid_unique, Columns: [uuid], Unique: true, Type: BTREE }
 graph_types:
   Columns:
     - { Field: graph_type, Type: varchar(32), 'Null': false, Extra: '' }
