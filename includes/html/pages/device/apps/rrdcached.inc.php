@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rrdcached.inc.php
  *

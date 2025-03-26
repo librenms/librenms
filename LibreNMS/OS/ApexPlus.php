@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApexPlus.php
  * Trango Systems Apex Plus Wireless Sensors for LibreNMS

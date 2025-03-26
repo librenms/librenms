@@ -53,9 +53,9 @@
         "php-amqplib/php-amqplib": "^3.1",
         "phpmailer/phpmailer": "~6.0",
         "predis/predis": "^2.0",
-        "silber/bouncer": "^1.0",
         "socialiteproviders/manager": "^4.3",
         "spatie/laravel-ignition": "^2.0",
+        "spatie/laravel-permission": "^6.16",
         "symfony/yaml": "^6.2",
         "tecnickcom/tcpdf": "^6.4",
         "tightenco/ziggy": "^1.6.0"
@@ -74,7 +74,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-mockery": "^1.0",
-        "phpunit/phpunit": "^9.5.10"
+        "phpunit/phpunit": "^10.0"
     },
     "suggest":
     {

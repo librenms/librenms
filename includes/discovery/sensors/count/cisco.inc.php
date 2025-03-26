@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS - Cisco count sensors
  *

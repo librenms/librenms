@@ -1,4 +1,5 @@
 <?php
+
 /*
  * BrowserPush.php
  *

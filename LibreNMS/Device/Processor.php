@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Processor.php
  *
@@ -193,7 +194,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
                 $rrd_name = ['processor', $processor_type, $processor_index];
                 $fields = compact('usage');
                 $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
-                data_update($os->getDeviceArray(), 'processors', $tags, $fields);
+                app('Datastore')->put($os->getDeviceArray(), 'processors', $tags, $fields);
 
                 if ($usage != $processor_usage) {
                     dbUpdate(['processor_usage' => $usage], 'processors', '`processor_id` = ?', [$processor_id]);

@@ -1,4 +1,5 @@
 <?php
+
 /*Copyright (c) 2019 GitStoph <https://github.com/GitStoph>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,7 +36,7 @@ class Jira extends Transport
             if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
-        // Messsage is a recovery
+            // Messsage is a recovery
         } else {
             if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.

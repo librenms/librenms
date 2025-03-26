@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container-fluid">
-        <x-panel body-class="!tw-p-0">
+        <x-panel body-class="tw:p-0!">
             <x-slot name="heading">
                 <h2 class="panel-title">{{ __('VLAN') }}
                 <select id="vlan-select">

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApexLynx.php
  * Trango Systems Apex Lynx Wireless Sensors for LibreNMS

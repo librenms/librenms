@@ -1,13 +1,13 @@
 <div>
-    <span class="tw-text-nowrap tw-pr-1">
-        <span class="tw-text-xl tw-font-bold">{{ $device->displayName() }}</span>
+    <span class="tw:text-nowrap tw:pr-1">
+        <span class="tw:text-xl tw:font-bold">{{ $device->displayName() }}</span>
         {{ $device->hardware }}
     </span>
-    <span class="tw-text-nowrap tw-pl-2 tw-pr-1">
+    <span class="tw:text-nowrap tw:pl-2 tw:pr-1">
         @if($device->os){{ \LibreNMS\Config::getOsSetting($device->os, 'text') }}@endif
         {{ $device->version }}
     </span>
-    <span class="tw-text-nowrap tw-pl-2">
+    <span class="tw:text-nowrap tw:pl-2">
         @if($device->feature)({{ $device->features }})@endif
         @if($device->location)[{{ $device->location }}]@endif
     </span>

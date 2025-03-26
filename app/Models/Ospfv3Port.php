@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfPort.php
  *
@@ -40,7 +41,6 @@ class Ospfv3Port extends PortRelatedModel
         'ospfv3_port_id',
         'context_name',
         'ospfv3IfIndex',
-        'ospfv3IfInstId',
         'ospfv3IfAreaId',
         'ospfv3IfType',
         'ospfv3IfAdminStatus',

@@ -72,7 +72,7 @@ foreach ($instances as $instance) {
         echo '
                       <tbody>
                         <tr>
-                          <td>' . $area->ospfv3AreaId . '</td>
+                          <td>' . (filter_var($area->ospfv3AreaId, FILTER_VALIDATE_IP) ? $area->ospfv3AreaId : long2ip($area->ospfv3AreaId)) . '</td>
                           <td>' . $area_port_count . '(' . $area_port_count_enabled . ')</td>
                           <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
                         </tr>
@@ -110,7 +110,7 @@ foreach ($instances as $instance) {
                       <td>' . $ospfPort->ospfv3IfState . '</td>
                       <td>' . $ospfPort->ospfv3IfMetricValue . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfPort->ospfv3IfAdminStatus . '</span></td>
-                      <td>' . $ospfPort->ospfv3IfAreaId . '</td>
+                      <td>' . (filter_var($ospfPort->ospfv3IfAreaId, FILTER_VALIDATE_IP) ? $ospfPort->ospfv3IfAreaId : long2ip($ospfPort->ospfv3IfAreaId)) . '</td>
                     </tr>
                   </tbody>';
     }

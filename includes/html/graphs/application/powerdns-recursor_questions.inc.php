@@ -1,4 +1,5 @@
 <?php
+
 /**
  * powerdns-recursor_questions.inc.php
  *
