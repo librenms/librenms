@@ -82,7 +82,7 @@ mib_dir: juniper
 ```
 
 `poller_modules`: This is a list of poller modules to either enable
-(1) or disable (0). Check `misc/config_definitions.json` to see which
+(1) or disable (0). Check `resources/definitions/config_definitions.json` to see which
 modules are enabled/disabled by default.
 
 ```yaml
@@ -92,7 +92,7 @@ poller_modules:
 ```
 
 `discovery_modules`: This is the list of discovery modules to either
-enable (1) or disable (0). Check `misc/config_definitions.json` to see
+enable (1) or disable (0). Check `resources/definitions/config_definitions.json` to see
 which modules are enabled/disabled by default.
 
 ```yaml
