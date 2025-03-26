@@ -1,8 +1,8 @@
 <?php
 
 // Lookup the Isam Port Numbering Method
-$asamPortNumberingMethod = snmp_getnext($device, 'asamPortNumberingMethodSystem', '-Ovq', 'ASAM-SYSTEM-MIB', 'nokia');
-$eqptHolderActualType = snmp_get($device, 'eqptHolderActualType.17', '-Ovq', 'ASAM-EQUIP-MIB', 'nokia');
+$asamPortNumberingMethod = \SnmpQuery::get('ASAM-SYSTEM-MIB::asamPortNumberingMethodSystem.0')->value();
+$eqptHolderActualType = \SnmpQuery::get('ASAM-EQUIP-MIB::eqptHolderActualType.17')->value();
 echo 'ISAM Slot/Port Mapping for ' . $eqptHolderActualType . '';
 
 //Typ to prodcut name
