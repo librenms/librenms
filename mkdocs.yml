@@ -292,6 +292,7 @@ nav:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
       - Creating Release: Developing/Creating-Release.md
       - Applications: Developing/Application-Notes.md
+      - Graphs: Developing/Graph-Notes.md
 
   - Miscellaneous:
     - Security information: General/Security.md
