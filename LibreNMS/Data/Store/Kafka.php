@@ -40,7 +40,7 @@ class Kafka extends BaseDatastore
         $this->client = null;
     }
 
-    private function getClient(): Producer
+    public function getClient(): Producer
     {
         $conf = new Conf();
         // Set the log level
