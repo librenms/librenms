@@ -19,12 +19,14 @@ foreach ($_POST as $name => $value) {
 // don't leak login and other data
 unset($vars['username'], $vars['password'], $vars['_token']);
 
-function array_map_recursive(callable $callback, array $array)
-{
-    $result = [];
-    foreach ($array as $key => $value) {
-        $result[$key] = is_array($value) ? array_map_recursive($callback, $value) : $callback($value);
-    }
+if (! function_exists('array_map_recursive')) {
+    function array_map_recursive(callable $callback, array $array)
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            $result[$key] = is_array($value) ? array_map_recursive($callback, $value) : $callback($value);
+        }
 
-    return $result;
+        return $result;
+    }
 }
