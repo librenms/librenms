@@ -2,13 +2,13 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use RdKafka\Producer;
 use RdKafka\ProducerTopic;
-use Illuminate\Support\Facades\Log;
 
 
 
@@ -35,9 +35,9 @@ class KafkaDBStoreTest extends TestCase
 
     public function testSuccessfulDataPush()
     {
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
-        $producer = Mockery::mock([Producer::class]);
-        $topic = Mockery::mock([ProducerTopic::class]);
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
+        $producer = Mockery::mock(Producer::class);
+        $topic = Mockery::mock(ProducerTopic::class);
 
         $kafka->shouldReceive('getClient')->andReturn($producer);
         $producer->shouldReceive('newTopic')->andReturn($topic);
@@ -58,14 +58,14 @@ class KafkaDBStoreTest extends TestCase
     {
         Config::set('kafka.groups-exclude', 'EXCLUDED_GROUP');
 
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
-        $device_data = Mockery::mock([\App\Facades\DeviceCache::class]);
-        $device_data->shouldReceive('get')->andReturn((object)['groups' => collect([(object)['name' => 'excluded_group']])]);
+        $device_data = Mockery::mock(\App\Facades\DeviceCache::class);
+        $device_data->shouldReceive('get')->andReturn((object) ['groups' => collect([(object) ['name' => 'excluded_group']])]);
 
         Log::shouldReceive('debug')->once()->with('KAFKA: Skipped parsing to Kafka, device is in group: excluded_group');
 
@@ -76,7 +76,7 @@ class KafkaDBStoreTest extends TestCase
     {
         Config::set('kafka.measurement-exclude', 'excluded_measurement');
 
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'excluded_measurement';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
@@ -91,9 +91,9 @@ class KafkaDBStoreTest extends TestCase
     {
         Config::set('kafka.device-fields-exclude', 'excluded_field');
 
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
-        $producer = Mockery::mock([Producer::class]);
-        $topic = Mockery::mock([ProducerTopic::class]);
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
+        $producer = Mockery::mock(Producer::class);
+        $topic = Mockery::mock(ProducerTopic::class);
 
         $kafka->shouldReceive('getClient')->andReturn($producer);
         $producer->shouldReceive('newTopic')->andReturn($topic);
@@ -112,8 +112,8 @@ class KafkaDBStoreTest extends TestCase
 
     public function testSafeFlush()
     {
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
-        $producer = Mockery::mock([Producer::class]);
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
+        $producer = Mockery::mock(Producer::class);
 
         $kafka->shouldReceive('getClient')->andReturn($producer);
         $producer->shouldReceive('getOutQLen')->andReturn(1);
@@ -127,8 +127,8 @@ class KafkaDBStoreTest extends TestCase
 
     public function testExceptionHandling()
     {
-        $kafka = Mockery::mock([Kafka::class])->makePartial();
-        $producer = Mockery::mock([Producer::class]);
+        $kafka = Mockery::mock(Kafka::class)->makePartial();
+        $producer = Mockery::mock(Producer::class);
 
         $kafka->shouldReceive('getClient')->andReturn($producer);
         $producer->shouldReceive('newTopic')->andThrow(new \Exception('Test exception'));

@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
-use RdKafka\Producer;
 use \RdKafka\Message;
+use RdKafka\Producer;
 
 class Kafka extends BaseDatastore
 {
@@ -33,7 +33,7 @@ class Kafka extends BaseDatastore
 
     public function __destruct()
     {
-        if (!$this->isShuttingDown) {
+        if (! $this->isShuttingDown) {
             $this->safeFlush();
         }
         // Clear reference
@@ -48,17 +48,17 @@ class Kafka extends BaseDatastore
     private function getClient(): Producer
     {
         $conf = new Conf();
-        # Set the log level
+        // Set the log level
         $conf->set('log_level', (string) LOG_DEBUG);
-        # Set the log callback for exceptions
+        // Set the log callback for exceptions
         $conf->setDrMsgCb(
             function (Producer $producer, Message $message): void {
                 if ($message->err !== RD_KAFKA_RESP_ERR_NO_ERROR) {
-                    Log::error($message->err);
+                    Log::error($message->errstr());
                 }
             }
         );
-        # Set the log callback for logs
+        // Set the log callback for logs
         $conf->setLogCb(
             function (Producer $producer, int $level, string $facility, string $message): void {
                 switch ($level) {
@@ -133,10 +133,10 @@ class Kafka extends BaseDatastore
         return new Producer($conf);
     }
 
-    private function safeFlush()
+    public function safeFlush()
     {
         // check if client instance exists
-        if (!$this->client) {
+        if (! $this->client) {
             return;
         }
 
