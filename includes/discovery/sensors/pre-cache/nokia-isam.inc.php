@@ -3,7 +3,7 @@
 // Lookup the Isam Port Numbering Method
 $asamPortNumberingMethod = snmp_getnext($device, 'asamPortNumberingMethodSystem', '-Ovq', 'ASAM-SYSTEM-MIB', 'nokia');
 $eqptHolderActualType = snmp_get($device, 'eqptHolderActualType.17', '-Ovq', 'ASAM-EQUIP-MIB', 'nokia');
-echo 'ISAM Slot/Port Mapping for '.$eqptHolderActualType.'';
+echo 'ISAM Slot/Port Mapping for ' . $eqptHolderActualType . '';
 
 //Typ to prodcut name
 $eqptHolderTable = [
@@ -17,10 +17,10 @@ $eqptHolderTable = [
 ];
 
 if ($asamPortNumberingMethod == 'positionBasedSlotId') {
-// Slot mapping for "positionBasedSlotId" (see ASAM-SYSTEM-MIB)
-// also hardcoded because of no reference found in MIB but matched on DSLAM typ (eqptHolderActualTyp)
-// acutal tested on ISAM 7330/56/60/62
-// Nokia IDs for ISAM 7330
+    // Slot mapping for "positionBasedSlotId" (see ASAM-SYSTEM-MIB)
+    // also hardcoded because of no reference found in MIB but matched on DSLAM typ (eqptHolderActualTyp)
+    // acutal tested on ISAM 7330/56/60/62
+    // Nokia IDs for ISAM 7330
     if ($eqptHolderActualType == 'NFXS-B') {
         $slotTable = [
             '4352' => 'ntio-1:',
@@ -51,8 +51,8 @@ if ($asamPortNumberingMethod == 'positionBasedSlotId') {
             '28929' => 'ctrl:7/1:',
             '28931' => 'lt:7/1/1:',
             '28932' => 'lt:7/1/2:',
-	];
-// Slot IDs for Nokia ISAM 7356
+        ];
+        // Slot IDs for Nokia ISAM 7356
     } elseif ($eqptHolderActualType == 'NFXR-A') {
         $slotTable = [
             '4353' => 'nt:',
@@ -73,8 +73,8 @@ if ($asamPortNumberingMethod == 'positionBasedSlotId') {
             '28929' => 'ctrl:7/1:',
             '28931' => 'lt:7/1/1:',
             '28932' => 'lt:7/1/2:',
-	];
-// Slot IDs for Nokia ISAM 7360
+        ];
+        // Slot IDs for Nokia ISAM 7360
     } elseif ($eqptHolderActualType == 'NFXS-F') {
         $slotTable = [
             '4352' => 'acu:1/1:',
@@ -106,30 +106,31 @@ if ($asamPortNumberingMethod == 'positionBasedSlotId') {
             '28929' => 'ctrl:7/1:',
             '28931' => 'lt:7/1/1:',
             '28932' => 'lt:7/1/2:',
-	];
-// Slot IDs for Nokia ISAM 7362
+        ];
+        // Slot IDs for Nokia ISAM 7362
     } elseif ($eqptHolderActualType == 'CFXR-A') {
         $slotTable = [
             '4353' => 'nt:',
             '4355' => 'lt:1/1/1:',
-        ]; }
+        ];
+    }
 } else {
-// Slot mapping
-// FIXME Hardcoded to Num Based Slot Numbering. This should be pulled from SNMP
-$slotTable = [
-    '4352' => 'acu:1/1/',
-    '4353' => 'nt-a:',
-    '4354' => 'nt-b:',
-    '4355' => 'lt:1/1/1/',
-    '4356' => 'lt:1/1/2/',
-    '4357' => 'lt:1/1/3/',
-    '4358' => 'lt:1/1/4/',
-    '4359' => 'lt:1/1/5/',
-    '4360' => 'lt:1/1/6/',
-    '4361' => 'lt:1/1/7/',
-    '4362' => 'lt:1/1/8/',
-    '4481' => '4481', // FIXME define this
-];
+    // Slot mapping
+    // FIXME Hardcoded to Num Based Slot Numbering. This should be pulled from SNMP
+    $slotTable = [
+        '4352' => 'acu:1/1/',
+        '4353' => 'nt-a:',
+        '4354' => 'nt-b:',
+        '4355' => 'lt:1/1/1/',
+        '4356' => 'lt:1/1/2/',
+        '4357' => 'lt:1/1/3/',
+        '4358' => 'lt:1/1/4/',
+        '4359' => 'lt:1/1/5/',
+        '4360' => 'lt:1/1/6/',
+        '4361' => 'lt:1/1/7/',
+        '4362' => 'lt:1/1/8/',
+        '4481' => '4481', // FIXME define this
+    ];
 }
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardContainerOffset', [], 'ASAM-EQUIP-MIB', 'nokia');
 $pre_cache['nokiaIsamSlot'] = snmpwalk_cache_multi_oid($device, 'eqptBoardIfSlotId', $pre_cache['nokiaIsamSlot'], 'ASAM-EQUIP-MIB', 'nokia');
