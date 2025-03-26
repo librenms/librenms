@@ -78,8 +78,7 @@ class DatastoreTest extends TestCase
             'LibreNMS\Data\Store\InfluxDB',
             'LibreNMS\Data\Store\InfluxDBv2',
             'LibreNMS\Data\Store\OpenTSDB',
-            'LibreNMS\Data\Store\Prometheus',
-            'LibreNMS\Data\Store\Kafka',
+            'LibreNMS\Data\Store\Prometheus'
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');
