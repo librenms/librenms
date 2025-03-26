@@ -43,6 +43,7 @@ class Kafka extends BaseDatastore
     /**
      * Generate producer instance
      * base on kafka configuration
+     * 
      * @return Producer
      */
     private function getClient(): Producer
