@@ -14,15 +14,17 @@ use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
-use Silber\Bouncer\BouncerFacade as Bouncer;
-use Silber\Bouncer\Database\HasRolesAndAbilities;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
-    use HasRolesAndAbilities, Notifiable, HasFactory, HasPushSubscriptions;
+    use HasFactory;
+    use HasPushSubscriptions;
+    use HasRoles;
+    use Notifiable;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
@@ -52,42 +54,34 @@ class User extends Authenticatable
 
     /**
      * Test if this user has global read access
-     *
-     * @return bool
      */
-    public function hasGlobalRead()
+    public function hasGlobalRead(): bool
     {
-        return $this->isA('admin', 'global-read');
+        return $this->can('global-read');
     }
 
     /**
      * Test if this user has global admin access
-     *
-     * @return bool
      */
-    public function hasGlobalAdmin()
+    public function hasGlobalAdmin(): bool
     {
-        return $this->isA('admin', 'demo');
+        return $this->can('global-admin');
     }
 
     /**
      * Test if the User is an admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->isA('admin');
+        return $this->can('admin');
     }
 
     /**
      * Test if this user is the demo user
-     *
-     * @return bool
      */
-    public function isDemo()
+    public function isDemo(): bool
     {
-        return $this->isA('demo');
+        return $this->hasRole('demo');
     }
 
     /**
@@ -96,7 +90,7 @@ class User extends Authenticatable
      * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
-    public function canAccessDevice($device)
+    public function canAccessDevice($device): bool
     {
         return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
@@ -109,20 +103,6 @@ class User extends Authenticatable
     public function setPassword($password)
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
-    }
-
-    /**
-     * Set roles and remove extra roles, optionally creating non-existent roles, flush permissions cache for this user if roles changed
-     */
-    public function setRoles(array $roles, bool $create = false): void
-    {
-        if ($roles != $this->getRoles()) {
-            if ($create) {
-                $this->assign($roles);
-            }
-            Bouncer::sync($this)->roles($roles);
-            Bouncer::refresh($this);
-        }
     }
 
     /**

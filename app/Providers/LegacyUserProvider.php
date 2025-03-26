@@ -212,7 +212,7 @@ class LegacyUserProvider implements UserProvider
         // create and update roles, if provided
         $roles = $auth->getRoles($user->username);
         if ($roles !== false) {
-            $user->setRoles($roles, true);
+            $user->syncRoles($roles);
         }
 
         return $user;
