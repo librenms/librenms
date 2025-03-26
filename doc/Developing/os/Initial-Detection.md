@@ -148,7 +148,7 @@ So, considering the example:
 #### OS discovery
 
 OS discovery collects additional standardized data about the OS.  These are specified in
-the discovery yaml `includes/definitions/discovery/<os>.yaml` or `LibreNMS/OS/<os>.php` if
+the discovery yaml `resources/definitions/os_discovery/<os>.yaml` or `LibreNMS/OS/<os>.php` if
 more complex collection is required.
 
 - `version` The version of the OS running on the device.

@@ -583,7 +583,7 @@ class ConfigRepository
      */
     private function loadAllOsDefinitions(): void
     {
-        $os_list = glob($this->get('install_dir') . '/includes/definitions/*.yaml');
+        $os_list = glob($this->get('install_dir') . '/resources/definitions/os_detection/*.yaml');
 
         foreach ($os_list as $yaml_file) {
             $os = basename($yaml_file, '.yaml');
