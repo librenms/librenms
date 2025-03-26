@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TrippliteAlarmAdded.php
  *

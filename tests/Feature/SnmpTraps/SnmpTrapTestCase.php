@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpTrapTestCase.php
  *

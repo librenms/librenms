@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Syslog.php
  *

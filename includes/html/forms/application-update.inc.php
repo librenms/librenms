@@ -1,4 +1,5 @@
 <?php
+
 /**
  * application-update.php
  *

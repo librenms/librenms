@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS - ADVA AOS device support - Pre-Cache for Sensors
  *

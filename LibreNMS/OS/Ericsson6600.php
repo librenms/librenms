@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ericsson6600.php
  *

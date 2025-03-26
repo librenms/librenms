@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Quanta LB6M States information module
  *

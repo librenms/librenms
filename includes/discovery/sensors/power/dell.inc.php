@@ -1,4 +1,5 @@
 <?php
+
 /**
  * power.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * exalink-fusion.inc.php
  *

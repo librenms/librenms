@@ -198,18 +198,20 @@ Output:
 
 ### `list_ip_addresses`
 
-List all IPv4 and IPv6 addresses.
+List all IPv4 and IPv6 or only version specific addresses.
 
-Route: `/api/v0/resources/ip/addresses`
+Route: `/api/v0/resources/ip/addresses/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/addresses/ipv6
 ```
 
 Output:
@@ -272,18 +274,20 @@ Output:
 
 ### `list_ip_networks`
 
-List all IPv4 and IPv6 networks.
+List all IPv4 and IPv6 or only version specific networks.
 
-Route: `/api/v0/resources/ip/networks`
+Route: `/api/v0/resources/ip/networks/:address_family`
 
 Input:
 
--
+- address_family: optional ipv4 or ipv6 for ip version specific list.
 
 Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv4
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/ip/networks/ipv6
 ```
 
 Output:
@@ -470,7 +474,6 @@ Output:
             "port_id": "0",
             "ospfv3_nbr_id": "2",
             "ospfv3NbrIfId: "1147535360",
-            "ospfv3NbrIfIndex": "2",
             "ospfv3NbrIfInstId": "0",
             "ospfv3NbrRtrId": "167797515",
             "ospfv3NbrAddressType": "ipv6",
@@ -513,7 +516,6 @@ Output:
           "port_id": 2838,
           "ospfv3_port_id": "2",
           "ospfv3IfIndex": "2",
-          "ospfv3IfInstId": "0",
           "ospfv3IfAreaId": "0",
           "ospfv3IfType": "broadcast",
           "ospfv3IfAdminStatus": "enabled",

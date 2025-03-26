@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpTest.php
  *
@@ -56,8 +57,6 @@ class IpTest extends TestCase
 
     /**
      * See https://github.com/librenms/librenms/pull/13468 for more info
-     *
-     * @requires PHP >= 7.4
      */
     public function testIsValidIPv6ExcludeReserved(): void
     {

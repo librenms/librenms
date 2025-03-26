@@ -114,7 +114,7 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
         'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $ports_keys_int++;
 }

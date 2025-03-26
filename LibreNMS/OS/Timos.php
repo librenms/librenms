@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timos.php
  *
@@ -922,7 +923,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         return $inventory;
     }
 
-    private function parseIpField(array $data, string $ngField): string|null
+    private function parseIpField(array $data, string $ngField): ?string
     {
         if (isset($data[$ngField])) {
             try {

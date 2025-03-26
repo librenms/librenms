@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SVGTest.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -33,9 +35,8 @@ use RegexIterator;
 
 /**
  * Class SVGTest
- *
- * @group os
  */
+#[Group('os')]
 class SVGTest extends TestCase
 {
     public function testSVGContainsPNG(): void

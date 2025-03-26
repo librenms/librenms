@@ -103,7 +103,7 @@ if ($device['os_group'] == 'cisco') {
         ];
 
         $tags = compact('rrd_def');
-        data_update($device, 'cipsec_flow', $tags, $fields);
+        app('Datastore')->put($device, 'cipsec_flow', $tags, $fields);
 
         $os->enableGraph('cipsec_flow_tunnels');
         $os->enableGraph('cipsec_flow_pkts');

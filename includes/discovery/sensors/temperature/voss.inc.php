@@ -1,4 +1,5 @@
 <?php
+
 /**
  * voss.inc.php
  *

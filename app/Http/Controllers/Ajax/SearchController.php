@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SearchController.php
  *
