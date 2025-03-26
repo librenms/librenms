@@ -184,7 +184,7 @@ All options can be reset to default by excluding the value argument.
 
 Options with special requirements are as follows:
  - All colours should be specified using the hex representation, and not colour names
- - background_type background_data.layer and node_type will only accept valid values (see misc/config_definition.json)
+ - background_type background_data.layer and node_type will only accept valid values (see resources/definitions/config_definition.json)
  - custom_map.legend_colours is an array of lower percent and colour.  This means in the example above, lines will be green from 0-10%, then blue above 10%.
    - There is a special value of "-1" in the legend colours for when the interface is offline, or the port speed could not be determined
    - There is a special value of "-2" in the legend colours for when the device an interface is connected to is offline

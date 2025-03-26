@@ -1,4 +1,4 @@
-First we define our graphs in `misc/config_definitions.json` to share
+First we define our graphs in `resources/definitions/config_definitions.json` to share
 our work and contribute in the development of LibreNMS. :-)
 
 ```json

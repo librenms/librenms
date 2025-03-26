@@ -1,0 +1,60 @@
+mib: FIBROLAN-SFP-MIB:FIBROLAN-DEVICE-MIB
+modules:
+    os:
+        version: .1.0.8802.1.1.2.1.3.4.0
+        
+    processors:
+        data:
+            -
+                oid: flDeviceCpuStatusEntry
+                value:  flDeviceCpuUtilization
+                num_oid: '.1.3.6.1.4.1.4467.1000.10.1.120.1.2'
+                descr: 'CPU Usage'
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: flSfpMonitoringTable
+                    value: flSfpRxPower
+                    num_oid: '.1.3.6.1.4.1.4467.1000.50.1.2.1.1.{{ $index }}'
+                    descr: 'Rx Port {{ $index }}'
+                    index: flSfpRxPower.{{ $index }}
+                    user_func: 'uw_to_dbm'
+                    group: 'RX dBm'
+                -
+                    oid: flSfpMonitoringTable
+                    value: flSfpTxPower
+                    num_oid: '.1.3.6.1.4.1.4467.1000.50.1.2.1.2.{{ $index }}'
+                    descr: 'Port {{ $index }} Tx Level'
+                    index: flSfpTxPower.{{ $index }}
+                    user_func: 'uw_to_dbm'
+                    group: 'TX dBm'
+        temperature:
+            data:
+                -
+                    oid: flSfpMonitoringTable
+                    value: flSfpTemperature
+                    num_oid: '.1.3.6.1.4.1.4467.1000.50.1.2.1.3.{{ $index }}'
+                    descr: 'Port {{ $index }} Transceiver'
+                    index: flSfpTemperature.{{ $index }}
+                    group: 'Transceivers'
+        current:
+            data:
+                -
+                    oid: flSfpMonitoringTable
+                    value: flSfpBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.4467.1000.50.1.2.1.4.{{ $index }}'
+                    descr: 'Port {{ $index }} Transceiver Bias Current'
+                    index: flSfpBiasCurrent.{{ $index }}
+                    divisor: 1000
+                    group: 'Transceivers'
+        voltage:
+            data:
+                -
+                    oid: flSfpMonitoringTable
+                    value: flSfpSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.4467.1000.50.1.2.1.5.{{ $index }}'
+                    descr: 'Port {{ $index }} Transceiver Vcc'
+                    index: flSfpSupplyVoltage.{{ $index }}
+                    divisor: 1000
+                    group: 'Transceivers'

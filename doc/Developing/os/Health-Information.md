@@ -48,13 +48,13 @@ files so that you don't need to know how to write PHP.
 > correct divisor / multiplier if applicable.
 
 All yaml files are located in
-`includes/definitions/discovery/$os.yaml`. Defining the information
+`resources/definitions/os_discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
 sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
 all the data you need. We will use netbotz as an example here.
 
-`includes/definitions/discovery/netbotz.yaml`
+`resources/definitions/os_discovery/netbotz.yaml`
 
 ```yaml
 mib: NETBOTZV2-MIB
