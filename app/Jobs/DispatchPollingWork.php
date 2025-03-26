@@ -17,11 +17,13 @@ class DispatchPollingWork implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     private string $pollingQueueConnection;
     private int $find_time;
+    private int $discovery_find_time;
     private bool $enabled;
 
     public function __construct(
     ) {
         $this->find_time = Config::get('service_poller_frequency', Config::get('rrd.step', 300)) - 1;
+        $this->discovery_find_time = Config::get('service_discovery_frequency', 21600) - 1;
         $this->enabled = Config::get('scheduler.poll.enabled', false);
         $default = \config('queue.default');
         // database minimum driver, redis recommended
@@ -42,7 +44,9 @@ class DispatchPollingWork implements ShouldQueue
             ->where('disabled', 0)
             ->where(function (Builder $query) {
                 $query->whereNull('last_polled')
-                    ->orWhereRaw('`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)', [$this->find_time]);
+                    ->orWhereNull('last_discovered')
+                    ->orWhereRaw('`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)', [$this->find_time])
+                    ->orWhereRaw('`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND', [$this->discovery_find_time]);
             })
             ->orderBy('last_polled_timetaken', 'desc')
             ->get();
