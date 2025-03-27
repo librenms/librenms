@@ -94,12 +94,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Blade::directive('vuei18n', function () {
-            $manifest_file = public_path('js/lang/manifest.json');
-            $manifest = is_readable($manifest_file) ? json_decode(file_get_contents($manifest_file), true) : [];
-            $locales = array_unique(['en', app()->getLocale()]);
-            $output = array_map(fn ($locale) => '<script src="' . asset($manifest[$locale] ?? "/js/lang/$locale.js") . '"></script>', $locales);
-
-            return implode(PHP_EOL, $output);
+            return "<?php
+             \$manifest_file = public_path('js/lang/manifest.json');
+             \$manifest = is_readable(\$manifest_file) ? json_decode(file_get_contents(\$manifest_file), true) : [];
+             \$locales = array_unique(['en', app()->getLocale()]);
+             \$output = array_map(fn (\$locale) => '<script src=\"' . asset(\$manifest[\$locale] ?? \"/js/lang/\$locale.js\") . '\"></script>', \$locales);
+             echo implode(PHP_EOL, \$output);
+ ?>";
         });
     }
 
