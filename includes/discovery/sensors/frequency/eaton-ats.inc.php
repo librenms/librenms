@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -31,5 +32,5 @@ foreach ($oids as $volt_id => $data) {
     $divisor = 10;
     $current = $data['ats2InputFrequency'] / $divisor;
 
-    discover_sensor($valid['sensor'], 'frequency', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

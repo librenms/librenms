@@ -1,4 +1,5 @@
 <?php
+
 /*
  * cpu temp for raspberry pi
  * requires snmp extend agent script from librenms-agent
@@ -13,7 +14,7 @@ $value = trim($value, '"');
 if (is_numeric($value)) {
     $sensor_type = 'raspberry_temp';
     $descr = 'CPU Temp';
-    discover_sensor($valid['sensor'], 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
 }
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
@@ -25,7 +26,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
         if ($data != '') {
             [$oid] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $temperature_id = $split_oid[(count($split_oid) - 2)] . '.' . $split_oid[(count($split_oid) - 1)];
+            $temperature_id = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
 
             $descr_oid = ".1.3.6.1.4.1.232.6.2.6.8.1.3.$temperature_id";
             $descr = snmp_get($device, $descr_oid, '-Oqnv', 'CPQHLTH-MIB', 'hp');
@@ -37,7 +38,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
             $threshold = snmp_get($device, $threshold_oid, '-Oqv', '');
 
             if (! empty($temperature)) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $oid, 'hpilo', $descr, '1', '1', null, null, null, $threshold, $temperature);
+                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'hpilo', $descr, '1', '1', null, null, null, $threshold, $temperature);
             }
         }
     }
@@ -54,7 +55,7 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     $index = '116.1';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, 'temperature', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }
 

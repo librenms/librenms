@@ -1,9 +1,9 @@
 <?php
 
-$vm = proxmox_vm_info(var_get('vmid'), var_get('instance'));
+$vm = proxmox_vm_info($vars['vmid'], $vars['instance']);
 
 $graphs = [
-    'proxmox_traffic'       => 'Traffic',
+    'proxmox_traffic' => 'Traffic',
 ];
 
 foreach ($vm['ports'] as $port) {
@@ -23,7 +23,7 @@ foreach ($vm['ports'] as $port) {
 
         echo '<h3>' . $text . ' ' . $port['port'] . '@' . $vm['description'] . '</h3>';
 
-        echo "<tr bgcolor='$row_colour'><td colspan=5>";
+        echo '<tr><td colspan=5>';
 
         include 'includes/html/print-graphrow.inc.php';
 

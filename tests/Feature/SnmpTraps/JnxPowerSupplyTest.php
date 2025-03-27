@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxPowerSupplyTest.php
  * -Description-
@@ -27,6 +28,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
     public function testJnxPowerSupplyFailureTrap(): void
@@ -46,7 +49,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 TRAP,
             'Power Supply PEM 3 is down',
             'Could not handle JnxPowerSupplyFailure',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -67,7 +70,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
 TRAP,
             'Power Supply PEM 4 is OK',
             'Could not handle JnxPowerSupplyOK',
-            [1],
+            [Severity::Ok],
         );
     }
 }

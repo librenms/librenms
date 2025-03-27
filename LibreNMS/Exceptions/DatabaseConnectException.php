@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DatabaseConnectException.php
  *
@@ -60,9 +61,9 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
             'message' => "$title: " . $this->getMessage(),
-        ]) : response()->view('errors.generic', [
+        ], 503) : response()->view('errors.generic', [
             'title' => $title,
             'content' => $this->getMessage(),
-        ]);
+        ], 503);
     }
 }

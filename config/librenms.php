@@ -8,49 +8,58 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-return [
+ return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | User
-    |--------------------------------------------------------------------------
-    |
-    | This value is the user LibreNMS runs as. It is used to secure permissions
-    | and grant access to things needed. Defaults to librenms.
-    */
+     /*
+     |--------------------------------------------------------------------------
+     | User
+     |--------------------------------------------------------------------------
+     |
+     | This value is the user LibreNMS runs as. It is used to secure permissions
+     | and grant access to things needed. Defaults to librenms.
+     */
 
-    'user' => env('LIBRENMS_USER', 'librenms'),
+     'user' => env('LIBRENMS_USER', 'librenms'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Group
-    |--------------------------------------------------------------------------
-    |
-    | This value is the group LibreNMS runs as. It is used to secure permissions
-    | and grant access to things needed. Defaults to the same as LIBRENMS_USER.
-    */
+     /*
+     |--------------------------------------------------------------------------
+     | Group
+     |--------------------------------------------------------------------------
+     |
+     | This value is the group LibreNMS runs as. It is used to secure permissions
+     | and grant access to things needed. Defaults to the same as LIBRENMS_USER.
+     */
 
-    'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
+     'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Install
-    |--------------------------------------------------------------------------
-    |
-    | This value sets if the install process needs to be run.
-    | You may also specify which install steps to present with a comma separated list.
-    */
+     /*
+     |--------------------------------------------------------------------------
+     | Install
+     |--------------------------------------------------------------------------
+     |
+     | This value sets if the install process needs to be run.
+     | You may also specify which install steps to present with a comma separated list.
+     */
 
-    'install' => env('INSTALL', false),
+     'install' => env('INSTALL', false),
 
-    /*
-    |--------------------------------------------------------------------------
-    | NODE ID
-    |--------------------------------------------------------------------------
-    |
-    | Unique value to identify this node. Primarily used for distributed polling.
-    */
+     /*
+     |--------------------------------------------------------------------------
+     | NODE ID
+     |--------------------------------------------------------------------------
+     |
+     | Unique value to identify this node. Primarily used for distributed polling.
+     */
 
-    'node_id' => env('NODE_ID'),
+     'node_id' => env('NODE_ID'),
 
-];
+     /*
+     |--------------------------------------------------------------------------
+     | Config Cache TTL
+     |--------------------------------------------------------------------------
+     |
+     | Amount of seconds to allow the config to be cached.  0 means no cache.
+     */
+
+     'config_cache_ttl' => env('CONFIG_CACHE_TTL', 300),
+ ];

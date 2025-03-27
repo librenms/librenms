@@ -1,118 +1,100 @@
 <?php
 
+use App\Models\Ipv4Mac;
+use LibreNMS\Util\Mac;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
+
 $param = [];
 
-$sql = ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
-$where = '';
-
-if (! Auth::user()->hasGlobalRead()) {
-    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
-    $param = array_merge($param, $device_ids);
+if (! isset($sort) || empty($sort)) {
+    $sort = 'hostname ASC';
+}
+$sort_arr = explode(' ', trim($sort));
+if ($sort_arr[0] === 'interface') {
+    $sort_arr[0] = 'port_if_descr';
+} elseif ($sort_arr[0] === 'hostname') {
+    $sort_arr[0] = 'device_hostname';
 }
 
-$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";
+if (isset($current)) {
+    $page = $current;
+} else {
+    $page = 1;
+}
+
+$query = Ipv4Mac::hasAccess(Auth::user())
+    ->with('port', 'device', 'remote_ports_maybe', 'remote_ports_maybe.device')
+    ->withAggregate('port', 'ifDescr')
+    ->withAggregate('device', 'hostname')
+    ->orderBy(...$sort_arr);
 
 if (is_numeric($vars['device_id'])) {
-    $sql .= ' AND P.device_id = ?';
-    $param[] = $vars['device_id'];
+    $query->where('device_id', $vars['device_id']);
 }
 
 if (isset($vars['port_id']) && is_numeric($vars['port_id'])) {
-    $sql .= ' AND P.port_id = ?';
-    $param[] = $vars['port_id'];
+    $query->where('port_id', $vars['port_id']);
 }
 
 if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
     $ip_search = '%' . trim($vars['searchPhrase']) . '%';
-    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $vars['searchPhrase']) . '%';
+    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', trim($vars['searchPhrase'])) . '%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
-        $sql .= ' AND `ipv4_address` LIKE ?';
-        $param[] = $ip_search;
+        $query->where('ipv4_address', 'like', $ip_search);
     } elseif (isset($vars['searchby']) && $vars['searchby'] == 'mac') {
-        $sql .= ' AND `mac_address` LIKE ?';
-        $param[] = $mac_search;
+        $query->where('mac_address', 'like', $mac_search);
     } else {
-        $sql .= ' AND (`ipv4_address` LIKE ? OR `mac_address` LIKE ?)';
-        $param[] = $ip_search;
-        $param[] = $mac_search;
+        $query->where(function ($q) use ($ip_search, $mac_search) {
+            $q->where('ipv4_address', 'like', $ip_search)
+                ->orWhere('mac_address', 'like', $mac_search);
+        });
     }
 }
 
-$count_sql = "SELECT COUNT(`M`.`port_id`) $sql";
+$pag = $query->paginate($rowCount, page: $page);
 
-$total = dbFetchCell($count_sql, $param);
-if (empty($total)) {
-    $total = 0;
-}
+foreach ($pag->items() as $arp) {
+    if ($arp->port->ifInErrors_delta > 0 || $arp->port->ifOutErrors_delta > 0) {
+        $error_img = generate_port_link($arp->port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
+    } else {
+        $error_img = '';
+    }
 
-if (! isset($sort) || empty($sort)) {
-    $sort = '`hostname` ASC';
-}
-
-$sql .= " ORDER BY $sort";
-
-if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
-    $limit_high = $rowCount;
-}
-
-if ($rowCount != -1) {
-    $sql .= " LIMIT $limit_low,$limit_high";
-}
-
-$sql = "SELECT *,`P`.`ifDescr` AS `interface` $sql";
-
-foreach (dbFetchRows($sql, $param) as $entry) {
-    $entry = cleanPort($entry);
-    if (empty($ignore)) {
-        if ($entry['ifInErrors'] > 0 || $entry['ifOutErrors'] > 0) {
-            $error_img = generate_port_link($entry, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
+    if ($arp->remote_ports_maybe) {
+        $remote_port = $arp->remote_ports_maybe->first();
+        if ($remote_port->port_id != $arp->port_id) {
+            $arp_name = Url::deviceLink($remote_port->device);
+            $arp_if = Url::portLink($remote_port);
         } else {
-            $error_img = '';
-        }
-
-        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$entry['ipv4_address']]);
-        if ($arp_host) {
-            $arp_name = generate_device_link($arp_host);
-        } else {
-            unset($arp_name);
-        }
-
-        if ($arp_host) {
-            $arp_host = cleanPort($arp_host);
-            $arp_if = generate_port_link($arp_host);
-        } else {
-            unset($arp_if);
-        }
-
-        if ($arp_host['device_id'] == $entry['device_id']) {
             $arp_name = 'Localhost';
-        }
-
-        if ($arp_host['port_id'] == $entry['port_id']) {
             $arp_if = 'Local port';
         }
+    } elseif ($arp->mac_address == $arp->port->ifPhysAddress) {
+        $arp_name = 'Localhost';
+        $arp_if = 'Local port';
+    } else {
+        unset($arp_name);
+        unset($arp_if);
+    }
 
-        $response[] = [
-            'mac_address'      => \LibreNMS\Util\Rewrite::readableMac($entry['mac_address']),
-            'mac_oui'          => \LibreNMS\Util\Rewrite::readableOUI($entry['mac_address']),
-            'ipv4_address'     => $entry['ipv4_address'],
-            'hostname'         => generate_device_link($entry),
-            'interface'        => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,
-            'remote_device'    => $arp_name,
-            'remote_interface' => $arp_if,
-        ];
-    }//end if
-
-    unset($ignore);
+    $mac = Mac::parse($arp->mac_address);
+    $response[] = [
+        'mac_address' => $mac->readable(),
+        'mac_oui' => $mac->vendor(),
+        'ipv4_address' => $arp->ipv4_address,
+        'hostname' => Url::deviceLink($arp->device),
+        'interface' => Url::portLink($arp->port, Rewrite::shortenIfName($arp->label)) . ' ' . $error_img,
+        'remote_device' => $arp_name,
+        'remote_interface' => $arp_if,
+    ];
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $pag->total(),
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

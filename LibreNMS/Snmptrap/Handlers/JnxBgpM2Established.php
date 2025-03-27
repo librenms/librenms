@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxBgpM2Established.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Util\IP;
@@ -57,7 +59,7 @@ class JnxBgpM2Established implements SnmptrapHandler
         $bgpPeer->bgpPeerState = $peerState;
 
         if ($bgpPeer->isDirty('bgpPeerState')) {
-            $trap->log("BGP Peer $peerAddr is now in the $peerState state", 1);
+            $trap->log("BGP Peer $peerAddr is now in the $peerState state", Severity::Ok);
         }
 
         $bgpPeer->save();

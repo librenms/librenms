@@ -2,25 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\OspfNbr;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<OspfNbr> */
+/** @extends Factory<\App\Models\OspfNbr> */
 class OspfNbrFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = OspfNbr::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'id' => $this->faker->randomDigit(),

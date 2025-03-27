@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraphiteStoreTest.php
  *
@@ -26,12 +27,12 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use Carbon\Carbon;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Graphite;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class GraphiteStoreTest extends TestCase
 {
     protected $timestamp = 997464400;
@@ -42,38 +43,40 @@ class GraphiteStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
+        Config::set('graphite.enable', true);
     }
 
     protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
+        Config::set('graphite.enable', false);
 
         parent::tearDown();
     }
 
-    public function testSocketConnectError()
+    public function testSocketConnectError(): void
     {
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
         $mockFactory->shouldReceive('createClient')
-            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception');
+            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception')->once();
 
         new Graphite($mockFactory);
     }
 
-    public function testSocketWriteError()
+    public function testSocketWriteError(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
 
         $mockSocket->shouldReceive('write')
-            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception');
+            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
 
         $graphite->put(['hostname' => 'test'], 'fake', ['rrd_name' => 'name'], ['one' => 1]);
     }
 
-    public function testSimpleWrite()
+    public function testSimpleWrite(): void
     {
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
@@ -84,9 +87,9 @@ class GraphiteStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $mockSocket->shouldReceive('write')
-            ->with("testhost.testmeasure.rrd_name.ifIn 234234 $this->timestamp\n");
+            ->with("testhost.testmeasure.rrd_name.ifIn 234234 $this->timestamp\n")->once();
         $mockSocket->shouldReceive('write')
-            ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n");
+            ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n")->once();
         $graphite->put($device, $measurement, $tags, $fields);
     }
 

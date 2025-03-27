@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RuckusSzClusterInMaintenance.php
  *
@@ -32,6 +33,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -48,6 +50,6 @@ class RuckusSzClusterInMaintenance implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $clusterName = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName'));
-        $trap->log("Smartzone cluster $clusterName state changed to maintenance", 3);
+        $trap->log("Smartzone cluster $clusterName state changed to maintenance", Severity::Notice);
     }
 }

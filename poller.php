@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * poller.php
  *
@@ -23,69 +24,23 @@
  * Modified 4/17/19
  * @author Heath Barnhart <hbarnhart@kanren.net>
  */
-
-use App\Action;
-use App\Actions\Device\UpdateDeviceGroupsAction;
-use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
-use LibreNMS\Data\Store\Datastore;
-use LibreNMS\Util\Debug;
-
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$poller_start = microtime(true);
-Log::setDefaultDriver('console');
-echo Config::get('project_name') . " Poller\n";
+$options = getopt('h:rfpdvm:q');
 
-$options = getopt('h:m:i:n:r::d::v::a::f::q');
+c_echo('%RWarning: poller.php is deprecated!%n Use %9lnms device:poll%n instead.' . PHP_EOL . PHP_EOL);
 
-if (isset($options['h'])) {
-    if ($options['h'] == 'odd') {
-        $options['n'] = '1';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'even') {
-        $options['n'] = '0';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'all') {
-        $where = ' ';
-        $doing = 'all';
-    } elseif ($options['h']) {
-        if (is_numeric($options['h'])) {
-            $where = 'AND `device_id` = ' . $options['h'];
-            $doing = $options['h'];
-        } else {
-            if (preg_match('/\*/', $options['h'])) {
-                $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
-            } else {
-                $where = "AND `hostname` = '" . $options['h'] . "'";
-            }
-            $doing = $options['h'];
-        }
-    }
+$scheduler = \LibreNMS\Config::get('schedule_type.poller');
+if ($scheduler != 'legacy' && $scheduler != 'cron') {
+    exit(0); // message above is sufficient
 }
 
-if (isset($options['i']) && $options['i'] && isset($options['n'])) {
-    $where = true;
-    // FIXME
-    $query = 'SELECT * FROM (SELECT @rownum :=0) r,
-        (
-            SELECT @rownum := @rownum +1 AS rownum, `devices`.*
-            FROM `devices`
-            WHERE `disabled` = 0
-            ORDER BY `device_id` ASC
-        ) temp
-        WHERE MOD(temp.rownum, ' . $options['i'] . ') = ' . $options['n'] . ';';
-    $doing = $options['n'] . '/' . $options['i'];
-}
-
-if (empty($where)) {
+if (empty($options['h'])) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
-    echo "-h odd             Poll odd numbered devices  (same as -i 2 -n 0)\n";
-    echo "-h even            Poll even numbered devices (same as -i 2 -n 1)\n";
+    echo "-h odd             Poll odd numbered devices\n";
+    echo "-h even            Poll even numbered devices\n";
     echo "-h all             Poll all devices\n\n";
-    echo "-i <instances> -n <number>                   Poll as instance <number> of <instances>\n";
-    echo "                   Instances start at 0. 0-3 for -n 4\n\n";
     echo "Debugging and testing options:\n";
     echo "-r                 Do not create or update RRDs\n";
     echo "-f                 Do not insert data into InfluxDB\n";
@@ -93,74 +48,29 @@ if (empty($where)) {
     echo "-d                 Enable debugging output\n";
     echo "-v                 Enable verbose debugging output\n";
     echo "-m                 Specify module(s) to be run. Comma separate modules, submodules may be added with /\n";
+    echo "-q                 Quiet, minimal output /\n";
     echo "\n";
     echo "No polling type specified!\n";
     exit;
 }
 
-if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
-    echo \LibreNMS\Util\Version::get()->header();
+$arguments = [
+    'device spec' => $options['h'],
+    '--verbose' => isset($options['v']) ? 3 : (isset($options['d']) ? 2 : 1),
+];
 
-    echo "DEBUG!\n";
-    if (isset($options['v'])) {
-        Debug::setVerbose();
-    }
-    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+if (isset($options['m'])) {
+    $arguments['--modules'] = $options['m'];
 }
 
-// If we've specified modules with -m, use them
-$module_override = parse_modules('poller', $options);
-
-$datastore = Datastore::init($options);
-
-echo "Starting polling run:\n\n";
-$polled_devices = 0;
-$unreachable_devices = 0;
-if (! isset($query)) {
-    $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
+if (isset($options['q'])) {
+    $arguments['--quiet'] = true;
 }
 
-foreach (dbFetch($query) as $device) {
-    DeviceCache::setPrimary($device['device_id']);
-
-    if (! poll_device($device, $module_override)) {
-        $unreachable_devices++;
-    }
-
-    // Update device_groups
-    echo "### Start Device Groups ###\n";
-    $dg_start = microtime(true);
-    $group_changes = Action::execute(UpdateDeviceGroupsAction::class);
-    d_echo('Groups Added: ' . implode(',', $group_changes['attached']) . PHP_EOL);
-    d_echo('Groups Removed: ' . implode(',', $group_changes['detached']) . PHP_EOL);
-    echo '### End Device Groups, runtime: ' . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
-
-    echo "#### Start Alerts ####\n";
-    $rules = new AlertRules();
-    $rules->runRules($device['device_id']);
-    echo "#### End Alerts ####\r\n";
-    $polled_devices++;
+if (isset($options['r']) || isset($options['f']) || isset($options['p'])) {
+    $arguments['--no-data'] = true;
 }
 
-$poller_end = microtime(true);
-$poller_run = ($poller_end - $poller_start);
-$poller_time = substr($poller_run, 0, 5);
+$return = Artisan::call('device:poll', $arguments);
 
-$string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
-d_echo("$string\n");
-
-if (! isset($options['q'])) {
-    echo PHP_EOL;
-    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
-}
-
-logfile($string);
-Datastore::terminate();
-// Remove this for testing
-// print_r(get_defined_vars());
-
-if ($polled_devices === $unreachable_devices) {
-    exit(6);
-}
-
-exit(0);
+exit($return);

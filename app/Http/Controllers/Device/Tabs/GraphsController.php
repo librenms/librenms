@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraphsController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class GraphsController implements DeviceTab
@@ -50,7 +52,7 @@ class GraphsController implements DeviceTab
         return __('Graphs');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

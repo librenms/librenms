@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MefController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class MefController implements DeviceTab
@@ -50,7 +52,7 @@ class MefController implements DeviceTab
         return __('Metro Ethernet');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

@@ -5,8 +5,8 @@ use LibreNMS\Util\Number;
 print_optionbar_start();
 
 $link_array = [
-    'page'    => 'routing',
-    'protocol'  => 'mpls',
+    'page' => 'routing',
+    'protocol' => 'mpls',
 ];
 
 if (! isset($vars['view'])) {
@@ -292,7 +292,7 @@ if ($vars['view'] == 'sdps') {
 
 if ($vars['view'] == 'sdpbinds') {
     echo '<tr><th><a title="Device">Device</a></th>
-        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain">Service Id</a></th>
+        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain">Service ID</a></th>
         <th><a title="SDP Binding identifier. SDP identifier : Service identifier">SDP Bind Id</a></th>
         <th><a title="This object specifies whether this Service SDP binding is a spoke or a mesh.">Bind Type</a></th>
         <th><a title="The value of VC Type is an enumerated integer that specifies the type of virtual circuit (VC) associated with the SDP binding">VC Type</a></th>
@@ -361,7 +361,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
 if ($vars['view'] == 'services') {
     echo '<tr><th><a title="Device">Device</a></th>
-        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain.">Service Id</a></th>
+        <th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain.">Service ID</a></th>
         <th><a title="The value of this object specifies the service type: e.g. epipe, tls, etc.">Type</a></th>
         <th><a title="The value of this object specifies the ID of the customer who owns this service.">Customer</a></th>
         <th><a title="The value of this object specifies the desired state of this service.">Admin Status</a></th>
@@ -442,7 +442,7 @@ vprn services are up when the service is administratively up however routing fun
 
 if ($vars['view'] == 'saps') {
     echo '<tr><th><a title="Device">Device</a></th>
-        <th><a title="The value of this object specifies the Service identifier.">Service Id</a></th>
+        <th><a title="The value of this object specifies the Service identifier.">Service ID</a></th>
         <th><a title="The ID of the access port where this SAP is defined.">SAP Port</a></th>
         <th><a title="The value of the label used to identify this SAP on the access port specified by sapPortId.">Encapsulation</a></th>
         <th><a title="This object indicates the type of service where this SAP is defined.">Type</a></th>

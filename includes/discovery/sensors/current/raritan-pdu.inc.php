@@ -13,12 +13,12 @@ if ($inlet_oids) {
         if ($inlet_data) {
             [$inlet_oid,$inlet_descr] = explode(' ', $inlet_data, 2);
             $inlet_split_oid = explode('.', $inlet_oid);
-            $inlet_index = $inlet_split_oid[(count($inlet_split_oid) - 2)] . '.' . $inlet_split_oid[(count($inlet_split_oid) - 1)];
+            $inlet_index = $inlet_split_oid[count($inlet_split_oid) - 2] . '.' . $inlet_split_oid[count($inlet_split_oid) - 1];
             $inlet_oid = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$inlet_index.1";
             $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$inlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB'));
             $inlet_current = (snmp_get($device, "measurementsInletSensorValue.$inlet_index.1", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
             if ($inlet_current >= 0) {
-                discover_sensor($valid['sensor'], 'current', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, $multiplier, null, null, null, null, $inlet_current);
+                discover_sensor(null, 'current', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, $multiplier, null, null, null, null, $inlet_current);
             }
         }
     }
@@ -34,7 +34,7 @@ if ($outlet_oids) {
         if ($outlet_data) {
             [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
-            $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
+            $outlet_index = $outlet_split_oid[count($outlet_split_oid) - 1];
             $outletsuffix = "$outlet_index";
             $outlet_insert_index = $outlet_index;
             // outletLoadValue: "A non-negative value indicates the measured load in milli Amps"
@@ -46,7 +46,7 @@ if ($outlet_oids) {
             $outlet_high_limit = snmp_get($device, "outletCurrentUpperCritical.$outletsuffix", '-Ovq', 'PDU-MIB') / $divisor;
             $outlet_current = snmp_get($device, "outletCurrent.$outletsuffix", '-Ovq', 'PDU-MIB') / $divisor;
             if ($outlet_current >= 0) {
-                discover_sensor($valid['sensor'], 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
+                discover_sensor(null, 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
             }
         }
     }
@@ -62,7 +62,7 @@ if ($outlet_oids) {
         if ($outlet_data) {
             [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
-            $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
+            $outlet_index = $outlet_split_oid[count($outlet_split_oid) - 1];
             $outletsuffix = "$outlet_index";
             $outlet_insert_index = $outlet_index;
             $outlet_oid = ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.$outletsuffix.1";
@@ -77,7 +77,7 @@ if ($outlet_oids) {
             $outlet_divisor = pow(10, snmp_get($device, "outletSensorDecimalDigits.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB'));
             $outlet_power = (snmp_get($device, "measurementsOutletSensorValue.1.$outlet_index.1", '-Ovq', 'PDU2-MIB') / $outlet_divisor);
             if ($outlet_power >= 0) {
-                discover_sensor($valid['sensor'], 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_power);
+                discover_sensor(null, 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_power);
             }
         }
     }
@@ -118,6 +118,6 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $warn_limit = $raritan_data['inletCurrentLowerWarning'] / $divisor;
         $high_limit = $raritan_data['inletCurrentLowerCritical'] / $divisor;
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleCurrent'] / $divisor;
-        discover_sensor($valid['sensor'], 'current', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+        discover_sensor(null, 'current', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }

@@ -1,13 +1,17 @@
-mib: IMCO-LS110-MIB
+mib: IMCO-LSPS-MIB
 modules:
+    os:
+        hardware: IMCO-LSPS-MIB::sdsModel.0
+        serial: IMCO-LSPS-MIB::sdsSerialNumber.0
+        version: IMCO-LSPS-MIB::sdsSoftware.0
     sensors:
         temperature:
             data:
                 -
                     oid: sdsTempSensValue
                     num_oid: '.1.3.6.1.4.1.33283.1.30.5.1.3.{{ $index }}'
-                    index: sdsTempSensValue.{{index}}
-                    descr: Temperature
+                    index: sdsTempSensValue.{{ $index }}
+                    descr: Battery Temperature
                     divisor: 100
 
                     skip_values:
@@ -21,7 +25,7 @@ modules:
                 -
                     oid: sdsBatteryCapacity
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.7.{{ $index }}'
-                    index: sdsBatteryCapacity.{{index}}
+                    index: sdsBatteryCapacity.{{ $index }}
                     descr: 'Battery Charge'
                     divisor: 10
 
@@ -30,7 +34,7 @@ modules:
                 -
                     oid: sdsLoad
                     num_oid: '.1.3.6.1.4.1.33283.1.30.7.8.{{ $index }}'
-                    index: sdsLoad.{{index}}
+                    index: sdsLoad.{{ $index }}
                     descr: 'Load(VA)'
                     divisor: 10
 
@@ -40,7 +44,7 @@ modules:
                 -
                     oid: opto3
                     num_oid: '.1.3.6.1.4.1.33283.1.30.2.3.{{ $index }}'
-                    index: opto3.{{index}}
+                    index: opto3.{{ $index }}
                     descr: 'Power state'
                     states:
                         - { descr: Battery, graph: 0, value: 2, generic: 2 }

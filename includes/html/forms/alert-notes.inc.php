@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-notes.inc.php
  *
@@ -46,7 +47,7 @@ if (is_numeric($alert_id)) {
     $message = 'Invalid alert id';
 }
 exit(json_encode([
-    'status'  => $status,
+    'status' => $status,
     'message' => $message,
-    'note'    => $note,
+    'note' => $note,
 ]));

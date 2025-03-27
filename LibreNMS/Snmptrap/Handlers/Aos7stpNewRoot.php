@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aos7stpNewRoot.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -41,6 +43,6 @@ class Aos7stpNewRoot implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', 3, 'stp');
+        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', Severity::Notice, 'stp');
     }
 }

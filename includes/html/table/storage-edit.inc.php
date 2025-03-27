@@ -2,7 +2,7 @@
 
 $device_id = $vars['device_id'];
 
-$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `S`.`storage_deleted`=0';
+$sql = ' FROM `storage` AS `S` LEFT JOIN `devices` AS `D` ON `S`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=?';
 $param[] = $device_id;
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
@@ -27,7 +27,7 @@ if (! isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = ($current * $rowCount) - ($rowCount);
+    $limit_low = ($current * $rowCount) - $rowCount;
     $limit_high = $rowCount;
 }
 
@@ -52,5 +52,5 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     ];
 }
 
-$output = ['current'=>$current, 'rowCount'=>$rowCount, 'rows'=>$response, 'total'=>$total];
+$output = ['current' => $current, 'rowCount' => $rowCount, 'rows' => $response, 'total' => $total];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

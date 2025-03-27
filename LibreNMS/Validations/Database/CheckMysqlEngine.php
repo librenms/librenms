@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckMysqlEngine.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Validations\Database;
 
-use DB;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationFixer;

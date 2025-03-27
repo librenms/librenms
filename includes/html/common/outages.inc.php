@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,8 +40,8 @@ var outages_grid = $("#outages").bootgrid({
     {
         return {
             device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
-            to: "' . addcslashes($vars['to'], '"') . '",
-            from: "' . addcslashes($vars['from'], '"') . '",
+            to: "' . htmlspecialchars($vars['to']) . '",
+            from: "' . htmlspecialchars($vars['from']) . '",
         };
     },
     url: "' . url('/ajax/table/outages') . '"

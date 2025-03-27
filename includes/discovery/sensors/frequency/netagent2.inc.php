@@ -1,4 +1,5 @@
 <?php
+
 /**
  * netagent2.inc.php
  *
@@ -29,9 +30,9 @@
  */
 
 // Detect type of UPS (Signle-Phase/3 Phase)
-    // Number of input lines
-    $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
-    $in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
+// Number of input lines
+$upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
+$in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
 
 // Single-phase system
 if ($in_phaseNum == '1') {
@@ -51,7 +52,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Input frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -83,7 +84,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Output frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $out_frequency_oid,
@@ -119,7 +120,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Input frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -151,7 +152,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Output frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,
@@ -183,7 +184,7 @@ if ($in_phaseNum == '3') {
         $descr = 'Bypass frequency';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'frequency',
             $device,
             $in_frequency_oid,

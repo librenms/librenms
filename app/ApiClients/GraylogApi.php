@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraylogApi.php
  *
@@ -26,34 +27,29 @@
 namespace App\ApiClients;
 
 use App\Models\Device;
-use GuzzleHttp\Client;
 use LibreNMS\Config;
+use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private Client $client;
+    private \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
-    public function __construct(array $config = [])
+    public function __construct()
     {
         if (version_compare(Config::get('graylog.version', '2.4'), '2.1', '>=')) {
             $this->api_prefix = '/api';
         }
 
-        if (empty($config)) {
-            $base_uri = Config::get('graylog.server');
-            if ($port = Config::get('graylog.port')) {
-                $base_uri .= ':' . $port;
-            }
-
-            $config = [
-                'base_uri' => $base_uri,
-                'auth' => [Config::get('graylog.username'), Config::get('graylog.password')],
-                'headers' => ['Accept' => 'application/json'],
-            ];
+        $base_uri = Config::get('graylog.server');
+        if ($port = Config::get('graylog.port')) {
+            $base_uri .= ':' . $port;
         }
 
-        $this->client = new Client($config);
+        $this->client = Http::client()
+            ->baseUrl($base_uri)
+            ->withBasicAuth(Config::get('graylog.username'), Config::get('graylog.password'))
+            ->acceptJson();
     }
 
     public function getStreams(): array
@@ -65,9 +61,8 @@ class GraylogApi
         $uri = $this->api_prefix . '/streams';
 
         $response = $this->client->get($uri);
-        $data = json_decode($response->getBody(), true);
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**
@@ -93,10 +88,9 @@ class GraylogApi
             'filter' => $filter,
         ];
 
-        $response = $this->client->get($uri, ['query' => $data]);
-        $data = json_decode($response->getBody(), true);
+        $response = $this->client->get($uri, $data)->throw();
 
-        return $data ?: [];
+        return $response->json() ?: [];
     }
 
     /**
@@ -104,13 +98,14 @@ class GraylogApi
      */
     public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
+        $field = Config::get('graylog.query.field');
         $query = [];
         if ($search) {
             $query[] = 'message:"' . $search . '"';
         }
 
         if ($device) {
-            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
+            $query[] = $field . ': ("' . $this->getAddresses($device)->implode('" OR "') . '")';
         }
 
         if (empty($query)) {
@@ -127,6 +122,7 @@ class GraylogApi
             $device->hostname,
             $device->displayName(),
             $device->ip,
+            $device->sysName,
         ]);
 
         if (Config::get('graylog.match-any-address')) {

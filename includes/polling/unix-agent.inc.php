@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
@@ -28,6 +29,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         // Set stream timeout (for timeouts during agent  fetch
         stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
         $agentinfo = stream_get_meta_data($agent);
+        $agent_raw = '';
 
         // fetch data while not eof and not timed-out
         while ((! feof($agent)) && (! $agentinfo['timed_out'])) {
@@ -52,7 +54,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         $fields = [
             'time' => $agent_time,
         ];
-        data_update($device, 'agent', $tags, $fields);
+        app('Datastore')->put($device, 'agent', $tags, $fields);
 
         $os->enableGraph('agent');
 
@@ -62,6 +64,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'ceph',
             'mysql',
             'nginx',
+            'os-updates',
             'php-fpm',
             'powerdns',
             'powerdns-recursor',
@@ -72,17 +75,19 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
-        global $agent_data;
         $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
-            [$section, $data] = explode('>>>', $section);
-            [$sa, $sb] = explode('-', $section, 2);
+            if (empty($section)) {
+                continue;
+            }
 
+            [$section, $data] = explode('>>>', $section);
             if (in_array($section, $agentapps)) {
                 $agent_data['app'][$section] = trim($data);
             }
 
-            if (! empty($sa) && ! empty($sb)) {
+            if (str_contains($section, '-')) {
+                [$sa, $sb] = explode('-', $section, 2);
                 $agent_data[$sa][$sb] = trim($data);
             } else {
                 $agent_data[$section] = trim($data);
@@ -108,9 +113,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             dbDelete('processes', 'device_id = ?', [$device['device_id']]);
             $data = [];
             foreach (explode("\n", $agent_data['ps']) as $process) {
-                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9\:\.\-]*),([0-9]*)\)\ (.*)/', '\\1|\\2|\\3|\\4|\\5|\\6', $process);
-                [$user, $vsz, $rss, $cputime, $pid, $command] = explode('|', $process, 6);
-                if (! empty($command)) {
+                if (preg_match('/\((.*),([0-9]*),([0-9]*),([-0-9:.]*),([0-9]*)\) (.+)/', $process, $process_matches)) {
+                    [, $user, $vsz, $rss, $cputime, $pid, $command] = $process_matches;
                     $data[] = ['device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command];
                 }
             }
@@ -133,7 +137,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                     $days = floor($cputime / 86400);
                     $hours = str_pad(floor(($cputime / 3600) % 24), 2, '0', STR_PAD_LEFT);
                     $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
-                    $seconds = str_pad(($cputime % 60), 2, '0', STR_PAD_LEFT);
+                    $seconds = str_pad($cputime % 60, 2, '0', STR_PAD_LEFT);
                     $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
                     $data[] = ['device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
                 }
@@ -200,9 +204,12 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         DeviceCache::getPrimary()->save();
     }
 
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data);
+
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';
-        check_valid_sensors($device, 'temperature', $valid['sensor'], 'agent');
+        app('sensor-discovery')->sync(sensor_class: 'temperature', poller_type: 'agent');
         d_echo($agent_sensors);
         if (count($agent_sensors) > 0) {
             record_sensor_data($device, $agent_sensors);

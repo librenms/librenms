@@ -1,4 +1,4 @@
-mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-RPM-MIB
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-VIRTUALCHASSIS-MIB:JUNIPER-RPM-MIB:POWER-ETHERNET-MIB
 modules:
     mempools:
         data:
@@ -30,7 +30,7 @@ modules:
                 descr: jnxOperatingDescr
                 skip_values:
                     -
-                        oid: jnxOperatingBuffer
+                        oid: jnxOperatingMemory
                         op: '='
                         value: 0
                     -
@@ -49,6 +49,18 @@ modules:
                     oid:
                         - ifDescr
                         - jnxFruName
+        ber:
+            data:
+                -
+                    oid: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMFECCurrentTable
+                    value: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERMantissa
+                    num_oid: '.1.3.6.1.4.1.2636.3.73.1.3.3.8.1.5.{{ $index }}'
+                    snmp_flags: '-OteQUb'
+                    divisor: '1.0E+{{ JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERExponent }}'
+                    descr: '{{ ifDescr:0 }} preFEC BER'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
         chromatic_dispersion:
             data:
                 -
@@ -58,6 +70,7 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifDescr }} CD'
+                    group: transceiver
                     index: 'jnxPMCurChromaticDispersion.{{ $index }}'
         delay:
             data:
@@ -69,9 +82,70 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000000000000
                     descr: '{{ $ifDescr }} DGD'
+                    group: transceiver
                     index: 'jnxPMCurDiffGroupDelay.{{ $index }}'
         dbm:
             data:
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.1.1.1.5.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.1.1.1.7.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'tx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentLaneRxLaserPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.2.1.1.6.{{ $index }}'
+                    descr: '{{ ifDescr:0 }} lane {{ $subindex1 }} Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowAlarmThreshold:0
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerLowWarningThreshold:0
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighAlarmThreshold:0
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentRxLaserPowerHighWarningThreshold:0
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomModuleLaneTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentLaneTxLaserOutputPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.{{ $index }}'
+                    descr: '{{ ifDescr:0 }} lane {{ $subindex1 }} Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold:0
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerLowWarningThreshold:0
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold:0
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserOutputPowerHighWarningThreshold:0
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'tx-{{ $index }}'
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurRxInputPower
@@ -80,6 +154,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ $ifDescr }} Rx Power'
+                    group: transceiver
                     index: 'jnxPMCurRxInputPower.{{ $index }}'
                 -
                     oid: jnxOpticsPMCurrentTable
@@ -89,6 +164,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 100
                     descr: '{{ $ifDescr }} Tx Power'
+                    group: transceiver
                     index: 'jnxPMCurTxOutputPower.{{ $index }}'
         quality_factor:
             data:
@@ -100,6 +176,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ $ifDescr }} Q2-factor'
+                    group: transceiver
                     index: 'jnxPMCurQ.{{ $index }}'
         snr:
             data:
@@ -111,6 +188,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 10
                     descr: '{{ $ifDescr }} electrical SNR'
+                    group: transceiver
                     index: 'jnxPMCurSNR.{{ $index }}'
         frequency:
             data:
@@ -122,9 +200,30 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     multiplier: 1000000
                     descr: '{{ $ifDescr }} Carrier Freq Offset'
+                    group: transceiver
                     index: 'jnxPMCurCarFreqOffset.{{ $index }}'
         temperature:
             data:
+                -
+                    oid: JUNIPER-MIB::jnxOperatingTable
+                    value: JUNIPER-MIB::jnxOperatingTemp
+                    num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.7.{{ $index }}'
+                    descr: JUNIPER-MIB::jnxOperatingDescr
+                    skip_values: 0
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperature
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.1.1.1.8.{{ $index }}'
+                    descr: '{{ $ifDescr }} Temperature'
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowAlarmThreshold
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureLowWarningThreshold
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighAlarmThreshold
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentModuleTemperatureHighWarningThreshold
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'rx-{{ $index }}'  # match old php discovery
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurTemperature
@@ -133,8 +232,24 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $ifDescr }} Temperature'
                     index: 'jnxPMCurTemperature.{{ $index }}'
+                    group: transceiver
         current:
             data:
+                -
+                    oid: JUNIPER-DOM-MIB::jnxDomCurrentTable
+                    value: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2636.3.60.1.1.1.1.6.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Current'
+                    divisor: 1000000
+                    skip_values: 0
+                    low_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold
+                    low_warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold
+                    high_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold
+                    warn_limit: JUNIPER-DOM-MIB::jnxDomCurrentTxLaserBiasCurrentHighWarningThreshold
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
                 -
                     oid: jnxOpticsPMCurrentTable
                     value: jnxPMCurTxLaserBiasCurrent
@@ -143,16 +258,15 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
+                    group: transceiver
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
         loss:
             data:
                 -
                     oid: jnxRpmResultsSummaryTable
                     value: jnxRpmResSumPercentLost
-                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $index_string }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $str_index_as_numeric }}'
                     group: RPM Probes
-                    entPhysicalIndex_measured: 'probes'
                     descr: '{{ $index }} Probe Loss'
                     index: 'jnxRpmResSumPercentLost.{{ $index }}'
         count:
@@ -228,3 +342,24 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: master }
                         - { value: 2, generic: 0, graph: 0, descr: backup }
                         - { value: 3, generic: 0, graph: 0, descr: linecard }
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseOperStatus
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.3.{{ $index }}'
+                    descr: 'PoE Controller {{ $index }} Status'
+                    index: 'pethMainPseOperStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 2, generic: 0, graph: 0, descr: off }
+                        - { value: 3, generic: 2, graph: 0, descr: fault }
+        power:
+            data:
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
+                    descr: 'PoE Controller {{ $index }} Load'
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
+                    low_limit: -1
+                    low_warn_limit: -1

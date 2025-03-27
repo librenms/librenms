@@ -60,9 +60,6 @@
         "poller_modules": {
             "type": "object",
             "properties": {
-                "cisco-cbqos": {
-                    "type": "boolean"
-                },
                 "cisco-qfp": {
                     "type": "boolean"
                 },
@@ -70,9 +67,6 @@
                     "type": "boolean"
                 },
                 "cisco-mac-accounting": {
-                    "type": "boolean"
-                },
-                "cisco-voice": {
                     "type": "boolean"
                 },
                 "cisco-remote-access-monitor": {
@@ -99,10 +93,10 @@
                 "entity-state": {
                     "type": "boolean"
                 },
-                "wifi": {
+                "ipmi": {
                     "type": "boolean"
                 },
-                "ipmi": {
+                "isis": {
                     "type": "boolean"
                 },
                 "entity-physical": {
@@ -138,6 +132,9 @@
                 "ospf": {
                     "type": "boolean"
                 },
+                "ospfv3": {
+                    "type": "boolean"
+                },
                 "ucd-diskio": {
                     "type": "boolean"
                 },
@@ -168,9 +165,6 @@
                 "aruba-controller": {
                     "type": "boolean"
                 },
-                "cisco-asa-firewall": {
-                    "type": "boolean"
-                },
                 "mib": {
                     "type": "boolean"
                 },
@@ -180,10 +174,7 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
-                "libvirt-vminfo": {
-                    "type": "boolean"
-                },
-                "vmware-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "vlans": {
@@ -270,6 +261,9 @@
                 "hr-device": {
                     "type": "boolean"
                 },
+                "isis": {
+                    "type": "boolean"
+                },
                 "discovery-protocols": {
                     "type": "boolean"
                 },
@@ -345,10 +339,7 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
-                "vmware-vminfo": {
-                    "type": "boolean"
-                },
-                "libvirt-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "mpls": {
@@ -364,6 +355,9 @@
             "additionalProperties": false
         },
         "ifname": {
+            "type": "boolean"
+        },
+        "ifalias": {
             "type": "boolean"
         },
         "mib_dir": {
@@ -391,7 +385,24 @@
             "type": "boolean"
         },
         "snmp_max_oid": {
-            "type": "string"
+            "type": "integer",
+            "minimum": 1
+        },
+        "syslog_hook": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "regex": {
+                        "type": "string"
+                    },
+                    "script": {
+                        "type": "string"
+                    }
+                },
+                "required": ["regex", "script"],
+                "additionalProperties": false
+            }
         },
         "ifXmcbc": {
             "type": "boolean"
@@ -446,6 +457,18 @@
             "type": "boolean"
         },
         "ignore_mount_string": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ignore_mount_regexp": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "ignore_mount_type": {
             "type": "array",
             "items": {
                 "type": "string"

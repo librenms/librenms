@@ -46,17 +46,17 @@ foreach ($mdadm_data as $data) {
     $array_level = str_replace('raid', '', $level);
 
     $fields = [
-        'level'          => $array_level,
-        'size'           => $size,
-        'disc_count'     => $disc_count,
+        'level' => $array_level,
+        'size' => $size,
+        'disc_count' => $disc_count,
         'hotspare_count' => $hotspare_count,
-        'degraded'       => $degraded,
-        'sync_speed'     => $sync_speed,
+        'degraded' => $degraded,
+        'sync_speed' => $sync_speed,
         'sync_completed' => $sync_completed,
     ];
 
     $metrics[$array_name] = $fields;
     $tags = ['name' => $array_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 update_application($app, $output, $metrics);

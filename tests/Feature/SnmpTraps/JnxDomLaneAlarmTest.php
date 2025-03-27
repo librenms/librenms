@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxDomLaneAlarmTest.php
  * -Description-
@@ -30,6 +31,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxDomLaneAlarmTest extends SnmpTrapTestCase
@@ -60,7 +62,7 @@ JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
             "DOM lane alarm on interface $port->ifDescr lane 0. Current alarm(s): input signal low",
             'Could not handle JnxDomLaneAlarmSet',
-            [5],
+            [Severity::Error],
             $device,
         );
     }
@@ -88,7 +90,7 @@ JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
             "DOM lane alarm cleared on interface $port->ifDescr lane 0. Current alarm(s): output signal high",
             'Could not handle JnxDomLaneAlarmCleared',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

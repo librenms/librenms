@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ifotec.inc.php
  *
@@ -25,7 +26,7 @@
 $index = 0;
 foreach ($pre_cache['ifoTemperatureTable'] as $ifoSensor) {
     discover_sensor(
-        $valid['sensor'],
+        null,
         'temperature',
         $device,
         $ifoSensor['ifoTempValue']['oid'],

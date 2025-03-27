@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * gen_smokeping.php
  *
@@ -33,4 +34,4 @@ if (php_sapi_name() === 'cli') {
     exit($return);
 }
 
-exit();
+exit;

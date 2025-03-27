@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RipeNccApiController.php
  *
@@ -57,7 +58,9 @@ class RipeNccApiController extends Controller
             if (isset($response['messages'])) {
                 $message .= ': ' . collect($response['messages'])
                         ->flatten()
-                        ->reject('error')
+                        ->reject(function ($value, $key) {
+                            return $value != 'error';
+                        })
                         ->implode(', ');
             }
 

@@ -10,8 +10,9 @@
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"snmp\"",
-    "name": "SNMP not responding on Device - Check on SNMP Service - Device marked Down!",
-    "default": true
+    "name": "Device Down (SNMP unreachable)",
+    "default": true,
+    "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
     "rule": "devices.uptime < \"300\" && macros.device = \"1\"",
@@ -110,10 +111,6 @@
     "name": "Device took too long to poll"
   },
   {
-    "rule": "macros.device_up = \"1\" && devices.os = \"asa\" && ciscoASA.data > \"5000\"",
-    "name": "Cisco ASA connections over 5000"
-  },
-  {
     "rule": "processors.processor_usage > \"85\" && macros.device_up = \"1\"",
     "name": "Processor usage over 85%"
   },
@@ -174,7 +171,7 @@
     "name": "APC UPS Diagonstics Test Result"
   },
   {
-    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
@@ -484,6 +481,126 @@
     "name": "Port Speed Degraded"
   },
   {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"warning\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Warnings >= 1",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"critical\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Critical >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"unknown\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Unknown >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"errored\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Errored >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI PSU Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI PSU Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI PSU Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Fan Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Fan Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Fan Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Temperature Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Temperature Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Temperature Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Volts Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Volts Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Volts Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Amps Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Amps Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Amps Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_suricata_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Suricata Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_meer_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Meer Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_sagan_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Sagan Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_daemonlogger_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Daemonlogger Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"time_to_polling_abs\" && application_metrics.value >= \"540\"",
+    "name": "Sneck Has Not Run For Over 540 Seconds",
+    "severity": "critical"
+  },
+  {
     "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \"alert\" && application_metrics.value = \"1\"",
     "name": "Suricata has a WARNING alert",
     "severity": "warning"
@@ -579,12 +696,12 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 90 AND storage.storage_perc < 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 90 && storage.storage_perc < 95",
     "name": "Space on / is >= 90% and < 95% in use",
     "severity":"warning"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
+    "rule": "storage.storage_descr = \"/\" && storage.storage_perc >= 95",
     "name": "Space on / is >= 95% in use",
     "severity":"critical"
   },
@@ -592,5 +709,140 @@
     "rule": "applications.app_type = \"systemd\" && application_metrics.metric = \"sub_service_failed\" && application_metrics.value > \"0\"",
     "name": "Systemd Services Failed > 0",
     "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric = \"max_size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: set(s) have a size > 5GB",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric like \"set_%_max_size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: set(s) has a log file(s) with a size > 5GB",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"logsize\" && application_metrics.metric = \"size\" && application_metrics.value > \"5000000000\"",
+    "name": "Logsize: total size > 5GB",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"l2_errors\" && application_metrics.value >= \"1\"",
+    "name": "ZFS L2 errors present",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric = \"health\" && application_metrics.value = \"0\"",
+    "name": "ZFS has one or more pool DEGRADED, FAULTED, UNAVAIL, REMOVED, or other",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"linux_config_files\" && application_metrics.metric = \"number_of_confs\" && application_metrics.value > \"0\"",
+    "name": "linux_config_files Configuration Files Out-Of-Sync > 0",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"smart\" && application_metrics.metric = \"unhealthy\" && application_metrics.value > \"0\"",
+    "name": "SMART: one or more disk is unhealthy",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"smart\" && application_metrics.metric = \"exit_nonzero\" && application_metrics.value > \"0\"",
+    "name": "SMART: one or more disk could not be polled",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"ss\" && application_metrics.metric = \"tcp_time-wait\" && application_metrics.value > \"100\"",
+    "name": "SS TCP TIME-WAIT Sessions > 100",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"ss\" && application_metrics.metric = \"inet6_tcp_established\" && application_metrics.value < \"10\"",
+    "name": "SS IPv6 TCP ESTABLISHED Sessions < 10",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"suricata_extract\" && application_metrics.metric = \"errors\" && application_metrics.value > \"0\"",
+    "name": "Suricata Extract Submit errors found > 0",
+    "severity": "warning"
+  },
+  {
+    "rule": "(applications.app_type = \"suricata_extract\" && application_metrics.metric = \"sub_fail\" && application_metrics.value > \"0\") || (applications.app_type = \"suricata_extract\" && application_metrics.metric = \"sub_4xx\" && application_metrics.value > \"0\") || (applications.app_type = \"suricata_extract\" && application_metrics.metric = \"sub_5xx\" && application_metrics.value > \"0\")",
+    "name": "Suricata Extract Submit submission failures found > 0",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata_extract\" && application_metrics.metric = \"truncated\" && application_metrics.value > \"0\"",
+    "name": "Suricata Extract Submit truncated extracts found > 0",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata_extract\" && application_metrics.metric = \"zero_sized\" && application_metrics.value > \"0\"",
+    "name": "Suricata Extract Submit zero sized files > 0",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"reported\" && application_metrics.value > 0",
+    "name": "CAPE reported = 0, nothing is processing",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"critical\" && application_metrics.value > 0",
+    "name": "CAPE Criticals > 0",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"error\" && application_metrics.value > 0",
+    "name": "CAPE Errors > 0",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test read failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},
+                                           {"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},
+                                           {"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}
+                                         ],"valid":false},
+    "name": "SMART: one or more disk is has self test unknown failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 90% in use",
+    "severity": "warning"
+  },
+  {
+    "builder": {"condition":"AND","rules":[
+                                           {"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},
+                                           {"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},
+                                           {"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}
+                                         ],"valid":false},
+    "name": "Linux High Memory Usage, >= 95% in use",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"zfs\" && application_metrics.metric like \"pool_%_%_errors\" && application_metrics.value > \"0\"",
+    "name": "ZFS: pool with errors present",
+    "severity": "critical"
   }
 ]

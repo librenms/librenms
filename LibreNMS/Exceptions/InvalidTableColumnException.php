@@ -1,4 +1,5 @@
 <?php
+
 /*
  * InvalidTableColumnException.php
  *
@@ -30,6 +31,6 @@ class InvalidTableColumnException extends ApiException
     public function __construct(
         public readonly array $columns
     ) {
-        parent::__construct('Invalid columns: ' . join(',', $this->columns));
+        parent::__construct('Invalid columns: ' . implode(',', $this->columns));
     }
 }

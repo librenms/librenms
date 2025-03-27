@@ -13,7 +13,7 @@ class SnmptrapProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
@@ -23,7 +23,7 @@ class SnmptrapProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(SnmptrapHandler::class, function ($app, $options) {
             $oid = reset($options);

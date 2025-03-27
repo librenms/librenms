@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CpUpsRtnOverTemp.php
  *
@@ -28,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -44,6 +46,6 @@ class CpUpsRtnOverTemp implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $temp = CyberPowerUtil::getMessage($trap);
-        $trap->log("$temp", 1);
+        $trap->log("$temp", Severity::Ok);
     }
 }

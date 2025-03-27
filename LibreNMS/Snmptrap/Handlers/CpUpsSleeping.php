@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CpUpsSleeping.php
  *
@@ -28,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -44,6 +46,6 @@ class CpUpsSleeping implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $status = CyberPowerUtil::getMessage($trap);
-        $trap->log("$status", 4);
+        $trap->log("$status", Severity::Warning);
     }
 }

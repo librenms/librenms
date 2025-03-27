@@ -1,5 +1,8 @@
 <?php
 
+use LibreNMS\Util\Mac;
+use LibreNMS\Util\Rewrite;
+
 $port = $vars['id'];
 $stat = $vars['stat'] ?: 'bits';
 $sort = in_array($vars['sort'], ['in', 'out', 'both']) ? $vars['sort'] : 'in';
@@ -49,7 +52,7 @@ $rrd_options .= " COMMENT:'                                     In\: Current    
 foreach ($accs as $acc) {
     $this_rrd = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
     if (Rrd::checkRrdExists($this_rrd)) {
-        $mac = \LibreNMS\Util\Rewrite::readableMac($acc['mac']);
+        $mac = Mac::parse($acc['mac'])->readable();
         $name = $mac;
 
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', [$acc['mac'], $acc['port_id']]);
@@ -62,7 +65,7 @@ foreach ($accs as $acc) {
                 [$addy['ipv4_address']]
             );
             if ($peer) {
-                $name = $peer['hostname'] . ' ' . makeshortif($peer['ifDescr']) . ' (' . $mac . ')';
+                $name = $peer['hostname'] . ' ' . Rewrite::shortenIfName($peer['ifDescr']) . ' (' . $mac . ')';
             }
 
             if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']])) {

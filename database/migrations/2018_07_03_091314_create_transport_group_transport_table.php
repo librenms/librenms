@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2018_07_03_091314_create_transport_group_transport_table.php
  *
@@ -26,14 +27,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateTransportGroupTransportTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('transport_group_transport', function (Blueprint $table) {
             $table->id();
@@ -47,8 +48,8 @@ class CreateTransportGroupTransportTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('transport_group_transport');
     }
-}
+};

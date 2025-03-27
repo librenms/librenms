@@ -16,9 +16,10 @@
                     <th data-column-id="user_id" data-visible="false" data-identifier="true" data-type="numeric">{{ __('ID') }}</th>
                     <th data-column-id="username" data-formatter="text">{{ __('Username') }}</th>
                     <th data-column-id="realname" data-formatter="text">{{ __('Real Name') }}</th>
-                    <th data-column-id="level" data-formatter="level" data-type="numeric">{{ __('Access') }}</th>
+                    <th data-column-id="roles" data-formatter="roles">{{ __('Roles') }}</th>
                     <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">{{ __('auth.title') }}</th>
                     <th data-column-id="email" data-formatter="text">{{ __('Email') }}</th>
+                    <th data-column-id="timezone">{{ __('Timezone') }}</th>
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">{{ __('Enabled') }}</th>
                     @endif
@@ -31,13 +32,15 @@
                 </thead>
                 <tbody id="users_rows">
                     @foreach($users as $user)
+                        @php /** @var \App\Models\User $user */ @endphp
                         <tr>
                             <td>{{ $user->user_id }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->realname }}</td>
-                            <td>{{ $user->level }}</td>
+                            <td>{{ $user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
+                            <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
                             @endif
@@ -91,12 +94,8 @@
                         var delete_button = '<button type="button" title="{{ __('Delete') }}" class="btn btn-sm btn-danger" onclick="return delete_user(' + row['user_id'] + ', \'' + row['username'] + '\');">' +
                             '<i class="fa fa-trash"></i></button> ';
 
+                        // FIXME don't show for super admin
                         var manage_button = '<form action="{{ url('edituser') }}/" method="GET"';
-
-                        if (row['level'] >= 5) {
-                            manage_button += ' style="visibility:hidden;"'
-                        }
-
                         manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
                             '"><button type="submit" title="{{ __('Manage Access') }}" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
@@ -108,24 +107,25 @@
 
                         return output
                     },
-                    level: function (column, row) {
-                        var level = row[column.id];
-                        if (level == 10) {
-                            return '{{ __('Admin') }}';
-                        } else if (level == 5) {
-                            return '{{ __('Global Read') }}';
-                        } else if (level == 11) {
-                            return '{{ __('Demo') }}';
-                        }
+                    roles: function (column, row) {
+                        let roles = JSON.parse(row[column.id]);
+                        let div = document.createElement('div');
 
-                        return '{{ __('Normal') }}';
+                        roles.forEach((role) => {
+                            let label = document.createElement('span');
+                            label.className = 'label label-info tw:mr-1';
+                            label.innerText = role;
+                            div.appendChild(label);
+                        })
+
+                        return div.outerHTML;
                     }
                 }
             });
 
-            @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+            @can('create', \App\Models\User::class)
                 $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
-            @endif
+            @endcan
 
             user_grid.css('display', 'table'); // done loading, show
         });

@@ -14,7 +14,9 @@
 // License: GPLv3
 //
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];
@@ -52,17 +54,17 @@ foreach (dbFetchRows($sql, [$deviceid]) as $entry) {
 
     if (! match_network(Config::get('nets'), $ip)) {
         echo 'i';
-        log_event("Ignored $ip", $deviceid, 'interface', 3, $if);
+        Eventlog::log("Ignored $ip", $deviceid, 'interface', Severity::Notice, $if);
         continue;
     }
 
     // Attempt discovery of each IP only once per run.
-    if (object_is_cached('arp_discovery', $ip)) {
+    if (Cache::get('arp_discovery:' . $ip)) {
         echo '.';
         continue;
     }
 
-    object_add_cache('arp_discovery', $ip);
+    Cache::put('arp_discovery:' . $ip, true, 3600);
 
     $name = gethostbyaddr($ip);
     echo '+';

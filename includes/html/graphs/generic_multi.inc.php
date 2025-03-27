@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -29,14 +30,14 @@ if ($nototal) {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Now      Min      Max     Avg\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l'";
     if (! $nototal) {
         $rrd_options .= " COMMENT:'Total      '";
     }
 
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "Now      Min      Max     Avg\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l'";
 }
 
 $i = 0;
@@ -93,7 +94,7 @@ if ($print_total) {
         $tot[] = '+';
     }
 
-    $rrd_options .= ' CDEF:tot=' . implode($tot, ',');
+    $rrd_options .= ' CDEF:tot=' . implode(',', $tot);
     $rrd_options .= ' COMMENT:"  ' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $descr_len) . '"';
     $rrd_options .= ' GPRINT:tot:LAST:%5.1lf%s';
     $rrd_options .= ' GPRINT:tot:MIN:%5.1lf%s';

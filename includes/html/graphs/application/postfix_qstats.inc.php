@@ -18,27 +18,27 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Incoming',
-            'ds'       => 'incomingq',
-            'colour'   => '582A72',
+            'descr' => 'Incoming',
+            'ds' => 'incomingq',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Active',
-            'ds'       => 'activeq',
-            'colour'   => '28774F',
+            'descr' => 'Active',
+            'ds' => 'activeq',
+            'colour' => '28774F',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Deferred',
-            'ds'       => 'deferredq',
-            'colour'   => '88CC88',
+            'descr' => 'Deferred',
+            'ds' => 'deferredq',
+            'colour' => '88CC88',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Hold',
-            'ds'       => 'holdq',
-            'colour'   => 'D46A6A',
+            'descr' => 'Hold',
+            'ds' => 'holdq',
+            'colour' => 'D46A6A',
         ],
     ];
 } else {

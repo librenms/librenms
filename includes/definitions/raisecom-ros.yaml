@@ -3,6 +3,22 @@ text: 'Raisecom ROS'
 type: network
 bad_snmpEngineTime: true
 mib_dir: raisecom
+oids:
+  unordered:
+    # Tell LibreNMS to call snmpwalk with the -Cc flag for these entries
+    - ifEntry
+    - ifXEntry
+    - ifDescr
+    - ifAdminStatus
+    - ifOperStatus
+    - ifLastChange
+    - ifType
+    - ifPhysAddress
+    - ifMtu
+    - ifInErrors
+    - ifOutErrors
+    - ifInDiscards
+    - ifOutDiscards
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

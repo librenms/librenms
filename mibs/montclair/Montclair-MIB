@@ -1,0 +1,949 @@
+Montclair-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Integer32, Gauge32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+       FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+Montclair MODULE-IDENTITY
+    LAST-UPDATED "201704190000Z"
+    ORGANIZATION "Montclair"
+    CONTACT-INFO
+    "Montclair Fiber Optics, Inc.
+    Web: Montclair Fiber Optics, Inc
+    E-mail: info@montclairfiber.com
+    8705 Montclair Drive, Suite 140
+    Middleton, WI 53562"
+
+    DESCRIPTION  "'Number' changed to 'Amount', 'Fans' changed to 'Fan' in object names; DESCRIPTIONs correction"
+
+    REVISION "201704090000Z"
+    DESCRIPTION  "Correction of DESCRIPTIONs."
+
+    REVISION     "201704090000Z"
+    DESCRIPTION  "Updated description of some object."
+
+    REVISION     "201601182020Z"
+    DESCRIPTION  "Beta Version."
+    ::= { enterprises 1385 }
+
+
+
+mainInfo            OBJECT IDENTIFIER     ::= { Montclair 1 }
+networkConfig       OBJECT IDENTIFIER     ::= { Montclair 3 }
+networkSNMP         OBJECT IDENTIFIER     ::= { Montclair 5 }
+networkLLDP         OBJECT IDENTIFIER     ::= { Montclair 7 }
+deviceTime          OBJECT IDENTIFIER     ::= { Montclair 11 }
+deviceStatus        OBJECT IDENTIFIER     ::= { Montclair 12 }
+deviceSetting       OBJECT IDENTIFIER     ::= { Montclair 13 }
+mainDevices         OBJECT IDENTIFIER     ::= { Montclair 77 }
+
+
+amplifier           OBJECT IDENTIFIER  ::= { mainDevices 7 }
+amplifierDynamic    OBJECT IDENTIFIER  ::= { amplifier 2 }
+amplifierSetting    OBJECT IDENTIFIER  ::= { amplifier 3 }
+
+
+
+--
+-- mainInfo objects .1.3.6.1.4.1.1385.1
+--
+deviceVendor OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "deviceVendor"
+    ::= { mainInfo 1 }
+    -- .1.3.6.1.4.1.1385.1.1.0 -- 
+
+devicePartNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model full info (P/N)"
+    ::= { mainInfo 2 }
+
+deviceSerialNumber  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Device Serial Number"
+    ::= { mainInfo 3 }
+
+deviceFirmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware version"
+    ::= { mainInfo 4 }
+
+
+--
+-- networkConfig objects .1.3.6.1.4.1.1385.3
+--
+netDHCPConfig  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                  off(1),
+                  on(2)
+                  }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "DHCP Client Configuration:
+           1 - Off,
+           2 - On"
+    ::= { networkConfig 1 }
+    -- .1.3.6.1.4.1.1385.3.1.0 -- 
+
+netConfigIPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "Device IP Address"
+    ::= { networkConfig 2 }
+
+netConfigSubnetMask  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+           "Device Subnet Mask"
+    ::= { networkConfig 3 }
+
+netDefaultGateway  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "Default Gateway"
+    ::= { networkConfig 4 }
+
+netMACAddress  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Device MAC Address"
+    ::= { networkConfig 5 }
+
+
+--
+-- networkSNMP objects .1.3.6.1.4.1.1385.5
+--
+netSNMPServer1IPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP (Simple Network Management
+            Protocol) TRAP-server #1 (primary)"
+    ::= { networkSNMP 1 }
+    -- .1.3.6.1.4.1.1385.5.1.0 --
+
+netSNMPServer2IPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP (Simple Network Management
+            Protocol) TRAP-server #2 (backup)"
+    ::= { networkSNMP 2 }
+
+netSNMPServer3IPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP (Simple Network Management
+            Protocol) TRAP-server #3 (backup)"
+    ::= { networkSNMP 3 }
+
+netSNMPServer4IPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP (Simple Network Management
+            Protocol) TRAP-server #4 (backup)"
+    ::= { networkSNMP 4 }
+
+netSNMPTrustedIP1  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP Trusted IP #1 (primary)"
+    ::= { networkSNMP 5 }
+
+netSNMPTrustedIP2  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP Trusted IP #2"
+    ::= { networkSNMP 6 }
+
+netSNMPTrustedIP3  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP Trusted IP #3"
+    ::= { networkSNMP 7 }
+
+netSNMPTrustedIP4  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "IP Address of SNMP Trusted IP #4"
+    ::= { networkSNMP 8 }
+
+netSNMPCommunityRead  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "SNMP Read Community"
+    ::= { networkSNMP 9 }
+
+netSNMPCommunityWrite  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "SNMP Read/Write Community"
+    ::= { networkSNMP 10 }
+
+
+--
+-- networkLLDP objects .1.3.6.1.4.1.1385.7
+--
+netLLDPEnabled  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "LLDP Enabled/Disabled"
+    ::= { networkLLDP 1 }
+    -- .1.3.6.1.4.1.1385.7.1.0 --
+
+netLLDPPeriod  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "LLDP Message Transmission Period"
+    ::= { networkLLDP 2 }
+
+netLLDPRemoteMAC  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Detected Remote Port MAC Address"
+    ::= { networkLLDP 3 }
+
+netLLDPRemotePortID  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Detected Remote Port Identifier (ID)"
+    ::= { networkLLDP 4 }
+
+netLLDPRemotePortDesc  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Detected Remote Port Description"
+    ::= { networkLLDP 5 }
+
+
+--
+-- deviceTime objects .1.3.6.1.4.1.1385.11 
+--
+netTimeServerIPAddress  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "IP Address of SNTP:
+        Simple Network Time Protocol -
+        Time Server"
+    ::= { deviceTime 1 }
+    -- .1.3.6.1.4.1.1385.11.1.0
+
+deviceUNIXTime  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Current Time in UNIX(POSIX) Time Notation
+            (Seconds elapsed since 00:00:00,
+            1 Jan 1970 UTC"
+    ::= { deviceTime 2 }
+
+deviceTimeZone  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+           "Local Time Zone (The offset from
+            Coordinated Universal Time (UTC)), minutes"
+    ::= { deviceTime 3 }
+
+deviceDateTime  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "DateTime, string"
+    ::= { deviceTime 4 }
+
+deviceOperationTime  OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Summary Operation time, seconds"
+    ::= { deviceTime 5 }
+
+
+--
+-- deviceStatus .1.3.6.1.4.1.1385.12 
+--
+status  OBJECT-TYPE
+    SYNTAX    INTEGER {
+                     emergency(1),
+                     alert(2),
+                     critical(3),
+                     error(4),
+                     warning(5),
+                     notice(6),
+                     normal(7)
+                     }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+           "Device Common Status"
+    ::= { deviceStatus 1 }
+
+deviceInternalTemperatute  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Case Temperatute, degree"
+    ::= { deviceStatus  2 }
+
+devicePowerSupplyAmount  OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PowerSupply Amount"
+    ::= { deviceStatus  3 }
+
+devicePowerSupply1Status  OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     undef(1),
+                     critical(3),
+                     normal(7)
+                     }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PowerSupply1 Status"
+    ::= { deviceStatus 4 }
+
+devicePowerSupply2Status  OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     undef(1),
+                     critical(3),
+                     normal(7)
+                     }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PowerSupply2 Status"
+    ::= { deviceStatus  5 }
+
+deviceFanAmount  OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fans Amount"
+    ::= { deviceStatus  6 }
+
+deviceFanStatus  OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     unknown(1),
+                     critical(3),
+                     warning(5),
+                     normal(7)
+                     }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fans status"
+    ::= { deviceStatus  7 }
+
+deviceFanMode  OBJECT-TYPE
+    SYNTAX   INTEGER {
+            auto(1),
+            manual(2),
+            low(3),
+            linear(4),
+            high(5)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fan Operation Mode:
+            auto(1); manual(2) - forced set value;
+            low(3), linear(4) or high(5) - the current condition of automatic fan mode operation"
+    ::= { deviceStatus  8 }
+
+deviceFun1Speed  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fan1 Speed, RPM"
+    ::= { deviceStatus  9 }
+
+deviceFun2Speed  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fan2 Speed, RPM"
+    ::= { deviceStatus  10 }
+
+deviceFun3Speed  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Fan3 Speed, RPM"
+    ::= { deviceStatus  11 }
+
+
+
+--
+-- deviceSetting objects .1.3.6.1.4.1.1385.13 
+--
+deviceFanModeSet OBJECT-TYPE
+    SYNTAX  INTEGER {
+            auto(1),
+            manual(2)
+            }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "deviceFanMode, Auto Mode On/Off"
+    ::= { deviceSetting 1 }
+
+deviceFanPowerSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "deviceFanPowerSet, Set Value of Fan Air Flow for Manual Mode, %"
+    ::= { deviceSetting 2 }
+
+deviceFanMinimumSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "deviceFanMinimum, Min Value of Fan Air Flow for Auto Mode, %"
+    ::= { deviceSetting 3 }
+
+deviceFanMaximumSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "PFanMax, Max Value of Fan Air Flow for Auto Mode, %"
+    ::= { deviceSetting 4 }
+
+deviceFanTemperatureLowThrSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "TCaseMin, Min Value of Case Temperature for Auto Mode, centigrade degree"
+    ::= { deviceSetting 5 }
+
+deviceFanTemperatureHighThrSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "TCaseMax, Max Value of Case Temperature for Auto Mode, centigrade degree"
+    ::= { deviceSetting 6 }
+
+
+
+--
+-- amplifierDynamic objects .1.3.6.1.4.1.1385.77.7.2 
+--
+opticalSwitchInput1Power  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "InputPower1*10, input 1 optical power, dBm*10.
+            For example, value -12 means the input 1 optical power is -1.2 dBm."
+    ::= { amplifierDynamic 1 }
+    -- .1.3.6.1.4.1.1385.77.7.2.1.0 --
+
+opticalSwitchInput2Power  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Input2Power*10, input 2 optical power, dBm*10.
+            For example, value 35 means the input 1 optical power is 3.5 dBm."
+    ::= { amplifierDynamic 2 }
+
+opticalSwitchActiveInput  OBJECT-TYPE
+    SYNTAX  INTEGER {
+            pin1(1),
+            pin2(2),
+            pass(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Active Optical Input:
+            pin1(1) - input 1;
+            pin2(2) - input 2;
+            pass(3) - have one input"
+    ::= { amplifierDynamic 3 }
+
+amplifierBackReflectionPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "BackReflectionPower*10, BackReflectionPower Optical Power, dBm*10.
+            Monitoring of backward optical power. Sensor measure full backward incoming power in dBm.
+            For example, value -378 means the backwar incomind amplifier is -37.8 dBm."
+    ::= { amplifierDynamic 4 }
+
+amplifierInputPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "InputPower*10, Amplifier Input Optical Power, dBm*10.
+            For example, value 23 means the input optical power is 2.3 dBm."
+    ::= { amplifierDynamic 5 }
+
+amplifierEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AmpEnable, Amplifier pump current On/Off"
+    ::= { amplifierDynamic 6 }
+
+amplifierMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            acc(1),
+            apc(2),
+            agc(3)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amplifier stabilization mode:
+        acc(1) - amplifier pump current stabilization mode;
+        apc(2) - amplifier output power stabilization mode;
+        agc(3) - amplifier gain stabilization mode"
+    ::= { amplifierDynamic 7 }
+
+amplifierPrePumpCurrent  OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PrePumpCurrent, Preliminary Pump Current, %"
+    ::= { amplifierDynamic 8 }
+
+amplifierPumpCurrent1  OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PumpCurrent1, Amplifier Pump Current 1, %"
+    ::= { amplifierDynamic 9 }
+
+amplifierPumpCurrent2  OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PumpCurrent2, Amplifier Pump Current 2, %"
+    ::= { amplifierDynamic 10 }
+
+
+amplifierOutputPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Pout*10, Output optical power, dBm*10"
+    ::= { amplifierDynamic 11 }
+
+amplifierGain  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Gain, Amlifier gain, dB*10"
+    ::= { amplifierDynamic 12 }
+
+amplifierPortAmount  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PortAmount (PortsNumber), pcs"
+    ::= { amplifierDynamic 13 }
+
+amplifierPortOutputPower  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PortOutputPower, Amlifier PortOutputPower, dBm*10"
+    ::= { amplifierDynamic 14 }
+
+amplifierPortGain  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Gain per Port, Calculated from InputPower and PortOutputPower, dB*10"
+    ::= { amplifierDynamic 15 }
+
+
+amplifierRadiatorTemperature  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "RadiatorTemperature, Main Radiator Temperature, centigrade degree"
+    ::= { amplifierDynamic  16 }
+
+amplifierPrePumpTemperature  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "PrePumpTemperature*10, Pre Pump Diod TEC Temperature, centigrade degree*10"
+    ::= { amplifierDynamic  17 }
+
+amplifierAPSbyInputPower  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "amplifierAPSbyInputPower"
+    ::= { amplifierDynamic  18 }
+
+amplifierAPSbyBackReflection  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "amplifierAPSbyBackReflection"
+    ::= { amplifierDynamic  19 }
+
+amplifierAPSbyTemperature  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "amplifierAPSbyTemperature"
+    ::= { amplifierDynamic  20 }
+
+
+--
+-- amplifierSetting objects .1.3.6.1.4.1.1385.77.7.3 
+--
+opticalSwitchModeSet OBJECT-TYPE
+    SYNTAX  INTEGER {
+            input1manual(1),
+            input2manual(2),
+            auto(3)
+            }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Switching Operation Mode"
+    ::= { amplifierSetting 1 }
+
+opticalSwitchDeltaSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Maximum |Pin1-Pin2|  Difference for Optical Switch Commutation, dB"
+    ::= { amplifierSetting 2 }
+
+amplifierAPSSet OBJECT-TYPE
+    SYNTAX  INTEGER {
+            on(1),
+            off(2)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "amplifier APS Set, Amplifier Automatic Power Shotdown Mode On/Off"
+    ::= { amplifierSetting 3 }
+
+amplifierModeSet OBJECT-TYPE
+    SYNTAX  INTEGER {
+            acc(1),
+            apc(2),
+            agc(3)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amplifier Stabilization Mode,
+        acc(1)  - Amplifier Current Stabilization Mode,
+        apc(2) - Amplifier Pout Stabilization Mode,
+        agc(3) - Amplifier Gain Stabilization Mode"
+    ::= { amplifierSetting 4 }
+
+amplifierPrePumpCurrentSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "amplifierPrePumpCurrentSet, Set Value of Preliminary Pump Laser Diode Current, mA"
+    ::= { amplifierSetting 5 }
+
+amplifierPumpCurrent1Set OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierPumpCurrent1Set, Set Value of Amplifier Laser Diode Pump Current, mA"
+    ::= { amplifierSetting 6 }
+
+amplifierPumpCurrent2Set OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierPumpCurrent2Set, Set Value of Amplifier Laser Diode Pump Current, mA"
+    ::= { amplifierSetting 7 }
+
+amplifierOutputPowerSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierOutputPowerSet*10, Set Value of Output Optical Power, dBm*10"
+    ::= { amplifierSetting 8 }
+
+amplifierGainSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierGainSet*10, Set Value of Output Optical Power, dBm*10"
+    ::= { amplifierSetting 9 }
+
+amplifierPortOutputPowerSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierPortOutputPowerSet*10, Set Value of Output Optical Power, dBm*10"
+    ::= { amplifierSetting 10 }
+
+amplifierPortGainSet OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "amplifierPortGainSet*10, Set Value of Output Optical Power, dBm*10"
+    ::= { amplifierSetting 11 }
+
+
+
+--
+--
+-- Compliance statements
+--
+--
+
+mainConformance OBJECT IDENTIFIER       ::= { Montclair 9 }
+devicesConformance OBJECT IDENTIFIER    ::= { mainConformance 77 }
+
+--
+-- local Devices Groups BEGIN
+--
+
+mainInfoGroup OBJECT-GROUP
+    OBJECTS {
+        deviceVendor,
+        devicePartNumber,
+        deviceSerialNumber,
+        deviceFirmwareVersion        
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for mainInfo"
+    ::= { mainConformance 1 }
+
+
+networkConfigGroup OBJECT-GROUP
+    OBJECTS {
+        netDHCPConfig,
+        netConfigIPAddress,
+        netConfigSubnetMask,
+        netDefaultGateway,
+        netMACAddress,
+        netSNMPServer1IPAddress,
+        netSNMPServer2IPAddress,
+        netSNMPServer3IPAddress,
+        netSNMPServer4IPAddress,
+        netSNMPTrustedIP1,
+        netSNMPTrustedIP2,
+        netSNMPTrustedIP3,
+        netSNMPTrustedIP4,
+        netSNMPCommunityRead,
+        netSNMPCommunityWrite,
+        netLLDPEnabled,
+        netLLDPPeriod,
+        netLLDPRemoteMAC,
+        netLLDPRemotePortID,
+        netLLDPRemotePortDesc,
+        netTimeServerIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for networkConfig"
+    ::= { mainConformance 3 }
+
+deviceTimeGroup OBJECT-GROUP
+    OBJECTS {
+        deviceUNIXTime,
+        deviceTimeZone,
+        deviceDateTime,
+        deviceOperationTime
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for deviceTime"
+    ::= { mainConformance 11 }
+
+deviceStatusGroup OBJECT-GROUP
+    OBJECTS {
+        status,
+        deviceInternalTemperatute,
+        devicePowerSupplyAmount,
+        devicePowerSupply1Status,
+        devicePowerSupply2Status,
+        deviceFanAmount,
+        deviceFanStatus,
+        deviceFanMode,
+        deviceFun1Speed,
+        deviceFun2Speed,
+        deviceFun3Speed,
+        deviceFanModeSet,
+        deviceFanPowerSet,
+        deviceFanMinimumSet,
+        deviceFanMaximumSet,
+        deviceFanTemperatureLowThrSet,
+        deviceFanTemperatureHighThrSet
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for deviceStatus"
+    ::= { mainConformance 12 }
+
+deviceSettingGroup OBJECT-GROUP
+    OBJECTS {
+        status,
+        deviceInternalTemperatute,
+        devicePowerSupplyAmount,
+        devicePowerSupply1Status,
+        devicePowerSupply2Status,
+        deviceFanAmount,
+        deviceFanStatus,
+        deviceFanMode,
+        deviceFun1Speed,
+        deviceFun2Speed,
+        deviceFun3Speed
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for deviceSetting"
+    ::= { mainConformance 13 }
+
+amplifierGroup OBJECT-GROUP
+    OBJECTS {
+        amplifierBackReflectionPower,
+        amplifierInputPower,
+        amplifierEnabled,
+        amplifierMode,
+        amplifierPrePumpCurrent,
+        amplifierPumpCurrent1,
+        amplifierPumpCurrent2,
+        amplifierOutputPower,
+        amplifierGain,
+        amplifierPortAmount,
+        amplifierPortOutputPower,
+        amplifierPortGain,
+        amplifierRadiatorTemperature,
+        amplifierPrePumpTemperature,
+        amplifierAPSbyInputPower,
+        amplifierAPSbyBackReflection,
+        amplifierAPSbyTemperature,
+        opticalSwitchModeSet,
+        opticalSwitchDeltaSet,
+        amplifierAPSSet,
+        amplifierModeSet,
+        amplifierPrePumpCurrentSet,
+        amplifierPumpCurrent1Set,
+        amplifierPumpCurrent2Set,
+        amplifierOutputPowerSet,
+        amplifierGainSet,
+        amplifierPortOutputPowerSet,
+        amplifierPortGainSet,
+        opticalSwitchInput1Power,
+        opticalSwitchInput2Power,
+        opticalSwitchActiveInput
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects for amplifier"
+    ::= { devicesConformance 7 }
+
+
+END
+

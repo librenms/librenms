@@ -6,7 +6,7 @@ you think something is missing, feel free to ask us.
 * Auto discovery
 * Alerting
 * Multiple environment sensors support
-* Multiple protocols data collection (STP, OSPF, BGP etc)
+* Multiple protocols data collection (STP, OSPF, OSPFv3, BGP etc)
 * VLAN, ARP and FDB table collection
 * Customizable Dashboards
 * Device Backup integration (Oxidized, RANCID)
@@ -50,6 +50,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * ADVA FSP150CC
 * ADVA FSP3000 R7
 * ADVA OptiSwitch
+* ADVA OSA
 * Advantech
 * Aerohive HiveOS
 * Airconsole Server
@@ -65,7 +66,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Alliedware Plus
 * Allworx VoIP
 * Alpha Comp@s
+* Alpha CXC HP Controller
+* Alpha CXRC Controller
 * Alpha FXM
+* Alpine OptoElectronics TDCM-EDFA platform
 * AlteonOS
 * Alvarion Breeze
 * Anue
@@ -111,16 +115,19 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * AXIS Network Document Server
 
 ### B
+* Baicells CPE
 * Barco Clickshare
 * Barracuda Email Security Gateway
 * Barracuda Load Balancer
 * Barracuda NG Firewall
 * Barracuda Web Application Firewall
+* BATS AATS
 * BDCOM(tm) Software
 * BeagleBoard
 * Benu
 * Bintec Be.IP Plus
 * Bintec Smart Router
+* BKE
 * BKtel
 * Blade Network Technologies
 * BladeShelter PDU by PowerTek
@@ -139,15 +146,17 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 
 ### C
 * C&C Power Commander plus
-* Calix
+* Calix AXOS
 * Calix B6 System
 * Calix EXA
 * Calix Legacy
 * Cambium
 * Cambium CMM
 * Cambium CMM4
+* Cambium cnMatrix
 * Cambium cnPilot
 * Cambium cnPilot Router
+* Cambium cnWave60
 * Cambium epmp
 * Cambium PTP 250
 * Cambium PTP 300/500
@@ -157,12 +166,15 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Cambium PTP 800
 * Canon Printer
 * Carel pCOWeb
+* Catalyst 1200-1300 Series Managed Switch
 * cdata
 * Ceragon CeraOS
 * CET TSI Controller
 * Chatsworth PDU
 * Check Point GAiA
 * CheckPoint SecurePlatform
+* Christie Projector
+* Ciena Reconfigurable Line System
 * Ciena SAOS
 * Ciena Service Delivery Switch
 * Ciena Waveserver
@@ -173,6 +185,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Cisco APIC
 * Cisco ASA
 * Cisco AsyncOS
+* Cisco BroadWorks
 * Cisco Catalyst 1900
 * Cisco CatOS
 * Cisco EPC
@@ -185,6 +198,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Cisco IOS-XE
 * Cisco IOS-XR
 * Cisco ME1200
+* Cisco Nexus 3550 Series
 * Cisco NX-OS
 * Cisco ONS
 * Cisco PIX-OS
@@ -201,6 +215,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Citrix Netscaler
 * Comet System Web Sensor
 * Comtrol Industrial Switch
+* Connection Technology Systems
 * Controlbox TH-332B
 * CoreOS
 * Corero CMS
@@ -228,6 +243,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Dell EqualLogic
 * Dell Laser
 * Dell Networking OS
+* Dell OpenManage Enterprise Modular
 * Dell PowerConnect
 * Dell PowerVault
 * Dell PowerVault MD
@@ -242,6 +258,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Digipower
 * Digital China Networks
 * DKT Comega
+* DmOS
 * DPS Telecom NetGuardian
 * DragonflyBSD
 * Dragonwave Harmony Enhanced
@@ -261,6 +278,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Eaton Matrix
 * Eaton MGE PDU
 * Eaton PDU
+* Eaton SC200 Controller
 * Eaton UPS
 * EDFA
 * Edgecore
@@ -272,9 +290,8 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Eltek Valere
 * Eltek Valere eNexus
 * Eltek WebPower
+* Eltex
 * Eltex OLT
-* Eltex-MES21xx
-* Eltex-MES23xx
 * EMC Data Domain
 * EMC Flare OS
 * EMC Isilon OneFS
@@ -285,8 +302,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * EnGenius Access Point
 * enLogic PDU
 * Enterasys
+* EonStor GS DS-3016
 * Epson Printer
 * Epson Projector
+* Epson Scanner
 * Ericsson 6600 series
 * Ericsson IPOS
 * Ericsson LG iPECS UCP
@@ -298,6 +317,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Exagrid
 * Exalt ExtendAir
 * Exinda
+* Expert Sensor Box
 * Extrahop Appliance
 * Extreme BOSS
 * Extreme SLX-OS
@@ -308,14 +328,26 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 
 ### F
 * F5 Big IP
+* F5OS
 * Fiberhome
 * FiberHome Switch
 * Fibernet XMUX 4+
+* Fiberstore (BDCOM)
+* Fiberstore (Centec CNOS)
+* Fiberstore Datacenter Switch
 * Fiberstore GBN
 * Fiberstore Switch
+* FibroLAN Falcon OS
+* FibroLAN MetroStar OS
 * Firebrick
+* FireEye OS
 * Force10 FTOS
+* Forcepoint FlexEdge Secure SD-WAN
+* Forcepoint NGFW
+* Fortinet Application Deliver Controller
+* Fortinet FortiAP
 * Fortinet FortiAuthenticator
+* Fortinet FortiExtender
 * Fortinet Fortigate
 * Fortinet FortiMail
 * Fortinet FortiSandbox
@@ -328,6 +360,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * FreeBSD
 * FreshTomato
 * FS.COM monitored pdu
+* Fujifilm Printer
 * Fujitsu
 * Fujitsu ETERNUS
 * FUJITSU iRMC
@@ -357,12 +390,13 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Halon
 * Hanwha Techwin
 * HAProxy ALOHA
+* Hardware Appliance
 * Helios IP
 * Hikvision Camera
 * Hikvision NVR
 * Hillstone StoneOs
 * Himoinsa Generator Sets
-* Hirschmann Railswitch
+* Hirschmann
 * Hitachi Storage Virtualization Operating System (SVOS)
 * HP Blade Management
 * HP MSM
@@ -386,6 +420,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Huawei SMU
 * Huawei UPS
 * Huawei VRP
+* Huawei YunShan OS
 * HWg Poseidon
 * HWg STE
 * HWg STE2
@@ -401,6 +436,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * IBM Tape Library
 * iBoot PDU
 * Icotera OS
+* ICR-OS
 * ICT Digital Series Power Supply
 * ICT Distribution Series
 * ICT Modular Power System
@@ -410,7 +446,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * IgniteNet HeliOS
 * Illustra Network Camera
 * Imco Power
-* Imco Power LS110
+* Imco Power LS/PS
 * Infinera Groove
 * Infinera PON
 * Infinera XTM
@@ -419,6 +455,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Innovaphone ISDN
 * Inteno GW
 * IONODES
+* IP Infusion OcNOS
 * IP Office Firmware
 * ITWatchDogs Goose
 
@@ -440,13 +477,17 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Kyocera Mita Printer
 
 ### L
+* Lambdatrail
 * Lancom OS
+* Lancom Systems LCOS LX
+* Lancom Systems LCOS SX
 * Lanier Printer
 * LANTIME v6
 * Lantronix SLC
 * Lantronix UDS
 * Last Mile Gear CTM
 * Lenovo Cloud Network Operating System
+* Lenovo XCC IMPI
 * LenovoEMC
 * Lexmark Printer
 * Liebert
@@ -454,15 +495,20 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * LigoWave LigoOS
 * Linksys Smart Switch
 * Linux
+* Loadbalancer.org
 * LogMaster
+* Loop Telecom Operating System
 
 ### M
 * m0n0wall
 * Maipu MyPower
 * Marathon UPS
+* McAfee Linux OS - ATD
+* McAfee Linux OS - NSP
 * McAfee SIEM Nitro
 * Mcafee Web Gateway
 * MegaTec NetAgent II
+* Meinberg microSync
 * Mellanox
 * Meraki AP
 * Meraki MX Appliance
@@ -476,10 +522,14 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Minkels RMS
 * Mirth Connect
 * Mitel Standard Linux
+* MNI Microwave Radio
 * MobileIron
+* Montclair EDFA
 * Motorola DOCSIS Cable Modem
 * Motorola Netopia
 * Moxa
+* Moxa AWK
+* Moxa-EDS-4000-Series
 * MRV LambdaDriver
 * MRV OptiDriver
 
@@ -496,11 +546,13 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Network Management Unit
 * Nexans
 * Nimble OS
+* Nokia 1830 PSS
 * NOKIA ISAM
 * Nokia SR OS (TiMOS)
 * Novell Netware
 * NRG Printer
 * NTI
+* Nutanix AOS
 * NVT Phybridge
 
 ### O
@@ -516,7 +568,9 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * OpenWrt
 * OPNsense
 * Oracle ILOM
+* Orolia SecureSync
 * Orvaldi UPS
+* Overture Hatteras DSLAM
 
 ### P
 * Packetflux SiteMonitor
@@ -538,6 +592,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Pica8 OS
 * Ping only
 * PLANET
+* Polycom Videoconferencing System
 * Powercode BMU
 * PowerWalker UPS
 * PowerWalker VFI
@@ -552,6 +607,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * QTECH
 * Quanta
 * QuantaStor
+* Quantum
 
 ### R
 * Radlan
@@ -570,14 +626,15 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Ribbon GSX
 * Ribbon SBC
 * Ricoh Printer
-* Riello UPS
 * Rittal CMC
 * Rittal CMC III PU
 * Rittal IT Chiller
 * Rittal LCP
 * Rittal LCP DX Chiller
 * Riverbed
+* RNX UPDU
 * Rohde & Schwarz
+* Rubrik
 * Ruckus Wireless HotZone
 * Ruckus Wireless SmartZone
 * Ruckus Wireless Unleashed
@@ -592,6 +649,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * SAF Integra X
 * SAF Tehnika
 * Sagem ADR IONOS
+* Samlex Inverter
 * Samsung Printer
 * Savin Printer
 * Schleifenbauer SPDM
@@ -609,6 +667,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Siklu Wireless
 * Silver Peak VXOA
 * Sinetica UPS
+* Skyhigh Secure Web Gateway
 * SM-OS
 * SmartOptics DCP-M Series
 * SmartOptics M-Series
@@ -617,13 +676,18 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * snr-erd
 * Socomec Net Vision
 * Socomec PDU
+* Socomec UPS
+* Software Appliance
+* Solid Optics EDFAMUX
 * SonicWALL
 * Sophos UTM Firewall
 * Sophos XG
 * Stormshield NS-BSD
+* Stulz GMBH Klimatechnik
 * Sub10 Systems
 * Sun OpenSolaris
 * Sun Solaris
+* Supermicro BMC
 * Supermicro Switch
 * Symbol AP
 * SyncServer
@@ -631,6 +695,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 
 ### T
 * Tait Infra93 Series
+* Tait TN Admin OS
 * Tandberg Magnum
 * technicolor TG MediaAcces
 * Tegile IntelliFlash
@@ -641,7 +706,6 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * TelePresence Conductor
 * Teleste Luminato
 * Teltonika RutOS
-* teltonika rutos
 * Teltonika RutOS RUTX Series
 * Teradici PCoIP
 * Terra
@@ -657,22 +721,29 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Tranzeo
 * TRENDnet Switch
 * Tripp Lite PowerAlert
+* TrippLite console server
 * TrueNAS
 * TSC Printer
 * Tycon Systems TPDIN
 
 ### U
 * Ubiquiti AirFiber
+* Ubiquiti AirFiber 60
 * Ubiquiti AirFiber LTU
 * Ubiquiti AirOS
 * Ubiquiti Edgepower
 * Ubiquiti UniFi
 * Ubiquoss PON
 * Ucopia
+* UFiber
+* UHP Networks VSAT Terminal
+* ULAF+
 * UniPing
 
 ### V
+* V-Solution
 * Vanguard ApplicationsWare
+* Vertiv Avocent MergePoint Unity
 * Vertiv PDU
 * Video Communication Server
 * Viprinux
@@ -681,8 +752,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * VMware ESXi
 * VMware SD-WAN
 * VMware vCenter
+* Volius
 * Voswall
 * Vubiq Networks
+* Vutlan
 * Vyatta
 * VyOS
 
@@ -691,8 +764,11 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Waystream iBOS
 * Web-Thermo-Hygrometer
 * WebPower
+* WebPower-smart2
 * West Mountain RMCU
+* Westermo WeOS
 * WISI Tangram
+* WTI CONSOLE
 * WTI MPC
 * WTI POWER
 
@@ -715,3 +791,4 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * ZyXEL NWA
 * ZyXEL Prestige
 * ZyXEL ZyWALL
+* Zyxel Zyxelwlc

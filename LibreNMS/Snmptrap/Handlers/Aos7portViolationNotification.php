@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aos7portViolationNotification.php
  *
@@ -31,6 +32,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -50,6 +52,6 @@ class Aos7portViolationNotification implements SnmptrapHandler
         $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-        $trap->log("There has been a loop detected on the port $port->ifDescr. The current status code is: $reason.", 5);
+        $trap->log("There has been a loop detected on the port $port->ifDescr. The current status code is: $reason.", Severity::Error);
     }
 }

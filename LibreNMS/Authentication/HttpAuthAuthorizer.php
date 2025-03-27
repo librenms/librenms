@@ -27,26 +27,11 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
             return true;
         }
 
-        if (Config::has('http_auth_guest') && parent::userExists(Config::get('http_auth_guest'))) {
+        if (Config::get('http_auth_guest') && parent::userExists(Config::get('http_auth_guest'))) {
             return true;
         }
 
         return false;
-    }
-
-    public function getUserlevel($username)
-    {
-        $user_level = parent::getUserlevel($username);
-
-        if ($user_level) {
-            return $user_level;
-        }
-
-        if (Config::has('http_auth_guest')) {
-            return parent::getUserlevel(Config::get('http_auth_guest'));
-        }
-
-        return 0;
     }
 
     public function getUserid($username)
@@ -57,7 +42,7 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
             return $user_id;
         }
 
-        if (Config::has('http_auth_guest')) {
+        if (Config::get('http_auth_guest')) {
             return parent::getUserid(Config::get('http_auth_guest'));
         }
 

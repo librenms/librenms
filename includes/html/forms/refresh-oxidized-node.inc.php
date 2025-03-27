@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -19,7 +20,7 @@ if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
         $message = 'Queued refresh in oxidized for device ' . $device_hostname;
     } else {
         $status = 'error';
-        $message = 'ERROR: Could not queue refresh of oxidized device' . $device_hostname;
+        $message = 'ERROR: Could not queue refresh of oxidized device ' . $device_hostname;
     }
 } else {
     $status = 'error';
@@ -27,7 +28,7 @@ if (Auth::user()->hasGlobalAdmin() && isset($device_hostname)) {
 }
 
 $output = [
-    'status'  => $status,
+    'status' => $status,
     'message' => $message,
 ];
 

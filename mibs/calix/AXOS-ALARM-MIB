@@ -88,7 +88,10 @@ axosAlarmType OBJECT-TYPE
                        qos(1),
                        processing-error(2),
                        equipment(3),
-                       environmental(4)
+                       environmental(4),
+                       operational-violation(5),
+                       integrity-violation(6),
+                       informational(7)
                    }
     MAX-ACCESS  read-only
     STATUS      current
@@ -122,7 +125,17 @@ axosAlarmCategory OBJECT-TYPE
                         pon(22),
                         bondedgroup(23),
                         cardimgmgmt(24),
-                        ontimgmgmt(25)
+                        ontimgmgmt(25),
+                        slot(26),
+                        subscriber(27),
+                        mpls(28),
+                        l2vpn(29),
+                        aeont(30),
+                        bfd(31),
+                        vrrp(32),
+                        pim(33),
+                        connection(34),
+                        mfib(35)
                     }
     MAX-ACCESS  read-only
     STATUS      current

@@ -13,13 +13,13 @@ decrease page load times significantly.
 
 Simplified block diagram of an Apache HTTP server with Varnish 4.0 Reverse Proxy
 
-![Block Diagram 1](/img/varnish_block.png)
+![Block Diagram 1](../img/varnish_block.png)
 
 ## CentOS 7 Varnish Installation
 
 In this example we will assume your Apache 2.4.X HTTP server is working and
 configured to process HTTP requests on port 80.  If not, please see
-[Installing LibreNMS](../Installation/Installation-CentOS-7-Apache.md)
+[Installing LibreNMS](../Installation/Install-LibreNMS.md)
 
 ## Install Varnish 4.0 RPM
 

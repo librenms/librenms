@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcOnBatteryTest.php
  *
@@ -24,6 +25,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class ApcOnBatteryTest extends SnmpTrapTestCase
 {
     /**
@@ -43,7 +46,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
 TRAP,
             'The UPS has switched to battery backup power.',
             'Could not handle testApcOnBattery trap',
-            [4],
+            [Severity::Warning],
         );
     }
 }

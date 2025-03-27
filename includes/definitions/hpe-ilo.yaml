@@ -10,4 +10,7 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.232.9.4.10
             - .1.3.6.1.4.1.232.9.4.11
+            - .1.3.6.1.4.1.232.9.4.12
 mib_dir: hp
+ignore_mount_regexp:
+    - '#^[^/]+ on /#' # Ignore linux synthetic mounts via CPQHOST-MIB

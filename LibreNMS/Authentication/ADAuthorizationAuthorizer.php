@@ -2,7 +2,9 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
+use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
 
@@ -14,7 +16,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     protected static $AUTH_IS_EXTERNAL = true;
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected $ldap_connection;
+    protected ?Connection $ldap_connection = null;
 
     public function __construct()
     {
@@ -77,6 +79,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             ['samaccountname']
         );
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -92,14 +97,13 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-    public function getUserlevel($username)
+    public function getRoles(string $username): array|false
     {
-        $userlevel = $this->authLdapSessionCacheGet('userlevel');
-        if ($userlevel) {
-            return $userlevel;
-        } else {
-            $userlevel = 0;
+        $roles = $this->authLdapSessionCacheGet('roles');
+        if ($roles !== null) {
+            return $roles;
         }
+        $roles = [];
 
         // Find all defined groups $username is in
         $search = ldap_search(
@@ -110,18 +114,29 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
-        // Loop the list and find the highest level
-        foreach ($entries[0]['memberof'] as $entry) {
+        // collect all roles
+        $auth_ad_groups = Config::get('auth_ad_groups');
+        foreach ($entries[0]['memberof'] as $index => $entry) {
+            if ($index == 'count') {
+                continue; // skip count entry
+            }
+
             $group_cn = $this->getCn($entry);
-            $auth_ad_groups = Config::get('auth_ad_groups');
-            if ($auth_ad_groups[$group_cn]['level'] > $userlevel) {
-                $userlevel = $auth_ad_groups[$group_cn]['level'];
+
+            if (isset($auth_ad_groups[$group_cn]['roles']) && is_array($auth_ad_groups[$group_cn]['roles'])) {
+                $roles = array_merge($roles, $auth_ad_groups[$group_cn]['roles']);
+            } elseif (isset($auth_ad_groups[$group_cn]['level'])) {
+                $role = LegacyAuthLevel::tryFrom($auth_ad_groups[$group_cn]['level'])?->getName();
+                if ($role) {
+                    $roles[] = $role;
+                }
             }
         }
 
-        $this->authLdapSessionCacheSet('userlevel', $userlevel);
+        $roles = array_unique($roles);
+        $this->authLdapSessionCacheSet('roles', $roles);
 
-        return $userlevel;
+        return $roles;
     }
 
     public function getUserid($username)
@@ -140,6 +155,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             $attributes
         );
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -151,7 +169,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return $user_id;
     }
 
-    protected function getConnection()
+    protected function getConnection(): ?Connection
     {
         return $this->ldap_connection;
     }

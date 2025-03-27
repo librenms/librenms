@@ -6,6 +6,7 @@ use App\Models\Alert;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
 {
@@ -39,10 +40,9 @@ class AlertController extends Controller
         $alert->note = trim($alert->note . PHP_EOL . "$timestamp - $state_description ($username) " . $ack_msg);
 
         if ($alert->save()) {
-            if (in_array($state, [2, 22])) {
-                $rule_name = $alert->rule->name;
-                Eventlog::log("$username acknowledged alert $rule_name note: $ack_msg", $alert->device_id, 'alert', 2, $alert->id);
-            }
+            $rule_name = $alert->rule->name;
+            $act = strtolower($state_description) . 'nowledged';
+            Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $alert->device_id, 'alert', Severity::Info, $alert->id);
 
             return response()->json([
                 'message' => "Alert {$state_description}nowledged.",

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 echo 'RC-VLAN-MIB VLANs: ';
 
 if ($device['os'] == 'boss') {
@@ -16,7 +19,7 @@ if ($device['os'] == 'boss') {
             if ($vlan_data['vlan_name'] != $vlan['rcVlanName']) {
                 $vlan_upd['vlan_name'] = $vlan['rcVlanName'];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['rcVlanName']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['rcVlanName']} ", $device['device_id'], 'vlan', Severity::Notice, $vlan_data['vlan_id']);
                 echo 'U';
             } else {
                 echo '.';
@@ -27,7 +30,7 @@ if ($device['os'] == 'boss') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan['rcVlanName'],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
             echo '+';
         }

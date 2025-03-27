@@ -93,5 +93,30 @@
     <description>Due to a security vulnerability, you must upgrade your memcached application scripts to the latest version. (1.1)</description>
     <pubDate>Fri, 10 Oct 2022 18:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Manually set port speeds reset</title>
+    <description>Due to a bug, all manually set port speeds will need to be reconfigured. Likely they are set to 1 instead of the expected value. See https://github.com/librenms/librenms/pull/15238 for more information.</description>
+    <pubDate>Mon, 21 Aug 2023 15:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Alerting packet loss macro</title>
+    <description>The packet loss macros were broken recently. The quick fix is to have them resemble device up/down, which is similar to how they would function if fping_options.count=1. Hopefully, they can be fixed in the future, but be aware their functionality is degraded in the meantime.</description>
+    <pubDate>Sat, 4 Apr 2024 14:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Removal of ciscoASA table</title>
+    <description>On the 12th of February 2025, we will be merging in pull request 16952 (https://github.com/librenms/librenms/pull/16952) which will remove the ciscoASA table. Please see https://community.librenms.org/t/remove-of-the-ciscoasa-table/26978 for further information.</description>
+    <pubDate>Sun, 19 Jan 2025 22:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Storage table change</title>
+    <description>The storage table structure has changed and storage_deleted and storage_mib were removed. If you have alert rules that reference those fields, you can remove storage_deleted and change storage_mib to type.</description>
+    <pubDate>Fri, 24 Jan 2025 22:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>cisco-access OS removal</title>
+    <description>We will be merging the cisco-access (C1200/C1300 based devices) OS into the ciscosb OS. This will be done on the 20th of March 2025. If you have any alert rules or groups that reference this old OS then please update them include ciscosb as soon as possible.</description>
+    <pubDate>Sun, 2 Mar 2025 22:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

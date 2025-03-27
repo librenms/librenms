@@ -3,7 +3,7 @@
 echo 'Datacom';
 
 $multiplier = 1;
-$divisor = 100;
+$divisor = 1;
 foreach ($pre_cache['datacom_oids'] as $index => $entry) {
     if (is_numeric(str_replace('dBm', '', $entry['ddTransceiversRxPower']))) {
         $oid = '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.' . $index;
@@ -16,7 +16,7 @@ foreach ($pre_cache['datacom_oids'] as $index => $entry) {
         $current = $entry['ddTransceiversRxPower'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-' . $index, 'datacom', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, 'datacom', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 
     if (is_numeric(str_replace('dBm', '', $entry['ddTransceiversTxPower']))) {
@@ -30,6 +30,6 @@ foreach ($pre_cache['datacom_oids'] as $index => $entry) {
         $current = $entry['ddTransceiversTxPower'];
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, 'datacom', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+        discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, 'datacom', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

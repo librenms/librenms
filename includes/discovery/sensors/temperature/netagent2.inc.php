@@ -1,4 +1,5 @@
 <?php
+
 /**
  * netagent2.inc.php
  *
@@ -37,7 +38,7 @@ if (! empty($ups_temperature) || $ups_temperature == 0) {
     $descr = 'Temperature';
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'temperature',
         $device,
         $ups_temperature_oid,

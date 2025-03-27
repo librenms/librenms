@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture Cisco OTV Details
  *
@@ -59,7 +60,7 @@ if ($device['os_group'] == 'cisco') {
     $module = 'Cisco-OTV';
 
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'], ['type'=>$module]);
+    $components = $component->getComponents($device['device_id'], ['type' => $module]);
 
     // We only care about our device id.
     $components = $components[$device['device_id']];

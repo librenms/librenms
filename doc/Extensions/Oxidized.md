@@ -244,6 +244,20 @@ If you have devices which you do not wish to appear in Oxidized then
 you can edit those devices in Device -> Edit -> Misc and enable
 "Exclude from Oxidized?"
 
+The use of custom ssh and telnet ports can be set through device settings misc tab, and can be passed on to oxidized with the following `vars_map`
+
+```bash
+      source:
+        http:
+          map:
+            name: hostname
+            model: os
+            group: group
+          vars_map:
+            ssh_port: ssh_port
+            telnet_port: telnet_port
+```
+
 It's also possible to exclude certain device types and OS' from being
 output via the API.
 
@@ -263,7 +277,7 @@ You can also ignore whole groups of devices
 ## Trigger configuration backups
 
 Using the Oxidized REST API and [Syslog
-Hooks](/Extensions/Syslog/#external-hooks), Oxidized can trigger
+Hooks](Syslog.md#external-hooks), Oxidized can trigger
 configuration downloads whenever a configuration change event has been
 logged. An example script to do this is included in
 `./scripts/syslog-notify-oxidized.php`. Oxidized can spawn a new

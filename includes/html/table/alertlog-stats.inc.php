@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,8 +35,10 @@ if (isset($vars['min_severity'])) {
 if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
-    $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id RIGHT JOIN devices_perms AS P ON E.device_id = P.device_id WHERE $where AND P.user_id = ?";
-    $param[] = [Auth::id()];
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    // @phpstan-ignore-next-line
+    $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where AND E.device_id IN " . dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
@@ -55,7 +58,7 @@ if (empty($total)) {
 $sql .= ' GROUP BY D.device_id, R.name ORDER BY COUNT(*) DESC';
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 

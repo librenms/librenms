@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GeocodingHelper.php *
  * -Description-
@@ -83,7 +84,7 @@ trait GeocodingHelper
     abstract protected function parseLatLng(array $data): array;
 
     /**
-     * Build Guzzle request option array
+     * Build request option array
      *
      * @param  string  $address
      * @return array

@@ -34,7 +34,7 @@ function string_to_oid($string)
 }//end string_to_oid()
 
 // Options!
-$short_opts = 'S:sktmlhj:a:';
+$short_opts = 'S:sktmlhj:a:d:';
 $options = getopt($short_opts);
 
 // print the help
@@ -48,6 +48,7 @@ if (isset($options['h'])) {
   -k      If m is specified, just print the keys in tested order.
   -a      The application name for use with -s and -t.
   -S      SNMP extend name. Defaults to the same as -a.
+  -d      JSON file to use for app data.
   -h      Show this help text.
 
 -j must always be specified.
@@ -63,7 +64,7 @@ if (isset($options['h'])) {
    prints it in a slightly neater manner and in a manner and in tested
    order.
 ';
-    exit();
+    exit;
 }
 
 // make sure we have a JSON file to work with
@@ -105,7 +106,7 @@ if ((isset($options['l'])) || (
     (! isset($options['t'])) &&
     (! isset($options['s'])) &&
     (! isset($options['m']))
-    )) {
+)) {
     exit(0);
 }
 
@@ -173,6 +174,7 @@ if (isset($options['t'])) {
                     'app_status' => '',
                     'app_instance' => '',
                     'data' => null,
+                    'deleted_at' => null,
                 ]],
             ],
             'poller' => [
@@ -184,6 +186,7 @@ if (isset($options['t'])) {
                     'app_status' => '',
                     'app_instance' => '',
                     'data' => null,
+                    'deleted_at' => null,
                 ]],
                 'application_metrics' => [],
             ],
@@ -196,6 +199,20 @@ if (isset($options['t'])) {
             'value_prev' => null,
             'app_type' => $options['a'],
         ];
+    }
+    // if d is specified, try to read it in and add it
+    if (isset($options['d'])) {
+        $raw_app_data = file_get_contents($options['d']);
+        if ($raw_json === false) {
+            exit(2);
+        }
+        $app_data = json_decode(stripslashes($raw_app_data), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            echo "Parsing '" . $options['d'] . "' failed. Running jsonlint...\n\n";
+            system('jsonlint ' . escapeshellarg($options['j']));
+            exit(3);
+        }
+        $test_data['applications']['poller']['applications']['0']['data'] = json_encode($app_data);
     }
     echo json_encode($test_data, JSON_PRETTY_PRINT) . "\n";
     exit(0);

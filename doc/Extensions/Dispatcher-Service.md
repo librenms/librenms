@@ -18,7 +18,7 @@ behaviour only found in Python3.4+.
 - PyMySQL is recommended as it requires no C compiler to
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
-- redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
+- redis-py 4.0+ and Redis 5.0+ server (if using distributed polling)
 - psutil
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
@@ -76,44 +76,72 @@ DB_PASSWORD=
 
 Once you have your Redis database set up, configure it in the .env file on each node. Configure the redis cache driver for distributed locking.
 
+There are a number of options - most of them are optional if your redis instance is standalone and unauthenticated (neither recommended).
+
 ```dotenv
+##
+## Standalone
+##
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
-# OR
-REDIS_SENTINEL=192.0.2.1:26379
-REDIS_SENTINEL_SERVICE=myservice
-
 REDIS_DB=0
-#REDIS_PASSWORD=
-#REDIS_TIMEOUT=60
+REDIS_TIMEOUT=60
 
-CACHE_DRIVER=redis
+# If requirepass is set in redis set everything above as well as: (recommended)
+REDIS_PASSWORD=PasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_USERNAME=UsernameGoesHere
+
+##
+## Sentinel
+##
+REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
+REDIS_SENTINEL_SERVICE=mymaster
+
+# If requirepass is set in sentinel, set everything above as well as: (recommended)
+REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
+
+For more information on ACL's, see <https://redis.io/docs/management/security/acl/> 
+
+Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT` - Sentinel just provides the address of the instance currently accepting writes and manages failover. It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
 
 ### Basic Configuration
 
-Additional configuration settings can be set in `config.php` or
-directly into the database.
+Additional configuration settings can be set in your config.
 
 The defaults are shown here - it's recommended that you at least tune
 the number of workers.
 
-```php
-$config['service_poller_workers']              = 24;     # Processes spawned for polling
-$config['service_services_workers']            = 8;      # Processes spawned for service polling
-$config['service_discovery_workers']           = 16;     # Processes spawned for discovery
+!!! setting "poller/dispatcherservice"
+    ```bash
+    lnms config:set service_poller_workers 24
+    lnms config:set service_services_workers 8
+    lnms config:set service_discovery_workers 16
+    lnms config:set schedule_type.poller dispatcher
+    lnms config:set schedule_type.services dispatcher
+    lnms config:set schedule_type.discovery dispatcher
+    ```
 
+Optional Settings
 
-//Optional Settings
-$config['service_poller_frequency']            = 300;    # Seconds between polling attempts
-$config['service_services_frequency']          = 300;    # Seconds between service polling attempts
-$config['service_discovery_frequency']         = 21600;  # Seconds between discovery runs
-$config['service_billing_frequency']           = 300;    # Seconds between billing calculations
-$config['service_billing_calculate_frequency'] = 60;     # Billing interval
-$config['service_poller_down_retry']           = 60;     # Seconds between failed polling attempts
-$config['service_loglevel']                    = 'INFO'; # Must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'
-$config['service_update_frequency']            = 86400;  # Seconds between LibreNMS update checks
-```
+!!! setting "poller/dispatcherservice"
+    ```bash
+    lnms config:set service_poller_frequency 300
+    lnms config:set service_services_frequency 300
+    lnms config:set service_discovery_frequency 21600
+    lnms config:set schedule_type.alerting dispatcher
+    lnms config:set schedule_type.billing dispatcher
+    lnms config:set service_billing_frequency 300
+    lnms config:set service_billing_calculate_frequency 60
+    lnms config:set service_poller_down_retry 60
+    lnms config:set service_loglevel INFO
+    lnms config:set service_update_frequency 86400
+    ```
 
 There are also some SQL options, but these should be inherited from
 your LibreNMS web UI configuration.
@@ -143,9 +171,10 @@ Maximum WS equals the number of workers multiplied with the number of seconds in
 The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.
 You can enable it by setting the following:
 
-```php
-$config['service_ping_enabled'] = true;
-```
+!!! setting "poller/scheduledtasks"
+    ```bash
+    lnms config:set schedule_type.ping dispatcher
+    ```
 
 ## Watchdog
 
@@ -159,10 +188,7 @@ The watchdog scheduler will check that the poller log file has been written to w
 
 ## Cron Scripts
 
-Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled. The only cron task enabled after switching to the dispatcher service should be the following:
-```
-*    *    * * *   librenms    cd /opt/librenms/ && php artisan schedule:run >> /dev/null 2>&1
-```
+Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled.
 
 ## Service Installation
 
@@ -242,8 +268,6 @@ replacement scl.
 Warning: Bullseye provide PHP 7.4 that is too old to run LibreNMS.
 
 ##### Debian 12 (Bookworm)
-
-Warning: Bookworm is not available as stable yet (as 2022 november).
 
 Install dependancies
 ```

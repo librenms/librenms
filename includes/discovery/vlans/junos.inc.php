@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 echo 'JUNIPER-VLAN-MIB VLANs: ';
 
 $vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'IEEE8021-Q-BRIDGE-MIB');
@@ -68,7 +71,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
                 $vlan_upd['vlan_name'] = $vlan[$tmp_name];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan[$tmp_name]} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan[$tmp_name]} ", $device['device_id'], 'vlan', Severity::Notice, $vlan_data['vlan_id']);
                 echo 'U';
             } else {
                 echo '.';
@@ -79,7 +82,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan[$tmp_name],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
             echo '+';
         }

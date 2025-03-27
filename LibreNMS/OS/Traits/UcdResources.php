@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UcdProcessor.php
  *
@@ -26,8 +27,11 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use App\Models\Storage;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Util\Number;
 
 trait UcdResources
 {
@@ -39,7 +43,7 @@ trait UcdResources
      */
     public function discoverProcessors()
     {
-        echo 'UCD Resources: ';
+        Log::info('UCD Resources: ');
 
         return [
             Processor::discover(
@@ -66,7 +70,7 @@ trait UcdResources
             'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
-        if ($this->oidValid($data, 'memTotalReal') && ($this->oidValid($data, 'memAvailReal') || $this->oidValid($data, 'memSysAvail'))) {
+        if ($this->oidValid($data, 'memTotalReal') && $this->oidValid($data, 'memAvailReal')) {
             $mempools->push((new Mempool([
                 'mempool_index' => 1,
                 'mempool_type' => 'ucd',
@@ -74,7 +78,7 @@ trait UcdResources
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Physical memory',
                 'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.6.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'] ?? null, ($data[0]['memAvailReal'] ?? 0) + ($data[0]['memBuffer'] ?? 0) + ($data[0]['memCached'] ?? 0)));
+            ]))->fillUsage(null, $data[0]['memTotalReal'] ?? null, $data[0]['memAvailReal']));
         }
 
         if ($this->oidValid($data, 'memTotalSwap') && $this->oidValid($data, 'memAvailSwap')) {
@@ -96,7 +100,7 @@ trait UcdResources
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Memory buffers',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.14.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memBuffer']));
+            ]))->fillUsage($data[0]['memBuffer'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memCached')) {
@@ -107,7 +111,7 @@ trait UcdResources
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Cached memory',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.15.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memCached']));
+            ]))->fillUsage($data[0]['memCached'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memSysAvail')) {
@@ -122,6 +126,38 @@ trait UcdResources
         }
 
         return $mempools;
+    }
+
+    public function discoverStorage(): Collection
+    {
+        $disks = new Collection;
+
+        return \SnmpQuery::walk('UCD-SNMP-MIB::dskTable')->mapTable(function ($data, $index) {
+            $units = 1024;
+            $total = $data['UCD-SNMP-MIB::dskTotal'] ?? null;
+            $used = $data['UCD-SNMP-MIB::dskUsed'] ?? null;
+            $free = $data['UCD-SNMP-MIB::dskAvail'] ?? null;
+
+            // available numbers wonky sometimes
+            $avail_broke = $free === null || $free == '2147483647';
+            [$used_calc, $used_oid, $free_oid] = $avail_broke
+                ? [$used, ".1.3.6.1.4.1.2021.9.1.8.$index", null]
+                : [$total - $free, null, ".1.3.6.1.4.1.2021.9.1.7.$index"];
+
+            return new Storage([
+                'type' => 'ucd-dsktable',
+                'storage_index' => $index,
+                'storage_type' => 'ucdDisk',
+                'storage_descr' => $data['UCD-SNMP-MIB::dskPath'] ?? 'Unnamed Storage',
+                'storage_size' => $total * $units,
+                'storage_units' => $units,
+                'storage_used' => $used_calc * $units,
+                'storage_used_oid' => $used_oid,
+                'storage_free' => $free * $units,
+                'storage_free_oid' => $free_oid,
+                'storage_perc' => Number::calculatePercent($used_calc, $total, 0),
+            ]);
+        });
     }
 
     private function oidValid($data, $oid)

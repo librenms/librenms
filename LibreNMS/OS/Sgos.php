@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sgos.php
  *
@@ -25,7 +26,10 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
@@ -33,7 +37,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Sgos extends OS implements ProcessorDiscovery, OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $oid_list = [
             'sgProxyHttpClientRequestRate.0',
@@ -55,10 +59,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'requests' => $sgos[0]['sgProxyHttpClientRequestRate'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_average_requests', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_average_requests', $tags, $fields);
 
             $this->enableGraph('sgos_average_requests');
-            echo ' HTTP Req Rate';
+            Log::info(' HTTP Req Rate');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpClientConnections'] ?? null)) {
@@ -69,10 +73,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'client_conn' => $sgos[0]['sgProxyHttpClientConnections'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_client_connections', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_client_connections', $tags, $fields);
 
             $this->enableGraph('sgos_client_connections');
-            echo ' Client Conn';
+            Log::info(' Client Conn');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpServerConnections'] ?? null)) {
@@ -83,10 +87,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'server_conn' => $sgos[0]['sgProxyHttpServerConnections'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_server_connections', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_server_connections', $tags, $fields);
 
             $this->enableGraph('sgos_server_connections');
-            echo ' Server Conn';
+            Log::info(' Server Conn');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpClientConnectionsActive'] ?? null)) {
@@ -97,10 +101,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'client_conn_active' => $sgos[0]['sgProxyHttpClientConnectionsActive'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_client_connections_active', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_client_connections_active', $tags, $fields);
 
             $this->enableGraph('sgos_client_connections_active');
-            echo ' Client Conn Active';
+            Log::info(' Client Conn Active');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpServerConnectionsActive'] ?? null)) {
@@ -111,10 +115,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'server_conn_active' => $sgos[0]['sgProxyHttpServerConnectionsActive'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_server_connections_active', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_server_connections_active', $tags, $fields);
 
             $this->enableGraph('sgos_server_connections_active');
-            echo ' Server Conn Active';
+            Log::info(' Server Conn Active');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpClientConnectionsIdle'] ?? null)) {
@@ -125,10 +129,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'client_idle' => $sgos[0]['sgProxyHttpClientConnectionsIdle'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_client_connections_idle', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_client_connections_idle', $tags, $fields);
 
             $this->enableGraph('sgos_client_connections_idle');
-            echo ' Client Conne Idle';
+            Log::info(' Client Conne Idle');
         }
 
         if (is_numeric($sgos[0]['sgProxyHttpServerConnectionsIdle'] ?? null)) {
@@ -139,10 +143,10 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 'server_idle' => $sgos[0]['sgProxyHttpServerConnectionsIdle'],
             ];
 
-            data_update($this->getDeviceArray(), 'sgos_server_connections_idle', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'sgos_server_connections_idle', $tags, $fields);
 
             $this->enableGraph('sgos_server_connections_idle');
-            echo ' Server Conn Idle';
+            Log::info(' Server Conn Idle');
         }
     }
 
@@ -163,7 +167,7 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 $this->getName(),
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3417.2.11.2.4.1.8.$index",
-                zeropad($index),
+                Str::padLeft($index, 2, '0'),
                 "Processor $count",
                 1,
                 $entry['s5ChasUtilCPUUsageLast10Minutes']

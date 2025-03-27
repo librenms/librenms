@@ -13,7 +13,14 @@ if (! empty($agent_data['app'][$name])) {
     $bind = snmp_get($device, $oid, $options, $mib);
 }
 
-[$incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets] = explode("\n", $bind);
+$bind_data = explode("\n", $bind);
+if (count($bind_data) !== 8) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
+}
+
+[$incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets] = $bind_data;
 
 //
 // INCOMING PROCESSING
@@ -37,21 +44,21 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('spf', 'DERIVE', 0);
 
 $fields = [
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
 ];
 $metrics['queries'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $rrd_name = ['app', $name, $app->app_id, 'incoming'];
 $rrd_def = RrdDefinition::make()
@@ -125,7 +132,7 @@ $fields = [
 $metrics['incoming'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // OUTGOING PROCESSING
@@ -180,16 +187,16 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('opt', 'DERIVE', 0);
 
 $fields = [
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
     'afsdb' => $afsdb,
     'apl' => $apl,
     'caa' => $caa,
@@ -226,7 +233,7 @@ $fields = [
 $metrics['outgoing'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'outgoing', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // SERVER PROCESSING
@@ -286,7 +293,7 @@ $fields = [
 $metrics['server'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'server', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // RESOLVER PROCESSING
@@ -351,7 +358,7 @@ $fields = [
 $metrics['resolver'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'resolver', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // CACHE PROCESSING
@@ -359,7 +366,6 @@ data_update($device, 'app', $tags, $fields);
 [$ch, $cm, $chfq, $cmfq, $crddtme, $crddtte, $cdn, $cdhb, $ctmt, $ctmiu, $cthmiu,
     $chmt, $chmiu, $chhmiu] = explode(',', $cache);
 
-$rrd_name = ['app', $name, $app->app_id, 'cache'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ch', 'DERIVE', 0)
     ->addDataset('cm', 'DERIVE', 0)
@@ -394,8 +400,13 @@ $fields = [
 ];
 $metrics['cache'] = $fields;
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id, 'cache'],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // ADB PROCESSING
@@ -418,7 +429,7 @@ $fields = [
 $metrics['adb'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'adb', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // SOCKETS PROCESSING
@@ -507,7 +518,7 @@ $fields = [
 $metrics['sockets'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'sockets', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //
 // RR SETS PROCESSING
@@ -569,16 +580,16 @@ $rrd_def = RrdDefinition::make()
 $rrd_name = ['app', $name, $app->app_id, 'rrpositive'];
 
 $fields = [
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
     'afsdb' => $afsdb,
     'apl' => $apl,
     'caa' => $caa,
@@ -616,22 +627,22 @@ $fields = [
 $metrics['rrpositive'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrpositive', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // now handle the negative
 $rrd_name = ['app', $name, $app->app_id, 'rrnegative'];
 
 $fields = [
-    'any'   => $notany,
-    'a'     => $nota,
-    'aaaa'  => $notaaaa,
+    'any' => $notany,
+    'a' => $nota,
+    'aaaa' => $notaaaa,
     'cname' => $notcname,
-    'mx'    => $notmx,
-    'ns'    => $notns,
-    'ptr'   => $notptr,
-    'soa'   => $notsoa,
-    'srv'   => $notsrv,
-    'spf'   => $notspf,
+    'mx' => $notmx,
+    'ns' => $notns,
+    'ptr' => $notptr,
+    'soa' => $notsoa,
+    'srv' => $notsrv,
+    'spf' => $notspf,
     'afsdb' => $notafsdb,
     'apl' => $notapl,
     'caa' => $notcaa,
@@ -661,7 +672,7 @@ $fields = [
     'txt' => $nottxt,
     'uri' => $noturi,
     'dname' => $notdname,
-    'nxdomain'=> $notnxdomain,
+    'nxdomain' => $notnxdomain,
     'axfr' => $notaxfr,
     'ixfr' => $notixfr,
     'opt' => $notopt,
@@ -669,5 +680,5 @@ $fields = [
 $metrics['rrnegative'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrnegative', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $bind, $metrics);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpResponse.php
  *
@@ -105,14 +106,25 @@ class SnmpResponse
         }
 
         $oids = Arr::wrap($oids);
+
+        // search for an exact match
         foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
-                $oid = Oid::toNumeric($oid);
+                $oid = Oid::of($oid)->toNumeric();
             }
 
             if (isset($values[$oid]) && $values[$oid] !== '') {
                 return $values[$oid];
+            }
+
+            // if this is a textual oid without an index, match the first one at any index
+            if (! preg_match('/[.[]\d+]?$/', $oid)) {
+                foreach ($values as $key => $value) {
+                    if (preg_match('/^' . preg_quote($oid) . '[.[]/', $key) && $value !== '') {
+                        return $value;
+                    }
+                }
             }
         }
 
@@ -173,6 +185,48 @@ class SnmpResponse
         return $this->values;
     }
 
+    /**
+     * Create a key to value pair for an OID
+     * You may omit $oid if there is only one $oid in the walk
+     */
+    public function pluck(?string $oid = null): array
+    {
+        $output = [];
+        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
+
+        foreach ($this->values() as $key => $value) {
+            if (preg_match($regex, $key, $matches)) {
+                $output_key = str_replace('][', '.', $matches[1]);
+                $output[$output_key] = $value;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Group values by index as specified by $index_count
+     * Useful when dealing with numeric oids
+     * (By default this counts from right to left, using a negative index count will count from left to right)
+     */
+    public function groupByIndex(int $index_count = 1, array &$array = []): array
+    {
+        foreach ($this->values() as $oid => $value) {
+            $parts = $this->getOidParts(ltrim($oid, '.')); // trim leftmost . so negative counts work as expected
+            $suffix = array_slice($parts, -$index_count);
+            $index = implode('.', $suffix);
+
+            $array[$index][$oid] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Separate the index from the OID name
+     * Insert into array as index => oidName
+     */
     public function valuesByIndex(array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
@@ -216,23 +270,19 @@ class SnmpResponse
             return new Collection;
         }
 
-        return collect($this->values())
-            ->map(function ($value, $oid) {
-                $parts = $this->getOidParts($oid);
-                $key = array_shift($parts);
+        $data = [];
+        foreach ($this->values() as $key => $value) {
+            $parts = $this->getOidParts($key);
+            $oid = array_shift($parts);
+            $data[implode('][', $parts)][$oid] = $value;
+        }
 
-                return [
-                    '_index' => implode('][', $parts),
-                    $key => $value,
-                ];
-            })
-            ->groupBy('_index')
-            ->map(function ($values, $index) use ($callback) {
-                $values = array_merge(...$values);
-                unset($values['_index']);
+        $return = new Collection;
+        foreach ($data as $index => $values) {
+            $return->push(call_user_func($callback, $values, ...explode('][', (string) $index)));
+        }
 
-                return call_user_func($callback, $values, ...explode('][', (string) $index));
-            });
+        return $return;
     }
 
     /**
@@ -252,7 +302,7 @@ class SnmpResponse
     {
         return (string) preg_replace([
             '/^.*No Such Instance currently exists.*$/m',
-            '/\n[^\r\n]+No more variables left[^\r\n]+$/s',
+            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
         ], '', $this->raw);
     }
 
@@ -285,5 +335,10 @@ class SnmpResponse
 
         // regular oid
         return explode('.', $key);
+    }
+
+    public function __sleep()
+    {
+        return ['raw', 'exitCode', 'stderr'];
     }
 }

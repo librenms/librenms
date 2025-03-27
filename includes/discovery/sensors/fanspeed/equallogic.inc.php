@@ -17,9 +17,9 @@ if (! empty($oids)) {
         if (! empty($data)) {
             [$oid,$descr] = explode(' = ', $data, 2);
             $split_oid = explode('.', $oid);
-            $num_index = $split_oid[(count($split_oid) - 1)];
+            $num_index = $split_oid[count($split_oid) - 1];
             $index = $num_index;
-            $part_oid = $split_oid[(count($split_oid) - 2)];
+            $part_oid = $split_oid[count($split_oid) - 2];
             $num_index = $part_oid . '.' . $num_index;
             $base_oid = '.1.3.6.1.4.1.12740.2.1.7.1.3.1.';
             $oid = $base_oid . $num_index;
@@ -33,7 +33,7 @@ if (! empty($oids)) {
             $index = (100 + $index);
 
             if ($extra[$keys[0]]['eqlMemberHealthDetailsFanCurrentState'] != 'unknown') {
-                discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
+                discover_sensor(null, 'fanspeed', $device, $oid, $index, 'snmp', $descr, 1, 1, $low_limit, $low_warn, $high_limit, $high_warn, $temperature);
             }
         }//end if
     }//end foreach

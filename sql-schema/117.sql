@@ -1,1 +1,0 @@
-ALTER TABLE alert_rules ADD COLUMN proc VARCHAR(80) AFTER name;

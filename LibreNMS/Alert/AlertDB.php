@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertDB.php
  *
@@ -83,7 +84,7 @@ class AlertDB
             //Our first table has no valid glue, append the 'devices' table to it!
             array_unshift($tables, 'devices');
         }
-        $x = sizeof($tables) - 1;
+        $x = count($tables) - 1;
         $i = 0;
         $join = '';
         while ($i < $x) {

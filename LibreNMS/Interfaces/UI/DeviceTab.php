@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceTab.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Interfaces\UI;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 
 interface DeviceTab
 {
@@ -62,7 +64,8 @@ interface DeviceTab
      * Collect data to send to the view
      *
      * @param  Device  $device
+     * @param  Request  $request
      * @return array
      */
-    public function data(Device $device): array;
+    public function data(Device $device, Request $request): array;
 }

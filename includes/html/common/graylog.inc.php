@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -29,6 +30,7 @@ $tmp_output = '
         <thead>
             <tr>
             <th data-column-id="severity" data-sortable="false"></th>
+            <th data-column-id="origin">Origin</th>
             <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
             <th data-column-id="level">Level</th>
             <th data-column-id="source">Source</th>

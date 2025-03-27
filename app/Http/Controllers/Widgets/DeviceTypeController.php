@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceSummaryController.php
  *
@@ -27,7 +28,6 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 
 class DeviceTypeController extends WidgetController

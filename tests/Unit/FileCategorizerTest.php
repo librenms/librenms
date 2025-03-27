@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FileCategorizerTest.php
  *
@@ -31,13 +32,13 @@ use LibreNMS\Util\FileCategorizer;
 
 class FileCategorizerTest extends TestCase
 {
-    public function testEmptyFiles()
+    public function testEmptyFiles(): void
     {
         $cat = new FileCategorizer();
         $this->assertEquals($this->getCategorySkeleton(), $cat->categorize());
     }
 
-    public function testIgnoredFiles()
+    public function testIgnoredFiles(): void
     {
         $this->assertCategorized([], [
             'docs/Nothing.md',
@@ -53,7 +54,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testPhpFiles()
+    public function testPhpFiles(): void
     {
         $this->assertCategorized([
             'php' => [
@@ -65,7 +66,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testDocsFiles()
+    public function testDocsFiles(): void
     {
         $this->assertCategorized([
             'docs' => [
@@ -76,7 +77,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testPython()
+    public function testPython(): void
     {
         $this->assertCategorized([
             'python' => [
@@ -86,7 +87,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testBash()
+    public function testBash(): void
     {
         $this->assertCategorized([
             'bash' => [
@@ -96,7 +97,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testSvg()
+    public function testSvg(): void
     {
         $this->assertCategorized([
             'svg' => [
@@ -107,7 +108,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testResources()
+    public function testResources(): void
     {
         $this->assertCategorized([
             'resources' => [
@@ -121,7 +122,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testOsFiles()
+    public function testOsFiles(): void
     {
         $this->assertCategorized([
             'os' => ['ftd', '3com', 'adva_fsp150', 'saf-integra-b'],
@@ -180,7 +181,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    public function testFullChecks()
+    public function testFullChecks(): void
     {
         $this->assertCategorized(['full-checks' => ['composer.lock']]);
         $this->assertCategorized(['full-checks' => ['.github/workflows/test.yml']], ['other', '.github/workflows/test.yml']);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display F5 GTM Wide IP Details
  *
@@ -45,7 +46,7 @@ $components = $keep;
 // Begin our master array, all other values will be processed into this array.
 $tblBigIP = [];
 
-if ((snmp_get($device, 'sysModuleAllocationProvisionLevel.3.103.116.109', '-Ovqs', 'F5-BIGIP-SYSTEM-MIB')) != false) {
+if (snmp_get($device, 'sysModuleAllocationProvisionLevel.3.103.116.109', '-Ovqs', 'F5-BIGIP-SYSTEM-MIB') != false) {
     $gtmWideIPEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.1.2.1', 0);
     if (! is_null($gtmWideIPEntry)) {
         $gtmWideStatusEntry = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.3.12.3.2.1', 0);

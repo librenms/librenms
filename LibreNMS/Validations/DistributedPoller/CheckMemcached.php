@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckMemcached.php
  *
@@ -25,7 +26,6 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
-use App\Models\Poller;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
@@ -60,6 +60,6 @@ class CheckMemcached implements Validation
      */
     public function enabled(): bool
     {
-        return Config::get('distributed_poller') && Poller::isActive()->count() > 1;
+        return Config::get('distributed_poller') && env('CACHE_DRIVER') == 'memcached';
     }
 }

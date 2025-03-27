@@ -5,10 +5,10 @@ $mdadm_arrays = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'mdadm');
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'mdadm',
+    'tab' => 'apps',
+    'app' => 'mdadm',
 ];
 
 $array_list = [];
@@ -28,12 +28,12 @@ printf('%s | arrays: %s', generate_link('All RAID Arrays', $link_array), implode
 print_optionbar_end();
 
 $graphs = [
-    'mdadm_level'          => 'RAID level',
-    'mdadm_size'           => 'RAID Size',
-    'mdadm_disc_count'     => 'RAID Disc count',
-    'mdadm_hotspare_count' => 'RAID Hotspare Disc count',
-    'mdadm_degraded'       => 'RAID degraded',
-    'mdadm_sync_speed'     => 'RAID Sync speed',
+    'mdadm_level' => 'RAID level',
+    'mdadm_size' => 'RAID Size',
+    'mdadm_disc_count' => 'RAID Disk count',
+    'mdadm_hotspare_count' => 'RAID Hotspare Disk count',
+    'mdadm_degraded' => 'RAID degraded',
+    'mdadm_sync_speed' => 'RAID Sync speed',
     'mdadm_sync_completed' => 'RAID Sync completed',
 ];
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NetflowController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -35,7 +37,7 @@ class NetflowController implements DeviceTab
     {
         if (Config::get('nfsen_enable')) {
             foreach ((array) Config::get('nfsen_rrds', []) as $nfsenrrds) {
-                if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
+                if ($nfsenrrds[strlen($nfsenrrds) - 1] != '/') {
                     $nfsenrrds .= '/';
                 }
 
@@ -72,7 +74,7 @@ class NetflowController implements DeviceTab
         return __('Netflow');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [
             'tab' => 'nfsen',

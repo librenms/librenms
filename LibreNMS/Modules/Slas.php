@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SLA.php
  *
@@ -24,10 +25,13 @@ use App\Models\Device;
 use App\Models\Sla;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\RRD\RrdDefinition;
 
 class Slas implements Module
 {
@@ -39,6 +43,11 @@ class Slas implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof SlaDiscovery;
     }
 
     /**
@@ -56,6 +65,11 @@ class Slas implements Module
         }
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof SlaPolling;
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -63,7 +77,7 @@ class Slas implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof SlaPolling) {
             // Gather our SLA's from the DB.
@@ -74,23 +88,39 @@ class Slas implements Module
                 // We have SLA's, lets go!!!
                 $os->pollSlas($slas);
                 $os->getDevice()->slas()->saveMany($slas);
+
+                // The base RRD
+                foreach ($slas as $sla) {
+                    $datastore->put($os->getDeviceArray(), 'sla', [
+                        'sla_nr' => $sla->sla_nr,
+                        'rrd_name' => ['sla', $sla->sla_nr],
+                        'rrd_def' => RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000),
+                    ], [
+                        'rtt' => $sla->rtt,
+                    ]);
+                }
             }
         }
+    }
+
+    public function dataExists(Device $device): bool
+    {
+        return $device->slas()->exists();
     }
 
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->slas()->delete();
+        return $device->slas()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'slas' => $device->slas()->orderBy('sla_nr')

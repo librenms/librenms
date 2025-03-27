@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxLdpLspUp.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -45,6 +47,6 @@ class JnxLdpLspUp implements SnmptrapHandler
         $routerID = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpRtrid'));
         $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName'));
 
-        $trap->log("LDP session $instanceName from $routerID to $lspForward is now up.", 1);
+        $trap->log("LDP session $instanceName from $routerID to $lspForward is now up.", Severity::Ok);
     }
 }

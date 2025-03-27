@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventlogController.php
  *
@@ -49,6 +50,7 @@ class EventlogController extends SelectController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function sortFields($request)

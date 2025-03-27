@@ -1,0 +1,3772 @@
+TROPIC-SOFTWARE-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      IpAddress,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      TruthValue                              FROM SNMPv2-TC
+      ifIndex                                 FROM IF-MIB
+      InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
+      TropicShelfIndexType,
+      TropicSlotIndexType,
+      TnCommand, AluWdmNewTransferProtocol    FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnSystemModules, tnSoftwareMIB          FROM TROPIC-GLOBAL-REG;
+
+  tnSoftwareMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202301201200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The Software Loading MIB."
+
+      REVISION    "202301201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwPortModuleType:
+                   bmdco6e."
+
+      REVISION    "202210141200Z"
+      DESCRIPTION "Added the following to tnInstalledFwPortModuleType:
+                   c2dco4o
+                   bmdc06l."
+
+      REVISION    "202208121200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sci48t."
+
+      REVISION    "202207291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   1ux500."
+
+      REVISION    "202207151200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   opsuml."
+
+      REVISION    "202204291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ir32aw
+                   eilaaw
+                   18ce300."
+
+      REVISION    "202203041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sfd48
+                   sfd64."
+
+      REVISION    "202202041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sqx10."
+
+      REVISION    "202201211200Z"
+      DESCRIPTION "Added the following to tnSoftwareNode:
+                   tnSwNodeMigrateFileName."
+
+      REVISION    "202112241200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   asc2."
+
+      REVISION    "202112171200Z"
+      DESCRIPTION "1) Added the following to tnSoftwareNode:
+                      tnSwNodeUrlLoadType.
+                   2) Added the following to tnInstalledFwCardType:
+                      ir4."
+
+      REVISION    "202112101200Z"
+      DESCRIPTION "Added the following to TropicSwControl:
+                   srosMigration(15)."
+
+      REVISION    "202110221200Z"
+      DESCRIPTION "1) Added the following to tnInstalledFwCardType:
+                      mxn1624.
+                   2) Added the following to tnSwCardDynamicTable:
+                      tnSwCardDynamicFeatureUnavailableCurrent1
+                      tnSwCardDynamicFeatureUnavailableCurrent2
+                      tnSwCardDynamicFeatureUnknownCurrent1
+                      tnSwCardDynamicFeatureUnknownCurrent2
+                      tnSwCardDynamicDscRpmCountUnavailableCurrent
+                      tnSwCardDynamicFsRpmCountUnavailableCurrent
+                      tnSwCardDynamicActiveReleaseUnavailableCurrent
+                      tnSwCardDynamicDscRpmCountUnknownCurrent
+                      tnSwCardDynamicFsRpmCountUnknownCurrent
+                      tnSwCardDynamicActiveReleaseUnknownCurrent."
+
+      REVISION    "202110081200Z"
+      DESCRIPTION "1) Added the following to tnSoftwareDynamic:
+                      tnSwDynamicFullCurrent1
+                      tnSwDynamicFullCurrent2
+                      tnSwDynamicAvailableCurrent1
+                      tnSwDynamicAvailableCurrent2
+                      tnSwDynamicExcludedCurrent1
+                      tnSwDynamicExcludedCurrent2
+                      tnSwDynamicFullCurrentRelease
+                      tnSwDynamicAvailableCurrentRelease
+                      tnSwDynamicExcludedCurrentRelease
+                      tnSwDynamicUnavailableCurrentRelease
+                      tnSwDynamicUnknownCurrentRelease
+                      tnSwDynamicFullCurrentTotalRpms
+                      tnSwDynamicAvailableCurrentTotalRpms
+                      tnSwDynamicExcludedCurrentTotalRpms
+                      tnSwDynamicUnavailableCurrentTotalRpms
+                      tnSwDynamicUnknownCurrentTotalRpms
+                      tnSwDynamicFullCurrentRpmsLoaded
+                      tnSwDynamicAvailableCurrentRpmsLoaded
+                      tnSwDynamicExcludedCurrentRpmsLoaded
+                      tnSwDynamicUnavailableCurrentRpmsLoaded
+                      tnSwDynamicUnknownCurrentRpmsLoaded.
+                   2) Added the following table:
+                      tnSwDynamicInfoTable."
+
+      REVISION    "202110011200Z"
+      DESCRIPTION "1) Added the following to tnInstalledFwPortModuleType:
+                      bmdco6.
+                   2) Added the following to tnSoftwareDynamic:
+                      tnSwDynamicUnavailableCurrent1
+                      tnSwDynamicUnavailableCurrent2
+                      tnSwDynamicUnknownCurrent1
+                      tnSwDynamicUnknownCurrent2."
+
+      REVISION    "202109241200Z"
+      DESCRIPTION "Added the following to tnSoftwareDynamic:
+                   tnSwDynamicAutoRefresh."
+
+      REVISION    "202108061200Z"
+      DESCRIPTION "Added the following table:
+                   tnSwCardDynamicTable."
+
+      REVISION    "202107161200Z"
+      DESCRIPTION "Added the following to tnSwCardTable:
+                   tnSwCardCurrentDscRpmCount
+                   tnSwCardCurrentFsRpmCount
+                   tnSwCardStandByDscRpmCount
+                   tnSwCardStandByFsRpmCount."
+
+      REVISION    "202106181200Z"
+      DESCRIPTION "Added the following to tnSoftwareNode:
+                   tnSwNodeLoadType."
+
+      REVISION    "202106111200Z"
+      DESCRIPTION "1) Added the following to tnInstalledFwCardType:
+                      s6ad600.
+                   2) Added the following to tnSwDynamicFeature:
+                      clear(5)."
+
+      REVISION    "202106041200Z"
+      DESCRIPTION "Added the tnSoftwareDynamic scalars."
+
+      REVISION    "202105211200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   2uc1t."
+
+      REVISION    "202105141200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   opsum."
+
+      REVISION    "202105071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   dd2m4."
+
+      REVISION    "202104091200Z"
+      DESCRIPTION "Added the following to tnSwNodeControlStatus:
+                   autoRefresh(5)
+                   manualRefresh(6)."
+
+      REVISION    "202102191200Z"
+      DESCRIPTION "Added the following table:
+                   tnInstalledFwPortTable."
+
+      REVISION    "202102051200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sfm6."
+
+      REVISION    "202012241200Z"
+      DESCRIPTION "Added the following table:
+                   tnPortFwTable."
+
+      REVISION    "202010021200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   xst4t
+                   xst12t
+                   mxn824
+                   asc4
+                   5mx500
+                   2ux500
+                   s5ad400."
+
+      REVISION    "202009181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   16p200
+                   ir9."
+
+      REVISION    "202008211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   d1ad400q."
+
+      REVISION    "202006191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   dfm6."
+
+      REVISION    "202004031200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   12p120s."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   4uc1t
+                   asg."
+
+      REVISION    "202002281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   18p400."
+
+      REVISION    "202001101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mlfsb."
+
+      REVISION    "201912201200Z"
+      DESCRIPTION "Added the following to tnSoftwareNode:
+                   tnSwNodeUrl."
+
+      REVISION    "201911151200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   omdcl
+                   mcs16x15l
+                   eilal
+                   ra5pb."
+
+      REVISION    "201910041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   d1ad400q."
+
+      REVISION    "201908021200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   1ety100."
+
+      REVISION    "201907261200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   psimmfc
+                   psilmfc
+                   psilpfdc."
+
+      REVISION    "201907191200Z"
+      DESCRIPTION "Added the following to tnSoftwareNode:
+                   tnSwNodePort."
+
+      REVISION    "201907121200Z"
+      DESCRIPTION "Added the following to tnFwCardTable:
+                   tnFwCardFpgaCapability."
+
+      REVISION    "201905311200Z"
+      DESCRIPTION "Added the following card:
+                   esre."
+
+      REVISION    "201903151200Z"
+      DESCRIPTION "Marked the following in tnSwNodeSwdlServerProtocol as obsolete:
+                   tftp(3)."
+
+      REVISION    "201901251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   s13x100l."
+
+      REVISION    "201901181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   s4x400."
+
+      REVISION    "201812281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   irdm32l."
+
+      REVISION    "201810261200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   dfc12."
+
+      REVISION    "201810191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sc24t."
+
+      REVISION    "201809281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   10an1t
+                   8uc1t."
+
+      REVISION    "201809141200Z"
+      DESCRIPTION "Changed SYNTAX of tnSwNodeSwdlServerProtocol from
+                   AluWdmTransferProtocol to INTEGER."
+
+      REVISION    "201808101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mcs16x15."
+
+      REVISION    "201807061200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   6px800."
+
+      REVISION    "201806291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   irdm32
+                   ra4p
+                   eila
+                   8cx800."
+
+      REVISION    "201806151200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   xsp9t6."
+
+      REVISION    "201806081200Z"
+      DESCRIPTION "Added the following values to TropicSwControl:
+                   autoIsuLoad(12)
+                   to
+                   autoIsuCommit(14)."
+
+      REVISION    "201805251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   xfan8
+                   xfan12
+                   40cx800."
+
+      REVISION    "201805181200Z"
+      DESCRIPTION "Added the following to tnSoftwareNode:
+                   tnSwNodeControlStatus."
+
+      REVISION    "201803231200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ipreamp."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201801261200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   aswg-l."
+
+      REVISION    "201801121200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   opsb5."
+
+      REVISION    "201711101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   2ux200
+                   4mx200."
+
+      REVISION    "201711031200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   msh4-fsb."
+
+      REVISION    "201710131200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   s2ad200."
+
+      REVISION    "201709291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   pss12xpowerfilter."
+
+      REVISION    "201709221200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   8dc30
+                   8ac7
+                   16dc65
+                   16ac16
+                   iroadm20."
+
+      REVISION    "201709151200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   xst4t8."
+
+      REVISION    "201709011200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   130sla1
+                   130slx10."
+
+      REVISION    "201708181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   da2c4."
+
+      REVISION    "201707141200Z"
+      DESCRIPTION "1) Added the following to tnInstalledFwCardType:
+                      sc48
+                   2) Changed the mapping for sc16 and ptpioctl."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   18p40."
+
+      REVISION    "201706301200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   d5x500q."
+
+      REVISION    "201706231200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   opsflex."
+
+      REVISION    "201706091200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   20an80
+                   10an400
+                   8p20."
+
+      REVISION    "201704071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   otdrm."
+
+      REVISION    "201703241200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ra2p96."
+
+      REVISION    "201703101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   iroadm9r."
+
+      REVISION    "201702101200Z"
+      DESCRIPTION "Changed SYNTAX of the following from SnmpAdminString
+                   (SIZE(0..17) to SnmpAdminString (SIZE(0..20):
+                   tnSwCardAppBank0
+                   tnSwCardAppBank1
+                   tnSwCardEmergBootBank
+                   tnSwCardUserBootBank."
+
+      REVISION    "201701271200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   d5x500l
+                   lci2000l."
+
+      REVISION    "201701201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   8dc30t
+                   16dc65t."
+
+      REVISION    "201612191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   otdrwb."
+
+      REVISION    "201612091200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   30se300
+                   6se300."
+
+      REVISION    "201611281200Z"
+      DESCRIPTION "Added the following scalars to tnSoftwareNode:
+                   tnSwNodeSwdlServerInetAddressType
+                   tnSwNodeSwdlServerInetAddress."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611011200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   lci2000."
+
+      REVISION    "201609301200Z"
+      DESCRIPTION "Added default value  to tnInstalledFwIsDefault."
+
+      REVISION    "201609131200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   wtocmfl
+                   aar2x8al
+                   wr20-tfml
+                   mcs8x16l
+                   pss8xpowerfilter
+                   xmfc."
+
+      REVISION    "201608291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   s13x100e."
+
+      REVISION    "201608221200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   aar2x8a."
+
+      REVISION    "201608161200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   1ux100
+                   20ax200
+                   20mx80."
+
+      REVISION    "201607271200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sfdc8[a-e]
+                   aa2donwb
+                   osctapr
+                   11qpa4b."
+
+      REVISION    "201606011200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ptpioctl."
+
+      REVISION    "201605251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   s13x100
+                   12ce121."
+
+      REVISION    "201605201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   iroadm9m."
+
+      REVISION    "201605101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ra5p."
+
+      REVISION    "201605041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   awbila."
+
+      REVISION    "201604071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   awbing
+                   awbegr."
+
+      REVISION    "201602291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   cec2."
+
+      REVISION    "201602231200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mfc,
+                   sc."
+
+      REVISION    "201512081200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   lci1000."
+
+      REVISION    "201510281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   12ce120
+                   1ce100."
+
+      REVISION    "201510051200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   pss96powerfilter."
+
+      REVISION    "201508061200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   monotdr."
+
+      REVISION    "201506221200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ots11m100."
+
+      REVISION    "201506121200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   d5x500."
+
+      REVISION    "201502201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ul2uc400
+                   ul4uc400
+                   ul20uc200."
+
+      REVISION    "201501161200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   monocm."
+
+      REVISION    "201409251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   iroadmv
+                   iroadmf."
+
+      REVISION    "201409181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ot130snq10."
+
+      REVISION    "201408081200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   12p120
+                   20p200
+                   1ud200."
+
+      REVISION    "201407071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   io4an400."
+
+      REVISION    "201406231200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   io30an300."
+
+      REVISION    "201405061200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   io4an100g
+                   io30an10g."
+
+      REVISION    "201403301200Z"
+      DESCRIPTION "Changed SYNTAX of the following from (SIZE(0..255))
+                   to (SIZE(0..128)):
+                   tnSwNodeSwdlServerUserId
+                   tnSwNodeSwdlServerPassword."
+
+      REVISION    "201402191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   aswg
+                   a4pswg
+                   otdr
+                   wr20tfm
+                   aar8a
+                   mcs8x16
+                   msh8fsm."
+
+      REVISION    "201402031200Z"
+      DESCRIPTION "Added the following to tnFwCardTable:
+                   tnFwCardProvisioningInfo."
+
+      REVISION    "201401211200Z"
+      DESCRIPTION "Added the following table:
+                   tnFwHitlessCardTable."
+
+      REVISION    "201312201200Z"
+      DESCRIPTION "Added the following to tnSwNodePartialLoadCommand:
+                   forceDownload(3)."
+
+      REVISION    "201311251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   wtocmf."
+
+      REVISION    "201311061200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSwNodeFPGALockOverride."
+
+      REVISION    "201310101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   wr20tf."
+
+      REVISION    "201310071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   psc1-6."
+
+      REVISION    "201309041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   io10an10gb
+                   io10et10gb."
+
+      REVISION    "201308121200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ot130sca1."
+
+      REVISION    "201306241200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   aa2donw."
+
+      REVISION    "201305241200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ul130scupb
+                   ot112sdx11."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSoftwareEvents."
+
+      REVISION    "201304191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ot11dpm8
+                   ot11dpm4m
+                   ot11dpm4e."
+
+      REVISION    "201304111200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ot130snx10
+                   io24anmb."
+
+      REVISION    "201303161200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   am2625a
+                   am2032a
+                   ot260scx2."
+
+      REVISION    "201303071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11ope8
+                   11qce12x."
+
+      REVISION    "201208281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   4an10g
+                   8et1gb
+                   10et10g
+                   11qcupc
+                   520scx4."
+
+      REVISION    "201207241200Z"
+      DESCRIPTION "1) Added the following to tnInstalledFwCardType:
+                      24et1gb.
+                   2) Marked the following as obsolete:
+                      11qta4."
+
+      REVISION    "201206181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   a2p2125
+                   4qpa8
+                   112pdm11
+                   wtocma
+                   ptpctl
+                   ptpio."
+
+      REVISION    "201205181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSwNodeTFTPServer."
+
+      REVISION    "201204271200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   130scx10."
+
+      REVISION    "201204241200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ul130scup."
+
+      REVISION    "201203291200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11dpe12a."
+
+      REVISION    "201203181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   opsb."
+
+      REVISION    "201202121200Z"
+      DESCRIPTION "Added the following new tables:
+                   tnPortGroupTable
+                   tnInstalledFwPortGroupTable."
+
+      REVISION    "201201191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   cl10an10g
+                   cl24anm."
+
+      REVISION    "201201181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   wr8c88af."
+
+      REVISION    "201201101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11star1a
+                   mvac8b."
+
+      REVISION    "201111211200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11qpe24."
+
+      REVISION    "201111141200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43scge1."
+
+      REVISION    "201109161200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43scx4e."
+
+      REVISION    "201109061200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11qpen4."
+
+      REVISION    "201108311200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ul43scup
+                   ul11qcup."
+
+      REVISION    "201107191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   1dpp24m."
+
+      REVISION    "201107071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11qta4."
+
+      REVISION    "201106301200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   112snx10
+                   112sna1."
+
+      REVISION    "201106131200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mxslc
+                   eosm
+                   eosul."
+
+      REVISION    "201106071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mxec."
+
+      REVISION    "201105171200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43scx4l
+                   am2125b."
+
+      REVISION    "201105041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43sca1."
+
+      REVISION    "201103281200Z"
+      DESCRIPTION "Changed SYNTAX of tnSwNodeSwdlServerProtocol to
+                   use AluWdmTransferProtocol."
+
+      REVISION    "201011101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mesh4."
+
+      REVISION    "201010191200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11dpm12."
+
+      REVISION    "201010181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSwCardLastControlOperation
+                   tnSwCardControlAbort
+                   tnSwCardLastControlOperationStatus
+                   tnSwCardLastControlOperationResult
+                   tnSwCardLastControlOperationIntegerResult
+                   tnSwCardLastControlOperationPercentCompleted
+                   tnSwCardBytesTransferred."
+
+      REVISION    "201010171200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   112sx10l
+                   112sa1l."
+
+      REVISION    "201009281200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11dpe12e."
+
+      REVISION    "201009241200Z"
+      DESCRIPTION "Renamed mt0 to mt0c in tnInstalledFwCardType."
+
+      REVISION    "201009201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ra2p
+                   am2318a
+                   am2125a
+                   itlu
+                   wr8c88a."
+
+      REVISION    "201009101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43scx4."
+
+      REVISION    "201007201200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   mvac."
+
+      REVISION    "201006251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   sfd4[a-h]."
+
+      REVISION    "201006041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   am2017b
+                   am2325b
+                   1dpp21."
+
+      REVISION    "201005101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   wtocm
+                   wr2-88
+                   pss4ec."
+
+      REVISION    "201005071200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   flc
+                   mt0
+                   mt3t8
+                   mt1t9."
+
+      REVISION    "201002171200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   alpfgt
+                   osct."
+
+      REVISION    "201001041200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   112scx10
+                   112sca1."
+
+      REVISION    "200912101200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   11qpa4
+                   Sfd40
+                   Sfd40b
+                   A2325A."
+
+      REVISION    "200911011200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43sta1p
+                   43stx4p."
+
+      REVISION    "200909251200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   alpfgk
+                   osc
+                   4dpa2
+                   sfd8[a-d]."
+
+      REVISION    "200903311200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   43stx4."
+
+      REVISION    "200903181200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   ahplg."
+
+      REVISION    "200903151200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   cwr8-88
+                   sfd44b
+                   itlb."
+
+      REVISION    "200903021200Z"
+      DESCRIPTION "Added the following to tnInstalledFwCardType:
+                   4dpa4."
+
+      REVISION    "200902071200Z"
+      DESCRIPTION "Changed tnCardType to tnInstalledFwCardType."
+
+      REVISION    "200902051200Z"
+      DESCRIPTION "1) Added the following table:
+                      tnInstalledFwTable.
+                   2) Fixed compliance group problem with tnFwCardTable."
+
+      REVISION    "200902011200Z"
+      DESCRIPTION "Added the following table:
+                   tnFwCardTable."
+
+      REVISION    "200812171200Z"
+      DESCRIPTION "Increased the string length of the following from 17 to 20:
+                   tnSwNodeCommittedRelease
+                   tnSwNodeWorkingRelease
+                   tnSwNodeActiveRelease."
+
+      REVISION    "200805291200Z"
+      DESCRIPTION "Added the FPGA MIB tables."
+
+      REVISION    "200805021200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added tnSwNodeFPGALockOverride."
+
+      REVISION    "200309131200Z"
+      DESCRIPTION "Added the following scalars to tnSoftwareNode:
+                   tnSwNodePartialLoadCommand
+                   tnSwNodePartialLoadSupportedCardTypes
+                   tnSwNodePartialLoadImgInstalledCardTypes
+                   tnSwNodePartialLoadImgToBeInstalledCardTypes
+                   tnSwNodePartialLoadActionResult
+                   tnSwNodePartialLoadActionPercentCompleted."
+
+      ::= { tnSystemModules 6 }
+
+  tnSoftwareConf        OBJECT IDENTIFIER ::= { tnSoftwareMIB 1 }
+  tnSoftwareGroups      OBJECT IDENTIFIER ::= { tnSoftwareConf 1 }
+  tnSoftwareCompliances OBJECT IDENTIFIER ::= { tnSoftwareConf 2 }
+  tnSoftwareObjs        OBJECT IDENTIFIER ::= { tnSoftwareMIB 2 }
+  tnSoftwareBasics      OBJECT IDENTIFIER ::= { tnSoftwareObjs 1 }
+  tnSoftwareNode        OBJECT IDENTIFIER ::= { tnSoftwareBasics 1 }
+  tnSoftwareDynamic     OBJECT IDENTIFIER ::= { tnSoftwareObjs 2 }
+
+--  obsolete
+--  tnSoftwareEvents      OBJECT IDENTIFIER ::= { tnSoftwareMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    TropicSwControl ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Control operations for software downloads."
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         unknown(2),
+                         audit(3),
+                         activate(4),
+                         upgradeAuto(5),
+                         commit(6),
+                         backout(7),
+                         load(8),
+                         cardActivate(9),
+                         cardLoad(10),
+                         autoInstall(11),
+                         autoIsuLoad(12),
+                         autoActivate(13),
+                         autoIsuCommit(14),
+                         srosMigration(15)
+                       }
+
+    TropicSwBank ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The flash banks accessible to the network operator."
+        SYNTAX         INTEGER {
+                         none(1),
+                         application0(2),
+                         application1(3),
+                         userBoot(4),
+                         emergencyBoot(5)
+                       }
+
+    TropicSwLastOperationStatus ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The status of the previously executed operation."
+        SYNTAX         INTEGER {
+                         completed(1),
+                         inProgress(2),
+                         failure(3),
+                         none(4)
+                       }
+
+    TropicSwLastOperationResult ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The result of the previously executed operation."
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+
+    TropicSwLastOperationPercentCompleted ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The percent complete of the previously executed
+                        operation."
+        SYNTAX         Unsigned32
+
+    AluWdmPortGroupMode ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Specifies an FPGA image type that supports certain
+                        signal types."
+        SYNTAX         INTEGER {
+                         pwrSv(1),   -- Power save mode
+                         oth(2),     -- OTUn signals
+                         ethSth(3),  -- Ethernet, OCn, or STMn signals
+                         eth(4),     -- Ethernet signals
+                         sth(5),     -- OCn or STMn signals
+                         fc(6)       -- Fibre channel signals
+                       }
+
+--------------------------------------------------------------------------------
+--  Software - Node Level Scalars
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnSwNodeTFTPServer OBJECT-TYPE ::= { tnSoftwareNode 1 }
+
+    tnSwNodeReleaseRoot OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The path to the directory containing releases,
+                        relative to the TFTP server root directory.
+                        A forward slash will be prepended if it
+                        does not start with one."
+        ::= { tnSoftwareNode 2 }
+
+    tnSwNodeControl OBJECT-TYPE
+        SYNTAX         TropicSwControl
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Controls the software download.  Command details
+                        are as follows:
+
+                        ******************************************************
+                        load - will simply execute the script generated
+                               by audit, running only the load steps.  It
+                               must be preceded by an audit.  Load will
+                               not run an audit or delete the the audit
+                               script.  Cards are not loaded in parallel.
+                             - a set pdu including this attribute with
+                               this value may also include attribute
+                               tnSwNodeLastAuditTimeStamp.  If
+                               tnSwNodeLastAuditTimeStamp is included,
+                               and it differs from the value stored on
+                               the node, the load will fail.
+
+                        upgradeAuto - upgradeAuto will perform an audit,
+                                      load, and activate.  It will not
+                                      commit the release.  It will fail
+                                      if no upgrade path exists unless
+                                      tnSwNodeUpgradeForce is specified.
+                                    - a set pdu including this attribute
+                                      with this value must also include
+                                      attribute tnSwNodeWorkingReleaseDir;
+                                      otherwise, the set will be failed
+                                      back to the network operator.
+                                    - a set pdu including this attribute
+                                      with this value may also include
+                                      attributes tnSwNodeUpgradeForce
+                                      and/or tnSwNodeUpgradeNoBackup.
+
+                        audit - generates the audit script but does not
+                                run it.
+                              - sets the value of attribute
+                                tnSwNodeUpgradePathAvailable.
+                              - a set pdu including this attribute with
+                                this value must also include attribute
+                                tnSwNodeWorkingReleaseDir; otherwise, the
+                                set will be failed back to the network
+                                operator.
+                              - a set pdu including this attribute with
+                                this value may also include attributes
+                                tnSwNodeUpgradeForce and/or
+                                tnSwNodeUpgradeNoBackup.
+
+                        activate - only runs the previously generated
+                                   audit script but does not perform any
+                                   load steps that may be in the audit
+                                   script. The load command must precede
+                                   activate.
+                                 - a set pdu including this attribute
+                                   with this value may also include
+                                   attribute tnSwNodeLastAuditTimeStamp.
+                                   If tnSwNodeLastAuditTimeStamp is
+                                   included, and it differs from the
+                                   value stored on the node, the activate
+                                   will fail.
+
+                        commit - sets tnSwNodeCommittedRelease equal
+                                 to tnSwNodeWorkingRelease, then clears
+                                 tnSwNodeWorkingRelease.
+                               - clears tnSwNodeWorkingReleaseDir.
+
+                        backout - only allowed if an upgrade has been
+                                  attempted on the node.
+
+                        autoIsu_load   - autoISU load.
+
+                        auto_activate  - auto activate.
+
+                        autoIsu_commit - autoIsu commit.
+
+                        Sets on all other values are restricted.  A read
+                        on this attribute returns a value of noCmd.
+                        ******************************************************"
+        ::= { tnSoftwareNode 3 }
+
+--    obsolete
+--    tnSwNodeUseTFTPServerOnly OBJECT-TYPE ::= { tnSoftwareNode 4 }
+
+    tnSwNodeCommittedRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The committed software release."
+        ::= { tnSoftwareNode 5 }
+
+    tnSwNodeWorkingRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The software release to which the system
+                        is upgrading.  This is cleared following
+                        a commit to the release."
+        ::= { tnSoftwareNode 6 }
+
+    tnSwNodeForce OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         false(2),
+                         true(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This attribute, when set to true, MAY result in
+                        the DB being purged (only if there is no upgrade
+                        path available).  When this attribute is set to
+                        false, the DB will NOT be purged.  All reads on
+                        this attribute will return a value of none.  It's
+                        value is not persistent on the 1696R/1830 NE.  A
+                        set pdu including this attribute must also
+                        include attribute tnSwNodeControl; otherwise,
+                        the set will be failed back to the network
+                        operator."
+        ::= { tnSoftwareNode 7 }
+
+    tnSwNodeNoBackup OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         false(2),
+                         true(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This attribute, when set to true, a DB backup
+                        will not be required or enforced.  When this
+                        attribute is set to false, a DB will backup will
+                        be required and enforced.  All reads on this
+                        attribute will return a value of none.  Its
+                        value is not persistent on the 1696R/1830 NE.
+                        A set pdu including this attribute must also
+                        include attribute tnSwNodeControl; otherwise,
+                        the set will be failed back to the network
+                        operator."
+        ::= { tnSoftwareNode 8 }
+
+    tnSwNodeUpgradePathAvailable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This object is set by the 1696R/1830 NE after
+                        the completion of an audit, either by setting
+                        tnSwNodeControl to audit or indirectly by
+                        setting tnSwNodeControl to upgradeAuto."
+        ::= { tnSoftwareNode 9 }
+
+    tnSwNodeLastControlOperation OBJECT-TYPE
+        SYNTAX         TropicSwControl
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is the last control command executed against
+                        the software download subsystem.  If the last
+                        operation against the software download subsystem
+                        is not one of the valid operations in
+                        TropicSwControl, the value of this attribute
+                        will be unknown."
+        ::= { tnSoftwareNode 10 }
+
+    tnSwNodeControlAbort OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This attribute allows the network operator to
+                        submit an abort on any operation executed via
+                        attribute tnSwNodeControl.  It is only allowed
+                        if tnSwNodeLastControlOperationStatus is
+                        inProgress.  When read back, the value of this
+                        attribute is noCmd.  An abort will always
+                        succeed."
+        ::= { tnSoftwareNode 11 }
+
+    tnSwNodeLastControlOperationStatus OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the
+                        previously executed tnSwNodeControl operation."
+        ::= { tnSoftwareNode 12 }
+
+    tnSwNodeLastControlOperationResult OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the previously executed
+                        tnSwNodeControl operation, whether or not it
+                        passed or failed."
+        ::= { tnSoftwareNode 13 }
+
+    tnSwNodeLastControlOperationIntegerResult OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the previously executed
+                        tnSwNodeControl operation, as an integer."
+        ::= { tnSoftwareNode 14 }
+
+    tnSwNodeLastControlOperationPercentCompleted OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationPercentCompleted
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The percent completion of the previously executed
+                        tnSwNodeControl operation.  Only applies when
+                        tnSwNodeLastControlOperationStatus is inProgress.
+                        It should be 0 at all other times."
+        ::= { tnSoftwareNode 15 }
+
+    tnSwNodeLastAuditTimeStamp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The time at which the last audit was executed,
+                        measured in total time ticks (seconds) from the
+                        year 1970.
+
+                        When setting tnSwNodeControl to install,
+                        tnSwNodeLastAuditTimeStamp may be included in
+                        the set pdu.
+
+                        Attempting to set tnSwNodeLastAuditTimeStamp
+                        independent of attribute tnSwNodeControl will
+                        be failed back to the network operator.
+
+                        The value read back is controlled entirely by
+                        the 1696R/1830 NE, which keeps this value in the
+                        database.  The value in the database will not
+                        be overwritten by setting this attribute via SNMP.
+
+                        Setting this to a value of 0 or not including
+                        this attribute with tnSwNodeControl in a set
+                        pdu disables this feature."
+        ::= { tnSoftwareNode 16 }
+
+--    obsolete
+--    tnSwNodeCommittedReleaseDir OBJECT-TYPE ::= { tnSoftwareNode 17 }
+
+    tnSwNodeWorkingReleaseDir OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The directory associated with the software
+                        release to which the system is upgrading.  For
+                        sets, if the directory starts with a forward
+                        slash, it is absolute; otherwise, it is relative
+                        to the release root that contains the release
+                        files.  For gets, the response will be the
+                        absolute directory, including the release root
+                        and including a leading forward slash.
+
+                        This is cleared following a commit to the
+                        release.  A set pdu including this attribute
+                        must also include attribute tnSwNodeControl;
+                        otherwise, the set will be failed back to the
+                        network operator."
+        ::= { tnSoftwareNode 18 }
+
+    tnSwNodeActiveRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The currently active software release."
+        ::= { tnSoftwareNode 19 }
+
+    tnSwNodeSwdlServerProtocol OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ftp(1),
+                         sftp(2),
+--                         obsolete
+--                         tftp(3),
+                         http(4),
+                         https(5)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This attributes indicates the software download
+                        protocol."
+        ::= { tnSoftwareNode 20 }
+
+    tnSwNodeSwdlServerIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The software download server where software files
+                        to be downloaded reside.  This will be used as
+                        the primary source for files."
+        ::= { tnSoftwareNode 21 }
+
+    tnSwNodeSwdlServerUserId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The userId used to access software download server."
+        ::= { tnSoftwareNode 22 }
+
+    tnSwNodeSwdlServerPassword OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The password used to access software download server."
+        ::= { tnSoftwareNode 23 }
+
+--    obsolete
+--    tnSwNodeFPGALockOverride OBJECT-TYPE ::= { tnSoftwareNode 24 }
+
+    tnSwNodePartialLoadCommand OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         partialLoad(2),
+                         forceDownload(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { noCmd }
+        ::= { tnSoftwareNode 25 }
+
+    tnSwNodePartialLoadSupportedCardTypes OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2000))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The lc card types which image support by the
+                        node software release.  Format like
+                        11PDM12&112PDM11."
+        ::= { tnSoftwareNode 26 }
+
+    tnSwNodePartialLoadImgInstalledCardTypes OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2000))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The lc card types which image have been installed
+                        on the node.  Format like 11PDM12&112PDM11."
+        ::= { tnSoftwareNode 27 }
+
+    tnSwNodePartialLoadImgToBeInstalledCardTypes OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2000))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The lc card types which image will need to install
+                        on the node.  Format like 11PDM12&112PDM11.  Only
+                        applies when tnSwNodePartialLoadCommand is
+                        partialLoad."
+        ::= { tnSoftwareNode 28 }
+
+    tnSwNodePartialLoadActionResult OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The partial load result of the action."
+        ::= { tnSoftwareNode 29 }
+
+    tnSwNodePartialLoadActionPercentCompleted OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationPercentCompleted
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The partial load percent completion of the action.
+                        It should be 0 at all other times."
+        ::= { tnSoftwareNode 30 }
+
+    tnSwNodeSwdlServerInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The value specifies the type of Internet address
+                        stored in tnSwNodeSwdlServerInetAddress."
+        DEFVAL         { unknown }
+        ::= { tnSoftwareNode 31 }
+
+    tnSwNodeSwdlServerInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of the Software server."
+        DEFVAL         { ''H }
+        ::= { tnSoftwareNode 32 }
+
+    tnSwNodeControlStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         autoLoad(1),
+                         autoActivate(2),
+                         autoCommit(3),
+                         manual(4),
+                         autoRefresh(5),
+                         manualRefresh(6)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { manual }
+        ::= { tnSoftwareNode 33 }
+
+    tnSwNodePort OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This attributes indicates the Software
+                        server port."
+        DEFVAL         { 21 }
+        ::= { tnSoftwareNode 34 }
+
+    tnSwNodeUrl OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareNode 35 }
+
+    tnSwNodeLoadType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         dynamic(2),
+                         static(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareNode 36 }
+
+    tnSwNodeUrlLoadType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         dynamic(1),
+                         full(2)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareNode 37 }
+
+    tnSwNodeMigrateFileName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "It is used as the SROS image filename to be downloaded
+                        from server to TPS NE when the migration command is
+                        executed."
+        ::= { tnSoftwareNode 38 }
+
+--------------------------------------------------------------------------------
+--  Software - Card Level Table
+--------------------------------------------------------------------------------
+    tnSwCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSwCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Software Downloading on a per card basis.
+
+                        The following sets of attributes are legal in a
+                        single SNMP set pdu.  Any other combinations
+                        will be rejected.
+
+                        tnSwCardControl (value load)
+                        tnSwCardBankToLoad
+                        tnSwCardReleaseDir
+
+                        or
+
+                        tnSwCardControl (value activate)
+                        tnSwCardBankToActivate
+
+                        or
+
+                        tnSwCardControlAbort"
+        ::= { tnSoftwareBasics 2 }
+
+    tnSwCardEntry OBJECT-TYPE
+        SYNTAX         TnSwCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnSwCardTable 1 }
+
+    TnSwCardEntry ::= SEQUENCE {
+        tnSwCardAppBank0                             SnmpAdminString,
+        tnSwCardAppBank1                             SnmpAdminString,
+        tnSwCardEmergBootBank                        SnmpAdminString,
+        tnSwCardUserBootBank                         SnmpAdminString,
+        tnSwCardActiveBank                           TropicSwBank,
+        tnSwCardNextBootBank                         TropicSwBank,
+        tnSwCardBankToActivate                       TropicSwBank,
+        tnSwCardBankToLoad                           INTEGER,
+        tnSwCardControl                              TropicSwControl,
+--        obsolete
+--        tnSwCardLastControlOperation                 TropicSwControl,
+--        tnSwCardControlAbort                         INTEGER,
+--        tnSwCardLastControlOperationStatus           TropicSwLastOperationStatus,
+--        tnSwCardLastControlOperationResult           TropicSwLastOperationResult,
+--        tnSwCardLastControlOperationIntegerResult    Integer32,
+--        tnSwCardLastControlOperationPercentCompleted TropicSwLastOperationPercentCompleted,
+--        tnSwCardBytesTransferred                     Unsigned32,
+        tnSwCardReleaseDir                           SnmpAdminString,
+        tnSwCardCurrentDscRpmCount                   Integer32,
+        tnSwCardCurrentFsRpmCount                    Integer32,
+        tnSwCardStandByDscRpmCount                   Integer32,
+        tnSwCardStandByFsRpmCount                    Integer32
+    }
+
+    tnSwCardAppBank0 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently in bank 0."
+        ::= { tnSwCardEntry 1 }
+
+    tnSwCardAppBank1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently in bank 1."
+        ::= { tnSwCardEntry 2 }
+
+    tnSwCardEmergBootBank OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently in the
+                        emergency boot bank."
+        ::= { tnSwCardEntry 3 }
+
+    tnSwCardUserBootBank OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently in the
+                        user boot bank."
+        ::= { tnSwCardEntry 4 }
+
+    tnSwCardActiveBank OBJECT-TYPE
+        SYNTAX         TropicSwBank
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The currently active bank."
+        ::= { tnSwCardEntry 5 }
+
+    tnSwCardNextBootBank OBJECT-TYPE
+        SYNTAX         TropicSwBank
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The bank from which to boot the card on
+                        the next card reset."
+        ::= { tnSwCardEntry 6 }
+
+    tnSwCardBankToActivate OBJECT-TYPE
+        SYNTAX         TropicSwBank
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the bank to switch to
+                        and reset.  A set PDU containing this attribute
+                        must also contain attribute tnSwCardControl.
+                        When read, this attribute returns a value of
+                        none."
+        ::= { tnSwCardEntry 7 }
+
+    tnSwCardBankToLoad OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         application(2),
+                         boot(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The flash bank to which the load will be
+                        transferred.  Selecting a value of application
+                        will result in the load being transferred to
+                        the inactive application bank.  Selecting a
+                        value of boot will result in the load being
+                        transferred to the user boot bank.  All reads
+                        on this attribute will return a value of none."
+        ::= { tnSwCardEntry 8 }
+
+    tnSwCardControl OBJECT-TYPE
+        SYNTAX         TropicSwControl
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Command cardLoad results in forced SW loading
+                        at the card level.  Command cardActivate results
+                        in a bank switch and card reset.  Sets on all
+                        other values are restricted.  A read on this
+                        attribute returns a value of noCmd."
+        ::= { tnSwCardEntry 9 }
+
+--    obsolete
+--    tnSwCardLastControlOperation                 OBJECT-TYPE ::= { tnSwCardEntry 10 }
+--    tnSwCardControlAbort                         OBJECT-TYPE ::= { tnSwCardEntry 11 }
+--    tnSwCardLastControlOperationStatus           OBJECT-TYPE ::= { tnSwCardEntry 12 }
+--    tnSwCardLastControlOperationResult           OBJECT-TYPE ::= { tnSwCardEntry 13 }
+--    tnSwCardLastControlOperationIntegerResult    OBJECT-TYPE ::= { tnSwCardEntry 14 }
+--    tnSwCardLastControlOperationPercentCompleted OBJECT-TYPE ::= { tnSwCardEntry 15 }
+--    tnSwCardBytesTransferred                     OBJECT-TYPE ::= { tnSwCardEntry 16 }
+
+    tnSwCardReleaseDir OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The directory that contains all the release
+                        files.  For sets, if the directory starts with
+                        a forward slash, it is absolute; otherwise, it
+                        is relative to the release root that contains
+                        the release files.
+
+                        All reads on this attribute will return an empty
+                        string.  Its value is not persistent on the
+                        1696R/1830 NE."
+        ::= { tnSwCardEntry 17 }
+
+    tnSwCardCurrentDscRpmCount OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardEntry 18 }
+
+    tnSwCardCurrentFsRpmCount OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardEntry 19 }
+
+    tnSwCardStandByDscRpmCount OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardEntry 20 }
+
+    tnSwCardStandByFsRpmCount OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardEntry 21 }
+
+--------------------------------------------------------------------------------
+-- Software Audit Script Table
+--------------------------------------------------------------------------------
+    tnSwAuditScriptTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSwAuditScriptEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table is comprised of the content of a
+                        software upgrade script, created by the execution
+                        of a software audit.  A network operator may view
+                        the script prior to running it.  While the script
+                        is running, the network operator may use this
+                        table to view the progress of the software upgrade."
+        ::= { tnSoftwareBasics 3 }
+
+    tnSwAuditScriptEntry OBJECT-TYPE
+        SYNTAX         TnSwAuditScriptEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table is indexed via the software upgrade
+                        stage and the step within the stage."
+        INDEX { tnSwAuditScriptStage,
+                tnSwAuditScriptStep }
+        ::= { tnSwAuditScriptTable 1 }
+
+    TnSwAuditScriptEntry ::= SEQUENCE {
+        tnSwAuditScriptStage                  Unsigned32,
+        tnSwAuditScriptStep                   Unsigned32,
+        tnSwAuditScriptShelf                  TropicShelfIndexType,
+        tnSwAuditScriptSlot                   TropicSlotIndexType,
+        tnSwAuditScriptCardType               OBJECT IDENTIFIER,
+        tnSwAuditScriptAction                 SnmpAdminString,
+        tnSwAuditScriptActionStatus           SnmpAdminString,
+        tnSwAuditScriptActionResult           TropicSwLastOperationResult,
+        tnSwAuditScriptActionPercentCompleted TropicSwLastOperationPercentCompleted,
+        tnSwAuditScriptResultTimeStamp        Unsigned32
+    }
+
+    tnSwAuditScriptStage OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The software upgrade stage.  The lower bound is
+                        0."
+        ::= { tnSwAuditScriptEntry 1 }
+
+    tnSwAuditScriptStep OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The step within the software upgrade stage.  The
+                        lower bound is 1."
+        ::= { tnSwAuditScriptEntry 2 }
+
+    tnSwAuditScriptShelf OBJECT-TYPE
+        SYNTAX         TropicShelfIndexType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The shelf id of the shelf being upgraded."
+        ::= { tnSwAuditScriptEntry 3 }
+
+    tnSwAuditScriptSlot OBJECT-TYPE
+        SYNTAX         TropicSlotIndexType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The slot of the card being upgraded."
+        ::= { tnSwAuditScriptEntry 4 }
+
+    tnSwAuditScriptCardType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The card type of the card being upgraded."
+        ::= { tnSwAuditScriptEntry 5 }
+
+    tnSwAuditScriptAction OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The currently executing operation."
+        ::= { tnSwAuditScriptEntry 7 }
+
+    tnSwAuditScriptActionStatus OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the action."
+        ::= { tnSwAuditScriptEntry 8 }
+
+    tnSwAuditScriptActionResult OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the action."
+        ::= { tnSwAuditScriptEntry 9 }
+
+    tnSwAuditScriptActionPercentCompleted OBJECT-TYPE
+        SYNTAX         TropicSwLastOperationPercentCompleted
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The percent completion of the action.  Only
+                        applies when tnSwAuditScriptActionStatus is
+                        inProgress.  It should be 0 at all other times."
+        ::= { tnSwAuditScriptEntry 10 }
+
+    tnSwAuditScriptResultTimeStamp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the result occurred,
+                        measured in total time ticks (seconds) from
+                        the year 1970."
+        ::= { tnSwAuditScriptEntry 11 }
+
+--------------------------------------------------------------------------------
+--  Software - CPLD Table
+--------------------------------------------------------------------------------
+    tnSwCpldTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSwCpldEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "CPLD Software Programming on a per card basis."
+        ::= { tnSoftwareBasics 4 }
+
+    tnSwCpldEntry OBJECT-TYPE
+        SYNTAX         TnSwCpldEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnSwCpldTable 1 }
+
+    TnSwCpldEntry ::= SEQUENCE {
+        tnSwCpldProgramControl INTEGER
+    }
+
+    tnSwCpldProgramControl OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         gentle(2),
+                         force(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Values:
+
+                        noCmd  - the returned value on get requests.
+                        gentle - indicates to program the CPLDs only
+                                 if CPLD versions differ.
+                        force  - program the CPLDs regardless of the
+                                 version numbers."
+        ::= { tnSwCpldEntry 1 }
+
+--------------------------------------------------------------------------------
+--  Firmware - Card Level Table
+--------------------------------------------------------------------------------
+    tnFwCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnFwCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Firmware Maintenance on a per card basis."
+        ::= { tnSoftwareBasics 5 }
+
+    tnFwCardEntry OBJECT-TYPE
+        SYNTAX         TnFwCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnFwCardTable 1 }
+
+    TnFwCardEntry ::= SEQUENCE {
+        tnFwCardCurrentBundle           SnmpAdminString,
+        tnFwCardLoadedAt                Unsigned32,
+        tnFwCardLoadBundle              SnmpAdminString,
+        tnFwCardProvisionedAt           Unsigned32,
+        tnFwCardLoadState               INTEGER,
+        tnFwCardWatchDog                Unsigned32,
+        tnFwCardProvisioningInfo        SnmpAdminString,
+        tnFwCardFpgaCapability          SnmpAdminString
+    }
+
+    tnFwCardCurrentBundle OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The filename of the bundle of firmware that is
+                        currently loaded in the card, for example,
+                        <cardFunction>_i.j.k.  This is updated on each
+                        warm and cold restart by comparing the version
+                        registers of each FPGA against the list of
+                        version registers in the profile."
+        DEFVAL         { ''H }
+        ::= { tnFwCardEntry 1 }
+
+    tnFwCardLoadedAt OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the named firmware bundle was
+                        last successfully loaded (seconds from 1970)."
+        ::= { tnFwCardEntry 2 }
+
+    tnFwCardLoadBundle OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The revision code portion of filename of the bundle
+                        of firmware that is to be loaded in the card at the
+                        next cold reset; the i.j[.k] portion of
+                        <cardFunction>_i.j[.k].  When .k is not specified,
+                        the file with the numerically highest value of k is
+                        used.  When the <cardFunction> is not specified,
+                        the word profile will be used in its place, e.g.
+                        profile_1.1.0.  When the <tnFwCardLoadBundle> and
+                        the <cardFunction> are not specified, the resulting
+                        string will be profile_default."
+        DEFVAL         { ''H }
+        ::= { tnFwCardEntry 3 }
+
+    tnFwCardProvisionedAt OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the provisioned firmware bundle
+                        name was changed for this card (seconds from 1970)."
+        ::= { tnFwCardEntry 4 }
+
+    tnFwCardLoadState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         loaded(2),
+                         init1(3),
+                         init2(4),
+                         init3(5),
+                         init4(6),
+                         init5(7),
+                         init6(8),
+                         init7(9),
+                         init8(10),
+                         init9(11),
+                         init10(12),
+                         failed(13),
+                         timeOut(14)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the firmware load process for the card
+                        as a whole.  This uses conditions FPGAInit[1-10]
+                        raised by Board Manager, which will also update the
+                        ECId."
+        ::= { tnFwCardEntry 5 }
+
+    tnFwCardWatchDog OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is the time since the beginning of the init
+                        state for the individual FPGA device currently
+                        being loaded.  It is updated only when requested
+                        for display.  Timeout starts at 45 minutes.
+                        Progress time displayed will be = 45:00-current
+                        value."
+        ::= { tnFwCardEntry 6 }
+
+    tnFwCardProvisioningInfo OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "FPGA card provisioning information for up
+                        to 10 profiles.  The information for each
+                        profile contains the following 5 fields:
+
+                        NGOCC 01 static 40020402 hitless
+
+                        where
+
+                        NGOCC    - FPGA name of this profile.
+                        01       - Vendor/hardware realization variant of a profile.
+                        static   - FPGA type, static or dynamic.
+                        40020402 - Version.
+                        hitless  - Status.
+
+                        Software developers are working out the details
+                        of the arrangement of these fields."
+        ::= { tnFwCardEntry 7 }
+
+    tnFwCardFpgaCapability OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFwCardEntry 8 }
+
+--------------------------------------------------------------------------------
+--  Firmware - Installed files Table
+--------------------------------------------------------------------------------
+    tnInstalledFwTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnInstalledFwEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This object describes the firmware available on the EC"
+        ::= { tnSoftwareBasics 6 }
+
+    tnInstalledFwEntry OBJECT-TYPE
+        SYNTAX         TnInstalledFwEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "An entry of the installed firmware table"
+        INDEX { tnInstalledFwCardType,
+                tnInstalledFwFileName }
+        ::= { tnInstalledFwTable 1 }
+
+    TnInstalledFwEntry ::= SEQUENCE {
+        tnInstalledFwCardType         Unsigned32,
+        tnInstalledFwFileName         SnmpAdminString,
+        tnInstalledFwIsDefault        TruthValue
+    }
+
+    tnInstalledFwCardType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Supported values in R1.1:
+                        11dpge12    - 1
+                        11star1     - 2
+                        11stge12    - 3
+                        11stmm10    - 4
+                        ahphg       - 5
+                        alphg       - 6
+                        cwr8        - 7
+                        dcm         - 8
+                        ec          - 9
+                        opsa        - 10
+                        sfc1a       - 11
+                        sfc1b       - 12
+                        sfc1c       - 13
+                        sfc1d       - 14
+                        sfc1e       - 15
+                        sfc1f       - 16
+                        sfc1g       - 17
+                        sfc1h       - 18
+                        sfc2a       - 19
+                        sfc2b       - 20
+                        sfc2c       - 21
+                        sfc2d       - 22
+                        sfc4a       - 23
+                        sfc4b       - 24
+                        sfc8        - 25
+                        sfd44       - 26
+                        sfd5a       - 27
+                        sfd5b       - 28
+                        sfd5c       - 29
+                        sfd5d       - 30
+                        sfd5e       - 31
+                        sfd5f       - 32
+                        sfd5g       - 33
+                        sfd5h       - 34
+                        svac        - 35
+
+                        R2.0:
+                        4dpa4       - 36
+                        cwr8-88     - 37
+                        sfd44b      - 38
+                        itlb        - 39
+                        ahplg       - 40
+                        43stx4      - 41
+
+                        R2.5:
+                        alpfgk      - 42
+                        osc         - 43
+                        4dpa2       - 44
+                        sfd8a       - 45
+                        sfd8b       - 46
+                        sfd8c       - 47
+                        sfd8d       - 48
+                        43sta1p     - 49
+                        43stx4p     - 50
+                        11qpa4      - 51
+                        sfd40       - 52
+                        sfd40b      - 53
+                        a2325a      - 54
+                        112scx10    - 55
+                        112sca1     - 56
+                        alpfgt      - 57
+                        osct        - 58
+
+                        R2.9:
+                        flc         - 59
+                        mt0c        - 60
+                        mt3t8       - 61
+                        mt1t9       - 62
+
+                        R3.0:
+                        wtocm       - 63
+                        wr2-88      - 64
+                        pss4ec      - 65
+                        am2017b     - 66
+                        am2325b     - 67
+                        1dpp21      - 68
+                        sfd4a       - 69
+                        sfd4b       - 70
+                        sfd4c       - 71
+                        sfd4d       - 72
+                        sfd4e       - 73
+                        sfd4f       - 74
+                        sfd4g       - 75
+                        sfd4h       - 76
+                        mvac        - 77
+
+                        R3.1.5:
+                        43scx4      - 78
+
+                        R3.5:
+                        ra2p        - 79
+                        am2318a     - 80
+                        am2125a     - 81
+                        itlu        - 82
+                        wr8c88a     - 83
+                        11dpe12e    - 84
+                        112sx10l    - 85
+                        112sa1l     - 86
+                        11dpm12     - 87
+                        mesh4       - 88
+
+                        R3.6:
+                        43sca1      - 89
+                        43scx4l     - 90
+                        am2125b     - 91
+                        mxec        - 92
+                        mxslc       - 93
+                        eosm        - 94
+                        eosul       - 95
+
+                        R3.6.5:
+                        112snx10    - 96
+                        112sna1     - 97
+--                        obsolete
+--                        11qta4      - 98
+                        1dpp24m     - 99
+                        ul43scup    - 100
+                        ul11qcup    - 101
+                        11qpen4     - 102
+                        43scx4e     - 103
+                        43scge1     - 104
+                        11qpe24     - 105
+
+                        R5.0:
+                        11star1a    - 106
+                        mvac8b      - 107
+                        wr8c88af    - 108
+
+                        R5.1:
+                        opsb        - 111
+                        11dpe12a    - 112
+
+                        R5.5:
+                        cl10an10g   - 109
+                        cl24anm     - 110
+                        ul130scup   - 113
+                        130scx10    - 114
+                        a2p2125     - 115
+                        4qpa8       - 116
+                        112pdm11    - 117
+                        wtocma      - 118
+                        ptpctl      - 119
+                        ptpio       - 120
+                        24et1gb     - 121
+                        4an10g      - 122
+                        8et1gb      - 123
+                        10et10g     - 124
+                        11qcupc     - 125
+                        520scx4     - 126
+
+                        R6.0.6:
+                        ot130snx10  - 132
+                        ot130sca1   - 140
+
+                        R7.0:
+                        11ope8      - 127
+                        11qce12x    - 128
+                        am2625a     - 129
+                        am2032a     - 130
+                        ot260scx2   - 131
+                        io24anmb    - 133
+                        ot11dpm8    - 134
+                        ot11dpm4m   - 135
+                        ot11dpm4e   - 136
+                        ul130scupb  - 137
+                        ot112sdx11  - 138
+                        aa2donw     - 139
+                        io10an10gb  - 141
+                        io10et10gb  - 142
+                        psc1-6      - 143
+                        wr20tf      - 144
+                        wtocmf      - 145
+
+                        R7.0.2:
+                        aswg        - 146
+                        a4pswg      - 147
+                        otdr        - 148
+                        wr20-tfm    - 149
+                        aar-8a      - 150
+                        mcs8-16     - 151
+                        msh8-fsm    - 152
+                        mfc         - 174
+                        sc          - 175
+
+                        R8.0:
+                        io4an100g   - 153
+                        io30an10g   - 154
+                        io30an300   - 155
+                        io4an400    - 156
+                        12p120      - 157
+                        20p200      - 158
+                        1ud200      - 159
+                        ot130snq10  - 160
+                        iroadmv     - 161
+                        iroadmf     - 162
+                        monocm      - 163
+                        monotdr     - 169
+                        pss96powerfilter - 170
+
+                        R9.0:
+                        ul2uc400    - 164
+                        ul4uc400    - 165
+                        ul20uc200   - 166
+                        d5x500      - 167
+                        ots11m100   - 168
+                        12ce120     - 171
+                        1ce100      - 172
+                        lci1000     - 173
+                        cec2        - 176
+                        awbing      - 177
+                        awbegr      - 178
+
+                        R9.1:
+                        awbila      - 179
+                        ra5p        - 180
+                        iroadm9m    - 181
+                        s13x100     - 182
+                        12ce121     - 183
+                        sc16        - 184
+                        sfdc8a      - 185
+                        sfdc8b      - 186
+                        sfdc8c      - 187
+                        sfdc8d      - 188
+                        sfdc8e      - 189
+                        aa2donwb    - 190
+                        osctapr     - 191
+                        11qpa4b     - 192
+                        1ux100      - 193
+                        20ax200     - 194
+                        20mx80      - 195
+                        aar2x8a     - 196
+                        s13x100e    - 197
+                        wtocmfl     - 198
+                        aar2x8al    - 199
+                        wr20-tfml   - 200
+                        mcs8x16l    - 201
+                        pss8xpowerfilter - 202
+                        xmfc        - 203
+                        lci2000     - 204
+                        30se300     - 205
+                        6se300      - 206
+                        otdrwb      - 207
+
+                        R10.0:
+                        8dc30t      - 208
+                        16dc65t     - 209
+                        d5x500l     - 210
+                        lci2000l    - 211
+                        iroadm9r    - 212
+                        ra2p96      - 213
+                        otdrm       - 214
+
+                        R10.1:
+                        20an80      - 215
+                        10an400     - 216
+                        8p20        - 217
+                        opsflex     - 218
+                        d5x500q     - 219
+                        18p40       - 220
+                        sc48        - 221
+                        ptpioctl    - 222
+                        da2c4       - 223
+                        130sla1     - 224
+                        130slx10    - 225
+                        xst4t8      - 226
+                        8dc30       - 227
+                        8ac7        - 228
+                        16dc65      - 229
+                        16ac16      - 230
+                        iroadm20    - 231
+                        pss12xpowerfilter - 232
+                        s2ad200     - 233
+                        msh4-fsb    - 234
+                        2ux200      - 235
+                        4mx200      - 236
+
+                        R11.0:
+                        opsb5       - 237
+                        aswg-l      - 238
+                        ipreamp     - 239
+
+                        R11.1:
+                        xfan8       - 240
+                        xfan12      - 241
+                        40cx800     - 242
+                        xsp9t6      - 243
+                        irdm32      - 244
+                        ra4p        - 245
+                        eila        - 246
+                        8cx800      - 247
+                        6px800      - 248
+                        mcs16x15    - 249
+                        10an1t      - 250
+                        8uc1t       - 251
+                        sc24t       - 252
+                        dfc12       - 253
+                        s13x100l    - 254
+
+                        R12.0:
+                        irdm32l     - 255
+                        s4x400      - 256
+                        esre        - 257
+                        psimmfc     - 258
+                        psilmfc     - 259
+                        psilpfdc    - 260
+
+                        R13.0:
+                        1ety100     - 261
+--                        obsolete
+--                        d1ad400q    - 262
+                        omdcl       - 263
+                        mcs16x15l   - 264
+                        eilal       - 265
+                        ra5pb       - 266
+                        mlfsb       - 267
+                        18p400      - 268
+                        4uc1t       - 269
+                        asg         - 270
+                        12p120s     - 271
+                        dfm6        - 272
+
+                        R13.1:
+                        16p200      - 273
+                        ir9         - 274
+                        xst4t       - 275
+                        xst12t      - 276
+                        mxn824      - 277
+                        asc4        - 278
+                        5mx500      - 279
+                        2ux500      - 280
+                        s5ad400     - 281
+                        sfm6        - 282
+
+                        R14.0:
+                        dd2m4       - 283
+                        opsum       - 284
+                        2uc1t       - 285
+                        s6ad600     - 286
+
+                        R14.0.8:
+                        mxn1624     - 287
+                        ir4         - 288
+                        asc2        - 289
+                        sqx10       - 290
+                        sfd48       - 291
+                        sfd64       - 292
+
+                        R14.1:
+                        ir32aw      - 293
+                        eilaaw      - 294
+                        18ce300     - 295
+                        opsuml      - 296
+                        1ux500      - 297
+                        sci48t      - 298."
+
+        ::= { tnInstalledFwEntry 1 }
+
+    tnInstalledFwFileName OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This attribute contains the name of the firmware
+                        file for files with links, it specifies the
+                        target file name."
+        ::= { tnInstalledFwEntry 2 }
+
+    tnInstalledFwIsDefault OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute specifies if the software is
+                        default."
+        DEFVAL         { false }
+        ::= { tnInstalledFwEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Port Group Table
+--------------------------------------------------------------------------------
+    tnPortGroupTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPortGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareBasics 7 }
+
+    tnPortGroupEntry OBJECT-TYPE
+        SYNTAX         TnPortGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPortGroupTable 1 }
+
+    TnPortGroupEntry ::= SEQUENCE {
+        tnPortGroupMode           AluWdmPortGroupMode,
+        tnPortGroupFwDownload     SnmpAdminString,
+        tnPortGroupFwCurrent      SnmpAdminString
+    }
+
+    tnPortGroupMode OBJECT-TYPE
+        SYNTAX         AluWdmPortGroupMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Port group mode is a synonym for the applied
+                        FPGA firmware type."
+        ::= { tnPortGroupEntry 1 }
+
+    tnPortGroupFwDownload OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The port group firmware version to be downloaded.
+                        A null value means the preferred version for the
+                        selected mode in the active card firmware profile."
+        ::= { tnPortGroupEntry 2 }
+
+    tnPortGroupFwCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current port group firmware version that is
+                        running on the FPGA."
+        ::= { tnPortGroupEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Installed Firmware Port Group Table
+--------------------------------------------------------------------------------
+    tnInstalledFwPortGroupTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnInstalledFwPortGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareBasics 8 }
+
+    tnInstalledFwPortGroupEntry OBJECT-TYPE
+        SYNTAX         TnInstalledFwPortGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnInstalledFwCardType,
+                tnInstalledFwFileName,
+                tnInstalledFwPortGroupMode,
+                tnInstalledFwPortGroupFw }
+        ::= { tnInstalledFwPortGroupTable 1 }
+
+    TnInstalledFwPortGroupEntry ::= SEQUENCE {
+        tnInstalledFwPortGroupMode          AluWdmPortGroupMode,
+        tnInstalledFwPortGroupFw            SnmpAdminString,
+        tnInstalledFwPortGroupIsDefault     TruthValue
+    }
+
+    tnInstalledFwPortGroupMode OBJECT-TYPE
+        SYNTAX         AluWdmPortGroupMode
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The valid port group mode in the card firmware
+                        profile."
+        ::= { tnInstalledFwPortGroupEntry 1 }
+
+    tnInstalledFwPortGroupFw OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The valid port group firmware version number
+                        associated with the port group mode."
+        ::= { tnInstalledFwPortGroupEntry 2 }
+
+    tnInstalledFwPortGroupIsDefault OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute specifies if the software is
+                        default."
+        ::= { tnInstalledFwPortGroupEntry 3 }
+
+--------------------------------------------------------------------------------
+--  Firmware - Card Level HitLess Table
+--------------------------------------------------------------------------------
+    tnFwHitlessCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnFwHitlessCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Firmware Hitless Maintenance on a per card basis."
+        ::= { tnSoftwareBasics 9 }
+
+    tnFwHitlessCardEntry OBJECT-TYPE
+        SYNTAX         TnFwHitlessCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnFwHitlessCardTable 1 }
+
+    TnFwHitlessCardEntry ::= SEQUENCE {
+        tnFwHitlessCardTrigger       TruthValue,
+        tnFwHitlessCardLoadState     INTEGER,
+        tnFwHitlessCardWatchDog      Unsigned32
+    }
+
+    tnFwHitlessCardTrigger OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hitless - Provisioned firmware package will be
+                        loaded to the card by performing a warm reboot."
+        ::= { tnFwHitlessCardEntry 1 }
+
+    tnFwHitlessCardLoadState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         loaded(2),
+                         initNsa1(3),
+                         initNsa2(4),
+                         initNsa3(5),
+                         initNsa4(6),
+                         initNsa5(7),
+                         initNsa6(8),
+                         initNsa7(9),
+                         initNsa8(10),
+                         initNsa9(11),
+                         initNsa10(12),
+                         failed(13),
+                         timeOut(14)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the firmware hitless load process
+                        for the card as a whole.  This uses conditions
+                        FPGAINITNSA[1-10] raised by Board Manager, which
+                        will also update the ECId."
+        ::= { tnFwHitlessCardEntry 2 }
+
+    tnFwHitlessCardWatchDog OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is the time since the beginning of the init
+                        state for the individual FPGA Hitless device
+                        currently being loaded.  It is updated only when
+                        requested for display.  Timeout starts at 45
+                        minutes.  Progress time displayed will be =
+                        45:00-current value."
+        ::= { tnFwHitlessCardEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Port Fw Table
+--------------------------------------------------------------------------------
+    tnPortFwTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPortFwEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareBasics 10 }
+
+    tnPortFwEntry OBJECT-TYPE
+        SYNTAX         TnPortFwEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPortFwTable 1 }
+
+    TnPortFwEntry ::= SEQUENCE {
+        tnPortFwFunction               SnmpAdminString,
+        tnPortFwLoadBundle             SnmpAdminString,
+        tnPortFwHitless                TruthValue,
+        tnPortFwHitlessLoadState       INTEGER,
+        tnPortFwLoadState              INTEGER,
+        tnPortFwCurrentBundle          SnmpAdminString,
+        tnPortFwLoadedAt               Unsigned32,
+        tnPortFwProvisionedAt          Unsigned32,
+        tnPortFwLoadTimeOut            Unsigned32,
+        tnPortFwHitlessLoadTimeOut     Unsigned32,
+        tnPortFwProvisioningInfo       SnmpAdminString
+    }
+
+    tnPortFwFunction OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Fw Function."
+        DEFVAL         { "profile" }
+        ::= { tnPortFwEntry 1 }
+
+    tnPortFwLoadBundle OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The revision code portion of filename of the bundle of
+                        firmware that is to be loaded in the pluggable module
+                        at the next cold reset; the i.j[.k] portion of
+                        <FwFunction>_i.j[.k].  When .k is not specified, the
+                        file with the numerically highest value of k is used.
+                        When the <FwFunction> is not specified, the word profile
+                        will be used in its place, e.g.  profile_1.1.0.  When
+                        the <tnPortFwLoadBundle> and the <Function> are not
+                        specified, the resulting string will be profile_default."
+        DEFVAL         { "default" }
+        ::= { tnPortFwEntry 2 }
+
+    tnPortFwHitless OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hitless - Provisioned firmware package will be loaded to
+                        the pluggable module by performing a warm reboot."
+        DEFVAL         { false }
+        ::= { tnPortFwEntry 3 }
+
+    tnPortFwHitlessLoadState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         loaded(2),
+                         initNsa1(3),
+                         initNsa2(4),
+                         initNsa3(5),
+                         initNsa4(6),
+                         initNsa5(7),
+                         initNsa6(8),
+                         initNsa7(9),
+                         initNsa8(10),
+                         initNsa9(11),
+                         initNsa10(12),
+                         failed(13),
+                         timeOut(14)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the firmware hitless load process for the
+                        pluggable module as a whole.  This uses conditions
+                        FPGAINITNSA[1-10] raised by Board Manager, which will
+                        also update the ECId."
+        ::= { tnPortFwEntry 4 }
+
+    tnPortFwLoadState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         loaded(2),
+                         init1(3),
+                         init2(4),
+                         init3(5),
+                         init4(6),
+                         init5(7),
+                         init6(8),
+                         init7(9),
+                         init8(10),
+                         init9(11),
+                         init10(12),
+                         failed(13),
+                         timeOut(14)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the firmware load process for the pluggable
+                        module as a whole.  This uses conditions FPGAInit[1-10]
+                        raised by Board Manager, which will also update the ECId."
+        ::= { tnPortFwEntry 5 }
+
+    tnPortFwCurrentBundle OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The filename of the bundle of firmware that is currently
+                        loaded in the pluggable module, for example, <FwFunction>_i.j.k.
+                        This is updated on each warm and cold restart by comparing
+                        the version registers of each FPGA against the list of
+                        version registers in the profile."
+        DEFVAL         { "" }
+        ::= { tnPortFwEntry 6 }
+
+    tnPortFwLoadedAt OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the named firmware bundle was last
+                        successfully loaded (seconds from 1970)."
+        ::= { tnPortFwEntry 7 }
+
+    tnPortFwProvisionedAt OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the provisioned firmware bundle name
+                        was changed for this pluggable module (seconds from 1970)."
+        ::= { tnPortFwEntry 8 }
+
+    tnPortFwLoadTimeOut OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is the time since the beginning of the init state
+                        for the individual FPGA device currently being loaded.
+                        It is updated only when requested for display.  Timeout
+                        starts at 45 minutes.  Progress time displayed will be
+                        = 45:00-current value."
+        ::= { tnPortFwEntry 9 }
+
+    tnPortFwHitlessLoadTimeOut OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is the time since the beginning of the init state
+                        for the individual FPGA Hitless device currently being
+                        loaded.  It is updated only when requested for display.
+                        Timeout starts at 45 minutes.  Progress time displayed
+                        will be = 45:00-current value."
+        ::= { tnPortFwEntry 10 }
+
+    tnPortFwProvisioningInfo OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..520))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "FPGA pluggable module provisioning information for up
+                        to 10 profiles.  The information for each profile
+                        contains the following 5 fields:
+
+                        NGOCC 01 static 40020402 hitless
+
+                        where
+
+                        NGOCC    - FPGA name of this profile.
+                        01       - Vendor/hardware realization variant of a profile.
+                        static   - FPGA type, static or dynamic.
+                        40020402 - Version.
+                        hitless  - Status.
+
+                        Software developers are working out the details of the
+                        arrangement of these fields."
+        DEFVAL         { "" }
+        ::= { tnPortFwEntry 11 }
+
+--------------------------------------------------------------------------------
+--  Firmware - Installed files Table
+--------------------------------------------------------------------------------
+    tnInstalledFwPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnInstalledFwPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This object describes the firmware available on the EC"
+        ::= { tnSoftwareBasics 11 }
+
+    tnInstalledFwPortEntry OBJECT-TYPE
+        SYNTAX         TnInstalledFwPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "An entry of the installed firmware table"
+        INDEX { tnInstalledFwPortModuleType,
+                tnInstalledFwPortFileName }
+        ::= { tnInstalledFwPortTable 1 }
+
+    TnInstalledFwPortEntry ::= SEQUENCE {
+        tnInstalledFwPortModuleType         Unsigned32,
+        tnInstalledFwPortFileName           SnmpAdminString,
+        tnInstalledFwPortIsDefault          TruthValue
+    }
+
+    tnInstalledFwPortModuleType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "c2dco4     - 1
+                        bmdco6     - 2
+                        c2dco4o    - 3
+                        bmdc06l    - 4
+                        bmdco6e    - 5."
+        ::= { tnInstalledFwPortEntry 1 }
+
+    tnInstalledFwPortFileName OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This attribute contains the name of the firmware file
+                        for files with links, it specifies the target file name."
+        ::= { tnInstalledFwPortEntry 2 }
+
+    tnInstalledFwPortIsDefault OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute specifies if the software is default."
+        DEFVAL         { false }
+        ::= { tnInstalledFwPortEntry 3 }
+
+--------------------------------------------------------------------------------
+--  Dynamic Software - Node Level Scalars
+--------------------------------------------------------------------------------
+    tnSwDynamicServerInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The value specifies the type of Internet address stored
+                        in tnSwNodeSwdlServerInetAddress."
+        DEFVAL         { unknown }
+        ::= { tnSoftwareDynamic 1 }
+
+    tnSwDynamicServerInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of the Dynamic Software server."
+        DEFVAL         { ''H }
+        ::= { tnSoftwareDynamic 2 }
+
+    tnSwDynamicServerIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 3 }
+
+    tnSwDynamicRoot OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 4 }
+
+    tnSwDynamicRefresh OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 5 }
+
+    tnSwDynamicServerUserId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 6 }
+
+    tnSwDynamicServerPassword OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 7 }
+
+    tnSwDynamicPort OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 21 }
+        ::= { tnSoftwareDynamic 8 }
+
+    tnSwDynamicServerProtocol OBJECT-TYPE
+        SYNTAX         AluWdmNewTransferProtocol
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { ftp }
+        ::= { tnSoftwareDynamic 9 }
+
+    tnSwDynamicLoadType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         dynamic(2),
+                         static(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 10 }
+
+    tnSwDynamicFeature OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         get(1),
+                         delete(2),
+                         add(3),
+                         addForce(4),
+                         clear(5)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 11 }
+
+    tnSwDynamicLoadEntities OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 12 }
+
+    tnSwDynamicAutoRefresh OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 13 }
+
+    tnSwDynamicUnavailableCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 14 }
+
+    tnSwDynamicUnavailableCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 15 }
+
+    tnSwDynamicUnknownCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 16 }
+
+    tnSwDynamicUnknownCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 17 }
+
+    tnSwDynamicFullCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 18 }
+
+    tnSwDynamicFullCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 19 }
+
+    tnSwDynamicAvailableCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 20 }
+
+    tnSwDynamicAvailableCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 21 }
+
+    tnSwDynamicExcludedCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 22 }
+
+    tnSwDynamicExcludedCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 23 }
+
+    tnSwDynamicFullCurrentRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 24 }
+
+    tnSwDynamicAvailableCurrentRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 25 }
+
+    tnSwDynamicExcludedCurrentRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 26 }
+
+    tnSwDynamicUnavailableCurrentRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 27 }
+
+    tnSwDynamicUnknownCurrentRelease OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 28 }
+
+    tnSwDynamicFullCurrentTotalRpms OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 29 }
+
+    tnSwDynamicAvailableCurrentTotalRpms OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 30 }
+
+    tnSwDynamicExcludedCurrentTotalRpms OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 31 }
+
+    tnSwDynamicUnavailableCurrentTotalRpms OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 32 }
+
+    tnSwDynamicUnknownCurrentTotalRpms OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 33 }
+
+    tnSwDynamicFullCurrentRpmsLoaded OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 34 }
+
+    tnSwDynamicAvailableCurrentRpmsLoaded OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 35 }
+
+    tnSwDynamicExcludedCurrentRpmsLoaded OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 36 }
+
+    tnSwDynamicUnavailableCurrentRpmsLoaded OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 37 }
+
+    tnSwDynamicUnknownCurrentRpmsLoaded OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareDynamic 38 }
+
+--------------------------------------------------------------------------------
+--  Card Dynamic Table
+--------------------------------------------------------------------------------
+    tnSwCardDynamicTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSwCardDynamicEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareBasics 12 }
+
+    tnSwCardDynamicEntry OBJECT-TYPE
+        SYNTAX         TnSwCardDynamicEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnSwCardDynamicTable 1 }
+
+    TnSwCardDynamicEntry ::= SEQUENCE {
+        tnSwCardDynamicFeatureFullCurrent1                SnmpAdminString,
+        tnSwCardDynamicFeatureFullCurrent2                SnmpAdminString,
+        tnSwCardDynamicFeatureFullStandby1                SnmpAdminString,
+        tnSwCardDynamicFeatureFullStandby2                SnmpAdminString,
+        tnSwCardDynamicFeatureAvailableCurrent1           SnmpAdminString,
+        tnSwCardDynamicFeatureAvailableCurrent2           SnmpAdminString,
+        tnSwCardDynamicFeatureAvailableStandby1           SnmpAdminString,
+        tnSwCardDynamicFeatureAvailableStandby2           SnmpAdminString,
+        tnSwCardDynamicFeatureExcludedCurrent1            SnmpAdminString,
+        tnSwCardDynamicFeatureExcludedCurrent2            SnmpAdminString,
+        tnSwCardDynamicFeatureExcludedStandby1            SnmpAdminString,
+        tnSwCardDynamicFeatureExcludedStandby2            SnmpAdminString,
+        tnSwCardDynamicDscRpmCountFullCurrent             Integer32,
+        tnSwCardDynamicFsRpmCountFullCurrent              Integer32,
+        tnSwCardDynamicActiveReleaseFullCurrent           SnmpAdminString,
+        tnSwCardDynamicDscRpmCountFullStandby             Integer32,
+        tnSwCardDynamicFsRpmCountFullStandby              Integer32,
+        tnSwCardDynamicActiveReleaseFullStandby           SnmpAdminString,
+        tnSwCardDynamicDscRpmCountAvailableCurrent        Integer32,
+        tnSwCardDynamicFsRpmCountAvailableCurrent         Integer32,
+        tnSwCardDynamicActiveReleaseAvailableCurrent      SnmpAdminString,
+        tnSwCardDynamicDscRpmCountAvailableStandby        Integer32,
+        tnSwCardDynamicFsRpmCountAvailableStandby         Integer32,
+        tnSwCardDynamicActiveReleaseAvailableStandby      SnmpAdminString,
+        tnSwCardDynamicDscRpmCountExcludedCurrent         Integer32,
+        tnSwCardDynamicFsRpmCountExcludedCurrent          Integer32,
+        tnSwCardDynamicActiveReleaseExcludedCurrent       SnmpAdminString,
+        tnSwCardDynamicDscRpmCountExcludedStandby         Integer32,
+        tnSwCardDynamicFsRpmCountExcludedStandby          Integer32,
+        tnSwCardDynamicActiveReleaseExcludedStandby       SnmpAdminString,
+        tnSwCardDynamicFeatureUnavailableCurrent1         SnmpAdminString,
+        tnSwCardDynamicFeatureUnavailableCurrent2         SnmpAdminString,
+        tnSwCardDynamicFeatureUnknownCurrent1             SnmpAdminString,
+        tnSwCardDynamicFeatureUnknownCurrent2             SnmpAdminString,
+        tnSwCardDynamicDscRpmCountUnavailableCurrent      Integer32,
+        tnSwCardDynamicFsRpmCountUnavailableCurrent       Integer32,
+        tnSwCardDynamicActiveReleaseUnavailableCurrent    SnmpAdminString,
+        tnSwCardDynamicDscRpmCountUnknownCurrent          Integer32,
+        tnSwCardDynamicFsRpmCountUnknownCurrent           Integer32,
+        tnSwCardDynamicActiveReleaseUnknownCurrent        SnmpAdminString
+    }
+
+    tnSwCardDynamicFeatureFullCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 1 }
+
+    tnSwCardDynamicFeatureFullCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 2 }
+
+    tnSwCardDynamicFeatureFullStandby1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 3 }
+
+    tnSwCardDynamicFeatureFullStandby2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 4 }
+
+    tnSwCardDynamicFeatureAvailableCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 5 }
+
+    tnSwCardDynamicFeatureAvailableCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 6 }
+
+    tnSwCardDynamicFeatureAvailableStandby1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 7 }
+
+    tnSwCardDynamicFeatureAvailableStandby2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 8 }
+
+    tnSwCardDynamicFeatureExcludedCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 9 }
+
+    tnSwCardDynamicFeatureExcludedCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 10 }
+
+    tnSwCardDynamicFeatureExcludedStandby1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 11 }
+
+    tnSwCardDynamicFeatureExcludedStandby2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 12 }
+
+    tnSwCardDynamicDscRpmCountFullCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 13 }
+
+    tnSwCardDynamicFsRpmCountFullCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 14 }
+
+    tnSwCardDynamicActiveReleaseFullCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 15 }
+
+    tnSwCardDynamicDscRpmCountFullStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 16 }
+
+    tnSwCardDynamicFsRpmCountFullStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 17 }
+
+    tnSwCardDynamicActiveReleaseFullStandby OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 18 }
+
+    tnSwCardDynamicDscRpmCountAvailableCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 19 }
+
+    tnSwCardDynamicFsRpmCountAvailableCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 20 }
+
+    tnSwCardDynamicActiveReleaseAvailableCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 21 }
+
+    tnSwCardDynamicDscRpmCountAvailableStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 22 }
+
+    tnSwCardDynamicFsRpmCountAvailableStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 23 }
+
+    tnSwCardDynamicActiveReleaseAvailableStandby OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 24 }
+
+    tnSwCardDynamicDscRpmCountExcludedCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 25 }
+
+    tnSwCardDynamicFsRpmCountExcludedCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 26 }
+
+    tnSwCardDynamicActiveReleaseExcludedCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 27 }
+
+    tnSwCardDynamicDscRpmCountExcludedStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 28 }
+
+    tnSwCardDynamicFsRpmCountExcludedStandby OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 29 }
+
+    tnSwCardDynamicActiveReleaseExcludedStandby OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 30 }
+
+    tnSwCardDynamicFeatureUnavailableCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 31 }
+
+    tnSwCardDynamicFeatureUnavailableCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 32 }
+
+    tnSwCardDynamicFeatureUnknownCurrent1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 33 }
+
+    tnSwCardDynamicFeatureUnknownCurrent2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 34 }
+
+    tnSwCardDynamicDscRpmCountUnavailableCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 35 }
+
+    tnSwCardDynamicFsRpmCountUnavailableCurrent   OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 36 }
+
+    tnSwCardDynamicActiveReleaseUnavailableCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 37 }
+
+    tnSwCardDynamicDscRpmCountUnknownCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 38 }
+
+    tnSwCardDynamicFsRpmCountUnknownCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 39 }
+
+    tnSwCardDynamicActiveReleaseUnknownCurrent OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..20))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwCardDynamicEntry 40 }
+
+--------------------------------------------------------------------------------
+--  SW Dynamic Info Table
+--------------------------------------------------------------------------------
+    tnSwDynamicInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSwDynamicInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareBasics 13 }
+
+    tnSwDynamicInfoEntry OBJECT-TYPE
+        SYNTAX         TnSwDynamicInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnSwDynamicInfoEntries }
+        ::= { tnSwDynamicInfoTable 1 }
+
+    TnSwDynamicInfoEntry ::= SEQUENCE {
+        tnSwDynamicInfoEntries      Unsigned32,
+        tnSwDynamicInfoDetails      SnmpAdminString
+   }
+
+    tnSwDynamicInfoEntries OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwDynamicInfoEntry 1 }
+
+    tnSwDynamicInfoDetails OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSwDynamicInfoEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnSwNodeGroup OBJECT-GROUP
+        OBJECTS {
+--            obsolete
+--            tnSwNodeTFTPServer,
+            tnSwNodeReleaseRoot,
+            tnSwNodeControl,
+--            obsolete
+--            tnSwNodeUseTFTPServerOnly,
+            tnSwNodeCommittedRelease,
+            tnSwNodeWorkingRelease,
+            tnSwNodeForce,
+            tnSwNodeNoBackup,
+            tnSwNodeUpgradePathAvailable,
+            tnSwNodeLastControlOperation,
+            tnSwNodeControlAbort,
+            tnSwNodeLastControlOperationStatus,
+            tnSwNodeLastControlOperationResult,
+            tnSwNodeLastControlOperationIntegerResult,
+            tnSwNodeLastControlOperationPercentCompleted,
+            tnSwNodeLastAuditTimeStamp,
+--            obsolete
+--            tnSwNodeCommittedReleaseDir,
+            tnSwNodeWorkingReleaseDir,
+            tnSwNodeActiveRelease,
+            tnSwNodeSwdlServerProtocol,
+            tnSwNodeSwdlServerIp,
+            tnSwNodeSwdlServerUserId,
+            tnSwNodeSwdlServerPassword,
+--            obsolete
+--            tnSwNodeFPGALockOverride,
+            tnSwNodePartialLoadCommand,
+            tnSwNodePartialLoadSupportedCardTypes,
+            tnSwNodePartialLoadImgInstalledCardTypes,
+            tnSwNodePartialLoadImgToBeInstalledCardTypes,
+            tnSwNodePartialLoadActionResult,
+            tnSwNodePartialLoadActionPercentCompleted,
+            tnSwNodeSwdlServerInetAddressType,
+            tnSwNodeSwdlServerInetAddress,
+            tnSwNodeControlStatus,
+            tnSwNodePort,
+            tnSwNodeUrl,
+            tnSwNodeLoadType,
+            tnSwNodeUrlLoadType,
+            tnSwNodeMigrateFileName
+        }
+        STATUS         current
+        DESCRIPTION    "A collection of objects providing System Downloads"
+        ::= { tnSoftwareGroups 1 }
+
+    tnSwCardGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwCardAppBank0,
+            tnSwCardAppBank1,
+            tnSwCardEmergBootBank,
+            tnSwCardUserBootBank,
+            tnSwCardActiveBank,
+            tnSwCardNextBootBank,
+            tnSwCardBankToActivate,
+            tnSwCardBankToLoad,
+            tnSwCardControl,
+--            obsolete
+--            tnSwCardLastControlOperation,
+--            tnSwCardControlAbort,
+--            tnSwCardLastControlOperationStatus,
+--            tnSwCardLastControlOperationResult,
+--            tnSwCardLastControlOperationIntegerResult,
+--            tnSwCardLastControlOperationPercentCompleted,
+--            tnSwCardBytesTransferred,
+            tnSwCardReleaseDir,
+            tnSwCardCurrentDscRpmCount,
+            tnSwCardCurrentFsRpmCount,
+            tnSwCardStandByDscRpmCount,
+            tnSwCardStandByFsRpmCount
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 2 }
+
+    tnSwAuditScriptGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwAuditScriptShelf,
+            tnSwAuditScriptSlot,
+            tnSwAuditScriptCardType,
+            tnSwAuditScriptAction,
+            tnSwAuditScriptActionStatus,
+            tnSwAuditScriptActionResult,
+            tnSwAuditScriptActionPercentCompleted,
+            tnSwAuditScriptResultTimeStamp
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 3 }
+
+    tnSwCpldGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwCpldProgramControl
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 4 }
+
+    tnFwCardGroup OBJECT-GROUP
+        OBJECTS {
+            tnFwCardCurrentBundle,
+            tnFwCardLoadedAt,
+            tnFwCardLoadBundle,
+            tnFwCardProvisionedAt,
+            tnFwCardLoadState,
+            tnFwCardWatchDog,
+            tnFwCardProvisioningInfo,
+            tnFwCardFpgaCapability
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 5 }
+
+    tnInstalledFwGroup OBJECT-GROUP
+        OBJECTS {
+            tnInstalledFwIsDefault
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 6 }
+
+    tnPortGroupGroup OBJECT-GROUP
+        OBJECTS {
+            tnPortGroupMode,
+            tnPortGroupFwDownload,
+            tnPortGroupFwCurrent
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 7 }
+
+    tnInstalledFwPortGroupGroup OBJECT-GROUP
+        OBJECTS {
+            tnInstalledFwPortGroupIsDefault
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 8 }
+
+    tnFwHitlessCardGroup OBJECT-GROUP
+        OBJECTS {
+            tnFwHitlessCardTrigger,
+            tnFwHitlessCardLoadState,
+            tnFwHitlessCardWatchDog
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 9 }
+
+    tnPortFwGroup OBJECT-GROUP
+        OBJECTS {
+            tnPortFwFunction,
+            tnPortFwLoadBundle,
+            tnPortFwHitless,
+            tnPortFwHitlessLoadState,
+            tnPortFwLoadState,
+            tnPortFwCurrentBundle,
+            tnPortFwLoadedAt,
+            tnPortFwProvisionedAt,
+            tnPortFwLoadTimeOut,
+            tnPortFwHitlessLoadTimeOut,
+            tnPortFwProvisioningInfo
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 10 }
+
+    tnInstalledFwPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnInstalledFwPortIsDefault
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 11 }
+
+    tnSwDynamicGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwDynamicServerInetAddressType,
+            tnSwDynamicServerInetAddress,
+            tnSwDynamicServerIp,
+            tnSwDynamicRoot,
+            tnSwDynamicRefresh,
+            tnSwDynamicServerUserId,
+            tnSwDynamicServerPassword,
+            tnSwDynamicPort,
+            tnSwDynamicServerProtocol,
+            tnSwDynamicLoadType,
+            tnSwDynamicFeature,
+            tnSwDynamicLoadEntities,
+            tnSwDynamicAutoRefresh,
+            tnSwDynamicUnavailableCurrent1,
+            tnSwDynamicUnavailableCurrent2,
+            tnSwDynamicUnknownCurrent1,
+            tnSwDynamicUnknownCurrent2,
+            tnSwDynamicFullCurrent1,
+            tnSwDynamicFullCurrent2,
+            tnSwDynamicAvailableCurrent1,
+            tnSwDynamicAvailableCurrent2,
+            tnSwDynamicExcludedCurrent1,
+            tnSwDynamicExcludedCurrent2,
+            tnSwDynamicFullCurrentRelease,
+            tnSwDynamicAvailableCurrentRelease,
+            tnSwDynamicExcludedCurrentRelease,
+            tnSwDynamicUnavailableCurrentRelease,
+            tnSwDynamicUnknownCurrentRelease,
+            tnSwDynamicFullCurrentTotalRpms,
+            tnSwDynamicAvailableCurrentTotalRpms,
+            tnSwDynamicExcludedCurrentTotalRpms,
+            tnSwDynamicUnavailableCurrentTotalRpms,
+            tnSwDynamicUnknownCurrentTotalRpms,
+            tnSwDynamicFullCurrentRpmsLoaded,
+            tnSwDynamicAvailableCurrentRpmsLoaded,
+            tnSwDynamicExcludedCurrentRpmsLoaded,
+            tnSwDynamicUnavailableCurrentRpmsLoaded,
+            tnSwDynamicUnknownCurrentRpmsLoaded
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 12 }
+
+    tnSwCardDynamicGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwCardDynamicFeatureFullCurrent1,
+            tnSwCardDynamicFeatureFullCurrent2,
+            tnSwCardDynamicFeatureFullStandby1,
+            tnSwCardDynamicFeatureFullStandby2,
+            tnSwCardDynamicFeatureAvailableCurrent1,
+            tnSwCardDynamicFeatureAvailableCurrent2,
+            tnSwCardDynamicFeatureAvailableStandby1,
+            tnSwCardDynamicFeatureAvailableStandby2,
+            tnSwCardDynamicFeatureExcludedCurrent1,
+            tnSwCardDynamicFeatureExcludedCurrent2,
+            tnSwCardDynamicFeatureExcludedStandby1,
+            tnSwCardDynamicFeatureExcludedStandby2,
+            tnSwCardDynamicDscRpmCountFullCurrent,
+            tnSwCardDynamicFsRpmCountFullCurrent,
+            tnSwCardDynamicActiveReleaseFullCurrent,
+            tnSwCardDynamicDscRpmCountFullStandby,
+            tnSwCardDynamicFsRpmCountFullStandby,
+            tnSwCardDynamicActiveReleaseFullStandby,
+            tnSwCardDynamicDscRpmCountAvailableCurrent,
+            tnSwCardDynamicFsRpmCountAvailableCurrent,
+            tnSwCardDynamicActiveReleaseAvailableCurrent,
+            tnSwCardDynamicDscRpmCountAvailableStandby,
+            tnSwCardDynamicFsRpmCountAvailableStandby,
+            tnSwCardDynamicActiveReleaseAvailableStandby,
+            tnSwCardDynamicDscRpmCountExcludedCurrent,
+            tnSwCardDynamicFsRpmCountExcludedCurrent,
+            tnSwCardDynamicActiveReleaseExcludedCurrent,
+            tnSwCardDynamicDscRpmCountExcludedStandby,
+            tnSwCardDynamicFsRpmCountExcludedStandby,
+            tnSwCardDynamicActiveReleaseExcludedStandby,
+            tnSwCardDynamicFeatureUnavailableCurrent1,
+            tnSwCardDynamicFeatureUnavailableCurrent2,
+            tnSwCardDynamicFeatureUnknownCurrent1,
+            tnSwCardDynamicFeatureUnknownCurrent2,
+            tnSwCardDynamicDscRpmCountUnavailableCurrent,
+            tnSwCardDynamicFsRpmCountUnavailableCurrent,
+            tnSwCardDynamicActiveReleaseUnavailableCurrent,
+            tnSwCardDynamicDscRpmCountUnknownCurrent,
+            tnSwCardDynamicFsRpmCountUnknownCurrent,
+            tnSwCardDynamicActiveReleaseUnknownCurrent
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 13 }
+
+    tnSwDynamicInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnSwDynamicInfoDetails
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSoftwareGroups 14 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnSoftwareCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnSwNodeGroup,
+            tnSwCardGroup,
+            tnSwAuditScriptGroup,
+            tnSwCpldGroup,
+            tnFwCardGroup,
+            tnInstalledFwGroup,
+            tnPortGroupGroup,
+            tnInstalledFwPortGroupGroup,
+            tnFwHitlessCardGroup,
+            tnPortFwGroup,
+            tnInstalledFwPortGroup,
+            tnSwDynamicGroup,
+            tnSwCardDynamicGroup,
+            tnSwDynamicInfoGroup
+        }
+        ::= { tnSoftwareCompliances 1 }
+
+END -- DEFINITION OF TROPIC-SOFTWARE-MIB

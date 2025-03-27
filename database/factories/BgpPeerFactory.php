@@ -2,25 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\BgpPeer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<BgpPeer> */
+/** @extends Factory<\App\Models\BgpPeer> */
 class BgpPeerFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = BgpPeer::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'bgpPeerIdentifier' => $this->faker->ipv4(),

@@ -21,7 +21,7 @@ if (! isset($sort) || empty($sort)) {
 
 // Define the Limit parameters
 if (isset($current)) {
-    $start = (($current * $rowCount) - ($rowCount));
+    $start = (($current * $rowCount) - $rowCount);
 }
 if ($rowCount != -1) {
     $options['limit'] = [$start, $rowCount];
@@ -60,9 +60,9 @@ foreach ($COMPONENTS[$device_id] as $ID => $AVP) {
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => ! empty($COMPONENTS[$device_id]) ? count($COMPONENTS[$device_id]) : 0,
+    'rows' => $response,
+    'total' => ! empty($COMPONENTS[$device_id]) ? count($COMPONENTS[$device_id]) : 0,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

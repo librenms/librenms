@@ -1,0 +1,82 @@
+CONEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises
+				FROM RFC1155-SMI;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+products		OBJECT IDENTIFIER ::= { conel 1 }
+
+routerER75		OBJECT IDENTIFIER ::= { products 1 }
+routerER75i		OBJECT IDENTIFIER ::= { products 2 }
+routerUR5		OBJECT IDENTIFIER ::= { products 3 }
+routerUR5i		OBJECT IDENTIFIER ::= { products 4 }
+routerXR5i		OBJECT IDENTIFIER ::= { products 5 }
+routerER75iV2		OBJECT IDENTIFIER ::= { products 6 }
+routerUR5V2		OBJECT IDENTIFIER ::= { products 7 }
+routerUR5iV2		OBJECT IDENTIFIER ::= { products 8 }
+routerXR5iV2		OBJECT IDENTIFIER ::= { products 9 }
+routerLR77V2		OBJECT IDENTIFIER ::= { products 10 }
+routerCR10V2		OBJECT IDENTIFIER ::= { products 11 }
+routerUCR11V2		OBJECT IDENTIFIER ::= { products 12 }
+routerUR5iV2L		OBJECT IDENTIFIER ::= { products 13 }
+routerSpectre3G		OBJECT IDENTIFIER ::= { products 14 }
+routerSpectreRT		OBJECT IDENTIFIER ::= { products 15 }
+routerRR75i		OBJECT IDENTIFIER ::= { products 16 }
+routerSpectreLTEAT	OBJECT IDENTIFIER ::= { products 17 }
+routerXR5iV2E		OBJECT IDENTIFIER ::= { products 18 }
+routerBiviasV2HC	OBJECT IDENTIFIER ::= { products 19 }
+routerBiviasV2LC	OBJECT IDENTIFIER ::= { products 20 }
+routerSpectreLTEVZ	OBJECT IDENTIFIER ::= { products 21 }
+routerBiviasV2LL	OBJECT IDENTIFIER ::= { products 22 }
+routerBiviasV2LH	OBJECT IDENTIFIER ::= { products 23 }
+routerBiviasV2HH	OBJECT IDENTIFIER ::= { products 24 }
+routerLR77V2L		OBJECT IDENTIFIER ::= { products 25 }
+routerSpectreV3HSPA	OBJECT IDENTIFIER ::= { products 26 }
+routerSpectreV3LTE	OBJECT IDENTIFIER ::= { products 27 }
+routerSpectreV3CDMA	OBJECT IDENTIFIER ::= { products 28 }
+routerSpectreV3ERT	OBJECT IDENTIFIER ::= { products 29 }
+routerSpectreV3TLTE	OBJECT IDENTIFIER ::= { products 32 }
+routerSpectreV3LTEUS	OBJECT IDENTIFIER ::= { products 35 }
+routerSpectreV3LLTE	OBJECT IDENTIFIER ::= { products 36 }
+routerSpectreV3LLTEUS	OBJECT IDENTIFIER ::= { products 37 }
+routerSpectreV3ERTUS	OBJECT IDENTIFIER ::= { products 38 }
+routerSpectreV3LERT	OBJECT IDENTIFIER ::= { products 39 }
+routerSpectreV3LERTUS	OBJECT IDENTIFIER ::= { products 40 }
+routerSpectreV3TLTEUS	OBJECT IDENTIFIER ::= { products 41 }
+routerICR321X		OBJECT IDENTIFIER ::= { products 42 }
+routerICR323X		OBJECT IDENTIFIER ::= { products 43 }
+routerICR324X		OBJECT IDENTIFIER ::= { products 44 }
+routerICR320X		OBJECT IDENTIFIER ::= { products 45 }
+routerICR383X		OBJECT IDENTIFIER ::= { products 46 }
+routerICR213X		OBJECT IDENTIFIER ::= { products 47 }
+routerICR233X		OBJECT IDENTIFIER ::= { products 48 }
+routerICR440X		OBJECT IDENTIFIER ::= { products 49 }
+routerICR443X		OBJECT IDENTIFIER ::= { products 50 }
+routerICR444X		OBJECT IDENTIFIER ::= { products 51 }
+routerICR203X		OBJECT IDENTIFIER ::= { products 52 }
+routerICR204X		OBJECT IDENTIFIER ::= { products 53 }
+routerICR240X		OBJECT IDENTIFIER ::= { products 54 }
+routerICR243X		OBJECT IDENTIFIER ::= { products 55 }
+routerICR244X		OBJECT IDENTIFIER ::= { products 56 }
+routerICR201X		OBJECT IDENTIFIER ::= { products 57 }
+routerICR241X		OBJECT IDENTIFIER ::= { products 58 }
+routerICR445X		OBJECT IDENTIFIER ::= { products 59 }
+routerICR446X		OBJECT IDENTIFIER ::= { products 60 }
+routerICR250X		OBJECT IDENTIFIER ::= { products 61 }
+routerICR253X		OBJECT IDENTIFIER ::= { products 62 }
+routerICR254X		OBJECT IDENTIFIER ::= { products 63 }
+routerICR260X		OBJECT IDENTIFIER ::= { products 64 }
+routerICR263X		OBJECT IDENTIFIER ::= { products 65 }
+routerICR264X		OBJECT IDENTIFIER ::= { products 66 }
+routerICR270X		OBJECT IDENTIFIER ::= { products 67 }
+routerICR271X		OBJECT IDENTIFIER ::= { products 68 }
+routerICR273X		OBJECT IDENTIFIER ::= { products 69 }
+routerICR274X		OBJECT IDENTIFIER ::= { products 70 }
+routerICR280X		OBJECT IDENTIFIER ::= { products 71 }
+routerICR281X		OBJECT IDENTIFIER ::= { products 72 }
+routerICR283X		OBJECT IDENTIFIER ::= { products 73 }
+routerICR284X		OBJECT IDENTIFIER ::= { products 74 }
+
+END

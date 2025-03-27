@@ -9,20 +9,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasFactory, HasPushSubscriptions;
+    use HasFactory;
+    use HasPushSubscriptions;
+    use HasRoles;
+    use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
+    protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
@@ -42,51 +47,41 @@ class User extends Authenticatable
 
     public function toFlare(): array
     {
-        return $this->only(['level', 'auth_type', 'enabled']);
+        return $this->only(['auth_type', 'enabled']);
     }
 
     // ---- Helper Functions ----
 
     /**
      * Test if this user has global read access
-     * these users have a level of 5, 10 or 11 (demo).
-     *
-     * @return bool
      */
-    public function hasGlobalRead()
+    public function hasGlobalRead(): bool
     {
-        return $this->hasGlobalAdmin() || $this->level == 5;
+        return $this->can('global-read');
     }
 
     /**
      * Test if this user has global admin access
-     * these users have a level of 10 or 11 (demo).
-     *
-     * @return bool
      */
-    public function hasGlobalAdmin()
+    public function hasGlobalAdmin(): bool
     {
-        return $this->level >= 10;
+        return $this->can('global-admin');
     }
 
     /**
      * Test if the User is an admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->level == 10;
+        return $this->can('admin');
     }
 
     /**
      * Test if this user is the demo user
-     *
-     * @return bool
      */
-    public function isDemo()
+    public function isDemo(): bool
     {
-        return $this->level == 11;
+        return $this->hasRole('demo');
     }
 
     /**
@@ -95,7 +90,7 @@ class User extends Authenticatable
      * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
-    public function canAccessDevice($device)
+    public function canAccessDevice($device): bool
     {
         return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
@@ -127,6 +122,18 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function getNotifications(?string $type = null): int|Collection
+    {
+        return match ($type) {
+            'total' => $this->notifications()->count(),
+            'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
+            'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
+            'sticky' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1))->get(),
+            'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
+            default => $this->notifications,
+        };
     }
 
     /**
@@ -167,7 +174,7 @@ class User extends Authenticatable
 
     public function scopeAdminOnly($query)
     {
-        $query->where('level', 10);
+        $query->whereIs('admin');
     }
 
     // ---- Accessors/Mutators ----
@@ -214,12 +221,22 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
+    public function bills(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Bill::class, 'bill_perms', 'user_id', 'bill_id');
+    }
+
     public function devices()
     {
         // pseudo relation
         return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
             return $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this));
         });
+    }
+
+    public function devicesOwned(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
     public function deviceGroups(): BelongsToMany
@@ -233,13 +250,23 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
+            return $this->portsOwned();
         }
+    }
+
+    public function portsOwned(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
     public function dashboards(): HasMany
     {
         return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+    }
+
+    public function notifications(): BelongsToMany
+    {
+        return $this->belongsToMany(Notification::class, 'notifications_attribs', 'user_id', 'notifications_id', 'user_id', 'notifications_id');
     }
 
     public function notificationAttribs(): HasMany

@@ -10,6 +10,6 @@ discovery:
     -
         sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         snmpget:
-            oid: .1.3.6.1.4.1.2021.7890.1.101.1
+            oid: 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"'
             op: starts
             value: OpenWrt

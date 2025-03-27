@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoPortSecurity.php
  *
@@ -22,6 +23,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class CiscoMacViolationTest extends SnmpTrapTestCase
 {
     /**
@@ -42,7 +45,7 @@ CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress a8:9d:21:e1:d8:50
 TRAP,
             'SNMP Trap: Secure MAC Address Violation on port GigabitEthernet1/0/24. Last MAC address: a8:9d:21:e1:d8:50',
             'Could not handle testMacViolation trap',
-            [4],
+            [Severity::Warning],
         );
     }
 }

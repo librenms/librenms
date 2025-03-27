@@ -1,4 +1,5 @@
 <?php
+
 /**
  * infinera-groove.inc.php
  *
@@ -22,6 +23,9 @@
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
+
+use LibreNMS\Util\Number;
+
 echo 'Port types:';
 
 foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
@@ -33,19 +37,19 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
     $cg_stats = snmpwalk_cache_multi_oid($device, $infineratype . 'Statistics', $cg_stats, 'CORIANT-GROOVE-MIB');
 
     $required = [
-        'ifAlias'               => $infineratype . 'AliasName',
-        'ifAdminStatus'         => $infineratype . 'AdminStatus',
-        'ifOperStatus'          => $infineratype . 'OperStatus',
-        'ifType'                => 'Ethernet',
-        'ifHCInBroadcastPkts'   => $infineratype . 'StatisticsEntryInBroadcastPackets',
-        'ifHCInMulticastPkts'   => $infineratype . 'StatisticsEntryInMulticastPackets',
-        'ifHCInOctets'          => $infineratype . 'StatisticsEntryInOctets',
-        'ifHCInUcastPkts'       => $infineratype . 'StatisticsEntryInPackets',
-        'ifHCOutBroadcastPkts'  => $infineratype . 'StatisticsEntryOutBroadcastPackets',
-        'ifHCOutMulticastPkts'  => $infineratype . 'StatisticsEntryOutMulticastPackets',
-        'ifHCOutOctets'         => $infineratype . 'StatisticsEntryOutOctets',
-        'ifHCOutUcastPkts'      => $infineratype . 'StatisticsEntryOutPackets',
-        'ifHighSpeed'           => $infspeed * 1000,
+        'ifAlias' => $infineratype . 'AliasName',
+        'ifAdminStatus' => $infineratype . 'AdminStatus',
+        'ifOperStatus' => $infineratype . 'OperStatus',
+        'ifType' => 'Ethernet',
+        'ifHCInBroadcastPkts' => $infineratype . 'StatisticsEntryInBroadcastPackets',
+        'ifHCInMulticastPkts' => $infineratype . 'StatisticsEntryInMulticastPackets',
+        'ifHCInOctets' => $infineratype . 'StatisticsEntryInOctets',
+        'ifHCInUcastPkts' => $infineratype . 'StatisticsEntryInPackets',
+        'ifHCOutBroadcastPkts' => $infineratype . 'StatisticsEntryOutBroadcastPackets',
+        'ifHCOutMulticastPkts' => $infineratype . 'StatisticsEntryOutMulticastPackets',
+        'ifHCOutOctets' => $infineratype . 'StatisticsEntryOutOctets',
+        'ifHCOutUcastPkts' => $infineratype . 'StatisticsEntryOutPackets',
+        'ifHighSpeed' => $infspeed * 1000,
     ];
 
     foreach ($cg_stats as $index => $tmp_stats) {
@@ -74,7 +78,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
         }
 
         // convert to integer
-        $lindex = cast_number($lindex);
+        $lindex = Number::cast($lindex);
 
         $port_stats[$lindex]['ifName'] = $descr;
         $port_stats[$lindex]['ifDescr'] = $descr;

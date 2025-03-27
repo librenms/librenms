@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CommonTrapTest.php
  *
@@ -30,6 +31,7 @@ use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Traits\RequiresDatabase;
@@ -74,7 +76,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
         $this->assertEquals('', $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('trap', $eventlog->type, 'Trap eventlog type incorrect');
-        $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
+        $this->assertEquals(Severity::Info, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
     public function testGenericTrap(): void
@@ -95,7 +97,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
         $this->assertEquals('SNMPv2-MIB::someOid', $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('trap', $eventlog->type, 'Trap eventlog type incorrect');
-        $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
+        $this->assertEquals(Severity::Info, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
     public function testAuthorization(): void
@@ -117,7 +119,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
         $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->displayName(), $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('auth', $eventlog->type, 'Trap eventlog type incorrect');
-        $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
+        $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
     public function testBridgeNewRoot(): void
@@ -139,7 +141,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
         $this->assertEquals('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('stp', $eventlog->type, 'Trap eventlog type incorrect');
-        $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
+        $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
     public function testBridgeTopologyChanged(): void
@@ -152,7 +154,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange
 TRAP,
             'SNMP Trap: Topology of Spanning Tree Instance on device {{ hostname }} was changed', // assertTrapLogsMessage sets display to hostname
             'Failed to handle BRIDGE-MIB::topologyChange',
-            [3, 'stp'],
+            [Severity::Notice, 'stp'],
         );
     }
 
@@ -166,7 +168,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart
 TRAP,
             'SNMP Trap: Device {{ hostname }} cold booted',
             'Failed to handle SNMPv2-MIB::coldStart',
-            [4, 'reboot'],
+            [Severity::Warning, 'reboot'],
         );
     }
 
@@ -180,7 +182,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart
 TRAP,
             'SNMP Trap: Device {{ hostname }} warm booted',
             'Failed to handle SNMPv2-MIB::warmStart',
-            [4, 'reboot'],
+            [Severity::Warning, 'reboot'],
         );
     }
 
@@ -194,7 +196,7 @@ SNMPv2-MIB::snmpTrapOID.0 ENTITY-MIB::entConfigChange
 TRAP,
             'SNMP Trap: Configuration of Entity Database on device {{ hostname }} was changed',
             'Failed to handle ENTITY-MIB::entConfigChange',
-            [3, 'system'],
+            [Severity::Notice, 'system'],
         );
     }
 }

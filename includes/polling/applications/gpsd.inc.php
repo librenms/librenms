@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -121,7 +122,6 @@ if ($app->app_id > 0) {
 
     // Generate RRD Def
 
-    $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('mode', 'GAUGE', 0, 4)
         ->addDataset('hdop', 'GAUGE', 0, 100)
@@ -130,8 +130,13 @@ if ($app->app_id > 0) {
         ->addDataset('satellites_used', 'GAUGE', 0, 40);
 
     // Update Application
-    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-    data_update($device, 'app', $tags, $fields);
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'rrd_name' => ['app', $name, $app->app_id],
+        'rrd_def' => $rrd_def,
+    ];
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     if (! empty($agent_data['app'][$name])) {
         update_application($app, $gpsd, $fields);

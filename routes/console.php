@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Symfony\Component\Process\Process;
 
@@ -43,19 +44,7 @@ Artisan::command('update', function () {
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
-//    PingCheck::dispatch(new PingCheck($this->argument('groups')));
-    $command = [base_path('ping.php')];
-    if ($this->argument('groups')) {
-        $command[] = '-g';
-        $command[] = implode(',', $this->argument('groups'));
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    PingCheck::dispatch($this->argument('groups', []));
 })->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
@@ -85,28 +74,6 @@ Artisan::command('poller:discovery
     }
     (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Discover information about existing devices, defines what will be polled'));
-
-Artisan::command('poller:poll
-    {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, odd, even, all') . '}
-    {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-    {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
-', function () {
-    $command = [base_path('poller.php'), '-h', $this->argument('device spec')];
-    if ($this->option('no-data')) {
-        array_push($command, '-r', '-f', '-p');
-    }
-    if ($this->option('modules')) {
-        $command[] = '-m';
-        $command[] = $this->option('modules');
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Poll data from devices as defined by discovery'));
 
 Artisan::command('poller:alerts', function () {
     $command = [base_path('alerts.php')];
@@ -177,6 +144,7 @@ Artisan::command('poller:billing-calculate
 Artisan::command('scan
     {network?* : ' . __('CIDR notation network(s) to scan, can be ommited if \'nets\' config is set') . '}
     {--P|ping-only : ' . __('Add the device as a ping only device if it replies to ping but not SNMP') . '}
+    {--o|dns-only : ' . __('Only DNS resolved Devices') . '}
     {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
     {--l|legend : ' . __('Print the legend') . '}
 ', function () {
@@ -187,6 +155,10 @@ Artisan::command('scan
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
+    }
+
+    if ($this->option('dns-only')) {
+        $command[] = '-o';
     }
 
     if ($this->option('ping-only')) {

@@ -30,17 +30,16 @@
     </div>
 </div>
 
-@can('admin')
-    <div class="form-group @if($errors->has('level')) has-error @endif">
-        <label for="level" class="control-label col-sm-3">{{ __('Level') }}</label>
+@can('viewAny', \Spatie\Permission\Models\Role::class)
+    <div class="form-group @if($errors->has('roles')) has-error @endif">
+        <label for="level" class="control-label col-sm-3">{{ __('Roles') }}</label>
         <div class="col-sm-9">
-            <select class="form-control" id="level" name="level">
-                <option value="1">{{ __('Normal') }}</option>
-                <option value="5" @if(old('level', $user->level) == 5) selected @endif>{{ __('Global Read') }}</option>
-                <option value="10" @if(old('level', $user->level) == 10) selected @endif>{{ __('Admin') }}</option>
-                @if(old('level', $user->level) == 11)<option value="11" selected>{{ __('Demo') }}</option>@endif
+            <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', \Spatie\Permission\Models\Role::class) readonly @endcannot>
+                @foreach(\Spatie\Permission\Models\Role::query()->get() as $role)
+                    <option value="{{ $role->name }}" @if(collect(old('roles', $user->getRoleNames()))->contains($role->name)) selected @endif>{{ __($role->name) }}</option>
+                @endforeach
             </select>
-            <span class="help-block">{{ $errors->first('level') }}</span>
+            <span class="help-block">{{ $errors->first('roles') }}</span>
         </div>
     </div>
 @endcan
@@ -61,9 +60,9 @@
     <div class="form-group @if($errors->hasAny(['old_password', 'new_password', 'new_password_confirmation'])) has-error @endif">
         <label for="password" class="control-label col-sm-3">{{ __('Password') }}</label>
         <div class="col-sm-9">
-            @cannot('admin')
+            @if(auth()->user()->cannot('admin') || auth()->user()->is($user))
                 <input type="password" class="form-control" id="old_password" name="old_password" placeholder="{{ __('Current Password') }}">
-            @endcannot
+            @endif
             <input type="password" autocomplete="off" class="form-control" id="new_password" name="new_password" placeholder="{{ __('New Password') }}">
             <input type="password" autocomplete="off" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('Confirm Password') }}">
             <span class="help-block">
@@ -85,6 +84,19 @@
     </div>
 </div>
 @endif
+
+<div class="form-group @if($errors->has('timezone')) has-error @endif">
+    <label for="timezone" class="control-label col-sm-3">{{ __('Timezone') }}</label>
+    <div class="col-sm-9">
+        <select id="timezone" name="timezone" class="form-control">
+            <option value="default">Browser Timezone</option>
+            @foreach(timezone_identifiers_list() as $tz)
+                <option value="{{ $tz }}" @if(old('timezone', $timezone) == $tz) selected @endif>{{ $tz }}</option>
+            @endforeach
+        </select>
+        <span class="help-block">{{ $errors->first('timezone') }}</span>
+    </div>
+</div>
 
 <script>
 $("[type='checkbox']").bootstrapSwitch();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LINE Notify Transport
  */
@@ -6,44 +7,32 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Linenotify extends Transport
 {
-    protected $name = 'LINE Notify';
+    protected string $name = 'LINE Notify';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $opts['line-notify-access-token'] = $this->config['line-notify-access-token'];
-
-        return $this->contactLinenotify($obj, $opts);
-    }
-
-    private function contactLinenotify($obj, $opts)
-    {
+        // TODO possible to attach graph images
         $lineUrl = 'https://notify-api.line.me/api/notify';
-        $lineHead = ['Authorization: Bearer ' . $opts['line-notify-access-token']];
-        $lineFields = ['message' => $obj['msg']];
+        $lineFields = ['message' => $alert_data['msg']];
 
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $lineUrl);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $lineHead);
-        curl_setopt($curl, CURLOPT_NOBODY, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $lineFields);
-        curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        if ($code != 200) {
-            return 'HTTP Status code ' . $code;
+        $res = Http::client()
+            ->withToken($this->config['line-notify-access-token'])
+            ->asForm()
+            ->post($lineUrl, $lineFields);
+
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $lineFields);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -51,7 +40,7 @@ class Linenotify extends Transport
                     'title' => 'Token',
                     'name' => 'line-notify-access-token',
                     'descr' => 'LINE Notify Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
             ],
             'validation' => [

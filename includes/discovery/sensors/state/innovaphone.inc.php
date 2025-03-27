@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS sensors state discovery module for HP Procurve
  *
@@ -35,9 +36,6 @@ if (! empty($oids)) {
         }
         $name = 'Interface ' . $ifname;
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
-
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
     }
 }

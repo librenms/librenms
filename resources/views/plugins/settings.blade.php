@@ -2,4 +2,6 @@
 
 @section('title', $title)
 
-@include($settings_view, $settings)
+@section('content')
+    @include($content_view, $settings)
+@endsection

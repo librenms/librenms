@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -13,51 +14,43 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Msteams extends Transport
 {
-    protected $name = 'Microsoft Teams';
+    protected string $name = 'Microsoft Teams';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $opts['url'] = $this->config['msteam-url'];
-        }
-
-        return $this->contactMsteams($obj, $opts);
-    }
-
-    public function contactMsteams($obj, $opts)
-    {
-        $url = $opts['url'];
         $data = [
-            'title' => $obj['title'],
-            'themeColor' => self::getColorForState($obj['state']),
-            'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
-            'summary' => $obj['title'],
+            'title' => $alert_data['title'],
+            'themeColor' => self::getColorForState($alert_data['state']),
+            'text' => strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'summary' => $alert_data['title'],
         ];
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type:application/json', 'Expect:']);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        if ($this->config['use-json'] === 'on' && $obj['uid'] !== '000') {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
-        }
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump('Microsoft Teams returned Error, retry later');
 
-            return false;
+        $client = Http::client();
+
+        // template will contain raw json
+        if ($this->config['use-json'] === 'on') {
+            $msg = $alert_data['uid'] === '000'
+                ? $this->testJsonMessage() // use pre-made JSON for tests
+                : $alert_data['msg'];
+
+            $client->withBody($msg, 'application/json');
         }
 
-        return true;
+        $res = $client->post($this->config['msteam-url'], $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -70,7 +63,7 @@ class Msteams extends Transport
                 [
                     'title' => 'Use JSON?',
                     'name' => 'use-json',
-                    'descr' => 'Compose MessageCard with JSON rather than Markdown',
+                    'descr' => 'Compose MessageCard with JSON rather than Markdown. Your template must be valid MessageCard JSON',
                     'type' => 'checkbox',
                     'default' => false,
                 ],
@@ -79,5 +72,42 @@ class Msteams extends Transport
                 'msteam-url' => 'required|url',
             ],
         ];
+    }
+
+    private function testJsonMessage(): string
+    {
+        return '{
+    "type": "message",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "contentUrl": null,
+            "content": {
+                "type": "AdaptiveCard",
+                "body": [
+                    {
+                        "type": "TextBlock",
+                        "size": "Medium",
+                        "weight": "Bolder",
+                        "text": "LibreNMS Test Adaptive Card"
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "You have successfully sent a pre-formatted AdaptiveCard message to Teams.",
+                        "wrap": true
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "This does not test if your alert template is valid AdaptiveCard JSON.",
+                        "isSubtle": true,
+                        "wrap": true
+                    }
+                ],
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.4"
+            }
+        }
+    ]
+}';
     }
 }

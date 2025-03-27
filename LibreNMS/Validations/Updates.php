@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Updates.php
  *
@@ -111,7 +112,6 @@ class Updates extends BaseValidation
         $modifiedcmd = 'git diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
         if ($code !== 0 && ! empty($cmdoutput)) {
-
             // Check so it's not only plugins that "pests" the diff
             if (! ($cmdoutput === ['composer.json', 'composer.lock'] && ComposerHelper::getPlugins())) {
                 $result = ValidationResult::warn(

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eloquent.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\DB;
 
-use DB;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Laravel;
 use PDOException;
 

@@ -18,27 +18,27 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Senders',
-            'ds'       => 'senders',
-            'colour'   => '582A72',
+            'descr' => 'Senders',
+            'ds' => 'senders',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Sending H/D',
-            'ds'       => 'sendinghd',
-            'colour'   => '28774F',
+            'descr' => 'Sending H/D',
+            'ds' => 'sendinghd',
+            'colour' => '28774F',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Recipients',
-            'ds'       => 'recipients',
-            'colour'   => '88CC88',
+            'descr' => 'Recipients',
+            'ds' => 'recipients',
+            'colour' => '88CC88',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Recip H/D',
-            'ds'       => 'recipienthd',
-            'colour'   => 'D46A6A',
+            'descr' => 'Recip H/D',
+            'ds' => 'recipienthd',
+            'colour' => 'D46A6A',
         ],
     ];
 } else {

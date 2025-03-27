@@ -1,4 +1,5 @@
 <?php
+
 /*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -36,7 +37,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app
 
 $array = [
     'queries_forwarded' => ['descr' => 'Queries forwarded', 'colour' => '1F35A5'],
-    'queries_cached' =>  ['descr' => 'Queries cached', 'colour' => '137C21'],
+    'queries_cached' => ['descr' => 'Queries cached', 'colour' => '137C21'],
 ];
 
 $i = 0;

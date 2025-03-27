@@ -1,4 +1,5 @@
 <?php
+
 /*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,7 +29,6 @@ $stats = snmp_get($device, $oid, '-Oqv');
 
 [$frozen, $queue] = explode("\n", $stats);
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('frozen', 'GAUGE', 0)
     ->addDataset('queue', 'GAUGE', 0);
@@ -38,6 +38,11 @@ $fields = [
     'queue' => intval(trim($queue, '"')),
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $stats, $fields);

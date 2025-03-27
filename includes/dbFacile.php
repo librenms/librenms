@@ -44,7 +44,7 @@ function dbQuery($sql, $parameters = [])
 
         return Eloquent::DB()->statement($sql, (array) $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
 
         return false;
     }
@@ -65,7 +65,7 @@ function dbInsert($data, $table)
     try {
         $result = Eloquent::DB()->insert($sql, (array) $data);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $data, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
     }
 
     if ($result) {
@@ -111,7 +111,7 @@ function dbBulkInsert($data, $table)
             return $result;
         } catch (PDOException $pdoe) {
             // FIXME query?
-            dbHandleException(new QueryException("Bulk insert $table", $data_chunk, $pdoe));
+            dbHandleException(new QueryException('dbFacile', "Bulk insert $table", $data_chunk, $pdoe));
         }
     }
 
@@ -162,7 +162,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 
         return $result;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $data, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
     }
 
     return false;
@@ -182,7 +182,7 @@ function dbDelete($table, $where = null, $parameters = [])
     try {
         $result = Eloquent::DB()->delete($sql, (array) $parameters);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
 
     return $result;
@@ -231,7 +231,7 @@ function dbDeleteOrphans($target_table, $parents)
     try {
         $result = Eloquent::DB()->delete($query);
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($query, [], $pdoe));
+        dbHandleException(new QueryException('dbFacile', $query, [], $pdoe));
     }
 
     return $result;
@@ -254,35 +254,13 @@ function dbFetchRows($sql, $parameters = [])
 
         return $rows;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
 
     return [];
 }//end dbFetchRows()
-
-/**
- * This is intended to be the method used for large result sets.
- * It is intended to return an iterator, and act upon buffered data.
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbFetch($sql, $parameters = [])
-{
-    return dbFetchRows($sql, $parameters);
-    /*
-        // for now, don't do the iterator thing
-        $result = dbQuery($sql, $parameters);
-        if($result) {
-        // return new iterator
-        return new dbIterator($result);
-        } else {
-        return null; // ??
-        }
-     */
-}//end dbFetch()
 
 /**
  * Like fetch(), accepts any number of arguments
@@ -301,7 +279,7 @@ function dbFetchRow($sql = null, $parameters = [])
 
         return $row;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -327,7 +305,7 @@ function dbFetchCell($sql, $parameters = [])
             // shift first field off first row
         }
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
@@ -357,60 +335,13 @@ function dbFetchColumn($sql, $parameters = [])
 
         return $cells;
     } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException($sql, $parameters, $pdoe));
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     } finally {
         $PDO_FETCH_ASSOC = false;
     }
 
     return [];
 }//end dbFetchColumn()
-
-/**
- * Should be passed a query that fetches two fields
- * The first will become the array key
- * The second the key's value
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbFetchKeyValue($sql, $parameters = [])
-{
-    $data = [];
-    foreach (dbFetch($sql, $parameters) as $row) {
-        $key = array_shift($row);
-        if (sizeof($row) == 1) {
-            // if there were only 2 fields in the result
-            // use the second for the value
-            $data[$key] = array_shift($row);
-        } else {
-            // if more than 2 fields were fetched
-            // use the array of the rest as the value
-            $data[$key] = $row;
-        }
-    }
-
-    return $data;
-}//end dbFetchKeyValue()
-
-/**
- * Legacy dbFacile indicates DB::raw() as a value wrapped in an array
- *
- * @param  array  $data
- * @return array
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbArrayToRaw($data)
-{
-    array_walk($data, function (&$item) {
-        if (is_array($item)) {
-            $item = Eloquent::DB()->raw(reset($item));
-        }
-    });
-
-    return $data;
-}
 
 /**
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
@@ -473,37 +404,10 @@ function dbPlaceHolders(&$values)
 }//end dbPlaceHolders()
 
 /**
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbBeginTransaction()
-{
-    Eloquent::DB()->beginTransaction();
-}//end dbBeginTransaction()
-
-/**
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbCommitTransaction()
-{
-    Eloquent::DB()->commit();
-}//end dbCommitTransaction()
-
-/**
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbRollbackTransaction()
-{
-    Eloquent::DB()->rollBack();
-}//end dbRollbackTransaction()
-
-/**
  * Generate a string of placeholders to pass to fill in a list
  * result will look like this: (?, ?, ?, ?)
  *
- * @param $count
+ * @param  $count
  * @return string placholder list
  *
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
@@ -548,31 +452,4 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
     }
 
     return [$inserted, $deleted];
-}
-
-/**
- * Synchronize a relationship to a list of relations
- *
- * @param  string  $table
- * @param  array  $relationships  array of relationship pairs with columns as keys and ids as values
- * @return array [$inserted, $deleted]
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbSyncRelationships($table, $relationships = [])
-{
-    $changed = [[0, 0]];
-    [$target_column, $list_column] = array_keys(reset($relationships));
-
-    $grouped = [];
-    foreach ($relationships as $relationship) {
-        $grouped[$relationship[$target_column]][] = $relationship[$list_column];
-    }
-
-    foreach ($grouped as $target => $list) {
-        $changed[] = dbSyncRelationship($table, $target_column, $target, $list_column, $list);
-    }
-
-    return [array_sum(array_column($changed, 0)), array_sum(array_column($changed, 1))];
 }

@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,41 +24,83 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Exception;
+use Illuminate\Support\Str;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use Spatie\Permission\Models\Role;
 
 class Mail extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        return $this->contactMail($obj);
-    }
+        $emails = match ($this->config['mail-contact'] ?? '') {
+            'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
+            'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
+            'role' => AlertUtil::findContactsRoles([$this->config['role']]),
+            default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
+        };
 
-    public function contactMail($obj)
-    {
-        $email = $this->config['email'] ?? $obj['contacts'];
         $html = Config::get('email_html');
 
-        if ($html && ! $this->isHtmlContent($obj['msg'])) {
+        if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
-            $msg = preg_replace("/\r?\n/", "<br />\n", $obj['msg']);
+            $msg = preg_replace("/\r?\n/", "<br />\n", $alert_data['msg']);
         } else {
             // fix line returns for windows mail clients
-            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
         }
 
-        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html, $this->config['attach-graph'] ?? null);
+        try {
+            return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
+        } catch (Exception $e) {
+            throw new AlertTransportDeliveryException($alert_data, 0, $e->getMessage());
+        }
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
+        $roles = ['None' => ''];
+        foreach (Role::query()->pluck('name')->all() as $name) {
+            $roles[$name] = Str::title(str_replace('-', ' ', $name));
+        }
+
         return [
             'config' => [
+                [
+                    'title' => 'Contact Type',
+                    'name' => 'mail-contact',
+                    'descr' => 'Method for selecting contacts',
+                    'type' => 'select',
+                    'options' => [
+                        'Specified Email' => 'email',
+                        'Device sysContact' => 'sysContact',
+                        'Owner(s)' => 'owners',
+                        'Role' => 'role',
+                    ],
+                    'default' => 'email',
+                ],
                 [
                     'title' => 'Email',
                     'name' => 'email',
                     'descr' => 'Email address of contact',
-                    'type'  => 'text',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Role',
+                    'name' => 'role',
+                    'descr' => 'Role of users to mail',
+                    'type' => 'select',
+                    'options' => $roles,
+                ],
+                [
+                    'title' => 'BCC',
+                    'name' => 'bcc',
+                    'descr' => 'Use BCC instead of TO',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ],
                 [
                     'title' => 'Include Graphs',
@@ -68,7 +111,9 @@ class Mail extends Transport
                 ],
             ],
             'validation' => [
-                'email' => 'required|email',
+                'mail-contact' => 'required|in:email,sysContact,owners,role',
+                'email' => 'required_if:mail-contact,email|prohibited_unless:mail-contact,email|email',
+                'role' => 'required_if:mail-contact,role|prohibited_unless:mail-contact,role|exists:roles,name',
             ],
         ];
     }

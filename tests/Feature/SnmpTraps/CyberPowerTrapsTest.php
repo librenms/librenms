@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CyberPowerTrapsTest.php
  *
@@ -25,6 +26,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
     public function testCpUpsOverload(): void
@@ -41,7 +44,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS has sensed an overload condition.',
             'Could not handle CpUpsOverload trap',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -59,7 +62,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS battery test failed.',
             'Could not handle CpUpsDiagFailed trap',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -94,7 +97,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'Utility power failed, transfer to backup mode.',
             'Could not handle CpUpsOnBattery trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -112,7 +115,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS battery capacity is low than threshold, soon to be exhausted.',
             'Could not handle CpLowBattery trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -130,7 +133,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'Utility power restored, return from backup mode.',
             'Could not handle CpPowerRestored trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -165,7 +168,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS has returned from a low battery condition.',
             'Could not handle CpRtnLowBattery trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -183,7 +186,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS has been turned off.',
             'Could not handle CpUpsTurnedOff trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -201,7 +204,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS entered sleep mode. Output power will not be provided.',
             'Could not handle CpUpsSleeping trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -219,7 +222,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS woke up from sleep mode. Output power is being provided.',
             'Could not handle CpUpsWokeUp trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -237,7 +240,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS started reboot sequence.',
             'Could not handle CpUpsRebootStarted trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -255,7 +258,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS inner temperature is too high.',
             'Could not handle CpUpsOverTemp trap',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -273,7 +276,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS over temperature condition cleared.',
             'Could not handle CpRtnOverTemp trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -291,7 +294,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS has returned from an overload condition.',
             'Could not handle CpRtOverLoad trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -309,7 +312,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The UPS runtime calibration completed.',
             'Could not handle CpRtnDischarged trap',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -327,7 +330,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The battery charger is abnormal.',
             'Could not handle CpUpsChargerFailure trap',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -345,7 +348,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps
 TRAP,
             'The charger returned from a failure condition.',
             'Could not handle CpRtnChargerFailure trap',
-            [1],
+            [Severity::Ok],
         );
     }
 

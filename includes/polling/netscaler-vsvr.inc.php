@@ -95,19 +95,19 @@ if ($device['os'] == 'netscaler') {
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'netscaler-vsvr', $tags, $fields);
+            app('Datastore')->put($device, 'netscaler-vsvr', $tags, $fields);
 
             echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad($vsvr['vsvrType'], 5) . ' | ' . str_pad($vsvr['vsvrState'], 6) . ' | ' . str_pad($vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad($vsvr['vsvrPort'], 5);
             echo ' | ' . str_pad($vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
 
             $db_update = [
-                'vsvr_ip'       => $vsvr['vsvrIpAddress'],
-                'vsvr_port'     => $vsvr['vsvrPort'],
-                'vsvr_state'    => $vsvr['vsvrState'],
-                'vsvr_type'     => $vsvr['vsvrType'],
-                'vsvr_req_rate' => $vsvr['RequestRate'],
-                'vsvr_bps_in'   => $vsvr['vsvrRxBytesRate'],
-                'vsvr_bps_out'  => $vsvr['vsvrTxBytesRate'],
+                'vsvr_ip' => $vsvr['vsvrIpAddress'],
+                'vsvr_port' => $vsvr['vsvrPort'],
+                'vsvr_state' => $vsvr['vsvrState'],
+                'vsvr_type' => $vsvr['vsvrType'],
+                'vsvr_req_rate' => $vsvr['vsvrRequestRate'] ?? 0,
+                'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'] ?? 0,
+                'vsvr_bps_out' => $vsvr['vsvrTxBytesRate'] ?? 0,
             ];
 
             if (! is_array($vsvrs[$vsvr['vsvrFullName']])) {

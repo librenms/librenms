@@ -1,1 +1,0 @@
-ALTER TABLE `alerts` ADD `note` TEXT NOT NULL AFTER `open`;

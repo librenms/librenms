@@ -17,15 +17,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'in use',
-            'ds'       => 'curfiledescrcnt',
-            'colour'   => '28536c',
+            'descr' => 'in use',
+            'ds' => 'curfiledescrcnt',
+            'colour' => '28536c',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'max',
-            'ds'       => 'curfiledescrmax',
-            'colour'   => 'd46a6a',
+            'descr' => 'max',
+            'ds' => 'curfiledescrmax',
+            'colour' => 'd46a6a',
         ],
     ];
 } else {

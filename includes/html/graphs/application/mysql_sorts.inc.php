@@ -5,10 +5,10 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
-    'SRows'  => 'Rows Sorted',
+    'SRows' => 'Rows Sorted',
     'SRange' => 'Range',
-    'SMPs'   => 'Merge Passes',
-    'SScan'  => 'Scan',
+    'SMPs' => 'Merge Passes',
+    'SScan' => 'Scan',
 ];
 
 $i = 0;

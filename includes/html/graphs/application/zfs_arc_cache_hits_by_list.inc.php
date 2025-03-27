@@ -14,28 +14,28 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Anon Used',
-        'ds'       => 'anon_hits_per',
+        'descr' => 'Anon Used',
+        'ds' => 'anon_hits_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Most Recent',
-        'ds'       => 'mru_per',
+        'descr' => 'Most Recent',
+        'ds' => 'mru_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Most Frequent',
-        'ds'       => 'mfu_per',
+        'descr' => 'Most Frequent',
+        'ds' => 'mfu_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'MRU Ghost',
-        'ds'       => 'mru_ghost_per',
+        'descr' => 'MRU Ghost',
+        'ds' => 'mru_ghost_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'MFU Ghost',
-        'ds'       => 'mfu_ghost_per',
+        'descr' => 'MFU Ghost',
+        'ds' => 'mfu_ghost_per',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

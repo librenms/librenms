@@ -1,4 +1,5 @@
 <?php
+
 /**
  * StpPortsController.php
  *
@@ -28,8 +29,8 @@ namespace App\Http\Controllers\Table;
 use App\Facades\DeviceCache;
 use App\Models\PortStp;
 use App\Models\Stp;
-use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
+use Illuminate\Support\Facades\Blade;
+use LibreNMS\Util\Mac;
 
 class PortStpController extends TableController
 {
@@ -85,20 +86,26 @@ class PortStpController extends TableController
      */
     public function formatItem($stpPort)
     {
+        $drMac = Mac::parse($stpPort->designatedRoot);
+        $dbMac = Mac::parse($stpPort->designatedBridge);
+
+        $dr = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->whereNot('bridgeAddress', '000000000000')->value('device_id'));
+        $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->whereNot('bridgeAddress', '')->value('device_id'));
+
         return [
-            'port_id' => Url::portLink($stpPort->port, $stpPort->port->getShortLabel()) . '<br />' . $stpPort->port->getDescription(),
+            'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $stpPort->port]),
             'vlan' => $stpPort->vlan ?: 1,
             'priority' => $stpPort->priority,
             'state' => $stpPort->state,
             'enable' => $stpPort->enable,
             'pathCost' => $stpPort->pathCost,
-            'designatedRoot' => Rewrite::readableMac($stpPort->designatedRoot),
-            'designatedRoot_vendor' => Rewrite::readableOUI($stpPort->designatedRoot),
-            'designatedRoot_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->value('device_id'))),
+            'designatedRoot' => $drMac->readable(),
+            'designatedRoot_vendor' => $drMac->vendor(),
+            'designatedRoot_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $dr]),
             'designatedCost' => $stpPort->designatedCost,
-            'designatedBridge' => Rewrite::readableMac($stpPort->designatedBridge),
-            'designatedBridge_vendor' => Rewrite::readableOUI($stpPort->designatedBridge),
-            'designatedBridge_device' => Url::deviceLink(DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'))),
+            'designatedBridge' => $dbMac->readable(),
+            'designatedBridge_vendor' => $dbMac->vendor(),
+            'designatedBridge_device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $db]),
             'designatedPort' => $stpPort->designatedPort,
             'forwardTransitions' => $stpPort->forwardTransitions,
         ];

@@ -13,6 +13,24 @@
  * @author     LibreNMS Contributors
 */
 
+function show_device_group($device_group_id) {
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    ?>
+    <div class="panel-heading">
+        <span class="devices-font-bold">
+        <?php
+        if ($device_group_id == 'none') {
+            echo "ungrouped Devices";
+        } elseif ($device_group_id) {
+            echo "Device Group: ";
+        }
+        ?>
+        </span>
+        <?php echo htmlentities($device_group_name) ?>
+    </div>
+    <?php
+}
+
 $pagetitle[] = 'Devices';
 
 if (! isset($vars['format'])) {
@@ -46,7 +64,7 @@ $menu_options = ['bits' => 'Bits',
     'storage' => 'Storage',
     'diskio' => 'Disk I/O',
     'poller_perf' => 'Poller',
-    'ping_perf' => 'Ping',
+    'icmp_perf' => 'Ping',
     'temperature' => 'Temperature',
 ];
 $sep = '';
@@ -134,7 +152,7 @@ if ($format == 'graph') {
 
     if (! empty($vars['searchquery'])) {
         $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR display LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
-        $sql_param += array_fill(count($param), 6, '%' . $vars['searchquery'] . '%');
+        $sql_param += array_fill(0, 6, '%' . $vars['searchquery'] . '%');
     }
     if (! empty($vars['os'])) {
         $where .= ' AND os = ?';
@@ -166,7 +184,6 @@ if ($format == 'graph') {
         $where .= ' AND status= ?';
         $sql_param[] = $state;
         $where .= " AND disabled='0' AND `disable_notify`='0'";
-        $sql_param[] = '';
     }
     if (! empty($vars['disabled'])) {
         $where .= ' AND disabled= ?';
@@ -180,11 +197,14 @@ if ($format == 'graph') {
         $where .= ' AND `disable_notify`= ?';
         $sql_param[] = $vars['disable_notify'];
     }
-    if (! empty($vars['location']) && $vars['location'] == 'Unset') {
-        $location_filter = '';
-    }
-    if (! empty($vars['location'])) {
-        $location_filter = $vars['location'];
+    if (! empty($vars['location']) && $vars['location'] != 'Unset') {
+        if (is_numeric($vars['location'])) {
+            $where .= ' AND `locations`.`id`= ?';
+            $sql_param[] = $vars['location'];
+        } else {
+            $where .= ' AND `locations`.`location`= ?';
+            $sql_param[] = $vars['location'];
+        }
     }
     if (isset($vars['poller_group'])) {
         $where .= ' AND `poller_group`= ?';
@@ -199,6 +219,7 @@ if ($format == 'graph') {
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
     }
+    show_device_group($vars['group']);
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
@@ -217,42 +238,39 @@ if ($format == 'graph') {
         }
 
         if (device_permitted($device['device_id'])) {
-            if (! $location_filter || $device['location'] == $location_filter) {
-                $graph_type = 'device_' . $subformat;
+            $graph_type = 'device_' . $subformat;
 
-                if (session('widescreen')) {
-                    $width = 270;
-                } else {
-                    $width = 315;
-                }
-
-                $graph_array_new = [];
-                $graph_array_new['type'] = $graph_type;
-                $graph_array_new['device'] = $device['device_id'];
-                $graph_array_new['height'] = '110';
-                $graph_array_new['width'] = $width;
-                $graph_array_new['legend'] = 'no';
-                $graph_array_new['title'] = 'yes';
-                $graph_array_new['from'] = $graph_array['from'];
-                $graph_array_new['to'] = $graph_array['to'];
-
-                $graph_array_zoom = $graph_array_new;
-                $graph_array_zoom['height'] = '150';
-                $graph_array_zoom['width'] = '400';
-                $graph_array_zoom['legend'] = 'yes';
-
-                $link_array = $graph_array;
-                $link_array['page'] = 'graphs';
-                $link_array['type'] = $graph_type;
-                $link_array['device'] = $device['device_id'];
-                unset($link_array['height'], $link_array['width']);
-                $overlib_link = \LibreNMS\Util\Url::generate($link_array);
-
-                echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
-                echo '<div class="panel panel-default">';
-                echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
-                echo "</div></div>\n\n";
+            if (session('widescreen')) {
+                $width = 270;
+            } else {
+                $width = 315;
             }
+
+            $graph_array_new = [];
+            $graph_array_new['type'] = $graph_type;
+            $graph_array_new['device'] = $device['device_id'];
+            $graph_array_new['height'] = '110';
+            $graph_array_new['width'] = $width;
+            $graph_array_new['legend'] = 'no';
+            $graph_array_new['title'] = 'yes';
+            $graph_array_new['from'] = $graph_array['from'];
+            $graph_array_new['to'] = $graph_array['to'];
+
+            $graph_array_zoom = $graph_array_new;
+            $graph_array_zoom['height'] = '150';
+            $graph_array_zoom['width'] = '400';
+            $graph_array_zoom['legend'] = 'yes';
+
+            $link_array = $graph_array;
+            $link_array['page'] = 'graphs';
+            $link_array['type'] = $graph_type;
+            $link_array['device'] = $device['device_id'];
+            unset($link_array['height'], $link_array['width']);
+            $overlib_link = \LibreNMS\Util\Url::generate($link_array);
+            echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
+            echo '<div class="panel panel-default">';
+            echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
+            echo "</div></div>\n\n";
         }
     }
     echo '</div>';
@@ -289,6 +307,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
+        <?php show_device_group($vars['group']); ?>
         <table id="devices" class="table table-hover table-condensed table-striped">
             <thead>
                 <tr>
@@ -344,21 +363,21 @@ if ($format == 'graph') {
             },
             post: function () {
                 return {
-                    format: '<?php echo $vars['format']; ?>',
+                    format: '<?php echo htmlspecialchars($vars['format']); ?>',
                     searchPhrase: '<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>',
-                    os: '<?php echo $vars['os'] ?? ''; ?>',
-                    version: '<?php echo $vars['version'] ?? ''; ?>',
-                    hardware: '<?php echo $vars['hardware'] ?? ''; ?>',
-                    features: '<?php echo $vars['features'] ?? ''; ?>',
-                    location: '<?php echo $vars['location'] ?? ''; ?>',
-                    type: '<?php echo $vars['type'] ?? ''; ?>',
-                    state: '<?php echo $vars['state'] ?? ''; ?>',
-                    disabled: '<?php echo $vars['disabled'] ?? ''; ?>',
-                    ignore: '<?php echo $vars['ignore'] ?? ''; ?>',
-                    disable_notify: '<?php echo $vars['disable_notify'] ?? ''; ?>',
-                    group: '<?php echo $vars['group'] ?? ''; ?>',
-                    poller_group: '<?php echo $vars['poller_group'] ?? ''; ?>',
-                    device_id: '<?php echo $vars['device_id'] ?? ''; ?>',
+                    os: '<?php echo htmlspecialchars($vars['os'] ?? ''); ?>',
+                    version: '<?php echo htmlspecialchars($vars['version'] ?? ''); ?>',
+                    hardware: '<?php echo htmlspecialchars($vars['hardware'] ?? ''); ?>',
+                    features: '<?php echo htmlspecialchars($vars['features'] ?? ''); ?>',
+                    location: '<?php echo htmlspecialchars($vars['location'] ?? ''); ?>',
+                    type: '<?php echo htmlspecialchars($vars['type'] ?? ''); ?>',
+                    state: '<?php echo htmlspecialchars($vars['state'] ?? ''); ?>',
+                    disabled: '<?php echo htmlspecialchars($vars['disabled'] ?? ''); ?>',
+                    ignore: '<?php echo htmlspecialchars($vars['ignore'] ?? ''); ?>',
+                    disable_notify: '<?php echo htmlspecialchars($vars['disable_notify'] ?? ''); ?>',
+                    group: '<?php echo htmlspecialchars($vars['group'] ?? ''); ?>',
+                    poller_group: '<?php echo htmlspecialchars($vars['poller_group'] ?? ''); ?>',
+                    device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
@@ -372,7 +391,7 @@ if ($format == 'graph') {
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value='<?php echo $vars['searchquery'] ?? ''; ?>' class='form-control' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value='<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>' class='form-control' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $state_selection ?></div>" +
             "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +

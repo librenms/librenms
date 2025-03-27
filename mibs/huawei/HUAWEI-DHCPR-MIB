@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei DHCP Relay MIB
 -- Reference: HUAWEI Enterprise MIB
--- Version: V2.04
+-- Version: V3.04
 -- History:
 --         v1.1
 --         modified by huangjun 2009-12-08
@@ -16,17 +16,20 @@ HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-MIB            
         ifIndex            
             FROM RFC1213-MIB            
-        OBJECT-GROUP, MODULE-COMPLIANCE           
+        OBJECT-GROUP, MODULE-COMPLIANCE,NOTIFICATION-GROUP          
             FROM SNMPv2-CONF            
         IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY          
-            FROM SNMPv2-SMI            
-        RowStatus            
+            FROM SNMPv2-SMI       
+        NOTIFICATION-TYPE            
+           FROM SNMPv2-SMI 
+        RowStatus,DisplayString          
             FROM SNMPv2-TC
         EnabledStatus
             FROM P-BRIDGE-MIB;
 
+
     hwDHCPRelayMib MODULE-IDENTITY 
-        LAST-UPDATED "201408120000Z"        -- AUG 12, 2014 at 00:00 GMT
+        LAST-UPDATED "202202140000Z"        --FEB 14, 2022 at 00:00 GMT
         ORGANIZATION 
  "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -42,22 +45,46 @@ HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
             "This MIB describes objects used for managing DHCP relay,
              including  configuring ip addresses for DHCP relay,
              selecting allocation mode of dhcp service, and some statistic information."
+       REVISION "202202140000Z"        -- FEB 14, 2022 at 00:00 GMT
+        DESCRIPTION
+            "Update the attribute of these nodes: hwPDRouteExceed and hwPDRouteExceedResume."
+
+       REVISION "202102100000Z"        -- FEB 10, 2021 at 00:00 GMT
+        DESCRIPTION
+            "Update the attribute of these nodes: hwDHCPRelayIpUnnumberedUsrNum, hwDHCPRelayMaxIpUnnumberedUsrNum, hwDHCPv6RelayUsrNum, hwDHCPv6RelayMaxUsrNum, hwDHCPv6RelayIpNum and hwDHCPv6RelayMaxIpNum."
+
+       REVISION "202101190000Z"        -- JAN 19, 2021 at 00:00 GMT
+        DESCRIPTION
+            "Add these nodes: hwDHCPRelayIpUnnumberedUsrThreshold, hwDHCPRelayIpUnnumberedUsrThresholdResume, hwDHCPRelayIpUnnumberedUsrExhaust, 
+            hwDHCPRelayIpUnnumberedUsrExhaustResume, hwDHCP6RelayUsrTblThreshold, hwDHCP6RelayUsrTblThresholdResume, hwDHCP6RelayUsrTblExhaust, 
+            hwDHCP6RelayUsrTblExhaustResume, hwDHCP6RelayUsrIPThreshold, hwDHCP6RelayUsrIPThresholdResume, hwDHCP6RelayUsrIPExhaust and hwDHCP6RelayUsrIPExhaustResume."
+
+       REVISION "202007080000Z"        -- JUL 08, 2020 at 00:00 GMT
+       DESCRIPTION 
+            "This version add the hwPDRouteExceedResume   node."
+			
+	   REVISION "201907190000Z"        -- JUL 19, 2019 at 00:00 GMT
+       DESCRIPTION 
+            "This version add the hwPDRouteExceed   node."
 
        REVISION "201408120000Z"        -- AUG 12, 2014 at 00:00 GMT
        DESCRIPTION 
             "This version add the hwDHCPRelayReleaseLocalPktNum  node."
 
-		REVISION "201310170000Z"        -- OCT 17, 2013 at 00:00 GMT
+       REVISION "201310170000Z"        -- OCT 17, 2013 at 00:00 GMT
         DESCRIPTION
             "V2.03 - V2.04 add the hwDHCP6RDUID node."
+
+       REVISION "201306290000Z"        -- June 29, 2013 at 00:00 GMT
+        DESCRIPTION
+            "Update the descriptions of these nodes: hwDHCPRTxClientPktNum, hwDHCPRTxClientUniPktNum and hwDHCPRTxClientBroPktNum."
+
+
         REVISION "200307210000Z"        
         DESCRIPTION
             "The initial revision of this MIB module."
 
-        REVISION "201306290000Z"        -- June 29, 2013 at 00:00 GMT
-        DESCRIPTION
-            "Update the descriptions of these nodes: hwDHCPRTxClientPktNum, hwDHCPRTxClientUniPktNum and hwDHCPRTxClientBroPktNum."
-        REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
+               REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
         DESCRIPTION
             "The initial revision of this MIB module."
         ::= { hwDhcp 1 }
@@ -458,7 +485,57 @@ HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
             "The total number of the DHCP local release packets handled
             by DHCP relay."
         ::= { hwDHCPRelayMibObject 25 }
-      
+
+	hwDHCPRelayTrapObjects OBJECT IDENTIFIER ::= { hwDHCPRelayMibObject 26 }
+
+	hwDHCPRelayIpUnnumberedUsrNum  OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"Number of DHCP relay IP unnumbered tables on the device."
+	::= { hwDHCPRelayTrapObjects 1 }   
+	
+	hwDHCPRelayMaxIpUnnumberedUsrNum  OBJECT-TYPE
+	   SYNTAX Counter32
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Maximum number of DHCP relay IP unnumbered tables on the device."
+	::= { hwDHCPRelayTrapObjects 2 }
+	
+	hwDHCPv6RelayUsrNum  OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"Number of DHCPv6 relay tables on the device."
+	::= { hwDHCPRelayTrapObjects 3 }   
+	
+	hwDHCPv6RelayMaxUsrNum  OBJECT-TYPE
+	   SYNTAX Counter32
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Maximum number of DHCPv6 relay tables on the device."
+	::= { hwDHCPRelayTrapObjects 4 }
+
+	hwDHCPv6RelayIpNum  OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"Number of DHCPv6 relay IP tables on the device."
+	::= { hwDHCPRelayTrapObjects 5 }   
+	
+	hwDHCPv6RelayMaxIpNum  OBJECT-TYPE
+	   SYNTAX Counter32
+	   MAX-ACCESS accessible-for-notify
+	   STATUS current
+	   DESCRIPTION
+		"Maximum number of DHCPv6 relay IP tables on the device."
+	::= { hwDHCPRelayTrapObjects 6 }
+
     hwDHCPRelayMIBConformance OBJECT IDENTIFIER ::= { hwDHCPRelayMib 2 }
     
     hwDHCPRelayMIBCompliances OBJECT IDENTIFIER ::= { hwDHCPRelayMIBConformance 1 }
@@ -474,6 +551,104 @@ HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
               ::= { hwDHCPRelayMIBCompliances 1 }
     hwDHCPRelayMIBGroups OBJECT IDENTIFIER ::= { hwDHCPRelayMIBConformance 2 }
     
+    hwDhcpRelayTraps OBJECT IDENTIFIER ::= { hwDHCPRelayMib 3 }
+			
+    hwPDRouteExceed NOTIFICATION-TYPE
+		STATUS current     
+		DESCRIPTION 
+			"The number of PD route for DHCPv6 relay reached the maximum."
+		::= { hwDhcpRelayTraps 1 }
+
+	hwPDRouteExceedResume NOTIFICATION-TYPE
+		STATUS current     
+		DESCRIPTION 
+			"The number of PD route for DHCPv6 relay descends to alarm threshold."
+		::= { hwDhcpRelayTraps 2 }
+
+    hwDHCPRelayIpUnnumberedUsrThreshold NOTIFICATION-TYPE
+        OBJECTS { hwDHCPRelayIpUnnumberedUsrNum, hwDHCPRelayMaxIpUnnumberedUsrNum } 
+        STATUS current     
+        DESCRIPTION 
+            "This object indicates that an alarm is generated when the number of DHCP relay IP unnumbered tables on the device exceeds 80% of the upper limit."
+        ::= { hwDhcpRelayTraps 3 }    
+
+    hwDHCPRelayIpUnnumberedUsrThresholdResume NOTIFICATION-TYPE
+        OBJECTS { hwDHCPRelayIpUnnumberedUsrNum, hwDHCPRelayMaxIpUnnumberedUsrNum } 
+        STATUS current     
+        DESCRIPTION 
+            "This object indicates that a clear alarm is generated when the number of DHCP relay IP unnumbered tables on the device falls below 70% of the upper limit."
+        ::= { hwDhcpRelayTraps 4 }
+
+    hwDHCPRelayIpUnnumberedUsrExhaust NOTIFICATION-TYPE
+        OBJECTS { hwDHCPRelayMaxIpUnnumberedUsrNum } 
+        STATUS current     
+        DESCRIPTION 
+            "This object indicates that an alarm is generated when the number of DHCP relay IP unnumbered tables on the device reaches the upper limit."
+        ::= { hwDhcpRelayTraps 5 }    
+            
+    hwDHCPRelayIpUnnumberedUsrExhaustResume NOTIFICATION-TYPE
+        OBJECTS { hwDHCPRelayMaxIpUnnumberedUsrNum } 
+        STATUS current     
+        DESCRIPTION 
+            "This object indicates that a clear alarm is generated when the number of DHCP relay IP unnumbered tables on the device falls below 90% of the upper limit."
+        ::= { hwDhcpRelayTraps 6 } 
+
+    hwDHCP6RelayUsrTblThreshold NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayUsrNum, hwDHCPv6RelayMaxUsrNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of DHCPv6 relay tables on the device exceeds 80% of the upper limit."
+            ::= { hwDhcpRelayTraps 7 }    
+            
+    hwDHCP6RelayUsrTblThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayUsrNum, hwDHCPv6RelayMaxUsrNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 relay tables on the device falls below 70% of the upper limit."
+            ::= { hwDhcpRelayTraps 8 }    
+            
+    hwDHCP6RelayUsrTblExhaust NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayMaxUsrNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of DHCPv6 relay tables on the device reaches the upper limit."
+            ::= { hwDhcpRelayTraps 9 }    
+            
+    hwDHCP6RelayUsrTblExhaustResume NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayMaxUsrNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 relay tables on the device falls below 90% of the upper limit."
+            ::= { hwDhcpRelayTraps 10 } 
+            
+    hwDHCP6RelayUsrIPThreshold NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayIpNum, hwDHCPv6RelayMaxIpNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of DHCPv6 relay IP tables on the device exceeds 80% of the upper limit."
+            ::= { hwDhcpRelayTraps 11 }    
+            
+    hwDHCP6RelayUsrIPThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayIpNum, hwDHCPv6RelayMaxIpNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 relay IP tables on the device falls below 70% of the upper limit."
+            ::= { hwDhcpRelayTraps 12 }    
+            
+    hwDHCP6RelayUsrIPExhaust NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayMaxIpNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of DHCPv6 relay IP tables on the device reaches the upper limit."
+            ::= { hwDhcpRelayTraps 13 }    
+            
+    hwDHCP6RelayUsrIPExhaustResume NOTIFICATION-TYPE
+            OBJECTS { hwDHCPv6RelayMaxIpNum } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of DHCPv6 relay IP tables on the device falls below 90% of the upper limit."
+            ::= { hwDhcpRelayTraps 14 }
+
     hwDHCPRelayMIBGroup OBJECT-GROUP
         OBJECTS { hwDHCPRIPAddr, hwDHCPRIPRowStatus, hwDHCPRSelectAllocateMode, hwDHCPRelayCycleStatus, hwDHCPRRxBadPktNum, 
             hwDHCPRRxServerPktNum, hwDHCPRTxServerPktNum, hwDHCPRRxClientPktNum, hwDHCPRTxClientPktNum, hwDHCPRTxClientUniPktNum, 
@@ -485,5 +660,19 @@ HUAWEI-DHCPR-MIB DEFINITIONS ::= BEGIN
             "The basic collection of objects providing management of
             DHCP realy."
         ::= { hwDHCPRelayMIBGroups 1 }
+
+    hwDhcpRelayTrapGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwPDRouteExceed, hwPDRouteExceedResume, hwDHCPRelayIpUnnumberedUsrThreshold, hwDHCPRelayIpUnnumberedUsrThresholdResume, hwDHCPRelayIpUnnumberedUsrExhaust, hwDHCPRelayIpUnnumberedUsrExhaustResume, hwDHCP6RelayUsrTblThreshold, hwDHCP6RelayUsrTblThresholdResume, hwDHCP6RelayUsrTblExhaust, hwDHCP6RelayUsrTblExhaustResume, hwDHCP6RelayUsrIPThreshold, hwDHCP6RelayUsrIPThresholdResume, hwDHCP6RelayUsrIPExhaust, hwDHCP6RelayUsrIPExhaustResume }
+		STATUS current
+		DESCRIPTION 
+			"The DHCPRelay's Notification group."
+		::= { hwDHCPRelayMIBGroups 2 } 
+
+    hwDHCPRelayTrapObjectGroup OBJECT-GROUP
+    OBJECTS { hwDHCPRelayIpUnnumberedUsrNum, hwDHCPRelayMaxIpUnnumberedUsrNum, hwDHCPv6RelayUsrNum, hwDHCPv6RelayMaxUsrNum, hwDHCPv6RelayIpNum, hwDHCPv6RelayMaxIpNum }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for DHCP relay alarm."
+    ::= { hwDHCPRelayMIBGroups 3 }
 
 END

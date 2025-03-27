@@ -14,9 +14,11 @@ modules:
                         - tempertureSensorName
                         - fanSpeedSensorName
                         - voltageSensorName
+                        - powerSupplyIndex
                         - fwLSConnName
                         - mglsGWIP
                         - vsxStatusVsName
+                    snmp_flags: ['-OQUs', '-Cc']
         state:
             data:
                 -
@@ -25,6 +27,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.6.{{ $index }}'
                     descr: '{{ $tempertureSensorName }}, Temperature Out Of Range'
                     index: 'tempertureSensorStatus.{{ $index }}'
+                    group: Sensor Temperature
                     states:
                         - { value: 0, descr: 'false', graph: 1, generic: 0 }
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
@@ -35,6 +38,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.6.{{ $index }}'
                     descr: '{{ $fanSpeedSensorName }}, Fanspeed Out Of Range'
                     index: 'fanSpeedSensorStatus.{{ $index }}'
+                    group: Sensor Fan Speed
                     states:
                         - { value: 0, descr: 'false', graph: 1, generic: 0 }
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
@@ -45,10 +49,21 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.6.{{ $index }}'
                     descr: '{{ $voltageSensorName }}, Voltage Out Of Range'
                     index: 'voltageSensorStatus.{{ $index }}'
+                    group: Sensor Voltage
                     states:
                         - { value: 0, descr: 'false', graph: 1, generic: 0 }
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+                -
+                    oid: powerSupplyStatus
+                    value: powerSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.9.1.1.2.{{ $index }}'
+                    descr: 'PowerSupply{{ $powerSupplyIndex }}'
+                    index: 'powerSupplyStatus.{{ $index }}'
+                    group: Sensor PSU
+                    states:
+                        - { value: 0, descr: 'Up', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'Down', graph: 0, generic: 2 }
                 -
                     oid: haStarted
                     num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
@@ -85,6 +100,7 @@ modules:
                 -
                     oid: tunnelState
                     num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
+                    snmp_flags: ['-OQUs', '-Cc']
                     index: 'tunnelStateIndex.{{ $index }}'
                     descr: "{{ $tunnelPeerObjName }} ({{ $tunnelPeerIpAddr }})"
                     group: IPSEC VPN

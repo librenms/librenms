@@ -28,9 +28,6 @@ modules:
             data:
                 -
                     oid:
-                        - fgVpnTunEntPhase1Name
-                        - fgVpnTunEntPhase2Name
-                        - fgVpnTunEntRemGwyIp
                         - fgVdEntName
         state:
             data:
@@ -40,16 +37,23 @@ modules:
                     index: 'fgHwSensorEntIndex.{{ $index }}'
                     descr: fgHwSensorEntName
                     value: fgHwSensorEntAlarmStatus
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: '='
+                            value: ''
                     states:
                         - { value: 0, descr: OK, graph: 1, generic: 0 }
                         - { value: 1, descr: ERROR, graph: 1, generic: 2 }
                 -
-                    oid: fgVpnTunEntStatus
-                    num_oid: '.1.3.6.1.4.1.12356.101.12.2.2.1.20.{{ $index }}'
-                    index: 'fgVpnTunEntIndex.{{ $index }}'
-                    descr: "{{ $fgVpnTunEntPhase1Name }}\\{{ $fgVpnTunEntPhase2Name }} ({{ $fgVpnTunEntRemGwyIp }})"
+                    oid: fgVpn2TunTable
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.4.2.1.26.{{ $index }}'
+                    index: 'Vdom_{{ $fgVpn2TunVdom }}.Ph1_{{ $fgVpn2TunPhase1Name }}.Ph2_{{ $fgVpn2TunPhase2Name }}'
+                    snmp_flags: '-OteQUsax'
+                    snmp_no_Ih_flag: ''
+                    descr: "{{ $fgVpn2TunPhase1Name }}\\{{ $fgVpn2TunPhase2Name }} ({{ $InetAddress_fgVpn2TunRemGwyIp }})"
                     group: IPSEC VPN
-                    value: fgVpnTunEntStatus
+                    value: fgVpn2TunStatus
                     states:
                         - { value: 1, descr: Down, graph: 1, generic: 2 }
                         - { value: 2, descr: Up, graph: 1, generic: 0 }
@@ -96,8 +100,75 @@ modules:
                     states:
                         - { value: 0, descr: Alive, graph: 1, generic: 0 }
                         - { value: 1, descr: Dead, graph: 1, generic: 2 }
+                -
+                    oid: fgVdTable
+                    value: fgVdEntHaState
+                    num_oid: '.1.3.6.1.4.1.12356.101.3.2.1.1.4.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} vDom HA state'
+                    group: HA
+                    index: 'fgVdEntIndex.{{ $index }}'
+                    states:
+                        - { value: 1, descr: Primary, graph: 1, generic: 0 }
+                        - { value: 2, descr: Secondary, graph: 1, generic: 0 }
+                        - { value: 3, descr: Standalone, graph: 1, generic: 0 }
         count:
             data:
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.1.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTP Sessions Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPSBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.2.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTPS Sessions Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPSBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPURLBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.3.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTP URLs Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPURLBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfHTTPSURLBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.4.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} HTTPS URLs Blocked'
+                    group: Webfilter
+                    index: 'fgWfHTTPSURLBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfActiveXBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.5.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} ActiveX Blocked'
+                    group: Webfilter
+                    index: 'fgWfActiveXBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfCookieBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.6.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} Cookies Blocked'
+                    group: Webfilter
+                    index: 'fgWfCookieBlocked.{{ $index }}'
+                    rrd_type: COUNTER
+                -
+                    oid: fgWebfilterStatsTable
+                    value: fgWfAppletBlocked
+                    num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.7.{{ $index }}'
+                    descr: '{{ $fgVdEntName }} Applets Blocked'
+                    group: Webfilter
+                    index: 'fgWfAppletBlocked.{{ $index }}'
+                    rrd_type: COUNTER
                 -
                     oid: fgVpnTunnelUpCount
                     num_oid: '.1.3.6.1.4.1.12356.101.12.1.1.{{ $index }}'
@@ -108,13 +179,13 @@ modules:
                     oid: fgVpnSslStatsLoginUsers
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.2.{{ $index }}'
                     index: 'fgVpnSslStatsLoginUsers.{{ $index }}'
-                    descr: SSL VPN Logged users
+                    descr: '{{ $fgVdEntName }} SSL VPN Logged users'
                     group: VPN
                 -
                     oid: fgVpnSslStatsActiveTunnels
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.6.{{ $index }}'
                     index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
-                    descr: SSL VPN Active tunnels
+                    descr: '{{ $fgVdEntName }} SSL VPN Active tunnels'
                     group: VPN
                 -
                     oid: fgVWLHealthCheckLinkTable
@@ -131,6 +202,13 @@ modules:
                     group: SD-WAN
                     index: 'fgVWLHealthCheckLinkJitter.{{ $index }}'
                 -
+                    oid: fgVWLHealthCheckLinkTable
+                    value: fgVWLHealthCheckLinkPacketLoss
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.9.{{ $index }}'
+                    descr: 'Link Packet Loss {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    group: SD-WAN
+                    index: 'fgVWLHealthCheckLinkPacketLoss.{{ $index }}'
+                -
                     oid: fgLinkMonitorTable
                     value: fgLinkMonitorLatency
                     num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.4.{{ $index }}'
@@ -144,6 +222,13 @@ modules:
                     descr: 'Monitor Jitter {{ $fgLinkMonitorName }}'
                     group: Link monitor
                     index: 'fgLinkMonitorJitter.{{ $index }}'
+                -
+                    oid: fgLinkMonitorTable
+                    value: fgLinkMonitorPacketLoss
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.8.{{ $index }}'
+                    descr: 'Monitor Packet Loss {{ $fgLinkMonitorName }}'
+                    group: Link monitor
+                    index: 'fgLinkMonitorPacketLoss.{{ $index }}'
                 -
                     oid: fgIpsStatsTable
                     value: fgIpsIntrusionsDetected
@@ -216,6 +301,7 @@ modules:
                     group: IPS
                     index: 'fgIpsAnomalyDetections.{{ $index }}'
                     rrd_type: COUNTER
+
         signal:
             data:
                 -
@@ -238,4 +324,54 @@ modules:
                     low_warn_limit: -85
                     warn_limit: -30
                     high_limit: -20
-
+        temperature:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!Temp).)*$/'
+                        -
+                            oid: fgHwSensorEntValue
+                            op: '='
+                            value: -1
+        fanspeed:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!Fan).)*$/'
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/.*Temp.*/'
+                        -
+                            oid: fgHwSensorEntValue
+                            op: '='
+                            value: -1
+        voltage:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!VCC).)*$/'

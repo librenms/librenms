@@ -24,33 +24,33 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Returned',
-            'ds'       => 'ret',
-            'colour'   => '582A72',
+            'descr' => 'Returned',
+            'ds' => 'ret',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Fetched',
-            'ds'       => 'fetch',
-            'colour'   => 'AA6C39',
+            'descr' => 'Fetched',
+            'ds' => 'fetch',
+            'colour' => 'AA6C39',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Inserted',
-            'ds'       => 'ins',
-            'colour'   => 'FFD1AA',
+            'descr' => 'Inserted',
+            'ds' => 'ins',
+            'colour' => 'FFD1AA',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Updated',
-            'ds'       => 'upd',
-            'colour'   => '88CC88',
+            'descr' => 'Updated',
+            'ds' => 'upd',
+            'colour' => '88CC88',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Deleted',
-            'ds'       => 'del',
-            'colour'   => '28536C',
+            'descr' => 'Deleted',
+            'ds' => 'del',
+            'colour' => '28536C',
         ],
     ];
 } else {

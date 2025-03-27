@@ -1,4 +1,5 @@
 <?php
+
 /**
  * QueryBuilderFilter.php
  *
@@ -70,7 +71,7 @@ class QueryBuilderFilter implements \JsonSerializable
                 continue; // don't include the time based macros, they don't work like that
             }
 
-            if ((Str::endsWith($key, '_usage_perc')) || (Str::startsWith($key, 'packet_loss_'))) {
+            if (Str::endsWith($key, '_perc') || Str::startsWith($key, 'packet_loss_')) {
                 $this->filter[$field] = [
                     'id' => $field,
                     'type' => 'integer',

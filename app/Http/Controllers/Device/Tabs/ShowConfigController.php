@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ShowConfigController.php
  *
@@ -28,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\DeviceCache;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -60,7 +62,7 @@ class ShowConfigController extends Controller implements DeviceTab
         return __('Config');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [
             'rancid_path' => $this->getRancidPath(),
@@ -104,7 +106,7 @@ class ShowConfigController extends Controller implements DeviceTab
         if (Config::has('rancid_configs.0')) {
             $device = DeviceCache::getPrimary();
             foreach (Config::get('rancid_configs') as $configs) {
-                if ($configs[(strlen($configs) - 1)] != '/') {
+                if ($configs[strlen($configs) - 1] != '/') {
                     $configs .= '/';
                 }
 

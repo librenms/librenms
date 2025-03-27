@@ -18,8 +18,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Threshold',
-        'ds'       => 'threshold',
+        'descr' => 'Threshold',
+        'ds' => 'threshold',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

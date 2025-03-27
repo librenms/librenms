@@ -1,0 +1,19 @@
+os: skyhighwebprotect
+text: 'Skyhigh Secure Web Gateway'
+type: firewall
+icon: skyhigh
+mib_dir: skyhigh
+ifname: true
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.59732.2.7.1.1
+            - .1.3.6.1.4.1.1230.2.7.1.1
+        snmpget:
+            oid: '.1.3.6.1.4.1.59732.2.7.1.1.0'
+            op: starts
+            value: 'Skyhigh Secure Web Gateway'

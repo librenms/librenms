@@ -1,4 +1,5 @@
 <?php
+
 /**
  * infinera-groove.inc.php
  *
@@ -28,7 +29,7 @@ foreach ($pre_cache['infineragroove_slotTable'] as $index => $data) {
         $descr = 'Chassis fan ' . $infinera_slot;
         $oid = '.1.3.6.1.4.1.42229.1.2.3.3.1.1.7.' . $index;
         $value = $data['cardFanSpeedRate'];
-        discover_sensor($valid['sensor'], 'load', $device, $oid, 'cardFanSpeedRate.' . $index, 'infinera-groove', $descr, null, '1', 0, 20, 80, 100, $value);
+        discover_sensor(null, 'load', $device, $oid, 'cardFanSpeedRate.' . $index, 'infinera-groove', $descr, null, '1', 0, 20, 80, 100, $value);
     }
 }
 

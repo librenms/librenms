@@ -57,7 +57,7 @@ if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name]
     $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-if ($proxmox) {
+if (! empty($proxmox)) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
@@ -76,11 +76,6 @@ if ($proxmox) {
             [$vmid, $vmport, $vmpin, $vmpout, $vmdesc] = explode('/', $vm, 5);
             echo "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
 
-            $rrd_proxmox_name = [
-                'pmxcluster' => $pmxcluster,
-                'vmid' => $vmid,
-                'vmport' => $vmport,
-            ];
             $rrd_def = RrdDefinition::make()
                 ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
                 ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000);
@@ -91,8 +86,20 @@ if ($proxmox) {
 
             $proxmox_metric_prefix = "pmxcluster{$pmxcluster}_vmid{$vmid}_vmport$vmport";
             $metrics[$proxmox_metric_prefix] = $fields;
-            $tags = compact('name', 'app_id', 'pmxcluster', 'vmid', 'vmport', 'rrd_proxmox_name', 'rrd_def');
-            data_update($device, 'app', $tags, $fields);
+            $tags = [
+                'name' => $name,
+                'app_id' => $app->app_id,
+                'pmxcluster' => $pmxcluster,
+                'vmid' => $vmid,
+                'vmport' => $vmport,
+                'rrd_proxmox_name' => [
+                    'pmxcluster' => $pmxcluster,
+                    'vmid' => $vmid,
+                    'vmport' => $vmport,
+                ],
+                'rrd_def' => $rrd_def,
+            ];
+            app('Datastore')->put($device, 'app', $tags, $fields);
 
             if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate([

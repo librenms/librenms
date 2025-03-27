@@ -44,15 +44,15 @@ foreach ($account_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $category, $owner_name];
 
     $fields = [
-        'enabled'           => $enabled,
-        'libraries'         => $libraries,
+        'enabled' => $enabled,
+        'libraries' => $libraries,
         'trashed_libraries' => $trashed_libraries,
-        'size_consumption'  => $size_consumption,
+        'size_consumption' => $size_consumption,
     ];
 
     $metrics[$owner_name . '_' . $category] = $fields;
     $tags = ['name' => $owner_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // handling groups
@@ -71,7 +71,7 @@ $fields = [
 
 $metrics[$group_name . '_' . $category] = $fields;
 $tags = ['name' => $group_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // handling client version
 $rrd_def = RrdDefinition::make()
@@ -90,7 +90,7 @@ foreach ($client_version as $data) {
 
     $metrics[$version_name . '_' . $category] = $fields;
     $tags = ['name' => $version_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // handling client platform
@@ -110,7 +110,7 @@ foreach ($client_platform as $data) {
 
     $metrics[$os_name . '_' . $category] = $fields;
     $tags = ['name' => $os_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // handling sysinfo
@@ -129,6 +129,6 @@ $fields = [
 
 $metrics[$sysinfo_name . '_' . $category] = $fields;
 $tags = ['name' => $sysinfo_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

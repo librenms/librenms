@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NetgearFailedUserLoginTest.php
  *
@@ -22,6 +23,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class HpFaultTest extends SnmpTrapTestCase
 {
     public function testBadCable(): void
@@ -41,7 +44,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps
 TRAP,
             "Fault - Bad Cable http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
             'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
-            [4, 'badCable'],
+            [Severity::Warning, 'badCable'],
         );
     }
 
@@ -60,7 +63,7 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps",
             "Fault - Unhandled http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
             'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
-            [2, 'badDriver'],
+            [Severity::Info, 'badDriver'],
         );
     }
 
@@ -79,7 +82,7 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps",
             "Fault - Broadcaststorm http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
             'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
-            [5, 'bcastStorm'],
+            [Severity::Error, 'bcastStorm'],
         );
     }
 }

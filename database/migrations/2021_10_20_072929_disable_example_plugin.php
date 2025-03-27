@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class DisableExamplePlugin extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // disable ExamplePlugin that was accidentally enabled for everyone
         DB::table('plugins')
@@ -26,8 +26,8 @@ class DisableExamplePlugin extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         //
     }
-}
+};

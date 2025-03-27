@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 echo 'RFC1628 ';
 
 $battery_current = snmp_get($device, 'upsBatteryCurrent.0', '-OqvU', 'UPS-MIB');
@@ -9,7 +11,7 @@ if (is_numeric($battery_current)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'current',
         $device,
         $oid,
@@ -38,9 +40,10 @@ foreach ($output_current as $index => $data) {
         $data['upsOutputCurrent'] = $data['upsOutputCurrent'][0];
         $oid .= '.0';
     }
+    $data['upsOutputCurrent'] = Number::cast($data['upsOutputCurrent']);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'current',
         $device,
         $oid,
@@ -69,9 +72,10 @@ foreach ($input_current as $index => $data) {
         $data['upsInputCurrent'] = $data['upsInputCurrent'][0];
         $oid .= '.0';
     }
+    $data['upsInputCurrent'] = Number::cast($data['upsInputCurrent']);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'current',
         $device,
         $oid,
@@ -100,9 +104,10 @@ foreach ($bypass_current as $index => $data) {
         $data['upsBypassCurrent'] = $data['upsBypassCurrent'][0];
         $oid .= '.0';
     }
+    $data['upsBypassCurrent'] = Number::cast($data['upsBypassCurrent']);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'current',
         $device,
         $oid,

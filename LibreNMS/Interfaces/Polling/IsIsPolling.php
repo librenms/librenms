@@ -1,4 +1,5 @@
 <?php
+
 /*
  * IsIsPolling.php
  *
@@ -25,11 +26,13 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use Illuminate\Database\Eloquent\Collection;
+
 interface IsIsPolling
 {
     /**
-     * @param  \Illuminate\Support\Collection  $adjacencies  \App\Models\IsIsAdjacency
-     * @return \Illuminate\Support\Collection \App\Models\IsIsAdjacency
+     * @param  Collection<int, \App\Models\IsisAdjacency>  $adjacencies
+     * @return Collection<int, \App\Models\IsisAdjacency>
      */
-    public function pollIsIs($adjacencies);
+    public function pollIsIs(Collection $adjacencies);
 }

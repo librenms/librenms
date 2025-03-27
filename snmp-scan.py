@@ -33,6 +33,7 @@ from sys import stdout
 from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
+args = {}
 
 
 class Outcome:
@@ -43,6 +44,8 @@ class Outcome:
     FAILED = 4
     EXCLUDED = 5
     TERMINATED = 6
+    NODNS = 7
+    ERROR = 8
 
 
 POLLER_GROUP = "0"
@@ -59,6 +62,8 @@ stats = {
     Outcome.FAILED: 0,
     Outcome.EXCLUDED: 0,
     Outcome.TERMINATED: 0,
+    Outcome.NODNS: 0,
+    Outcome.ERROR: 0,
 }
 
 
@@ -75,6 +80,8 @@ def get_outcome_symbol(outcome):
         Outcome.KNOWN: "*",
         Outcome.FAILED: "-",
         Outcome.TERMINATED: "",
+        Outcome.NODNS: "~",
+        Outcome.ERROR: "E",
     }[outcome]
 
 
@@ -125,6 +132,8 @@ def scan_host(scan_ip):
             pass
 
         try:
+            if args.dns and not hostname:
+                return Result(scan_ip, hostname, Outcome.NODNS, "DNS not Resolved")
 
             arguments = [
                 "/usr/bin/env",
@@ -134,9 +143,11 @@ def scan_host(scan_ip):
                 POLLER_GROUP,
                 hostname or scan_ip,
             ]
+
             if args.ping:
                 arguments.insert(5, args.ping)
             add_output = check_output(arguments)
+
             return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
             output = err.output.decode().rstrip()
@@ -147,6 +158,8 @@ def scan_host(scan_ip):
                     return Result(scan_ip, hostname, Outcome.FAILED, output)
             elif err.returncode == 3:
                 return Result(scan_ip, hostname, Outcome.KNOWN, output)
+            elif err.returncode == 1:
+                return Result(scan_ip, hostname, Outcome.ERROR, output)
     except KeyboardInterrupt:
         return Result(scan_ip, hostname, Outcome.TERMINATED, "Terminated")
 
@@ -188,6 +201,15 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
             POLLER_GROUP
         ),
     )
+
+    parser.add_argument(
+        "-o",
+        "--dns-only",
+        dest="dns",
+        action="store_true",
+        help="Only DNS resolved Devices",
+    )
+
     parser.add_argument("-l", "--legend", action="store_true", help="Print the legend.")
     parser.add_argument(
         "-v",
@@ -242,7 +264,9 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
     chdir(install_dir)
     try:
         CONFIG = json.loads(
-            check_output(["/usr/bin/env", "php", "config_to_json.php"]).decode()
+            check_output(
+                ["/usr/bin/env", "php", "lnms", "config:get", "--dump"]
+            ).decode()
         )
     except CalledProcessError as e:
         parser.error(
@@ -299,7 +323,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
     if args.legend and not VERBOSE_LEVEL:
         print(
-            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n"
+            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
         )
 
     print("Scanning IPs:")
@@ -336,5 +360,16 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
     )
     if stats[Outcome.EXCLUDED]:
         summary += ", {} ips excluded by config".format(stats[Outcome.EXCLUDED])
+    if stats[Outcome.NODNS]:
+        summary += ", {} ips excluded due to missing reverse DNS record".format(
+            stats[Outcome.NODNS]
+        )
+    if stats[Outcome.ERROR]:
+        summary += (
+            ", {} errors while checking device (try with -v to see errors)".format(
+                stats[Outcome.ERROR]
+            )
+        )
+
     print(summary)
     print("Runtime: {:.2f} seconds".format(time() - start_time))

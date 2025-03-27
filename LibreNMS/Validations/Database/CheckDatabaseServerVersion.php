@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckDatabaseServerVersion.php
  *
@@ -50,7 +51,7 @@ class CheckDatabaseServerVersion implements Validation
                         trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MariaDB', 'suggested' => Database::MARIADB_RECOMMENDED_VERSION]),
                     );
                 }
-            break;
+                break;
             case 'MySQL':
                 if (version_compare($version, Database::MYSQL_MIN_VERSION, '<=')) {
                     return ValidationResult::fail(
@@ -58,7 +59,7 @@ class CheckDatabaseServerVersion implements Validation
                         trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MySQL', 'suggested' => Database::MYSQL_RECOMMENDED_VERSION]),
                     );
                 }
-            break;
+                break;
         }
 
         return ValidationResult::ok(trans('validation.validations.database.CheckDatabaseServerVersion.ok'));

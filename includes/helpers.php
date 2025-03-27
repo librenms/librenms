@@ -1,4 +1,5 @@
 <?php
+
 /**
  * helpers.php
  *
@@ -68,18 +69,6 @@ if (! function_exists('array_pairs')) {
     }
 }
 
-/**
- * Cast string to int or float.
- * Returns 0 if string is not numeric
- *
- * @param  string  $number
- * @return float|int
- */
-function cast_number($number)
-{
-    return \LibreNMS\Util\Number::cast($number);
-}
-
 if (! function_exists('trans_fb')) {
     /**
      * Translate the given message with a fallback string if none exists.
@@ -113,5 +102,21 @@ if (! function_exists('preg_match_any')) {
         }
 
         return false;
+    }
+}
+
+if (! function_exists('toast')) {
+    /**
+     * send a toastr popup or return ToastInterface
+     */
+    function toast(?string $title = null, ?string $message = null, string $level = 'info', ?array $options = null)
+    {
+        $toast = app(\App\Http\Interfaces\ToastInterface::class);
+
+        if (! is_null($message)) {
+            return $toast->message($title, $message, $level, $options);
+        }
+
+        return $toast;
     }
 }

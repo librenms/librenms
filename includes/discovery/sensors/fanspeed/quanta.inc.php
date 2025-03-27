@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Quanta LB6M Fan Speed information
  *
@@ -22,6 +23,6 @@ foreach ($sensors_values as $index => $entry) {
     $descr = "Fan Speed $index:";
 
     if ($current_value > 0) {
-        discover_sensor($valid['sensor'], 'fanspeed', $device, "$numeric_oid_base.$index", $index, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
+        discover_sensor(null, 'fanspeed', $device, "$numeric_oid_base.$index", $index, $sensor_type, $descr, 1, 1, null, null, null, null, $current_value);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoDHCPServerTrapTest.php
  *
@@ -23,6 +24,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
 {
     /**
@@ -40,7 +43,7 @@ CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddrHighThreshold."some-dh
 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool" = INTEGER: 99',
             'SNMP Trap: DHCP pool "some-dhcp-pool" address space high. Free addresses: \'= INTEGER: 99\' addresses.',
             'Could not handle CiscoDHCPServerFreeAddressHigh Test trap',
-            [2],
+            [Severity::Info],
         );
     }
 
@@ -54,7 +57,7 @@ CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddrLowThreshold."some-dhc
 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool" = INTEGER: 99',
             'SNMP Trap: DHCP pool "some-dhcp-pool" address space low. Free addresses: \'= INTEGER: 99\' addresses.',
             'Could not handle CiscoDHCPServerFreeAddressHigh Test trap',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -67,7 +70,7 @@ SNMPv2-MIB::snmpTrapOID.0 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime
 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime = Hex-STRING: 07 E6 0B 0A 03 0F 25 00 2B 00',
             'SNMP Trap: Device DHCP service started.',
             'Could not handle CiscoDHCPServerStart Test trap',
-            [2],
+            [Severity::Info],
         );
     }
 
@@ -80,7 +83,7 @@ SNMPv2-MIB::snmpTrapOID.0 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStopTime
 CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStopTime = Hex-STRING: 07 E6 0B 0A 03 0F 25 00 2B 00',
             'SNMP Trap: Device DHCP service stopped.',
             'Could not handle CiscoDHCPServerStop Test trap',
-            [5],
+            [Severity::Error],
         );
     }
 }

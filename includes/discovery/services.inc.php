@@ -4,15 +4,15 @@ use App\Http\Controllers\ServiceTemplateController;
 use LibreNMS\Config;
 
 if (Config::get('discover_services_templates')) {
-    (new ServiceTemplateController())->applyAll(); // FIXME applyAll() should not be on a controller
+    (new ServiceTemplateController())->applyDeviceAll($device['device_id']); // FIXME applyAll() should not be on a controller
 }
 if (Config::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [
-        22  => 'ssh',
-        25  => 'smtp',
-        53  => 'dns',
-        80  => 'http',
+        22 => 'ssh',
+        25 => 'smtp',
+        53 => 'dns',
+        80 => 'http',
         110 => 'pop',
         143 => 'imap',
     ];
@@ -26,7 +26,7 @@ if (Config::get('discover_services')) {
                 [$oid, $tcpstatus] = explode(' ', $data);
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
-                    $tcp_port = $split_oid[(count($split_oid) - 6)];
+                    $tcp_port = $split_oid[count($split_oid) - 6];
                     if ($known_services[$tcp_port]) {
                         discover_service($device, $known_services[$tcp_port]);
                     }

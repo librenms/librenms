@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Pmp.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -95,7 +97,7 @@ class Pmp extends OS implements
         $device->hardware = $hardware;
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Migrated to Wireless Sensor
         $fec = snmp_get_multi_oid($this->getDeviceArray(), ['fecInErrorsCount.0', 'fecOutErrorsCount.0', 'fecCRCError.0'], '-OQUs', 'WHISP-BOX-MIBV2-MIB');
@@ -109,7 +111,7 @@ class Pmp extends OS implements
                 'fecOutErrorsCount' => $fec['fecOutErrorsCount.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-errorCount', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-errorCount', $tags, $fields);
             $this->enableGraph('canopy_generic_errorCount');
         }
 
@@ -120,7 +122,7 @@ class Pmp extends OS implements
                 'crcErrors' => $fec['fecCRCError.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-crcErrors', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-crcErrors', $tags, $fields);
             $this->enableGraph('canopy_generic_crcErrors');
         }
 
@@ -131,7 +133,7 @@ class Pmp extends OS implements
                 'jitter' => $jitter,
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-jitter', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-jitter', $tags, $fields);
             $this->enableGraph('canopy_generic_jitter');
             unset($rrd_def, $jitter);
         }
@@ -150,7 +152,7 @@ class Pmp extends OS implements
                 'failed' => $failed,
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-regCount', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-regCount', $tags, $fields);
             $this->enableGraph('canopy_generic_regCount');
             unset($rrd_def, $registered, $failed);
         }
@@ -166,7 +168,7 @@ class Pmp extends OS implements
                 'tracked' => floatval($tracked),
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-gpsStats', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-gpsStats', $tags, $fields);
             $this->enableGraph('canopy_generic_gpsStats');
         }
 
@@ -185,7 +187,7 @@ class Pmp extends OS implements
                 'avg' => $radio['radioDbmAvg.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-radioDbm', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-radioDbm', $tags, $fields);
             $this->enableGraph('canopy_generic_radioDbm');
         }
 
@@ -199,7 +201,7 @@ class Pmp extends OS implements
                 'vertical' => $dbm['linkRadioDbmVertical.2'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-450-linkRadioDbm', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-450-linkRadioDbm', $tags, $fields);
             $this->enableGraph('canopy_generic_450_linkRadioDbm');
         }
 
@@ -210,7 +212,7 @@ class Pmp extends OS implements
                 'last' => $lastLevel,
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-450-powerlevel', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-450-powerlevel', $tags, $fields);
             $this->enableGraph('canopy_generic_450_powerlevel');
         }
 
@@ -228,7 +230,7 @@ class Pmp extends OS implements
                 'combined' => $combined,
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-signalHV', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-signalHV', $tags, $fields);
             $this->enableGraph('canopy_generic_signalHV');
             unset($rrd_def, $vertical, $horizontal, $combined);
         }
@@ -245,7 +247,7 @@ class Pmp extends OS implements
                 'vertical' => $vertical,
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'canopy-generic-450-slaveHV', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'canopy-generic-450-slaveHV', $tags, $fields);
             $this->enableGraph('canopy_generic_450_slaveHV');
         }
     }

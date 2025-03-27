@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -136,7 +137,7 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$packets_label}'>" . Number::formatBi($tmp_component['packets'], 2, 3, 'pps') . '</span>
+                        <span class='label {$packets_label}'>" . Number::formatBi($tmp_component['packets'], 2, 0, 'pps') . '</span>
                     </div>
                 </h3>
             </div>';
@@ -156,7 +157,7 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$throughput_label}'>" . Number::formatBi($tmp_component['throughput'], 2, 3, 'bps') . '</span>
+                        <span class='label {$throughput_label}'>" . Number::formatBi($tmp_component['throughput'], 2, 0, 'bps') . '</span>
                     </div>
                 </h3>
             </div>';
@@ -187,7 +188,8 @@ foreach ($components as $component_id => $tmp_component) {
     /*
      * QFP Memory resources
      */
-    $mem_prec = $tmp_component['memory_used'] * 100 / $tmp_component['memory_total'];
+    $mem_prec = Number::calculatePercent((int) $tmp_component['memory_used'], (int) $tmp_component['memory_total']);
+
     if ($mem_prec < 75) {
         $mem_label = 'label-success';
     } elseif ($mem_prec < 90) {
@@ -198,7 +200,7 @@ foreach ($components as $component_id => $tmp_component) {
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_memory';
     $text_descr = 'QFP Memory';
-    $label_text = sprintf('%sB / %sB', Number::formatBi($tmp_component['memory_used'], 2, 3, ''), Number::formatBi($tmp_component['memory_total'], 2, 3, ''));
+    $label_text = sprintf('%sB / %sB', Number::formatBi($tmp_component['memory_used'], 2, 0, ''), Number::formatBi($tmp_component['memory_total'], 2, 0, ''));
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>

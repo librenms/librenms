@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -19,7 +20,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     $message = 'Oxidized node list was reloaded';
 }
 $output = [
-    'status'  => $status,
+    'status' => $status,
     'message' => $message,
 ];
 header('Content-type: application/json');

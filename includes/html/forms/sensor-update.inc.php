@@ -17,7 +17,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -38,7 +38,7 @@ if (! is_numeric($device_id)) {
 } elseif (! isset($data)) {
     $message = 'Missing data';
 } else {
-    if (dbUpdate([$value_type => set_null($data, ['NULL']), 'sensor_custom' => 'Yes'], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]) >= 0) {
+    if (dbUpdate([$value_type => set_null($data), 'sensor_custom' => 'Yes'], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]) >= 0) {
         $message = 'Sensor value updated';
         $status = 'ok';
     } else {
@@ -47,7 +47,7 @@ if (! is_numeric($device_id)) {
 }
 
 $response = [
-    'status'        => $status,
-    'message'       => $message,
+    'status' => $status,
+    'message' => $message,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

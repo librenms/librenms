@@ -18,6 +18,8 @@ def confirm(question):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no'  (or 'y' or 'n').\n")
 
+def clear_cache():
+    call(["php", "artisan", "optimize:clear"])
 
 librenms_dir = dirname(dirname(abspath(__file__)))
 
@@ -33,7 +35,7 @@ args = parser.parse_args()
 if args.discard:
     if confirm("Are you sure you want to delete all modified and untracked files?"):
         dirs = ["app/", "bootstrap/", "contrib/", "database/", "doc/", "html/", "includes/", "LibreNMS/",
-                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
+                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "tests/"]
         gitignores = ['.gitignore',
                       'bootstrap/cache/.gitignore',
                       'logs/.gitignore',
@@ -57,9 +59,12 @@ if args.discard:
         if args.vendor:
             call(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], cwd=librenms_dir)
 
+        clear_cache();
+
 elif args.save:
     msg = "github-remove saved on "+str(datetime.datetime.now())
     call(["git", "stash", "save", msg], cwd=librenms_dir)
+    clear_cache()
 
 elif args.restore:
     p = Popen(["git", "stash", "list"], stdout=subprocess.PIPE)
@@ -70,3 +75,5 @@ elif args.restore:
         call(["git", "stash", "pop"], cwd=librenms_dir)
     else:
         print("Last stash was not created by " + __file__ + ". Aborting.")
+
+    clear_cache()

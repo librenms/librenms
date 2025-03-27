@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,6 +23,7 @@ $alert_states = [
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
+    'changed' => 5,
 ];
 
 $alert_severities = [
@@ -165,6 +167,7 @@ if (defined('SHOW_SETTINGS')) {
 ';
 } else {
     $alert_id = $vars['alert_id'] ?? 0;
+    $rule_id = $vars['rule_id'] ?? '';
     $device_id = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'] ?? '';
     $fired = $widget_settings['fired'] ?? '';
@@ -257,6 +260,10 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         return {
             id: "alerts",
 ';
+
+    if (is_numeric($rule_id)) {
+        $common_output[] = "rule_id: '$rule_id',\n";
+    }
     if (is_numeric($alert_id)) {
         $common_output[] = "alert_id: '$alert_id',\n";
     }

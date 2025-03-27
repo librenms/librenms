@@ -11,10 +11,10 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $this->call(DefaultAlertTemplateSeeder::class);
-        $this->call(DefaultLegacySchemaSeeder::class);
         $this->call(ConfigSeeder::class);
+        $this->call(RolesSeeder::class);
     }
 }

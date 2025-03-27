@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpTrapTestCase.php
  *
@@ -52,7 +53,7 @@ abstract class SnmpTrapTestCase extends TestCase
         $trap = Mockery::mock('LibreNMS\Snmptrap\Trap[log,getDevice]', [$rawTrap]);
         $trap->shouldReceive('getDevice')->andReturn($device); // mock getDevice to avoid saving to database
         foreach (Arr::wrap($log) as $index => $message) {
-            $call_args = is_array($args[$index]) ? $args[$index] : $args;
+            $call_args = is_array($args[$index] ?? null) ? $args[$index] : $args;
 
             $trap->shouldReceive('log')->once()->with(SimpleTemplate::parse($message, $template_variables), ...$call_args);
         }

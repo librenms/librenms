@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MeasurementManager.php
  *
@@ -26,6 +27,7 @@
 namespace App\Polling\Measure;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Log;
 
 class MeasurementManager
@@ -118,6 +120,15 @@ class MeasurementManager
         app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore) {
             $this->printSummary($datastore, $stats, self::DATASTORE_COLOR);
         });
+
+        $snmpquery_cache_performance = Cache::driver('array')->get('SnmpQuery_cache_performance');
+        if (! empty($snmpquery_cache_performance)) {
+            Log::info('SnmpQuery Cache Performance');
+            foreach ($snmpquery_cache_performance as $key => $hits) {
+                $vars = explode('|', $key);
+                Log::info(" $vars[4] cache hits: $hits" . ($hits ? '' : ' %RWaste of memory!%n'), ['color' => true]);
+            }
+        }
     }
 
     public function getCategory(string $category): MeasurementCollection

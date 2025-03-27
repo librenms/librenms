@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display F5 GTM Wide IP Details
  *
@@ -26,7 +27,6 @@ $error_poolaction[6] = 'None';
 
 $component = new LibreNMS\Component();
 $options['filter']['disabled'] = ['=', 0];
-$options['filter']['ignore'] = ['=', 0];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -101,7 +101,7 @@ if (! empty($components)) {
         }
 
         $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
-        data_update($device, $type, $tags, $fields);
+        app('Datastore')->put($device, $type, $tags, $fields);
     } // End foreach components
 
     unset($f5_stats);

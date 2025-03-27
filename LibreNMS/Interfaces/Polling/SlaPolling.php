@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SlaPolling.php
  *
@@ -32,7 +33,7 @@ interface SlaPolling
     /**
      * Poll Sla data for Sla in database.
      *
-     * @param  Collection  $slas
+     * @param  Collection<int, \App\Models\Sla>  $slas
      */
-    public function pollSlas(Collection $slas);
+    public function pollSlas(Collection $slas): void;
 }

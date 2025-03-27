@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lcos.php
  *
@@ -35,7 +36,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
+use LibreNMS\Util\Number;
 
 class Lcos extends OS implements
     WirelessFrequencyDiscovery,
@@ -193,7 +195,7 @@ class Lcos extends OS implements
                 'lcos-tx',
                 $radio,
                 "Tx Power ($radio)",
-                $entry['lcsStatusWlanRadiosEntryTransmitPower']
+                Number::extract($entry['lcsStatusWlanRadiosEntryTransmitPower']) // returns "12 dbm"
             );
         }
 
@@ -215,14 +217,14 @@ class Lcos extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $bssid = $bssids[$index];
-            if (isset($sensors[$bssid])) {
+            if (isset($sensors[$bssid]) || ! array_key_exists('lcsStatusWlanCompetingNetworksEntryPhySignal', $entry)) {
                 continue;
             }
 
             $sensors[$bssid] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',
                 $bssid,
                 'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -248,17 +250,17 @@ class Lcos extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $bssid = $bssids[$index];
-            if (isset($sensors[$bssid])) {
+            if (isset($sensors[$bssid]) || ! array_key_exists('lcsStatusWlanCompetingNetworksEntryEffRate', $entry)) {
                 continue;
             }
 
             $sensors[$bssid] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos-tx',
                 $bssid,
-                'TX Rate ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'TX Rate ' . ($entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] ?? '') . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntryEffRate'],
                 1000000
             );
@@ -282,18 +284,18 @@ class Lcos extends OS implements
         $sensors = [];
 
         foreach ($data as $index => $entry) {
-            $bssid = $bssids[$index];
-            if (isset($sensors[$bssid])) {
+            $bssid = $bssids[$index] ?? null;
+            if (isset($sensors[$bssid]) || ! array_key_exists('lcsStatusWlanCompetingNetworksEntrySignalLevel', $entry)) {
                 continue;
             }
 
             $sensors[$bssid] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',
                 $bssid,
-                'RSSI ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
+                'RSSI ' . ($entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] ?? '') . " $bssid",
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TrippliteTrapTest.php
  *
@@ -25,6 +26,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class TrippliteTrapTest extends SnmpTrapTestCase
 {
     public function testTlpNotificationsAlarmEntryAdded(): void
@@ -49,7 +52,7 @@ TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a
 TRAP,
             'Trap Alarm active: On Battery',
             'Could not handle tlpNotificationsAlarmEntryAdded',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -75,7 +78,7 @@ TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a
 TRAP,
             'Trap Alarm inactive: On Utility Power',
             'Could not handle tlpNotificationsAlarmEntryRemoved',
-            [2],
+            [Severity::Info],
         );
     }
 }

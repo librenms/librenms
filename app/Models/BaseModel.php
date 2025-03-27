@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BaseModel.php
  *
@@ -95,5 +96,21 @@ abstract class BaseModel extends Model
             return $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
                 ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user));
         });
+    }
+
+    public static function definedRelations(): array
+    {
+        $reflector = new \ReflectionClass(get_called_class());
+
+        return collect($reflector->getMethods())
+            ->filter(
+                fn ($method) => ! empty($method->getReturnType()) &&
+                    str_contains(
+                        $method->getReturnType(),
+                        'Illuminate\Database\Eloquent\Relations'
+                    )
+            )
+            ->pluck('name')
+            ->all();
     }
 }

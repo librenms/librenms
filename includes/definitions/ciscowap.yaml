@@ -13,14 +13,15 @@ discovery:
             - .1.3.6.1.4.1.9.6.1.31.
             - .1.3.6.1.4.1.9.6.1.32.
             - .1.3.6.1.4.1.9.6.1.34.
+            - .1.3.6.1.4.1.9.1.3280  # ciscoIW9165DHURWB
+            - .1.3.6.1.4.1.9.1.3281  # ciscoIW9165EURWB
+            - .1.3.6.1.4.1.9.1.3282  # ciscoIW9167EHURWB
     -
         sysDescr:
             - 'Cisco Small Business WAP'
 poller_modules:
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
-    cisco-voice: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true

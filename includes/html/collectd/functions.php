@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2009  Bruno Prémont <bonbons AT linux-vserver.org>
  *
@@ -139,7 +140,7 @@ function collectd_list_pinsts($arg_host, $arg_plugin)
                 if ($dent != '.' && $dent != '..' && is_dir($datadir . '/' . $arg_host . '/' . $dent)) {
                     if ($i = strpos($dent, '-')) {
                         $plugin = substr($dent, 0, $i);
-                        $pinst = substr($dent, ($i + 1));
+                        $pinst = substr($dent, $i + 1);
                     } else {
                         $plugin = $dent;
                         $pinst = '';
@@ -165,7 +166,9 @@ function collectd_list_pinsts($arg_host, $arg_plugin)
  * Fetch list of types found in collectd's datadirs for given host+plugin+instance
  *
  * @arg_host Name of host
+ *
  * @arg_plugin Name of plugin
+ *
  * @arg_pinst Plugin instance
  *
  * @return array Sorted list of types (sorted alphabetically)
@@ -181,8 +184,8 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
     foreach (Config::get('datadirs') as $datadir) {
         if (preg_match(REGEXP_HOST, $arg_host) && ($d = @opendir($datadir . '/' . $arg_host . '/' . $my_plugin))) {
             while (($dent = readdir($d)) !== false) {
-                if ($dent != '.' && $dent != '..' && is_file($datadir . '/' . $arg_host . '/' . $my_plugin . '/' . $dent) && substr($dent, (strlen($dent) - 4)) == '.rrd') {
-                    $dent = substr($dent, 0, (strlen($dent) - 4));
+                if ($dent != '.' && $dent != '..' && is_file($datadir . '/' . $arg_host . '/' . $my_plugin . '/' . $dent) && substr($dent, strlen($dent) - 4) == '.rrd') {
+                    $dent = substr($dent, 0, strlen($dent) - 4);
                     if ($i = strpos($dent, '-')) {
                         $types[] = substr($dent, 0, $i);
                     } else {
@@ -205,8 +208,11 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
  * Fetch list of type instances found in collectd's datadirs for given host+plugin+instance+type
  *
  * @arg_host Name of host
+ *
  * @arg_plugin Name of plugin
+ *
  * @arg_pinst Plugin instance
+ *
  * @arg_type Type
  *
  * @return array Sorted list of type instances (sorted alphabetically)
@@ -222,11 +228,11 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
     foreach (Config::get('datadirs') as $datadir) {
         if (preg_match(REGEXP_HOST, $arg_host) && ($d = @opendir($datadir . '/' . $arg_host . '/' . $my_plugin))) {
             while (($dent = readdir($d)) !== false) {
-                if ($dent != '.' && $dent != '..' && is_file($datadir . '/' . $arg_host . '/' . $my_plugin . '/' . $dent) && substr($dent, (strlen($dent) - 4)) == '.rrd') {
-                    $dent = substr($dent, 0, (strlen($dent) - 4));
+                if ($dent != '.' && $dent != '..' && is_file($datadir . '/' . $arg_host . '/' . $my_plugin . '/' . $dent) && substr($dent, strlen($dent) - 4) == '.rrd') {
+                    $dent = substr($dent, 0, strlen($dent) - 4);
                     if ($i = strpos($dent, '-')) {
                         $type = substr($dent, 0, $i);
-                        $tinst = substr($dent, ($i + 1));
+                        $tinst = substr($dent, $i + 1);
                     } else {
                         $type = $dent;
                         $tinst = '';
@@ -275,7 +281,7 @@ function collectd_identifier($host, $plugin, $type, $pinst, $tinst)
 
     if ($rrd_realpath) {
         $identifier = basename($rrd_realpath);
-        $identifier = substr($identifier, 0, (strlen($identifier) - 4));
+        $identifier = substr($identifier, 0, strlen($identifier) - 4);
         $rrd_realpath = dirname($rrd_realpath);
         $identifier = basename($rrd_realpath) . '/' . $identifier;
         $rrd_realpath = dirname($rrd_realpath);
@@ -351,8 +357,8 @@ function collectd_flush($identifier)
  */
 function rrd_strip_quotes($str)
 {
-    if ($str[0] == '"' && $str[(strlen($str) - 1)] == '"') {
-        return substr($str, 1, (strlen($str) - 2));
+    if ($str[0] == '"' && $str[strlen($str) - 1] == '"') {
+        return substr($str, 1, strlen($str) - 2);
     } else {
         return $str;
     }
@@ -377,16 +383,16 @@ function _rrd_info($file)
             }
 
             $key = trim(substr($s, 0, $p));
-            $value = trim(substr($s, ($p + 1)));
+            $value = trim(substr($s, $p + 1));
             if (strncmp($key, 'ds[', 3) == 0) {
                 // DS definition
                 $p = strpos($key, ']');
-                $ds = substr($key, 3, ($p - 3));
+                $ds = substr($key, 3, $p - 3);
                 if (! isset($info['DS'])) {
                     $info['DS'] = [];
                 }
 
-                $ds_key = substr($key, ($p + 2));
+                $ds_key = substr($key, $p + 2);
 
                 if (strpos($ds_key, '[') === false) {
                     if (! isset($info['DS']["$ds"])) {
@@ -398,12 +404,12 @@ function _rrd_info($file)
             } elseif (strncmp($key, 'rra[', 4) == 0) {
                 // RRD definition
                 $p = strpos($key, ']');
-                $rra = substr($key, 4, ($p - 4));
+                $rra = substr($key, 4, $p - 4);
                 if (! isset($info['RRA'])) {
                     $info['RRA'] = [];
                 }
 
-                $rra_key = substr($key, ($p + 2));
+                $rra_key = substr($key, $p + 2);
 
                 if (strpos($rra_key, '[') === false) {
                     if (! isset($info['RRA']["$rra"])) {
@@ -440,9 +446,9 @@ function rrd_get_color($code, $line = true)
 /**
  * Draw RRD file based on it's structure
  *
- * @param $host
- * @param $plugin
- * @param $type
+ * @param  $host
+ * @param  $plugin
+ * @param  $type
  * @param  null  $pinst
  * @param  null  $tinst
  * @param  array  $opts
@@ -552,7 +558,7 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
     reset($rrdinfo['DS']);
     $n = 1;
     foreach ($rrdinfo['DS'] as $k => $v) {
-        $graph[] = sprintf('LINE1:%s_avg#%s:%s ', $k, rrd_get_color($n++, true), $k . substr('                  ', 0, ($l_max - strlen($k))));
+        $graph[] = sprintf('LINE1:%s_avg#%s:%s ', $k, rrd_get_color($n++, true), $k . substr('                  ', 0, $l_max - strlen($k)));
         if (isset($opts['tinylegend']) && $opts['tinylegend']) {
             continue;
         }
@@ -613,10 +619,10 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
 /**
  * Draw RRD file based on it's structure
  *
- * @param $timespan
- * @param $host
- * @param $plugin
- * @param $type
+ * @param  $timespan
+ * @param  $host
+ * @param  $plugin
+ * @param  $type
  * @param  null  $pinst
  * @param  null  $tinst
  * @return false|string Commandline to call RRDGraph in order to generate the final graph* @internal param $

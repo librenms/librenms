@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AdvaSysAlmTrapest.php
  *
@@ -25,6 +26,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
     public function testCriticalAlarm(): void
@@ -45,7 +48,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 "Critical alarm test"
 TRAP,
             'System Alarm: Critical alarm test Status: critical',
             'Could not handle cmSysAlmTrap critical',
-            [5],
+            [Severity::Error],
         );
     }
 
@@ -67,7 +70,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 "Major alarm test"
 TRAP,
             'System Alarm: Major alarm test Status: major',
             'Could not handle cmSysAlmTrap major',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -89,7 +92,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 "Minor alarm test"
 TRAP,
             'System Alarm: Minor alarm test Status: minor',
             'Could not handle cmSysAlmTrap minor',
-            [3],
+            [Severity::Notice],
         );
     }
 
@@ -111,7 +114,7 @@ CM-ALARM-MIB::cmSysAlmDescr.5 "Cleared alarm test"
 TRAP,
             'System Alarm: Cleared alarm test Status: cleared',
             'Could not handle cmSysAlmTrap major',
-            [1],
+            [Severity::Ok],
         );
     }
 }

@@ -20,6 +20,7 @@ Thumbs.db
 config.php
 html/css/custom/*
 html/images/custom/*
+html/images/custommap/*
 includes/custom/*
 junk
 nbproject
@@ -44,4 +45,7 @@ librenms_theme
 
 bin/
 lib/
+lib64
 pyvenv.cfg
+
+/.phpunit.cache

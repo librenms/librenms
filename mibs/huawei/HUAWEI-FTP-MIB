@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: File Transfer Protocol(FTP) mib
 -- Reference:   huawei enterprise mib
--- Version:     V1.03           
+-- Version:     V1.04           
 -- History:     V1.0  zhouyao, 2008-09-28, publish 
 --                   V1.01  Wang Feng,2014-04-14,Add nodes for wlan npe trusted host
 --                  V1.02  dingzanfei,2014-08-15,Add nodes for switch notify
@@ -23,7 +23,7 @@ HUAWEI-FTP-MIB DEFINITIONS ::= BEGIN
     
 
     hwFtp MODULE-IDENTITY 
-        LAST-UPDATED "201605260900Z"        -- April 21, 2016 at 09:00 GMT
+        LAST-UPDATED "201910301800Z"        -- October 30, 2019 at 18:00 GMT
         ORGANIZATION
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -38,18 +38,21 @@ HUAWEI-FTP-MIB DEFINITIONS ::= BEGIN
             "V1.00
              The HUAWEI-FTP-MIB which contains objects manages the FTP server and FTP client configuration. 
             "
+        REVISION "201910301800Z"        
+            DESCRIPTION 
+                "Modified to modify A columnar object 'hwFtpHostPermitRowState' with a SYNTAX clause value of RowStatus."
 
         REVISION "201605260900Z"        
             DESCRIPTION 
                 "Modified to Add nodes for ftp user login failed alarm."
 
+        REVISION "201408151600Z"        
+            DESCRIPTION 
+                 "Modified to Add switch notify."
+
         REVISION "201404210900Z"        
             DESCRIPTION 
                 "Modified to Add nodes for wlan npe trusted host."
-
-        REVISION "201408151600Z"        
-            DESCRIPTION 
-                "Modified to Add switch notify."
 
         ::= { hwDatacomm 166 }
 
@@ -140,7 +143,7 @@ HUAWEI-FTP-MIB DEFINITIONS ::= BEGIN
 			
      hwFtpHostPermitRowState OBJECT-TYPE
             SYNTAX RowStatus
-            MAX-ACCESS read-write
+            MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
 		"This object identifies the status of a row."

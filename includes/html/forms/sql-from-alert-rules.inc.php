@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-rules.inc.php
  *
@@ -47,6 +48,7 @@ if (is_numeric($rule_id)) {
         'invert' => Config::get('alert_rule.invert_rule_match'),
         'interval' => 60 * Config::get('alert_rule.interval'),
         'recovery' => Config::get('alert_rule.recovery_alerts'),
+        'acknowledgement' => Config::get('alert_rule.acknowledgement_alerts'),
     ];
     $output = [
         'status' => 'ok',

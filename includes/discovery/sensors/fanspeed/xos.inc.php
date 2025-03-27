@@ -16,11 +16,11 @@ foreach ($oids as $index => $entry) {
     $value = snmp_get($device, $oid, '-Oqv', 'EXTREME-SYSTEM-MIB');
     $descr = "Fan Speed $modindex";
     // round function used to round limit values to hundreds to avoid h/w/l limits being changed on every discovery as a change of 1rpm for fan speed would cause the limit values to change since they're dynamically calculated
-    $high_limit = round_Nth(($value * 1.5), 100);
-    $high_warn_limit = round_Nth(($value * 1.25), 100);
-    $low_warn_limit = round_Nth(($value * 0.75), 100);
-    $low_limit = round_Nth(($value * 0.5), 100);
+    $high_limit = round_Nth($value * 1.5, 100);
+    $high_warn_limit = round_Nth($value * 1.25, 100);
+    $low_warn_limit = round_Nth($value * 0.75, 100);
+    $low_limit = round_Nth($value * 0.5, 100);
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'extreme-fanspeed', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+        discover_sensor(null, 'fanspeed', $device, $oid, $index, 'extreme-fanspeed', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
     }
 }

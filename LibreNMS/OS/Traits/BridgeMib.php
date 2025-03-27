@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BridgeMib.php
  *
@@ -25,10 +26,11 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Facades\PortCache;
 use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 trait BridgeMib
@@ -67,19 +69,20 @@ trait BridgeMib
             return new Collection;
         }
 
-        $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
-        $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
-        \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$bridge} DR: {$drBridge}");
+        $bridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
+        $bridgeMac = $bridge->hex();
+        $drBridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
+        \Log::info(sprintf('VLAN: %s Bridge: %s DR: %s', $vlan ?: 1, $bridge->readable(), $drBridge->readable()));
 
         $instance = new \App\Models\Stp([
             'vlan' => $vlan,
-            'rootBridge' => $bridge == $drBridge ? 1 : 0,
-            'bridgeAddress' => $bridge,
+            'rootBridge' => $bridgeMac == $drBridge->hex() ? 1 : 0,
+            'bridgeAddress' => $bridgeMac,
             'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown',
             'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
             'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
             'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
-            'designatedRoot' => $drBridge,
+            'designatedRoot' => $drBridge->hex(),
             'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
             'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
             'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
@@ -97,21 +100,28 @@ trait BridgeMib
     public function discoverStpPorts(Collection $stpInstances): Collection
     {
         $ports = new Collection;
+
+        // prep base port to port_id map if we have instances
+        $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
+        $basePortIdMap = array_map(function ($ifIndex) {
+            return PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+        }, $baseIfIndex);
+
         foreach ($stpInstances as $instance) {
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
-                ->mapTable(function ($data, $port) use ($instance) {
+                ->mapTable(function ($data, $port) use ($instance, $basePortIdMap) {
                     return new PortStp([
                         'vlan' => $instance->vlan,
-                        'port_id' => $this->basePortToId($port),
+                        'port_id' => $basePortIdMap[$port] ?? 0,
                         'port_index' => $port,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
                         'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'designatedRoot' => Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? ''),
+                        'designatedRoot' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
                         'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
-                        'designatedBridge' => Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? ''),
+                        'designatedBridge' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
                         'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
                         'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                     ]);
@@ -156,7 +166,8 @@ trait BridgeMib
 
             $instance->timeSinceTopologyChange = substr($data['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0;
             $instance->topChanges = $data['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0;
-            $instance->designatedRoot = Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
+            $instance->designatedRoot = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '')->hex();
+            $instance->rootBridge = $instance->bridgeAddress == $instance->designatedRoot; // dr might have changed
         });
     }
 
@@ -179,8 +190,8 @@ trait BridgeMib
                     $port->vlan = $vlan;
                     $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
                     $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
-                    $port->designatedRoot = Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '');
-                    $port->designatedBridge = Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '');
+                    $port->designatedRoot = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex();
+                    $port->designatedBridge = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex();
 
                     return $port;
                 });

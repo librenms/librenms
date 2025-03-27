@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthLog.php
  *
@@ -31,5 +32,7 @@ class AuthLog extends Model
 {
     public $timestamps = false;
     protected $table = 'authlog';
-    protected $dates = ['datetime'];
+    protected $casts = [
+        'datetime' => 'datetime',
+    ];
 }

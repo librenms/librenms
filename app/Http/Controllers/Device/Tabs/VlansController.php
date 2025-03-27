@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VlansController.php
  *
@@ -27,6 +28,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use App\Models\PortVlan;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VlansController implements DeviceTab
@@ -51,7 +53,7 @@ class VlansController implements DeviceTab
         return __('VLANs');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [
             'vlans' => self::getVlans($device),
@@ -84,7 +86,7 @@ class VlansController implements DeviceTab
             })
             ->with(['port.device'])
             ->select('ports_vlans.*', 'vlans.vlan_name')->orderBy('vlan_vlan')->orderBy('ports.ifName')->orderBy('ports.ifDescr')
-            ->get();
+            ->get()->sortBy(['vlan', 'port']);
 
         $data = $portVlan->groupBy('vlan');
 

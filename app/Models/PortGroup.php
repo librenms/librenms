@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortGroup.php
  *
@@ -35,6 +36,7 @@ class PortGroup extends BaseModel
         if ($user->hasGlobalRead()) {
             return $query;
         }
+
         // maybe filtered in future
         return $query;
     }

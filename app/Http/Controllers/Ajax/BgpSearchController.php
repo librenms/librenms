@@ -1,4 +1,5 @@
 <?php
+
 /*
  * BgpSearchController.php
  *
@@ -59,14 +60,14 @@ class BgpSearchController extends SearchController
             : 'fa fa-external-link-square fa-lg icon-theme';
 
         return [
-            'url'         => Url::deviceUrl($peer->device, ['tab' => 'routing', 'proto' => 'bgp']),
-            'name'        => $peer->bgpPeerIdentifier,
+            'url' => Url::deviceUrl($peer->device, ['tab' => 'routing', 'proto' => 'bgp']),
+            'name' => $peer->bgpPeerIdentifier,
             'description' => $peer->astext,
-            'localas'     => $peer->device->bgpLocalAs,
-            'bgp_image'   => $bgp_image,
-            'remoteas'    => $peer->bgpPeerRemoteAs,
-            'colours'     => Color::forBgpPeerStatus($peer),
-            'hostname'    => $peer->device->displayName(),
+            'localas' => $peer->device->bgpLocalAs,
+            'bgp_image' => $bgp_image,
+            'remoteas' => $peer->bgpPeerRemoteAs,
+            'colours' => Color::forBgpPeerStatus($peer),
+            'hostname' => $peer->device->displayName(),
         ];
     }
 }

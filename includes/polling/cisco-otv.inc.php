@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture Cisco Class-Based QoS Details
  *
@@ -66,7 +67,7 @@ if ($device['os_group'] == 'cisco') {
     $components = $component->getComponents($device['device_id'], $options);
 
     // We only care about our device id.
-    $components = $components[$device['device_id']];
+    $components = $components[$device['device_id']] ?? null;
 
     // Only collect SNMP data if we have enabled components
     if (is_array($components) && count($components) > 0) {
@@ -136,7 +137,7 @@ if ($device['os_group'] == 'cisco') {
                 ];
 
                 $tags = compact('label', 'rrd_name', 'rrd_def');
-                data_update($device, 'cisco-otv-vlan', $tags, $fields);
+                app('Datastore')->put($device, 'cisco-otv-vlan', $tags, $fields);
             } elseif ($array['otvtype'] == 'adjacency') {
                 $array['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.' . $array['index'] . '.1.4.' . $array['endpoint']];
                 $message = false;
@@ -182,7 +183,7 @@ if ($device['os_group'] == 'cisco') {
                 ];
 
                 $tags = compact('endpoint', 'rrd_name', 'rrd_def');
-                data_update($device, 'cisco-otv-mac', $tags, $fields);
+                app('Datastore')->put($device, 'cisco-otv-mac', $tags, $fields);
             } // End If
         } // End foreach components
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rrdcached.inc.php
  *
@@ -26,6 +27,7 @@
  */
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $data = '';
 $name = 'rrdcached';
@@ -62,7 +64,7 @@ if ($agent_data['app'][$name]) {
             $data .= fgets($sock, 128);
             if ($max == -1) {
                 $tmp_max = explode(' ', $data);
-                $max = $tmp_max[0] + 1;
+                $max = Number::cast($tmp_max[0]) + 1;
             }
             $count++;
         }
@@ -72,7 +74,6 @@ if ($agent_data['app'][$name]) {
     }
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('queue_length', 'GAUGE', 0)
     ->addDataset('updates_received', 'COUNTER', 0)
@@ -93,8 +94,13 @@ foreach (explode("\n", $data) as $line) {
     }
 }
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $data, $fields);
 
-unset($data, $rrd_name, $rrd_def, $fields, $tags);
+unset($data, $rrd_def, $fields, $tags);

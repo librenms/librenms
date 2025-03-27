@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI L3VPN Statistics Management MIB
 -- Reference:
--- Version:     V2.04
+-- Version:     V2.05
 -- History:
 --              V1.0 qiyanqing, 2007-04-12, publish
 --              V1.1 rengaofeng, 2009-02-13, add qos statistics table
@@ -29,7 +29,7 @@
                 
                 
         hwL3vpn MODULE-IDENTITY 
-            LAST-UPDATED "201708171556Z"        -- Aug 17, 2017 at 1556 GMT
+            LAST-UPDATED "201712201100Z"        -- Dem 20, 2017 at 1100 GMT
             ORGANIZATION
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -43,6 +43,10 @@
             DESCRIPTION
                 "The HUAWEI-L3VPN-EXT-MIB contains objects to statistic L3VPN's traffic."
 
+            REVISION "201712201100Z" 
+            DESCRIPTION
+            "Modify syntax ,include'hwL3vpnStatEnable' 'hwL3vpnPeerStatEnable'"
+            
             REVISION "201708171556Z" 
             DESCRIPTION
             "Modify description of MIB nodes"
@@ -147,7 +151,7 @@
             STATUS current
             DESCRIPTION
                 "This object indicates whether statistics collection is enabled or not. 1 indicates enable, and 0 indicates disable."
-            DEFVAL { disable }
+            DEFVAL { disabled }
             ::= { hwL3vpnStatisticsEntry 2 }
  
             
@@ -501,7 +505,7 @@
             STATUS current
             DESCRIPTION
                 "This object indicates the enable sign of L3VPN peer's traffic statistics."
-            DEFVAL { disable }
+            DEFVAL { disabled }
             ::= { hwL3vpnPeerStatisticsEntry 3 }
                          
         hwL3vpnPeerStatResetStatistic OBJECT-TYPE

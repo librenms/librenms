@@ -81,28 +81,32 @@ if (! $auth) {
 
     print_optionbar_end();
 
-    $thumb_array = Config::get('graphs.row.normal');
+    $show_command = isset($vars['showcommand']) && $vars['showcommand'] == 'yes';
+    if (! $show_command) {
+        $thumb_array = Config::get('graphs.row.normal');
 
-    echo '<table width=100% class="thumbnail_graph_table"><tr>';
+        echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
-    foreach ($thumb_array as $period => $text) {
-        $graph_array['from'] = Config::get("time.$period");
+        foreach ($thumb_array as $period => $text) {
+            $graph_array['from'] = Config::get("time.$period");
 
-        $link_array = $vars;
-        $link_array['from'] = $graph_array['from'];
-        $link_array['to'] = $graph_array['to'];
-        $link_array['page'] = 'graphs';
-        $link = \LibreNMS\Util\Url::generate($link_array);
+            $link_array = $vars;
+            $link_array['from'] = $graph_array['from'];
+            $link_array['to'] = $graph_array['to'];
+            $link_array['page'] = 'graphs';
+            $link = \LibreNMS\Util\Url::generate($link_array);
 
-        echo '<td style="text-align: center;">';
-        echo '<b>' . $text . '</b>';
-        echo '<a href="' . $link . '">';
-        echo \LibreNMS\Util\Url::lazyGraphTag($graph_array);
-        echo '</a>';
-        echo '</td>';
+            echo '<td style="text-align: center;">';
+            echo '<b>' . $text . '</b>';
+            echo '<a href="' . $link . '">';
+            echo \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+            echo '</a>';
+            echo '</td>';
+        }
+
+        echo '</tr></table>';
+        echo '<hr />';
     }
-
-    echo '</tr></table>';
 
     $graph_array = $vars;
     $graph_array['height'] = Config::get('webui.min_graph_height');
@@ -120,11 +124,9 @@ if (! $auth) {
         if ($screen_height > 960) {
             $graph_array['height'] = ($screen_height - ($screen_height / 2));
         } else {
-            $graph_array['height'] = max($graph_array['height'], ($screen_height - ($screen_height / 1.5)));
+            $graph_array['height'] = max($graph_array['height'], $screen_height - ($screen_height / 1.5));
         }
     }
-
-    echo '<hr />';
 
     include_once 'includes/html/print-date-selector.inc.php';
 
@@ -148,7 +150,7 @@ if (! $auth) {
     //  }
 
     echo ' | ';
-    if (isset($vars['showcommand']) && $vars['showcommand'] == 'yes') {
+    if ($show_command) {
         echo generate_link('Hide RRD Command', $vars, ['page' => 'graphs', 'showcommand' => null]);
     } else {
         echo generate_link('Show RRD Command', $vars, ['page' => 'graphs', 'showcommand' => 'yes']);
@@ -161,6 +163,10 @@ if (! $auth) {
         } else {
             echo generate_link('Zoom to Port Speed', $vars, ['page' => 'graphs', 'port_speed_zoom' => 1]);
         }
+        echo ' | To show trend, set to future date';
+    }
+
+    if (str_contains($vars['type'], 'sensor_')) {
         echo ' | To show trend, set to future date';
     }
 
@@ -188,7 +194,7 @@ if (! $auth) {
         print_optionbar_end();
     }
 
-    if (! empty($vars['showcommand'])) {
+    if ($show_command) {
         $vars = $graph_array;
         $_GET = $graph_array;
         $command_only = 1;

@@ -1,0 +1,9 @@
+os: orolia-securesync
+text: 'Orolia SecureSync'
+type: timing
+icon: orolia
+group: orolia
+mib_dir: spectracom
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.18837.3

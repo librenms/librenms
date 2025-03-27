@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS - ADVA device support - Temperature Sensors
  *
@@ -20,8 +21,8 @@
 // ***** Temperature Sensors for ADVA FSP3000 R7
 // *************************************************************
 
-    $multiplier = 1;
-    $divisor = 10;
+$multiplier = 1;
+$divisor = 10;
 
 if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
     foreach (array_keys($pre_cache['adva_fsp3kr7_Card']) as $index) {
@@ -32,7 +33,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
             $current = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValueTemp'] / $divisor;
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,

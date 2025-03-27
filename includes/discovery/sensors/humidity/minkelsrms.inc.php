@@ -15,7 +15,7 @@ foreach (explode("\n", $oids) as $data) {
         if ($status == 2) {
             // 2 = normal, 0 = not connected
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $descr_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.1.$index";
             $oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.3.$index";
             $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.7.$index";
@@ -30,7 +30,7 @@ foreach (explode("\n", $oids) as $data) {
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
             $warnlowlimit = snmp_get($device, $warnlowlimit_oid, '-Oqv', '');
 
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
+            discover_sensor(null, 'humidity', $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
         }
     }
 }

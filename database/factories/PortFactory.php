@@ -2,25 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Port> */
+/** @extends Factory<\App\Models\Port> */
 class PortFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Port::class;
-
-    /**
      * Define the model's default state.
-     *
-     * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'ifIndex' => $this->faker->unique()->numberBetween(),

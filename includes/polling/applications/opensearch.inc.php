@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -47,7 +48,7 @@ $metrics = [
     'status' => $data['status'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'ttl'];
 $rrd_def = RrdDefinition::make()
@@ -64,7 +65,7 @@ $metrics = [
     'ttl_last_mod_age' => $data['ttl_last_mod_age'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'ti'];
 $rrd_def = RrdDefinition::make()
@@ -87,7 +88,7 @@ $metrics = [
     'ti_throttled' => $data['ti_throttled'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'ts'];
 $rrd_def = RrdDefinition::make()
@@ -110,7 +111,7 @@ $metrics = [
     'ts_su_time' => $data['ts_su_time'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tr'];
 $rrd_def = RrdDefinition::make()
@@ -125,7 +126,7 @@ $metrics = [
     'tr_ext_time' => $data['tr_ext_time'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tf'];
 $rrd_def = RrdDefinition::make()
@@ -138,7 +139,7 @@ $metrics = [
     'tf_time' => $data['tf_time'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tqc'];
 $rrd_def = RrdDefinition::make()
@@ -159,7 +160,7 @@ $metrics = [
     'tqc_evictions' => $data['tqc_evictions'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tg'];
 $rrd_def = RrdDefinition::make()
@@ -178,7 +179,7 @@ $metrics = [
     'tg_missing_time' => $data['tg_missing_time'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tm'];
 $rrd_def = RrdDefinition::make()
@@ -197,7 +198,7 @@ $metrics = [
     'tm_throttled_size' => $data['tm_throttled_size'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tw'];
 $rrd_def = RrdDefinition::make()
@@ -208,7 +209,7 @@ $metrics = [
     'tw_time' => $data['tw_time'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tfd'];
 $rrd_def = RrdDefinition::make()
@@ -219,7 +220,7 @@ $metrics = [
     'tfd_evictions' => $data['tfd_evictions'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tseg'];
 $rrd_def = RrdDefinition::make()
@@ -248,7 +249,7 @@ $metrics = [
     'tseg_fbs_size' => $data['tseg_fbs_size'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'trc'];
 $rrd_def = RrdDefinition::make()
@@ -263,7 +264,7 @@ $metrics = [
     'trc_misses' => $data['trc_misses'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 $rrd_name = ['app', $name, $app->app_id, 'tst'];
 $rrd_def = RrdDefinition::make()
@@ -274,12 +275,12 @@ $metrics = [
     'tst_res_size' => $data['tst_res_size'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
+app('Datastore')->put($device, 'app', $tags, $metrics);
 
 // save clustername upon changes and log it post initial set
 if (isset($app->data['cluster'])) {
     if ($app->data['cluster'] != $returned['data']['cluster_name']) {
-        log_event('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device, 'application');
+        Eventlog::log('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device['device_id'], 'application');
 
         // save the found cluster name
         $app->data = ['cluster' => $returned['data']['cluster_name']];

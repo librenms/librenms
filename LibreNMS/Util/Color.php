@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Color.php
  *
@@ -83,6 +84,15 @@ class Color
             'right' => 'bbd392',
             'middle' => 'afcc7c',
         ];
+    }
+
+    public static function percent(int|float|null $numerator = null, int|float|null $denominator = null, int|float|null $percent = null): string
+    {
+        $percent = $percent ? round($percent) : Number::calculatePercent($numerator, $denominator, 0);
+        $r = min(255, 5 * ($percent - 25));
+        $b = max(0, 255 - (5 * ($percent + 25)));
+
+        return sprintf('#%02x%02x%02x', $r, $b, $b);
     }
 
     /**

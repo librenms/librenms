@@ -1,0 +1,20 @@
+os: nokia-1830
+group: nokia
+text: 'Nokia 1830 PSS'
+mib_dir: nokia/1830
+type: network
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_state, text: States }
+    - { graph: device_dbm, text: 'Optical Power' }
+icon: nokia
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7483.1.3.1.2 # PSS32
+            - .1.3.6.1.4.1.7483.1.3.1.6 # PSS 
+            - .1.3.6.1.4.1.7483.1.3.1.8 # PSS4
+            - .1.3.6.1.4.1.7483.1.3.1.12 # PSD
+            - .1.3.6.1.4.1.7483.1.3.1.13 # PSI
+            - .1.3.6.1.4.1.7483.1.3.1.14 # PSIM

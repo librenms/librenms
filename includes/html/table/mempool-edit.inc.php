@@ -27,7 +27,7 @@ if (! isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = ($current * $rowCount) - ($rowCount);
+    $limit_low = ($current * $rowCount) - $rowCount;
     $limit_high = $rowCount;
 }
 
@@ -48,5 +48,5 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         'mempool_perc_warn' => $perc_warn, ];
 }
 
-$output = ['current'=>$current, 'rowCount'=>$rowCount, 'rows'=>$response, 'total'=>$total];
+$output = ['current' => $current, 'rowCount' => $rowCount, 'rows' => $response, 'total' => $total];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckSchemaCollation.php
  *
@@ -93,7 +94,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
     public function fix(): bool
     {
         \DB::table('migrations')->where('migration', '2021_02_09_122930_migrate_to_utf8mb4')->delete();
-        $res = \Artisan::call('migrate', ['--force' => true]);
+        $res = \Artisan::call('migrate', ['--force' => true, '--isolated' => true]);
 
         return $res === 0;
     }

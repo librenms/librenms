@@ -22,6 +22,7 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">
 
+    @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
@@ -40,9 +41,8 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20220910" rel="stylesheet">
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=27112024" rel="stylesheet">
     <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
@@ -65,7 +65,7 @@
     <script src="{{ asset('js/mktree.js') }}"></script>
     <script src="{{ asset('js/jquery.bootgrid.min.js') }}"></script>
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
-    <script src="{{ asset('js/pace.min.js') }}"></script>
+    <script data-pace-options='{ "eventLag": { "lagThreshold": 30 } }' src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
     <script src="{{ asset('js/select2.min.js') }}"></script>
     <script>
@@ -76,20 +76,27 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=10272021') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=29092024') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/flasher.min.js?ver=0.6.1') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         // Apply color scheme
         if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
-            document.documentElement.classList.add('tw-dark')
+            document.documentElement.classList.add('tw:dark')
         } else {
-            document.documentElement.classList.remove('tw-dark')
+            document.documentElement.classList.remove('tw:dark')
         }
     </script>
     @auth
+        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
+        <script>
+            var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if(tz !== '{{ session('preferences.timezone') }}') {
+                updateTimezone(tz, false);
+            }
+        </script>
+        @endif
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')
@@ -105,13 +112,11 @@
     @include('layouts.menu')
 @endif
 
-<br />
-
 @yield('content')
 
 @yield('scripts')
 
-@flasher_render
+<x-toast />
 
 @stack('scripts')
 </body>

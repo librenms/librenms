@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Graph.php
  *
@@ -87,7 +88,7 @@ class Graph
                 throw $e;
             }
 
-            return new GraphImage(ImageFormat::forGraph(), 'Error', $e->generateErrorImage());
+            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
         }
     }
 
@@ -101,7 +102,10 @@ class Graph
      */
     public static function get($vars): GraphImage
     {
-        define('IGNORE_ERRORS', true);
+        if (! defined('IGNORE_ERRORS')) {
+            define('IGNORE_ERRORS', true);
+        }
+
         chdir(base_path());
 
         include_once base_path('includes/dbFacile.php');
@@ -154,6 +158,8 @@ class Graph
             require base_path('/includes/html/graphs/customoid/customoid.inc.php');
         } elseif (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
             require base_path("/includes/html/graphs/$type/$subtype.inc.php");
+        } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
+            require base_path("/includes/html/graphs/$type/generic.inc.php");
         } else {
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
@@ -295,7 +301,7 @@ SVG;
 
         $px = (int) ((imagesx($img) - 7.5 * strlen($text)) / 2);
         $font = $width < 200 ? 3 : 5;
-        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
+        imagestring($img, $font, $px, $height / 2 - 8, $text, imagecolorallocate($img, ...$color));
 
         // Output the image
         ob_start();

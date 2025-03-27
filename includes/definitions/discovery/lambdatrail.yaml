@@ -1,0 +1,299 @@
+mib: LAMBDATRAIL-MIB:Lambdatrail2s-MIB
+modules:
+    os:
+            hardware: .1.3.6.1.4.1.35616.5.1.2.0
+            serial: .1.3.6.1.4.1.35616.5.1.5.0
+            version: .1.3.6.1.4.1.35616.5.1.10.0
+            version_regex: '/(?<version>\S+),.*/'
+    sensors: 
+        temperature:
+            data:
+                #LT2-S Variant
+                -
+                    oid: lt2sMgmtPortTable
+                    value: lt2sMgmtSfpLaserTemp
+                    num_oid: '.1.3.6.1.4.1.35616.5.1.26.1.15.{{ $index }}'
+                    descr: Mgmt {{ $index }} Temp
+                    index: 'lt2sMgmtSfpLaserTemp.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: lt2sMgmtSfpLaserTemp
+                            op: '='
+                            value: 0
+                -
+                    oid: lt2sPortTable
+                    value: lt2sLineLaserTemp
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.15.{{ $index }}'
+                    descr: Line {{ $index }} Temp
+                    index: 'lt2sLineLaserTemp.{{ $index }}'
+                -
+                    oid: lt2sPortTable
+                    value: lt2sClientLaserTemp
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.28.{{ $index }}'
+                    descr: Client {{ $index }} Temp
+                    index: 'lt2sClientLaserTemp.{{ $index }}'
+                -
+                    oid: lt2sTemperature
+                    value: lt2sTemperature
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.1.{{ $index }}'
+                    descr: Chassis Temp
+                #HS variant
+                -
+                    oid: portEntry
+                    value: portClientLaserTemp
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.12.1.17.{{ $index }}'
+                    descr: Client {{ $index }} Temp
+                    index: 'portClientLaserTemp.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: portClientLaserTemp
+                            op: '='
+                            value: -1
+                -
+                    oid: systemTemperature
+                    value: systemTemperature
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.1.{{ $index }}'
+                    descr: Chassis Temp                            
+        dbm:
+            data:
+                #LT2-S Variant
+                -
+                    oid: lt2sMgmtPortTable
+                    value: lt2sMgmtSfpRxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.1.26.1.14.{{ $index }}'
+                    descr: Mgmt {{ $index }} Rx
+                    index: 'lt2sMgmtSfpRxPower.{{ $index }}'
+                    group: 'Mgmt {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: lt2sMgmtSfpRxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: lt2sMgmtSfpRxPower
+                            op: '='
+                            value: -1
+                -
+                    oid: lt2sMgmtPortTable
+                    value: lt2sMgmtSfpTxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.1.26.1.13.{{ $index }}'
+                    index: 'lt2sMgmtSfpTxPower.{{ $index }}'
+                    descr: Mgmt {{ $index }} Tx
+                    group: 'Mgmt {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: lt2sMgmtSfpTxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: lt2sMgmtSfpTxPower
+                            op: '='
+                            value: -1
+                -
+                    oid: lt2sPortTable
+                    value: lt2sLineTxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.13.{{ $index }}'
+                    index: 'lt2sLineTxPower.{{ $index }}'
+                    descr: Line {{ $index }} Tx
+                    group: 'Line {{ $index }}'
+                    # low_limit: lt2sLineTxLow  --> does not work well, the thresholds dont have a divior
+                    # high_limit: lt2sLineTxHigh
+                    divisor: 1000
+            
+                -
+                    oid: lt2sPortTable
+                    value: lt2sLineRxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.14.{{ $index }}'
+                    index: 'lt2sLineRxPower.{{ $index }}'
+                    descr: Line {{ $index }} Rx
+                    group: 'Line {{ $index }}'
+                    # low_limit: lt2sLineRxLow
+                    # high_limit: lt2sLineRxHigh                                 
+                    divisor: 1000
+                -
+                    oid: lt2sPortTable
+                    value: lt2sClientTxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.26.{{ $index }}'
+                    index: 'lt2sClientTxPower.{{ $index }}'
+                    descr: Client {{ $index }} Tx
+                    group: 'Client {{ $index }}'     
+                    # low_limit: lt2sClientTxLow
+                    # high_limit: lt2sClientTxHigh                                        
+                    divisor: 1000                  
+                -
+                    oid: lt2sPortTable
+                    value: lt2sClientRxPower
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.27.{{ $index }}'
+                    index: 'lt2sClientRxPower.{{ $index }}'                    
+                    descr: 'Client {{ $index }} Rx'
+                    group: 'Client {{ $index }}'
+                    # low_limit: lt2sClientRxLow
+                    # high_limit: lt2sClientRxHigh                    
+                    divisor: 1000     
+                #HS variantes
+                -
+                    oid: portEntry
+                    value: portLineTxPower
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.12.1.8.{{ $index }}'
+                    index: 'portLineTxPower.{{ $index }}'
+                    descr: Line {{ $index }} Tx
+                    group: 'Line {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: portLineTxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: portLineTxPower
+                            op: '='
+                            value: -1
+                -
+                    oid: portEntry
+                    value: portLineRxPower
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.12.1.9.{{ $index }}'
+                    index: 'portLineRxPower.{{ $index }}'
+                    descr: Line {{ $index }} Rx
+                    group: 'Line {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: portLineRxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: portLineRxPower
+                            op: '='
+                            value: -1
+                -
+                    oid: portEntry
+                    value: portClientTxPower
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.12.1.15.1{{ $index }}'
+                    index: 'portClientTxPower.{{ $index }}'
+                    descr: Client {{ $index }} Tx
+                    group: 'Client {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: portClientTxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: portClientTxPower
+                            op: '='
+                            value: -1
+                -
+                    oid: portEntry
+                    value: portClientRxPower
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.12.1.16.{{ $index }}'
+                    index: 'portClientRxPower.{{ $index }}'
+                    descr: Client {{ $index }} Rx
+                    group: 'Client {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: portClientTxPower
+                            op: '='
+                            value: 0
+                        -
+                            oid: portLineRxPower
+                            op: '='
+                            value: -1                              
+        state:
+            data:
+                -
+                    oid: lt2sPortTable
+                    value: lt2sClientLink
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.22.{{ $index }}'
+                    descr: 'Client {{ $index }} State'
+                    group: Link
+                    state_name: lt2sClientLink
+                    states:
+                        - { descr: Down, graph: 1, value: 1, generic: 3 }
+                        - { descr: Up, graph: 1, value: 2, generic: 0 }                    
+                -
+                    oid: lt2sPortTable
+                    value: lt2sLineLink
+                    num_oid: '.1.3.6.1.4.1.35616.5.3.1.1.22.{{ $index }}'
+                    descr: 'Line {{ $index }} State'
+                    group: Link
+                    state_name: lt2sLineLink
+                    states:
+                        - { descr: Down, graph: 1, value: 1, generic: 3 }
+                        - { descr: Up, graph: 1, value: 2, generic: 0 }                    
+                -
+                    oid: lt2sPowerFanStatus
+                    value: lt2sPowerFanStatus
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.4.0'
+                    descr: 'Fan State'
+                    group: Fan
+                    state_name: lt2sPowerFanStatus
+                    states:
+                        - { descr: failed, graph: 0, value: 1, generic: 0 }
+                        - { descr: On, graph: 0, value: 2, generic: 0 } 
+                        - { descr: Off, graph: 0, value: 3, generic: 0 }
+                -
+                    oid: lt2sPowerFanMode
+                    value: lt2sPowerFanMode
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.6.0'
+                    descr: 'Fan Mode'
+                    group: Fan
+                    state_name: lt2sPowerFanMode
+                    states:
+                        - { descr: alwaysOff, graph: 0, value: 1, generic: 0 }
+                        - { descr: alwaysOn, graph: 0, value: 2, generic: 0 } 
+                        - { descr: byTemperature, graph: 0, value: 3, generic: 0 }
+                #HS Variant
+                -
+                    oid: systemFan1
+                    value: systemFan1
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.4.0'
+                    descr: 'Fan Status'
+                    group: Fan
+                    state_name: systemFan1
+                    states:
+                        - { descr: failed, graph: 0, value: 1, generic: 0 }
+                        - { descr: Off, graph: 0, value: 2, generic: 0 }
+                        - { descr: On, graph: 0, value: 3, generic: 0 } 
+                -
+                    oid: systemFan2
+                    value: systemFan2
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.5.0'
+                    descr: 'Fan Status'
+                    group: Fan
+                    state_name: systemFan2
+                    states:
+                        - { descr: failed, graph: 0, value: 1, generic: 0 }
+                        - { descr: Off, graph: 0, value: 2, generic: 0 }
+                        - { descr: On, graph: 0, value: 3, generic: 0 }                
+                -
+                    oid: systemPower1
+                    value: systemPower1
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.3.0'
+                    descr: 'Power1'
+                    group: Power
+                    state_name: systemPower1
+                    states:
+                        - { descr: notplugged, graph: 0, value: 1, generic: 0 }
+                        - { descr: Off, graph: 0, value: 2, generic: 0 } 
+                        - { descr: On, graph: 0, value: 3, generic: 0 }           
+                -
+                    oid: systemPower2
+                    value: systemPower2
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.3.0'
+                    descr: 'Power2'
+                    group: Power
+                    state_name: systemPower2
+                    states:
+                        - { descr: notplugged, graph: 0, value: 1, generic: 0 }
+                        - { descr: Off, graph: 0, value: 2, generic: 0 } 
+                        - { descr: On, graph: 0, value: 3, generic: 0 }                        
+        fanspeed:
+            data:
+                -
+                    oid: lt2sPowerFanRPM
+                    value: lt2sPowerFanRPM
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.5.{{ $index }}'
+                    descr: 'Fan Speed'

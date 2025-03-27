@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -15,10 +16,10 @@ $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $urlargs = [
-    'type'          => 'bill_historicbits',
-    'id'            => $_GET['bill_id'],
-    'width'         => $_GET['x'],
-    'height'        => $_GET['y'],
+    'type' => 'bill_historicbits',
+    'id' => $_GET['bill_id'],
+    'width' => $_GET['x'],
+    'height' => $_GET['y'],
 ];
 if (isset($_GET['bill_hist_id'])) {
     $urlargs['bill_hist_id'] = $_GET['bill_hist_id'];

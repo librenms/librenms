@@ -1,4 +1,4 @@
-mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB:ZYXEL-TRANSCEIVER-MIB:ZYXEL-STACKING-MIB
+mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB:ZYXEL-TRANSCEIVER-MIB:ZYXEL-STACKING-MIB:POWER-ETHERNET-MIB
 modules:
     mempools:
         data:
@@ -222,3 +222,21 @@ modules:
                             oid: transceiverDdmInfoEntryDescription
                             op: '!='
                             value: 'Voltage'
+        power:
+            data:
+                -
+                    oid: pethMainPseTable
+                    value: pethMainPsePower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
+                    index: 'pethMainPsePower.{{ $index }}'
+                    group: "PoE"
+                    descr: "PoE Budget Total - ID {{ $index }}"
+                -
+                    oid: pethMainPseTable
+                    value: pethMainPseConsumptionPower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
+                    high_limit: pethMainPsePower
+                    group: "PoE"
+                    descr: "PoE Budget Consumed - ID {{ $index }}"
+                    

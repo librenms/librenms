@@ -18,8 +18,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'EPS',
-        'ds'       => 'eps',
+        'descr' => 'EPS',
+        'ds' => 'eps',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -124,15 +124,15 @@ file sequence.
 
 ## Configure LibreNMS - All Operating Systems
 
-Edit `/opt/librenms/config.php` and add the following:
+!!! setting "external/smokeping"
+    ```bash
+    lnms config:set smokeping.dir '/var/lib/smokeping'
+    lnms config:set smokeping.pings 20
+    lnms config:set smokeping.probes 2
+    lnms config:set smokeping.integration true
+    lnms config:set smokeping.url 'smokeping/'
+    ```
 
-```php
-$config['smokeping']['dir'] = '/var/lib/smokeping';
-$config['smokeping']['pings'] = 20;
-$config['smokeping']['probes'] = 2;
-$config['smokeping']['integration'] = true;
-$config['smokeping']['url'] = 'smokeping/';  // If you have a specific URL or path for smokeping
-```
 `dir` should match the location that smokeping writes RRD's to
 `pings` should match the default smokeping value, default 20
 `probes` should be the number of processes to spread pings over, default 2
@@ -178,10 +178,133 @@ After creating the symlink, restart Apache with `sudo systemctl apache2 restart`
 
 You should be able to load the Smokeping web interface at `http://yourhost/cgi-bin/smokeping.cgi`
 
+### Nginx Configuration - RHEL, CentOS and alike
+This section assumes you have configured LibreNMS with Nginx as
+specified in [Configure Nginx](../Installation/Install-LibreNMS.md#__tabbed_5_1).
+
+Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
+```
+yum install fcgiwrap
+```
+Then create a new configuration file for fcgiwrap in /etc/nginx/fcgiwrap.conf
+```
+# Include this file on your nginx.conf to support debian cgi-bin scripts using
+# fcgiwrap
+location /cgi-bin/ {
+  # Disable gzip (it makes scripts feel slower since they have to complete
+  # before getting gzipped)
+  gzip off;
+
+  # Set the root to /usr/lib (inside this location this means that we are
+  # giving access to the files under /usr/lib/cgi-bin)
+  #root /usr/lib;
+  root /usr/share/nginx;
+
+  # Fastcgi socket
+  fastcgi_pass  unix:/var/run/fcgiwrap.socket;
+
+  # Fastcgi parameters, include the standard ones
+  include /etc/nginx/fastcgi_params;
+
+  # Adjust non standard parameters (SCRIPT_FILENAME)
+  fastcgi_param SCRIPT_FILENAME  /usr/lib$fastcgi_script_name;
+} 
+```
+Be sure to create the folder cgi-bin folder with required permissions (755)
+```
+mkdir /usr/share/nginx/cgi-bin
+```
+Create fcgiwrap systemd service in /usr/lib/systemd/system/fcgiwrap.service
+```
+# create new
+[Unit]
+Description=Simple CGI Server
+After=nss-user-lookup.target
+Requires=fcgiwrap.socket
+
+[Service]
+EnvironmentFile=/etc/sysconfig/fcgiwrap
+ExecStart=/usr/sbin/fcgiwrap ${DAEMON_OPTS} -c ${DAEMON_PROCS}
+User=librenms
+Group=librenms
+
+[Install]
+Also=fcgiwrap.socket
+```
+The socket file in /usr/lib/systemd/system/fcgiwrap.socket
+```
+# create new
+[Unit]
+Description=fcgiwrap Socket
+
+[Socket]
+ListenStream=/var/run/fcgiwrap.socket
+
+[Install]
+WantedBy=sockets.target
+```
+Enable fcgiwrap
+```
+systemctl enable --now fcgiwrap
+```
+
+Add the following configuration to your `/etc/nginx/conf.d/librenms.conf` file within `server` section.
+
+The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:
+```
+location = /smokeping/ {
+        fastcgi_intercept_errors on;
+        fastcgi_param   SCRIPT_FILENAME         /usr/share/smokeping/cgi/smokeping.fcgi;
+        fastcgi_param   QUERY_STRING            $query_string;
+        fastcgi_param   REQUEST_METHOD          $request_method;
+        fastcgi_param   CONTENT_TYPE            $content_type;
+        fastcgi_param   CONTENT_LENGTH          $content_length;
+        fastcgi_param   REQUEST_URI             $request_uri;
+        fastcgi_param   DOCUMENT_URI            $document_uri;
+        fastcgi_param   DOCUMENT_ROOT           $document_root;
+        fastcgi_param   SERVER_PROTOCOL         $server_protocol;
+        fastcgi_param   GATEWAY_INTERFACE       CGI/1.1;
+        fastcgi_param   SERVER_SOFTWARE         nginx/$nginx_version;
+        fastcgi_param   REMOTE_ADDR             $remote_addr;
+        fastcgi_param   REMOTE_PORT             $remote_port;
+        fastcgi_param   SERVER_ADDR             $server_addr;
+        fastcgi_param   SERVER_PORT             $server_port;
+        fastcgi_param   SERVER_NAME             $server_name;
+        fastcgi_param   HTTPS                   $https if_not_empty;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+}
+
+location ^~ /smokeping/ {
+        alias /usr/share/smokeping/cgi/;
+        index smokeping.fcgi;
+        gzip off;
+}
+```
+If images/js/css don't load, you might have to add
+```
+location ^~ /smokeping/css {
+        alias /usr/share/smokeping/htdocs/css/;
+        gzip off;
+}
+location ^~ /smokeping/js {
+        alias /usr/share/smokeping/htdocs/js/;
+        gzip off;
+}
+location ^~ /smokeping/images {
+        alias /opt/librenms/rrd/smokeping/images;
+        gzip off;
+}
+```
+After saving the configuration file, verify your Nginx configuration file syntax
+is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
+
+You should be able to load the Smokeping web interface at `http://yourlibrenms/smokeping`
+
+
 ### Nginx Configuration - Ubuntu, Debian and alike
 
 This section assumes you have configured LibreNMS with Nginx as
-specified in [Configure Nginx](../Installation/Installation-Ubuntu-1804-Nginx.md).
+specified in [Configure Nginx](../Installation/Install-LibreNMS.md#configure-web-server).
 
 Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
 
@@ -194,7 +317,7 @@ Then configure Nginx with the default configuration
 cp /usr/share/doc/fcgiwrap/examples/nginx.conf /etc/nginx/fcgiwrap.conf
 ```
 
-Add the following configuration to your `/etc/nginx/conf.d/librenms` config file.
+Add the following configuration to your `/etc/nginx/conf.d/librenms.conf` file within `server` section.
 
 The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:
 
@@ -307,7 +430,7 @@ Finally restart the smokeping service:
 sudo systemctl start smokeping
 ```
 
-Remember to update *config.php* with the new locations.
+Remember to update your config with the new locations.
 
 #### Configure SELinux to allow smokeping to write in LibreNMS directory on Centos / RHEL
 If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:

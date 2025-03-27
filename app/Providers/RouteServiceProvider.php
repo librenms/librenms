@@ -38,7 +38,6 @@ class RouteServiceProvider extends ServiceProvider
         //$this->configureRateLimiting();
 
         $this->routes(function () {
-
             /**
              * Define the "api" routes for the application.
              *

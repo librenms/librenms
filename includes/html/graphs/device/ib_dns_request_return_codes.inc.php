@@ -7,10 +7,10 @@ $rrd_options .= " --vertical-label='Requests per second'";
 $rrd_options .= " --lower-limit='0'";
 
 $stats = [
-    'success'        => '#74C366FF',
-    'failure'        => '#007283FF',
-    'nxdomain'       => '#FFAB00FF',
-    'nxrrset'        => '#B1441EFF',
+    'success' => '#74C366FF',
+    'failure' => '#007283FF',
+    'nxdomain' => '#FFAB00FF',
+    'nxrrset' => '#B1441EFF',
 ];
 
 $i = 0;

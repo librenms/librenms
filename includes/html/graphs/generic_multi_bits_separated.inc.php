@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -32,7 +33,7 @@ $unit_text = 'Bits/sec';
 
 if (! $noagg || ! $nodetails) {
     if ($width > '500') {
-        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)));
+        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5));
         $rrd_options .= sprintf(" COMMENT:'%12s'", 'Current');
         $rrd_options .= sprintf(" COMMENT:'%10s'", 'Average');
         $rrd_options .= sprintf(" COMMENT:'%10s'", 'Maximum');
@@ -42,7 +43,7 @@ if (! $noagg || ! $nodetails) {
         $rrd_options .= " COMMENT:'\l'";
     } else {
         $nototal = true;
-        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)));
+        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5));
         $rrd_options .= sprintf(" COMMENT:'%12s'", 'Now');
         $rrd_options .= sprintf(" COMMENT:'%10s'", 'Avg');
         $rrd_options .= sprintf(" COMMENT:'%10s\l'", 'Max');
@@ -140,7 +141,7 @@ if (! $noagg) {
     $rrd_options .= ' VDEF:totalin=aggrinbytes,TOTAL';
     $rrd_options .= ' VDEF:totalout=aggroutbytes,TOTAL';
     $rrd_options .= " COMMENT:' \\n'";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', ($descr_len + 5)), 0, ($descr_len + 5)) . 'In' . "'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', $descr_len + 5), 0, $descr_len + 5) . 'In' . "'";
     $rrd_options .= ' GPRINT:aggrinbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:aggrinbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:aggrinbits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -149,7 +150,7 @@ if (! $noagg) {
     }
 
     $rrd_options .= '\\n';
-    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', ($descr_len + 4)), 0, ($descr_len + 4)) . 'Out' . "'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', $descr_len + 4), 0, $descr_len + 4) . 'Out' . "'";
     $rrd_options .= ' GPRINT:aggroutbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:aggroutbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:aggroutbits:MAX:%6.' . $float_precision . "lf%s$units";

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Terra-sdi480 bitrates
  *
@@ -42,7 +43,7 @@ if (is_array($pre_cache['sdi480status'])) {
             $value = $br * $multiplier;
             $group = 'Inputs';
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'bitrate',
                 $device,
                 $oid,
@@ -75,7 +76,7 @@ if (is_array($pre_cache['sdi480status'])) {
             $value = $br * $multiplier;
             $group = 'Streams';
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'bitrate',
                 $device,
                 $oid,

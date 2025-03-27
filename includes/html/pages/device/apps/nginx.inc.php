@@ -2,7 +2,7 @@
 
 $graphs = [
     'nginx_connections' => 'nginx Connections',
-    'nginx_req'         => 'nginx requests',
+    'nginx_req' => 'nginx requests',
 ];
 
 foreach ($graphs as $key => $text) {

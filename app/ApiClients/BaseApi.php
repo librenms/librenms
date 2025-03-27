@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BaseApi.php
  *
@@ -25,8 +26,7 @@
 
 namespace App\ApiClients;
 
-use Illuminate\Support\Facades\Http;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Util\Http;
 
 class BaseApi
 {
@@ -37,9 +37,7 @@ class BaseApi
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
         if (is_null($this->client)) {
-            $this->client = Http::withOptions([
-                'proxy' => Proxy::forGuzzle($this->base_uri),
-            ])->baseUrl($this->base_uri)
+            $this->client = Http::client()->baseUrl($this->base_uri)
             ->timeout($this->timeout);
         }
 

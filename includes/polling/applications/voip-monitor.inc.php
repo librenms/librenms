@@ -26,8 +26,6 @@ foreach ($lines as $line) {
 
 unset($lines);
 
-$rrd_name = ['app', $name, $app->app_id];
-
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu', 'GAUGE', 0, 100)
     ->addDataset('kbyte', 'GAUGE', 0, 125000000000)
@@ -39,8 +37,13 @@ $fields = [
     'openfiles' => (int) $voip['Open files'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $fields);

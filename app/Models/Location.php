@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Location.php
  *
@@ -45,6 +46,7 @@ class Location extends Model
     protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
+    private $location_ignore_regex = '/\(.*?\)/';
 
     // ---- Helper Functions ----
 
@@ -127,7 +129,9 @@ class Location extends Model
         try {
             /** @var \LibreNMS\Interfaces\Geocoder $api */
             $api = app(\LibreNMS\Interfaces\Geocoder::class);
-            $this->fill($api->getCoordinates($this->location));
+
+            // Removes Location info inside () when looking up lat/lng
+            $this->fill($api->getCoordinates(preg_replace($this->location_ignore_regex, '', $this->location)));
 
             return true;
         } catch (BindingResolutionException $e) {

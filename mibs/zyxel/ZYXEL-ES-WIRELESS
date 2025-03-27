@@ -26,12 +26,12 @@ IMPORTS
 
 --
 -- Node: esWireless
--- includes wlanRadioTable, wlanStationTable, wlanStatisticsTable, wlanTraps
+-- includes wlanRadioTable, wlanStationTable, wlanStatisticsTable, wlanTraps, wlanControllerAPTable, wlanControllerAPRadioTable,wlanControllerAPVAPTable,wlanTotalStationCount
 --
 
 esWireless MODULE-IDENTITY
-	LAST-UPDATED		"201009200000Z"
-	ORGANIZATION	"Enterprise Solution ZyXEL"
+	LAST-UPDATED		"201503230000Z"
+	ORGANIZATION	"Enterprise Solution Zyxel"
 	CONTACT-INFO		""
 	DESCRIPTION
 		"The sub tree for Wireless information"
@@ -56,7 +56,7 @@ wlanRadioEntry OBJECT-TYPE
         STATUS		current
         DESCRIPTION
 		"An entry describing WLAN Radio information for each chip."
-        INDEX {ifIndex }
+        INDEX { wlanRadioIndex }
         ::= {  wlanRadioTable 1 }
 
 WlanRadioEntry ::= SEQUENCE {
@@ -65,6 +65,7 @@ WlanRadioEntry ::= SEQUENCE {
 	wlanSupportedChannel	OCTET STRING,
 	wlanMode			INTEGER,
 	wlanChannel			INTEGER,
+	wlanRadioIndex		Integer32
 	}
 
     	wlanCurrentChannel OBJECT-TYPE
@@ -83,7 +84,6 @@ WlanRadioEntry ::= SEQUENCE {
 			channel-11_2462mhz(11),
 			channel-12_2467mhz(12),
 			channel-13_2472mhz(13),
-
 			channel-36_5180mhz(36),
 			channel-40_5200mhz(40),
 			channel-44_5220mhz(44),
@@ -107,7 +107,66 @@ WlanRadioEntry ::= SEQUENCE {
 			channel-153_5765mhz(153),
 			channel-157_5785mhz(157),
 			channel-161_5805mhz(161),
-			channel-165_5825mhz(165)
+			channel-165_5825mhz(165),
+			channel-01_5955mhz(1),
+ 			channel-05_5975mhz(5),
+ 			channel-09_5995mhz(9),
+ 			channel-13_6015mhz(13),
+			channel-17_6035mhz(17),
+			channel-21_6055mhz(21),
+			channel-25_6075mhz(25),
+			channel-29_6095mhz(29),
+			channel-33_6115mhz(33),
+			channel-37_6135mhz(37),
+			channel-41_6155mhz(41),
+			channel-45_6175mhz(45),
+			channel-49_6195mhz(49),
+			channel-53_6215mhz(53),
+			channel-57_6235mhz(57),
+			channel-61_6255mhz(51),
+			channel-65_6275mhz(55),
+			channel-69_6295mhz(69),
+			channel-73_6315mhz(73),
+			channel-77_6335mhz(77),
+			channel-81_6355mhz(81),
+			channel-85_6375mhz(85),
+			channel-89_6395mhz(89),
+			channel-93_6415mhz(93),
+			channel-97_6435mhz(97),
+			channel-101_6455mhz(101),
+			channel-105_6475mhz(105),
+			channel-109_6495mhz(109),
+			channel-113_6515mhz(113),
+			channel-117_6535mhz(117),
+			channel-121_6555mhz(121),
+			channel-125_6575mhz(125),
+			channel-129_6595mhz(129),
+			channel-133_6615mhz(133),
+			channel-137_6635mhz(137),
+			channel-141_6655mhz(141),
+			channel-145_6675mhz(145),
+			channel-149_6695mhz(149),
+			channel-153_6715mhz(153),
+			channel-157_6735mhz(157),
+			channel-161_6755mhz(161),
+			channel-165_6775mhz(165),
+			channel-169_6795mhz(169),
+			channel-173_6815mhz(173),
+			channel-177_6835mhz(177),
+			channel-181_6855mhz(181),
+			channel-185_6875mhz(185),
+			channel-189_6895mhz(189),
+			channel-193_6915mhz(193),
+			channel-197_6935mhz(197),
+			channel-201_6955mhz(201),
+			channel-205_6975mhz(205),
+			channel-209_6995mhz(209),
+			channel-213_7015mhz(213),
+			channel-217_7035mhz(217),
+			channel-221_7055mhz(221),
+			channel-225_7075mhz(225),
+			channel-229_7095mhz(229),
+			channel-233_7115mhz(233)
  		}
 	        MAX-ACCESS	read-only
 	        STATUS		current
@@ -134,7 +193,8 @@ WlanRadioEntry ::= SEQUENCE {
 	wlanMode OBJECT-TYPE
 	 	SYNTAX		INTEGER {
 			mode_2_4G(1),
-	 		mode_5G(2)
+	 		mode_5G(2),
+			mode_6G(3)
 		}
 	        MAX-ACCESS	read-write
 	        STATUS		current
@@ -157,7 +217,6 @@ WlanRadioEntry ::= SEQUENCE {
 			channel-11_2462mhz(11),
 			channel-12_2467mhz(12),
 			channel-13_2472mhz(13),
-
 			channel-36_5180mhz(36),
 			channel-40_5200mhz(40),
 			channel-44_5220mhz(44),
@@ -181,7 +240,66 @@ WlanRadioEntry ::= SEQUENCE {
 			channel-153_5765mhz(153),
 			channel-157_5785mhz(157),
 			channel-161_5805mhz(161),
-			channel-165_5825mhz(165)
+			channel-165_5825mhz(165),			
+			channel-01_5955mhz(1),
+ 			channel-05_5975mhz(5),
+ 			channel-09_5995mhz(9),
+ 			channel-13_6015mhz(13),
+			channel-17_6035mhz(17),
+			channel-21_6055mhz(21),
+			channel-25_6075mhz(25),
+			channel-29_6095mhz(29),
+			channel-33_6115mhz(33),
+			channel-37_6135mhz(37),
+			channel-41_6155mhz(41),
+			channel-45_6175mhz(45),
+			channel-49_6195mhz(49),
+			channel-53_6215mhz(53),
+			channel-57_6235mhz(57),
+			channel-61_6255mhz(51),
+			channel-65_6275mhz(55),
+			channel-69_6295mhz(69),
+			channel-73_6315mhz(73),
+			channel-77_6335mhz(77),
+			channel-81_6355mhz(81),
+			channel-85_6375mhz(85),
+			channel-89_6395mhz(89),
+			channel-93_6415mhz(93),
+			channel-97_6435mhz(97),
+			channel-101_6455mhz(101),
+			channel-105_6475mhz(105),
+			channel-109_6495mhz(109),
+			channel-113_6515mhz(113),
+			channel-117_6535mhz(117),
+			channel-121_6555mhz(121),
+			channel-125_6575mhz(125),
+			channel-129_6595mhz(129),
+			channel-133_6615mhz(133),
+			channel-137_6635mhz(137),
+			channel-141_6655mhz(141),
+			channel-145_6675mhz(145),
+			channel-149_6695mhz(149),
+			channel-153_6715mhz(153),
+			channel-157_6735mhz(157),
+			channel-161_6755mhz(161),
+			channel-165_6775mhz(165),
+			channel-169_6795mhz(169),
+			channel-173_6815mhz(173),
+			channel-177_6835mhz(177),
+			channel-181_6855mhz(181),
+			channel-185_6875mhz(185),
+			channel-189_6895mhz(189),
+			channel-193_6915mhz(193),
+			channel-197_6935mhz(197),
+			channel-201_6955mhz(201),
+			channel-205_6975mhz(205),
+			channel-209_6995mhz(209),
+			channel-213_7015mhz(213),
+			channel-217_7035mhz(217),
+			channel-221_7055mhz(221),
+			channel-225_7075mhz(225),
+			channel-229_7095mhz(229),
+			channel-233_7115mhz(233)
  		}
 	        MAX-ACCESS	read-write
 	        STATUS		current
@@ -189,6 +307,14 @@ WlanRadioEntry ::= SEQUENCE {
 			"The control for WLAN channel. When setting this
 			parameter, the value should be a subset of all supported channel"
 	        ::= { wlanRadioEntry 6 }
+			
+	wlanRadioIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..2147483647)
+	        MAX-ACCESS	not-accessible
+	        STATUS		current
+	        DESCRIPTION
+			"Index of WLAN Radio information for each chip."
+	        ::= { wlanRadioEntry 7 }
 
 
 --
@@ -216,7 +342,8 @@ WlanStationEntry ::= SEQUENCE {
 	stationIndex			Integer32,
 	stationMacAddress		MacAddress,
 	stationAssociatedTime	DateAndTime,
-	stationSSID			OCTET STRING
+	stationSSID			OCTET STRING,
+	stationSignalStrength		OCTET STRING
 	}
 
 	stationIndex OBJECT-TYPE
@@ -252,6 +379,14 @@ WlanStationEntry ::= SEQUENCE {
 			"The associated ssid."
 	        ::= { wlanStationEntry 4 }
 
+	stationSignalStrength OBJECT-TYPE
+	        SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"Stations singal Strength (dbm)."
+	        ::= { wlanStationEntry 5 }
+
 
 --
 -- Node: wlanStatistics
@@ -271,7 +406,7 @@ wlanStatisticsEntry OBJECT-TYPE
         STATUS		current
         DESCRIPTION
 		"An entry describing WLAN statistics information."
-        INDEX { ifIndex  }
+        INDEX { wlanStatisticsIndex  }
         ::= {  wlanStatisticsTable 1 }
 
 WlanStatisticsEntry ::= SEQUENCE {
@@ -281,7 +416,8 @@ WlanStatisticsEntry ::= SEQUENCE {
 	dot11ReceivedFragmentCount   	Counter64,
 	dot11TransmittedFrameCount		Counter64,
 	dot11ReceivedPktCount     		Counter64,
-	dot11TransmittedPktCount 		Counter64
+	dot11TransmittedPktCount 		Counter64,
+	wlanStatisticsIndex			Integer32
 	}
 
 	dot11FailedCount  OBJECT-TYPE
@@ -344,6 +480,14 @@ WlanStatisticsEntry ::= SEQUENCE {
 	        DESCRIPTION
 			"This counter shall increment for each successfully transmitted packets."
 		::= {  wlanStatisticsEntry 7 }
+	
+	wlanStatisticsIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..2147483647)
+	        MAX-ACCESS	not-accessible
+	        STATUS		current
+	        DESCRIPTION
+			"Index of WLAN statistics information."
+	        ::= { wlanStatisticsEntry 8 }
 
 
 --
@@ -433,4 +577,395 @@ WlanStatisticsEntry ::= SEQUENCE {
 			"Wireless client authentication failed."
 		::= { trapsItems 3 }
 
+--
+-- Node: wlanControllerAPTable
+--
+
+wlanControllerAPTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanControllerAPEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists Controller APs information. Use managmented AP number as the index of each entry"
+        ::= { esWireless 11 }
+
+wlanControllerAPEntry OBJECT-TYPE
+        SYNTAX		WlanControllerAPEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing wireless information for each managmented AP."
+        INDEX {wlanControllerAPIndex }
+        ::= {  wlanControllerAPTable 1 }
+
+WlanControllerAPEntry ::= SEQUENCE {  
+	wlanControllerAPIndex Integer32,
+	wlanControllerAPMac	OCTET STRING,	
+	wlanControllerAPDescription	OCTET STRING,
+	wlanControllerAPMgmtIPAddr		IpAddress,
+	wlanControllerAPStationNum			Unsigned32,	 
+	}
+	wlanControllerAPIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..65535)           
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"AP index."	  
+			::= { wlanControllerAPEntry 1 }
+
+	wlanControllerAPMac OBJECT-TYPE
+	        SYNTAX		OCTET STRING             
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The MAC Addresss of the AP."
+	        DEFVAL { "public" }
+	        ::= { wlanControllerAPEntry 2 }
+
+	wlanControllerAPDescription OBJECT-TYPE
+	 		SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total numbers of associated stations"
+	        ::= { wlanControllerAPEntry 3 }
+
+	wlanControllerAPMgmtIPAddr OBJECT-TYPE
+	 		SYNTAX		IpAddress
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"AP managmented IP "
+	        ::= { wlanControllerAPEntry 4 }
+
+	wlanControllerAPStationNum OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total numbers of associated stations"
+	        ::= { wlanControllerAPEntry 5 }
+--
+-- Node: wlanControllerAPRadio
+--
+
+wlanControllerAPRadioTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanControllerAPRadioEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists the AP radio information."
+        ::= { esWireless 12 }
+
+wlanControllerAPRadioEntry OBJECT-TYPE
+        SYNTAX		WlanControllerAPRadioEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing WLAN Radio information for each chip."
+        INDEX { wlanControllerRadioIndex }
+
+        ::= {  wlanControllerAPRadioTable 1 }
+
+WlanControllerAPRadioEntry ::= SEQUENCE { 
+	wlanControllerRadioIndex	Integer32, 
+	wlanControllerRadioStationNum		Unsigned32, 
+	wlanControllerRadioCurrentChannel	INTEGER,
+	wlanControllerRadioOperationMode			INTEGER,
+	wlanControllerRadioBand			INTEGER,
+	wlanControllerRadioTxPkt		Counter32,
+	wlanControllerRadioRxPkt		Counter32,
+	wlanControllerRadioTxPower      Integer32,
+		}
+	wlanControllerRadioIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..4)           
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"AP radio index."	  
+			::= { wlanControllerAPRadioEntry 1 }   
+	wlanControllerRadioStationNum OBJECT-TYPE
+	 		SYNTAX		Unsigned32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total numbers of associated stations"
+	        ::= { wlanControllerAPRadioEntry 2 }
+
+   	wlanControllerRadioCurrentChannel OBJECT-TYPE
+ 		SYNTAX		INTEGER {
+ 			device_is_disable(0),
+ 			channel-01_2412mhz(1),
+ 			channel-02_2417mhz(2),
+ 			channel-03_2422mhz(3),
+ 			channel-04_2427mhz(4),
+			channel-05_2432mhz(5),
+			channel-06_2437mhz(6),
+			channel-07_2442mhz(7),
+			channel-08_2447mhz(8),
+			channel-09_2452mhz(9),
+			channel-10_2457mhz(10),
+			channel-11_2462mhz(11),
+			channel-12_2467mhz(12),
+			channel-13_2472mhz(13),
+			channel-36_5180mhz(36),
+			channel-40_5200mhz(40),
+			channel-44_5220mhz(44),
+			channel-48_5240mhz(48),
+			channel-52_5260mhz(52),
+			channel-56_5280mhz(56),
+			channel-60_5300mhz(60),
+			channel-64_5320mhz(64),
+			channel-100_5500mhz(100),
+			channel-104_5520mhz(104),
+			channel-108_5540mhz(108),
+			channel-112_5560mhz(112),
+			channel-116_5580mhz(116),
+			channel-120_5600mhz(120),
+			channel-124_5620mhz(124),
+			channel-128_5640mhz(128),
+			channel-132_5660mhz(132),
+			channel-136_5680mhz(136),
+			channel-140_5700mhz(140),
+			channel-149_5745mhz(149),
+			channel-153_5765mhz(153),
+			channel-157_5785mhz(157),
+			channel-161_5805mhz(161),
+			channel-165_5825mhz(165)
+ 		}
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The current operating wireless channel."
+	        ::= { wlanControllerAPRadioEntry 3 }
+
+	    wlanControllerRadioOperationMode OBJECT-TYPE
+ 		SYNTAX	INTEGER {
+ 			na(0),
+			ap(1), 
+ 			monitor(2),
+ 			mesh-Root(3),
+ 			mesh-repeater(4) 		
+ 		}
+	        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+			"The operation mode of the radio."
+	        ::= { wlanControllerAPRadioEntry 4 }
+
+	wlanControllerRadioBand OBJECT-TYPE
+	 	SYNTAX		INTEGER { 
+	 		na(0),
+			mode_2_4G(1),
+	 		mode_5G(2)
+	}
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The control for WLAN radio mode."
+	        ::= { wlanControllerAPRadioEntry 5 }
+
+	wlanControllerRadioTxPkt OBJECT-TYPE
+	 	SYNTAX		Counter32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total number of packets transmitted by the radio."
+	        ::= { wlanControllerAPRadioEntry 6 }
+
+	wlanControllerRadioRxPkt OBJECT-TYPE
+	 	SYNTAX		Counter32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total number of packets received by the radio."
+	        ::= { wlanControllerAPRadioEntry 7 } 
+			
+	wlanControllerRadioTxPower OBJECT-TYPE
+	 	SYNTAX		Integer32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The radio's real output power (dBm)"
+	        ::= { wlanControllerAPRadioEntry 8 } 
+			
+--
+-- Node: wlanControllerAPMultiVAPTable
+--
+
+wlanControllerAPVAPTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanControllerAPVAPEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists the AP VAP information."
+        ::= { esWireless 13 }
+--
+wlanControllerAPVAPEntry OBJECT-TYPE
+        SYNTAX		WlanControllerAPVAPEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing WLAN BSS information for each radio."
+        INDEX { wlanControllerRadioVAPIndex }
+        ::= {  wlanControllerAPVAPTable 1 }
+
+WlanControllerAPVAPEntry ::= SEQUENCE { 	
+	wlanControllerRadioVAPIndex	Integer32,
+	wlanControllerRadioVAPSSIDName OCTET STRING,
+	wlanControllerRadioVAPVLANID Integer32,
+	wlanControllerRadioVAPSecMode OCTET STRING
+	}
+
+	wlanControllerRadioVAPIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..8)           
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"AP radio VAP index."	  
+			::= { wlanControllerAPVAPEntry 1 }
+
+	wlanControllerRadioVAPSSIDName OBJECT-TYPE
+	 	SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"SSID name"
+	        ::= { wlanControllerAPVAPEntry 2 }
+
+	wlanControllerRadioVAPVLANID OBJECT-TYPE
+	 		SYNTAX		Integer32 (1..4094) 
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The VAP VLAN ID."
+	        ::= { wlanControllerAPVAPEntry 3 }  
+
+	wlanControllerRadioVAPSecMode OBJECT-TYPE
+	 		SYNTAX		OCTET STRING 
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The VAP security mode."
+	        ::= { wlanControllerAPVAPEntry 4 }
+--
+-- Node: wlanControllerStationTable
+--
+                  
+wlanControllerStationTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanControllerStationEntry
+        MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table lists controller stations list."
+        ::= { esWireless 14 }
+
+wlanControllerStationEntry OBJECT-TYPE
+        SYNTAX		WlanControllerStationEntry
+        MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry describing the station information."
+        INDEX { wlanControllerStationIndex  }
+        ::= {  wlanControllerStationTable 1 }
+                                                      
+WlanControllerStationEntry ::= SEQUENCE {
+	wlanControllerStationIndex			Integer32,
+	wlanControllerStationMacAddress		OCTET STRING,
+	wlanControllerStationAssociatedTime	OCTET STRING,
+	wlanControllerStationSSID			OCTET STRING,
+	wlanControllerStationIPAddr	IpAddress,
+	wlanControllerStationAssociatedAPMac	OCTET STRING,	 
+	wlanControllerStationSignalStrength	OCTET STRING,
+	wlanControllerStationTxPkt   Counter32,
+	wlanControllerStationRxPkt   Counter32,
+ 		}
+
+	wlanControllerStationIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..65535)
+	        MAX-ACCESS	read-only
+ 		STATUS		current
+ 		DESCRIPTION
+			"Index of stations."
+	        ::= { wlanControllerStationEntry 1 }
+
+	wlanControllerStationMacAddress OBJECT-TYPE
+	        SYNTAX		OCTET STRING             
+	        MAX-ACCESS	read-only
+	    	STATUS		current
+	    	DESCRIPTION
+			"The MAC Addresss of the station."
+	        DEFVAL { "public" }
+	        ::= { wlanControllerStationEntry 2 }
+
+	wlanControllerStationAssociatedTime OBJECT-TYPE
+	        SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	    	STATUS		current
+	    	DESCRIPTION
+			"The associated time of the station."
+	        ::= { wlanControllerStationEntry 3 }
+
+	wlanControllerStationSSID OBJECT-TYPE
+	        SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	    	STATUS		current
+	    	DESCRIPTION
+			"The associated ssid."
+	        ::= { wlanControllerStationEntry 4 }   
+
+	wlanControllerStationIPAddr OBJECT-TYPE
+	        SYNTAX		IpAddress             
+	        MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The IP Addresss of the station."
+	        ::= { wlanControllerStationEntry 5 }
+
+	wlanControllerStationAssociatedAPMac OBJECT-TYPE
+	        SYNTAX		OCTET STRING             
+	        MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION
+			"The MAC Addresss of the Associated AP."	
+            ::= { wlanControllerStationEntry 6 }
+
+    wlanControllerStationSignalStrength OBJECT-TYPE
+	        SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Stations singal Strength (dbm)"
+	        ::= { wlanControllerStationEntry 7 }
+
+	wlanControllerStationTxPkt OBJECT-TYPE
+	        SYNTAX		Counter32
+	        MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Bytes of packets transmitted from the station."
+	        ::= { wlanControllerStationEntry 8 }
+			
+	wlanControllerStationRxPkt OBJECT-TYPE
+	        SYNTAX		Counter32
+	        MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Bytes of packets received by the station."
+	        ::= { wlanControllerStationEntry 9 }
+			
+--
+-- Node: wlanTotalStationCount
+--
+
+wlanTotalStationCount OBJECT-TYPE
+	 	SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The total numbers of associated stations"
+		::= { esWireless 15 }
 END
+
+
+

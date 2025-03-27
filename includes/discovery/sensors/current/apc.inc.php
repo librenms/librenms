@@ -15,7 +15,7 @@ if (isset($oids) && $oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -39,7 +39,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -62,7 +62,7 @@ if (isset($oids) && $oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -86,7 +86,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -112,7 +112,7 @@ if (isset($oids) && $oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $descr = 'Bank ' . $banknum;
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
@@ -130,7 +130,7 @@ if (isset($oids) && $oids) {
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
             $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
             if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1) {
-                discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+                discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
             }
         }
     }
@@ -150,7 +150,7 @@ if (isset($oids) && $oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $voltage_oid = '.1.3.6.1.4.1.318.1.1.26.6.3.1.6';
             // rPDU2PhaseStatusVoltage
             $current_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.' . $index;
@@ -177,7 +177,7 @@ if (isset($oids) && $oids) {
             }
 
             $descr = 'Outlet ' . $index . ' - ' . snmp_get($device, $name_oid, '-Oqv', '');
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -209,14 +209,14 @@ if (isset($oids) && $oids) {
     $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
     // No / $precision here! Nice, APC!
     $descr = 'Output Feed';
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+    discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
 }
 unset($oids);
 
 // UPS
 
 $phasecount = $pre_cache['apcups_phase_count'];
-if ($phasecount > 1) {
+if ($phasecount > 2) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', [], 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputCurrent', $in_oids, 'PowerNet-MIB');
 } else {
@@ -231,15 +231,15 @@ if (isset($in_oids)) {
         $in_index = '3.1.4.' . $index;
         if (substr($index, 0, 1) == 2 && $data['upsPhaseInputCurrent'] != -1) {
             $descr = 'Phase ' . substr($index, -1) . ' Bypass Input';
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         } elseif (substr($index, 0, 1) == 1) {
             $descr = 'Phase ' . substr($index, -1) . ' Input';
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         }
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);
 foreach ($oids as $index => $data) {
     $type = 'apcUPS';
     $descr = 'Phase ' . substr($index, -1) . ' Output';
@@ -253,8 +253,8 @@ foreach ($oids as $index => $data) {
         $current = $data['upsPhaseOutputCurrent'] / $divisor;
     }
     if ($current >= -1) {
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);

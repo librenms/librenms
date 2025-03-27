@@ -2,10 +2,16 @@ os: slms
 text: 'Zhone MXK'
 type: network
 icon: zhone
+mib_dir: zhone
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.5504.1.7.
             - .1.3.6.1.4.1.5504.1.8.
+discovery_modules:
+    ports-stack:   false
+

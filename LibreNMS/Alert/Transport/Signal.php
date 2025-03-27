@@ -1,4 +1,5 @@
 <?php
+
 /* This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -26,29 +27,18 @@ use LibreNMS\Alert\Transport;
 
 class Signal extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $signalOpts = [
-            'path'  => escapeshellarg($this->config['path']),
-            'recipient-type'  => ($this->config['recipient-type'] == 'group') ? ' -g ' : ' ',
-            'recipient' => escapeshellarg($this->config['recipient']),
-        ];
-
-        return $this->contactSignal($obj, $signalOpts);
-    }
-
-    public function contactSignal($obj, $opts)
-    {
-        exec($opts['path']
+        exec(escapeshellarg($this->config['path'])
            . ' --dbus-system send'
-           . $opts['recipient-type']
-           . $opts['recipient']
-           . ' -m ' . escapeshellarg($obj['title']));
+           . (($this->config['recipient-type'] == 'group') ? ' -g ' : ' ')
+           . escapeshellarg($this->config['recipient'])
+           . ' -m ' . escapeshellarg($alert_data['title']));
 
         return true;
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'validation' => [],

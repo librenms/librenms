@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OutagesController.php
  *
@@ -27,8 +28,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
@@ -64,10 +65,10 @@ class OutagesController extends TableController
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
             ->when($request->from, function ($query) use ($request) {
-                $query->where('going_down', '>=', strtotime($request->from));
+                $query->where('going_down', '>=', Carbon::parse($request->from, session('preferences.timezone'))->getTimestamp());
             })
             ->when($request->to, function ($query) use ($request) {
-                $query->where('going_down', '<=', strtotime($request->to));
+                $query->where('going_down', '<=', Carbon::parse($request->to, session('preferences.timezone'))->getTimestamp());
             });
     }
 
@@ -84,7 +85,7 @@ class OutagesController extends TableController
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => $outage->device ? Url::deviceLink($outage->device, $outage->device->shortDisplayName()) : null,
+            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
             'duration' => $this->formatTime($duration),
         ];
     }
@@ -113,7 +114,7 @@ class OutagesController extends TableController
         }
 
         $output = "<span style='display:inline;'>";
-        $output .= (Carbon::createFromTimestamp($timestamp))->format(Config::get('dateformat.compact')); // Convert epoch to local time
+        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
         $output .= '</span>';
 
         return $output;

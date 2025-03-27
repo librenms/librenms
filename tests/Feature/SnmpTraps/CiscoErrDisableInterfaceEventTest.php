@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoErrDisableInterfaceEventTest.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
@@ -55,7 +57,7 @@ SNMPv2-MIB::snmpTrapOID.0 CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1
 CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.$port->ifIndex.0 bpduGuard",
             'SNMP TRAP: bpduGuard error detected on ' . $port->ifName . ' (Description: ' . $port->ifDescr . '). ' . $port->ifName . ' in err-disable state.',
             'Could not handle testErrDisableInterfaceEvent trap',
-            [4],
+            [Severity::Warning],
             $device,
         );
     }
@@ -80,7 +82,7 @@ SNMPv2-MIB::snmpTrapOID.0 CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1
 CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.10.0 bpduGuard",
             'SNMP TRAP: bpduGuard error detected on unknown port. Either ifIndex is not found in the trap, or it does not match a port on this device.',
             'Could not handle testErrDisableBadIfIndex trap',
-            [4],
+            [Severity::Warning],
             $device,
         );
     }

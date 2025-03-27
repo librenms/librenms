@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertScheduleController.php
  *
@@ -27,7 +28,7 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class AlertScheduleController extends TableController
 {

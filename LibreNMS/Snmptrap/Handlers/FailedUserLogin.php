@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FailedUserLogin.php
  *
@@ -23,6 +24,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -38,6 +40,6 @@ class FailedUserLogin implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Failed User Login: ' . $device->displayName(), 4, 'auth');
+        $trap->log('SNMP Trap: Failed User Login: ' . $device->displayName(), Severity::Warning, 'auth');
     }
 }

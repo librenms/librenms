@@ -1,4 +1,5 @@
 <?php
+
 /**
  * extendair.inc.php
  *
@@ -56,8 +57,7 @@ foreach ($sensors as $sensor) {
         create_state_index($state_name, $states);
 
         $descr = $sensor['descr'];
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
     }
 }
 

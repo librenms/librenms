@@ -1,4 +1,5 @@
 <?php
+
 /**
  * QueryBuilderFluentParser.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\Alerting;
 
-use DB;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Log;
 

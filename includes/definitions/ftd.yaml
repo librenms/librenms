@@ -21,8 +21,19 @@ discovery:
             - .1.3.6.1.4.1.9.1.2483 # { ciscoProducts 2483 } -- Cisco FirePOWER 1010 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2662 # { ciscoProducts 2662 } -- Cisco FirePOWER 1140 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2663 # { ciscoProducts 2663 } -- Cisco FirePOWER 1120 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2991 # { ciscoProducts 2991 } -- Cisco FirePOWER 4112 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2774 # { ciscoProducts 2774 } -- Cisco FirePOWER 4115 Security Module 24
             - .1.3.6.1.4.1.9.1.2775 # { ciscoProducts 2775 } -- Cisco FirePOWER 4125 Security Appliance
+            - .1.3.6.1.4.1.9.1.2295 # { ciscoProducts 2295 } -- Cisco FirePOWER 4110 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2294 # { ciscoProducts 2294 } -- Cisco FirePOWER 4120 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2778 # { ciscoProducts 2778 } -- Cisco FirePOWER 4125 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.2870 # { ciscoProducts 2870 } -- Cisco FirePOWER 1150 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.3053 # { ciscoProducts 3053 } -- Cisco Secure Firewall 3110 Security Appliance
+            - .1.3.6.1.4.1.9.1.3054 # { ciscoProducts 3054 } -- Cisco Secure Firewall 3120 Security Appliance
+            - .1.3.6.1.4.1.9.1.3055 # { ciscoProducts 3055 } -- Cisco Secure Firewall 3130 Security Appliance
+            - .1.3.6.1.4.1.9.1.3056 # { ciscoProducts 3056 } -- Cisco Secure Firewall 3140 Security Appliance
+            - .1.3.6.1.4.1.9.1.3057 # { ciscoProducts 3057 } -- Cisco Secure Firewall 3105 Security Appliance
+
 discovery_modules:
     entity-physical: false
     cisco-vrf-lite: false

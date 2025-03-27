@@ -1,4 +1,5 @@
 <?php
+
 /**
  * jetstream.inc.php
  *
@@ -23,6 +24,8 @@
  * @author     mtammasss@gmail.com
  * @author     PipoCanaja
  */
+
+use App\Models\Eventlog;
 
 // first release by (peca.nesovanovic@sattrakt.com) # 2020/05/25
 // jetstreamExpand function by Molnar Tamas (mtammasss@gmail.com) # 2020/05/25
@@ -75,7 +78,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             if ($vlan_data['vlan_name'] != $jet_vlan_data['dot1qVlanDescription']) {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device['device_id'], 'vlan');
                 echo 'U';
             } else {
                 echo '.';
@@ -86,10 +89,10 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $jet_vlan_id,
                 'vlan_name' => $jet_vlan_data['dot1qVlanDescription'],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
 
-            log_event('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $jet_vlan_id", $device, 'vlan');
+            Eventlog::log('VLAN added: ' . $jet_vlan_data['dot1qVlanDescription'] . ", $jet_vlan_id", $device['device_id'], 'vlan');
             echo '+';
         }
         $device['vlans'][$vtpdomain_id][$jet_vlan_id] = $jet_vlan_id;

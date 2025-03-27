@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcPduOutletOn.php
  *
@@ -23,6 +24,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -39,6 +41,6 @@ class ApcPduOutletOn implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $outlet = $trap->getOidData($trap->findOid('PowerNet-MIB::mtrapargsInteger.0'));
-        $trap->log("APC PDU: Outlet has been turned on: $outlet", 4);
+        $trap->log("APC PDU: Outlet has been turned on: $outlet", Severity::Warning);
     }
 }

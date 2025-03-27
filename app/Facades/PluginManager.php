@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PluginManager.php
  *
@@ -26,11 +27,12 @@
 namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
 class PluginManager extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \App\Plugins\PluginManager::class;
+        return PluginManagerInterface::class;
     }
 }

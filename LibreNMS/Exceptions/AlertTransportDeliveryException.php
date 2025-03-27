@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertTransportDeliveryException.php
  *
@@ -27,26 +28,13 @@ namespace LibreNMS\Exceptions;
 
 class AlertTransportDeliveryException extends \Exception
 {
-    /** @var array */
-    protected $params = [];
-    /** @var string */
-    protected $template = '';
-    /** @var string */
-    protected $response = '';
-
-    /**
-     * @param  array  $data
-     * @param  int  $code
-     * @param  string  $response
-     * @param  string  $message
-     * @param  array  $params
-     */
-    public function __construct($data, $code = 0, $response = '', $message = '', $params = [])
-    {
-        $this->params = $params;
-        $this->template = $message;
-        $this->response = $response;
-
+    public function __construct(
+        array $data,
+        int $code = 0,
+        protected string $response = '',
+        protected string $template = '',
+        protected array $params = []
+    ) {
         $name = $data['transport_name'] ?? '';
 
         $message = "Transport delivery failed with $code for $name: $response";

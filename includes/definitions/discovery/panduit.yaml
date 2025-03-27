@@ -1,12 +1,59 @@
 mib: PANDUIT-MIB
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
-        features: PANDUIT-MIB::pdug5Model.1
         hardware: PANDUIT-MIB::pdug5PartNumber.1
         serial: PANDUIT-MIB::pdug5SerialNumber.1
         version: PANDUIT-MIB::pdug5FirmwareVersion.1
+        features: RFC1213-MIB::sysDescr.0
+        features_replace: 
+          - '/SN:/'
+          - '/PN:Device Model:\S+/'
     sensors:
+        state:
+              data:
+                  -
+                    oid: pdug5IdentEntry
+                    value: pdug5Status
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.1.2.1.9.{{ $index }}'
+                    descr: 'System {{ index }} Overall Status'
+                    states:
+                      - { descr: 'Other', graph: 0, value: 1, generic: 3 }
+                      - { descr: 'OK', graph: 0, value: 2, generic: 0 }
+                      - { descr: 'degraded', graph: 0, value: 3, generic: 1 }
+                      - { descr: 'failed', graph: 0, value: 4, generic: 2 }
+                  -
+                    oid: pdug5GroupEntry
+                    value: pdug5GroupBreakerStatus
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.26.{{ $index }}'
+                    descr: 'Breaker {{ pdug5GroupName }} Status'
+                    index: 'pdug5GroupBreakerStatus.{{ $index }}'
+                    state_name: pdug5GroupBreakerStatus
+                    states:
+                      - { descr: 'Not Applicable', graph: 0, value: 1, generic: 0 }
+                      - { descr: 'On', graph: 0, value: 2, generic: 0 }
+                      - { descr: 'Off', graph: 0, value: 3, generic: 2 }
+                    skip_values:
+                        -
+                          oid: pdug5GroupBreakerStatus
+                          op: '='
+                          value: 0
+                  -
+                    oid: pdug5Outlet
+                    value: pdug5OutletControlStatus
+                    index: 'pdug5OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.5.2.1.1.{{ $index }}'
+                    descr: '{{ $pdug5OutletName }} (#{{ $subindex1 }}) State'
+                    group: 'Outlets'
+                    states:
+                        - { value: 1, generic: 3, descr: off, graph: 0 }
+                        - { value: 2, generic: 0, descr: on, graph: 0 }
+                        - { value: 3, generic: 1, descr: pendingOff, graph: 0 }
+                        - { value: 4, generic: 2, descr: pendingOn, graph: 0 }
+                    skip_values:
+                        -
+                          oid: 'pdug5OutletIndex'
+                          op: '='
+                          value: 0
         power:
             data:
                 -
@@ -14,14 +61,15 @@ modules:
                     value: pdug5GroupPowerWatts
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.20.{{ $index }}'
                     multiplier: 1
-                    descr: 'Group {{ $pdug5GroupName }} Output'
+                    descr: 'Breaker {{ $pdug5GroupName }} Output'
+                    group: breakers
                     index: 'pdug5GroupPowerWatts.{{ $index }}'
                     snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputPowerWatts
@@ -29,14 +77,42 @@ modules:
                     multiplier: 1
                     descr: 'Input power'
                     snmp_flags: ['-ObsaQ']
-
+                -
+                    oid: pdug5OutletEntry
+                    value: pdug5OutletWatts
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.5.1.1.13.{{ $index }}'
+                    multiplier: 1
+                    descr: '{{ $pdug5OutletName }} (#{{ $subindex1 }})'
+                    group: outlets
+                    index: 'pdug5OutletIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: pdug5OutletIndex
+                          op: '='
+                          value: 0
+        power_factor:
+            data:
+                -
+                    oid: pdug5InputPhaseEntry
+                    value: pdug5InputPhasePowerFactor
+                    index: 'pdug5InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.23.{{ $index }}'
+                    descr: '{{ $pdug5InputPhasePowerMeasType }} Power Factor'
+                    divisor: 100
+                    snmp_flags: ['-ObsaQ']
+                    skip_values:
+                      -
+                        oid: pdug5InputPhaseIndex
+                        op: '='
+                        value: 0
         current:
             data:
                 -
                     oid: pdug5GroupEntry
                     value: pdug5GroupCurrent
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.12.{{ $index }}'
-                    descr: 'Group {{ $pdug5GroupName }} Current'
+                    descr: 'Breaker {{ $pdug5GroupName }} Current'
+                    group: breakers
                     divisor: 100
                     index: 'pdug5GroupCurrent.{{ $index }}'
                     high_limit: pdug5GroupCurrentThUpperCritical
@@ -45,8 +121,8 @@ modules:
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputTotalCurrent
@@ -54,8 +130,6 @@ modules:
                     divisor: 100
                     descr: 'Input current'
                     snmp_flags: ['-ObsaQ']
-
-
         voltage:
             data:
                 -
@@ -63,15 +137,15 @@ modules:
                     value: pdug5GroupVoltage
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.5.{{ $index }}'
                     divisor: 10
-                    descr: 'Group {{ $pdug5GroupName }} Voltage'
+                    descr: 'Breaker {{ $pdug5GroupName }} Voltage'
+                    group: breakers
                     index: 'pdug5GroupVoltage.{{ $index }}'
                     snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
-                             oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
-
+                            oid: pdug5GroupName
+                            op: '='
+                            value: '.'
         frequency:
               data:
                   -
@@ -81,3 +155,64 @@ modules:
                     divisor: 10
                     descr: 'Input frequency'
                     snmp_flags: ['-ObsaQ']
+        load:
+              data:
+                  -
+                    oid: pdug5InputPhaseTable
+                    value: pdug5InputPhaseCurrentPercentLoad
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.17.{{ $index }}'
+                    descr: '{{ pdug5InputPhasePowerMeasType }} Input Load'
+                    index: 'pdug5InputPhaseIndex.{{ $index }}'
+                    snmp_flags: ['-ObsaQ']
+                    skip_values:
+                      -
+                        oid: pdug5InputPhaseIndex
+                        op: '='
+                        value: 0
+                  -
+                    oid: pdug5GroupEntry
+                    value: pdug5GroupCurrentPercentLoad
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.18.{{ $index }}'
+                    descr: 'Breaker {{ pdug5GroupName }} Output Load'
+                    group: breakers
+                    snmp_flags: ['-ObsaQ']
+                    skip_values:
+                      -
+                        oid: pdug5GroupName
+                        op: '='
+                        value: '.'
+        temperature:
+            data:
+                  -
+                    oid: pdug5TemperatureTable
+                    value: pdug5TemperatureValue
+                    index: 'pdug5TemperatureIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.4.2.1.4.{{ $index }}'
+                    descr: '{{ $pdug5TemperatureName }} Temperature sensor'
+                    low_limit: pdug5TemperatureThLowerCritical
+                    low_warn_limit: pdug5TemperatureThLowerWarning
+                    warn_limit: pdug5TemperatureThUpperWarning
+                    high_limit: pdug5TemperatureThUpperCritical
+                    skip_values:
+                    -
+                        oid: 'pdug5TemperatureProbeStatus'
+                        op: '=='
+                        value: '1'
+        humidity:
+            data:
+                  -
+                    oid: pdug5HumidityTable
+                    value: pdug5HumidityValue
+                    index: 'pdug5HumidityIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.4.3.1.4.{{ $index }}'
+                    descr: '{{ $pdug5HumidityName.0.1 }} Humidity sensor'
+                    low_limit: pdug5HumidityThLowerCritical
+                    low_warn_limit: pdug5HumidityThLowerWarning
+                    warn_limit: pdug5HumidityThUpperWarning
+                    high_limit: pdug5HumidityThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'pdug5HumidityProbeStatus'
+                        op: '=='
+                        value: '1'

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DatastoreTest.php
  *
@@ -27,10 +28,9 @@ namespace LibreNMS\Tests\Unit\Data;
 
 use LibreNMS\Config;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class DatastoreTest extends TestCase
 {
     protected function setUp(): void
@@ -40,13 +40,14 @@ class DatastoreTest extends TestCase
         Config::forget([
             'graphite',
             'influxdb',
+            'influxdbv2',
             'opentsdb',
             'prometheus',
             'rrd',
         ]);
     }
 
-    public function testDefaultInitialization()
+    public function testDefaultInitialization(): void
     {
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
@@ -55,23 +56,25 @@ class DatastoreTest extends TestCase
         $this->assertEquals('LibreNMS\Data\Store\Rrd', get_class($stores[0]), 'The default enabled store should be Rrd');
     }
 
-    public function testInitialization()
+    public function testInitialization(): void
     {
         Config::set('rrd.enable', false);
         Config::set('graphite.enable', true);
         Config::set('influxdb.enable', true);
+        Config::set('influxdbv2.enable', true);
         Config::set('opentsdb.enable', true);
         Config::set('prometheus.enable', true);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
-        $this->assertCount(4, $stores, 'Incorrect number of default stores enabled');
+        $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
 
         $enabled = array_map('get_class', $stores);
 
         $expected_enabled = [
             'LibreNMS\Data\Store\Graphite',
             'LibreNMS\Data\Store\InfluxDB',
+            'LibreNMS\Data\Store\InfluxDBv2',
             'LibreNMS\Data\Store\OpenTSDB',
             'LibreNMS\Data\Store\Prometheus',
         ];

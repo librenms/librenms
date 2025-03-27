@@ -1,4 +1,5 @@
 <?php
+
 /**
  * application-update.php
  *
@@ -22,31 +23,38 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use App\Models\Device;
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
-    $device_id = $_POST['device_id'];
+    $device = Device::find($_POST['device_id']);
     $app = $_POST['application'];
 
-    if (! isset($app) && validate_device_id($device_id) === false) {
+    if (! isset($app) && $device === null) {
         $status = ['status' => 1, 'message' => 'Error with data'];
     } else {
         $status = ['status' => 1, 'message' => 'Database update failed'];
+        $app = $device->applications()->withTrashed()->firstOrNew(['app_type' => $app]);
         if ($_POST['state'] == 'true') {
-            $update = [
-                'device_id' => $device_id,
-                'app_type' => $app,
-                'app_status' => '',
-                'app_instance' => '',
-            ];
-            if (dbInsert($update, 'applications')) {
-                log_event("Application enabled by user: $app", $device_id, 'application', 1);
+            if ($app->trashed()) {
+                $app->restore();
+            }
+            if ($app->save()) {
+                Eventlog::log('Application enabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Ok);
                 $status = ['status' => 0, 'message' => 'Application enabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for enabling the application failed'];
             }
         } else {
-            if (dbDelete('applications', '`device_id`=? AND `app_type`=?', [$device_id, $app])) {
-                log_event("Application disabled by user: $app", $device_id, 'application', 3);
+            $app->delete();
+            if ($app->save()) {
+                Eventlog::log('Application disabled by user ' . Auth::user()->username . ': ' . $app, $device->device_id, 'application', Severity::Notice);
                 $status = ['status' => 0, 'message' => 'Application disabled'];
+            } else {
+                $status = ['status' => 1, 'message' => 'Database update for disabling the application failed'];
             }
         }
     }

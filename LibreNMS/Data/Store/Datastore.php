@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Datastore.php
  *
@@ -27,9 +28,10 @@ namespace LibreNMS\Data\Store;
 
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
-class Datastore
+class Datastore implements DataStorageInterface
 {
     protected $stores;
 
@@ -46,6 +48,7 @@ class Datastore
             'f' => 'influxdb.enable',
             'p' => 'prometheus.enable',
             'g' => 'graphite.enable',
+            '2' => 'influxdbv2.enable',
         ];
         foreach ($opts as $opt => $setting) {
             if (isset($options[$opt])) {
@@ -106,9 +109,9 @@ class Datastore
     public function put($device, $measurement, $tags, $fields)
     {
         // convenience conversion to allow calling with a single value, so, e.g., these are equivalent:
-        // data_update($device, 'mymeasurement', $tags, 1234);
+        // put($device, 'mymeasurement', $tags, 1234);
         //     AND
-        // data_update($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
+        // put($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
         if (! is_array($fields)) {
             $fields = [$measurement => $fields];
         }
@@ -155,7 +158,7 @@ class Datastore
     /**
      * Get the measurements for all datastores, keyed by datastore name
      *
-     * @return \Illuminate\Support\Collection<\App\Polling\Measure\MeasurementCollection>
+     * @return \Illuminate\Support\Collection
      */
     public function getStats(): Collection
     {

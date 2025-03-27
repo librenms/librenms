@@ -4,6 +4,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Number;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -14,6 +15,7 @@ $options = getopt('dh:e:', ['help']);
 
 Config::set('rrd.enable', false);
 Config::set('influxdb.enable', false);
+Config::set('influxdbv2.enable', false);
 Config::set('nographite', true);
 
 function print_help()
@@ -101,7 +103,7 @@ foreach ($devices as &$device) {
     $device['port_count'] = $count;
     $device['inactive_ratio'] = ($inactive == 0 ? 0 : ($inactive / $count));
     $device['diff_sec'] = $device['selective_time_sec'] - $device['full_time_sec'];
-    $device['diff_perc'] = ($device['diff_sec'] / $device['full_time_sec']) * 100;
+    $device['diff_perc'] = Number::calculatePercent($device['diff_sec'], $device['full_time_sec']);
 
     // $enable_sel_value is negative and we want to enable it for all devices with an even lower value.
     // It also has to save more than 1 s, or we might enable it for devices with i.e. 100ms vs 50ms, which isn't needed.
@@ -160,7 +162,7 @@ $inactive_ratio = array_sum(array_column($devices, 'inactive_ratio')) / count($d
 $total_full_time = array_sum(array_column($devices, 'full_time_sec'));
 $total_selective_time = array_sum(array_column($devices, 'selective_time_sec'));
 $difference = $total_selective_time - $total_full_time;
-$difference_perc = ($difference / $total_full_time) * 100;
+$difference_perc = Number::calculatePercent($difference, $total_full_time);
 $total_diff_color = ($difference > 0 ? "\033[0;31m" : "\033[0;32m");
 
 printf(

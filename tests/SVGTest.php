@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SVGTest.php
  *
@@ -26,6 +27,7 @@
 namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -33,12 +35,11 @@ use RegexIterator;
 
 /**
  * Class SVGTest
- *
- * @group os
  */
+#[Group('os')]
 class SVGTest extends TestCase
 {
-    public function testSVGContainsPNG()
+    public function testSVGContainsPNG(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);
@@ -50,10 +51,14 @@ class SVGTest extends TestCase
         }
     }
 
-    public function testSVGHasLengthWidth()
+    public function testSVGHasLengthWidth(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             if ($file == 'html/images/safari-pinned-tab.svg') {
+                continue;
+            }
+
+            if (str_starts_with($file, 'html/images/custommap/background/')) {
                 continue;
             }
 
@@ -67,7 +72,7 @@ class SVGTest extends TestCase
         }
     }
 
-    public function testSVGHasViewBox()
+    public function testSVGHasViewBox(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);
@@ -79,7 +84,7 @@ class SVGTest extends TestCase
         }
     }
 
-    private function getSvgFiles()
+    private function getSvgFiles(): RegexIterator
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('html/images'));
 

@@ -19,7 +19,7 @@ IMPORTS
        FROM VMWARE-TC-MIB;
 
     vmwNetworkInsightMIB MODULE-IDENTITY
-    LAST-UPDATED "202203300000Z"
+    LAST-UPDATED "202303100000Z"
     ORGANIZATION "VMware, Inc"
     CONTACT-INFO
     "VMware, Inc
@@ -33,6 +33,18 @@ IMPORTS
     DESCRIPTION
     "This MIB module is for VMware vRealize Network Insight as described here:
     https://www.vmware.com/support/pubs/vrealize-network-insight-pubs.html
+    "
+
+    REVISION      "202303100000Z"
+    DESCRIPTION
+    "This is the fifteenth revision of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds four new notifications, see vmwNetworkInsightNotificationGroup15.
+    "
+
+    REVISION      "202209070000Z"
+    DESCRIPTION
+    "This is the fourteenth revision of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds eight new notifications, see vmwNetworkInsightNotificationGroup14.
     "
 
     REVISION      "202203300000Z"
@@ -3722,6 +3734,91 @@ vmwPanLogInsightDroppedFlowEvent NOTIFICATION-TYPE
       "Dropped flows are detected on Palo Alto device through VMware vRealize Log Insight. "
    ::= { vmwVRNIEvents 80050}
 
+vmwHcxConnectionRuleViolationEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Connection Rule is violated for the Firewall Rules. Please verify HCX Applinace Tunnel for the violated firewall rules."
+   ::= { vmwVRNIEvents 90518}
+
+vmwHcxApplianceAllTunnelDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "No tunnels are in working state on HCX Appliance. Please verify the tunnels are working for the HCX Appliance."
+   ::= { vmwVRNIEvents 90517}
+
+vmwHcxMtuMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "MTU doesn't match for uplink network profiles in the HCX Service Mesh. Please correct the MTU values for the uplink network profiles."
+   ::= { vmwVRNIEvents 90519}
+
+vmwSwitchPortRPFPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "uRPF packet drop ratio is high for switch port. Please check uRPF packet drop on the interface."
+   ::= { vmwVRNIEvents 30124}
+
+vmwCPLogInsightDroppedFlowEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Dropped flows are detected on Check Point device through VMware vRealize Log Insight."
+   ::= { vmwVRNIEvents 80051}
+
+vmwSNMPTrapEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is raised when incoming SNMP Trap is received by Network Insight."
+   ::= { vmwVRNIEvents 110017}
+
+
+vmwServiceRestartCountExceededEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "One or more services restarted multiple times. Please verify the system is in a healthy state."
+   ::= { vmwVRNIEvents 80544}
+
+vmwHcxWanOptServiceStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "WAN Optimisation Service is not Up. Please verify HCX WAN Optimisation Service is in healthy state."
+   ::= { vmwVRNIEvents 90511}
+
+vmwNsxtIpfixMultipleCollectorConfigurationEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX-T Multiple DFW IPFIX Collectors Configured. Please remove the stale collector IPs from NSX Policy DFW IPFIX collector profile. To automatically remove stale collector IPs from NSX Policy IPFIX collector profile, please uncheck the IPFIX checkbox on the Data Source edit page and check again after 30 minutes."
+   ::= { vmwVRNIEvents 80275}
+
+vmwHcxApplianceUnhealthyTunnelsEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Few tunnels on HCX Appliance are unhealthy. Please verify the tunnels are working for the HCX Appliance."
+   ::= { vmwVRNIEvents 90520}
+
+vmwHcxManagerVersionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "The paired HCX Managers are running different software versions. Please upgrade the appropriate HCX Manager so that the paired HCX Managers are running similar version of software."
+   ::= { vmwVRNIEvents 90521}
+
+vmwHcxApplianceVersionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "The paired HCX Appliances are running different software versions. Please upgrade the appropriate HCX Appliance so that the paired HCX Appliances are running similar version of software."
+   ::= { vmwVRNIEvents 90522}
+
 -- **********************************************************
 -- Notification parameters
 -- **********************************************************
@@ -4252,7 +4349,7 @@ vmwNetworkInsightMIBBasicCompliance12 MODULE-COMPLIANCE
     ::= { vmwNetworkInsightMIBCompliances 130 }
 
 vmwNetworkInsightMIBBasicCompliance13 MODULE-COMPLIANCE
-    STATUS     current
+    STATUS     deprecated
     DESCRIPTION
         "The compliance statement for entities which implement
          VMWARE-VRNI-MIB latest version."
@@ -4273,6 +4370,55 @@ vmwNetworkInsightMIBBasicCompliance13 MODULE-COMPLIANCE
                        vmwNetworkInsightNotificationGroup13
                       }
     ::= { vmwNetworkInsightMIBCompliances 140 }
+
+vmwNetworkInsightMIBBasicCompliance14 MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB latest version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup3,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4,
+                       vmwNetworkInsightNotificationGroup5,
+                       vmwNetworkInsightNotificationGroup6,
+                       vmwNetworkInsightNotificationGroup7,
+                       vmwNetworkInsightNotificationGroup8,
+                       vmwNetworkInsightNotificationGroup9,
+                       vmwNetworkInsightNotificationGroup10,
+                       vmwNetworkInsightNotificationGroup11,
+                       vmwNetworkInsightNotificationGroup12,
+                       vmwNetworkInsightNotificationGroup13,
+                       vmwNetworkInsightNotificationGroup14
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 150 }
+
+vmwNetworkInsightMIBBasicCompliance15 MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB latest version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup3,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4,
+                       vmwNetworkInsightNotificationGroup5,
+                       vmwNetworkInsightNotificationGroup6,
+                       vmwNetworkInsightNotificationGroup7,
+                       vmwNetworkInsightNotificationGroup8,
+                       vmwNetworkInsightNotificationGroup9,
+                       vmwNetworkInsightNotificationGroup10,
+                       vmwNetworkInsightNotificationGroup11,
+                       vmwNetworkInsightNotificationGroup12,
+                       vmwNetworkInsightNotificationGroup13,
+                       vmwNetworkInsightNotificationGroup14,
+                       vmwNetworkInsightNotificationGroup15
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 160 }
 
 vmwNetworkInsightNotificationGroup5 NOTIFICATION-GROUP
        NOTIFICATIONS {
@@ -4644,4 +4790,32 @@ vmwNetworkInsightNotificationGroup5 NOTIFICATION-GROUP
        DESCRIPTION
             "Set of added notifications (traps, informs) for 6.6.0 release."
         ::= { vmwNetworkInsightMIBGroups 145 }
+
+  vmwNetworkInsightNotificationGroup14 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+         vmwHcxConnectionRuleViolationEvent,
+         vmwHcxApplianceAllTunnelDownEvent,
+         vmwHcxMtuMismatchEvent,
+         vmwSwitchPortRPFPacketDropEvent,
+         vmwCPLogInsightDroppedFlowEvent,
+         vmwSNMPTrapEvent,
+         vmwServiceRestartCountExceededEvent,
+         vmwHcxWanOptServiceStatusEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) for 6.8.0 release."
+        ::= { vmwNetworkInsightMIBGroups 155 }
+
+  vmwNetworkInsightNotificationGroup15 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+         vmwNsxtIpfixMultipleCollectorConfigurationEvent,
+         vmwHcxApplianceUnhealthyTunnelsEvent,
+         vmwHcxManagerVersionMismatchEvent,
+         vmwHcxApplianceVersionMismatchEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) for 6.10.0 release."
+        ::= { vmwNetworkInsightMIBGroups 165 }
 END

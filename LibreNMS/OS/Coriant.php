@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Coriant.php
  *
@@ -28,13 +29,16 @@ namespace LibreNMS\OS;
 use App\Models\Eventlog;
 use App\Models\TnmsneInfo;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
-        echo 'TNMS-NBI-MIB: enmsNETable';
+        Log::info('TNMS-NBI-MIB: enmsNETable');
 
         /*
          * Coriant have done some SQL over SNMP, since we have to populate and update all the tables
@@ -58,7 +62,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
 
             if ($ne->isDirty()) {
                 $ne->save();
-                Eventlog::log("Coriant enmsNETable Hardware $ne->neType : $ne->neName ($index) at $ne->neLocation Discovered", $this->getDevice(), 'system', 2);
+                Eventlog::log("Coriant enmsNETable Hardware $ne->neType : $ne->neName ($index) at $ne->neLocation Discovered", $this->getDevice(), 'system');
             }
             $c_list[] = $index;
         }
@@ -66,7 +70,7 @@ class Coriant extends \LibreNMS\OS implements OSPolling
         foreach (TnmsneInfo::where('device_id', $this->getDeviceId())->whereNotIn('neID', $c_list)->get() as $ne) {
             /** @var TnmsneInfo $ne */
             $ne->delete();
-            Eventlog::log("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDevice(), 'system', $ne->neID);
+            Eventlog::log("Coriant enmsNETable Hardware $ne->neName at $ne->neLocation Removed", $this->getDevice(), 'system', Severity::Info, $ne->neID);
         }
     }
 }

@@ -22,6 +22,26 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Add ports from other snmp context
+if ($device['os'] == 'nokia-isam') {
+    require base_path('includes/discovery/ports/nokia-isam.inc.php');
+}
+
+//Get Bison ports
+if ($device['os'] == 'bison') {
+    require base_path('includes/discovery/ports/bison.inc.php');
+}
+
+// Get adva-fsp150cp
+if ($device['os'] == 'adva-fsp150cp') {
+    require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
+}
+
+// Get Trellix NSP ports
+if ($device['os'] == 'mlos-nsp') {
+    require base_path('includes/discovery/ports/mlos-nsp.inc.php');
+}
+
 //Get UFiber OLT ports
 if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
@@ -50,6 +70,21 @@ if ($device['os'] == 'luminato') {
 //Moxa Etherdevice portName mapping
 if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
+//Remove extra ports on Zhone slms devices
+if ($device['os'] == 'slms') {
+    require base_path('includes/discovery/ports/slms.inc.php');
+}
+
+//Cambium cnMatrix port description mapping
+if ($device['os'] == 'cnmatrix') {
+    require base_path('includes/discovery/ports/cnmatrix.inc.php');
+}
+
+//Get Tachyon ports
+if ($device['os'] == 'tachyon') {
+    require base_path('includes/discovery/ports/tachyon.inc.php');
 }
 
 // End Building SNMP Cache Array
@@ -104,6 +139,10 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+            $snmp_data['ifName'] = $matches[1];
+        }
+
         // Port newly discovered?
         if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
@@ -118,7 +157,8 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
             }
 
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
-            echo 'Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')';
+            d_echo('Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')');
+            echo '+';
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
             // Port re-discovered after previous deletion?
             $snmp_data['deleted'] = 0;
@@ -138,8 +178,6 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
                 echo '-';
             }
         }
-
-        echo 'X';
     }//end if
 }//end foreach
 

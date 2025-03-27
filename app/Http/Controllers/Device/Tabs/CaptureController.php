@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CaptureController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 
 class CaptureController implements \LibreNMS\Interfaces\UI\DeviceTab
 {
@@ -49,7 +51,7 @@ class CaptureController implements \LibreNMS\Interfaces\UI\DeviceTab
         return __('Capture');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OverviewController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use Session;
 
@@ -51,7 +53,7 @@ class OverviewController implements DeviceTab
         return __('Overview');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

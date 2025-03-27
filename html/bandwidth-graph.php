@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS
  *
@@ -12,11 +13,11 @@ $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $urlargs = [
-    'type'          => 'bill_historictransfer',
-    'id'            => $_GET['bill_id'],
-    'width'         => $_GET['x'],
-    'height'        => $_GET['y'],
-    'imgtype'       => $_GET['type'],
+    'type' => 'bill_historictransfer',
+    'id' => $_GET['bill_id'],
+    'width' => $_GET['x'],
+    'height' => $_GET['y'],
+    'imgtype' => $_GET['type'],
 ];
 if (is_numeric($_GET['bill_hist_id'])) {
     $urlargs['bill_hist_id'] = $_GET['bill_hist_id'];

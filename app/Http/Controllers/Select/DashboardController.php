@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DashboardController.php
  *
@@ -62,19 +63,18 @@ class DashboardController extends SelectController
         ];
     }
 
-    public function formatResponse($paginator)
+    protected function prependItem(): array
     {
-        if (! request()->has('term')) {
-            $paginator->prepend((object) ['dashboard_id' => 0]);
-        }
-
-        return parent::formatResponse($paginator);
+        return [
+            'id' => 0,
+            'text' => __('No Default Dashboard'),
+        ];
     }
 
     private function describe($dashboard): string
     {
         if ($dashboard->dashboard_id == 0) {
-            return 'No Default Dashboard';
+            return $this->prependItem()['text'];
         }
 
         return "{$dashboard->username}: {$dashboard->dashboard_name} ("

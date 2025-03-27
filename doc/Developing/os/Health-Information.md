@@ -90,7 +90,8 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $index_string }}` can be used instead.
+  In case the index is a string, `{{ $str_index_as_numeric }}` can be used instead and will convert
+the string to the equivalent OID representation.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
 - `low_limit` (optional): This is the critical low threshold that
@@ -109,7 +110,8 @@ are as follows:
   key with in the table or a static string, optionally using `{{ index }}`.
 - `group` (optional): Groups sensors together under in the webui,
   displaying this text. Not specifying this will put the sensors in
-  the default group.
+  the default group. If group is set to `transceiver` it will be shown with the port
+  instead of in with all the generic sensors (You must also set `entPhysicalIndex` to ifIndex)
 - `index` (optional): This is the index value we use to uniquely
   identify this sensor. `{{ $index }}` will be replaced by the `index`
   from the snmp walk.
@@ -117,10 +119,11 @@ are as follows:
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
 - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
-- `entPhysicalIndex` (optional): If the sensor belongs to a physical
-  entity then you can specify the index here.
-- `entPhysicalIndex_measured` (optional): If the sensor belongs to a
-  physical entity then you can specify the entity type here.
+- `entPhysicalIndex` and `entPhysicalIndex_measured` (optional) : If the
+  sensor belongs to a physical entity then you can link them here. The currently
+  supported variants are :
+    - `entPhysicalIndex` contains the entPhysicalIndex from entPhysical table, and `entPhysicalIndex_measured` is NULL
+    - `entPhysicalIndex` contains "ifIndex" value of the linked port and `entPhysicalIndex_measured` contains "ports"
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)
@@ -238,7 +241,7 @@ then passed to `discover_sensor()`.
 
 `discover_sensor()` Accepts the following arguments:
 
-- &$valid = This is always $valid['sensor'], do not pass any other values.
+- &$valid = This is always null. This is unused.
 - $class = Required. This is the sensor class from the table above (i.e humidity).
 - $device = Required. This is the $device array.
 - $oid = Required. This must be the numerical OID for where the data
@@ -304,7 +307,7 @@ entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
 in the desired order for the device overview page.
 - `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
-- `resources/lang/en/sensors.php`: add human-readable names and units for the sensor class
+- `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English, feel free to do so for other languages as well.
 
 Create and populate new files for the sensor class in the following places:
@@ -316,7 +319,7 @@ files are stored. Not used for yaml discovery.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
 order for the device overview page.
 - `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
-- `resources/lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
+- `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
 free to do so for other languages as well.
 
 Create and populate new files for the sensor class in the following places:
@@ -372,7 +375,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidRx,
@@ -394,7 +397,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidTx,

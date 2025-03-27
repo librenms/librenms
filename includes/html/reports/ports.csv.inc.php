@@ -106,52 +106,52 @@ $ports = dbFetchRows($query, $param);
 
 switch ($vars['sort']) {
     case 'traffic':
-        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifOctets_rate', descending: true);
         break;
 
     case 'traffic_in':
-        $ports = array_sort_by_column($ports, 'ifInOctets_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifInOctets_rate', descending: true);
         break;
 
     case 'traffic_out':
-        $ports = array_sort_by_column($ports, 'ifOutOctets_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifOutOctets_rate', descending: true);
         break;
 
     case 'packets':
-        $ports = array_sort_by_column($ports, 'ifUcastPkts_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifUcastPkts_rate', descending: true);
         break;
 
     case 'packets_in':
-        $ports = array_sort_by_column($ports, 'ifInUcastOctets_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifInUcastOctets_rate', descending: true);
         break;
 
     case 'packets_out':
-        $ports = array_sort_by_column($ports, 'ifOutUcastOctets_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifOutUcastOctets_rate', descending: true);
         break;
 
     case 'errors':
-        $ports = array_sort_by_column($ports, 'ifErrors_rate', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifErrors_rate', descending: true);
         break;
 
     case 'speed':
-        $ports = array_sort_by_column($ports, 'ifSpeed', SORT_DESC);
+        $ports = collect($ports)->sortBy('ifSpeed', descending: true);
         break;
 
     case 'port':
-        $ports = array_sort_by_column($ports, 'ifDescr', SORT_ASC);
+        $ports = collect($ports)->sortBy('ifDescr');
         break;
 
     case 'media':
-        $ports = array_sort_by_column($ports, 'ifType', SORT_ASC);
+        $ports = collect($ports)->sortBy('ifType');
         break;
 
     case 'descr':
-        $ports = array_sort_by_column($ports, 'ifAlias', SORT_ASC);
+        $ports = collect($ports)->sortBy('ifAlias');
         break;
 
     case 'device':
     default:
-        $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
+        $ports = collect($ports)->sortBy('hostname');
 }//end switch
 
 $csv[] = [
@@ -166,10 +166,10 @@ $csv[] = [
 
 foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+        $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
         $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
-        $port['in_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps');
-        $port['out_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
+        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
         $port = cleanPort($port, $device);
         $csv[] = [
             format_hostname($port),

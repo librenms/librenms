@@ -2,7 +2,7 @@
 -- SO-TC-MIB.mib
 -- Smartoptics Enterprise Specific TC MIB
 --
--- Copyright (c) 2021, Smartoptics
+-- Copyright (c) 2022, Smartoptics
 -- All rights reserved
 --
 
@@ -16,12 +16,18 @@ IMPORTS
         FROM SO-MIB;
 
 soTcMIB MODULE-IDENTITY
-    LAST-UPDATED "202104121049Z"
+    LAST-UPDATED "202209051410Z"
     ORGANIZATION "Smartoptics"
     CONTACT-INFO "http://www.smartoptics.com"
     DESCRIPTION "This is the enterprise specific TC MIB for 
 	Smartoptics containing common textual conventions."
-    
+
+    REVISION "202209051410Z"
+    DESCRIPTION "Added xc4Wss1-5 to InterfacePortMode."
+
+    REVISION "202203181349Z"
+    DESCRIPTION "Added InterfacePortMode."
+
     REVISION "202104121049Z"
     DESCRIPTION "Added DcpTenth, DcpHundreds, OchPortMode textual convention.
                  Updated description for InterfaceStatus."
@@ -106,6 +112,33 @@ OchPortMode ::= TEXTUAL-CONVENTION
     express (4)
     }
 
+InterfacePortMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The interface port mode for a service.
+        na - Not applicable.
+        localAD - The service is added to the chosen channel on the local Add/drop ports.
+        xc1 - The service is added to the cross connect port XC1.
+        xc2 - The service is added to the cross connect port XC2.
+        xc3 - The service is added to the cross connect port XC3.
+        xc4Wss1 - The service is added to the cross connect port XC4:Wss1.
+        xc4Wss2 - The service is added to the cross connect port XC4:Wss2.
+        xc4Wss3 - The service is added to the cross connect port XC4:Wss2.
+        xc4Wss4 - The service is added to the cross connect port XC4:Wss4.
+        xc4Wss5 - The service is added to the cross connect port XC4:Wss5."
+    SYNTAX INTEGER
+    {
+    na (1),
+    localAD (2),
+    xc1 (3),
+    xc2 (4),
+    xc3 (5),
+    xc4Wss1 (6),
+    xc4Wss2 (7),
+    xc4Wss3 (8),
+    xc4Wss4 (9),
+    xc4Wss5 (10)
+    }
 END
 
 --

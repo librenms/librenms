@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsTrapTest.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class PortsTrapTest extends SnmpTrapTestCase
@@ -59,9 +61,9 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n",
             ],
             'Could not handle linkDown',
             [
-                [5, 'interface', $port->port_id],
-                [3, 'interface', $port->port_id],
-                [5, 'interface', $port->port_id],
+                [Severity::Error, 'interface', $port->port_id],
+                [Severity::Notice, 'interface', $port->port_id],
+                [Severity::Error, 'interface', $port->port_id],
             ],
             $device,
         );
@@ -95,9 +97,9 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"up\"\n",
             ],
             'Could not handle linkUp',
             [
-                [1, 'interface', $port->port_id],
-                [3, 'interface', $port->port_id],
-                [1, 'interface', $port->port_id],
+                [Severity::Ok, 'interface', $port->port_id],
+                [Severity::Notice, 'interface', $port->port_id],
+                [Severity::Ok, 'interface', $port->port_id],
             ],
             $device,
         );

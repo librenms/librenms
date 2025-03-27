@@ -36,7 +36,7 @@ $metrics = [];
 $category = 'clients';
 $fields = [
     'connected' => $client_data['connected_clients'],
-    'blocked'   => $client_data['blocked_clients'],
+    'blocked' => $client_data['blocked_clients'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('connected', 'GAUGE', 0)
@@ -45,15 +45,15 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'memory';
 $fields = [
     'active' => $memory_data['allocator'],
-    'allocated'   => $memory_data['allocator_allocated'],
-    'resident'   => $memory_data['allocator_resident'],
-    'frag_bytes'   => $memory_data['allocator_frag_bytes'],
-    'rss_bytes'   => $memory_data['allocator_rss_bytes'],
+    'allocated' => $memory_data['allocator_allocated'],
+    'resident' => $memory_data['allocator_resident'],
+    'frag_bytes' => $memory_data['allocator_frag_bytes'],
+    'rss_bytes' => $memory_data['allocator_rss_bytes'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('active', 'GAUGE', 0)
@@ -65,7 +65,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'objects';
 $fields = [
@@ -77,7 +77,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'fragmentation';
 $fields = [
@@ -89,7 +89,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'usage';
 $fields = [
@@ -115,14 +115,14 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'defrag';
 $fields = [
     'hits' => $stats_data['active_defrag_hits'],
-    'misses'   => $stats_data['active_defrag_misses'],
-    'key_hits'   => $stats_data['active_defrag_key_hits'],
-    'key_misses'   => $stats_data['active_defrag_key_misses'],
+    'misses' => $stats_data['active_defrag_misses'],
+    'key_hits' => $stats_data['active_defrag_key_hits'],
+    'key_misses' => $stats_data['active_defrag_key_misses'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'GAUGE', 0)
@@ -133,12 +133,12 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'keyspace';
 $fields = [
     'hits' => $stats_data['keyspace_hits'],
-    'misses'   => $stats_data['keyspace_misses'],
+    'misses' => $stats_data['keyspace_misses'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'COUNTER', 0)
@@ -147,7 +147,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'sync';
 $fields = [
@@ -163,7 +163,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'commands';
 $fields = [
@@ -175,7 +175,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'connections';
 $fields = [
@@ -189,7 +189,7 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $category = 'net';
 $fields = [
@@ -203,6 +203,6 @@ $rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

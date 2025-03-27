@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,7 +44,7 @@ if ($device['os_group'] == 'cisco') {
      * Get module's components for a device
      */
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'], ['type'=>$module]);
+    $components = $component->getComponents($device['device_id'], ['type' => $module]);
     $components = $components[$device['device_id']];
 
     /*

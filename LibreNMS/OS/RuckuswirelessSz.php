@@ -55,7 +55,7 @@ class RuckuswirelessSz extends OS implements
         if (count($total_oids) > 1) {
             // clients - Discover System Total Client Count
             $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.2.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumSta.0
-            array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless-sz', ($index + 1), 'System Total:'));
+            array_push($sensors, new WirelessSensor('clients', $this->getDeviceId(), $oid, 'ruckuswireless-sz', $index + 1, 'System Total:'));
         }
 
         return $sensors;

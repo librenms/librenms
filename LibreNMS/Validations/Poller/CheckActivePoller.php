@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckActivePoller.php
  *
@@ -25,8 +26,10 @@
 
 namespace LibreNMS\Validations\Poller;
 
+use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 
 class CheckActivePoller implements \LibreNMS\Interfaces\Validation
@@ -39,7 +42,9 @@ class CheckActivePoller implements \LibreNMS\Interfaces\Validation
         $dispatcher_exists = PollerCluster::isActive()->exists();
         $wrapper_exists = Poller::isActive()->exists();
         if (! $dispatcher_exists && ! $wrapper_exists) {
-            return ValidationResult::fail(trans('validation.validations.poller.CheckActivePoller.fail'));
+            $interval = (int) \LibreNMS\Config::get('rrd.step');
+
+            return ValidationResult::fail(trans('validation.validations.poller.CheckActivePoller.fail', ['interval' => $interval]));
         }
 
         if ($dispatcher_exists && $wrapper_exists) {
@@ -54,6 +59,6 @@ class CheckActivePoller implements \LibreNMS\Interfaces\Validation
      */
     public function enabled(): bool
     {
-        return true;
+        return Eloquent::isConnected() && Device::exists();
     }
 }

@@ -1,0 +1,142 @@
+{
+    "availability": {
+        "poller": {
+            "availability": [
+                {
+                    "duration": 86400,
+                    "availability_perc": "100.000000"
+                },
+                {
+                    "duration": 604800,
+                    "availability_perc": "100.000000"
+                },
+                {
+                    "duration": 2592000,
+                    "availability_perc": "100.000000"
+                },
+                {
+                    "duration": 31536000,
+                    "availability_perc": "100.000000"
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.297.1.11.93.2.1.3.5.5",
+                    "sysDescr": "FUJIFILM ApeosPro C810",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "ApeosPro C810",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "fujifilmprinter",
+                    "type": "printer",
+                    "serial": "TC101630131338",
+                    "icon": "fujifilm.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "printer-supplies": {
+        "discovery": {
+            "printer_supplies": [
+                {
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Yellow Toner",
+                    "supply_capacity": 25000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "supply_index": 3,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Toner",
+                    "supply_capacity": 25000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                },
+                {
+                    "supply_index": 30,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.30",
+                    "supply_descr": "Black Toner 1",
+                    "supply_capacity": 23000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.30"
+                },
+                {
+                    "supply_index": 31,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.31",
+                    "supply_descr": "Black Toner 2",
+                    "supply_capacity": 23000,
+                    "supply_current": 90,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.31"
+                },
+                {
+                    "supply_index": 4,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Cyan Toner",
+                    "supply_capacity": 25000,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                },
+                {
+                    "supply_index": 5,
+                    "supply_type": "wasteToner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "supply_descr": "Waste Toner Container",
+                    "supply_capacity": 100,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                },
+                {
+                    "supply_index": 6,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "supply_descr": "Black Drum Cartridge",
+                    "supply_capacity": 163000,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                },
+                {
+                    "supply_index": 7,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "supply_descr": "Yellow Drum Cartridge",
+                    "supply_capacity": 163000,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                },
+                {
+                    "supply_index": 8,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "supply_descr": "Magenta Drum Cartridge",
+                    "supply_capacity": 163000,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                },
+                {
+                    "supply_index": 9,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "supply_descr": "Cyan Drum Cartridge",
+                    "supply_capacity": 163000,
+                    "supply_current": 99,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -5,6 +5,9 @@ use LibreNMS\RRD\RrdDefinition;
 foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ?', [$device['device_id']]) as $customoid) {
     d_echo($customoid);
 
+    $descr = $customoid['customoid_descr'];
+    $unit = $customoid['customoid_unit'];
+
     $prev_oid_value = $customoid['customoid_current'];
 
     $rawdata = snmp_get($device, $customoid['customoid_oid'], '-Oqv');
@@ -12,6 +15,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $user_funcs = [
         'celsius_to_fahrenheit',
         'fahrenheit_to_celsius',
+        'kelvin_to_celsius',
         'uw_to_dbm',
     ];
 
@@ -19,12 +23,12 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $os->enableGraph('customoid');
         $oid_value = $rawdata;
     } elseif (
-        $customoid['customoid_unit'] &&
-        str_i_contains($rawdata, $customoid['customoid_unit']) &&
-        is_numeric(trim(str_replace($customoid['customoid_unit'], '', $rawdata)))
+        $unit &&
+        Str::contains($rawdata, $unit, ignoreCase: true) &&
+        is_numeric(trim(str_replace($unit, '', $rawdata)))
     ) {
         $os->enableGraph('customoid');
-        $oid_value = trim(str_replace($customoid['customoid_unit'], '', $rawdata));
+        $oid_value = trim(str_replace($unit, '', $rawdata));
     } elseif (is_numeric(string_to_float($rawdata))) {
         $os->enableGraph('customoid');
         $oid_value = string_to_float($rawdata);
@@ -44,14 +48,14 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         $oid_value = $customoid['user_func']($oid_value);
     }
 
-    echo 'Custom OID ' . $customoid['customoid_descr'] . ': ';
-    echo $oid_value . ' ' . $customoid['customoid_unit'] . "\n";
+    echo 'Custom OID ' . $descr . ': ';
+    echo $oid_value . ' ' . $unit . "\n";
 
     $fields = [
         'oid_value' => $oid_value,
     ];
 
-    $rrd_name = ['customoid', $customoid['customoid_descr']];
+    $rrd_name = ['customoid', $descr];
     if ($customoid['customoid_datatype'] == 'COUNTER') {
         $datatype = $customoid['customoid_datatype'];
     } else {
@@ -60,9 +64,9 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $rrd_def = RrdDefinition::make()
         ->addDataset('oid_value', $datatype);
 
-    $tags = compact('rrd_name', 'rrd_def');
+    $tags = compact('descr', 'unit', 'rrd_name', 'rrd_def');
 
-    data_update($device, 'customoid', $tags, $fields);
+    app('Datastore')->put($device, 'customoid', $tags, $fields);
     dbUpdate(['customoid_current' => $oid_value, 'lastupdate' => ['NOW()'], 'customoid_prev' => $prev_oid_value], 'customoids', '`customoid_id` = ?', [$customoid['customoid_id']]);
 }//end foreach
 

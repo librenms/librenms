@@ -1,0 +1,774 @@
+--
+--defines ROOMALERT32S-MIB for SNMP agent extension of Room Alert 32S
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	1.1.0
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2019 AVTECH Software, Inc.
+--
+
+ROOMALERT32S-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+
+avtech	OBJECT IDENTIFIER ::= { enterprises 20916 }
+products	OBJECT IDENTIFIER ::= { avtech 1 }
+roomalert32S	OBJECT IDENTIFIER ::= { products 11 }
+sensors	OBJECT IDENTIFIER ::= { roomalert32S 1 }
+internal	OBJECT IDENTIFIER ::= { sensors 1 }
+temperature	OBJECT IDENTIFIER ::= { internal 1 }
+humidity	OBJECT IDENTIFIER ::= { internal 2 }
+power		OBJECT IDENTIFIER ::= { internal 3 }
+heat-index	OBJECT IDENTIFIER ::= { internal 4 }
+analog	OBJECT IDENTIFIER ::= { internal 5 }
+relay       OBJECT IDENTIFIER ::= { internal 6 }
+dew-point	OBJECT IDENTIFIER ::= { internal 7 }
+digital	OBJECT IDENTIFIER ::= { sensors 2 }
+digital-sen1	OBJECT IDENTIFIER ::= { digital 1 }
+digital-sen2	OBJECT IDENTIFIER ::= { digital 2 }
+digital-sen3	OBJECT IDENTIFIER ::= { digital 3 }
+digital-sen4	OBJECT IDENTIFIER ::= { digital 4 }
+digital-sen5	OBJECT IDENTIFIER ::= { digital 5 }
+digital-sen6	OBJECT IDENTIFIER ::= { digital 6 }
+digital-sen7	OBJECT IDENTIFIER ::= { digital 7 }
+digital-sen8	OBJECT IDENTIFIER ::= { digital 8 }
+switch	OBJECT IDENTIFIER ::= { sensors 3 }
+traps	OBJECT IDENTIFIER ::= { roomalert32S 2 }
+externalrelays OBJECT IDENTIFIER ::= { roomalert32S 3 }
+externalrelay1 OBJECT IDENTIFIER ::= { externalrelays 1 }
+externalrelay2 OBJECT IDENTIFIER ::= { externalrelays 2 }
+
+-- Room Alert 32S MIB
+-- Parameters
+
+
+internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Fahrenheit."
+::= { temperature 1 }
+
+internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Celsius."
+::= { temperature 2 }
+
+internal-humidity OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal relative humidity reading in %RH."
+::= { humidity 1 }
+
+internal-heat-index OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal heat index reading in Fahrenheit."
+::= { heat-index 1 }
+
+internal-heat-indexC OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal heat index reading in Celsius."
+::= { heat-index 2 }
+
+internal-power OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32S power supply. A '1' indicates the unit is running on AC/Utility power. A '0' indicates the unit is running on battery backup power."
+::= { power 1 }
+
+internal-analog1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32S analog input (0-5VDC)."
+::= { analog 1 }
+
+internal-analog2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32S analog input (0-5VDC)."
+::= { analog 2 }
+
+internal-relay1 OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the on-board relay output"
+::= { relay 1 }
+
+internal-relay2 OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the on-board relay output"
+::= { relay 2 }
+
+internal-dew-point-c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal dew-point reading in Celsius."
+::= { dew-point 1 }
+
+internal-dew-point-f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal dew-point reading in Fahrenheit."
+::= { dew-point 2 }
+
+digital-sen1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen1 1 }
+
+digital-sen1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen1 2 }
+
+digital-sen1-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen1 3 }
+
+digital-sen1-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen1 4 }
+
+digital-sen1-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen1 5 }
+
+
+digital-sen1-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen1 6 }
+
+digital-sen1-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen1 7 }
+
+digital-sen2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen2 1 }
+
+digital-sen2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen2 2 }
+
+digital-sen2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen2 3 }
+
+digital-sen2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen2 4 }
+
+digital-sen2-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen2 5 }
+
+
+digital-sen2-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen2 6 }
+
+digital-sen2-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen2 7 }
+
+digital-sen3-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen3 1 }
+
+digital-sen3-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen3 2 }
+
+digital-sen3-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen3 3 }
+
+digital-sen3-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen3 4 }
+
+digital-sen3-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen3 5 }
+
+
+digital-sen3-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen3 6 }
+
+digital-sen3-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen3 7 }
+
+digital-sen4-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen4 1 }
+
+digital-sen4-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen4 2 }
+
+digital-sen4-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen4 3 }
+
+digital-sen4-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen4 4 }
+
+digital-sen4-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen4 5 }
+
+
+digital-sen4-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen4 6 }
+
+digital-sen4-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen4 7 }
+
+digital-sen5-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen5 1 }
+
+digital-sen5-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen5 2 }
+
+digital-sen5-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen5 3 }
+
+digital-sen5-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen5 4 }
+
+digital-sen5-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen5 5 }
+
+
+digital-sen5-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen5 6 }
+
+digital-sen5-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen5 7 }
+
+digital-sen6-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen6 1 }
+
+digital-sen6-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen6 2 }
+
+digital-sen6-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen6 3 }
+
+digital-sen6-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen6 4 }
+
+digital-sen6-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen6 5 }
+
+
+digital-sen6-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen6 6 }
+
+digital-sen6-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen6 7 }
+
+digital-sen7-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen7 1 }
+
+digital-sen7-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen7 2 }
+
+digital-sen7-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen7 3 }
+
+digital-sen7-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen7 4 }
+
+digital-sen7-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen7 5 }
+
+
+digital-sen7-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen7 6 }
+
+digital-sen7-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen7 7 }
+
+digital-sen8-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Celsius."
+::= { digital-sen8 1 }
+
+digital-sen8-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor's current temperature in Fahrenheit."
+::= { digital-sen8 2 }
+
+digital-sen8-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current % relative humidity, voltage reading (V), power state (1=Power Detected, 0=No Power Detected), thermocouple temperature (C), or air speed (m/s)."
+::= { digital-sen8 3 }
+
+digital-sen8-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (F), custom analog reading, thermocouple temperature (F), or air speed (f/m)."
+::= { digital-sen8 4 }
+
+digital-sen8-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current heat index (C), thermocouple fault code (0=No Fault), or air flow (CMH)."
+::= { digital-sen8 5 }
+
+
+digital-sen8-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (C) or air flow (CFM)."
+::= { digital-sen8 6 }
+
+digital-sen8-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Varies by sensor type: current dew point (F)."
+::= { digital-sen8 7 }
+
+switch-sen1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 1 (0 = OPEN, 1 = CLOSED)."
+::= { switch 1 }
+
+switch-sen2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 2 (0 = OPEN, 1 = CLOSED)."
+::= { switch 2 }
+
+switch-sen3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 3 (0 = OPEN, 1 = CLOSED)."
+::= { switch 3 }
+
+switch-sen4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 4 (0 = OPEN, 1 = CLOSED)."
+::= { switch 4 }
+
+switch-sen5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 5 (0 = OPEN, 1 = CLOSED)."
+::= { switch 5 }
+
+switch-sen6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 6 (0 = OPEN, 1 = CLOSED)."
+::= { switch 6 }
+
+switch-sen7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 7 (0 = OPEN, 1 = CLOSED)."
+::= { switch 7 }
+
+switch-sen8 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 8 (0 = OPEN, 1 = CLOSED)."
+::= { switch 8 }
+
+switch-sen9 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 9 (0 = OPEN, 1 = CLOSED)."
+::= { switch 9 }
+
+switch-sen10 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 10 (0 = OPEN, 1 = CLOSED)."
+::= { switch 10 }
+
+switch-sen11 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 11 (0 = OPEN, 1 = CLOSED)."
+::= { switch 11 }
+
+switch-sen12 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 12 (0 = OPEN, 1 = CLOSED)."
+::= { switch 12 }
+
+switch-sen13 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 13 (0 = OPEN, 1 = CLOSED)."
+::= { switch 13 }
+
+switch-sen14 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 14 (0 = OPEN, 1 = CLOSED)."
+::= { switch 14 }
+
+switch-sen15 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 15 (0 = OPEN, 1 = CLOSED)."
+::= { switch 15 }
+
+switch-sen16 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 16 (0 = OPEN, 1 = CLOSED)."
+::= { switch 16 }
+
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last Alarm Message"
+::= { traps 1 }
+
+
+-- externalrelay1
+
+externalrelay1-element-one OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the first element on external relay 1."
+::= { externalrelay1 1 }
+
+externalrelay1-element-two OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the second element on external relay 1."
+::= { externalrelay1 2 }
+
+externalrelay1-element-three OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the third element on external relay 1."
+::= { externalrelay1 3 }
+
+externalrelay1-element-four OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the fourth element on external relay 1."
+::= { externalrelay1 4 }
+
+externalrelay1-element-five OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the fifth element on external relay 1."
+::= { externalrelay1 5 }
+
+externalrelay1-element-six OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the sixth element on external relay 1."
+::= { externalrelay1 6 }
+
+externalrelay1-element-seven OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the seventh element on external relay 1."
+::= { externalrelay1 7 }
+
+externalrelay1-element-eight OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the eighth element on external relay 1"
+::= { externalrelay1 8 }
+
+
+-- externalrelay2
+
+externalrelay2-element-one OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the first element on external relay 2."
+::= { externalrelay2 1 }
+
+externalrelay2-element-two OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the second element on external relay 2."
+::= { externalrelay2 2 }
+
+externalrelay2-element-three OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the third element on external relay 2."
+::= { externalrelay2 3 }
+
+externalrelay2-element-four OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the fourth element on external relay 2."
+::= { externalrelay2 4 }
+
+externalrelay2-element-five OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the fifth element on external relay 2."
+::= { externalrelay2 5 }
+
+externalrelay2-element-six OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the sixth element on external relay 2."
+::= { externalrelay2 6 }
+
+externalrelay2-element-seven OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the seventh element on external relay 2."
+::= { externalrelay2 7 }
+
+externalrelay2-element-eight OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the eighth element on external relay 2"
+::= { externalrelay2 8 }
+
+END

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2099  Bruno Prémont <bonbons AT linux-vserver.org>
  *
@@ -48,9 +49,9 @@ function dhtml_response_list(&$items, $method)
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'collectd',
+    'tab' => 'collectd',
 ];
 
 $plugins = collectd_list_plugins($device['hostname']);

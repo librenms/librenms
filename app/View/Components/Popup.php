@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
+use LibreNMS\Config;
 
 class Popup extends Component
 {
@@ -13,6 +14,8 @@ class Popup extends Component
      */
     public function render()
     {
-        return view('components.popup');
+        return Config::get('web_mouseover', true)
+            ? view('components.popup')
+            : view('components.nopopup');
     }
 }

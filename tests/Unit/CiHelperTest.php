@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiHelperTest.php
  *
@@ -30,7 +31,7 @@ use LibreNMS\Util\CiHelper;
 
 class CiHelperTest extends TestCase
 {
-    public function testSetFlags()
+    public function testSetFlags(): void
     {
         $helper = new CiHelper();
         $allFalse = array_map(function ($flag) {
@@ -55,13 +56,13 @@ class CiHelperTest extends TestCase
         $this->assertEquals($testOne, $helper->getFlags());
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $helper = new CiHelper();
         $this->assertEquals($this->getDefaultFlags(), $helper->getFlags());
     }
 
-    public function testNoFiles()
+    public function testNoFiles(): void
     {
         putenv('FILES=none');
         $helper = new CiHelper();
@@ -78,7 +79,7 @@ class CiHelperTest extends TestCase
         ]);
     }
 
-    public function testSetOs()
+    public function testSetOs(): void
     {
         $helper = new CiHelper();
         $helper->setOS(['netonix', 'e3meter']);
@@ -116,7 +117,7 @@ class CiHelperTest extends TestCase
         ]);
     }
 
-    public function testSetModules()
+    public function testSetModules(): void
     {
         $helper = new CiHelper();
         $helper->setModules(['sensors', 'processors']);
@@ -185,7 +186,7 @@ class CiHelperTest extends TestCase
         ]);
     }
 
-    public function testFileCategorization()
+    public function testFileCategorization(): void
     {
         putenv('FILES=LibreNMS/Alert/Transport/Sensu.php includes/services.inc.php');
         $helper = new CiHelper();

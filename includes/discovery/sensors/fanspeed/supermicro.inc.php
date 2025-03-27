@@ -13,7 +13,7 @@ foreach (explode("\n", $oids) as $data) {
     if ($data) {
         [$oid,$kind] = explode(' ', $data);
         $split_oid = explode('.', $oid);
-        $index = $split_oid[(count($split_oid) - 1)];
+        $index = $split_oid[count($split_oid) - 1];
         if ($kind == 0) {
             $fan_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.4.$index";
             $descr_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.2.$index";
@@ -30,7 +30,7 @@ foreach (explode("\n", $oids) as $data) {
             $descr = str_replace(' Fan Speed', '', $descr);
             $descr = str_replace(' Speed', '', $descr);
             if ($monitor == 'true') {
-                discover_sensor($valid['sensor'], 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
+                discover_sensor(null, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, null, null, null, $current);
             }
         }
     }//end if

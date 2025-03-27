@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,7 +37,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
     {
         return {
             device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
-            eventtype: "' . addcslashes($vars['eventtype'] ?? '', '"') . '",
+            eventtype: "' . htmlspecialchars($vars['eventtype'] ?? '') . '",
         };
     },
     url: "' . url('/ajax/table/eventlog') . '"

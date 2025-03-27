@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2015 Daniel Preussker, QuxLabs UG <preussker@quxlabs.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +38,7 @@ if (in_array($_REQUEST['action'], ['stick', 'unstick', 'create']) && ! Auth::use
 }
 
 if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
-    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'], 'user_id'=>Auth::id(), 'key'=>'read', 'value'=>1], 'notifications_attribs')) {
+    if (dbInsert(['notifications_id' => $_REQUEST['notification_id'], 'user_id' => Auth::id(), 'key' => 'read', 'value' => 1], 'notifications_attribs')) {
         exit(json_encode([
             'status' => 'ok',
             'message' => 'Set as Read',
@@ -61,7 +62,7 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
         'message' => 'All notifications set as read',
     ]));
 } elseif ($_REQUEST['action'] == 'stick' && isset($_REQUEST['notification_id'])) {
-    if (dbInsert(['notifications_id'=>$_REQUEST['notification_id'], 'user_id'=>Auth::id(), 'key'=>'sticky', 'value'=>1], 'notifications_attribs')) {
+    if (dbInsert(['notifications_id' => $_REQUEST['notification_id'], 'user_id' => Auth::id(), 'key' => 'sticky', 'value' => 1], 'notifications_attribs')) {
         exit(json_encode([
             'status' => 'ok',
             'message' => 'Set as Sticky',
@@ -75,7 +76,7 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
         ]));
     }
 } elseif ($_REQUEST['action'] == 'create' && (! empty($_REQUEST['title']) && ! empty($_REQUEST['body']))) {
-    if (dbInsert(['title'=>$_REQUEST['title'], 'body'=>$_REQUEST['body'], 'checksum'=>hash('sha512', Auth::id() . '.LOCAL.' . $_REQUEST['title']), 'source'=>Auth::id()], 'notifications')) {
+    if (dbInsert(['title' => $_REQUEST['title'], 'body' => $_REQUEST['body'], 'checksum' => hash('sha512', Auth::id() . '.LOCAL.' . $_REQUEST['title']), 'source' => Auth::id()], 'notifications')) {
         exit(json_encode([
             'status' => 'ok',
             'message' => 'Created',
@@ -89,6 +90,6 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
 }
 
 exit(json_encode([
-    'status'       => 'error',
-    'message'      => 'unknown error',
+    'status' => 'error',
+    'message' => 'unknown error',
 ]));

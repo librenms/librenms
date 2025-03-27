@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BasicApiTest.php
  *
@@ -34,8 +35,9 @@ class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testListDevices()
+    public function testListDevices(): void
     {
+        /** @var User $user */
         $user = User::factory()->admin()->create();
         $token = ApiToken::generateToken($user);
         $device = Device::factory()->create();
@@ -45,7 +47,7 @@ class BasicApiTest extends DBTestCase
             ->assertJson([
                 'status' => 'ok',
                 'devices' => [$device->toArray()],
-                'count'=> 1,
+                'count' => 1,
             ]);
     }
 }

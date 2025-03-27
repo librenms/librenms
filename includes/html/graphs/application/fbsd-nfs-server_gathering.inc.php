@@ -18,21 +18,21 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'write ops',
-            'ds'       => 'writeops',
-            'colour'   => 'aa6c39',
+            'descr' => 'write ops',
+            'ds' => 'writeops',
+            'colour' => 'aa6c39',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'write rpc',
-            'ds'       => 'writerpc',
-            'colour'   => '582a72',
+            'descr' => 'write rpc',
+            'ds' => 'writerpc',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'ops saved',
-            'ds'       => 'opsaved',
-            'colour'   => '28536c',
+            'descr' => 'ops saved',
+            'ds' => 'opsaved',
+            'colour' => '28536c',
         ],
     ];
 } else {

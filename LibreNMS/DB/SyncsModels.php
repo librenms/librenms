@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SyncsModels.php
  *
@@ -25,8 +26,10 @@
 
 namespace LibreNMS\DB;
 
+use App\Models\Device;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Models\Keyable;
 
 trait SyncsModels
 {
@@ -34,22 +37,25 @@ trait SyncsModels
      * Sync several models for a device's relationship
      * Model must implement \LibreNMS\Interfaces\Models\Keyable interface
      *
-     * @param  \App\Models\Device  $device
+     * @param  \Illuminate\Database\Eloquent\Model  $parentModel
      * @param  string  $relationship
-     * @param  \Illuminate\Support\Collection  $models  \LibreNMS\Interfaces\Models\Keyable
+     * @param  \Illuminate\Support\Collection<Keyable>  $models  \LibreNMS\Interfaces\Models\Keyable
      * @return \Illuminate\Support\Collection
      */
-    protected function syncModels($device, $relationship, $models): Collection
+    protected function syncModels($parentModel, $relationship, $models, $existing = null): Collection
     {
         $models = $models->keyBy->getCompositeKey();
-        $existing = $device->$relationship->groupBy->getCompositeKey();
+        $existing = ($existing ?? $parentModel->$relationship)->groupBy->getCompositeKey();
 
         foreach ($existing as $exist_key => $existing_rows) {
             if ($models->offsetExists($exist_key)) {
                 // update
                 foreach ($existing_rows as $index => $existing_row) {
                     if ($index == 0) {
-                        $existing_row->fill($models->get($exist_key)->getAttributes())->save();
+                        // fill attributes, ignoring mutators and fillable
+                        $merged = array_merge($existing_row->getAttributes(), $models->get($exist_key)->getAttributes());
+                        $existing_row->setRawAttributes($merged);
+                        $existing_row->save();
                     } else {
                         // delete extra rows at this key
                         $existing_row->delete();
@@ -64,15 +70,33 @@ trait SyncsModels
         }
 
         $new = $models->diffKeys($existing);
-        if (is_a($device->$relationship(), HasManyThrough::class)) {
+        if (is_a($parentModel->$relationship(), HasManyThrough::class)) {
             // if this is a distant relation, the models need the intermediate relationship set
             // just save assuming things are correct
             $new->each->save();
         } else {
-            $device->$relationship()->saveMany($new);
+            $parentModel->$relationship()->saveMany($new);
         }
 
         return $existing->map->first()->merge($new);
+    }
+
+    /**
+     * Sync a sub-group of models to the database
+     *
+     * @param  Collection<Keyable>  $models
+     */
+    public function syncModelsByGroup(Device $device, string $relationship, Collection $models, array $where): Collection
+    {
+        $filter = function ($models, $params) {
+            foreach ($params as $key => $value) {
+                $models = $models->where($key, '=', $value);
+            }
+
+            return $models;
+        };
+
+        return $this->syncModels($device, $relationship, $models->when($where, $filter), $device->$relationship->when($where, $filter));
     }
 
     /**

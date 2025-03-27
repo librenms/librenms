@@ -1,4 +1,3 @@
-mib: IF-MIB
 modules:
     mempools:
         data:
@@ -37,7 +36,7 @@ modules:
             - MOXA-EDSG512E-MIB::switchModel.0
             - MOXA-EDSG516E-MIB::switchModel.0
             - MOXA-EDSP506E-MIB::switchModel.0
-            - MOXA-EDSP510A8POE-MIB::switchModel
+            - MOXA-EDSP510A8POE-MIB::switchModel.0
             - MOXA-EDSG512E8POE-MIB::switchModel
         version:
             - MOXA-IKS6726A-MIB::firmwareVersion
@@ -45,7 +44,7 @@ modules:
             - MOXA-EDSG512E-MIB::firmwareVersion.0
             - MOXA-EDSG516E-MIB::firmwareVersion.0
             - MOXA-EDSP506E-MIB::firmwareVersion.0
-            - MOXA-EDSP510A8POE-MIB::firmwareVersion
+            - MOXA-EDSP510A8POE-MIB::firmwareVersion.0
             - MOXA-EDSG512E8POE-MIB::firmwareVersion
         serial:
             - MOXA-EDSG508E-MIB::serialNumber
@@ -58,7 +57,7 @@ modules:
             data:
                 -
                     oid:
-                        - ifDescr
+                        - IF-MIB::ifDescr
         power:
             data:
                 -
@@ -74,13 +73,13 @@ modules:
                 -
                     oid: MOXA-EDSP506E-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.162.1.40.6.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} PoE Consumption'
+                    descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
                     high_limit: 'powerLimit.{{ $index }}'
                 -
                     oid: MOXA-EDSP510A8POE-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.40.6.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} PoE Consumption'
+                    descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
                     high_limit: 36.0
                 -
@@ -92,124 +91,140 @@ modules:
                 -
                     oid: MOXA-EDSG512E8POE-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.40.6.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} PoE Consumption'
+                    descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
                     high_limit: 36.0
         temperature:
             data:
                 -
-                    oid: MOXA-EDSP510A8POE-MIB::sfpTemperature
+                    oid: MOXA-EDSP510A8POE-MIB::monitorSFPTable
+                    value: MOXA-EDSP510A8POE-MIB::sfpTemperature
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.3.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module temperature'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
                     index: 'sfpTemperature.{{ $index }}'
                     low_limit: -40.0
                     high_limit: 85.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::fiberTemperature
+                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512E8POE-MIB::fiberTemperature
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.5.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module temperature'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
                     index: 'fiberTemperature.{{ $index }}'
                     low_limit: -40.0
                     high_limit: 85.0
                 -
-                    oid: MOXA-EDSG516E-MIB::fiberTemperature
+                    oid: MOXA-EDSG516E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG516E-MIB::fiberTemperature
                     num_oid: '.1.3.6.1.4.1.8691.7.71.1.10.11.1.5.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module temperature'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
                     index: 'fiberTemperature.{{ $index }}'
                     low_limit: -40.0
                     high_limit: 85.0
                 -
-                    oid: MOXA-EDSP506E-MIB::fiberTemperature
+                    oid: MOXA-EDSP506E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSP506E-MIB::fiberTemperature
                     num_oid: '.1.3.6.1.4.1.8691.7.162.1.10.11.1.5.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module temperature'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
                     index: 'fiberTemperature.{{ $index }}'
                     low_limit: -40.0
                     high_limit: 85.0
         voltage:
             data:
                 -
-                    oid: MOXA-EDSP510A8POE-MIB::sfpVoltage
+                    oid: MOXA-EDSP510A8POE-MIB::monitorSFPTable
+                    value: MOXA-EDSP510A8POE-MIB::sfpVoltage
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.4.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Supply Voltage'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
                     index: 'sfpVoltage.{{ $index }}'
                     low_limit: 3.13
                     high_limit: 3.47
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::fiberVoltage
+                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512E8POE-MIB::fiberVoltage
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.4.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Supply Voltage'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
                     index: 'fiberVoltage.{{ $index }}'
                     low_limit: 3.13
                     high_limit: 3.47
                 -
-                    oid: MOXA-EDSG516E-MIB::fiberVoltage
+                    oid: MOXA-EDSG516E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG516E-MIB::fiberVoltage
                     num_oid: '.1.3.6.1.4.1.8691.7.71.1.10.11.1.4.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Supply Voltage'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
                     index: 'fiberVoltage.{{ $index }}'
                     low_limit: 3.13
                     high_limit: 3.47
                 -
-                    oid: MOXA-EDSP506E-MIB::fiberVoltage
+                    oid: MOXA-EDSP506E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSP506E-MIB::fiberVoltage
                     num_oid: '.1.3.6.1.4.1.8691.7.162.1.10.11.1.4.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Supply Voltage'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
                     index: 'fiberVoltage.{{ $index }}'
                     low_limit: 3.13
                     high_limit: 3.47
         dbm:
             data:
                 -
-                    oid: MOXA-EDSP510A8POE-MIB::sfpTxPower
+                    oid: MOXA-EDSP510A8POE-MIB::monitorSFPTable
+                    value: MOXA-EDSP510A8POE-MIB::sfpTxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.5.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Transmit Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'sfpTxPower.{{ $index }}'
                     low_limit: -9.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSP510A8POE-MIB::sfpRXPower
+                    oid: MOXA-EDSP510A8POE-MIB::monitorSFPTable
+                    value: MOXA-EDSP510A8POE-MIB::sfpRXPower
                     num_oid: '.1.3.6.1.4.1.8691.7.86.1.10.7.1.6.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Receive Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'sfpRxPower.{{ $index }}'
                     low_limit: -21.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::fiberTxPower
+                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512E8POE-MIB::fiberTxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.7.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Transmit Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
                     low_limit: -9.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::fiberRxPower
+                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512E8POE-MIB::fiberRxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.9.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Receive Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
                     low_limit: -21.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG516E-MIB::fiberTxPower
+                    oid: MOXA-EDSG516E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG516E-MIB::fiberTxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.71.1.10.11.1.7.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Transmit Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
                     low_limit: -9.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG516E-MIB::fiberRxPower
+                    oid: MOXA-EDSG516E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG516E-MIB::fiberRxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.71.1.10.11.1.9.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Receive Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
                     low_limit: -21.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSP506E-MIB::fiberTxPower
+                    oid: MOXA-EDSP506E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSP506E-MIB::fiberTxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.162.1.10.11.1.7.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Transmit Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
                     low_limit: -9.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSP506E-MIB::fiberRxPower
+                    oid: MOXA-EDSP506E-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSP506E-MIB::fiberRxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.162.1.10.11.1.9.{{ $index }}'
-                    descr: '{{ $ifDescr }} SFP module Receive Power'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
                     low_limit: -21.0
                     high_limit: -3.0
@@ -305,4 +320,3 @@ modules:
                     states:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
                         - { value:  1, generic: 0, graph: 0, descr: present }
-

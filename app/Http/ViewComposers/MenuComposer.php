@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Menu.php
  *
@@ -27,22 +28,25 @@ namespace App\Http\ViewComposers;
 
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
+use App\Models\CustomMap;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Link;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\PortGroup;
+use App\Models\PortsNac;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
 use PluginManager;
@@ -80,11 +84,18 @@ class MenuComposer
         $vars['package_count'] = Package::hasAccess($user)->count();
 
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
+
+        //Maps
+        $vars['links'] = Link::exists();
+        $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
+        $vars['device_group_dependencies'] = $vars['device_groups']->isNotEmpty() && \DB::table('device_group_device')->exists();
+        $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
 
         // Service menu
         if (Config::get('show_services')) {
@@ -116,6 +127,8 @@ class MenuComposer
             $vars['custom_port_descr']->isNotEmpty();
 
         $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
+
+        $vars['port_nac'] = PortsNac::hasAccess($user)->exists();
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();
@@ -166,6 +179,16 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
+                    ],
+                ];
+            }
+
+            if ($routing_count['ospfv3']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'ospfv3',
+                        'icon' => 'circle-o-notch fa-rotate-180',
+                        'text' => 'OSPFv3 Devices',
                     ],
                 ];
             }
@@ -256,6 +279,7 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;

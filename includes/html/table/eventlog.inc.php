@@ -1,4 +1,7 @@
 <?php
+
+use LibreNMS\Util\Rewrite;
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -60,7 +63,7 @@ if (! isset($sort) || empty($sort)) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 
@@ -74,7 +77,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
         $this_if = cleanPort(getifbyid($eventlog['reference']));
-        $type = '<b>' . generate_port_link($this_if, makeshortif(strtolower($this_if['label']))) . '</b>';
+        $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower($this_if['label']))) . '</b>';
     } else {
         $type = $eventlog['type'];
     }

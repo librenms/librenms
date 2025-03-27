@@ -1,0 +1,207 @@
+mib: Montclair-MIB
+modules:
+  os:
+    serial: Montclair-MIB::deviceSerialNumber.0
+    hardware: Montclair-MIB::devicePartNumber.0
+    version: Montclair-MIB::deviceFirmwareVersion.0
+    sysDescr_regex: '/(?<hardware>.*)/'
+  sensors:
+    pre-cache:
+      data:
+        -
+          oid:
+            - deviceStatus
+            - amplifierDynamic
+    count:
+      data:
+        -
+          oid: deviceStatus
+          value: devicePowerSupplyAmount
+          index: 'devicePowerSupplyAmount.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.3.{{ $index }}'
+          descr: Power Supplies
+        -
+          oid: deviceStatus
+          value: 'deviceFanAmount'
+          index: 'deviceFanAmount.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.6.{{ $index }}'
+          descr: Fan Count
+        -
+          oid: amplifierDynamic
+          value: 'amplifierPortAmount'
+          index: 'amplifierPortAmount.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.13.{{ $index }}'
+          descr: Ports
+    dbm:
+      data:
+        -
+          oid: amplifierDynamic
+          value: amplifierBackReflectionPower
+          index: 'amplifierBackReflectionPower.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.4.{{ $index }}'
+          descr: Amplifier Reflection
+          divisor: 10
+          high_limit: -15
+        -
+          oid: amplifierDynamic
+          value: amplifierInputPower
+          index: 'amplifierInputPower.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.5.{{ $index }}'
+          descr: Input Power
+          divisor: 10
+          high_limit: 10
+          low_limit: 0
+        -
+          oid: amplifierDynamic
+          value: amplifierOutputPower
+          index: 'amplifierOutputPower.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.11.{{ $index }}'
+          descr: Output Power
+          divisor: 10
+          high_limit: 40
+          low_limit: 28
+        -
+          oid: amplifierDynamic
+          value: amplifierPortOutputPower
+          index: 'amplifierPortOutputPower.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.14.{{ $index }}'
+          descr: Port Output Power
+          divisor: 10
+        -
+          oid: amplifierDynamic
+          value: amplifierGain
+          index: 'amplifierGain.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.12.{{ $index }}'
+          descr: Amp Gain
+          divisor: 10
+        -
+          oid: amplifierDynamic
+          value: amplifierPortGain
+          index: 'amplifierPortGain.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.15.{{ $index }}'
+          descr: Port Gain
+          divisor: 10
+    percent:
+      data:
+        -
+          oid: amplifierDynamic
+          value: amplifierPrePumpCurrent
+          index: 'amplifierPrePumpCurrent.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.8.{{ $index }}'
+          descr: Pre-Pump Current
+        -
+          oid: amplifierDynamic
+          value: amplifierPumpCurrent1
+          index: 'amplifierPumpCurrent1.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.9.{{ $index }}'
+          descr: Pump Current 1
+        -
+          oid: amplifierDynamic
+          value: amplifierPumpCurrent2
+          index: 'amplifierPumpCurrent2.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.10.{{ $index }}'
+          descr: Pump Current 2
+    temperature:
+      data:
+        -
+          oid: deviceStatus
+          value: deviceInternalTemperatute
+          index: 'deviceInternalTemperatute.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.2.{{ $index }}'
+          descr: Internal Temperature
+          low_limit: -33
+          high_limit: 70
+          skip_values:
+          -
+            oid: .1.3.6.1.4.1.1385.12.2.0
+            op: '='
+            value: 0
+        -
+          oid: amplifierDynamic
+          value: amplifierRadiatorTemperature
+          index: 'amplifierRadiatorTemperature.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.16.{{ $index }}'
+          descr: Amp Radiator Temperature
+          low_limit: -33
+          high_limit: 70
+        -
+          oid: amplifierDynamic
+          value: amplifierPrePumpTemperature
+          index: 'amplifierPrePumpTemperature.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.17.{{ $index }}'
+          descr: Amp Pre-Pump Temperature
+          divisor: 10
+          low_limit: -33
+          high_limit: 70
+    state:
+      data:
+        -
+          oid: deviceStatus
+          value: devicePowerSupply1Status
+          index: 'devicePowerSupply1Status.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.4.{{ $index }}'
+          descr: Power Supply 1
+          state_name: devicePowerSupply1Status
+          states:
+            - { value: 1, generic: 3, graph: 0, descr: Empty }
+            - { value: 3, generic: 2, graph: 0, descr: Critical }
+            - { value: 7, generic: 0, graph: 0, descr: Normal }
+        -
+          oid: deviceStatus
+          value: devicePowerSupply2Status
+          index: 'devicePowerSupply2Status.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.5.{{ $index }}'
+          descr: Power Supply 2
+          state_name: devicePowerSupply2Status
+          states:
+            - { value: 1, generic: 3, graph: 0, descr: Empty }
+            - { value: 3, generic: 2, graph: 0, descr: Critical }
+            - { value: 7, generic: 0, graph: 0, descr: Normal }
+        -
+          oid: deviceStatus
+          value: deviceFanStatus
+          index: 'deviceFanStatus.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.7.{{ $index }}'
+          descr: Fan Status
+          state_name: deviceFanStatus
+          states:
+            - { value: 0, generic: 3, graph: 0, descr: Normal }
+            - { value: 1, generic: 3, graph: 0, descr: Unknown }
+            - { value: 3, generic: 2, graph: 0, descr: Critical }
+            - { value: 5, generic: 2, graph: 0, descr: Warning }
+            - { value: 7, generic: 0, graph: 0, descr: Normal }
+        -
+          oid: deviceStatus
+          value: deviceFanMode
+          index: 'deviceFanMode.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.12.8.{{ $index }}'
+          descr: Fan Mode
+          state_name: deviceFanMode
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: Auto }
+            - { value: 2, generic: 0, graph: 0, descr: Manual }
+            - { value: 3, generic: 0, graph: 0, descr: Low }
+            - { value: 4, generic: 0, graph: 0, descr: Linear }
+            - { value: 5, generic: 0, graph: 0, descr: High }
+        -
+          oid: amplifierDynamic
+          value: amplifierEnabled
+          index: 'amplifierEnabled.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.6.{{ $index }}'
+          descr: Amplifier
+          state_name: amplifierStatus
+          states:
+            - { value: 1, generic: 2, graph: 0, descr: Disabled }
+            - { value: 2, generic: 0, graph: 0, descr: Enabled }
+            # The MIB seems to have this backwards...
+        -
+          oid: amplifierDynamic
+          value: amplifierMode
+          index: 'amplifierMode.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.1385.77.7.2.7.{{ $index }}'
+          descr: Amp Mode
+          state_name: amplifierMode
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: ACC }
+            - { value: 2, generic: 0, graph: 0, descr: APC }
+            - { value: 3, generic: 0, graph: 0, descr: AGC }
