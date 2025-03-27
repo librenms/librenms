@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture statistics from the AT-NTP-MIB
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MapDataController.php
  *
@@ -359,7 +360,7 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int|null $speed): int
+    protected function linkSpeedWidth(?int $speed): int
     {
         $speed /= 10000000;
         if (is_nan($speed)) {

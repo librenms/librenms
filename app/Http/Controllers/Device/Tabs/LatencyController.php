@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LatencyController.php
  *
