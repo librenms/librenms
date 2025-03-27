@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * gen_smokeping.php
  *

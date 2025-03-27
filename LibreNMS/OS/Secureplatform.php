@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Secureplatform.php
  *

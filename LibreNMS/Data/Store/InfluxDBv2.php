@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InfluxDBv2.php
  *

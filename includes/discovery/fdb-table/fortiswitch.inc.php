@@ -1,4 +1,5 @@
 <?php
+
 /**
  * fortiswitch.inc.php
  *

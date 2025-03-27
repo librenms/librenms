@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +36,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
     use LdapSessionCache;
 
-    protected Connection|null $ldap_connection = null;
+    protected ?Connection $ldap_connection = null;
     protected static $AUTH_IS_EXTERNAL = true;
 
     public function __construct()
