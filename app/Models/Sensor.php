@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
 
 class Sensor extends DeviceRelatedModel implements Keyable
 {
@@ -144,15 +145,37 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function formatValue(): string
     {
+        $value = $this->sensor_current;
+        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / Config::get('rrd.step', 300), 2, 3, '');
+        }
+
         return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
-            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
-            default => $this->sensor_current . ' ' . $this->unit(),
+            'state' => $this->currentTranslation()?->state_descr ?? 'Unknown',
+            'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
+            'runtime' => Time::formatInterval($value * 60),
+            'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
+            'dbm' => round($value, 3) . ' ' . $this->unit(),
+            default => $value . ' ' . $this->unit(),
         };
+    }
+
+    public function currentTranslation(): ?StateTranslation
+    {
+        if ($this->sensor_class !== 'state') {
+            return null;
+        }
+
+        return $this->translations->firstWhere('state_value', $this->sensor_current);
     }
 
     public function currentStatus(): Severity
     {
+        if ($this->sensor_class == 'state') {
+            return $this->currentTranslation()?->severity() ?? Severity::Unknown;
+        }
+
         if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
             return Severity::Error;
         }
