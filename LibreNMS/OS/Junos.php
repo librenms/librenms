@@ -55,12 +55,17 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             'JUNIPER-MIB::jnxBoxDescr.0',
             'JUNIPER-MIB::jnxBoxSerialNo.0',
             'JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberSWVersion.0',
+            'HOST-RESOURCES-MIB::hrSWInstalledName.1',
             'HOST-RESOURCES-MIB::hrSWInstalledName.2',
         ], '-OQUs');
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
         if (isset($data[2]['hrSWInstalledName'])) {
             preg_match('/^JUNOS.*\[(.+?)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
+        }
+        # deal with JSUs - checked with EVO only
+        if (isset($data[1]['hrSWInstalledName'])) {
+            preg_match('/^junos-evo.*?(\d+\.\d+.*)$/', $data[1]['hrSWInstalledName'], $parsedVersion);
         }
 
         $device->hardware = $data[0]['jnxBoxDescr'] ?? (isset($parsed['hardware']) ? 'Juniper ' . strtoupper($parsed['hardware']) : null);
