@@ -1,0 +1,600 @@
+TROPIC-SLOT-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION                      FROM SNMPv2-TC
+      TropicAdminStateType,
+      TropicOperationalStateType,
+      TropicOperationalCapabilityType,
+      TropicStateQualifierType,
+      TropicSlotIndexType,
+      TropicNewResetType                      FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotModules, tnSlotMIB,
+      tropicEmptyCard                         FROM TROPIC-GLOBAL-REG;
+
+  tnSlotMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202207221200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The slot MIB."
+
+      REVISION    "202207221200Z"
+      DESCRIPTION "1) Added the following to AluWdmSlotSubType:
+                      bSubType(10).
+                   2) Added the following to tnSlotTable:
+                      tnSlotKeyGraceEndTime."
+
+      REVISION    "202111261200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotCustomerLifeCycleState."
+
+      REVISION    "202007241200Z"
+      DESCRIPTION "Changed SYNTAX of tnSlotDueDate from SIZE(0..20) to SIZE(0..30)."
+
+      REVISION    "202005151200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotMigrationSubType."
+
+      REVISION    "202005081200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotInsertExtract."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   lPSubType(9)."
+
+      REVISION    "202002281200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotProgrammedProductCode
+                   tnSlotProductCodeSup
+                   tnSlotLifeCycleState
+                   tnSlotDueDate."
+
+      REVISION    "201912131200Z"
+      DESCRIPTION "Changed SYNTAX of the following from TropicResetType
+                   to TropicNewResetType:
+                   tnSlotReset."
+
+      REVISION    "201908021200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotProgrammedGenericType
+                   tnSlotPresentGenericType."
+
+      REVISION    "201901181200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   qSubType(8)."
+
+      REVISION    "201901111200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   unassigned(9999)."
+
+      REVISION    "201812211200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   fSubType(7)."
+
+      REVISION    "201809281200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   lSubType(6)."
+
+      REVISION    "201806151200Z"
+      DESCRIPTION "Added the following to AluWdmSlotSubType:
+                   eSubType(5)."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201711241200Z"
+      DESCRIPTION "1) Added the following textual convention:
+                      AluWdmSlotSubType.
+                   2) Added the following to tnSlotTable:
+                      tnSlotProgrammedSubType
+                      tnSlotPresentSubType."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611071200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotMigrationType."
+
+      REVISION    "201610201200Z"
+      DESCRIPTION "Added the following to TropicResetType:
+                    forceReset(4)."
+
+      REVISION    "201607121200Z"
+      DESCRIPTION "Added the following to tnSlotTable:
+                   tnSlotAlmProfName."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added DEFVAL to attributes."
+
+      REVISION    "201312061200Z"
+      DESCRIPTION "Changed DEFVAL of the following:
+                   tnSlotProgrammedType, from '{}' to 'tropicEmptyCard'
+                   tnSlotStateQualifier, from 'uas' to '{ uas }'."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSlotEvents."
+
+      REVISION    "201012091200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnSlotCompanyID
+                   tnSlotMnemonic
+                   tnSlotCLEI
+                   tnSlotUnitPartNum
+                   tnSlotSWPartNum
+                   tnSlotFactoryID
+                   tnSlotSerialNum
+                   tnSlotDate
+                   tnSlotExtraData."
+
+      REVISION    "200906251200Z"
+      DESCRIPTION "Added the following to tnSlotResetReason:
+                   ecProcessExit(42),
+                   eventNvramAccessFailure(43),
+                   userCCActivitySwitch(44)."
+
+      REVISION    "200810161200Z"
+      DESCRIPTION "Marked the following as deprecated:
+                   tnSlotCompanyID
+                   tnSlotMnemonic
+                   tnSlotCLEI
+                   tnSlotUnitPartNum
+                   tnSlotSWPartNum
+                   tnSlotFactoryID
+                   tnSlotSerialNum
+                   tnSlotDate
+                   tnSlotExtraData."
+
+      REVISION    "200809261200Z"
+      DESCRIPTION "Added boardMgrPowerCycle(40) and
+                   boardMgrProcessorReset(41) to tnSlotResetReason."
+
+      REVISION    "200807251200Z"
+      DESCRIPTION "Marked the remote inventory attributes as
+                   to be deleted."
+
+      REVISION    "200803061200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added remote inventory attributes to MIB."
+
+      ::= { tnSlotModules 1 }
+
+  tnSlotConf        OBJECT IDENTIFIER ::= { tnSlotMIB 1 }
+  tnSlotGroups      OBJECT IDENTIFIER ::= { tnSlotConf 1 }
+  tnSlotCompliances OBJECT IDENTIFIER ::= { tnSlotConf 2 }
+  tnSlotObjs        OBJECT IDENTIFIER ::= { tnSlotMIB 2 }
+  tnSlotBasics      OBJECT IDENTIFIER ::= { tnSlotObjs 2 }
+--  obsolete
+--  tnSlotEvents      OBJECT IDENTIFIER ::= { tnSlotMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    AluWdmSlotSubType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         INTEGER {
+                          empty(1),
+                          mSubType(2),
+                          rSubType(3),
+                          hSubType(4),
+                          eSubType(5),
+                          lSubType(6),
+                          fSubType(7),
+                          qSubType(8),
+                          lPSubType(9),
+                          bSubType(10),
+                          unassigned(9999)
+                       }
+
+--------------------------------------------------------------------------------
+-- Generic Slot Table
+--------------------------------------------------------------------------------
+    tnSlotTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+     ::= { tnSlotBasics 1 }
+
+    tnSlotEntry OBJECT-TYPE
+        SYNTAX         TnSlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnSlotTable 1 }
+
+    TnSlotEntry ::=
+        SEQUENCE {
+            tnSlotIndex                     TropicSlotIndexType,
+            tnSlotProgrammedType            OBJECT IDENTIFIER,
+            tnSlotPresentType               OBJECT IDENTIFIER,
+            tnSlotAdminState                TropicAdminStateType,
+            tnSlotOperationalState          TropicOperationalStateType,
+            tnSlotOperationalCapability     TropicOperationalCapabilityType,
+            tnSlotStateQualifier            TropicStateQualifierType,
+--            obsolete
+--            tnSlotCompanyID                 SnmpAdminString,
+--            tnSlotMnemonic                  SnmpAdminString,
+--            tnSlotCLEI                      SnmpAdminString,
+--            tnSlotUnitPartNum               SnmpAdminString,
+--            tnSlotSWPartNum                 SnmpAdminString,
+--            tnSlotFactoryID                 SnmpAdminString,
+--            tnSlotSerialNum                 SnmpAdminString,
+--            tnSlotDate                      SnmpAdminString,
+--            tnSlotExtraData                 SnmpAdminString
+            tnSlotAlmProfName               OCTET STRING,
+            tnSlotMigrationType             OBJECT IDENTIFIER,
+            tnSlotProgrammedSubType         AluWdmSlotSubType,
+            tnSlotPresentSubType            AluWdmSlotSubType,
+            tnSlotProgrammedGenericType     SnmpAdminString,
+            tnSlotPresentGenericType        SnmpAdminString,
+            tnSlotProgrammedProductCode     SnmpAdminString,
+            tnSlotProductCodeSup            INTEGER,
+            tnSlotLifeCycleState            SnmpAdminString,
+            tnSlotDueDate                   SnmpAdminString,
+            tnSlotInsertExtract             INTEGER,
+            tnSlotMigrationSubType          AluWdmSlotSubType,
+            tnSlotCustomerLifeCycleState    SnmpAdminString,
+            tnSlotKeyGraceEndTime           Integer32
+        }
+
+    tnSlotIndex OBJECT-TYPE
+        SYNTAX         TropicSlotIndexType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 1 }
+
+    tnSlotProgrammedType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Type of card to be provisioned in the given Slot."
+        DEFVAL         { tropicEmptyCard }
+        ::= { tnSlotEntry 2 }
+
+    tnSlotPresentType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Actual card present in the given slot."
+        DEFVAL         { tropicEmptyCard }
+        ::= { tnSlotEntry 3 }
+
+    tnSlotAdminState OBJECT-TYPE
+        SYNTAX         TropicAdminStateType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { down }
+        ::= { tnSlotEntry 4 }
+
+    tnSlotOperationalState OBJECT-TYPE
+        SYNTAX         TropicOperationalStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { down }
+        ::= { tnSlotEntry 5 }
+
+    tnSlotOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disabled }
+        ::= { tnSlotEntry 6 }
+
+    tnSlotStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { { uas } }
+        ::= { tnSlotEntry 7 }
+
+--    obsolete
+--    tnSlotCompanyID   OBJECT-TYPE ::= { tnSlotEntry 8 }
+--    tnSlotMnemonic    OBJECT-TYPE ::= { tnSlotEntry 9 }
+--    tnSlotCLEI        OBJECT-TYPE ::= { tnSlotEntry 10 }
+--    tnSlotUnitPartNum OBJECT-TYPE ::= { tnSlotEntry 11 }
+--    tnSlotSWPartNum   OBJECT-TYPE ::= { tnSlotEntry 12 }
+--    tnSlotFactoryID   OBJECT-TYPE ::= { tnSlotEntry 13 }
+--    tnSlotSerialNum   OBJECT-TYPE ::= { tnSlotEntry 14 }
+--    tnSlotDate        OBJECT-TYPE ::= { tnSlotEntry 15 }
+--    tnSlotExtraData   OBJECT-TYPE ::= { tnSlotEntry 16 }
+
+    tnSlotAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 17 }
+
+    tnSlotMigrationType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Replacement CardType for current existing card in the Slot."
+        DEFVAL         { tropicEmptyCard }
+        ::= { tnSlotEntry 18 }
+
+    tnSlotProgrammedSubType OBJECT-TYPE
+        SYNTAX         AluWdmSlotSubType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "SubType of card to be provisioned in the given Slot."
+        DEFVAL         { mSubType }
+        ::= { tnSlotEntry 19 }
+
+    tnSlotPresentSubType OBJECT-TYPE
+        SYNTAX         AluWdmSlotSubType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "SubType of card present in the given slot."
+        DEFVAL         { mSubType }
+        ::= { tnSlotEntry 20 }
+
+    tnSlotProgrammedGenericType OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 21 }
+
+    tnSlotPresentGenericType OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 22 }
+
+    tnSlotProgrammedProductCode OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 23 }
+
+    tnSlotProductCodeSup OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disabled(1),
+                         enabled(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disabled }
+        ::= { tnSlotEntry 24 }
+
+    tnSlotLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 25 }
+
+    tnSlotDueDate OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..30))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 26 }
+
+    tnSlotInsertExtract OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         start(1),
+                         stop(2),
+                         remove(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 27 }
+
+    tnSlotMigrationSubType OBJECT-TYPE
+        SYNTAX         AluWdmSlotSubType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Replacement SubType for current existing card in the slot."
+        DEFVAL         { unassigned }
+        ::= { tnSlotEntry 28 }
+
+    tnSlotCustomerLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotEntry 29 }
+
+    tnSlotKeyGraceEndTime OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "After the key mismatch is detected for the slot, grace
+                        period starts.  Once the grace period has expired, the
+                        card is powered off.
+                        -1 will be reported if the grace period has expired."
+        ::= { tnSlotEntry 30 }
+
+--------------------------------------------------------------------------------
+-- Slot Reset Table
+--------------------------------------------------------------------------------
+    tnSlotResetTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnSlotResetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotBasics 2 }
+
+    tnSlotResetEntry OBJECT-TYPE
+        SYNTAX         TnSlotResetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnSlotResetTable 1 }
+
+    TnSlotResetEntry ::= SEQUENCE {
+        tnSlotReset       TropicNewResetType,
+        tnSlotResetReason INTEGER,
+        tnSlotResetTime   Unsigned32
+    }
+
+    tnSlotReset OBJECT-TYPE
+        SYNTAX         TropicNewResetType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { noCmd }
+        ::= { tnSlotResetEntry 1 }
+
+    tnSlotResetReason OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(0),
+                         powerReset(1),
+                         userReset(2),
+                         ccActivitySwitch(3),
+                         softwareTrap(4),
+                         watchdog(5),
+                         alarmPanelStartupError(6),
+                         softwareStartupError(7),
+                         cardCommsError(8),
+                         softwareAssert(9),
+                         subcomponentSoftwareBadCrc(10),
+                         databaseError(11),
+                         seepError(12),
+                         subcomponentReset(13),
+                         warmReset(14),
+                         coldReset(15),
+                         userBootReset(16),
+                         ntpNotResponding(17),
+                         cardTookNewShelfSerialNumber(18),
+                         subcomponentStartupError(19),
+                         inBootJumperSet(20),
+                         inBootSeep(21),
+                         inBootBank0Corrupt(22),
+                         inBootBank1Corrupt(23),
+                         inBootAppLoadCorrupt(24),
+                         inBootCrashCountExceeded(25),
+                         subcomponentWatchdog(26),
+                         criticalDatabaseStartupError(27),
+                         redundancyError(28),
+                         controlNetworkError(29),
+                         shelfSerialNumberChanged(30),
+                         swlDiskTransferFailure(31),
+                         bitSyncCommsFailure(32),
+                         diskReformatted(33),
+                         diskMissing(34),
+                         diskIoError(35),
+                         cpuStarvation(36),
+                         uiStarvation(37),
+                         sonetSdhModeMismatch(38),
+                         universalCardTypeMismatch(39),
+                         boardMgrPowerCycle(40),
+                         boardMgrProcessorReset(41),
+                         ecProcessExit(42),
+                         eventNvramAccessFailure(43),
+                         userCCActivitySwitch(44)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotResetEntry 2 }
+
+    tnSlotResetTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The last reset time measured in total time ticks
+                        (seconds) from the year 1970.  This is not
+                        supported on fan controllers."
+        DEFVAL         { 0 }
+        ::= { tnSlotResetEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnSlotGroup OBJECT-GROUP
+        OBJECTS {
+            tnSlotProgrammedType,
+            tnSlotPresentType,
+            tnSlotAdminState,
+            tnSlotOperationalState,
+            tnSlotOperationalCapability,
+            tnSlotStateQualifier,
+--            obsolete
+--            tnSlotCompanyID,
+--            tnSlotMnemonic,
+--            tnSlotCLEI,
+--            tnSlotUnitPartNum,
+--            tnSlotSWPartNum,
+--            tnSlotFactoryID,
+--            tnSlotSerialNum,
+--            tnSlotDate,
+--            tnSlotExtraData
+            tnSlotAlmProfName,
+            tnSlotMigrationType,
+            tnSlotProgrammedSubType,
+            tnSlotPresentSubType,
+            tnSlotProgrammedGenericType,
+            tnSlotPresentGenericType,
+            tnSlotProgrammedProductCode,
+            tnSlotProductCodeSup,
+            tnSlotLifeCycleState,
+            tnSlotDueDate,
+            tnSlotInsertExtract,
+            tnSlotMigrationSubType,
+            tnSlotCustomerLifeCycleState,
+            tnSlotKeyGraceEndTime
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotGroups 1 }
+
+    tnSlotResetGroup OBJECT-GROUP
+        OBJECTS {
+            tnSlotReset,
+            tnSlotResetReason,
+            tnSlotResetTime
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnSlotGroups 2 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnSlotCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnSlotGroup,
+            tnSlotResetGroup
+        }
+        ::= { tnSlotCompliances 1 }
+
+END -- DEFINITION OF TROPIC-SLOT-MIB

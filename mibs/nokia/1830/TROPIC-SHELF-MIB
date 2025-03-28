@@ -1,0 +1,2435 @@
+TROPIC-SHELF-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      RowStatus, TruthValue                   FROM SNMPv2-TC
+      TropicShelfIndexType,
+      TropicCardCLEI,
+      TropicCardManufacturingPartNumber,
+      TropicCardSerialNumber,
+      TropicLEDColorType,
+      TropicLEDStateType,
+      TnCommand,
+      AluWdmWtClkValues,
+      TnRackSize,
+      AluWdmExpectedCruType                   FROM TROPIC-TC
+      tnShelfModules, tnShelfMIB,
+      tropicEmptyCard                         FROM TROPIC-GLOBAL-REG;
+
+  tnShelfMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202302031200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The shelf MIB for Nokia network elements."
+
+      REVISION    "202302031200Z"
+      DESCRIPTION "Added the following to tnShelfFabricEQPStatus:
+                   peerRedNotAvail(10)
+                   to
+                   peerReEvalInProg(14)."
+
+      REVISION    "202301271200Z"
+      DESCRIPTION "Added the following to tnShelfRackTable:
+                   tnShelfRackBlockNumber."
+
+      REVISION    "202202251200Z"
+      DESCRIPTION "Changed MAX-ACCESS of the following from read-only to
+                   read-create:
+                   tnShelfRiCLEI
+                   tnShelfRiManufacturingPartNumber
+                   tnShelfRiSerialNumber."
+
+      REVISION    "202202111200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfPowerFeed
+                   tnShelfPfaExpectedVolts
+                   tnShelfPfaLowVoltageThreshold
+                   tnShelfPfaHighVoltageThreshold
+                   tnShelfPfaVoltageThresholdTol
+                   tnShelfPfbExpectedVolts
+                   tnShelfPfbLowVoltageThreshold
+                   tnShelfPfbHighVoltageThreshold
+                   tnShelfPfbVoltageThresholdTol."
+
+      REVISION    "202201281200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfCouplingState."
+
+      REVISION    "202111261200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfCustomerLifeCycleState
+                   tnShelfXponderLifeCycleState."
+
+      REVISION    "202106251200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfCoupledNumber
+                   tnShelfCoupledCmd."
+
+      REVISION    "202105211200Z"
+      DESCRIPTION "Added the following to tnShelfMTXSIZE:
+                   oTN48TPrim(11)
+                   oTN48TSec(12)."
+
+      REVISION    "202103051200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnShelfPlcUpgradeMode."
+
+      REVISION    "202102121200Z"
+      DESCRIPTION "Added the following tables:
+                   tnShelfRackTable
+                   tnShelfFiberTrayTable."
+
+      REVISION    "202010021200Z"
+      DESCRIPTION "Added the following to tnShelfMTXSIZE:
+                   oTN4T(9)
+                   oTN12T(10)."
+
+      REVISION    "202008071200Z"
+      DESCRIPTION "Marked the following as deprecated:
+                   tnShelfPlcUpgradeMode."
+
+      REVISION    "202007241200Z"
+      DESCRIPTION "1) Changed SYNTAX of tnShelfDueDate from SIZE(0..20) to
+                      SIZE(0..30).
+                   2) Added the following to tnShelfTable:
+                      tnShelfRackLocation
+                      tnShelfXpdrNumber."
+
+      REVISION    "202004031200Z"
+      DESCRIPTION "Added the following table:
+                   tnShelfDisplayTable."
+
+      REVISION    "202003271200Z"
+      DESCRIPTION "Added the following table:
+                   tnMultiShelfTable."
+
+      REVISION    "202003131200Z"
+      DESCRIPTION "Added the following to tnShelfMTXSIZE:
+                   oTN24TC(8)."
+
+      REVISION    "202002281200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfPosition
+                   tnShelfLifeCycleState
+                   tnShelfDueDate."
+
+      REVISION    "201912201200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps60a(26)."
+
+      REVISION    "201911011200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfPlcUpgradeMode."
+
+      REVISION    "201909131200Z"
+      DESCRIPTION "Changed the description of the following:
+                   tnShelfFabricEqpsLEDColor."
+
+      REVISION    "201909061200Z"
+      DESCRIPTION "1) Added the following textual conventions:
+                      TropicShelfInvAvailabilityStatus
+                      TropicShelfInvCustomerInvField
+                      TropicShelfInvFiberType
+                      TropicShelfInvDcmSize
+                      TropicShelfInvInsertionLoss
+                      TropicShelfInvInsertionLossSlope
+                      TropicShelfInvDispersionFit
+                      TropicShelfInvFiberLength
+                      TropicShelfInvPmd
+                      TropicShelfInvLatencyMismatch.
+                   2) Added the following table:
+                      tnShelfInvTable."
+
+      REVISION    "201907051200Z"
+      DESCRIPTION "Changed SYNTAX of the following from INTEGER
+                   to OCTET STRING:
+                   tnShelfFabricActivityState
+                   tnShelfFabricFailures."
+
+      REVISION    "201904191200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfTsiFreeze."
+
+      REVISION    "201811261200Z"
+      DESCRIPTION "Added the following to tnShelfFabricActivityState:
+                   invalid(5)
+                   to
+                   maintenance(7)."
+
+      REVISION    "201811071200Z"
+      DESCRIPTION "1) Updated range and DEFVAL for the following:
+                      tnShelfExpectedVoltsAC, from INTEGER to Unsigned32 (90..264)
+                        and DEFVAL from v110 to 110.
+                   2) Updated range and DEFVAL for the following:
+                      tnShelfHighVoltageThresholdAC, from Unsigned32 (9000..26400)
+                        to Unsigned32 (9000..28800) and added DEFVAL of 11700.
+                   3) Updated DEFVAL for the following:
+                      tnShelfLowVoltageThresholdAC, from no DEFVAL to 9900.
+                      tnShelfVoltageFloorAC, from 10000 to 9100."
+
+      REVISION    "201810261200Z"
+      DESCRIPTION "1) Added the following to tnShelfFabricEQPStatus:
+                      loadBalancing(8)
+                      balancingDegraded(9).
+                   2) Added the following to tnShelfFabricFailures:
+                      cardDown(8)
+                      unPowered(9)."
+
+      REVISION    "201810191200Z"
+      DESCRIPTION "1) Added the following to tnShelfMTXSIZE:
+                      oTN24T(5)
+                      to
+                      unknown(7).
+                   2) Updated ranges of the following:
+                      tnShelfExpectedVoltsHVDC, from (200..600) to (240..333).
+                      tnShelfHighVoltageThresholdHVDC, from (22400..67200) to
+                        (25200..40000).
+                      tnShelfLowVoltageThresholdHVDC, from to (16000..48000)
+                        to (16000..31500)."
+
+      REVISION    "201810101200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfExpectedVoltsHVDC
+                   tnShelfHighVoltageThresholdHVDC
+                   tnShelfLowVoltageThresholdHVDC
+                   tnShelfVoltageThresholdTolHVDC
+                   tnShelfVoltageFloorHVDC
+                   tnShelfVoltageThresholdTolAC."
+
+      REVISION    "201807201200Z"
+      DESCRIPTION "1) Renamed the following in tnShelfMTXSIZE from:
+                      nineTSix(2)
+                      fourTEight(3)
+                      to:
+                      oTN9T6(2)
+                      oTN4T8(3)
+                   2) Added the following to tnShelfMTXSIZE:
+                      oTN1T6(4)."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201801191200Z"
+      DESCRIPTION "Added the following to tnShelfFabricEQPStatus:
+                   reEvalInProg(6)
+                   unknown(7)."
+
+      REVISION    "201712151200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfFanMode."
+
+      REVISION    "201710131200Z"
+      DESCRIPTION "1) Added the following to tnShelfTable:
+                      tnShelfUIDStatusLEDColor.
+                   2) Changed the SYNTAX of the MIB tnShelfUIDStatusLEDState
+                      from TropicLEDColorType to TropicLEDStateType."
+
+      REVISION    "201709081200Z"
+      DESCRIPTION "Added the following to tnShelfFabricFailures:
+                   cardMism(7)."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Redefined the enum values for the following:
+                   tnShelfLockout."
+
+      REVISION    "201706301200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfMTXSIZE
+                   tnShelfRMNMTXCAP."
+
+      REVISION    "201706141200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfUIDStatusLEDState."
+
+      REVISION    "201705261200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfUID."
+
+      REVISION    "201703241200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps16(25)."
+
+      REVISION    "201701201200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfExpectedCruA
+                   tnShelfExpectedCruB
+                   tnShelfPanelTimingPort
+                   tnShelfDelegateFCRUSlot."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201610191200Z"
+      DESCRIPTION "Moved the following TROPIC-ACCESSPORT-MIB
+                   tnShelfAmbientTemperature
+                   tnShelfPressure
+                   tnShelfRecorded
+                   tnShelfCalibrated
+                   tnShelfAltitude
+                   tnShelfRecordTime."
+
+      REVISION    "201610041200Z"
+      DESCRIPTION "Added the following from tnShelfTable:
+                   tnShelfFilterAction
+                   tnShelfAmbientTemperature
+                   tnShelfPressure
+                   tnShelfRecorded
+                   tnShelfCalibrated
+                   tnShelfAltitude
+                   tnShelfRecordTime."
+
+      REVISION    "201606031200Z"
+      DESCRIPTION "Changed the SYNTAX of tnShelfBranchRemainingPwrCap[1-6]:
+                   From Unsigned32 to Integer32."
+
+      REVISION    "201605061200Z"
+      DESCRIPTION "1) Added the following from tnShelfTable:
+                      tnShelfInventoryAction.
+                   2) Changed the UNITS of following from watts to 1/10 watts:
+                      tnShelfBranchPowerCap1
+                      tnShelfBranchPowerCap2
+                      tnShelfBranchPowerCap3
+                      tnShelfBranchPowerCap4
+                      tnShelfBranchPowerCap5
+                      tnShelfBranchPowerCap6
+                      tnShelfBranchRemainingPwrCap1
+                      tnShelfBranchRemainingPwrCap2
+                      tnShelfBranchRemainingPwrCap3
+                      tnShelfBranchRemainingPwrCap4
+                      tnShelfBranchRemainingPwrCap5
+                      tnShelfBranchRemainingPwrCap6."
+
+      REVISION    "201602011200Z"
+      DESCRIPTION "1) Added the following from tnShelfTable:
+                      tnShelfRackType.
+                   2) Added the following to tnShelfFabricFailures:
+                      latchOpen(6)."
+
+      REVISION    "201512241200Z"
+      DESCRIPTION "Moved the following Fabric MIB attributes from tnFabricCardTable
+                   to tnShelfTable:
+                   tnShelfFabricEQPStatus
+                   tnShelfFabricActivityState
+                   tnShelfFabricFailures
+                   tnShelfFabricUsage
+                   tnShelfFabricEqpsLEDColor
+                   tnShelfFabricReadyToProtect."
+
+      REVISION    "201512071200Z"
+      DESCRIPTION "Added the following from tnShelfTable:
+                   tnShelfBranchPowerCap1
+                   tnShelfBranchPowerCap2
+                   tnShelfBranchPowerCap3
+                   tnShelfBranchPowerCap4
+                   tnShelfBranchPowerCap5
+                   tnShelfBranchPowerCap6
+                   tnShelfBranchRemainingPwrCap1
+                   tnShelfBranchRemainingPwrCap2
+                   tnShelfBranchRemainingPwrCap3
+                   tnShelfBranchRemainingPwrCap4
+                   tnShelfBranchRemainingPwrCap5
+                   tnShelfBranchRemainingPwrCap6."
+
+      REVISION    "201510201200Z"
+      DESCRIPTION "Changed the UNITS of following from volts to 1/100 volts:
+                   tnShelfVoltageFloor
+                   tnShelfVoltageFloorAC."
+
+      REVISION    "201509301200Z"
+      DESCRIPTION "Added the following from tnShelfTable:
+                   tnShelfAlmProfName."
+
+      REVISION    "201508251200Z"
+      DESCRIPTION "Added the following from tnShelfTable:
+                   tnShelfFilterMonitorStatus
+                   tnShelfFilterInspectionInterval
+                   tnShelfFilterStartDate."
+
+      REVISION    "201508061200Z"
+      DESCRIPTION "Renamed amps65 to amps63 in tnShelfExpectedAmps."
+
+      REVISION    "201507311200Z"
+      DESCRIPTION "Added the following from tnShelfTable:
+                   tnShelfLockout."
+
+      REVISION    "201506041200Z"
+      DESCRIPTION "Updated the DEFVAL of following MIB:
+                   tnShelfLoadWarningThreshold."
+
+      REVISION    "201409121200Z"
+      DESCRIPTION "1) Added the following to tnShelfTable:
+                      tnShelfCalculatedLoadAC
+                      tnShelfPowerCapacity
+                      tnShelfRemainingPowerCapacity.
+                   2) Added the following to tnShelfExpectedAmps:
+                      amps65(24).
+                   3) Added the following to AluWdmExpectedAmpPF:
+                      ampsdc30(5)
+                      ampsac7(6)."
+
+      REVISION    "201407251200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfExpectedVoltsAC
+                   tnShelfHighVoltageThresholdAC
+                   tnShelfLowVoltageThresholdAC
+                   tnShelfVoltageFloorAC
+                   tnShelfExternalAcPower
+                   tnShelfLoadWarningThreshold
+                   tnShelfTimingSwitch."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added DEFVAL to attributes."
+
+      REVISION    "201312151200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfClkSwitch."
+
+      REVISION    "201311141200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnShelfInhibitAutoSwitching."
+
+      REVISION    "201309061200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfCalculatedLoad."
+
+      REVISION    "201308071200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfVoltageFloor."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnShelfEvents."
+
+      REVISION    "201304291200Z"
+      DESCRIPTION "Updated range and DESCRIPTIONs of the following:
+                   tnShelfHighVoltageThreshold
+                   tnShelfLowVoltageThreshold
+                   tnShelfVoltageThresholdTol."
+
+      REVISION    "201212141200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfMatrixSize."
+
+      REVISION    "201209251200Z"
+      DESCRIPTION "1) Added the following to tnShelfExpectedAmps:
+                      ampsNa(21)
+                      to
+                      amps320(23).
+                   2) Added the following to tnShelfTable:
+                      tnShelfExpectedVolts."
+
+      REVISION    "201209061200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfHighVoltageThreshold
+                   tnShelfLowVoltageThreshold
+                   tnShelfVoltageThresholdTol."
+
+      REVISION    "201203291200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps4dot1(20)."
+
+      REVISION    "201202231200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfExpectedPfa
+                   tnShelfExpectedPfb."
+
+      REVISION    "201202061200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   ampsMix(19)."
+
+      REVISION    "201104071200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps20dot6(16)
+                   amps8dot5(17)
+                   amps3dot7(18)."
+
+      REVISION    "201102061200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps2x50(13)
+                   amps2x60(14)
+                   amps3x60(15)."
+
+      REVISION    "201012161200Z"
+      DESCRIPTION "Added the following to tnShelfTable:
+                   tnShelfMateMt0cReadyToProtect
+                   tnShelfActivityMt0cSwitch."
+
+      REVISION    "201010121200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps for PSS64:
+                   amps275(12)."
+
+      REVISION    "201010041200Z"
+      DESCRIPTION "1) Added the following to tnShelfExpectedAmps:
+                      amps60(11).
+                   2) Updated description of tnShelfExpectedAmps per new
+                      requirements."
+
+      REVISION    "201009131200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps100(9)
+                   amps150(10)."
+
+      REVISION    "201006281200Z"
+      DESCRIPTION "Added the following to tnShelfExpectedAmps:
+                   amps35(6)
+                   amps5(7)
+                   amps7(8)."
+
+      REVISION    "201006041200Z"
+      DESCRIPTION "Added tnShelfRiDataTable for PSS4."
+
+      REVISION    "200912111200Z"
+      DESCRIPTION "Added tnShelfWTMode."
+
+      REVISION    "200909151200Z"
+      DESCRIPTION "Made auto(5) the default for tnShelfExpectedAmps."
+
+      REVISION    "200909091200Z"
+      DESCRIPTION "Added auto(5) to tnShelfExpectedAmps."
+
+      REVISION    "200907151200Z"
+      DESCRIPTION "Added amps20(4) to tnShelfExpectedAmps."
+
+      REVISION    "200906071200Z"
+      DESCRIPTION "Added TropicLEDColorType and TropicLEDStateType to
+                   IMPORTS list."
+
+      REVISION    "200905191200Z"
+      DESCRIPTION "Added tnShelfStatusLEDColor and tnShelfStatusLEDState."
+
+      REVISION    "200904271200Z"
+      DESCRIPTION "Updated the description for tnShelfSerialNumber to
+                   include ITLB."
+
+      REVISION    "200806051200Z"
+      DESCRIPTION "Added tnShelfInhibitAutoSwitching."
+
+      REVISION    "200805291200Z"
+      DESCRIPTION "1) Added tnShelfSerialNumber.
+                   2) Added tnShelfAINS."
+
+      REVISION    "200804051200Z"
+      DESCRIPTION "Changed tnShelfInhibitLossComms to tnShelfIsUnmanaged."
+
+      REVISION    "200803061200Z"
+      DESCRIPTION "Changed the expected amps shelf attribute SYNTAX
+                   from Unsigned32 to an enumerated integer."
+
+      REVISION    "200802161200Z"
+      DESCRIPTION "1) Updated the description for the shelf MIB.
+                   2) Added the expected amps shelf attribute."
+
+      ::= { tnShelfModules 1 }
+
+  tnShelfConf        OBJECT IDENTIFIER ::= { tnShelfMIB 1 }
+  tnShelfGroups      OBJECT IDENTIFIER ::= { tnShelfConf 1 }
+  tnShelfCompliances OBJECT IDENTIFIER ::= { tnShelfConf 2 }
+  tnShelfObjs        OBJECT IDENTIFIER ::= { tnShelfMIB 2 }
+  tnShelfBasics      OBJECT IDENTIFIER ::= { tnShelfObjs 1 }
+--  obsolete
+--  tnShelfEvents      OBJECT IDENTIFIER ::= { tnShelfMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    AluWdmExpectedAmpPF ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The expectedamps for PF card located in slot 2
+                        or 3 when the expectedamps is mix."
+        SYNTAX         INTEGER {
+                         amps3dot7(1),
+                         amps4dot1(2),
+                         amps8dot5(3),
+                         amps20dot6(4),
+                         ampsdc30(5),
+                         ampsac7(6),
+                         na(7)
+                       }
+    TropicShelfInvAvailabilityStatus ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The availability status."
+        SYNTAX         INTEGER {
+                         available(1),
+                         unavailable(2)
+                       }
+
+    TropicShelfInvCustomerInvField ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "46a"
+        STATUS         current
+        DESCRIPTION    "Readable Customer Inventory Field string."
+        SYNTAX         OCTET STRING (SIZE(0..46))
+
+    TropicShelfInvFiberType  ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "4a"
+        STATUS         current
+        DESCRIPTION    "Readable DCM Fiber Type string."
+        SYNTAX         OCTET STRING (SIZE(0..4))
+
+    TropicShelfInvDcmSize ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "3a.1a"
+        STATUS         current
+        DESCRIPTION    "Readable DCM transmission fiber length string (unit: km)."
+        SYNTAX         OCTET STRING (SIZE(0..5))
+
+    TropicShelfInvInsertionLoss ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "2a.1a"
+        STATUS         current
+        DESCRIPTION    "Readable insertion loss string (unit: dB)."
+        SYNTAX         OCTET STRING (SIZE(0..4))
+
+    TropicShelfInvInsertionLossSlope ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "2a.1a"
+        STATUS         current
+        DESCRIPTION    "Readable insertion loss slope string (unit: dB).
+                        The format is [+-]x.x."
+        SYNTAX         OCTET STRING (SIZE(0..4))
+
+    TropicShelfInvDispersionFit ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "40a"
+        STATUS         current
+        DESCRIPTION    "Readable DCM dispersion fit string. The format is
+                        [+-]x.xxxE[+-]xx[+-]x.xxxE[+-]xx[+-]x.xxxE[+-]xx[+-]x.xxxE[+-]xx."
+        SYNTAX         OCTET STRING (SIZE(0..40))
+
+    TropicShelfInvFiberLength ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "d"
+        STATUS         current
+        DESCRIPTION    "Fiber Length, in centimetres (0.01m)."
+        SYNTAX         Unsigned32
+
+    TropicShelfInvPmd ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "2a.1a"
+        STATUS         current
+        DESCRIPTION    "Readable DCM Polarization Mode Dispersion Type string
+                        (unit: ps)."
+        SYNTAX         OCTET STRING (SIZE(0..4))
+
+    TropicShelfInvLatencyMismatch ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT   "2a.1a"
+        STATUS         current
+        DESCRIPTION    "Readable DCM Latency Mismatch string.
+                        The format is [+-]x.x."
+        SYNTAX         OCTET STRING (SIZE(0..4))
+
+--------------------------------------------------------------------------------
+-- Generic Shelf Table
+--------------------------------------------------------------------------------
+    tnShelfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 1 }
+
+    tnShelfEntry OBJECT-TYPE
+        SYNTAX         TnShelfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex }
+        ::= { tnShelfTable 1 }
+
+    TnShelfEntry ::=
+        SEQUENCE {
+            tnShelfIndex                        TropicShelfIndexType,
+            tnShelfName                         SnmpAdminString,
+            tnShelfDescr                        SnmpAdminString,
+            tnShelfSerialNum                    Integer32,
+            tnShelfProgrammedType               OBJECT IDENTIFIER,
+            tnShelfPresentType                  OBJECT IDENTIFIER,
+            tnShelfActivitySwitch               TnCommand,
+            tnShelfLampTest                     TnCommand,
+            tnShelfMateCCReadyToProtect         TruthValue,
+            tnShelfIsUnmanaged                  TruthValue,
+            tnShelfExpectedAmps                 INTEGER,
+            tnShelfSerialNumber                 SnmpAdminString,
+            tnShelfAINS                         TruthValue,
+--            obsolete
+--            tnShelfInhibitAutoSwitching         TruthValue,
+            tnShelfStatusLEDColor               TropicLEDColorType,
+            tnShelfStatusLEDState               TropicLEDStateType,
+            tnShelfWTMode                       TruthValue,
+            tnShelfActivityMt0cSwitch           TnCommand,
+            tnShelfMateMt0cReadyToProtect       TruthValue,
+            tnShelfExpectedPfa                  AluWdmExpectedAmpPF,
+            tnShelfExpectedPfb                  AluWdmExpectedAmpPF,
+            tnShelfHighVoltageThreshold         Unsigned32,
+            tnShelfLowVoltageThreshold          Unsigned32,
+            tnShelfVoltageThresholdTol          Unsigned32,
+            tnShelfExpectedVolts                INTEGER,
+            tnShelfMatrixSize                   INTEGER,
+            tnShelfVoltageFloor                 Unsigned32,
+            tnShelfCalculatedLoad               Unsigned32,
+            tnShelfClkSwitch                    AluWdmWtClkValues,
+            tnShelfExpectedVoltsAC              Unsigned32,
+            tnShelfHighVoltageThresholdAC       Unsigned32,
+            tnShelfLowVoltageThresholdAC        Unsigned32,
+            tnShelfVoltageFloorAC               Unsigned32,
+            tnShelfExternalAcPower              Unsigned32,
+            tnShelfLoadWarningThreshold         Unsigned32,
+            tnShelfTimingSwitch                 INTEGER,
+            tnShelfCalculatedLoadAC             Unsigned32,
+            tnShelfPowerCapacity                Unsigned32,
+            tnShelfRemainingPowerCapacity       Integer32,
+            tnShelfLockout                      INTEGER,
+            tnShelfFilterMonitorStatus          TruthValue,
+            tnShelfFilterInspectionInterval     Unsigned32,
+            tnShelfFilterStartDate              Unsigned32,
+            tnShelfAlmProfName                  OCTET STRING,
+            tnShelfBranchPowerCap1              Unsigned32,
+            tnShelfBranchPowerCap2              Unsigned32,
+            tnShelfBranchPowerCap3              Unsigned32,
+            tnShelfBranchPowerCap4              Unsigned32,
+            tnShelfBranchPowerCap5              Unsigned32,
+            tnShelfBranchPowerCap6              Unsigned32,
+            tnShelfBranchRemainingPwrCap1       Integer32,
+            tnShelfBranchRemainingPwrCap2       Integer32,
+            tnShelfBranchRemainingPwrCap3       Integer32,
+            tnShelfBranchRemainingPwrCap4       Integer32,
+            tnShelfBranchRemainingPwrCap5       Integer32,
+            tnShelfBranchRemainingPwrCap6       Integer32,
+            tnShelfFabricEQPStatus              INTEGER,
+            tnShelfFabricActivityState          OCTET STRING,
+            tnShelfFabricFailures               OCTET STRING,
+            tnShelfFabricUsage                  INTEGER,
+            tnShelfFabricEqpsLEDColor           OCTET STRING,
+            tnShelfFabricReadyToProtect         INTEGER,
+            tnShelfRackType                     TnRackSize,
+            tnShelfInventoryAction              INTEGER,
+            tnShelfFilterAction                 INTEGER,
+            tnShelfExpectedCruA                 AluWdmExpectedCruType,
+            tnShelfExpectedCruB                 AluWdmExpectedCruType,
+            tnShelfPanelTimingPort              TruthValue,
+            tnShelfDelegateFCRUSlot             Unsigned32,
+            tnShelfUID                          INTEGER,
+            tnShelfUIDStatusLEDState            TropicLEDStateType,
+            tnShelfMTXSIZE                      INTEGER,
+            tnShelfRMNMTXCAP                    Integer32,
+            tnShelfUIDStatusLEDColor            TropicLEDColorType,
+            tnShelfFanMode                      INTEGER,
+            tnShelfExpectedVoltsHVDC            Unsigned32,
+            tnShelfHighVoltageThresholdHVDC     Unsigned32,
+            tnShelfLowVoltageThresholdHVDC      Unsigned32,
+            tnShelfVoltageThresholdTolHVDC      Unsigned32,
+            tnShelfVoltageFloorHVDC             Unsigned32,
+            tnShelfVoltageThresholdTolAC        Unsigned32,
+            tnShelfTsiFreeze                    INTEGER,
+--            obsolete
+--            tnShelfPlcUpgradeMode               INTEGER,
+            tnShelfPosition                     SnmpAdminString,
+            tnShelfLifeCycleState               SnmpAdminString,
+            tnShelfDueDate                      SnmpAdminString,
+            tnShelfRackLocation                 SnmpAdminString,
+            tnShelfXpdrNumber                   Integer32,
+            tnShelfCoupledNumber                Integer32,
+            tnShelfCoupledCmd                   INTEGER,
+            tnShelfCustomerLifeCycleState       SnmpAdminString,
+            tnShelfXponderLifeCycleState        SnmpAdminString,
+            tnShelfCouplingState                INTEGER,
+            tnShelfPowerFeed                    INTEGER,
+            tnShelfPfaExpectedVolts             Unsigned32,
+            tnShelfPfaLowVoltageThreshold       Unsigned32,
+            tnShelfPfaHighVoltageThreshold      Unsigned32,
+            tnShelfPfaVoltageThresholdTol       Unsigned32,
+            tnShelfPfbExpectedVolts             Unsigned32,
+            tnShelfPfbLowVoltageThreshold       Unsigned32,
+            tnShelfPfbHighVoltageThreshold      Unsigned32,
+            tnShelfPfbVoltageThresholdTol       Unsigned32
+        }
+
+    tnShelfIndex OBJECT-TYPE
+        SYNTAX         TropicShelfIndexType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 1 }
+
+    tnShelfName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..31))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf name (an abbreviated description)."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 2 }
+
+    tnShelfDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf description."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 3 }
+
+    tnShelfSerialNum OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf serial number.  Applicable to the 1696R."
+        ::= { tnShelfEntry 4 }
+
+    tnShelfProgrammedType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Type of shelf provisioned."
+        DEFVAL         { tropicEmptyCard }
+        ::= { tnShelfEntry 5 }
+
+    tnShelfPresentType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Actual shelf present."
+        DEFVAL         { tropicEmptyCard }
+        ::= { tnShelfEntry 6 }
+
+    tnShelfActivitySwitch OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Perform an activity switch on this shelf.  When
+                        read, this object returns noCmd."
+        DEFVAL         { noCmd }
+        ::= { tnShelfEntry 7 }
+
+    tnShelfLampTest OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Perform a lamp test on the shelf.  When read,
+                        this object returns noCmd."
+        DEFVAL         { noCmd }
+        ::= { tnShelfEntry 8 }
+
+    tnShelfMateCCReadyToProtect OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 9 }
+
+    tnShelfIsUnmanaged OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates a shelf is not being managed.  This is
+                        set to true for shelves that have no managed
+                        inventory."
+        DEFVAL         { false }
+        ::= { tnShelfEntry 10 }
+
+    tnShelfExpectedAmps OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         amps30(1),
+                         amps50(2),
+                         amps70(3),
+                         amps20(4),
+                         auto(5),
+                         amps35(6),
+                         amps5(7),
+                         amps7(8),
+                         amps100(9),
+                         amps150(10),
+                         amps60(11),
+                         amps275(12),
+                         amps2x50(13),
+                         amps2x60(14),
+                         amps3x60(15),
+                         amps20dot6(16),
+                         amps8dot5(17),
+                         amps3dot7(18),
+                         ampsMix(19),
+                         amps4dot1(20),
+                         ampsNa(21),
+                         amps3x50(22),
+                         amps320(23),
+                         amps63(24),
+                         amps16(25),
+                         amps60a(26)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute is associated with shelf
+                        pre-provisioning, and defines a single value for
+                        the shelf which applies to both PSFs.  The value
+                        can be edited by the network manager.  A mismatch
+                        alarm will be generated against any PSF that does
+                        not agree with the value of this attribute.  An
+                        excess load alarm will be raised against any
+                        inserted circuit pack which cannot be provided
+                        power without exceeding the actual or provisioned
+                        shelf amperage (whichever is less).  Auto means
+                        when the shelf is equipped, the EC reads the id of
+                        the two power filters and takes the value (they
+                        should both be the same, but just in case) of the
+                        smaller one as the shelf power capacity.
+
+                        Current configurable values:
+                        PSS4:   3.7, 8.5, 20.6.
+                        PSS32:  auto, 20, 30, 50, 60, 70.
+                        PSS16:  auto, 20, 35.
+                        PSS36:  If only PFC power filter is supported, this
+                                  attribute is read-only, with the value 150.
+                                If both PFC and PFB50 power filters are
+                                  supported, this attribute is provisionable
+                                  with values auto, 100, 150.
+                        PSS64:  275.
+                        PSS16II:  auto, 16, 63."
+        DEFVAL         { auto }
+        ::= { tnShelfEntry 11 }
+
+    tnShelfSerialNumber OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable to the 1830 PSS-32 DCM, SFD44 and ITLB
+                        shelves."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 12 }
+
+    tnShelfAINS OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable to the 1830 PSS-32."
+        DEFVAL         { false }
+        ::= { tnShelfEntry 13 }
+
+--    obsolete
+--    tnShelfInhibitAutoSwitching OBJECT-TYPE ::= { tnShelfEntry 14 }
+
+    tnShelfStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the shelf status LED."
+        ::= { tnShelfEntry 15 }
+
+    tnShelfStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the shelf status LED."
+        ::= { tnShelfEntry 16 }
+
+    tnShelfWTMode OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Shelf WT Mode."
+        DEFVAL         { true }
+        ::= { tnShelfEntry 17 }
+
+    tnShelfActivityMt0cSwitch OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Perform an activity switch on the MT0C.  When
+                        read, this object returns noCmd."
+        DEFVAL         { noCmd }
+        ::= { tnShelfEntry 18 }
+
+    tnShelfMateMt0cReadyToProtect OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 19 }
+
+    tnShelfExpectedPfa OBJECT-TYPE
+        SYNTAX         AluWdmExpectedAmpPF
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The expectedamps for PF card located in slot 2
+                        when the expectedamps is mix."
+        DEFVAL         { amps3dot7 }
+        ::= { tnShelfEntry 20 }
+
+    tnShelfExpectedPfb OBJECT-TYPE
+        SYNTAX         AluWdmExpectedAmpPF
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The expectedamps for PF card located in slot 3
+                        when the expectedamps is mix."
+        DEFVAL         { amps8dot5 }
+        ::= { tnShelfEntry 21 }
+
+    tnShelfHighVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..8500)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf high voltage threshold.  Default is depending
+                        on value of tnShelfExpectedVolts:
+                          v48 - 5700
+                          v60 - 7200.
+
+                        Current configurable values: 0 to 8500, in increments of 50."
+        ::= { tnShelfEntry 22 }
+
+    tnShelfLowVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..8500)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf low voltage threshold.  Default is depending
+                        on value of tnShelfExpectedVolts:
+                          v48 - 4050
+                          v60 - 5000.
+
+                        Current configurable values: 0 to 8500, in
+                        increments of 50."
+        ::= { tnShelfEntry 23 }
+
+    tnShelfVoltageThresholdTol OBJECT-TYPE
+        SYNTAX         Unsigned32 (100..500)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf voltage threshold tolerance.
+
+                        Current configurable values: 100 to 500, in
+                        increments of 100."
+        DEFVAL         { 200 }
+        ::= { tnShelfEntry 24 }
+
+    tnShelfExpectedVolts OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         v48(1),
+                         v60(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Nominal voltage for the shelf.
+                          v48 - The input supply voltage is nominally -48 V dc.
+                          v60 - The input supply voltage is nominally -60 V dc.
+                        This has the effect of setting the voltage alarms
+                        to the ends of the standard operating range for
+                        the specified input supply voltage."
+        DEFVAL         { v48 }
+        ::= { tnShelfEntry 25 }
+
+    tnShelfMatrixSize OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         ms1dot2T(2),
+                         ms1dot9T(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The matrix size of the shelf.
+                          notApplicable - Not applicable to this shelf.
+                          ms1dot2T      - 1.2T shelf.
+                          ms1dot9T      - 1.9T shelf.
+
+                        Sets are not supported."
+        DEFVAL         { notApplicable }
+        ::= { tnShelfEntry 26 }
+
+    tnShelfVoltageFloor OBJECT-TYPE
+        SYNTAX         Unsigned32 (3900..7200)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf voltage floor.
+
+                        Current configurable range: 3900 to 7200."
+        DEFVAL         { 3900 }
+        ::= { tnShelfEntry 27 }
+
+    tnShelfCalculatedLoad OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute shall be calculated by adding
+                        the pre-defined maximum power consumption of
+                        each plugged in or pre-provisioned card and
+                        then dividing the sum by tnShelfVoltageFloor."
+        ::= { tnShelfEntry 28 }
+
+    tnShelfClkSwitch OBJECT-TYPE
+        SYNTAX         AluWdmWtClkValues
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Clock Switch on shelf level."
+        DEFVAL         { wtClkAuto }
+        ::= { tnShelfEntry 29 }
+
+    tnShelfExpectedVoltsAC OBJECT-TYPE
+        SYNTAX         Unsigned32 (90..264)
+        UNITS          "volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Nominal AC voltage for the shelf.  This has the effect
+                        of setting the voltage alarms to the ends of the
+                        standard operating range for the specified input supply
+                        voltage."
+        DEFVAL         { 110 }
+        ::= { tnShelfEntry 30 }
+
+    tnShelfHighVoltageThresholdAC OBJECT-TYPE
+        SYNTAX         Unsigned32 (9000..28800)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf high AC voltage threshold.
+                        Current configurable values: 9000 to 28800, in increments
+                        of 50."
+        DEFVAL         { 11700 }
+        ::= { tnShelfEntry 31 }
+
+    tnShelfLowVoltageThresholdAC OBJECT-TYPE
+        SYNTAX         Unsigned32 (9000..26400)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf low AC voltage threshold.
+                        Current configurable values: 9000 to 26400, in increments
+                        of 50."
+        DEFVAL         { 9900 }
+        ::= { tnShelfEntry 32 }
+
+    tnShelfVoltageFloorAC OBJECT-TYPE
+        SYNTAX         Unsigned32 (9000..26400)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf AC voltage floor.
+                        Current configurable range: 9000 to 26400."
+        DEFVAL         { 9100 }
+        ::= { tnShelfEntry 33 }
+
+    tnShelfExternalAcPower OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The power of the external AC power box."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 34 }
+
+    tnShelfLoadWarningThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32 (500..1000)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf load warning threshold."
+        DEFVAL         { 1000 }
+        ::= { tnShelfEntry 35 }
+
+    tnShelfTimingSwitch OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         timingSwitchAuto(1),
+                         timingSwitchA(2),
+                         timingSwitchB(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "System Timing Switch on shelf level."
+        DEFVAL         { timingSwitchAuto }
+        ::= { tnShelfEntry 36 }
+
+    tnShelfCalculatedLoadAC OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute shall be calculated by adding
+                        the pre-defined maximum power consumption of
+                        each plugged in or pre-provisioned card and
+                        then dividing the sum by tnShelfVoltageFloor."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 37 }
+
+    tnShelfPowerCapacity OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Shelf Power Capacity."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 38 }
+
+    tnShelfRemainingPowerCapacity OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Shelf Remaining Power Capacity."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 39 }
+
+    tnShelfLockout OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         swc1(1),
+                         swc2(2),
+                         swc3(3),
+                         clear(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "FABRIC card lockout status."
+        DEFVAL         { clear }
+        ::= { tnShelfEntry 40 }
+
+    tnShelfFilterMonitorStatus OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Filter maintenance status."
+        DEFVAL         { false }
+        ::= { tnShelfEntry 41 }
+
+    tnShelfFilterInspectionInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..104)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Filter inspection interval time in weeks."
+        DEFVAL         { 26 }
+        ::= { tnShelfEntry 42 }
+
+    tnShelfFilterStartDate OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Filter inspection start date."
+        DEFVAL         { 426770689 }
+        ::= { tnShelfEntry 43 }
+
+    tnShelfAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 44 }
+
+    tnShelfBranchPowerCap1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 45 }
+
+    tnShelfBranchPowerCap2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 46 }
+
+    tnShelfBranchPowerCap3 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 47 }
+
+    tnShelfBranchPowerCap4 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 48 }
+
+    tnShelfBranchPowerCap5 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 49 }
+
+    tnShelfBranchPowerCap6 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 50 }
+
+    tnShelfBranchRemainingPwrCap1 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 51 }
+
+    tnShelfBranchRemainingPwrCap2 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 52 }
+
+    tnShelfBranchRemainingPwrCap3 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 53 }
+
+    tnShelfBranchRemainingPwrCap4 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 54 }
+
+    tnShelfBranchRemainingPwrCap5 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 55 }
+
+    tnShelfBranchRemainingPwrCap6 OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "1/10 watt"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 56 }
+
+    tnShelfFabricEQPStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         available(1),
+                         notAvailable(2),
+                         inUse(3),
+                         trafficImpaired(4),
+                         allTrafficLost(5),
+                         reEvalInProg(6),
+                         unknown(7),
+                         loadBalancing(8),
+                         balancingDegraded(9),
+                         peerRedNotAvail(10),
+                         peerRedInUse(11),
+                         peerTrafficImpaired(12),
+                         peerAllTrafficLost(13),
+                         peerReEvalInProg(14)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fabric location status."
+        ::= { tnShelfEntry 57 }
+
+    tnShelfFabricActivityState OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fabric activity states."
+        ::= { tnShelfEntry 58 }
+
+    tnShelfFabricFailures OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fabric failure mode."
+        ::= { tnShelfEntry 59 }
+
+    tnShelfFabricUsage OBJECT-TYPE
+        SYNTAX         INTEGER {
+                          inUse(1),
+                          notInUse(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fabric Usage status."
+        ::= { tnShelfEntry 60 }
+
+    tnShelfFabricEqpsLEDColor OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the EQPS status LED."
+        ::= { tnShelfEntry 61 }
+
+    tnShelfFabricReadyToProtect OBJECT-TYPE
+        SYNTAX         INTEGER {
+                          yes(1),
+                          partially(2),
+                          no(3),
+                          invalid(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fabric ready to protect status."
+        ::= { tnShelfEntry 62 }
+
+    tnShelfRackType OBJECT-TYPE
+        SYNTAX         TnRackSize
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf rack size"
+        DEFVAL         { inch19 }
+        ::= { tnShelfEntry 63 }
+
+    tnShelfInventoryAction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                          unInitialized(1),
+                          toDb(2),
+                          toHw(3),
+                          ready(4),
+                          fail(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Copies the shelf Remote Inventory information from the shelf
+                        inventory HW into the database or from database to the shelf
+                        inventory HW."
+        DEFVAL         { unInitialized }
+        ::= { tnShelfEntry 64 }
+
+    tnShelfFilterAction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notReady(1),
+                         ready(2),
+                         fail(3),
+                         tune(4),
+                         tuneInProgress(5),
+                         tuneSuccess(6),
+                         tuneFail(7),
+                         check(8),
+                         checkInProgress(9),
+                         checkSuccess(10),
+                         checkFail(11)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Performs an air filter supervision for a shelf on the
+                        network element."
+        DEFVAL         { notReady }
+        ::= { tnShelfEntry 65 }
+
+    tnShelfExpectedCruA OBJECT-TYPE
+        SYNTAX         AluWdmExpectedCruType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Expected CRU type for CRU card A. Currently
+                        only valid for PSS8/PSS16II shelf."
+        DEFVAL         { scru }
+        ::= { tnShelfEntry 66 }
+
+    tnShelfExpectedCruB OBJECT-TYPE
+        SYNTAX         AluWdmExpectedCruType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Expected CRU type for CRU card B. Currently
+                        only valid for PSS8/PSS16II shelf."
+        DEFVAL         { scru }
+        ::= { tnShelfEntry 67 }
+
+    tnShelfPanelTimingPort OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies whether all of the FCRU BITS/1PPS/ToD
+                        signals are from backplane(PSS16II UserPanel) or not.
+                        Only valid for PSS16II shelf."
+        DEFVAL         { true }
+        ::= { tnShelfEntry 68 }
+
+    tnShelfDelegateFCRUSlot OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The faceplate slot number used to get/set shelf level SYNC
+                        commands. Value 0 means invalid slot, shelf level SYNC
+                        entities are not available."
+        DEFVAL         { 0 }
+        ::= { tnShelfEntry 69 }
+
+    tnShelfUID OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         on(1),
+                         off(2),
+                         active(3),
+                         inactive(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Activate/Deactivate the UID function."
+        DEFVAL         { off }
+        ::= { tnShelfEntry 70 }
+
+    tnShelfUIDStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the shelf UID LED funtion."
+        ::= { tnShelfEntry 71 }
+
+    tnShelfMTXSIZE OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         oTN9T6(2),
+                         oTN4T8(3),
+                         oTN1T6(4),
+                         oTN24T(5),
+                         pKT9T6PTP(6),
+                         unknown(7),
+                         oTN24TC(8),
+                         oTN4T(9),
+                         oTN12T(10),
+                         oTN48TPrim(11),
+                         oTN48TSec(12)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf Matrix Size."
+        DEFVAL         { notApplicable }
+        ::= { tnShelfEntry 72 }
+
+    tnShelfRMNMTXCAP OBJECT-TYPE
+        SYNTAX         Integer32 (-1..9600)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf Remaining Matrix Capacity."
+        DEFVAL         { -1 }
+        ::= { tnShelfEntry 73 }
+
+    tnShelfUIDStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the shelf UID LED funtion."
+        ::= { tnShelfEntry 74 }
+
+    tnShelfFanMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         cool(1),
+                         quite(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute is associated with shelf."
+        DEFVAL         { cool }
+        ::= { tnShelfEntry 75 }
+
+    tnShelfExpectedVoltsHVDC OBJECT-TYPE
+        SYNTAX         Unsigned32 (240..333)
+        UNITS          "volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf Expected Volts HVDC.
+
+                        Current configurable range: 240 to 333."
+        DEFVAL         { 240 }
+        ::= { tnShelfEntry 76 }
+
+    tnShelfHighVoltageThresholdHVDC OBJECT-TYPE
+        SYNTAX         Unsigned32 (25200..40000)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf High voltage Threshold HVDC.
+
+                        Current configurable range: 25200 to 40000."
+        DEFVAL         { 26880 }
+        ::= { tnShelfEntry 77 }
+
+    tnShelfLowVoltageThresholdHVDC OBJECT-TYPE
+        SYNTAX         Unsigned32 (16000..31500)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf Low voltage Threshold HVDC.
+
+                        Current configurable range: 16000 to 31500."
+        DEFVAL         { 19200 }
+        ::= { tnShelfEntry 78 }
+
+    tnShelfVoltageThresholdTolHVDC OBJECT-TYPE
+        SYNTAX         Unsigned32 (100..4000)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf  voltage Threshold Tolerance HVDC.
+
+                        Current configurable range: 100 to 4000, in increments of 100."
+        DEFVAL         { 1200 }
+        ::= { tnShelfEntry 79 }
+
+    tnShelfVoltageFloorHVDC OBJECT-TYPE
+        SYNTAX         Unsigned32 (16000..48000)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf  voltage floor HVDC.
+
+                        Current configurable range: 16000 to 48000, in increments of 100."
+        DEFVAL         { 18000 }
+        ::= { tnShelfEntry 80 }
+
+    tnShelfVoltageThresholdTolAC OBJECT-TYPE
+        SYNTAX         Unsigned32 (100..1100)
+        UNITS          "1/100 volts"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shelf voltage threshold tolerance AC.
+
+                        Current configurable range: 100 to 1100, in increments of 100."
+        DEFVAL         { 600 }
+        ::= { tnShelfEntry 81 }
+
+    tnShelfTsiFreeze OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         set(1),
+                         unset(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 82 }
+
+--    obsolete
+--    tnShelfPlcUpgradeMode OBJECT-TYPE ::= { tnShelfEntry 83 }
+
+    tnShelfPosition OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 84 }
+
+    tnShelfLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 85 }
+
+    tnShelfDueDate OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..30))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 86 }
+
+    tnShelfRackLocation OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 87 }
+
+    tnShelfXpdrNumber OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 88 }
+
+    tnShelfCoupledNumber OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 89 }
+
+    tnShelfCoupledCmd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         config(1),
+                         upgrade(2),
+                         commit(3),
+                         cancel(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 90 }
+
+    tnShelfCustomerLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 91 }
+
+    tnShelfXponderLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfEntry 92 }
+
+    tnShelfCouplingState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         intermediate(2),
+                         committed(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 93 }
+
+    tnShelfPowerFeed OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         uniform(1),
+                         mixed(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 94 }
+
+    tnShelfPfaExpectedVolts OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 95 }
+
+    tnShelfPfaLowVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 96 }
+
+    tnShelfPfaHighVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 97 }
+
+    tnShelfPfaVoltageThresholdTol OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 98 }
+
+    tnShelfPfbExpectedVolts OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 99 }
+
+    tnShelfPfbLowVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 100 }
+
+    tnShelfPfbHighVoltageThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 101 }
+
+    tnShelfPfbVoltageThresholdTol OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfEntry 102 }
+
+--------------------------------------------------------------------------------
+-- Generic Shelf Scalars
+--------------------------------------------------------------------------------
+    tnShelfTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The total number of shelves allocated on a
+                        1696R/1830 ROADM NE."
+        ::= { tnShelfBasics 2 }
+
+--------------------------------------------------------------------------------
+-- PSS4 Shelf RI Data Table
+--------------------------------------------------------------------------------
+    tnShelfRiDataTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfRiDataEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Applicable to PSS4."
+        ::= { tnShelfBasics 3 }
+
+    tnShelfRiDataEntry OBJECT-TYPE
+        SYNTAX         TnShelfRiDataEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex }
+        ::= { tnShelfRiDataTable 1 }
+
+    TnShelfRiDataEntry ::=
+        SEQUENCE {
+            tnShelfRiCompanyID                SnmpAdminString,
+            tnShelfRiMnemonic                 SnmpAdminString,
+            tnShelfRiCLEI                     TropicCardCLEI,
+            tnShelfRiManufacturingPartNumber  TropicCardManufacturingPartNumber,
+            tnShelfRiSWPartNum                SnmpAdminString,
+            tnShelfRiFactoryID                SnmpAdminString,
+            tnShelfRiSerialNumber             TropicCardSerialNumber,
+            tnShelfRiDate                     SnmpAdminString,
+            tnShelfRiExtraData                SnmpAdminString
+        }
+
+    tnShelfRiCompanyID OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 1 }
+
+    tnShelfRiMnemonic OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 2 }
+
+    tnShelfRiCLEI OBJECT-TYPE
+        SYNTAX         TropicCardCLEI
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 3 }
+
+    tnShelfRiManufacturingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardManufacturingPartNumber
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 4 }
+
+    tnShelfRiSWPartNum OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 5 }
+
+    tnShelfRiFactoryID OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 6 }
+
+    tnShelfRiSerialNumber OBJECT-TYPE
+        SYNTAX         TropicCardSerialNumber
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 7 }
+
+    tnShelfRiDate OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 8 }
+
+    tnShelfRiExtraData OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRiDataEntry 9 }
+
+--------------------------------------------------------------------------------
+-- Passive Shelf Inventory Table
+--------------------------------------------------------------------------------
+    tnShelfInvTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfInvEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 4 }
+
+    tnShelfInvEntry OBJECT-TYPE
+        SYNTAX         TnShelfInvEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex }
+        ::= { tnShelfInvTable 1 }
+
+    TnShelfInvEntry ::=
+        SEQUENCE {
+            tnShelfInvInvStatus              TropicShelfInvAvailabilityStatus,
+            tnShelfInvCustInvField           TropicShelfInvCustomerInvField,
+            tnShelfInvFiberType              TropicShelfInvFiberType,
+            tnShelfInvDcmSize                TropicShelfInvDcmSize,
+            tnShelfInvAvgInsertionLoss       TropicShelfInvInsertionLoss,
+            tnShelfInvInsertionLossSlope     TropicShelfInvInsertionLossSlope,
+            tnShelfInvTotalDispFit           TropicShelfInvDispersionFit,
+            tnShelfInvDispFiberLength        TropicShelfInvFiberLength,
+            tnShelfInvPmd                    TropicShelfInvPmd,
+            tnShelfInvLatencyMismatch        TropicShelfInvLatencyMismatch
+        }
+
+    tnShelfInvInvStatus OBJECT-TYPE
+        SYNTAX         TropicShelfInvAvailabilityStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 1 }
+
+    tnShelfInvCustInvField OBJECT-TYPE
+        SYNTAX         TropicShelfInvCustomerInvField
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 2 }
+
+    tnShelfInvFiberType OBJECT-TYPE
+        SYNTAX         TropicShelfInvFiberType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 3 }
+
+    tnShelfInvDcmSize OBJECT-TYPE
+        SYNTAX         TropicShelfInvDcmSize
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 4 }
+
+    tnShelfInvAvgInsertionLoss OBJECT-TYPE
+        SYNTAX         TropicShelfInvInsertionLoss
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 5 }
+
+    tnShelfInvInsertionLossSlope OBJECT-TYPE
+        SYNTAX         TropicShelfInvInsertionLossSlope
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 6 }
+
+    tnShelfInvTotalDispFit OBJECT-TYPE
+        SYNTAX         TropicShelfInvDispersionFit
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 7 }
+
+    tnShelfInvDispFiberLength OBJECT-TYPE
+        SYNTAX         TropicShelfInvFiberLength
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 8 }
+
+    tnShelfInvPmd OBJECT-TYPE
+        SYNTAX         TropicShelfInvPmd
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 9 }
+
+    tnShelfInvLatencyMismatch OBJECT-TYPE
+        SYNTAX         TropicShelfInvLatencyMismatch
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfInvEntry 10 }
+
+--------------------------------------------------------------------------------
+-- Multi Shelf Table
+--------------------------------------------------------------------------------
+    tnMultiShelfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnMultiShelfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 5 }
+
+    tnMultiShelfEntry OBJECT-TYPE
+        SYNTAX         TnMultiShelfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnMultiShelfIndex  }
+        ::= { tnMultiShelfTable 1 }
+
+    TnMultiShelfEntry ::=
+        SEQUENCE {
+            tnMultiShelfIndex              Unsigned32,
+            tnMultiShelfSerialNumber       SnmpAdminString,
+            tnMultiShelfRowStatus          RowStatus
+        }
+
+    tnMultiShelfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32 (2..31)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnMultiShelfEntry 1 }
+
+    tnMultiShelfSerialNumber OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnMultiShelfEntry 2 }
+
+    tnMultiShelfRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.  Sets
+                        are permitted for the following values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnMultiShelfEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Shelf Display Table
+--------------------------------------------------------------------------------
+    tnShelfDisplayTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfDisplayEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 6 }
+
+    tnShelfDisplayEntry OBJECT-TYPE
+        SYNTAX         TnShelfDisplayEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex  }
+        ::= { tnShelfDisplayTable 1 }
+
+    TnShelfDisplayEntry ::=
+        SEQUENCE {
+            tnShelfDisplayIdType             INTEGER,
+            tnShelfDisplayIdIntf             INTEGER,
+            tnShelfDisplayIdString           SnmpAdminString,
+            tnShelfDisplayUserMessage        SnmpAdminString,
+            tnShelfDisplayFMMessage          SnmpAdminString,
+            tnShelfDisplayShortPush          SnmpAdminString,
+            tnShelfDisplayLongPush           SnmpAdminString
+        }
+
+    tnShelfDisplayIdType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         mac(1),
+                         ipv4(2),
+                         ipv6(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { ipv4 }
+        ::= { tnShelfDisplayEntry 1 }
+
+    tnShelfDisplayIdIntf OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         oamp(1),
+                         es1(2),
+                         es2(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { oamp }
+        ::= { tnShelfDisplayEntry 2 }
+
+
+    tnShelfDisplayIdString OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..48))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfDisplayEntry 3 }
+
+    tnShelfDisplayUserMessage OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfDisplayEntry 4 }
+
+    tnShelfDisplayFMMessage OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfDisplayEntry 5 }
+
+    tnShelfDisplayShortPush OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfDisplayEntry 6 }
+
+    tnShelfDisplayLongPush OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfDisplayEntry 7 }
+
+--------------------------------------------------------------------------------
+-- Shelf Rack Table
+--------------------------------------------------------------------------------
+    tnShelfRackTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfRackEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 7 }
+
+    tnShelfRackEntry OBJECT-TYPE
+        SYNTAX         TnShelfRackEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfRackNumber  }
+        ::= { tnShelfRackTable 1 }
+
+    TnShelfRackEntry ::=
+        SEQUENCE {
+            tnShelfRackNumber                Unsigned32,
+            tnShelfRackDescription           SnmpAdminString,
+            tnShelfRackBlockNumber           SnmpAdminString
+        }
+
+    tnShelfRackNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfRackEntry 1 }
+
+    tnShelfRackDescription OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRackEntry 2 }
+
+    tnShelfRackBlockNumber OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfRackEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Shelf Fiber Tray Table
+--------------------------------------------------------------------------------
+    tnShelfFiberTrayTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnShelfFiberTrayEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfBasics 8 }
+
+    tnShelfFiberTrayEntry OBJECT-TYPE
+        SYNTAX         TnShelfFiberTrayEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfFiberTrayNumber  }
+        ::= { tnShelfFiberTrayTable 1 }
+
+    TnShelfFiberTrayEntry ::=
+        SEQUENCE {
+            tnShelfFiberTrayNumber           Unsigned32,
+            tnShelfFiberTrayPosition         SnmpAdminString
+        }
+
+    tnShelfFiberTrayNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfFiberTrayEntry 1 }
+
+    tnShelfFiberTrayPosition OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnShelfFiberTrayEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnShelfGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfName,
+            tnShelfDescr,
+            tnShelfSerialNum,
+            tnShelfProgrammedType,
+            tnShelfPresentType,
+            tnShelfActivitySwitch,
+            tnShelfLampTest,
+            tnShelfMateCCReadyToProtect,
+            tnShelfIsUnmanaged,
+            tnShelfExpectedAmps,
+            tnShelfSerialNumber,
+            tnShelfAINS,
+--            obsolete
+--            tnShelfInhibitAutoSwitching,
+            tnShelfStatusLEDColor,
+            tnShelfStatusLEDState,
+            tnShelfWTMode,
+            tnShelfActivityMt0cSwitch,
+            tnShelfMateMt0cReadyToProtect,
+            tnShelfExpectedPfa,
+            tnShelfExpectedPfb,
+            tnShelfHighVoltageThreshold,
+            tnShelfLowVoltageThreshold,
+            tnShelfVoltageThresholdTol,
+            tnShelfExpectedVolts,
+            tnShelfMatrixSize,
+            tnShelfVoltageFloor,
+            tnShelfCalculatedLoad,
+            tnShelfClkSwitch,
+            tnShelfExpectedVoltsAC,
+            tnShelfHighVoltageThresholdAC,
+            tnShelfLowVoltageThresholdAC,
+            tnShelfVoltageFloorAC,
+            tnShelfExternalAcPower,
+            tnShelfLoadWarningThreshold,
+            tnShelfTimingSwitch,
+            tnShelfCalculatedLoadAC,
+            tnShelfPowerCapacity,
+            tnShelfRemainingPowerCapacity,
+            tnShelfLockout,
+            tnShelfFilterMonitorStatus,
+            tnShelfFilterInspectionInterval,
+            tnShelfFilterStartDate,
+            tnShelfAlmProfName,
+            tnShelfBranchPowerCap1,
+            tnShelfBranchPowerCap2,
+            tnShelfBranchPowerCap3,
+            tnShelfBranchPowerCap4,
+            tnShelfBranchPowerCap5,
+            tnShelfBranchPowerCap6,
+            tnShelfBranchRemainingPwrCap1,
+            tnShelfBranchRemainingPwrCap2,
+            tnShelfBranchRemainingPwrCap3,
+            tnShelfBranchRemainingPwrCap4,
+            tnShelfBranchRemainingPwrCap5,
+            tnShelfBranchRemainingPwrCap6,
+            tnShelfFabricEQPStatus,
+            tnShelfFabricActivityState,
+            tnShelfFabricFailures,
+            tnShelfFabricUsage,
+            tnShelfFabricEqpsLEDColor,
+            tnShelfFabricReadyToProtect,
+            tnShelfRackType,
+            tnShelfInventoryAction,
+            tnShelfFilterAction,
+            tnShelfExpectedCruA,
+            tnShelfExpectedCruB,
+            tnShelfPanelTimingPort,
+            tnShelfDelegateFCRUSlot,
+            tnShelfUID,
+            tnShelfUIDStatusLEDState,
+            tnShelfMTXSIZE,
+            tnShelfRMNMTXCAP,
+            tnShelfUIDStatusLEDColor,
+            tnShelfFanMode,
+            tnShelfExpectedVoltsHVDC,
+            tnShelfHighVoltageThresholdHVDC,
+            tnShelfLowVoltageThresholdHVDC,
+            tnShelfVoltageThresholdTolHVDC,
+            tnShelfVoltageFloorHVDC,
+            tnShelfVoltageThresholdTolAC,
+            tnShelfTsiFreeze,
+--            obsolete
+--            tnShelfPlcUpgradeMode,
+            tnShelfPosition,
+            tnShelfLifeCycleState,
+            tnShelfDueDate,
+            tnShelfRackLocation,
+            tnShelfXpdrNumber,
+            tnShelfCoupledNumber,
+            tnShelfCoupledCmd,
+            tnShelfCustomerLifeCycleState,
+            tnShelfXponderLifeCycleState,
+            tnShelfCouplingState,
+            tnShelfPowerFeed,
+            tnShelfPfaExpectedVolts,
+            tnShelfPfaLowVoltageThreshold,
+            tnShelfPfaHighVoltageThreshold,
+            tnShelfPfaVoltageThresholdTol,
+            tnShelfPfbExpectedVolts,
+            tnShelfPfbLowVoltageThreshold,
+            tnShelfPfbHighVoltageThreshold,
+            tnShelfPfbVoltageThresholdTol
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 1 }
+
+    tnShelfScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 2 }
+
+    tnShelfRiDataGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfRiCompanyID,
+            tnShelfRiMnemonic,
+            tnShelfRiCLEI,
+            tnShelfRiManufacturingPartNumber,
+            tnShelfRiSWPartNum,
+            tnShelfRiFactoryID,
+            tnShelfRiSerialNumber,
+            tnShelfRiDate,
+            tnShelfRiExtraData
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 3 }
+
+    tnShelfInvDataGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfInvInvStatus,
+            tnShelfInvCustInvField,
+            tnShelfInvFiberType,
+            tnShelfInvDcmSize,
+            tnShelfInvAvgInsertionLoss,
+            tnShelfInvInsertionLossSlope,
+            tnShelfInvTotalDispFit,
+            tnShelfInvDispFiberLength,
+            tnShelfInvPmd,
+            tnShelfInvLatencyMismatch
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 4 }
+
+    tnMultiShelfGroup OBJECT-GROUP
+        OBJECTS {
+            tnMultiShelfSerialNumber,
+            tnMultiShelfRowStatus
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 5 }
+
+    tnShelfDisplayGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfDisplayIdType,
+            tnShelfDisplayIdIntf,
+            tnShelfDisplayIdString,
+            tnShelfDisplayUserMessage,
+            tnShelfDisplayFMMessage,
+            tnShelfDisplayShortPush,
+            tnShelfDisplayLongPush
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 6 }
+
+    tnShelfRackGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfRackDescription,
+            tnShelfRackBlockNumber
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 7 }
+
+    tnShelfFiberTrayGroup OBJECT-GROUP
+        OBJECTS {
+            tnShelfFiberTrayPosition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnShelfGroups 8 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnShelfCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnShelfGroup,
+            tnShelfScalarsGroup,
+            tnShelfRiDataGroup,
+            tnShelfInvDataGroup,
+            tnMultiShelfGroup,
+            tnShelfDisplayGroup,
+            tnShelfRackGroup,
+            tnShelfFiberTrayGroup
+        }
+        ::= { tnShelfCompliances 1 }
+
+END -- DEFINITION OF TROPIC-SHELF-MIB
