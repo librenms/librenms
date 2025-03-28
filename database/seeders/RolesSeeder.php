@@ -33,14 +33,6 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cached roles and permissions
-//        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-        // create permissions
-//        Permission::create(['name' => 'edit articles']);
-
-        // update cache to know about the newly created permissions (required if using WithoutModelEvents in seeders)
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
         Role::findOrCreate('admin');
         Role::findOrCreate('global-read');
         Role::findOrCreate('user');

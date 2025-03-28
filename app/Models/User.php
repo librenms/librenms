@@ -174,7 +174,7 @@ class User extends Authenticatable
 
     public function scopeAdminOnly($query)
     {
-        $query->whereIs('admin');
+        $query->role('admin');
     }
 
     // ---- Accessors/Mutators ----

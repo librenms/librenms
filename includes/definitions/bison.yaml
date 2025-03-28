@@ -1,0 +1,13 @@
+os: bison
+text: Bison Router
+type: network
+icon: bison
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: bison
+discovery:
+    -
+        sysDescr_regex:
+            - '/Linux bison/'
