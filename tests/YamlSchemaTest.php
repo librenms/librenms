@@ -94,8 +94,8 @@ class YamlSchemaTest extends TestCase
     }
 
     /**
-     * @param string $filePath
-     * @param string $schema_file full path
+     * @param  string  $filePath
+     * @param  string  $schema_file  full path
      */
     private function validateFileAgainstSchema(string $filePath, string $schema_file): void
     {

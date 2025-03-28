@@ -27,8 +27,8 @@ return new class extends Migration
     }
 
     /**
-     * @param string $old_discovery_dir
-     * @param string $new_discovery_dir
+     * @param  string  $old_discovery_dir
+     * @param  string  $new_discovery_dir
      * @return void
      */
     private function moveFiles(string $old_discovery_dir, string $new_discovery_dir): void
@@ -40,7 +40,7 @@ return new class extends Migration
 
             if ($fileinfo->isFile()) {
                 $moved = rename($fileinfo->getPathname(), $new_discovery_dir . '/' . $fileinfo->getFilename());
-                echo "moved detection " . $fileinfo->getFilename() . PHP_EOL;
+                echo 'moved detection ' . $fileinfo->getFilename() . PHP_EOL;
 
                 if (! $moved) {
                     throw new Exception('Failed to move: ' . $fileinfo->getFilename());
@@ -56,7 +56,7 @@ return new class extends Migration
             $notEmpty = false;
 
             foreach ($remainingIterator as $fileinfo) {
-                if (!$fileinfo->isDot()) {
+                if (! $fileinfo->isDot()) {
                     $notEmpty = true;
                     break;
                 }
