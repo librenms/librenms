@@ -14,7 +14,7 @@ class Ospfv3PortFactory extends Factory
     {
         return [
             'id' => $this->faker->randomDigit(),
-            'ospfv3_instance_id' => 0,
+            'ospfv3IfInstId' => 0,
             'ospfv3_port_id' => $this->faker->randomDigit(),
             'ospfv3IfIpAddress' => $this->faker->ipv6(),
             'ospfv3AddressLessIf' => $this->faker->randomDigit(),
