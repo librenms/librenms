@@ -47,10 +47,16 @@ class SensorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
+        $class = $request->input('class');
+        $relations = ['device', 'device.location'];
+        if ($class == 'state') {
+            $relations[] = 'translations';
+        }
+
         return Sensor::query()
             ->hasAccess($request->user())
-            ->where('sensor_class', $request->input('class'))
-            ->with(['device', 'device.location'])
+            ->where('sensor_class', $class)
+            ->with($relations)
             ->withAggregate('device', 'hostname');
     }
 
