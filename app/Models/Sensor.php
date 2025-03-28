@@ -153,6 +153,9 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function currentStatus(): Severity
     {
+        if ($this->sensor_class === 'state') {
+            return Severity::from($this->state->state_generic_value);
+        }
         if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
             return Severity::Error;
         }
@@ -195,9 +198,15 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return $this->hasOneThrough(StateIndex::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
     }
 
+    public function state(): HasOneThrough
+    {
+        return $this->hasOneThrough(StateTranslation::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id')
+                    ->where('state_value', $this->sensor_current);
+    }
+
     public function translations(): BelongsToMany
     {
-        return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
+        return $this->belongsToMany(StateTranslation::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
     }
 
     public function getCompositeKey(): string
