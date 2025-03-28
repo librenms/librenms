@@ -16,7 +16,7 @@ $eqptHolderTable = [
     'CFXS-C' => 'Shelf: ISAM 7362 (SF-8GW)',
 ];
 
-if ($asamPortNumberingMethod == 'positionBasedSlotId') {
+if ($asamPortNumberingMethod == 2) {
     // Slot mapping for "positionBasedSlotId" (see ASAM-SYSTEM-MIB)
     // also hardcoded because of no reference found in MIB but matched on DSLAM typ (eqptHolderActualTyp)
     // acutal tested on ISAM 7330/56/60/62
