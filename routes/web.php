@@ -231,6 +231,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
+            Route::post('sensors', 'SensorsController')->name('table.sensors');
             Route::post('syslog', 'SyslogController');
             Route::post('tnmsne', 'TnmsneController')->name('table.tnmsne');
             Route::post('vlan-ports', 'VlanPortsController')->name('table.vlan-ports');
