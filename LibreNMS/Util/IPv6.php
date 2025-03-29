@@ -163,8 +163,10 @@ class IPv6 extends IP
      */
     public function uncompressed()
     {
+        // rfc4291 IPv4-mapped IPv6
+        $rpt = preg_match("/:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/", $this->ip) ? 7 : 8;
         // remove ::
-        $replacement = ':' . str_repeat('0000:', 8 - substr_count($this->ip, ':'));
+        $replacement = ':' . str_repeat('0000:', $rpt - substr_count($this->ip, ':'));
         $ip = str_replace('::', $replacement, $this->ip);
 
         // zero pad
