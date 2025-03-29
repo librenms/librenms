@@ -139,7 +139,7 @@ function resizeend() {
         newW=$(window).width();
         timeout = false;
         if(Math.abs(oldW - newW) >= 200)
-        {
+{
             refresh = true;
         }
         else {
@@ -237,6 +237,105 @@ $(document).ready(function () {
             $(this).bootgrid('reload');
         });
     }, 300000);
+});
+
+// Add export button to bootgrid tables
+$(document).on('initialized.rs.jquery.bootgrid', function (e) {
+    var grid = $(e.target);
+    var tableId = grid.attr('id');
+
+    if ($('#' + tableId + '-export-button').length === 0) {
+        var exportUrl = grid.data('ajaxurl');
+        var isLegacy = exportUrl && exportUrl.indexOf('ajax_table_export.php') !== -1;
+
+        if (exportUrl && !isLegacy) {
+            exportUrl += '/export';
+        }
+
+        if (exportUrl) {
+            var actionsContainer = null;
+
+            if (isLegacy) {
+                actionsContainer = grid.closest('div.col-md-12').find('div.bootgrid-header div.actions');
+            } else {
+                var panel = grid.closest('div.panel');
+                if (panel.length) {
+                    actionsContainer = panel.find('div.actions');
+                }
+            }
+
+            if (actionsContainer && actionsContainer.length) {
+                var exportButton = $(
+                    '<div id="' + tableId + '-export-button" class="btn-group mr-2 bootgrid-export-button">' +
+                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    '<i class="fa fa-download"></i> <span class="caret"></span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu">' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '</ul>' +
+                    '</div>'
+                );
+
+                actionsContainer.prepend(exportButton);
+
+                // onclick event for export button
+                // to handle filtering and sorting
+                exportButton.find('.export-link').on('click', function(e) {
+                    e.preventDefault();
+
+                    var gridId = $(this).data('grid-id');
+                    var grid = $('#' + gridId);
+                    var currentUrl = $(this).attr('href');
+                    var urlParams = [];
+
+                    var searchPhrase = $('.search-field').val();
+                    if (searchPhrase) {
+                        urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
+                    }
+
+                    var headerContainer = $('#' + gridId + '-header');
+                    if (headerContainer.length) {
+                        headerContainer.find('input[name]').each(function() {
+                            var field = $(this);
+                            var name = field.attr('name');
+                            var value = field.val();
+                            if (name === '_token') {
+                                return;
+                            }
+
+                            if (value !== null && value !== '' && value !== '1') {
+                                urlParams.push(name + '=' + encodeURIComponent(value));
+                            }
+                        });
+
+                        headerContainer.find('select[name]').each(function() {
+                            var select = $(this);
+                            var name = select.attr('name');
+                            var selectedOption = select.find(':selected');
+                            if (selectedOption.length) {
+                                urlParams.push(name + '=' + encodeURIComponent(selectedOption.val()));
+                            }
+                        });
+                    }
+
+                    var sorting = grid.bootgrid('getSortDictionary');
+                    if (sorting && Object.keys(sorting).length > 0) {
+                        for (var sortKey in sorting) {
+                            if (sorting.hasOwnProperty(sortKey)) {
+                                urlParams.push('sort[' + sortKey + ']=' + sorting[sortKey]);
+                            }
+                        }
+                    }
+
+                    if (urlParams.length > 0) {
+                        currentUrl += (currentUrl.indexOf('?') > -1 ? '&' : '?') + urlParams.join('&');
+                    }
+
+                    window.open(currentUrl, '_blank');
+                });
+            }
+        }
+    }
 });
 
 var jsFilesAdded = [];
