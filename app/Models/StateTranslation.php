@@ -45,7 +45,7 @@ class StateTranslation extends Model implements Keyable
 
     public function severity(): Severity
     {
-        return Severity::tryFrom($this->state_generic_value) ?? Severity::Unknown;
+        return Severity::tryFrom((int) $this->state_generic_value) ?? Severity::Unknown;
     }
 
     public function stateIndex(): BelongsTo

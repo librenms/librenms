@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -148,7 +149,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         $value = $this->sensor_current;
         if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
             //compute and display an approx rate for this sensor
-            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / Config::get('rrd.step', 300), 2, 3, '');
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
 
         return match ($this->sensor_class) {
