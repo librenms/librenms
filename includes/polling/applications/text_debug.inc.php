@@ -46,7 +46,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
             $stat_value = strlen($data['blobs'][$blob_name]);
             $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat_name];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, ['data' => $stat_value]);
+            app('Datastore')->put($device, 'app', $tags, ['data' => $stat_value]);
             $metrics[$stat_name] = $stat_value;
             $metrics['total_size'] = $metrics['total_size'] + $stat_value;
 
@@ -59,7 +59,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
                 $stat_value = strlen($data['blobs_exit_signal'][$blob_name]);
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat_name];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, ['data' => $stat_value]);
+                app('Datastore')->put($device, 'app', $tags, ['data' => $stat_value]);
                 $metrics[$stat_name] = $stat_value;
             }
 
@@ -72,7 +72,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
                 $stat_value = strlen($data['blobs_exit_signal'][$blob_name]);
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat_name];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, ['data' => $stat_value]);
+                app('Datastore')->put($device, 'app', $tags, ['data' => $stat_value]);
                 $metrics[$stat_name] = $stat_value;
             }
 
@@ -85,7 +85,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
                 $stat_value = strlen($data['blobs_exit_signal'][$blob_name]);
                 $rrd_name = $rrd_name = ['app', $name, $app->app_id, $stat_name];
                 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-                data_update($device, 'app', $tags, ['data' => $stat_value]);
+                app('Datastore')->put($device, 'app', $tags, ['data' => $stat_value]);
                 $metrics[$stat_name] = $stat_value;
             }
         }
@@ -95,7 +95,7 @@ if (isset($data['blobs']) && is_array($data['blobs']) && ! array_is_list($data['
 // save size info
 $rrd_name = $rrd_name = ['app', $name, $app->app_id, 'total_size'];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, ['data' => $metrics['total_size']]);
+app('Datastore')->put($device, 'app', $tags, ['data' => $metrics['total_size']]);
 
 $app->data = $app_data;
 update_application($app, 'OK', $metrics);
