@@ -168,7 +168,9 @@ class IPv6 extends IP
         // mapped ipv4 to hex
         if (str_contains($ip, '.') && str_contains($ip, ':')) {
             $split = strrpos($ip, ':');
-            $parts = array_map('dechex', explode('.', substr($ip, $split + 1)));
+            $parts = array_map(function ($part) {
+                return dechex($part);
+            }, explode('.', substr($ip, $split + 1)));
             $ip = substr($ip, 0, $split); // extract prefix
 
             foreach ($parts as $pos => $part) {
