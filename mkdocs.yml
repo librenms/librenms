@@ -188,9 +188,11 @@ nav:
       - Environment Variables: Support/Environment-Variables.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Galera Database Cluster: Extensions/Galera-Cluster.md
+      - High Availability: Support/High-Availability.md
       - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
       - IRC Bot: Extensions/IRC-Bot.md
       - Oauth/SAML support: Extensions/OAuth-SAML.md
+      - Redis Sentinel: Extensions/Redis-Sentinel.md
       - RRDCached: Extensions/RRDCached.md
       - RRDTune: Extensions/RRDTune.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md

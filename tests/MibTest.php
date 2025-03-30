@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MibTest.php
  *
@@ -153,7 +154,7 @@ class MibTest extends TestCase
      *
      * @return array
      */
-    public function mibDirs(): array
+    public static function mibDirs(): array
     {
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));

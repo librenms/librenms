@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirlessErrorRatioPolling.php
  *

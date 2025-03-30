@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -260,7 +261,7 @@ foreach ($lines as $line) {
                 // create or push data to rrd
                 $tags = ['name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]];
                 $metrics[$line_id] = $fields;
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
             break;
     }
@@ -269,7 +270,7 @@ $metrics['none'] = $default_fields;
 
 // push the default nfs server data to rrd
 $tags = ['name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def_array['default']];
-data_update($device, 'app', $tags, $default_fields);
+app('Datastore')->put($device, 'app', $tags, $default_fields);
 update_application($app, $nfsstats, $metrics);
 
 // clean up scope

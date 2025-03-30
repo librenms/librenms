@@ -1,4 +1,5 @@
 <?php
+
 /**
  * quantastor.inc.php
  *

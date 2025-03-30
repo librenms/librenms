@@ -6416,5 +6416,29 @@
                 }
             ]
         }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0202:99ff:fe15:cff0",
+                    "ipv6_compressed": "fe80::202:99ff:fe15:cff0",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0202:99ff:fe15:cff1",
+                    "ipv6_compressed": "fe80::202:99ff:fe15:cff1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": "fe80::/64",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

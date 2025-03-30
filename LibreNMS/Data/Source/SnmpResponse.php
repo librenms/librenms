@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpResponse.php
  *
@@ -301,7 +302,7 @@ class SnmpResponse
     {
         return (string) preg_replace([
             '/^.*No Such Instance currently exists.*$/m',
-            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/',
+            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
         ], '', $this->raw);
     }
 

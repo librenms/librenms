@@ -1,4 +1,5 @@
 <?php
+
 /**
  * check_oracle Nagios Plugin
  * Docs: https://www.monitoring-plugins.org/doc/man/check_oracle.html

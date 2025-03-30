@@ -1,4 +1,5 @@
 <?php
+
 /**
  * aos-emu2.inc.php
  *
