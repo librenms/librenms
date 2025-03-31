@@ -230,8 +230,10 @@ Route::middleware(['auth'])->group(function () {
             Route::post('port-nac', 'PortNacController')->name('table.port-nac');
             Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
+            Route::post('processors', 'ProcessorsController')->name('table.processors');
             Route::post('routes', 'RoutesTablesController');
             Route::post('sensors', 'SensorsController')->name('table.sensors');
+            Route::post('storages', 'StoragesController')->name('table.storages');
             Route::post('syslog', 'SyslogController');
             Route::post('tnmsne', 'TnmsneController')->name('table.tnmsne');
             Route::post('vlan-ports', 'VlanPortsController')->name('table.vlan-ports');

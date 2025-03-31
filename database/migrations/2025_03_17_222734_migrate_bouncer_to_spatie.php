@@ -43,8 +43,8 @@ return new class extends Migration
 
         foreach ($rolesByUserId as $user_id => $roles) {
             foreach ($roles as $role) {
-                DB::table('model_has_roles')->insert([
-                    'role_id' => $newRoleIds[$role],
+                DB::table('model_has_roles')->insertOrIgnore([
+                    'role_id' => $newRoleIds->get($role),
                     'model_type' => 'App\Models\User',
                     'model_id' => $user_id,
                 ]);

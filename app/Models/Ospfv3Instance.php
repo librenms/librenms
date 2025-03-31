@@ -26,16 +26,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ospfv3Instance extends DeviceRelatedModel
+class Ospfv3Instance extends DeviceRelatedModel implements Keyable
 {
     public $timestamps = false;
     protected $fillable = [
         'device_id',
-        'ospfv3_instance_id',
         'context_name',
+        'router_id',
         'ospfv3RouterId',
         'ospfv3AdminStatus',
         'ospfv3VersionNumber',
@@ -48,17 +48,38 @@ class Ospfv3Instance extends DeviceRelatedModel
         'ospfv3RxNewLsas',
         'ospfv3ExtAreaLsdbLimit',
         'ospfv3ExitOverflowInterval',
+        'ospfv3ReferenceBandwidth',
+        'ospfv3RestartSupport',
+        'ospfv3RestartInterval',
+        'ospfv3RestartStrictLsaChecking',
+        'ospfv3RestartStatus',
+        'ospfv3RestartAge',
+        'ospfv3RestartExitReason',
+        'ospfv3StubRouterSupport',
+        'ospfv3StubRouterAdvertisement',
+        'ospfv3DiscontinuityTime',
+        'ospfv3RestartTime',
     ];
 
     // ---- Define Relationships ----
 
-    public function user(): BelongsTo
+    public function areas(): HasMany
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->hasMany(Ospfv3Area::class);
     }
 
-    public function widgets(): HasMany
+    public function nbrs(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
+        return $this->hasMany(Ospfv3Nbr::class);
+    }
+
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(Ospfv3Port::class);
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "$this->device_id-$this->context_name";
     }
 }
