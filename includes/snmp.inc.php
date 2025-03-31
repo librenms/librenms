@@ -687,53 +687,13 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
  *
  * @internal param $string
  *
- * @return bool|array
+ * @return array
  *
  * @deprecated Please use SnmpQuery instead
  */
 function snmpwalk_array_num($device, $oid, $indexes = 1)
 {
-    $array = [];
-    $string = snmp_walk($device, $oid, '-Osqn');
-
-    if ($string === false) {
-        // False means: No Such Object.
-        return false;
-    }
-    if ($string == '') {
-        // Empty means SNMP timeout or some such.
-        return null;
-    }
-
-    // Let's turn the string into something we can work with.
-    foreach (explode("\n", $string) as $line) {
-        if ($line[0] == '.') {
-            // strip the leading . if it exists.
-            $line = substr($line, 1);
-        }
-        [$key, $value] = explode(' ', $line, 2);
-        $prop_id = explode('.', $key);
-        $value = trim($value);
-
-        // if we have requested more levels that exist, set to the max.
-        if ($indexes > count($prop_id)) {
-            $indexes = count($prop_id) - 1;
-        }
-
-        for ($i = 0; $i < $indexes; $i++) {
-            // Pop the index off.
-            $index = array_pop($prop_id);
-            $value = [$index => $value];
-        }
-
-        // Rebuild our key
-        $key = implode('.', $prop_id);
-
-        // Add the entry to the master array
-        $array = array_replace_recursive($array, [$key => $value]);
-    }
-
-    return $array;
+    return SnmpQuery::numeric()->walk($oid)->groupByIndex($indexes);
 }
 
 /**
