@@ -21,7 +21,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
         Route::get('ospf_ports', 'LegacyApiController@list_ospf_ports')->name('list_ospf_ports');
-        Route::get('ospfv3', 'LegacyApiController@list_ospf')->name('list_ospfv3');
+        Route::get('ospfv3', 'LegacyApiController@list_ospfv3')->name('list_ospfv3');
         Route::get('ospfv3_ports', 'LegacyApiController@list_ospfv3_ports')->name('list_ospfv3_ports');
         Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');

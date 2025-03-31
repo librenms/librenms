@@ -1545,6 +1545,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.ospfv3": {
+            "order": 235,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.cisco-cef": {
             "order": 50,
             "group": "discovery",
