@@ -138,7 +138,9 @@ class Cisco extends OS implements
             }
         }
 
-        if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        if ((empty($hardware) || preg_match('/Switch System/', $hardware) || preg_match('/MIDPLANE/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+            $hardware = $data[1000]['entPhysicalModelName'];
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
