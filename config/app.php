@@ -92,6 +92,7 @@ return [
      */
 
     'locale' => env('APP_LOCALE', 'en'),
+    'default_locale' => env('APP_LOCALE', 'en'), // just a holder for the system set locale
 
     /*
      |--------------------------------------------------------------------------
