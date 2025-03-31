@@ -342,9 +342,10 @@ class YamlDiscovery
             return $pre_cache;
         }
 
-        if (! empty($os->getDiscovery()['modules'])) {
+        $discovery_yaml = $os->getDiscovery();
+        if (! empty($discovery_yaml['modules'])) {
             echo 'Caching data: ';
-            foreach ($os->getDiscovery()['modules'] as $module => $discovery_data) {
+            foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
@@ -376,8 +377,8 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'] ?? null;
-                                $pre_cache[$oid] = SnmpQuery::mibs($mib)->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid]);
+                                $pre_cache[$oid] = SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
+                                    ->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid]);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
