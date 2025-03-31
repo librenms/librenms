@@ -7,6 +7,10 @@ foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
         $oid = '.1.3.6.1.4.1.637.61.1.23.3.1.7.' . $index;
         $state_name = 'eqptBoardOperError';
         $current = $data['eqptBoardOperError'];
+        // Skip empty and not planned boards / false table entrys
+        if ($current == 0 || $data['eqptSlotActualType'] == 'EMPTY' && $data['eqptSlotPlannedType'] == 'NOT_PLANNED') {
+            continue;
+        }
         $descr = $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] . ' ' . $data['eqptSlotActualType'] . ' (' . $data['eqptSlotPlannedType'] . ')';
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'no-error'],
@@ -32,9 +36,26 @@ foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
             ['value' => 255, 'generic' => 2, 'graph' => 0, 'descr' => 'unknown-error'],
         ];
         create_state_index($state_name, $states);
+        if ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:2/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:2/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:2/1/2:') {
+            $group = 'Remote Shelf: 2';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:3/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:3/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:3/1/2:') {
+            $group = 'Remote Shelf: 3';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:4/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:4/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:4/1/2:') {
+            $group = 'Remote Shelf: 4';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:5/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:5/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:5/1/2:') {
+            $group = 'Remote Shelf: 5';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:6/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:6/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:6/1/2:') {
+            $group = 'Remote Shelf: 6';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:7/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:7/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:7/1/2:') {
+            $group = 'Remote Shelf: 7';
+        } elseif ($pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'ctrl:8/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:8/1/1:' || $pre_cache['nokiaIsamSlot'][$index]['numBasedSlot'] == 'lt:8/1/2:') {
+            $group = 'Remote Shelf: 8';
+        } else {
+            $group = $pre_cache['nokiaProductName'];
+        }
 
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', null, null, null, $group);
     }
 }
 
