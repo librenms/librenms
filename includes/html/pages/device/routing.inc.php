@@ -1,5 +1,8 @@
 <?php
 
+// laravel routing uses section for sub-tab navigation
+$vars['proto'] ??= $vars['section'] ?? null;
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
