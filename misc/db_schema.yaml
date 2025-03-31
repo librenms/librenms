@@ -1,18 +1,3 @@
-abilities:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: only_owned, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: options, Type: longtext, 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
-    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    abilities_scope_index: { Name: abilities_scope_index, Columns: [scope], Unique: false, Type: BTREE }
 access_points:
   Columns:
     - { Field: accesspoint_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -200,22 +185,6 @@ application_metrics:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     application_metrics_app_id_metric_unique: { Name: application_metrics_app_id_metric_unique, Columns: [app_id, metric], Unique: true, Type: BTREE }
-assigned_roles:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: restricted_to_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: restricted_to_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    assigned_roles_entity_index: { Name: assigned_roles_entity_index, Columns: [entity_id, entity_type, scope], Unique: false, Type: BTREE }
-    assigned_roles_role_id_index: { Name: assigned_roles_role_id_index, Columns: [role_id], Unique: false, Type: BTREE }
-    assigned_roles_scope_index: { Name: assigned_roles_scope_index, Columns: [scope], Unique: false, Type: BTREE }
-  Constraints:
-    assigned_roles_role_id_foreign: { name: assigned_roles_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
 authlog:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1091,6 +1060,26 @@ migrations:
     - { Field: batch, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+model_has_permissions:
+  Columns:
+    - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: model_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: model_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [permission_id, model_id, model_type], Unique: true, Type: BTREE }
+    model_has_permissions_model_id_model_type_index: { Name: model_has_permissions_model_id_model_type_index, Columns: [model_id, model_type], Unique: false, Type: BTREE }
+  Constraints:
+    model_has_permissions_permission_id_foreign: { name: model_has_permissions_permission_id_foreign, foreign_key: permission_id, table: permissions, key: id, extra: 'ON DELETE CASCADE' }
+model_has_roles:
+  Columns:
+    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: model_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: model_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [role_id, model_id, model_type], Unique: true, Type: BTREE }
+    model_has_roles_model_id_model_type_index: { Name: model_has_roles_model_id_model_type_index, Columns: [model_id, model_type], Unique: false, Type: BTREE }
+  Constraints:
+    model_has_roles_role_id_foreign: { name: model_has_roles_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE' }
 mpls_lsps:
   Columns:
     - { Field: lsp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1568,18 +1557,13 @@ pdb_ix_peers:
 permissions:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: ability_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: forbidden, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: guard_name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    permissions_ability_id_index: { Name: permissions_ability_id_index, Columns: [ability_id], Unique: false, Type: BTREE }
-    permissions_entity_index: { Name: permissions_entity_index, Columns: [entity_id, entity_type, scope], Unique: false, Type: BTREE }
-    permissions_scope_index: { Name: permissions_scope_index, Columns: [scope], Unique: false, Type: BTREE }
-  Constraints:
-    permissions_ability_id_foreign: { name: permissions_ability_id_foreign, foreign_key: ability_id, table: abilities, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
+    permissions_name_guard_name_unique: { Name: permissions_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
 plugins:
   Columns:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1725,9 +1709,9 @@ ports:
     - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
+    ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
     ports_ifalias_port_descr_descr_portname_index: { Name: ports_ifalias_port_descr_descr_portname_index, Columns: [ifAlias, port_descr_descr, portName], Unique: false, Type: BTREE }
     ports_ifdescr_ifname_index: { Name: ports_ifdescr_ifname_index, Columns: [ifDescr, ifName], Unique: false, Type: BTREE }
-    ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -2066,14 +2050,22 @@ roles:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
+    - { Field: guard_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    roles_name_unique: { Name: roles_name_unique, Columns: [name, scope], Unique: true, Type: BTREE }
-    roles_scope_index: { Name: roles_scope_index, Columns: [scope], Unique: false, Type: BTREE }
+    roles_name_guard_name_unique: { Name: roles_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
+role_has_permissions:
+  Columns:
+    - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [permission_id, role_id], Unique: true, Type: BTREE }
+    role_has_permissions_role_id_foreign: { Name: role_has_permissions_role_id_foreign, Columns: [role_id], Unique: false, Type: BTREE }
+  Constraints:
+    role_has_permissions_permission_id_foreign: { name: role_has_permissions_permission_id_foreign, foreign_key: permission_id, table: permissions, key: id, extra: 'ON DELETE CASCADE' }
+    role_has_permissions_role_id_foreign: { name: role_has_permissions_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE' }
 route:
   Columns:
     - { Field: route_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
