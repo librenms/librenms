@@ -169,7 +169,7 @@ class IPv6 extends IP
         if (str_contains($ip, '.') && str_contains($ip, ':')) {
             $split = strrpos($ip, ':');
             $parts = array_map(function ($part) {
-                return dechex($part);
+                return dechex((int) $part);
             }, explode('.', substr($ip, $split + 1)));
             $ip = substr($ip, 0, $split); // extract prefix
 
