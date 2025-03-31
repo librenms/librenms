@@ -34,7 +34,7 @@ $pagetitle[] = 'Health :: Storage';
         <table id="storage" class="table table-hover table-condensed storage">
             <thead>
                 <tr>
-                    <th data-column-id="hostname">Device</th>
+                    <th data-column-id="device_hostname">Device</th>
                     <th data-column-id="storage_descr">Storage</th>
                     <th data-column-id="graph" data-sortable="false" data-searchable="false"></th>
                     <th data-column-id="storage_used" data-searchable="false">Used</th>
@@ -51,10 +51,9 @@ $pagetitle[] = 'Health :: Storage';
         post: function ()
         {
             return {
-                id: "storage",
                 view: '<?php echo htmlspecialchars($vars['view']); ?>'
             };
         },
-        url: "ajax_table.php"
+        url: "<?php echo route('table.storages') ?>"
     });
 </script>
