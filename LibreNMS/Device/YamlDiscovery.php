@@ -377,7 +377,8 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $pre_cache[$oid] = SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
+                                $pre_cache[$oid] ??= [];
+                                SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
                                     ->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid]);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
