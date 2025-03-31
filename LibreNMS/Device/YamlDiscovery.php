@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
 class YamlDiscovery
 {
@@ -376,7 +377,7 @@ class YamlDiscovery
                                 }
 
                                 $mib = $os->getDiscovery()['mib'] ?? null;
-                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
+                                $pre_cache[$oid] = SnmpQuery::mib($mib)->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid] ?? []);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
