@@ -385,7 +385,7 @@ class YamlDiscovery
                                 }
 
                                 $mib = $os->getDiscovery()['mib'] ?? null;
-                                $pre_cache[$oid] = SnmpQuery::mib($mib)->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid] ?? []);
+                                $pre_cache[$oid] = SnmpQuery::mibs($mib)->options($snmp_flag)->walk($oid)->valuesByIndex($pre_cache[$oid]);
 
                                 LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
