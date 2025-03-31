@@ -14,7 +14,8 @@ class Ospfv3NbrFactory extends Factory
     {
         return [
             'id' => $this->faker->randomDigit(),
-            'ospfv3_instance_id' => 0,
+            'ospfv3NbrIfInstId' => 0,
+            'ospfv3NbrIfIndex' => 0,
             'ospfv3NbrIpAddr' => $this->faker->ipv6(),
             'ospfv3NbrAddressLessIndex' => $this->faker->randomDigit(),
             'ospfv3NbrRtrId' => $this->faker->ipv4(),
