@@ -1564,6 +1564,32 @@
                     "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4354",
                     "processor_index": "4354",
                     "processor_type": "nokia-isam",
+                    "processor_usage": 0,
+                    "processor_descr": "CPU 4354",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4355",
+                    "processor_index": "4355",
+                    "processor_type": "nokia-isam",
+                    "processor_usage": 0,
+                    "processor_descr": "CPU 4355",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.637.61.1.9.29.1.1.4.4354",
+                    "processor_index": "4354",
+                    "processor_type": "nokia-isam",
                     "processor_usage": 1,
                     "processor_descr": "CPU 4354",
                     "processor_precision": 1,
@@ -1581,8 +1607,7 @@
                     "processor_perc_warn": 75
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "mempools": {
         "discovery": {
