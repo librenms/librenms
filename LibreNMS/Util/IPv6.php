@@ -163,9 +163,27 @@ class IPv6 extends IP
      */
     public function uncompressed()
     {
+        $ip = $this->ip;
+
+        // mapped ipv4 to hex
+        if (str_contains($ip, '.') && str_contains($ip, ':')) {
+            $split = strrpos($ip, ':');
+            $parts = array_map(function ($part) {
+                return dechex((int) $part);
+            }, explode('.', substr($ip, $split + 1)));
+            $ip = substr($ip, 0, $split); // extract prefix
+
+            foreach ($parts as $pos => $part) {
+                if ($pos % 2 == 0) {
+                    $ip .= ':';
+                }
+                $ip .= str_pad($part, 2, '0', STR_PAD_LEFT);
+            }
+        }
+
         // remove ::
-        $replacement = ':' . str_repeat('0000:', 8 - substr_count($this->ip, ':'));
-        $ip = str_replace('::', $replacement, $this->ip);
+        $replacement = ':' . str_repeat('0000:', 8 - substr_count($ip, ':'));
+        $ip = str_replace('::', $replacement, $ip);
 
         // zero pad
         $parts = explode(':', $ip, 8);
