@@ -11,7 +11,13 @@ class UserWidget extends Model
     protected $table = 'users_widgets';
     protected $primaryKey = 'user_widget_id';
     protected $fillable = ['user_id', 'widget', 'col', 'row', 'size_x', 'size_y', 'title', 'refresh', 'settings', 'dashboard_id'];
-    protected $casts = ['settings' => 'array'];
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'array'
+        ];
+    }
 
     // ---- Define Relationships ----
 

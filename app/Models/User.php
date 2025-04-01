@@ -38,12 +38,15 @@ class User extends Authenticatable
         'created' => UserCreated::class,
     ];
 
-    protected $casts = [
-        'realname' => 'string',
-        'descr' => 'string',
-        'email' => 'string',
-        'can_modify_passwd' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'realname' => 'string',
+            'descr' => 'string',
+            'email' => 'string',
+            'can_modify_passwd' => 'integer',
+        ];
+    }
 
     public function toFlare(): array
     {

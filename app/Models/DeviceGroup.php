@@ -35,7 +35,6 @@ class DeviceGroup extends BaseModel
 {
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
-    protected $casts = ['rules' => 'array'];
 
     public static function boot()
     {
@@ -56,6 +55,13 @@ class DeviceGroup extends BaseModel
                 $deviceGroup->updateDevices();
             }
         });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'rules' => 'array'
+        ];
     }
 
     // ---- Helper Functions ----

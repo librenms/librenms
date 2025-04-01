@@ -36,13 +36,6 @@ class CustomMap extends BaseModel
 {
     use HasFactory;
     protected $primaryKey = 'custom_map_id';
-    protected $casts = [
-        'options' => 'array',
-        'legend_colours' => 'array',
-        'newnodeconfig' => 'array',
-        'newedgeconfig' => 'array',
-        'background_data' => 'array',
-    ];
     protected $fillable = [
         'name',
         'menu_group',
@@ -60,6 +53,17 @@ class CustomMap extends BaseModel
         'background_type',
         'background_data',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'options' => 'array',
+            'legend_colours' => 'array',
+            'newnodeconfig' => 'array',
+            'newedgeconfig' => 'array',
+            'background_data' => 'array',
+        ];
+    }
 
     /**
      * Get background data intended to be passed to javascript to configure the background

@@ -37,9 +37,13 @@ class Eventlog extends DeviceRelatedModel
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
-    protected $casts = [
-        'severity' => Severity::class,
-    ];
+
+    protected function casts(): array
+    {
+        return [
+            'severity' => Severity::class,
+        ];
+    }
 
     // ---- Helper Functions ----
     /**
