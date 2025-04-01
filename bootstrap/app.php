@@ -14,7 +14,53 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->validateCsrfTokens(except: [
+            '/auth/*/callback',
+        ]);
+
+        $middleware->append(\App\Http\Middleware\HandleCors::class);
+
+        $middleware->web([
+            \App\Http\Middleware\CheckInstalled::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \App\Http\Middleware\VerifyUserEnabled::class,
+        ]);
+
+        $middleware->api([
+            \App\Http\Middleware\EnforceJson::class,
+            'authenticate:token',
+        ]);
+
+        $middleware->group('auth', [
+            \App\Http\Middleware\LegacyExternalAuth::class,
+            'authenticate',
+            \App\Http\Middleware\VerifyTwoFactor::class,
+            \App\Http\Middleware\LoadUserPreferences::class,
+        ]);
+
+        $middleware->group('minimal', [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+        ]);
+
+        $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
+
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
+            'deny-demo' => \App\Http\Middleware\DenyDemoUser::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        ]);
+
+        $middleware->priority([
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            Middleware\LegacyExternalAuth::class,
+            Middleware\Authenticate::class,
+            \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Auth\Middleware\Authorize::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
