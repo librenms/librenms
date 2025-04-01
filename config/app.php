@@ -17,31 +17,6 @@ return [
 
     'default_locale' => env('APP_LOCALE', 'en'), // just a holder for the system set locale
 
-    'providers' => ServiceProvider::defaultProviders()->merge([
-        /*
-          * Laravel Framework Service Providers...
-          */
-
-        /*
-          * Package Service Providers...
-          */
-
-        /*
-          * LibreNMS Service Providers...
-          */
-        App\Providers\ConfigServiceProvider::class,
-        App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded
-        App\Providers\AppServiceProvider::class,
-        App\Providers\CliServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
-        App\Providers\ComposerServiceProvider::class,
-        App\Providers\DatastoreServiceProvider::class,
-        App\Providers\SnmptrapProvider::class,
-        App\Providers\PluginProvider::class,
-    ])->toArray(),
 
     'aliases' => Facade::defaultAliases()->merge([
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
