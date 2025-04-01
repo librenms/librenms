@@ -926,18 +926,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     private function parseIpField(array $data, string $ngField): ?string
     {
         if (isset($data[$ngField])) {
-            $raw = $data[$ngField];
-
-            if (is_string($raw) && preg_match('/^([0-9A-Fa-f]{2} ?)+$/', $raw)) {
-                try {
-                    return IP::fromHexString($raw)->uncompressed();
-                } catch (InvalidIpException $e) {
-                    return null;
-                }
-            }
-
             try {
-                return IP::parse($raw)->uncompressed();
+                if (is_string($data[$ngField]) && preg_match('/^([0-9A-Fa-f]{2} ?)+$/', $data[$ngField])) {
+                    return IP::fromHexString($raw)->uncompressed();
+                }
+                
+                return IP::parse($data[$ngField])->uncompressed();
             } catch (InvalidIpException $e) {
                 return null;
             }
