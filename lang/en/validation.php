@@ -160,7 +160,7 @@ return [
                 'not_detected' => 'Python wrapper cron entry is not present',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Using :driver for locking, you should set CACHE_DRIVER=redis',
+                'bad_driver' => 'Using :driver for locking, you should set CACHE_STORE=redis',
                 'ok' => 'Redis is functional',
                 'unavailable' => 'Redis is unavailable',
             ],
