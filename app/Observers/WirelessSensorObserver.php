@@ -9,7 +9,7 @@ class WirelessSensorObserver
     /**
      * Handle the WirelessSensor "updating" event.
      *
-     * @param  \App\Models\WirelessSensor  $sensor
+     * @param  WirelessSensor  $sensor
      * @return void
      */
     public function updating(WirelessSensor $sensor): void

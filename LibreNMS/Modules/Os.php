@@ -78,7 +78,7 @@ class Os implements Module
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
     {
-        $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
+        $deviceModel = $os->getDevice(); /** @var Device $deviceModel */
         if ($os instanceof OSPolling) {
             $os->pollOS($datastore);
         } else {

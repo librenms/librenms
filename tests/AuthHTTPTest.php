@@ -28,7 +28,6 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-
 use function strip_tags;
 use function strip_tags as strip_tags1;
 

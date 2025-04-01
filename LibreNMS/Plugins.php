@@ -227,12 +227,12 @@ class Plugins
     {
         $countInstalled = 0;
 
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['..', '.']);
+        if (file_exists(Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(Config::get('plugin_dir')), ['..', '.']);
             $plugin_files = array_diff($plugin_files, Plugin::versionOne()->pluck('plugin_name')->toArray());
             foreach ($plugin_files as $name) {
-                if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
-                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
+                if (is_dir(Config::get('plugin_dir') . '/' . $name)
+                    && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
                     Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1]);
                     $countInstalled++;
                 }
@@ -246,8 +246,8 @@ class Plugins
     {
         $countRemoved = 0;
 
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['.', '..', '.gitignore']);
+        if (file_exists(Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(Config::get('plugin_dir')), ['.', '..', '.gitignore']);
             $plugins = Plugin::versionOne()->whereNotIn('plugin_name', $plugin_files)->select('plugin_id')->get();
             foreach ($plugins as $plugin) {
                 if ($plugin->delete()) {

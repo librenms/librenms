@@ -2,8 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -11,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \App\Models\Sensor::where('user_func', '')->update(['user_func' => null]);
+        App\Models\Sensor::where('user_func', '')->update(['user_func' => null]);
     }
 
     /**

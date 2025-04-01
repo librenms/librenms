@@ -62,8 +62,7 @@ class StringHelperTest extends TestCase
         $this->assertFalse(StringHelpers::isStringable([]));
         $this->assertFalse(StringHelpers::isStringable((object) []));
 
-        $stringable = new class
-        {
+        $stringable = new class {
             public function __toString()
             {
                 return '';

@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -34,7 +33,7 @@ return new class extends Migration
             $table->enum('sensor_custom', ['No', 'Yes'])->default('No');
             $table->string('entPhysicalIndex', 16)->nullable();
             $table->string('entPhysicalIndex_measured', 16)->nullable();
-            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('lastupdate')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             } else {
                 $table->timestamp('lastupdate')->useCurrent();

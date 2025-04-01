@@ -17,11 +17,11 @@ class UserWidget extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function dashboard(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Dashboard::class, 'dashboard_id');
+        return $this->belongsTo(Dashboard::class, 'dashboard_id');
     }
 }

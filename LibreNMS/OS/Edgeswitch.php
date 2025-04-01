@@ -32,5 +32,5 @@ use LibreNMS\OS;
 
 class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling
 {
-    use OS\Traits\VxworksProcessorUsage;
+    use Traits\VxworksProcessorUsage;
 }

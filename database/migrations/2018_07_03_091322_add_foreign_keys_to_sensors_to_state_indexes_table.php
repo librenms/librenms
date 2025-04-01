@@ -3,8 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -25,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('sensors_to_state_indexes', function (Blueprint $table) {
                 $table->dropForeign('sensors_to_state_indexes_ibfk_1');
                 $table->dropForeign('sensors_to_state_indexes_sensor_id_foreign');
