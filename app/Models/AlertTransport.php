@@ -13,11 +13,15 @@ class AlertTransport extends Model
 
     protected $primaryKey = 'transport_id';
     public $timestamps = false;
-    protected $casts = [
-        'is_default' => 'boolean',
-        'transport_config' => 'array',
-    ];
     protected $fillable = ['transport_config'];
+
+    protected function casts(): array
+    {
+        return [
+            'is_default' => 'boolean',
+            'transport_config' => 'array',
+        ];
+    }
 
     public function instance(): Transport
     {

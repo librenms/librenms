@@ -55,12 +55,6 @@ class ServiceTemplate extends BaseModel
         'disabled' => '0',
     ];
 
-    protected $casts = [
-        'ignore' => 'integer',
-        'disabled' => 'integer',
-        'rules' => 'array',
-    ];
-
     public static function boot()
     {
         parent::boot();
@@ -81,6 +75,15 @@ class ServiceTemplate extends BaseModel
                 $template->updateDevices();
             }
         });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'ignore' => 'integer',
+            'disabled' => 'integer',
+            'rules' => 'array',
+        ];
     }
 
     // ---- Helper Functions ----

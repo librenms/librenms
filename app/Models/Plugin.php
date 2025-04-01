@@ -33,7 +33,13 @@ class Plugin extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'plugin_id';
     protected $fillable = ['plugin_name', 'plugin_active', 'version', 'settings'];
-    protected $casts = ['plugin_active' => 'bool', 'settings' => 'array'];
+
+    protected function casts(): array
+    {
+        return [
+            'plugin_active' => 'bool', 'settings' => 'array'
+        ];
+    }
 
     // ---- Query scopes ----
 

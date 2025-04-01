@@ -36,9 +36,13 @@ class Application extends DeviceRelatedModel
     public $timestamps = false;
     protected $primaryKey = 'app_id';
     protected $fillable = ['device_id', 'app_type', 'app_instance', 'app_status', 'app_state', 'data', 'deleted_at', 'discovered'];
-    protected $casts = [
-        'data' => 'array',
-    ];
+
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+        ];
+    }
 
     // ---- Helper Functions ----
 

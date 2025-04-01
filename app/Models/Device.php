@@ -83,13 +83,16 @@ class Device extends BaseModel
         'uptime',
     ];
 
-    protected $casts = [
-        'inserted' => 'datetime',
-        'last_discovered' => 'datetime',
-        'last_polled' => 'datetime',
-        'last_ping' => 'datetime',
-        'status' => 'boolean',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'inserted' => 'datetime',
+            'last_discovered' => 'datetime',
+            'last_polled' => 'datetime',
+            'last_ping' => 'datetime',
+            'status' => 'boolean',
+        ];
+    }
 
     // ---- Helper Functions ----
 

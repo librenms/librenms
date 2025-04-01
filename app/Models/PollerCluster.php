@@ -37,9 +37,13 @@ class PollerCluster extends Model
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
-    protected $casts = [
-        'last_report' => 'datetime',
-    ];
+
+    protected function casts(): array
+    {
+        return [
+            'last_report' => 'datetime',
+        ];
+    }
 
     // ---- Accessors/Mutators ----
 
