@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
@@ -63,14 +62,6 @@ class Storage implements Module
 
         ModuleModelObserver::observe(\App\Models\Storage::class);
         $saved = $this->syncModels($os->getDevice(), 'storage', $storages);
-
-        // set default storage percent on new devices
-        $saved->each(function (\App\Models\Storage $storage) {
-            if ($storage->wasRecentlyCreated) {
-                $storage->storage_perc_warn = LibrenmsConfig::get('storage_perc_warn');
-                $storage->save();
-            }
-        });
 
         Log::info('');
         $storages->each($this->printStorage(...));
