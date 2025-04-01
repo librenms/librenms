@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ApplicationNewDefaults extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -31,4 +31,4 @@ class ApplicationNewDefaults extends Migration
             $table->string('app_status', 1024)->default(null)->change();
         });
     }
-}
+};
