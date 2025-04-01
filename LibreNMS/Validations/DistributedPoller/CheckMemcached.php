@@ -60,6 +60,6 @@ class CheckMemcached implements Validation
      */
     public function enabled(): bool
     {
-        return Config::get('distributed_poller') && env('CACHE_DRIVER') == 'memcached';
+        return Config::get('distributed_poller') && env('CACHE_STORE') == 'memcached';
     }
 }
