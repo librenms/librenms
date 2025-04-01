@@ -9,7 +9,7 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // migrate roles
         $bouncerRoles = DB::table('bouncer_roles')->get();
@@ -56,7 +56,7 @@ return new class extends Migration {
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         // Truncate Spatie tables, don't do this in production
 //        DB::statement('SET FOREIGN_KEY_CHECKS=0');

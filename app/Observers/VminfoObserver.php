@@ -14,7 +14,7 @@ class VminfoObserver
      * @param  Vminfo  $vminfo
      * @return void
      */
-    public function created(Vminfo $vminfo)
+    public function created(Vminfo $vminfo): void
     {
         Eventlog::log('Virtual Machine added: ' . $vminfo->vmwVmDisplayName . " ($vminfo->vmwVmMemSize GB / $vminfo->vmwVmCpus vCPU)", $vminfo->device_id, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
     }
@@ -38,7 +38,7 @@ class VminfoObserver
      * @param  Vminfo  $vminfo
      * @return void
      */
-    public function deleted(Vminfo $vminfo)
+    public function deleted(Vminfo $vminfo): void
     {
         Eventlog::log('Virtual Machine removed: ' . $vminfo->vmwVmDisplayName, $vminfo->device_id, 'vm', Severity::Warning, $vminfo->vmwVmVMID);
     }
@@ -49,7 +49,7 @@ class VminfoObserver
      * @param  Vminfo  $vminfo
      * @return void
      */
-    public function restored(Vminfo $vminfo)
+    public function restored(Vminfo $vminfo): void
     {
         //
     }
@@ -60,7 +60,7 @@ class VminfoObserver
      * @param  Vminfo  $vminfo
      * @return void
      */
-    public function forceDeleted(Vminfo $vminfo)
+    public function forceDeleted(Vminfo $vminfo): void
     {
         //
     }

@@ -33,7 +33,7 @@ class BashCompletionCommand extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         $completions = new Collection();
         $line = getenv('COMP_LINE');

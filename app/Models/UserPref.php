@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class UserPref extends BaseModel
 {
     public $timestamps = false;
@@ -85,7 +87,7 @@ class UserPref extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

@@ -16,7 +16,7 @@ class ClearConfigCommand extends LnmsCommand
      *
      * @return void
      */
-    public function handle(ConfigClearCommand $configClearCommand)
+    public function handle(ConfigClearCommand $configClearCommand): void
     {
         $configClearCommand->setLaravel($this->laravel);
         $configClearCommand->run(new ArrayInput([]), $this->output);
