@@ -198,3 +198,7 @@ Artisan::command('scan
 
     return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
+
+
+$this->scheduleMarkWorking($schedule);
+$this->scheduleMaintenance($schedule);  // should be after all others
