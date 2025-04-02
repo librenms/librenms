@@ -37,7 +37,7 @@ please speak to one of the core devs in
 Let's update our example file to add additional polling:
 
 ```bash
-librenms/LibreNMS/OS/Pulse.php
+LibreNMS/OS/Pulse.php
 ```
 
 We declare two specific graphs for users and sessions numbers. Theses
