@@ -5432,7 +5432,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 10
                 },
                 {
@@ -5441,7 +5441,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 3
                 }
             ]

@@ -77,7 +77,7 @@ class Ipv6Addresses implements Module
         })->each(function (Ipv6Address $ip) {
             $ipv6 = IPv6::parse($ip->ipv6_address);
 
-            // do not set an network for link-local addresses as the exist on all interfaces
+            // do not set a network for link-local addresses as they exist on all interfaces
             if ($ipv6->isLinkLocal()) {
                 $ip->ipv6_network_id = 0;
 

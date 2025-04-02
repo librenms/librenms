@@ -15982,7 +15982,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 28
                 },
                 {
@@ -15991,7 +15991,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 13
                 },
                 {
@@ -16000,7 +16000,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 34
                 },
                 {
@@ -16009,7 +16009,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 11
                 },
                 {
@@ -16018,7 +16018,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 32
                 },
                 {
@@ -16027,7 +16027,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 33
                 },
                 {
@@ -16036,7 +16036,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 36
                 },
                 {
@@ -16045,7 +16045,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 51
                 },
                 {
@@ -16054,7 +16054,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 52
                 },
                 {
@@ -16063,7 +16063,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 53
                 },
                 {
@@ -16072,7 +16072,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 54
                 },
                 {
@@ -16081,7 +16081,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 41
                 },
                 {
@@ -16090,7 +16090,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 42
                 },
                 {
@@ -16099,7 +16099,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 57
                 },
                 {
@@ -16108,7 +16108,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 58
                 },
                 {
@@ -16117,7 +16117,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 59
                 },
                 {
@@ -16126,7 +16126,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 60
                 },
                 {
@@ -16135,7 +16135,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 61
                 },
                 {
@@ -16144,7 +16144,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 62
                 },
                 {
@@ -16153,7 +16153,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 63
                 },
                 {
@@ -16162,7 +16162,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 64
                 }
             ]
