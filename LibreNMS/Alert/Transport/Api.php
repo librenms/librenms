@@ -70,7 +70,6 @@ class Api extends Transport
             'query' => $query,
         ]);
 
-        dd($client);
         $res = match ($method) {
             'get' => $client->get($host),
             'put' => $client->put($host),
