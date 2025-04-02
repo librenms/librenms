@@ -928,7 +928,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         if (isset($data[$ngField])) {
             try {
                 if (is_string($data[$ngField]) && preg_match('/^([0-9A-Fa-f]{2} ?)+$/', $data[$ngField])) {
-                    return IP::fromHexString($raw)->uncompressed();
+                    return IP::fromHexString($data[$ngField])->uncompressed();
                 }
 
                 return IP::parse($data[$ngField])->uncompressed();
