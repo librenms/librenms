@@ -2053,7 +2053,7 @@
                     "ipv6_prefixlen": 128,
                     "ipv6_origin": "manual",
                     "context_name": "",
-                    "ipv6_network": "2001:5f8:7f0d:1::26/128",
+                    "ipv6_network": null,
                     "ifIndex": 5
                 },
                 {
@@ -2062,7 +2062,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 5
                 }
             ]

@@ -6695,7 +6695,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": null,
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 1
                 },
                 {
@@ -6704,7 +6704,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": null,
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 254
                 }
             ]

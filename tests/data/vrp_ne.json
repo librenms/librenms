@@ -7742,7 +7742,7 @@
                     "ipv6_prefixlen": 128,
                     "ipv6_origin": "manual",
                     "context_name": "",
-                    "ipv6_network": "fd00:99:99::3/128",
+                    "ipv6_network": null,
                     "ifIndex": 50
                 }
             ]
