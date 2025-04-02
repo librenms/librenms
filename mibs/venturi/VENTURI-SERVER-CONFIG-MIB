@@ -1,0 +1,5731 @@
+VENTURI-SERVER-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32,
+    IpAddress,
+    Counter64,
+    TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    vServerMgmt
+        FROM VENTURI-SERVER-MIB
+    VenturiBooleanType,
+    VenturiLogLevels,
+    VenturiThresholdLevels,
+    VenturiTrapType,
+    VenturiLogModuleType,
+    VenturiTrapSeverity,
+    VenturiSyslogFacilityType
+        FROM VENTURI-TC
+
+-- Use Commit to COMMIT the configuration changes after a SET operation 
+-- Use Clear to CLEAR the configuration changes after a SET operation 
+;
+
+-- Module Identity
+
+vServerConf MODULE-IDENTITY
+    LAST-UPDATED    "201101030000Z"
+    ORGANIZATION    "Venturi Wireless"
+    CONTACT-INFO
+       "Contact:  Customer Support
+        Postal:   Venturi Wireless
+                  490 North McCarthy Boulevard
+                  Milpitas, CA  95035
+
+        Phone:    408-215-5100
+        FAX:      408-215-5105
+        Web:      www.venturiwireless.com
+        E-mail:   VenturiCustomerOps@venturiwireless.com"
+
+    DESCRIPTION
+        " Copyright 2007-2011 Venturi Wireless
+          All rights reserved.
+
+          Venturi MIB for Configuring Optimization Server."
+
+    REVISION    "201101030000Z"
+    DESCRIPTION "Updated copyright date to 2011"
+
+    REVISION    "201012130000Z"
+    DESCRIPTION "Added the Cliented QOS Management tables"
+
+    REVISION    "201003010000Z"
+    DESCRIPTION "Added the subscriber reporting filter tables"
+
+    REVISION    "201001120000Z"
+    DESCRIPTION "Updated the vServerSvrCompCfgTbl table"
+
+    REVISION    "201001060000Z"
+    DESCRIPTION "Updated User-Agent and Multipart config tables,
+                 Updated copyright date to 2010"
+          
+    REVISION    "200903240000Z"
+    DESCRIPTION "Updated for Video tables."
+
+    REVISION    "200805060000Z"
+    DESCRIPTION "Update copyright date to 2008."
+          
+    REVISION    "200803180000Z"
+    DESCRIPTION "UIWeb table is made obsolete."
+    
+    REVISION    "200803110000Z"
+    DESCRIPTION "This MIB module defines the configuration for a Venturi server. "
+        
+     ::= { vServerMgmt 4 }
+
+vServerConfIPSvcs        OBJECT IDENTIFIER ::= { vServerConf 1 }
+vServerConfAppSvcs       OBJECT IDENTIFIER ::= { vServerConf 2 }
+vServerConfMgmtSvcs      OBJECT IDENTIFIER ::= { vServerConf 3 }
+vServerConfActionSvcs    OBJECT IDENTIFIER ::= { vServerConf 4 }
+
+-- --------------------------------------------
+-- vServerConfIPSvcs
+-- DESCRIPTION:
+--    Defines the Conf for IP Svcs
+-- --------------------------------------------
+vServerConfIPSvcsPhysicalIf    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 1 }
+vServerConfIPSvcsLogicalIf     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 2 }
+vServerConfIPSvcsMgmtIf  
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 3 }
+vServerConfIPSvcsDataIf        
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 4 }
+vServerConfIPSvcsAdvanced             
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 5 }
+vServerConfIPSvcsPxy                
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 6 }
+vServerConfIPSvcsStatic               
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 7 }
+vServerConfIPSvcsDscp
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 8 }
+vServerConfIPSvcsQos
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcs 9 }
+
+-- --------------------------------------------
+-- Physical If
+-- --------------------------------------------
+vServerConfIPSvcsPhysicalScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsPhysicalIf 1 }
+vServerConfIPSvcsPhysicalTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsPhysicalIf 2 }
+
+vServerEthConfTbl        OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrEthConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of Ethernet configuration."
+    ::= { vServerConfIPSvcsPhysicalTbls 1 }
+
+vServerEthConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrEthConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Ethernet configuration Tbl."
+    INDEX    { vServerEthConfTblIndex }
+    ::= { vServerEthConfTbl     1 }
+
+VSvrEthConfTblEntry ::= 
+     SEQUENCE { 
+        vServerEthConfTblIndex         Unsigned32, 
+        vServerEthConfTblIfName        OCTET STRING,
+        vServerEthConfTblMACAddress    OCTET STRING,
+        vServerEthConfTblMTU           Unsigned32,
+        vServerEthConfTblCurConf       OCTET STRING,
+        vServerEthConfTblNewConf       OCTET STRING
+    }
+
+vServerEthConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The row number in this table.  This
+                   corresponds to the interface number."
+    ::= { vServerEthConfTblEntry 1 }
+
+vServerEthConfTblIfName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The ethernet interface's name.  This is 
+                   actually the prefix to the interface name,
+                   such as 'eth'.  This plus the interface
+                   number gives the complete interface name,
+                   such as 'eth2'."
+    ::= { vServerEthConfTblEntry 2 }
+
+vServerEthConfTblMACAddress    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The ethernet interface's MAC address."
+    ::= { vServerEthConfTblEntry 3 }
+
+vServerEthConfTblMTU    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents interface's MTU (Maximum Transmission
+                   Unit). This is the largest packet that can be 
+                   sent or received over this interface."
+    ::= { vServerEthConfTblEntry 4 }
+       
+vServerEthConfTblCurConf    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The current speed and duplex configuration."
+    ::= { vServerEthConfTblEntry 6 }
+       
+vServerEthConfTblNewConf    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION   "New speed and duplex configuration."
+    ::= { vServerEthConfTblEntry 7 }
+       
+-- --------------------------------------------
+-- Logical If
+-- --------------------------------------------
+
+vServerConfIPSvcsLogicalScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsLogicalIf 1 }
+vServerConfIPSvcsLogicalTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsLogicalIf 2 }
+
+vServerLogicalIfTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrLogicalIfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table of logical interface configuration."
+    ::= { vServerConfIPSvcsLogicalTbls 1 }
+
+vServerLogicalIfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrLogicalIfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the logical interface Tbl."
+    INDEX    { vServerLogicalIfTblIndex }
+    ::= { vServerLogicalIfTbl 1 }
+
+VSvrLogicalIfTblEntry ::=
+    SEQUENCE {
+        vServerLogicalIfTblIndex     Unsigned32,
+        vServerLogicalIfTblName      OCTET STRING,
+        vServerLogicalIfTblMode      OCTET STRING,
+        vServerLogicalIfTblParams    OCTET STRING
+    }
+
+vServerLogicalIfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row"
+    ::= { vServerLogicalIfTblEntry 1 }
+
+vServerLogicalIfTblName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents logical interface name."
+    ::= { vServerLogicalIfTblEntry 2 }
+
+vServerLogicalIfTblMode    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents logical interface mode; Format: standalone, bonding"
+    ::= { vServerLogicalIfTblEntry 3 }
+
+vServerLogicalIfTblParams    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents logical interface params.
+                   This will typically be blank-delimited 
+                   list of physical interfaces which make up
+                   the physical interfaces.  Examples:
+                   'eth2' or 'eth0 eth1'"
+    ::= { vServerLogicalIfTblEntry 4 }
+
+ 
+-- --------------------------------------------
+-- Mgmt If
+-- --------------------------------------------
+
+vServerConfIPSvcsMgmtScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsMgmtIf 1 }
+vServerConfIPSvcsMgmtTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsMgmtIf 2 }
+
+vServerMgmtIfTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrMgmtIfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table of Management interface configuration."
+    ::= { vServerConfIPSvcsMgmtTbls 1 }
+
+vServerMgmtIfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrMgmtIfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Management interface Tbl."
+    INDEX    { vServerMgmtIfTblIndex }
+    ::= { vServerMgmtIfTbl 1 }
+
+VSvrMgmtIfTblEntry ::=
+    SEQUENCE {
+        vServerMgmtIfTblIndex        Unsigned32,
+        vServerMgmtIfTblIp           IpAddress,
+        vServerMgmtIfTblNetmask      IpAddress,
+        vServerMgmtIfTblDefaultGw    IpAddress,
+        vServerMgmtIfTblBroadcast    IpAddress,
+        vServerMgmtIfTblDns1         IpAddress,
+        vServerMgmtIfTblDns2         IpAddress,
+        vServerMgmtIfTblDns3         IpAddress,
+        vServerMgmtIfTblDnsdomain    OCTET STRING,
+        vServerMgmtIfTblLogicalNicID Integer32,
+        vServerMgmtIfTblNetifId      Integer32
+    }
+
+vServerMgmtIfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerMgmtIfTblEntry 1 }
+
+vServerMgmtIfTblIp    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Management interface's IP Address."
+    ::= { vServerMgmtIfTblEntry 2 }
+
+vServerMgmtIfTblNetmask    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Management interface's netmask."
+    ::= { vServerMgmtIfTblEntry 3 }
+
+vServerMgmtIfTblDefaultGw    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Gateway address."
+    ::= { vServerMgmtIfTblEntry 4 }
+
+vServerMgmtIfTblBroadcast    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Management interface's broadcast address."
+    ::= { vServerMgmtIfTblEntry 5 }
+
+vServerMgmtIfTblDns1    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents primary DNS server."
+    ::= { vServerMgmtIfTblEntry 6 }
+
+vServerMgmtIfTblDns2    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents secondary DNS server."
+    ::= { vServerMgmtIfTblEntry 7 }
+
+vServerMgmtIfTblDns3    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents tertiary DNS server."
+    ::= { vServerMgmtIfTblEntry 8 }
+
+vServerMgmtIfTblDnsdomain    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents DNS domain."
+    ::= { vServerMgmtIfTblEntry 9 }
+
+vServerMgmtIfTblLogicalNicID    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents logical NIC id."
+    ::= { vServerMgmtIfTblEntry 10 }
+
+vServerMgmtIfTblNetifId    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION   "Represents interface id."
+    ::= { vServerMgmtIfTblEntry 11 }
+
+
+-- ---------------------------------------------
+-- Data If
+-- ---------------------------------------------
+
+vServerConfIPSvcsDataScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsDataIf 1 }
+vServerConfIPSvcsDataTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsDataIf 2 }
+
+
+vServerTransLstnPorts    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrTransLstnPortsEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current  
+    DESCRIPTION   "A table of data interface configuration."
+    ::= { vServerConfIPSvcsDataTbls 1 }
+
+vServerTransLstnPortsEntry          OBJECT-TYPE
+    SYNTAX        VSvrTransLstnPortsEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current  
+    DESCRIPTION   "An entry in the data interface Tbl."
+    INDEX    { vServerTransLstnPortsIndex }
+    ::= { vServerTransLstnPorts 1 }
+
+VSvrTransLstnPortsEntry ::= 
+    SEQUENCE { 
+        vServerTransLstnPortsIndex        Unsigned32,
+        vServerTransLstnPortsIp           IpAddress,
+        vServerTransLstnPortsNetmask      IpAddress,
+        vServerTransLstnPortsDefaultGw    IpAddress,
+        vServerTransLstnPortsBroadcast    IpAddress,
+        vServerTransLstnPortsDns1         IpAddress,
+        vServerTransLstnPortsDns2         IpAddress,
+        vServerTransLstnPortsDns3         IpAddress,
+        vServerTransLstnPortsDnsdomain    OCTET STRING,
+        vServerTransLstnPortsUdpPort      Integer32,
+        vServerTransLstnPortsTcpPort      Integer32,
+        vServerTransLstnPortsNetifId      Integer32,
+        vServerTransLstnPortsFlag         OCTET STRING,
+        vServerTransLstnPortsLogicalNicID Integer32
+}
+
+vServerTransLstnPortsIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerTransLstnPortsEntry 1 }
+
+vServerTransLstnPortsIp    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents data listen port's IP address."
+    ::= { vServerTransLstnPortsEntry 2 }
+
+vServerTransLstnPortsNetmask    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents netmask."
+    ::= { vServerTransLstnPortsEntry 3 }
+
+vServerTransLstnPortsDefaultGw    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents default gateway."
+    ::= { vServerTransLstnPortsEntry 4 }
+   
+vServerTransLstnPortsBroadcast    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents broadcast address."
+    ::= { vServerTransLstnPortsEntry 5 }
+   
+vServerTransLstnPortsDns1    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents primary DNS."
+    ::= { vServerTransLstnPortsEntry 6 }
+   
+vServerTransLstnPortsDns2    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents secondary DNS."
+    ::= { vServerTransLstnPortsEntry 7 }
+   
+vServerTransLstnPortsDns3    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents tertiary DNS."
+    ::= { vServerTransLstnPortsEntry 8 }
+   
+vServerTransLstnPortsDnsdomain    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents DNS domain."
+    ::= { vServerTransLstnPortsEntry 9 }
+   
+vServerTransLstnPortsUdpPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents UDP port."
+    ::= { vServerTransLstnPortsEntry 10 }
+   
+vServerTransLstnPortsTcpPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents TCP port."
+    ::= { vServerTransLstnPortsEntry 11 }
+   
+vServerTransLstnPortsNetifId    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents interface id."
+    ::= { vServerTransLstnPortsEntry 12 }
+   
+vServerTransLstnPortsFlag    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ports flag: String Format:Value(0-3)"
+    ::= { vServerTransLstnPortsEntry 13 }
+   
+vServerTransLstnPortsLogicalNicID    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents logical NIC id."
+    ::= { vServerTransLstnPortsEntry 14 }
+   
+
+-- ADVANCE ROUTE TABLE
+vServerConfIPSvcsAdvancedScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsAdvanced 1 }
+vServerConfIPSvcsAdvancedTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsAdvanced 2 }
+
+vServerVirtSvr    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrVirtSvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table of Advance route configuration."
+    ::= { vServerConfIPSvcsAdvancedTbls  1 }
+
+vServerVirtSvrEntry          OBJECT-TYPE
+    SYNTAX        VSvrVirtSvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Advance route Tbl."
+    INDEX    { vServerVirtSvrIndex }
+    ::= { vServerVirtSvr  1 }
+
+VSvrVirtSvrEntry ::=
+    SEQUENCE {
+        vServerVirtSvrIndex         Unsigned32,
+        vServerVirtSvrHostname      OCTET STRING,
+        vServerVirtSvrIpaddr        OCTET STRING,
+        vServerVirtSvrPortRange     OCTET STRING,
+        vServerVirtSvrDestinations  OCTET STRING
+    }
+
+vServerVirtSvrIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerVirtSvrEntry 1 }
+
+vServerVirtSvrHostname    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hostname."
+    ::= { vServerVirtSvrEntry 2 }
+   
+vServerVirtSvrIpaddr    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents IP-Address/netmask-bit.
+                   Example: 234.234.23.34/24"
+    ::= { vServerVirtSvrEntry 3 }
+   
+vServerVirtSvrPortRange    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents port range e.g. 2000:6000."
+    ::= { vServerVirtSvrEntry 4 }
+   
+vServerVirtSvrDestinations    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents destinations."
+    ::= { vServerVirtSvrEntry 5 }
+   
+vServerDefaultDestTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrDefaultDestTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table of default destinations."
+    ::= { vServerConfIPSvcsAdvancedTbls  2 }
+
+vServerDefaultDestTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrDefaultDestTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the default destination Tbl."
+    INDEX    { vServerDefaultDestTblIndex }
+    ::= { vServerDefaultDestTbl 1 }
+
+VSvrDefaultDestTblEntry ::=
+    SEQUENCE {
+        vServerDefaultDestTblIndex     Unsigned32,
+        vServerDefaultDestTblDestinations      OCTET STRING
+    }
+
+vServerDefaultDestTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerDefaultDestTblEntry 1 }
+
+vServerDefaultDestTblDestinations    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents destinations."
+    ::= { vServerDefaultDestTblEntry 2 }
+   
+-- --------------------------------------------
+-- PROXY TABLE
+-- --------------------------------------------
+vServerConfIPSvcsPxyScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsPxy 1 }
+vServerConfIPSvcsPxyTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsPxy 2 }
+
+ 
+vServerVSPxyTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrVSPxyTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A Table of proxy configuration."
+    ::= { vServerConfIPSvcsPxyTbls 1 }
+ 
+vServerVSPxyTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrVSPxyTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the proxy configuration Tbl."
+    INDEX    { vServerVSPxyTblIndex }
+    ::= { vServerVSPxyTbl    1 }
+ 
+VSvrVSPxyTblEntry ::=  
+    SEQUENCE { 
+        vServerVSPxyTblIndex     Unsigned32,
+        vServerVSPxyTblHnameIp   OCTET STRING,
+        vServerVSPxyTblPort      Integer32,
+        vServerVSPxyTblTpType    Integer32,
+        vServerVSPxyTblBalance   Unsigned32,
+        vServerVSPxyTblHealthCheck  VenturiBooleanType 
+    }
+
+vServerVSPxyTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerVSPxyTblEntry 1 }
+
+vServerVSPxyTblHnameIp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hostname or IP address."
+    ::= { vServerVSPxyTblEntry 2 }
+
+vServerVSPxyTblPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents proxy port."
+    ::= { vServerVSPxyTblEntry 3 }
+
+vServerVSPxyTblTpType    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents type Tp type
+           Valid Values: 
+           NONE 0
+           DEST_DIRECT 8
+           TCP and DEST_HTTPPROXY 130
+           TCP and DEST_CACHE 132
+           TCP and DEST_RTSPPROXY 384.
+           The values 8 and 384 are applicable only 
+           for the default rows"
+    ::= { vServerVSPxyTblEntry 4 }
+
+vServerVSPxyTblBalance    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Balance. 1=ON 0-OFF"
+    ::= { vServerVSPxyTblEntry 5 }
+
+vServerVSPxyTblHealthCheck  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Turns health checks on or off."
+    ::= { vServerVSPxyTblEntry 6 }
+
+-- --------------------------------------------
+-- STATIC-ROUTE-TABLE
+-- --------------------------------------------
+vServerConfIPSvcsStaticScalars    
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsStatic 1 }
+vServerConfIPSvcsStaticTbls     
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsStatic 2 }
+    
+   
+vServerStaticRouteTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrStaticRouteTblEntry
+    MAX-ACCESS    not-accessible  
+    STATUS        current 
+    DESCRIPTION   "A Table of static route configuration."
+    ::= { vServerConfIPSvcsStaticTbls 1 }
+
+vServerStaticRouteTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrStaticRouteTblEntry
+    MAX-ACCESS    not-accessible  
+    STATUS        current 
+    DESCRIPTION   "An entry in the static route Tbl."
+    INDEX    { vServerStaticRouteTblIndex }
+    ::= { vServerStaticRouteTbl    1 }
+
+VSvrStaticRouteTblEntry ::= 
+    SEQUENCE {
+        vServerStaticRouteTblIndex        Unsigned32,
+        vServerStaticRouteTblAllowRelay   OCTET STRING,
+        vServerStaticRouteTblMaskSize     OCTET STRING,
+        vServerStaticRouteTblAddress      IpAddress,
+        vServerStaticRouteTblGatewayAddr  IpAddress
+    }
+
+vServerStaticRouteTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerStaticRouteTblEntry 1 }
+
+vServerStaticRouteTblAllowRelay    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents String format- Allow-1 Disallow-0."
+    ::= { vServerStaticRouteTblEntry 2 }
+
+vServerStaticRouteTblMaskSize    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents mask size."
+    ::= { vServerStaticRouteTblEntry 3 }
+
+vServerStaticRouteTblAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents route's IP address."
+    ::= { vServerStaticRouteTblEntry 4 }
+
+vServerStaticRouteTblGatewayAddr    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents gateway's IP address."
+    ::= { vServerStaticRouteTblEntry 5 }
+-- --------------------------------------------
+-- DSCP configuration
+-- --------------------------------------------
+vServerConfIPSvcsDscpScalars
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsDscp 1}
+vServerConfIPSvcsDscpTbls 
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsDscp 2}
+
+vServerCLPreserveDscp    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to preserve the
+                   clientless DSCP and ECN"
+    ::= { vServerConfIPSvcsDscpScalars 1 }
+
+vServerCLDscpForObjectsServedFromCache   OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the default DSCP value that is to
+                   be used for objects served from cache for 
+                   both clientless and client-server"
+    ::= { vServerConfIPSvcsDscpScalars 2 }
+  
+vServerCSPreserveDscp OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to preserve the 
+                   client/server DSCP and ECN."
+    ::= { vServerConfIPSvcsDscpScalars 3}
+
+vServerCSDscpForObjectsServedFromCache  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION   "Represents the client/server default DSCP value that is to
+                   be used for objects served from cache. "
+    ::= { vServerConfIPSvcsDscpScalars 4 }
+
+vServerCSDscpForTrafficMarkedDscp0  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the client/server default DSCP value that is to 
+                   be used for traffic marked with DSCP value 0."
+    ::= { vServerConfIPSvcsDscpScalars 5 }
+
+vServerCSDscpForVTPControlTraffic  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the client/server DSCP value that is to 
+                   be used on VTP control traffic."
+    ::= { vServerConfIPSvcsDscpScalars 6 }
+
+vServerConfGwCStatsIntermediateUpdate   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The gwclientstats intermediate update interval
+                   in seconds between 0 and 900."
+    ::= { vServerConfIPSvcsDscpScalars 7 }
+
+vServerCLDscpForTrafficMarkedDscp0  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the clientless default DSCP value that is to
+                   be used for traffic marked with DSCP value 0."
+    ::= { vServerConfIPSvcsDscpScalars 8 }
+
+vServerConfIntermediateUpdateEnable   OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to enable/disable intermediate
+                   update intervals for cstats and gw-cstats."
+    ::= { vServerConfIPSvcsDscpScalars 9 }
+
+-- Tables --
+-- DSCP Filter Table
+vServerConfDscpFilterTbl                            OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerConfDscpFilterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table containing the list of DSCP values on which 
+         to track traffic."
+    ::= { vServerConfIPSvcsDscpTbls 1 }
+
+vServerConfDscpFilterEntry                            OBJECT-TYPE
+    SYNTAX        VServerConfDscpFilterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the vServerConfDscpFilterTbl."
+    INDEX    { vServerConfDscpFilterIndex }
+    ::= { vServerConfDscpFilterTbl 1 }
+
+VServerConfDscpFilterEntry ::=
+    SEQUENCE {
+        vServerConfDscpFilterIndex          Unsigned32,
+        vServerConfDscpFilterValue          Integer32,
+        vServerConfDscpFilterUseForBwEst    VenturiBooleanType
+    }
+
+vServerConfDscpFilterIndex          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerConfDscpFilterEntry 1 }
+
+vServerConfDscpFilterValue          OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The DSCP value between 0 and 63."
+    ::= { vServerConfDscpFilterEntry 2 }
+
+vServerConfDscpFilterUseForBwEst          OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Represents the flag for using the DSCP value 
+         for bandwidth estimation."
+    ::= { vServerConfDscpFilterEntry 3 }
+
+-- Gateway client IP/mask Filter Table --
+vServerConfGwIpMaskFilterTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerConfGwIpMaskFilterEntry    
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table containing the list of GW client IP and netmask on
+         which to track traffic."
+    ::= { vServerConfIPSvcsDscpTbls 2 }
+
+vServerConfGwIpMaskFilterEntry  OBJECT-TYPE
+    SYNTAX        VServerConfGwIpMaskFilterEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the vServerConfGwIpMaskFilterTbl."
+    INDEX    { vServerConfGwIpMaskFilterIndex }
+    ::= { vServerConfGwIpMaskFilterTbl  1 }
+
+VServerConfGwIpMaskFilterEntry ::=
+    SEQUENCE {
+        vServerConfGwIpMaskFilterIndex  Unsigned32,
+        vServerConfGwNetworkIp          IpAddress,
+        vServerConfGwNetmask            IpAddress
+    }
+
+vServerConfGwIpMaskFilterIndex  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerConfGwIpMaskFilterEntry  1 }
+
+vServerConfGwNetworkIp      OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the network IP address."
+    ::= { vServerConfGwIpMaskFilterEntry  2 }
+
+vServerConfGwNetmask        OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the netmask."
+    ::= { vServerConfGwIpMaskFilterEntry  3 }
+
+-- Transport bucket mapping table --
+vServerConfTransBucketMappingTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerConfTransBucketEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "A table containing the mapping of the DSCP values 
+         to the transport buckets."
+    ::= { vServerConfIPSvcsDscpTbls 3 }
+    
+vServerConfTransBucketEntry  OBJECT-TYPE
+    SYNTAX        VServerConfTransBucketEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the vServerConTransBucketMappingTbl."
+    INDEX    { vServerConfTransMappingIndex }
+    ::= { vServerConfTransBucketMappingTbl  1 }
+    
+VServerConfTransBucketEntry ::=
+    SEQUENCE { 
+        vServerConfTransMappingIndex    Unsigned32,
+        vServerConfTransMappingDscp     Unsigned32,
+        vServerConfTransMappingBucket   Integer32
+    }
+    
+vServerConfTransMappingIndex  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerConfTransBucketEntry  1 }
+    
+vServerConfTransMappingDscp OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Represents the DSCP value."
+    ::= { vServerConfTransBucketEntry  2 }
+
+vServerConfTransMappingBucket          OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Represents the bucket to which the DSCP belongs.
+         Valid values are 0(High), 1(Medium), 2(Low),
+         3(Extra Low) and -1(none)."
+    ::= { vServerConfTransBucketEntry 3 }
+
+-- --------------------------------------------
+-- Qos Management Configuration
+-- --------------------------------------------
+vServerConfIPSvcsQosScalars
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsQos 1}
+vServerConfIPSvcsQosTbls
+    OBJECT IDENTIFIER ::= { vServerConfIPSvcsQos 2}
+    
+vServerConfDscpReclassificationEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to enable the
+                   cliented DSCP Reclassification feature"
+    ::= { vServerConfIPSvcsQosScalars 1 }
+
+vServerConfShapingMinBandwidth    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the minimum shaping 
+                   bandwidth in bits/second"
+    ::= { vServerConfIPSvcsQosScalars 2 }
+
+vServerConfShapingMinFscValue    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..3))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the minimum Fsc value"
+    ::= { vServerConfIPSvcsQosScalars 3 }
+
+vServerConfShapingFscNumerator    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..4))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the Fsc numerator"
+    ::= { vServerConfIPSvcsQosScalars 4 }
+
+vServerConfDSCPToTransportShapingEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to enable the
+                   cliented DSCP To Transport Shaping feature"
+    ::= { vServerConfIPSvcsQosScalars 5 }
+
+vServerConfShapingMaxSubscriberCount    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents maximum subscriber count
+    			   for Fsc measurements"
+    ::= { vServerConfIPSvcsQosScalars 6 }
+
+-- Tables --
+-- Cliented Reclassification  Table 
+vServerConfClientedReclassifyTbl                           OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerConfClientedReclassifyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table containing the list of the reclassification groups
+         for the client-server traffic."
+    ::= { vServerConfIPSvcsQosTbls 1 }
+
+vServerConfClientedReclassifyEntry                            OBJECT-TYPE
+    SYNTAX        VServerConfClientedReclassifyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the cliented reclassification table."
+    INDEX    { vServerConfClientedReclassifyIndex }
+    ::= { vServerConfClientedReclassifyTbl 1 }
+    
+VServerConfClientedReclassifyEntry ::=
+    SEQUENCE {
+        vServerConfClientedReclassifyIndex          Unsigned32,
+        vServerConfClientedReclassifyPorts          OCTET STRING,
+        vServerConfClientedReclassifyIngressDscp    OCTET STRING,
+        vServerConfClientedReclassifyContentType    OCTET STRING,
+        vServerConfClientedReclassifySizeThreshold  Unsigned32,
+        vServerConfClientedReclassifyPeriodicClear  VenturiBooleanType,
+        vServerConfClientedReclassifyPeriodicClearSecs Integer32,
+        vServerConfClientedReclassifyEgressDscp     Integer32
+    }
+    
+vServerConfClientedReclassifyIndex          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerConfClientedReclassifyEntry 1 }
+
+vServerConfClientedReclassifyPorts    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the source ports used for the
+                   relcassification. Multiple ports are
+                   separated using comma delimiter."
+    ::= { vServerConfClientedReclassifyEntry 2 }
+
+vServerConfClientedReclassifyIngressDscp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the ingress DSCP value used for the
+                   relcassification. Valid values are
+                   0 to 63 or ANY."
+    ::= { vServerConfClientedReclassifyEntry 3 }
+
+vServerConfClientedReclassifyContentType    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the HTTP content-type used for the
+                  reclassifcation."
+    ::= { vServerConfClientedReclassifyEntry 4 }
+
+vServerConfClientedReclassifySizeThreshold          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flow size threshold."
+    ::= { vServerConfClientedReclassifyEntry 5 }
+
+vServerConfClientedReclassifyPeriodicClear    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag used to clear the stream
+                  size counters on a periodic basis."
+    ::= { vServerConfClientedReclassifyEntry 6 }
+
+vServerConfClientedReclassifyPeriodicClearSecs OBJECT-TYPE
+    SYNTAX        Integer32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the time in seconds to 
+                  clear the periodic clear"
+    ::= { vServerConfClientedReclassifyEntry 7 }
+
+vServerConfClientedReclassifyEgressDscp    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the egress DSCP value that is to be
+                  set for the reclassified group. Valid values are
+                  0 to 63 or -1(for no change)."
+    ::= { vServerConfClientedReclassifyEntry 8 }
+
+-- VTP Shaping Class Table -- 
+vServerConfVtpShapingClassTbl                           OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerConfVtpShapingClassEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table containing the VTP shaping class."
+    ::= { vServerConfIPSvcsQosTbls 2 }
+
+vServerConfVtpShapingClassEntry                         OBJECT-TYPE
+    SYNTAX        VServerConfVtpShapingClassEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the VTP shaping class table."
+    INDEX    { vServerConfVtpShapingClassIndex }
+    ::= { vServerConfVtpShapingClassTbl 1 }
+
+VServerConfVtpShapingClassEntry ::=
+    SEQUENCE {
+        vServerConfVtpShapingClassIndex      Unsigned32,
+        vServerConfVtpShaping                OCTET STRING,
+        vServerConfVtpShapingClassThreshold  Unsigned32,
+        vServerConfVtpShapingClassFscEnable  VenturiBooleanType,
+        vServerConfVtpShapingClassScale0     OCTET STRING,
+        vServerConfVtpShapingClassScale1     OCTET STRING,
+        vServerConfVtpShapingClassScale2     OCTET STRING,
+        vServerConfVtpShapingClassScale3     OCTET STRING
+    }
+
+vServerConfVtpShapingClassIndex          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerConfVtpShapingClassEntry 1 }
+
+vServerConfVtpShaping    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..16))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents the shaping class"
+    ::= { vServerConfVtpShapingClassEntry 2 }
+
+vServerConfVtpShapingClassThreshold          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the rtt delay in milliseconds."
+    ::= { vServerConfVtpShapingClassEntry 3 }
+
+vServerConfVtpShapingClassFscEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the flag to enable/disable Fsc."
+    ::= { vServerConfVtpShapingClassEntry 4 }
+
+vServerConfVtpShapingClassScale0    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..3))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the bandwidth multiplier for the
+                   scale0 shaping class"
+    ::= { vServerConfVtpShapingClassEntry 5 }
+
+vServerConfVtpShapingClassScale1    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..3))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the bandwidth multiplier for the
+                   scale1 shaping class"
+    ::= { vServerConfVtpShapingClassEntry 6 }
+
+vServerConfVtpShapingClassScale2    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..3))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the bandwidth multiplier for the
+                   scale2 shaping class"
+    ::= { vServerConfVtpShapingClassEntry 7 }
+
+vServerConfVtpShapingClassScale3    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..3))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents the bandwidth multiplier for the
+                   scale3 shaping class"
+    ::= { vServerConfVtpShapingClassEntry 8 }
+
+-- --------------------------------------------
+-- vServerConfAppSvcs
+-- DESCRIPTION:
+--    Defines the Conf for Application Svcs
+-- --------------------------------------------
+vServerConfAppSvcsTransport     
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 1 }
+vServerConfAppSvcsCompression   
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 2 }
+vServerConfAppSvcsClient        
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 3 }
+vServerConfAppSvcsFtp
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 4 }
+vServerConfAppSvcsQOS
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 5 }
+vServerConfAppSvcsUserAgent
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 6 }
+vServerConfAppSvcsSIC
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 7 }
+vServerConfAppSvcsDBoard
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 8 }
+vServerConfAppSvcsIPE
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 9 }
+vServerConfAppSvcsHHI
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 10 }
+vServerConfAppSvcsWebNotifier
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcs 11 }
+
+-- TRANSPORT
+-- vServerConfIPSvcsDataIf has trasport data as well
+-- UDP port and TCP Port 
+vServerConfAppSvcsTransportScalars    
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsTransport 1}
+vServerConfAppSvcsTransportTbls     
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsTransport 2}
+
+vServerUDPXportConfigMtu    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "VTP Bandwidth Mgmt: Default Link MTU Bytes"
+    ::= { vServerConfAppSvcsTransportScalars 1 }
+  
+vServerTransportConfigDoMtuDisc    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable MTU Discovery"
+    ::= { vServerConfAppSvcsTransportScalars 2 }
+
+vServerUDPXportConfigMaxBwExt    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "VTP bandwidth in bps. 
+                   Max: 1Gbps"
+    ::= { vServerConfAppSvcsTransportScalars 3 }
+
+vServerUDPXportConfigMaxBw2client    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Per client bandwidth in bps. 
+                   Max: 8 Mbps"
+    ::= { vServerConfAppSvcsTransportScalars 4 }
+
+vServerTransConfigAutoTuneEnable  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable TCP Auto Tuning Yes or No"
+    ::= { vServerConfAppSvcsTransportScalars 5 }
+
+vServerTransConfigTcpCongControlType OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Congestion Control methods are 
+                      TCP_BIC(0)
+                      TCP_RENO(1)
+                      TCP_CUBIC(2)
+                      TCP_HTCP(3)
+                      TCP_SCALABLE(4)
+                      TCP_VEGAS(5)
+                      TCP_WESTWOOD(6)
+                      TCP_HYBLA(7)
+                      TCP_VENO(8)
+                      TCP_LP(9)
+                      TCP_HIGHSPEED(10)"
+    ::= { vServerConfAppSvcsTransportScalars 6 }
+
+vServerTransConfigTcpInitialWindowSize OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Initial window size is 2-32"
+    ::= { vServerConfAppSvcsTransportScalars 7 }
+
+vServerTransConfigFastHttpRendering    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable fast HTTP rendering"
+    ::= { vServerConfAppSvcsTransportScalars 8 }
+
+vServerTransConfigTimeWaitTimeout OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "TIME_WAIT timeout in seconds between 5 and 360"
+    ::= { vServerConfAppSvcsTransportScalars 9 }
+
+vServerTransConfigIdleTimeout OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "IDLE timeout in seconds between 10 and 3000"
+    ::= { vServerConfAppSvcsTransportScalars 10 }
+
+vServerTransConfigHttpReqOptimization    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to enable/disable 
+                   HTTP request optimization"
+    ::= { vServerConfAppSvcsTransportScalars 11 }
+
+vServerMasterPxyTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrMasterPxyTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsTransportTbls 1 }
+
+vServerMasterPxyTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrMasterPxyTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerMasterPxyTblIndex }
+    ::= { vServerMasterPxyTbl  1 }
+
+VSvrMasterPxyTblEntry ::= 
+    SEQUENCE { 
+        vServerMasterPxyTblIndex           Unsigned32, 
+        vServerMasterPxyTblPxyMethName     OCTET STRING,
+        vServerMasterPxyTblStatsName       OCTET STRING,
+        vServerMasterPxyTblFlags           VenturiBooleanType,
+        vServerMasterPxyTblPxyHost         OCTET STRING,
+        vServerMasterPxyTblPxyPort         Integer32,
+        vServerMasterPxyTblDestHost        OCTET STRING,
+        vServerMasterPxyTblDestPort        Integer32,
+        vServerMasterPxyTblTCPKeepAlive       Integer32,
+        vServerMasterPxyTblTCPKeepAliveTime   Integer32,
+        vServerMasterPxyTblTCPKeepAliveProbes Integer32,
+        vServerMasterPxyTblTCPKeepAliveIntvl  Integer32
+    }
+
+vServerMasterPxyTblIndex    OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Represents index."
+     ::= { vServerMasterPxyTblEntry 1 }
+
+vServerMasterPxyTblPxyMethName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Master Proxy's Method name."
+    ::= { vServerMasterPxyTblEntry 2 }
+
+vServerMasterPxyTblStatsName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Master proxy's status name."
+    ::= { vServerMasterPxyTblEntry 3 }
+
+vServerMasterPxyTblFlags    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerMasterPxyTblEntry 4 }
+
+vServerMasterPxyTblPxyHost    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents host name of the Master proxy."
+    ::= { vServerMasterPxyTblEntry 5 }
+
+vServerMasterPxyTblPxyPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents proxy port."
+    ::= { vServerMasterPxyTblEntry 6 }
+
+vServerMasterPxyTblDestHost    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents destination hostname."
+    ::= { vServerMasterPxyTblEntry 7 }
+
+vServerMasterPxyTblDestPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents destination port number."
+    ::= { vServerMasterPxyTblEntry 8 }
+
+vServerMasterPxyTblTCPKeepAlive	OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "TCP Probe KeepAlive : Disable (0) Enable(1)"
+    ::= { vServerMasterPxyTblEntry 9 }
+
+vServerMasterPxyTblTCPKeepAliveTime	OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Range: 1 - 1000 secs"
+    ::= { vServerMasterPxyTblEntry 10 }
+
+vServerMasterPxyTblTCPKeepAliveProbes OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Range: 1 - 15"
+    ::= { vServerMasterPxyTblEntry 11 }
+
+vServerMasterPxyTblTCPKeepAliveIntvl  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Range: 1 - 600 secs"
+    ::= { vServerMasterPxyTblEntry 12 }
+
+vServerTransConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrTransConfTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsTransportTbls 2 }
+
+vServerTransConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrTransConfTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerTransConfTblIndex }
+    ::= { vServerTransConfTbl   1 }
+
+VSvrTransConfTblEntry ::= 
+    SEQUENCE { 
+        vServerTransConfTblIndex      Unsigned32, 
+        vServerTransConfTblMode       Unsigned32,
+        vServerTransConfTblType       Unsigned32,
+        vServerTransConfTblAutodetect Unsigned32
+    }
+
+vServerTransConfTblIndex    OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Represents index."
+     ::= { vServerTransConfTblEntry 1 }
+
+vServerTransConfTblMode    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Possible values: TRANS_DISABLED(0) TRANS_CLIENT(1) TRANS_SSC(2)"
+    ::= { vServerTransConfTblEntry 2 }
+   
+vServerTransConfTblType    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION   "Possible values: TRANS_AUTODETECT(0), TRANS_IPTABLES(1) TRANS_IPCHAINS(2)"
+    ::= { vServerTransConfTblEntry 3 }
+   
+vServerTransConfTblAutodetect    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION   "Autodetect transport type configuration. 0-OFF, 1=ON"
+    ::= { vServerTransConfTblEntry 4 }
+
+vServerTransPxyPmapTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrTransPxyPmapTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsTransportTbls 3 }
+
+vServerTransPxyPmapTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrTransPxyPmapTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerTransPxyPmapTblIndex }
+    ::= { vServerTransPxyPmapTbl 1 }
+
+VSvrTransPxyPmapTblEntry ::=
+    SEQUENCE {
+        vServerTransPxyPmapTblIndex         Unsigned32, 
+        vServerTransPxyPmapTblName          OCTET STRING,
+        vServerTransPxyPmapTblPorts         OCTET STRING,
+        vServerTransPxyPmapTblReDirect      Integer32,
+        vServerTransPxyPmapTblAppMethName   OCTET STRING,
+        vServerTransPxyPmapTblSPort         Integer32
+    }
+
+vServerTransPxyPmapTblIndex    OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Represents index."
+     ::= { vServerTransPxyPmapTblEntry 1 }
+
+vServerTransPxyPmapTblName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents name of the proxy."
+    ::= { vServerTransPxyPmapTblEntry 2 }
+   
+vServerTransPxyPmapTblPorts    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Server Transparency ports."
+    ::= { vServerTransPxyPmapTblEntry 3 }
+   
+vServerTransPxyPmapTblReDirect    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Values (0/1)"
+    ::= { vServerTransPxyPmapTblEntry 4 }
+   
+vServerTransPxyPmapTblAppMethName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy method name"
+    ::= { vServerTransPxyPmapTblEntry 5 }
+   
+vServerTransPxyPmapTblSPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Trasport proxy Source Port"
+    ::= { vServerTransPxyPmapTblEntry 6 }
+   
+
+
+
+vServerDefTransPxyPmapTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrDefTransPxyPmapTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsTransportTbls 4 }
+
+vServerDefTransPxyPmapTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrDefTransPxyPmapTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerDefTransPxyPmapTblIndex }
+    ::= { vServerDefTransPxyPmapTbl  1 }
+
+VSvrDefTransPxyPmapTblEntry ::= 
+    SEQUENCE { 
+        vServerDefTransPxyPmapTblIndex        Unsigned32, 
+        vServerDefTransPxyPmapTblName         OCTET STRING,
+        vServerDefTransPxyPmapTblPorts        OCTET STRING,
+        vServerDefTransPxyPmapTblReDirect     Integer32,
+        vServerDefTransPxyPmapTblAppMethName  OCTET STRING,
+        vServerDefTransPxyPmapTblSPort        Integer32
+    }
+
+vServerDefTransPxyPmapTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerDefTransPxyPmapTblEntry 1 }
+
+vServerDefTransPxyPmapTblName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy p-map table name."
+    ::= { vServerDefTransPxyPmapTblEntry 2 }
+   
+vServerDefTransPxyPmapTblPorts    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy p-map ports"
+    ::= { vServerDefTransPxyPmapTblEntry 3 }
+   
+vServerDefTransPxyPmapTblReDirect    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy p-map re-direct."
+    ::= { vServerDefTransPxyPmapTblEntry 4 }
+   
+vServerDefTransPxyPmapTblAppMethName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy p-map application method name."
+    ::= { vServerDefTransPxyPmapTblEntry 5 }
+   
+vServerDefTransPxyPmapTblSPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents transport proxy p-map S-port."
+    ::= { vServerDefTransPxyPmapTblEntry 6 }
+   
+
+-- COMPRESSION
+vServerConfAppSvcsCompressionScalars    
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsCompression 1}
+vServerConfAppSvcsCompressionTbls     
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsCompression 2}
+
+
+vServerSvrCompCfgTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrSvrCompCfgTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsCompressionTbls 1 }
+
+vServerSvrCompCfgTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrSvrCompCfgTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerSvrCompCfgTblIndex }
+    ::= { vServerSvrCompCfgTbl  1 }
+
+VSvrSvrCompCfgTblEntry ::= 
+    SEQUENCE { 
+        vServerSvrCompCfgTblIndex    Unsigned32, 
+        vServerSvrCompCfgTblGif2Png  Unsigned32,
+        vServerSvrCompCfgTblPng2Png  Unsigned32,
+        vServerSvrCompCfgTblPPM      Unsigned32,
+        vServerSvrCompCfgTblJ2k      Unsigned32,
+        vServerSvrCompCfgTblAZ       Unsigned32,
+        vServerSvrCompCfgTblPrgJpeg  Unsigned32,
+        vServerSvrCompCfgTblReqCompContentCS Unsigned32,
+        vServerSvrCompCfgTblReqCompContentCless Unsigned32,
+        vServerSvrCompCfgTblJPegArith Unsigned32,
+        vServerSvrCompCfgTblLossyHtml Unsigned32
+    }
+
+vServerSvrCompCfgTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerSvrCompCfgTblEntry 1 }
+
+vServerSvrCompCfgTblGif2Png    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Gif to Png flag i.e 0 and 1"
+    ::= { vServerSvrCompCfgTblEntry 2 }
+   
+vServerSvrCompCfgTblPng2Png    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Png optimization flag i.e 0 and 1"
+    ::= { vServerSvrCompCfgTblEntry 3 }
+
+vServerSvrCompCfgTblPPM    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Turn ON(1)/OFF(0): ppm compression.
+                   If PPM compression is not turned ON,
+                   the JavaScript will be compressed using gzip"
+    ::= { vServerSvrCompCfgTblEntry 4 }
+   
+vServerSvrCompCfgTblJ2k    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents flag for j2k compression i.e. 0 and 1."
+    ::= { vServerSvrCompCfgTblEntry 5 }
+   
+vServerSvrCompCfgTblAZ    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents airzip compression flag i.e 0 and 1."
+    ::= { vServerSvrCompCfgTblEntry 6 }
+   
+vServerSvrCompCfgTblPrgJpeg    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents progressive JPEG compression flag i.e 0 and 1."
+    ::= { vServerSvrCompCfgTblEntry 7 }
+
+vServerSvrCompCfgTblReqCompContentCS    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents flag to request compressed content
+                   from origin server for Client/Server users i.e 0 and 1."
+    ::= { vServerSvrCompCfgTblEntry 8 }
+
+vServerSvrCompCfgTblReqCompContentCless    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents flag to request compressed content
+                   from origin server for Clientless users i.e 0 and 1."
+    ::= { vServerSvrCompCfgTblEntry 9 }
+
+vServerSvrCompCfgTblJPegArith    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents JPeg Arithmetic Encoding flag i.e 0 and 1"
+    ::= { vServerSvrCompCfgTblEntry 10 }
+   
+vServerSvrCompCfgTblLossyHtml    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Lossy Html flag i.e 0 and 1"
+    ::= { vServerSvrCompCfgTblEntry 11 }
+   
+vServerCompSvrTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCompSvrTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Table."
+    ::= { vServerConfAppSvcsCompressionTbls 3 }
+
+vServerCompSvrTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCompSvrTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerCompSvrTblIndex }
+    ::= { vServerCompSvrTbl  1 }
+
+VSvrCompSvrTblEntry ::= 
+    SEQUENCE { 
+        vServerCompSvrTblIndex          Unsigned32, 
+        vServerCompSvrTblJPegSize       Unsigned32,
+        vServerCompSvrTblJPegMinSize    Unsigned32,
+        vServerCompSvrTblJPegMethod     Unsigned32,
+        vServerCompSvrTblMaxChunk       Unsigned32,
+        vServerCompSvrTblGzipSize       Unsigned32,
+        vServerCompSvrTblJ2kSize        Unsigned32,
+        vServerCompSvrTblJ2kMinSize     Unsigned32,
+        vServerCompSvrTblJpgMaxPix4J2k  Unsigned32,
+        vServerCompSvrTblJpgMaxPix4Opt  Unsigned32,
+        vServerCompSvrTblAzMaxSize      Unsigned32,
+        vServerCompSvrTblJpegMinBpp     Unsigned32
+    }
+
+vServerCompSvrTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerCompSvrTblEntry 1 }
+
+vServerCompSvrTblJPegSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents size of jpeg."
+    ::= { vServerCompSvrTblEntry 2 }
+   
+vServerCompSvrTblJPegMinSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents minimum size of jpeg for compression."
+    ::= { vServerCompSvrTblEntry 3 }
+   
+vServerCompSvrTblJPegMethod    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents jpeg compression method."
+    ::= { vServerCompSvrTblEntry 4 }
+   
+vServerCompSvrTblMaxChunk    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents maximum chunk."
+    ::= { vServerCompSvrTblEntry 5 }
+   
+vServerCompSvrTblGzipSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents gzip size."
+    ::= { vServerCompSvrTblEntry 6 }
+   
+vServerCompSvrTblJ2kSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents j2k size."
+    ::= { vServerCompSvrTblEntry 7 }
+   
+vServerCompSvrTblJ2kMinSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents J2k minimum size for compression."
+    ::= { vServerCompSvrTblEntry 8 }
+   
+vServerCompSvrTblJpgMaxPix4J2k    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents maximum pixel of jpg for j2k."
+    ::= { vServerCompSvrTblEntry 9 }
+   
+vServerCompSvrTblJpgMaxPix4Opt    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents maximum jpeg pixel"
+    ::= { vServerCompSvrTblEntry 10 }
+   
+vServerCompSvrTblAzMaxSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents airzip maximum size."
+    ::= { vServerCompSvrTblEntry 11 }
+   
+vServerCompSvrTblJpegMinBpp    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents minimum jpeg bpp."
+    ::= { vServerCompSvrTblEntry 12 }
+   
+
+vServerHttpConfTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrHttpConfTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsCompressionTbls 4 }
+
+vServerHttpConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrHttpConfTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerHttpConfTblIndex }
+    ::= { vServerHttpConfTbl    1 }
+
+VSvrHttpConfTblEntry ::= 
+    SEQUENCE { 
+        vServerHttpConfTblIndex                    Unsigned32, 
+        vServerHttpConfTblPrefetch                 Unsigned32,
+        vServerHttpConfTblIdentify                 Unsigned32,
+        vServerHttpConfTblXForwardFor              Unsigned32,
+        vServerHttpConfTblCompObjEnabled           VenturiBooleanType,
+        vServerHttpConfTblSSCLCompFlag             VenturiBooleanType,
+        vServerHttpConfTblSSCompFlag               VenturiBooleanType,
+        vServerHttpConfTblKeepAlive                VenturiBooleanType,
+        vServerHttpConfTblKATimeOut                Unsigned32,
+        vServerHttpConfTblProxyOverride            Unsigned32,
+        vServerHttpConfTblSSStdIComp               Unsigned32
+    }
+
+vServerHttpConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerHttpConfTblEntry 1 }
+
+vServerHttpConfTblPrefetch    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents HTTP compression prefetch."
+    ::= { vServerHttpConfTblEntry 2 }
+   
+vServerHttpConfTblIdentify    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents HTTP compression identity."
+    ::= { vServerHttpConfTblEntry 3 }
+   
+vServerHttpConfTblXForwardFor    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents HTTP compression Xforward port."
+    ::= { vServerHttpConfTblEntry 4 }
+   
+vServerHttpConfTblCompObjEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Http composite object compression configuration. Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerHttpConfTblEntry 5 }
+  
+vServerHttpConfTblSSCLCompFlag OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerHttpConfTblEntry 6 }
+  
+vServerHttpConfTblSSCompFlag    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerHttpConfTblEntry 7 }
+  
+vServerHttpConfTblKeepAlive     OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerHttpConfTblEntry 8 }
+  
+vServerHttpConfTblKATimeOut     OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "KeepAlive timeout in Seconds. (0-64000)"
+    ::= { vServerHttpConfTblEntry 9 }
+  
+vServerHttpConfTblProxyOverride     OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "ProxyOverride: Enable(1) Disable(0)"
+    ::= { vServerHttpConfTblEntry 10 }
+  
+vServerHttpConfTblSSStdIComp     OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Controls the default Compression level.
+                   Default Comp Level: 1(Best Quality) to 4(Faster)" 
+    ::= { vServerHttpConfTblEntry 11 }
+
+
+vServerSIEConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrSIEConfTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsCompressionTbls 5 }
+
+vServerSIEConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrSIEConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerSIEConfTblIndex }
+    ::= { vServerSIEConfTbl 1 }
+
+VSvrSIEConfTblEntry ::= 
+    SEQUENCE { 
+        vServerSIEConfTblIndex         Unsigned32, 
+        vServerSIEConfTblEnabled       VenturiBooleanType,
+        vServerSIEConfTblHttpEnabled   VenturiBooleanType,
+        vServerSIEConfTblFtpEnabled    VenturiBooleanType,
+        vServerSIEConfTblEmailEnabled  VenturiBooleanType,
+        vServerSIEConfTblStatsEnabled  VenturiBooleanType
+    }
+
+vServerSIEConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents row index of the SIEConf Table"
+    ::= { vServerSIEConfTblEntry 1 }
+
+vServerSIEConfTblEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerSIEConfTblEntry 2 }
+   
+vServerSIEConfTblHttpEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerSIEConfTblEntry 3 }
+   
+vServerSIEConfTblFtpEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerSIEConfTblEntry 4 }
+   
+vServerSIEConfTblEmailEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerSIEConfTblEntry 5 }
+   
+vServerSIEConfTblStatsEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Use VenturiBooleanType values to Enable or Disable."
+    ::= { vServerSIEConfTblEntry 6 }
+   
+-- ---------------------------------------------------------------------
+-- ImageCompTbl
+-- ---------------------------------------------------------------------
+--  {"GIF",  CI_GIF, {"None",     "Lossless", "Lossy", "Lossy", "None"},
+--                   {256,        256,        64,      2,       256   }},
+--  {"JPEG", CI_JPG, {"None",     "Lossy",    "Lossy", "Lossy", "None"},
+--                   {100,        90,         70,      50,      100   }},
+--  {"J2K",  CI_J2K, {"None",     "Lossy",    "Lossy", "Lossy", "None"},
+--                   {0,          30,         20,      10,      100  }},
+-- ---------------------------------------------------------------------
+-- Note:
+-- There is no global flag required for JPEG enable 
+-- Make sure the global flag for J2K is in sync with the none/lossy setting
+-- ---------------------------------------------------------------------
+
+vServerImageCompTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrImageCompTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsCompressionTbls 6 }
+
+vServerImageCompTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrImageCompTblEntry
+     MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerImageCompTblIndex }
+    ::= { vServerImageCompTbl  1 }
+
+VSvrImageCompTblEntry ::= 
+    SEQUENCE { 
+      vServerImageCompTblIndex    Unsigned32,
+      vServerImageCompTblName       OCTET STRING,
+      vServerImageCompTblId         Unsigned32,
+      vServerImageCompTblType0      OCTET STRING,
+      vServerImageCompTblLevel0     Unsigned32,
+      vServerImageCompTblType1      OCTET STRING,
+      vServerImageCompTblLevel1     Unsigned32,
+      vServerImageCompTblType2      OCTET STRING,
+      vServerImageCompTblLevel2     Unsigned32,
+      vServerImageCompTblType3      OCTET STRING,
+      vServerImageCompTblLevel3     Unsigned32,
+      vServerImageCompTblType4      OCTET STRING,
+      vServerImageCompTblLevel4     Unsigned32
+    }
+
+vServerImageCompTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerImageCompTblEntry 1 }
+
+vServerImageCompTblName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents Image compression tablename."
+    ::= { vServerImageCompTblEntry 2 }
+   
+vServerImageCompTblId    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerImageCompTblEntry 3 }
+
+vServerImageCompTblType0    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression type."
+    ::= { vServerImageCompTblEntry 4 }
+   
+vServerImageCompTblLevel0    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerImageCompTblEntry 5 }
+
+vServerImageCompTblType1    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression type1."
+    ::= { vServerImageCompTblEntry 6 }
+   
+vServerImageCompTblLevel1    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression level1."
+    ::= { vServerImageCompTblEntry 7 }
+
+vServerImageCompTblType2    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression type2."
+    ::= { vServerImageCompTblEntry 8 }
+   
+vServerImageCompTblLevel2    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression level2."
+    ::= { vServerImageCompTblEntry 9 }
+
+vServerImageCompTblType3    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression type2."
+    ::= { vServerImageCompTblEntry 10 }
+   
+vServerImageCompTblLevel3    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression level3."
+    ::= { vServerImageCompTblEntry 11 }
+
+vServerImageCompTblType4    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression type4."
+    ::= { vServerImageCompTblEntry 12 }
+   
+vServerImageCompTblLevel4    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Image compression level4."
+    ::= { vServerImageCompTblEntry 13 }
+
+-- HTTP header access --
+vServerHttpHdrAccessConfigTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrHttpHdrAccessConfigTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the HTTP header access table."
+    ::= { vServerConfAppSvcsCompressionTbls 7 }
+    
+vServerHttpHdrAccessTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrHttpHdrAccessConfigTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the HTTP header access table."
+    INDEX    { vServerHttpHdrAccessTblIndex }
+    ::= { vServerHttpHdrAccessConfigTbl  1 }
+
+VSvrHttpHdrAccessConfigTblEntry ::=
+    SEQUENCE {
+      vServerHttpHdrAccessTblIndex         Unsigned32,
+      vServerHttpHdrAccessTblHdrFieldName  OCTET STRING,
+      vServerHttpHdrAccessTblAllowDeny     OCTET STRING
+    }
+
+vServerHttpHdrAccessTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerHttpHdrAccessTblEntry 1 }
+
+vServerHttpHdrAccessTblHdrFieldName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents the name of the HTTP header field."
+    ::= { vServerHttpHdrAccessTblEntry 2 }
+
+vServerHttpHdrAccessTblAllowDeny    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..10))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents if the header field will be allowed
+                   or denied. The valid values are allow or deny"
+    ::= { vServerHttpHdrAccessTblEntry 3 }
+
+
+-- CLIENT
+-- ------------------------------------------------------------
+vServerConfAppSvcsClientScalars    
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsClient 1}
+vServerConfAppSvcsClientTbls     
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsClient 2}
+
+--  Scalars --
+vServerClientlessEnabled  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Turns clientless support on or off."
+    ::= { vServerConfAppSvcsClientScalars 1 }
+
+vServerClientlessTransInterceptEnable OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Turns clientless transparent intercept on or off."
+    ::= { vServerConfAppSvcsClientScalars 2 }
+
+--  Tables --
+
+vServerAppClientUpdateTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrAppClientUpdateTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfAppSvcsClientTbls 1 }
+
+vServerAppClientUpdateTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrAppClientUpdateTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Venturi Server application client update Tbl."
+    INDEX    { vServerAppClientUpdateTblIndex }
+    ::= { vServerAppClientUpdateTbl 1 }
+
+VSvrAppClientUpdateTblEntry ::= 
+    SEQUENCE { 
+        vServerAppClientUpdateTblIndex    Unsigned32, 
+        vServerAppClientUpdateTblLocalURL OCTET STRING,
+        vServerAppClientUpdateTblPort     Integer32
+    }
+
+vServerAppClientUpdateTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerAppClientUpdateTblEntry 1 }
+
+vServerAppClientUpdateTblLocalURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents App client local URL."
+    ::= { vServerAppClientUpdateTblEntry 2 }
+
+vServerAppClientUpdateTblPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents App client port."
+    ::= { vServerAppClientUpdateTblEntry 3 }
+  
+
+vServerAppClientlessConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrAppClientlessConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of Venturi optimization server Application 
+                   clientless configuration Tbl."
+    ::= { vServerConfAppSvcsClientTbls 2 }
+
+vServerAppClientlessConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrAppClientlessConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Venturi optimization server Application 
+                   clientless configuration Tbl"
+    INDEX    { vServerAppClientlessConfTblIndex }
+    ::= { vServerAppClientlessConfTbl 1 }
+
+VSvrAppClientlessConfTblEntry ::= 
+    SEQUENCE { 
+        vServerAppClientlessConfTblIndex    Unsigned32, 
+        vServerAppClientlessConfTblEnable   VenturiBooleanType,
+        vServerAppClientlessConfTblURL      OCTET STRING,
+        vServerAppClientlessConfTblIdle     Unsigned32
+    }
+
+vServerAppClientlessConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerAppClientlessConfTblEntry 1 }
+
+vServerAppClientlessConfTblEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Enable Flag."
+    ::= { vServerAppClientlessConfTblEntry 2 }
+
+vServerAppClientlessConfTblURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Venturi optimization server Application 
+                   clientless configuration URL."
+    ::= { vServerAppClientlessConfTblEntry 3 }
+   
+vServerAppClientlessConfTblIdle    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Venturi optimization server Application 
+                   clientless configuration Idle time."
+    ::= { vServerAppClientlessConfTblEntry 4 }
+
+vServerClientAutoUpgGblTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrClientAutoUpgGblTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of Venturi optimization server's 
+                   client auto upgrade global Tbl."
+    ::= { vServerConfAppSvcsClientTbls 3 }
+
+
+vServerClientAutoUpgGblTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrClientAutoUpgGblTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Venturi optimization server 
+                   client auto upgrade global Tbl."
+    INDEX    { vServerClientAutoUpgGblTblIndex }
+    ::= { vServerClientAutoUpgGblTbl 1 }
+
+VSvrClientAutoUpgGblTblEntry ::= 
+    SEQUENCE { 
+        vServerClientAutoUpgGblTblIndex               Unsigned32, 
+        vServerClientAutoUpgGblTblEnable              VenturiBooleanType,
+        vServerClientAutoUpgGblTblUpgTimeInterval     Unsigned32,
+        vServerClientAutoUpgGblTblMaxClientVerStored  Unsigned32
+    }
+
+vServerClientAutoUpgGblTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerClientAutoUpgGblTblEntry 1 }
+
+vServerClientAutoUpgGblTblEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents enable flag of client auto upgrade global table."
+    ::= { vServerClientAutoUpgGblTblEntry 2 }
+
+vServerClientAutoUpgGblTblUpgTimeInterval    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents upgrade time interval."
+    ::= { vServerClientAutoUpgGblTblEntry 3 }
+   
+vServerClientAutoUpgGblTblMaxClientVerStored    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents maximum client version stored."
+    ::= { vServerClientAutoUpgGblTblEntry 4 }
+   
+
+vServerClientAutoUpgConfTgtTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrClientAutoUpgConfTgtTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of client auto upgrade configuration target Tbl."
+    ::= { vServerConfAppSvcsClientTbls 4 }
+
+vServerClientAutoUpgConfTgtTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrClientAutoUpgConfTgtTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the client auto upgrade configuration target Tbl."
+    INDEX    { vServerClientAutoUpgConfTgtTblIndex }
+    ::= { vServerClientAutoUpgConfTgtTbl 1 }
+
+VSvrClientAutoUpgConfTgtTblEntry ::= 
+    SEQUENCE { 
+        vServerClientAutoUpgConfTgtTblIndex       Unsigned32, 
+        vServerClientAutoUpgConfTgtTblHourPerDay  Unsigned32,
+        vServerClientAutoUpgConfTgtTblSunday      Unsigned32,
+        vServerClientAutoUpgConfTgtTblMonday      Unsigned32,
+        vServerClientAutoUpgConfTgtTblTuesday     Unsigned32,
+        vServerClientAutoUpgConfTgtTblWednesday   Unsigned32,
+        vServerClientAutoUpgConfTgtTblThursday    Unsigned32,
+        vServerClientAutoUpgConfTgtTblFriday      Unsigned32,
+        vServerClientAutoUpgConfTgtTblSaturday    Unsigned32
+    }
+
+vServerClientAutoUpgConfTgtTblIndex    OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Represents index of the row."
+     ::= { vServerClientAutoUpgConfTgtTblEntry 1 }
+
+vServerClientAutoUpgConfTgtTblHourPerDay    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour per day in the client auto upgrade conf target Tbl."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 2 }
+   
+
+
+vServerClientAutoUpgConfTgtTblSunday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Sunday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 3 }
+   
+
+
+vServerClientAutoUpgConfTgtTblMonday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Monday"
+    ::= { vServerClientAutoUpgConfTgtTblEntry 4 }
+   
+
+
+vServerClientAutoUpgConfTgtTblTuesday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Tuesday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 5 }
+   
+vServerClientAutoUpgConfTgtTblWednesday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Wednesday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 6 }
+   
+vServerClientAutoUpgConfTgtTblThursday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Thursday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 7 }
+   
+vServerClientAutoUpgConfTgtTblFriday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Friday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 8 }
+   
+vServerClientAutoUpgConfTgtTblSaturday    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents hour for Saturday."
+    ::= { vServerClientAutoUpgConfTgtTblEntry 9 }
+  
+
+
+vServerClientAutoUpgVerTgtTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrClientAutoUpgVerTgtTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of client auto upgrade version target Tbl."
+    ::= { vServerConfAppSvcsClientTbls 5 }
+
+vServerClientAutoUpgVerTgtTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrClientAutoUpgVerTgtTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the client auto upgrade version target Tbl."
+    INDEX    { vServerClientAutoUpgVerTgtTblIndex }
+    ::= { vServerClientAutoUpgVerTgtTbl 1 }
+
+VSvrClientAutoUpgVerTgtTblEntry ::= 
+    SEQUENCE { 
+        vServerClientAutoUpgVerTgtTblIndex         Unsigned32, 
+        vServerClientAutoUpgVerTgtTblRow           Unsigned32,
+        vServerClientAutoUpgVerTgtTblVer           OCTET STRING,
+        vServerClientAutoUpgVerTgtTblPlatform      OCTET STRING,
+        vServerClientAutoUpgVerTgtTblClientPayload OCTET STRING
+    }
+
+vServerClientAutoUpgVerTgtTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerClientAutoUpgVerTgtTblEntry 1 }
+
+vServerClientAutoUpgVerTgtTblRow    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Row."
+    ::= { vServerClientAutoUpgVerTgtTblEntry 2 }
+
+vServerClientAutoUpgVerTgtTblVer    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Version."
+    ::= { vServerClientAutoUpgVerTgtTblEntry 3 }
+   
+vServerClientAutoUpgVerTgtTblPlatform    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Platform."
+    ::= { vServerClientAutoUpgVerTgtTblEntry 4 }
+   
+vServerClientAutoUpgVerTgtTblClientPayload    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ClientPayload."
+    ::= { vServerClientAutoUpgVerTgtTblEntry 5 }
+  
+-- -------------------------------------------------
+-- ClientUpdateInfo controls ClientUpdate parameters
+-- -------------------------------------------------
+vServerClientUpdateInfo   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrClientUpdateInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for Client Update Info"
+    ::= { vServerConfAppSvcsClientTbls 6 }
+
+vServerClientUpdateInfoEntry    OBJECT-TYPE
+    SYNTAX        VSvrClientUpdateInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Client Update Info"
+    INDEX    { vServerClientUpdateInfoIndex }
+    ::= { vServerClientUpdateInfo 1 }
+
+VSvrClientUpdateInfoEntry ::=
+    SEQUENCE {
+        vServerClientUpdateInfoIndex         Unsigned32, 
+        vServerClientUpdateInfoSendClntUpdate VenturiBooleanType,
+        vServerClientUpdateInfoClientVer     OCTET STRING,
+        vServerClientUpdateInfoUrl           OCTET STRING,
+        vServerClientUpdateInfoExpTime       Unsigned32
+    }
+
+vServerClientUpdateInfoIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerClientUpdateInfoEntry 1 }
+
+vServerClientUpdateInfoSendClntUpdate    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ClntUpdate"
+    ::= { vServerClientUpdateInfoEntry 2 }
+
+vServerClientUpdateInfoClientVer    OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ClientVer"
+    ::= { vServerClientUpdateInfoEntry 3 }
+
+vServerClientUpdateInfoUrl    OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Url"
+    ::= { vServerClientUpdateInfoEntry 4 }
+
+vServerClientUpdateInfoExpTime    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ExpTime"
+    ::= { vServerClientUpdateInfoEntry 5 }
+
+-- -------------------------------------------------
+-- FTP
+-- ------------------------------------------------------------
+ vServerConfAppSvcsFtpScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsFtp 1 }
+ vServerConfAppSvcsFtpTbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsFtp 2 }
+
+
+vServerFtpConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrFtpConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of Ftp configuration."
+    ::= { vServerConfAppSvcsFtpTbls 1 }
+
+vServerFtpConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrFtpConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Ftp configuration Tbl."
+    INDEX    { vServerFtpConfTblIndex }
+    ::= { vServerFtpConfTbl 1 }
+
+VSvrFtpConfTblEntry ::= 
+    SEQUENCE { 
+        vServerFtpConfTblIndex           Unsigned32, 
+        vServerFtpConfTblDataMethName  OCTET STRING,
+        vServerFtpConfTblSocksMethName OCTET STRING,
+        vServerFtpConfTblTimeout         Unsigned32,
+        vServerFtpConfTblDelay           Unsigned32
+    }
+
+vServerFtpConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerFtpConfTblEntry 1 }
+
+vServerFtpConfTblDataMethName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Ftp configuration data method name."
+    ::= { vServerFtpConfTblEntry 2 }
+   
+vServerFtpConfTblSocksMethName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Ftp configuration sock method name."
+    ::= { vServerFtpConfTblEntry 3 }
+   
+vServerFtpConfTblTimeout    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Ftp configuration timeout."
+    ::= { vServerFtpConfTblEntry 4 }
+   
+vServerFtpConfTblDelay    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Ftp configuration delay."
+    ::= { vServerFtpConfTblEntry 5 }
+   
+
+-- -------------------------------------------------
+-- QOS using DNI
+--
+-- VServerQOS tables
+-- Policy File Distribution
+-- VClient Policy Update
+-- Backup and Restore of QOS data
+-- Backup and Restore of QOS data
+-- VSA management Using RADIUS
+--
+-- The above tables are used for managign the following functionality
+-- VSA, RadiusPolicyTable, Target HOst, directory, 
+-- user, password, applications
+-- QosPolicyPustTable 
+-- Policy file, hash values table, dirty flag, queue in QosPolicyTable 
+-- -------------------------------------------------
+ vServerConfAppSvcsQOSScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsQOS 1 }
+ vServerConfAppSvcsQOSTbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsQOS 2 }
+
+vServerConfQOSLicensed    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Tells if QOS license is purchased"
+    ::= { vServerConfAppSvcsQOSScalars 1 }
+
+vServerConfQOSEnabled    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable / Disable QOS license"
+    ::= { vServerConfAppSvcsQOSScalars 2 }
+
+vServerConfUpdateQOSProfilesNow    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "0-Do nothing 1-UpdateProfile Below 2-Update All"
+    ::= { vServerConfAppSvcsQOSScalars 3 }
+
+vServerConfUpdQOSProfName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Update this Profile at vServer"
+    ::= { vServerConfAppSvcsQOSScalars 4 }
+
+vServerConfAssignDefProfName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Set Default Profile Name at vServer"
+    ::= { vServerConfAppSvcsQOSScalars 5 }
+
+
+
+-- -------------------------------------------------
+-- UserAgent Configuration
+-- This section of the MIB is used to manage MultiPart
+-- Configuration
+-- -------------------------------------------------
+ vServerConfAppSvcsUserAgentScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsUserAgent 1 }
+ vServerConfAppSvcsUserAgentTbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsUserAgent 2 }
+
+
+ 
+vServerUACfgTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerUACfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The User Agent Config Table."
+    ::= { vServerConfAppSvcsUserAgentTbls 1 }
+ 
+vServerUACfgTblEntry          OBJECT-TYPE
+    SYNTAX        VServerUACfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the User Agent Config Table."
+    INDEX    { vServerUACfgTblIndex }
+    ::= { vServerUACfgTbl    1 }
+ 
+VServerUACfgTblEntry ::=  
+    SEQUENCE { 
+        vServerUACfgTblIndex   Unsigned32,
+        vServerUAId            Unsigned32,
+        vServerUAHeaderSig     OCTET STRING,
+        vServerUAMultiPartId   Unsigned32,
+        vServerUAGZIPEnabled   Unsigned32,
+        vServerUACLPerRedEnabled   Unsigned32,
+        vServerUAPrgJpegEnabled    VenturiBooleanType,
+        vServerUALossyJpegEnabled  VenturiBooleanType,
+        vServerUALossyGifEnabled   VenturiBooleanType,
+        vServerUALossyHtmlEnabled  VenturiBooleanType,
+        vServerUALossyPngEnabled  VenturiBooleanType,
+        vServerUAItractivNoChunk   VenturiBooleanType
+    }
+
+vServerUACfgTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerUACfgTblEntry 1 }
+
+vServerUAId    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "A positive integer used to identify the settings.
+                   The first row with ID value 1 cannot be deleted.  
+                   An ID less that 1 means an empty slot."
+    ::= { vServerUACfgTblEntry 2 }
+
+vServerUAHeaderSig    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The signature of the user agent header."
+    ::= { vServerUACfgTblEntry 3 }
+
+vServerUAMultiPartId    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Refers to a row in the vServerUAMultiPartCfgTbl.
+                   This must refer to an enabled entry in the MultiPart
+                   Config Table."
+    ::= { vServerUACfgTblEntry 4 }
+
+vServerUAGZIPEnabled    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if GZip is supported by this user agent. 
+                   Valid values are 0 for disable compression, 1 for default 
+                   compression, 2 for using gzip if compression is active 
+                   globally"
+    ::= { vServerUACfgTblEntry 5 }
+
+vServerUACLPerRedEnabled   OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Clientless Personalization Page Redirect 
+		   Enable(1) or Disable(0)"
+    ::= { vServerUACfgTblEntry 6 }
+
+vServerUAPrgJpegEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if progressive JPEG compression is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 7 }
+
+vServerUALossyJpegEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if lossy JPEG compression is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 8 }
+
+vServerUALossyGifEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if lossy GIF compression is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 9 }
+
+vServerUALossyHtmlEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if lossy html is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 10 }
+
+vServerUALossyPngEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if lossy png is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 11 }
+
+vServerUAItractivNoChunk    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates if ItractivNoChunk is
+                   supported by this user agent."
+    ::= { vServerUACfgTblEntry 12 }
+
+vServerUAMultiPartCfgTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerUAMultiPartCfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The User Agent MultiPart Config Table."
+    ::= { vServerConfAppSvcsUserAgentTbls 2 }
+ 
+vServerUAMultiPartCfgTblEntry          OBJECT-TYPE
+    SYNTAX        VServerUAMultiPartCfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the User Agent MultiPart Config Table."
+    INDEX    { vServerUAMPartCfgTblIndex }
+    ::= { vServerUAMultiPartCfgTbl    1 }
+ 
+VServerUAMultiPartCfgTblEntry ::=  
+    SEQUENCE { 
+        vServerUAMPartCfgTblIndex      Unsigned32,
+        vServerUAMPartId               Unsigned32,
+        vServerUAMPartEnable           VenturiBooleanType,
+        vServerUAMPartMaxPartSize      Unsigned32,
+        vServerUAMPartMaxPackSize      Unsigned32,
+        vServerUAMPartMaxWaitTime      Unsigned32,
+        vServerUAMPartUseMixedType     VenturiBooleanType,
+        vServerUAMPartEnableMFilter    VenturiBooleanType,
+        vServerUAMPartEnableChunk      VenturiBooleanType,
+        vServerUAMPartEnableBase64     VenturiBooleanType,
+        vServerUAMPartNoOtherDomObj    VenturiBooleanType,
+        vServerUAMPartIncludeTxt       VenturiBooleanType,
+        vServerUAMPartIncludeImg       VenturiBooleanType,
+        vServerUAMPartIncludeCss       VenturiBooleanType,
+        vServerUAMPartIncludeJs        VenturiBooleanType,
+        vServerUAMPartCacheSubObjects  VenturiBooleanType
+    }
+
+
+vServerUAMPartCfgTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerUAMultiPartCfgTblEntry 1 }
+
+vServerUAMPartId  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "A positive integer used to identify the settings. 
+                   The first row with MPartId 1 is the default settings 
+                   and cannot be deleted by UI. An ID less than 1 means 
+                   empty slot."
+    ::= { vServerUAMultiPartCfgTblEntry 2 }
+
+vServerUAMPartEnable  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether VServer should turn on the multipart 
+                   processing for this user agent."
+    ::= { vServerUAMultiPartCfgTblEntry 3 }
+
+vServerUAMPartMaxPartSize  OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "If the object size in bytes (pre-compression) is larger 
+                   than this value, it should not be added into the multipart 
+                   package."
+    ::= { vServerUAMultiPartCfgTblEntry 4 }
+
+vServerUAMPartMaxPackSize  OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "If the multipart package size in bytes (post-compression) 
+                   is larger than this value, no more objects should be added."
+    ::= { vServerUAMultiPartCfgTblEntry 5 }
+
+vServerUAMPartMaxWaitTime  OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "If no extra object is received from web server after this 
+                   amount if time (in ms), the multipart package should be 
+                   closed."
+    ::= { vServerUAMultiPartCfgTblEntry 6 }
+
+vServerUAMPartUseMixedType  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether mixed type is used."
+    ::= { vServerUAMultiPartCfgTblEntry 7 }
+
+vServerUAMPartEnableMFilter  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Turns the multipart filter on or off."
+    ::= { vServerUAMultiPartCfgTblEntry 8 }
+
+vServerUAMPartNoOtherDomObj  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether to exclude the objects from
+                   other domains from the multipart package."
+    ::= { vServerUAMultiPartCfgTblEntry 11 }
+
+vServerUAMPartIncludeTxt  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether text objects should be included 
+                   in the multipart package."
+    ::= { vServerUAMultiPartCfgTblEntry 12 }
+
+vServerUAMPartIncludeImg  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether image objects should be included 
+                   in the multipart package."
+    ::= { vServerUAMultiPartCfgTblEntry 13 }
+
+vServerUAMPartIncludeCss  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether CSS objects should be included 
+                   in the multipart package."
+    ::= { vServerUAMultiPartCfgTblEntry 14 }
+
+vServerUAMPartIncludeJs  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether Javascript objects should be included 
+                   in the multipart package."
+    ::= { vServerUAMultiPartCfgTblEntry 15 }
+
+vServerUAMPartCacheSubObjects  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Indicates whether sub objects should be cached."
+    ::= { vServerUAMultiPartCfgTblEntry 16 }
+
+-- ------------------------------------------------------------
+-- SIC (Subscriber Information Control) Configuration 
+-- ------------------------------------------------------------
+ vServerConfAppSvcsSICScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsSIC 1 }
+
+ vServerConfAppSvcsSICTbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsSIC 2 }
+
+-- ------------------------------------------------------------
+-- Dashborad params 
+-- ------------------------------------------------------------
+ vServerConfAppSvcsDBoardScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsDBoard 1 }
+
+ vServerConfAppSvcsDBoardTbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsDBoard 2 }
+
+vServerDBoardCUsrCnt    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Cliented User Count"
+    ::= { vServerConfAppSvcsDBoardScalars 1 }
+  
+vServerDBoardCLUsrCnt    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Clientless User Count"
+    ::= { vServerConfAppSvcsDBoardScalars 2 }
+  
+vServerDBoardCConn    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Cliented Connections"
+    ::= { vServerConfAppSvcsDBoardScalars 3 }
+  
+vServerDBoardCLConn    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Clientless Connections"
+    ::= { vServerConfAppSvcsDBoardScalars 4 }
+  
+vServerDBoardTotalConn    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Total Connections"
+    ::= { vServerConfAppSvcsDBoardScalars 5 }
+  
+vServerDBoardCTraffic    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Cliented Traffic"
+    ::= { vServerConfAppSvcsDBoardScalars 6 }
+  
+vServerDBoardCLTraffic    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Clientless Traffic"
+    ::= { vServerConfAppSvcsDBoardScalars 7 }
+
+vServerDBoardTotalTraffic    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current Total Traffic - bits per sec"
+    ::= { vServerConfAppSvcsDBoardScalars 8 }
+
+vServerDBoardDownStreamSavings    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "DownStreamSavings Bytes"
+    ::= { vServerConfAppSvcsDBoardScalars 9 }
+
+vServerDBoardUpStreamSavings    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "UpStreamSavings Bytes"
+    ::= { vServerConfAppSvcsDBoardScalars 10 }
+
+vServerDBoardCPULoad    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current CPU Usage"
+    ::= { vServerConfAppSvcsDBoardScalars 11 }
+
+vServerDBoardMemUsed    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Memory Used in MB"
+    ::= { vServerConfAppSvcsDBoardScalars 12 }
+
+vServerDBoardMemFree    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Memory Free in MB"
+    ::= { vServerConfAppSvcsDBoardScalars 13 }
+
+vServerDBoardMemSwap    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Memory Swap in MB"
+    ::= { vServerConfAppSvcsDBoardScalars 14 }
+
+vServerDBoardDiskSpace    OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Disk Space Free in MB"
+    ::= { vServerConfAppSvcsDBoardScalars 15 }
+
+-- --------------------------------------------
+-- Add Cache Statisctics as well
+-- --------------------------------------------
+
+
+-- ------------------------------------------------------------
+--  IPE - IP Extraction
+-- ------------------------------------------------------------
+ vServerConfAppSvcsIPEScalars 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsIPE 1 }
+
+ vServerConfAppSvcsIPETbls 
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsIPE 2 }
+ 
+vServerIPEFilterTbl   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerIPEFilterTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The IPE Filter Table."
+    ::= { vServerConfAppSvcsIPETbls 1 }
+ 
+vServerIPEFilterTblEntry          OBJECT-TYPE
+    SYNTAX        VServerIPEFilterTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the IPE Filter Table."
+    INDEX    { vServerIPEFilterIndex }
+    ::= { vServerIPEFilterTbl    1 }
+ 
+VServerIPEFilterTblEntry ::=  
+    SEQUENCE { 
+        vServerIPEFilterIndex         Unsigned32,
+        vServerIPEFilterEnabled       VenturiBooleanType,
+        vServerIPEFilterAddress       IpAddress,
+        vServerIPEFilterMaskSize      Unsigned32
+    }
+
+vServerIPEFilterIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The row number of in the IPE Filter Table."
+    ::= { vServerIPEFilterTblEntry 1 }
+
+vServerIPEFilterEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enables or disables the filter."
+    ::= { vServerIPEFilterTblEntry 2 }
+
+vServerIPEFilterAddress    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The network address."
+    ::= { vServerIPEFilterTblEntry 3 }
+
+vServerIPEFilterMaskSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "bits"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The network mask size."
+    ::= { vServerIPEFilterTblEntry 4 }
+   
+
+-- ------------------------------------------------------------
+--  HHI - HTTP Header Insertion 
+-- ------------------------------------------------------------
+vSvrConfAppSvcsHHIScalars    
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsHHI 1 }
+vSvrConfAppSvcsHHITbls     
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsHHI 2 }
+
+vSvrConfHHIMain    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrConfHHIMainEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for HHI Configuration."
+    ::= { vSvrConfAppSvcsHHITbls  1 }
+
+vSvrConfHHIMainEntry          OBJECT-TYPE
+    SYNTAX        VSvrConfHHIMainEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry for HHI Configuration."
+    INDEX    { vSvrConfHHIMainIndex }
+    ::= { vSvrConfHHIMain  1 }
+
+VSvrConfHHIMainEntry ::=
+    SEQUENCE {
+        vSvrConfHHIMainIndex         	Unsigned32,
+        vSvrConfHHIMainURL      	OCTET STRING,
+        vSvrConfHHIMainTmplID  		Integer32
+    }
+
+vSvrConfHHIMainIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row"
+    ::= { vSvrConfHHIMainEntry 1 }
+
+vSvrConfHHIMainURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..256))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents URL"
+    ::= { vSvrConfHHIMainEntry 2 }
+   
+vSvrConfHHIMainTmplID    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents TmplID. 
+                   Range: -1, (0 to 31)"
+    ::= { vSvrConfHHIMainEntry 3 }
+
+
+vSvrConfHHITmpl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrConfHHITmplEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for HHI Configuration"
+    ::= { vSvrConfAppSvcsHHITbls  2 }
+
+vSvrConfHHITmplEntry          OBJECT-TYPE
+    SYNTAX        VSvrConfHHITmplEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry for HHI Configuration"
+    INDEX    { vSvrConfHHITmplIndex }
+    ::= { vSvrConfHHITmpl  1 }
+
+VSvrConfHHITmplEntry ::=
+    SEQUENCE {
+        vSvrConfHHITmplIndex         	Unsigned32,
+        vSvrConfHHITmplTmplName		OCTET STRING,
+        vSvrConfHHITmplFlds      	OCTET STRING
+    }
+
+vSvrConfHHITmplIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row"
+    ::= { vSvrConfHHITmplEntry 1 }
+
+vSvrConfHHITmplTmplName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents TemplateName"
+    ::= { vSvrConfHHITmplEntry 2 }
+   
+vSvrConfHHITmplFlds    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Fields"
+    ::= { vSvrConfHHITmplEntry 3 }
+
+
+
+vSvrConfHHIHdr    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrConfHHIHdrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for HHI Configuration"
+    ::= { vSvrConfAppSvcsHHITbls  3 }
+
+vSvrConfHHIHdrEntry          OBJECT-TYPE
+    SYNTAX        VSvrConfHHIHdrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry for HHI Configuration"
+    INDEX    { vSvrConfHHIHdrIndex }
+    ::= { vSvrConfHHIHdr  1 }
+
+VSvrConfHHIHdrEntry ::=
+    SEQUENCE {
+        vSvrConfHHIHdrIndex         	Unsigned32,
+        vSvrConfHHIHdrHdrName      	OCTET STRING,
+        vSvrConfHHIHdrHdrRadType	Integer32,
+        vSvrConfHHIHdrHdrRadVndId	Integer32,
+        vSvrConfHHIHdrHdrRadVndType	Integer32,
+        vSvrConfHHIHdrHdrHint		Integer32
+    }
+
+vSvrConfHHIHdrIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row"
+    ::= { vSvrConfHHIHdrEntry 1 }
+
+vSvrConfHHIHdrHdrName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents HeaderName"
+    ::= { vSvrConfHHIHdrEntry 2 }
+
+vSvrConfHHIHdrHdrRadType    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Radius Type"
+    ::= { vSvrConfHHIHdrEntry 3 }
+
+vSvrConfHHIHdrHdrRadVndId    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Radius Vendor Id"
+    ::= { vSvrConfHHIHdrEntry 4 }
+
+vSvrConfHHIHdrHdrRadVndType    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Radius Vendor Type"
+    ::= { vSvrConfHHIHdrEntry 5 }
+
+vSvrConfHHIHdrHdrHint    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Valid Types:
+		  	HHI_TYPE_UNKNOWN       0
+		  	HHI_TYPE_TEXT          1 
+			HHI_TYPE_STRING        2 
+			HHI_TYPE_ADDRESS       3 
+			HHI_TYPE_INTEGER       4 
+			HHI_TYPE_BCD           5 
+			HHI_TYPE_BCD_R         6" 
+    ::= { vSvrConfHHIHdrEntry 6 }
+
+-- ------------------------------------------------------------
+-- HHI URL Table Upload and Download
+-- ------------------------------------------------------------
+vSvrConfHHIFtp    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrConfHHIFtpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for HHI Configuration"
+    ::= { vSvrConfAppSvcsHHITbls  4 }
+
+vSvrConfHHIFtpEntry          OBJECT-TYPE
+    SYNTAX        VSvrConfHHIFtpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry for HHI FTP Configuration"
+    INDEX    { vSvrConfHHIFtpIndex }
+    ::= { vSvrConfHHIFtp  1 }
+
+VSvrConfHHIFtpEntry ::=
+    SEQUENCE {
+        vSvrConfHHIFtpIndex         Unsigned32,
+        vSvrConfHHIFtpHost          OCTET STRING,
+        vSvrConfHHIFtpDir           OCTET STRING,
+        vSvrConfHHIFtpFile          OCTET STRING,
+        vSvrConfHHIFtpUser          OCTET STRING,
+        vSvrConfHHIFtpPasswd        OCTET STRING,
+        vSvrConfHHIFtpAction        Integer32,
+        vSvrConfHHIFtpNow           Integer32,
+        vSvrConfHHIFtpResult        Integer32
+    }
+
+vSvrConfHHIFtpIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the Row"
+    ::= { vSvrConfHHIFtpEntry 1 }
+
+vSvrConfHHIFtpHost    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "FTP Host"
+    ::= { vSvrConfHHIFtpEntry 2 }
+
+vSvrConfHHIFtpDir    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Path to FTP Directory"
+    ::= { vSvrConfHHIFtpEntry 3 }
+
+vSvrConfHHIFtpFile    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "FTP File Name"
+    ::= { vSvrConfHHIFtpEntry 4 }
+
+vSvrConfHHIFtpUser    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "FTP User"
+    ::= { vSvrConfHHIFtpEntry 5 }
+
+vSvrConfHHIFtpPasswd    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "FTP Password"
+    ::= { vSvrConfHHIFtpEntry 6 }
+
+vSvrConfHHIFtpAction    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "FTP Action:
+                   FTP_ACTION_NONE                     0
+                   FTP_FILE_TO_VSERVER_AND_APPLY       1
+                   FTP_FILE_FROM_VSERVER_AFTER_CREATE  2
+                   FTP_CLEAN_FILES_ON_VSERVER          3
+                   FTP_CREATE_FILE_ON_VSERVER          4
+                   FTP_APPLY_FILE_ON_VSERVER           5
+                   FTP_FILE_TO_VSERVER                 6
+                   FTP_FILE_FROM_VSERVER               7"
+    ::= { vSvrConfHHIFtpEntry 7 }
+
+vSvrConfHHIFtpNow    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Execute above action"
+    ::= { vSvrConfHHIFtpEntry 8 }
+
+vSvrConfHHIFtpResult        OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Result of Above Action
+                   FTP_STATUS_NONE(0)
+                   FTP_STATUS_SUCCESS(1)
+                   FTP_STATUS_FAILED(2)
+                   FTP_STATUS_INPROGRESS(3)"
+    ::= { vSvrConfHHIFtpEntry 9 }
+
+-- ------------------------------------------------------------
+-- WebNotifier --
+-- ------------------------------------------------------------
+
+ vServerConfAppSvcsWebNotifierScalars
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsWebNotifier 1 }
+
+ vServerConfAppSvcsWebNotifierTbls
+    OBJECT IDENTIFIER ::= { vServerConfAppSvcsWebNotifier 2 }
+
+vServerWebNotifierTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrWebNotifierTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The WebNotifier table."
+    ::= { vServerConfAppSvcsWebNotifierTbls 1 }
+
+vServerWebNotifierTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrWebNotifierTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the WebNotifier table."
+    INDEX    { vServerWebNotifierTblIndex }
+    ::= { vServerWebNotifierTbl  1 }
+
+VSvrWebNotifierTblEntry ::=
+    SEQUENCE {
+        vServerWebNotifierTblIndex        Unsigned32,
+        vServerWebNotifierTblEnable       VenturiBooleanType,
+        vServerWebNotifierTblLocation     Unsigned32,
+        vServerWebNotifierTblAddString    OCTET STRING,
+    }
+ 
+vServerWebNotifierTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents row index of the WebNotifier Table"
+    ::= { vServerWebNotifierTblEntry 1 }
+
+
+vServerWebNotifierTblEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable/Disable WebNotifier"
+    ::= { vServerWebNotifierTblEntry 2 }
+
+vServerWebNotifierTblLocation    OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The WebNotifier Page-Location"
+    ::= { vServerWebNotifierTblEntry 3 }
+
+vServerWebNotifierTblAddString    OBJECT-TYPE
+
+    SYNTAX        OCTET STRING (SIZE (0..100))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The WebNotifer String to be added"
+    ::= { vServerWebNotifierTblEntry 4 }
+
+-- WebNotifierHostTable/WebNotifierBlacklistedHostTable
+-- To configure hosts to be blacklisted from WebNotifier 
+
+vServerWebNotifierHostTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrWebNotifierTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The WebNotifierHost table (WebNotifierBlacklistedHostTable)"
+    ::= { vServerConfAppSvcsWebNotifierTbls 2 }
+
+vServerWebNotifierHostTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrWebNotifierHostTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the WebNotifierHost table (WebNotifierBlacklistedHostTable)"
+    INDEX    { vServerWebNotifierHostTblIndex }
+    ::= { vServerWebNotifierHostTbl  1 }
+
+VSvrWebNotifierHostTblEntry ::=
+    SEQUENCE {
+        vServerWebNotifierHostTblIndex   Unsigned32,
+        vServerWebNotifierHostTblHost    OCTET STRING,
+    }
+
+vServerWebNotifierHostTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents row index of the WebNotifierHost Table (WebNotifierBlacklistedHostTable)"
+    ::= { vServerWebNotifierHostTblEntry 1 }
+
+vServerWebNotifierHostTblHost    OBJECT-TYPE
+
+    SYNTAX        OCTET STRING (SIZE (0..100))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Configure a host to be blacklisted from WebNotifier"
+    ::= { vServerWebNotifierHostTblEntry 2 }
+
+-- ------------------------------------------------------------
+-- vServerConfMgmtSvcs
+-- DESCRIPTION:
+--    Defines the Conf for Mgmt Svcs
+
+vServerConfDeviceGlobals     
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 1 }
+vServerConfFeature           
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 2 }
+vServerConfPush               
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 4 }
+vServerConfAlert             
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 5 }
+vServerConfSnmp              
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 6 }
+vServerConfLog               
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 7 }
+vServerConfCache             
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 8 }
+vServerConfAuth            
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 9 }
+vServerConfScheduledBoot     
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 10 }
+vServerConfSoftwareMgmt     
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 11 }
+vServerConfSecurityMgmt     
+    OBJECT IDENTIFIER ::= { vServerConfMgmtSvcs 12 }
+
+-- ---------------------------------------------------------
+-- DEVICE-GLOBALS
+-- ---------------------------------------------------------
+
+vServerConfDeviceGlobalsScalars 
+    OBJECT IDENTIFIER ::= { vServerConfDeviceGlobals 1 }
+vServerConfDeviceGlobalsTbls  
+    OBJECT IDENTIFIER ::= { vServerConfDeviceGlobals 2 }
+
+-- ------------
+-- Scalars 
+-- LIST of Possible Time zone and Regions
+-- Zulu (GMT)
+-- Africa,Abidjan
+-- Africa,Accra
+-- Africa,Addis_Ababa
+-- Africa,Algiers
+-- Africa,Asmera
+-- Africa,Bamako
+-- Africa,Bangui
+-- Africa,Banjul
+-- Africa,Bissau
+-- Africa,Blantyre
+-- Africa,Brazzaville
+-- Africa,Bujumbura
+-- Africa,Cairo
+-- Africa,Casablanca
+-- Africa,Ceuta
+-- Africa,Conakry
+-- Africa,Dakar
+-- Africa,Dar_es_Salaam
+-- Africa,Djibouti
+-- Africa,Douala
+-- Africa,El_Aaiun
+-- Africa,Freetown
+-- Africa,Gaborone
+-- Africa,Harare
+-- Africa,Johannesburg
+-- Africa,Kampala
+-- Africa,Khartoum
+-- Africa,Kigali
+-- Africa,Kinshasa
+-- Africa,Lagos
+-- Africa,Libreville
+-- Africa,Lome
+-- Africa,Luanda
+-- Africa,Lubumbashi
+-- Africa,Lusaka
+-- Africa,Malabo
+-- Africa,Maputo
+-- Africa,Maseru
+-- Africa,Mbabane
+-- Africa,Mogadishu
+-- Africa,Monrovia
+-- Africa,Nairobi
+-- Africa,Ndjamena
+-- Africa,Niamey
+-- Africa,Nouakchott
+-- Africa,Ouagadougou
+-- Africa,Porto-Novo
+-- Africa,Sao_Tome
+-- Africa,Timbuktu
+-- Africa,Tripoli
+-- Africa,Tunis
+-- Africa,Windhoek
+-- America,Buenos_Aires
+-- America,Caracas
+-- America,Mexico_City
+-- Antarctica,Casey
+-- Antarctica,Davis
+-- Antarctica,DumontDUrville
+-- Antarctica,Mawson
+-- Antarctica,McMurdo
+-- Antarctica,Palmer
+-- Antarctica,South_Pole
+-- Antarctica,Syowa
+-- Antarctica,Vostok
+-- Asia,Muscat
+-- Asia,Aden
+-- Asia,Almaty
+-- Asia,Amman
+-- Asia,Anadyr
+-- Asia,Aqtau
+-- Asia,Aqtobe
+-- Asia,Ashgabat
+-- Asia,Ashkhabad
+-- Asia,Baghdad
+-- Asia,Bahrain
+-- Asia,Baku
+-- Asia,Bangkok
+-- Asia,Beirut
+-- Asia,Urumqi
+-- Asia,Bishkek
+-- Asia,Brunei
+-- Asia,Calcutta
+-- Asia,Chungking
+-- Asia,Colombo
+-- Asia,Dacca
+-- Asia,Damascus
+-- Asia,Dhaka
+-- Asia,Dili
+-- Asia,Dubai
+-- Asia,Dushanbe
+-- Asia,Gaza
+-- Asia,Harbin
+-- Asia,Hong_Kong
+-- Asia,Hovd
+-- Asia,Irkutsk
+-- Asia,Istanbul
+-- Asia,Jakarta
+-- Asia,Jayapura
+-- Asia,Jerusalem
+-- Asia,Kabul
+-- Asia,Kamchatka
+-- Asia,Karachi
+-- Asia,Kashgar
+-- Asia,Katmandu
+-- Asia,Krasnoyarsk
+-- Asia,Kuala_Lumpur
+-- Asia,Kuching
+-- Asia,Kuwait
+-- Asia,Macao
+-- Asia,Magadan
+-- Asia,Manila
+-- Asia,Nicosia
+-- Asia,Novosibirsk
+-- Asia,Omsk
+-- Asia,Tokyo
+-- Asia,Phnom_Penh
+-- Asia,Pyongyang
+-- Asia,Qatar
+-- Asia,Rangoon
+-- Asia,Riyadh
+-- Asia,Riyadh87
+-- Asia,Riyadh88
+-- Asia,Riyadh89
+-- Asia,Saigon
+-- Asia,Samarkand
+-- Asia,Seoul
+-- Asia,Shanghai
+-- Asia,Singapore
+-- Asia,Taipei
+-- Asia,Tashkent
+-- Asia,Tbilisi
+-- Asia,Tehran
+-- Asia,Tel_Aviv
+-- Asia,Thimbu
+-- Asia,Thimphu
+-- Asia,Ujung_Pandang
+-- Asia,Ulaanbaatar
+-- Asia,Ulan_Bator
+-- Asia,Vientiane
+-- Asia,Vladivostok
+-- Asia,Yakutsk
+-- Asia,Yekaterinburg
+-- Asia,Yerevan
+-- Atlantic,Azores
+-- Atlantic,Bermuda
+-- Atlantic,Canary
+-- Atlantic,Cape_Verde
+-- Atlantic,Faeroe
+-- Atlantic,Jan_Mayen
+-- Atlantic,Madeira
+-- Atlantic,Reykjavik
+-- Atlantic,South_Georgia
+-- Atlantic,St_Helena
+-- Atlantic,Stanley
+-- Australia,ACT
+-- Australia,Adelaide
+-- Australia,Brisbane
+-- Australia,Broken_Hill
+-- Australia,Canberra
+-- Australia,Darwin
+-- Australia,Hobart
+-- Australia,LHI
+-- Australia,Lindeman
+-- Australia,Lord_Howe
+-- Australia,Melbourne
+-- Australia,NSW
+-- Australia,North
+-- Australia,Perth
+-- Australia,Queensland
+-- Australia,South
+-- Australia,Sydney
+-- Australia,Tasmania
+-- Australia,Victoria
+-- Australia,West
+-- Australia,Yancowinna
+-- Brazil,Acre
+-- Brazil,DeNoronha
+-- Brazil,East
+-- Brazil,West
+-- Canada,Atlantic
+-- Canada,Newfoundland
+-- Canada,Saskatchewan
+-- Chile,Continental
+-- Chile,EasterIsland
+-- Europe,Amsterdam
+-- Europe,Andorra
+-- Europe,Athens
+-- Europe,Belfast
+-- Europe,Belgrade
+-- Europe,Berlin
+-- Europe,Bratislava
+-- Europe,Brussels
+-- Europe,Bucharest
+-- Europe,Budapest
+-- Europe,Chisinau
+-- Europe,Copenhagen
+-- Europe,Dublin
+-- Europe,London
+-- Europe,Gibraltar
+-- Europe,Helsinki
+-- Europe,Istanbul
+-- Europe,Kaliningrad
+-- Europe,Kiev
+-- Europe,Lisbon
+-- Europe,Ljubljana
+-- Europe,Luxembourg
+-- Europe,Madrid
+-- Europe,Malta
+-- Europe,Minsk
+-- Europe,Monaco
+-- Europe,Moscow
+-- Europe,Nicosia
+-- Europe,Oslo
+-- Europe,Paris
+-- Europe,Prague
+-- Europe,Riga
+-- Europe,Rome
+-- Europe,Samara
+-- Europe,San_Marino
+-- Europe,Sarajevo
+-- Europe,Simferopol
+-- Europe,Skopje
+-- Europe,Sofia
+-- Europe,Zagreb
+-- Europe,Stockholm
+-- Europe,Tallinn
+-- Europe,Tirane
+-- Europe,Tiraspol
+-- Europe,Uzhgorod
+-- Europe,Vaduz
+-- Europe,Vatican
+-- Europe,Vienna
+-- Europe,Vilnius
+-- Europe,Warsaw
+-- Europe,Zaporozhye
+-- Europe,Zurich
+-- Indian,Antananarivo
+-- Indian,Chagos
+-- Indian,Christmas
+-- Indian,Cocos
+-- Indian,Comoro
+-- Indian,Kerguelen
+-- Indian,Mahe
+-- Indian,Maldives
+-- Indian,Mauritius
+-- Indian,Mayotte
+-- Indian,Reunion
+-- Mexico,BajaNorte
+-- Mexico,BajaSur
+-- Mexico,General
+-- Mideast,Riyadh87
+-- Mideast,Riyadh88
+-- Mideast,Riyadh89
+-- Pacific,Apia
+-- Pacific,Auckland
+-- Pacific,Chatham
+-- Pacific,Easter
+-- Pacific,Efate
+-- Pacific,Enderbury
+-- Pacific,Fakaofo
+-- Pacific,Fiji
+-- Pacific,Funafuti
+-- Pacific,Galapagos
+-- Pacific,Gambier
+-- Pacific,Guadalcanal
+-- Pacific,Guam
+-- Pacific,Honolulu
+-- Pacific,Johnston
+-- Pacific,Kiritimati
+-- Pacific,Kosrae
+-- Pacific,Kwajalein
+-- Pacific,Majuro
+-- Pacific,Marquesas
+-- Pacific,Midway
+-- Pacific,Nauru
+-- Pacific,Niue
+-- Pacific,Norfolk
+-- Pacific,Noumea
+-- Pacific,Pago_Pago
+-- Pacific,Palau
+-- Pacific,Pitcairn
+-- Pacific,Ponape
+-- Pacific,Port_Moresby
+-- Pacific,Rarotonga
+-- Pacific,Saipan
+-- Pacific,Samoa
+-- Pacific,Tahiti
+-- Pacific,Tarawa
+-- Pacific,Tongatapu
+-- Pacific,Truk
+-- Pacific,Wake
+-- Pacific,Wallis
+-- Pacific,Yap
+-- US,Alaska
+-- US,Aleutian
+-- US,Arizona
+-- US,Central
+-- US,East-Indiana
+-- US,Eastern
+-- US,Hawaii
+-- US,Indiana-Starke
+-- US,Michigan
+-- US,Mountain
+-- US,Pacific
+-- US,Samoa
+-- ------------
+  
+vServerDateAndTime    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Sets Date and Time in String format (UTC).
+                   Format: YYYY/MM/DD HH:MM:SS"
+    ::= { vServerConfDeviceGlobalsScalars 1 }
+
+vServerTZRegion    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Time zone region."
+    ::= { vServerConfDeviceGlobalsScalars 2 }
+   
+vServerTimeZone    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Time zone."
+    ::= { vServerConfDeviceGlobalsScalars 3 }
+   
+vServerTimeServerURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Host name or IP address of a time server when 
+                   using NTP (Network Time Protocol) to set the
+                   time on the Venturi server."
+    ::= { vServerConfDeviceGlobalsScalars 4 }
+   
+vServerTimeServerProtocol    OBJECT-TYPE
+    SYNTAX        INTEGER { none (0), ntp (1) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Time server protocol.  Specify 'none'
+                   to use the internal clock."
+    ::= { vServerConfDeviceGlobalsScalars 5 }
+   
+vServerTimeServerInterval    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "NTP Update Interval in Minutes.
+                   Minimum=10Min Maximum=600Min (10hrs)" 
+    ::= { vServerConfDeviceGlobalsScalars 6 }
+  
+vServerFormatOnBoot    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This specifies whether the server is to format
+                   the hard disk on reboot."
+    ::= { vServerConfDeviceGlobalsScalars 7 }
+   
+vServerSSHEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enables or disables SSH access to the server."
+    ::= { vServerConfDeviceGlobalsScalars 8 }
+   
+vServerHostname    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The host name of the Venturi server."
+    ::= { vServerConfDeviceGlobalsScalars 9 }
+   
+vServerServerIdForClient    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This server id is used in creating the client ID, 
+                   so when several servers are behind the same load 
+                   balancer, the client ID can show if the client 
+                   actually belongs this server. Range: 0-255"
+    ::= { vServerConfDeviceGlobalsScalars 10 }
+   
+
+-- ---------------------
+-- UI Web Info Table
+-- ---------------------
+
+vServerUiWebInfoTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrUiWebInfoTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfDeviceGlobalsTbls 1 }
+
+vServerUiWebInfoTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrUiWebInfoTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerUiWebInfoTblIndex }
+    ::= { vServerUiWebInfoTbl 1 }
+
+VSvrUiWebInfoTblEntry ::= 
+    SEQUENCE { 
+        vServerUiWebInfoTblIndex     Unsigned32, 
+        vServerUiWebInfoTblActive    Unsigned32,
+        vServerUiWebInfoTblHTTPPort  Unsigned32,
+        vServerUiWebInfoTblHTTPSPort Unsigned32
+    }
+
+vServerUiWebInfoTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerUiWebInfoTblEntry 1 }
+
+vServerUiWebInfoTblActive    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Ui webinfo table active."
+    ::= { vServerUiWebInfoTblEntry 2 }
+   
+vServerUiWebInfoTblHTTPPort    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents UI webinfo HTTP Port."
+    ::= { vServerUiWebInfoTblEntry 3 }
+   
+vServerUiWebInfoTblHTTPSPort    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents UI webinfo HTTPS Port.."
+    ::= { vServerUiWebInfoTblEntry 4 }
+  
+
+-- ---------------------
+-- User Conf Table
+-- This table is no longer supported
+-- and made obselete
+-- ---------------------
+
+vServerUserConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrUserConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        obsolete 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfDeviceGlobalsTbls 2 }
+
+vServerUserConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrUserConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        obsolete 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerUserConfTblIndex }
+    ::= { vServerUserConfTbl  1 }
+
+VSvrUserConfTblEntry ::= 
+    SEQUENCE { 
+        vServerUserConfTblIndex           Unsigned32, 
+        vServerUserConfTblClientAccessNum Unsigned32,
+        vServerUserConfTblUTdisp          OCTET STRING,
+        vServerUserConfTblUTIP            IpAddress,
+        vServerUserConfTblCUdisp          OCTET STRING,
+        vServerUserConfTblCUIP            IpAddress
+    }
+
+vServerUserConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION   "Represents index."
+    ::= { vServerUserConfTblEntry 1 }
+
+vServerUserConfTblClientAccessNum    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION   "Represents number of client access."
+    ::= { vServerUserConfTblEntry 2 }
+   
+vServerUserConfTblUTdisp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION   "Represents user configuration display name."
+    ::= { vServerUserConfTblEntry 3 }
+   
+vServerUserConfTblUTIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION   "Represents UT IP address."
+    ::= { vServerUserConfTblEntry 4 }
+   
+vServerUserConfTblCUdisp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION   "Represents client update display."
+    ::= { vServerUserConfTblEntry 5 }
+   
+vServerUserConfTblCUIP    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        obsolete
+    DESCRIPTION   "Represents client update ip."
+    ::= { vServerUserConfTblEntry 6 }
+   
+-- ---------------------------------------------------------
+-- FEATURE-TABLE
+-- ---------------------------------------------------------
+vServerConfFeatureScalars OBJECT IDENTIFIER ::= { vServerConfFeature 1 }
+
+vServerFeatCtrlTblVirtVS     OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents VirtVS flag of feature control table."
+    ::= { vServerConfFeatureScalars 1 }
+
+vServerFeatCtrlTblIpTransparency  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents ip transparency flag of feature control table."
+    ::= { vServerConfFeatureScalars 2 }
+
+vServerFeatCtrlTblEnableRouting  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents routing enable flag of feature control table."
+    ::= { vServerConfFeatureScalars 3 }
+
+vServerFeatCtrlTblRadiusAcct  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS accept flag of feature control table."
+    ::= { vServerConfFeatureScalars 4 }
+
+vServerFeatCtrlTblRtspEnable  OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents rtsp enable flag of feature control table."
+    ::= { vServerConfFeatureScalars 5 }
+
+-- ---------------------------------------------------------    
+-- FTP
+-- ---------------------------------------------------------
+
+vServerConfPushScalars   OBJECT IDENTIFIER ::= { vServerConfPush 1 }
+vServerConfPushTbls   OBJECT IDENTIFIER ::= { vServerConfPush 2 }
+
+-- Scalars --
+
+vServerConfPushTimeout                          OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The timeout in seconds after which a delivery attempt
+         will be retried."
+    ::= { vServerConfPushScalars 1 }
+
+vServerConfPushRetryCount                       OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The push retry count.  If the initial attempt to deliver
+         the file fails, it will be retried this number of times.
+         So, the maximum number of delivery attempts is retry 
+         count + 1."
+    ::= { vServerConfPushScalars 2 }
+
+vServerConfPushDeliveryPeriod                   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "minutes"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The scheduled time in minutes between pushes
+         of the selected files to a target server."
+    ::= { vServerConfPushScalars 3 }
+
+vServerConfigPushCstatsAccountingMode           OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Represents the client statistics accounting mode, 
+         1 for Counters, 2 for Increments."
+    ::= { vServerConfPushScalars 4 }
+
+-- Tbls --
+
+vServerPushTgtTbl                            OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VServerPushTgtEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of target systems to which files will be 
+         delivered."
+    ::= { vServerConfPushTbls 1 }
+
+vServerPushTgtEntry                            OBJECT-TYPE
+    SYNTAX        VServerPushTgtEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the vServerPushTgtTbl."
+    INDEX    { vServerPushTgtIndex }
+    ::= { vServerPushTgtTbl 1 }
+
+VServerPushTgtEntry ::=
+    SEQUENCE {
+        vServerPushTgtIndex                    Unsigned32,
+        vServerPushTgtEnable                   VenturiBooleanType,
+        vServerPushTgtHost                     OCTET STRING,
+        vServerPushTgtPort                     Unsigned32,
+        vServerPushTgtUser                     OCTET STRING,
+        vServerPushTgtPassword                 OCTET STRING,
+        vServerPushTgtDirectory                OCTET STRING,
+        vServerPushTgtTrapNotification         VenturiBooleanType,
+        vServerPushProtocol                    INTEGER,
+        vServerPushFileTypes                   BITS
+    }
+
+vServerPushTgtIndex                                  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The index (row number) of the entry in the table."
+    ::= { vServerPushTgtEntry 1 }
+
+vServerPushTgtEnable                                 OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The enable state of this push target.  The target
+         may be enabled (yes) or disabled (no) without
+         changing the other information about the target."
+    ::= { vServerPushTgtEntry 2 }
+
+vServerPushTgtHost                                   OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The host name or IP address of the server to which
+         the files will be uploaded."
+    ::= { vServerPushTgtEntry 3 }
+    
+vServerPushTgtPort                                   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The port number on the target host to which we will
+         connect to deliver files.  It is expected that a 
+         server process supporting the selected protocol will
+         be listening on this port."
+    ::= { vServerPushTgtEntry 4 }
+
+vServerPushTgtUser                                   OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The user name which will be presented when connecting 
+         to the target host."
+    ::= { vServerPushTgtEntry 5 }
+    
+vServerPushTgtPassword                               OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The password which will be presented when connecting 
+         to the target host."
+    ::= { vServerPushTgtEntry 6 }
+    
+vServerPushTgtDirectory                              OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..512))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The directory on the target host to which the files
+         will be uploaded."
+    ::= { vServerPushTgtEntry 7 }
+    
+vServerPushTgtTrapNotification                       OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "A failure condition will be announced with an SNMP trap
+         if the specified file types fail to upload to the target
+         host and this object is set to 'yes'."
+    ::= { vServerPushTgtEntry 8 }
+
+vServerPushProtocol                                     OBJECT-TYPE
+    SYNTAX        INTEGER { ftp (1), scp (2), sftp (3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The procotol used to upload files."
+    ::= { vServerPushTgtEntry 9 }
+
+vServerPushFileTypes                                    OBJECT-TYPE
+    SYNTAX        BITS { 
+                          logs          (0),
+                          transactions  (1),
+                          stats         (2),
+                          clientStats   (3),
+                          clientUpg     (4),
+                          cdclogs       (5),
+                          gwcstats      (6)
+                       }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Defines the types of files which will be uploaded to 
+         this target host. This is a bit mask with each bit
+         indicating a different file type to upload from the
+         Venturi server."
+    ::= { vServerPushTgtEntry 10 }
+
+
+-- ------------------------------------------------------------------
+-- ALERT-CONFIG
+-- ------------------------------------------------------------------
+
+vServerConfAlertScalars    OBJECT IDENTIFIER ::= { vServerConfAlert 1 }
+vServerConfAlertTbls    OBJECT IDENTIFIER ::= { vServerConfAlert 2 }
+
+-- ----------------------
+-- Alert Scalars
+-- ----------------------
+
+vServerConfAlertEmailTO    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Email address of target for email alerts."
+    ::= { vServerConfAlertScalars 1 }
+   
+vServerConfAlertEmailFROM    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Address to send as FROM address in email alerts."
+    ::= { vServerConfAlertScalars 2 }
+   
+vServerConfAlertSMTPServer    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Address of SMTP server to use in sending email alerts."
+    ::= { vServerConfAlertScalars 3 }
+   
+vServerConfAlertThreshold    OBJECT-TYPE
+    SYNTAX        VenturiThresholdLevels
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Only events (logs) at or above this priority level will 
+                   be processed."
+    ::= { vServerConfAlertScalars 4 }
+   
+vServerConfAlertDebugLogEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable software debug logs.  Debug logs are recorded
+                   by Venturi software to aid in problem determination
+                   by Venturi Customer Ops.  Debug logs should only be
+                   enabled when requested by Venturi Customer Ops.  
+                   Enabling debug logs may affect performance of the 
+                   Venturi server, depending on the level of detail
+                   specified in the vServerLogModuleConfTbl."
+    ::= { vServerConfAlertScalars 5 }
+   
+vServerConfAlertSNMPTrapsEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Allow sending of SNMP traps by the server."
+    ::= { vServerConfAlertScalars 6 }
+
+vServerConfAlertSyslogServer    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The name or IP address of the syslog server 
+                   to which Venturi logs are sent when syslog 
+                   is configured as a target for Venturi alerts."
+    ::= { vServerConfAlertScalars 7 }
+   
+vServerConfAlertSyslogFacility    OBJECT-TYPE
+    SYNTAX        VenturiSyslogFacilityType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The syslog facility used when Venturi logs are
+                   sent to syslog (local0 - local7)."
+    ::= { vServerConfAlertScalars 8 }
+   
+-- ----------------------
+-- Log Module Config Table
+-- ----------------------
+
+vServerLogModuleConfTbl    OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrLogModuleConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "The table used to set the debug log thresholds 
+                   for the various log modules in the Venturi server 
+                   application.  These will be used to control the level
+                   of logging when vServerConfAlertDebugLogEnable is
+                   set to 'yes'."
+    ::= { vServerConfAlertTbls 1 }
+
+vServerLogModuleConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrLogModuleConfTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the vSErverLogModuleConfTbl."
+    INDEX    { vServerLogModuleConfTblModule }
+    ::= { vServerLogModuleConfTbl    1 }
+
+VSvrLogModuleConfTblEntry ::= 
+    SEQUENCE { 
+        vServerLogModuleConfTblModule     VenturiLogModuleType, 
+        vServerLogModuleConfTblThreshold  VenturiThresholdLevels
+    }
+
+vServerLogModuleConfTblModule    OBJECT-TYPE
+    SYNTAX        VenturiLogModuleType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The Venturi log module."
+    ::= { vServerLogModuleConfTblEntry 1 }
+
+vServerLogModuleConfTblThreshold    OBJECT-TYPE
+    SYNTAX        VenturiThresholdLevels
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The threshold for debug logs for this log module.  
+                   Only software debug messages with priorities at 
+                   or above this level will be recorded."
+    ::= { vServerLogModuleConfTblEntry 2 }
+   
+
+vServerAlertRoutingTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrAlertRoutingTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "This table defines the routing of Venturi
+                   log messages through various reporting 
+                   methods (such as syslog, SNMP trap and log
+                   to internal file).  The priority of each
+                   event can also be set.  Only events which
+                   have priority at or above the log threshold
+                   will be routed.  Note that deprecated alerts
+                   may also exist in this table for historical
+                   consistency, so events not listed as current
+                   should be ignored."
+        ::= { vServerConfAlertTbls 2 }
+
+vServerAlertRoutingTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrAlertRoutingTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerAlertIndex }
+        ::= { vServerAlertRoutingTbl  1 }
+
+VSvrAlertRoutingTblEntry ::= 
+    SEQUENCE { 
+        vServerAlertIndex        Unsigned32, 
+        vServerAlertEventName    OCTET STRING, 
+        vServerAlertPriority     VenturiLogLevels,
+        vServerAlertMethods      BITS,
+        vServerAlertCurrent      VenturiBooleanType,
+        vServerAlertTrapSeverity VenturiTrapSeverity
+    }
+
+vServerAlertIndex     OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Index into the table of alerts."
+    ::= { vServerAlertRoutingTblEntry 1 }
+
+vServerAlertEventName OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Human readable name (in English) of the
+                   event triggering this alert."
+    ::= { vServerAlertRoutingTblEntry 2 }
+   
+vServerAlertPriority    OBJECT-TYPE
+    SYNTAX        VenturiLogLevels
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The priority of this alert.  This alert will only
+                   be sent if its priority is equal to or higher than
+                   the value of vServerConfAlertThreshold."
+    ::= { vServerAlertRoutingTblEntry 3 }
+  
+vServerAlertMethods  OBJECT-TYPE
+    SYNTAX        BITS {
+                         logfile (0),
+                         email   (1),
+                         snmptrap(2),
+                         syslog  (3)
+                       }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This is a bit mask indicating the delivery methods
+                   currently enabled for this alert."
+    ::= { vServerAlertRoutingTblEntry 4 }
+
+vServerAlertCurrent     OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indicates whether this alert is current (yes) or
+                   historical (no).  Historical alerts are no longer
+                   generated by current code, but remain in the table
+                   to perserve compatability with previous server
+                   revisions."
+    ::= { vServerAlertRoutingTblEntry 5 }
+
+vServerAlertTrapSeverity     OBJECT-TYPE
+    SYNTAX        VenturiTrapSeverity
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This is the value of the TrapSeverity field sent
+                   with the trap associated with this alert, if there
+                   is one.  For alerts with no associated trap, this
+                   object is meaningless and is set to notApplicable(0)
+                   by default."
+    ::= { vServerAlertRoutingTblEntry 6 }
+
+
+-- --------------------------------------------------------------------
+-- SNMP
+-- --------------------------------------------------------------------
+
+vServerConfSnmpScalars    OBJECT IDENTIFIER ::= { vServerConfSnmp 1 }
+vServerConfSnmpTbls    OBJECT IDENTIFIER ::= { vServerConfSnmp 2 }
+
+-- ----------------------
+-- SNMP Scalars
+-- ----------------------
+
+vServerSnmpConfTblAgentEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Used to control whether the SNMP agent is running."
+    ::= { vServerConfSnmpScalars 1 }
+
+vServerSnmpConfTblAgentPort    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Normally the SNMP agent listens for requests on UDP
+                   port 161, but this can be changed by setting this
+                   object to an alternative UDP port number.
+                   Note:  make sure the port is available (not taken
+                   by another service) or the SNMP agent will fail to 
+                   run."
+    ::= { vServerConfSnmpScalars 2 }
+   
+vServerSnmpConfTblReadOnlyCommunity    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The community name used read-only access to
+                   the SNMP agent."
+    ::= { vServerConfSnmpScalars 3 }
+   
+vServerSnmpConfTblReadWriteCommunity    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The community name used for read-write access
+                   to the SNMP agent.
+                   Note:  it is not valid to use the same name for
+                   both read-only and read-write communities.  They
+                   must be different for the SNMP agent to distinguish
+                   the type of access requested."
+    ::= { vServerConfSnmpScalars 4 }
+   
+vServerSnmpConfTblSysContact    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This configures the value returned for sysContact
+                   from MIB-II."
+    ::= { vServerConfSnmpScalars 5 }
+   
+vServerSnmpConfTblSysLocation    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "This configures the value returned for sysLocation
+                   from MIB-II."
+    ::= { vServerConfSnmpScalars 6 }
+  
+vServerSNMPTrapTgtRetryCount    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "RetryCount (0-5)"
+    ::= { vServerConfSnmpScalars 7 }
+   
+vServerSNMPTrapTgtTimeout    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Timeout in Secs"
+    ::= { vServerConfSnmpScalars 8 }
+   
+vServerSNMPTrapTgtTrapFrequency    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "TrapFrequency in secs"
+    ::= { vServerConfSnmpScalars 9 }
+   
+vServerSnmpConfTblHealthCheckAgentEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable or disable health check SNMP agent."
+    ::= { vServerConfSnmpScalars 10 }
+
+-- ----------------------
+-- SNMP Trap Target Table
+-- ----------------------
+
+vServerSNMPTrapTgt          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrSNMPTrapTgtEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "The table of configured trap targets."
+        ::= { vServerConfSnmpTbls 1 }
+
+vServerSNMPTrapTgtEntry          OBJECT-TYPE
+    SYNTAX        VSvrSNMPTrapTgtEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Trap Target Table."
+    INDEX    { vServerSNMPTrapTgtIndex }
+        ::= { vServerSNMPTrapTgt   1 }
+
+VSvrSNMPTrapTgtEntry ::= 
+    SEQUENCE { 
+        vServerSNMPTrapTgtIndex     Unsigned32, 
+        vServerSNMPTrapTgtHost      OCTET STRING,
+        vServerSNMPTrapTgtPort      Unsigned32,
+        vServerSNMPTrapTgtCommunity OCTET STRING,
+        vServerSNMPTrapTgtTrapType  VenturiTrapType
+    }
+
+vServerSNMPTrapTgtIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Index of the entry."
+    ::= { vServerSNMPTrapTgtEntry 1 }
+
+vServerSNMPTrapTgtHost    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Host name or IP address of the trap target."
+    ::= { vServerSNMPTrapTgtEntry 2 }
+   
+vServerSNMPTrapTgtPort    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Target UPD port to which traps are sent."
+    ::= { vServerSNMPTrapTgtEntry 3 }
+   
+vServerSNMPTrapTgtCommunity    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Community name sent with the trap."
+    ::= { vServerSNMPTrapTgtEntry 4 }
+   
+vServerSNMPTrapTgtTrapType    OBJECT-TYPE
+    SYNTAX        VenturiTrapType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The trap type sent. v1 trap is no longer supported"
+    ::= { vServerSNMPTrapTgtEntry 5 }
+   
+-- ---------------------------------------------------------
+-- LOG
+-- ---------------------------------------------------------
+
+vServerConfLogScalars    OBJECT IDENTIFIER ::= { vServerConfLog 1 }
+vServerConfLogTbls       OBJECT IDENTIFIER ::= { vServerConfLog 2 }
+
+vServerHttpLogFullUrl    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Selects whether full (as opposed to relative) URLS 
+                   should be recorded in transaction logs."
+    ::= { vServerConfLogScalars 1 }
+   
+vServerHttpLogHideIp    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Selects whether the source IP address should be
+                   recorded in URL logs."
+    ::= { vServerConfLogScalars 2 }
+   
+vServerTransactionLoggingEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Selects whether URL logging is enabled."
+    ::= { vServerConfLogScalars 3 }
+   
+vServerDisconnectedUserLoggingEnabled    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Selects whether disconnected user logging is enabled."
+    ::= { vServerConfLogScalars 4 }
+   
+-- ---------------------------------------------------------
+-- CACHE
+-- ---------------------------------------------------------
+
+vServerConfCacheScalars OBJECT IDENTIFIER ::= { vServerConfCache 1 }
+vServerConfCacheTbls  OBJECT IDENTIFIER ::= { vServerConfCache 2 }
+
+vServerMaxCacheObjectSize    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Specifies the maximum cacheable object size in KB."
+    ::= { vServerConfCacheScalars 1 }
+-- ---------------------------------------------------------
+-- Cache Bypass Table 
+-- ---------------------------------------------------------
+
+vServerCacheBypassTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCacheBypassTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfCacheTbls 1 }
+
+vServerCacheBypassTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCacheBypassTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerCacheBypassTblIndex }
+    ::= { vServerCacheBypassTbl  1 }
+
+VSvrCacheBypassTblEntry ::= 
+    SEQUENCE { 
+        vServerCacheBypassTblIndex        Unsigned32, 
+        vServerCacheBypassTblHostname     OCTET STRING,
+        vServerCacheBypassTblIpaddr       IpAddress,
+        vServerCacheBypassTblPortRange    OCTET STRING,
+        vServerCacheBypassTblDestinations OCTET STRING
+    }
+
+vServerCacheBypassTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerCacheBypassTblEntry 1 }
+
+vServerCacheBypassTblHostname    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents bypassing cache's hostname"
+    ::= { vServerCacheBypassTblEntry 2 }
+
+vServerCacheBypassTblIpaddr    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents bypassing cache's IP address."
+    ::= { vServerCacheBypassTblEntry 3 }
+   
+vServerCacheBypassTblPortRange    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents port-range e.g 1024:2048."
+    ::= { vServerCacheBypassTblEntry 4 }
+   
+vServerCacheBypassTblDestinations    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents destinations bypassed"
+    ::= { vServerCacheBypassTblEntry 5 }
+   
+
+-- ---------------------------------------------------------
+-- Cache Config Table 
+-- ---------------------------------------------------------
+
+vServerCacheConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCacheConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfCacheTbls 2 }
+
+vServerCacheConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCacheConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerCacheConfTblIndex }
+    ::= { vServerCacheConfTbl  1 }
+
+VSvrCacheConfTblEntry ::=
+    SEQUENCE {
+        vServerCacheConfTblIndex     Unsigned32,
+        vServerCacheConfTblMode      Unsigned32,
+        vServerCacheConfTblExtCacheURL      OCTET STRING
+    }
+
+vServerCacheConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerCacheConfTblEntry 1 }
+
+vServerCacheConfTblMode    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents various mode of cache."
+    ::= { vServerCacheConfTblEntry 2 }
+
+vServerCacheConfTblExtCacheURL      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "ExternalCacheURL"
+    ::= { vServerCacheConfTblEntry 3 }
+  
+
+-- ---------------------------------------------------------
+-- Squid ACL Config Table 
+-- ---------------------------------------------------------
+vServerCacheACLConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCacheACLConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfCacheTbls 3 }
+
+vServerCacheACLConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCacheACLConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerCacheACLConfTblIndex }
+    ::= { vServerCacheACLConfTbl  1 }
+
+VSvrCacheACLConfTblEntry ::=
+    SEQUENCE {
+        vServerCacheACLConfTblIndex     Unsigned32,
+        vServerCacheACLConfTblName           OCTET STRING,
+        vServerCacheACLConfTblMatchType      OCTET STRING,
+        vServerCacheACLConfTblMatchArgs      OCTET STRING
+    }
+
+vServerCacheACLConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerCacheACLConfTblEntry 1 }
+
+vServerCacheACLConfTblName    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Name."
+    ::= { vServerCacheACLConfTblEntry 2 }
+
+vServerCacheACLConfTblMatchType      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "MatchType"
+    ::= { vServerCacheACLConfTblEntry 3 }
+
+vServerCacheACLConfTblMatchArgs      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "MatchArgs"
+    ::= { vServerCacheACLConfTblEntry 4 }
+
+-- ---------------------------------------------------------
+-- Squid RP Config Table 
+-- ---------------------------------------------------------
+
+vServerCacheRPConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCacheRPConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    ::= { vServerConfCacheTbls 4 }
+
+vServerCacheRPConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCacheRPConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the Tbl."
+    INDEX    { vServerCacheRPConfTblIndex }
+    ::= { vServerCacheRPConfTbl  1 }
+
+VSvrCacheRPConfTblEntry ::=
+    SEQUENCE {
+        vServerCacheRPConfTblIndex     Unsigned32,
+        vServerCacheRPConfTblPattern   OCTET STRING,
+        vServerCacheRPConfTblMin       Unsigned32,
+        vServerCacheRPConfTblMax       Unsigned32,
+        vServerCacheRPConfTblPercent   Unsigned32
+    }
+
+vServerCacheRPConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index."
+    ::= { vServerCacheRPConfTblEntry 1 }
+
+vServerCacheRPConfTblPattern    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..64))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Pattern."
+    ::= { vServerCacheRPConfTblEntry 2 }
+
+vServerCacheRPConfTblMin      OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Min"
+    ::= { vServerCacheRPConfTblEntry 3 }
+
+vServerCacheRPConfTblMax      OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Max"
+    ::= { vServerCacheRPConfTblEntry 4 }
+
+vServerCacheRPConfTblPercent      OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Percent"
+    ::= { vServerCacheRPConfTblEntry 5 }
+ 
+-- ---------------------------------------------------------
+-- Cache Hierarchy Config Table
+-- ---------------------------------------------------------
+
+vServerCacheHierarchyConfTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrCacheHierarchyConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table with the cache hierarchy entries."
+    ::= { vServerConfCacheTbls 5 }
+    
+vServerCacheHierarchyConfTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrCacheHierarchyConfTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the cache hierarchy table."
+    INDEX    { vServerCacheHierarchyConfTblIndex }
+    ::= { vServerCacheHierarchyConfTbl  1 }
+
+VSvrCacheHierarchyConfTblEntry ::=
+    SEQUENCE {
+        vServerCacheHierarchyConfTblIndex        Unsigned32,
+        vServerCacheHierarchyConfTblIpAndPort    OCTET STRING,
+        vServerCacheHierarchyConfTblRelationType OCTET STRING
+    }
+
+vServerCacheHierarchyConfTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents the index of the cache hierarchy table."
+    ::= { vServerCacheHierarchyConfTblEntry 1 }
+
+vServerCacheHierarchyConfTblIpAndPort    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The remote cache address and port in the following
+                   format: <IP address>:<port>
+                   Example: 10.27.2.45:9090"
+    ::= { vServerCacheHierarchyConfTblEntry 2 }
+
+vServerCacheHierarchyConfTblRelationType      OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..8))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The relation type of the remote server. The valid
+                   values are proxy or sibling "
+    ::= { vServerCacheHierarchyConfTblEntry 3 }
+
+-- ---------------------------------------------------------
+-- RADIUS Configuration
+
+-- AuthTable
+-- AuthenticationMethod (SOURCEIP,RADIUS,NONE)
+--     AUTH_NONE,                  /* no authentication */
+--     AUTH_SIMPLE,                /* simple authentication */
+--     AUTH_RADIUS                 /* RADIUS authentication */
+-- AuthenticationString (For SOURCEIP)
+
+-- These are provisioned into RADIUSConfigTable
+-- Enabled
+-- ServerHost
+-- ServerPort
+-- SharedSecret 
+-- ListenPort
+
+-- These are provisioned into radius_cfg_table
+-- rad_enable (accounting enabled or not)
+--   Also accounting is controlled globally through Feature Control Table
+--   as this can be seperately chargable feature
+-- rad_svr_retry_count
+-- rad_svr_timeout
+-- rad_svr_key
+-- rad_svr_count
+
+-- Allow Deny table 
+-- ---------------------------------------------------------
+
+vServerConfAuthScalars    OBJECT IDENTIFIER ::= { vServerConfAuth 1 }
+vServerConfAuthTbls    OBJECT IDENTIFIER ::= { vServerConfAuth 2 }
+
+vServerConfAuthMethod  OBJECT-TYPE
+    SYNTAX        INTEGER { authnone (1), authsimple (2), authradius (3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION "Type of vServerConfAuthMethod i.e. NONE(1), SOURCEIP(2),RADIUS(3)"
+    ::= { vServerConfAuthScalars 1 }
+
+vServerConfAuthString  OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION "AuthSimple Authentication String"
+    ::= { vServerConfAuthScalars 2 }
+
+
+vServerradiusCfgTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrradiusCfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table of RADIUS configuration."
+    ::= { vServerConfAuthTbls 1 }
+
+vServerradiusCfgTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrradiusCfgTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the RADIUS configuration Tbl."
+    INDEX    { vServerradiusCfgTblIndex }
+    ::= { vServerradiusCfgTbl  1 }
+
+VSvrradiusCfgTblEntry ::= 
+    SEQUENCE { 
+        vServerradiusCfgTblIndex            Unsigned32, 
+        vServerradiusCfgTblRadEnable        VenturiBooleanType,
+        vServerradiusCfgTblRadSvrRetryCount Integer32,
+        vServerradiusCfgTblRadSvrTimeout    Integer32,
+        vServerradiusCfgTblRadSvrKey        OCTET STRING,
+        vServerradiusCfgTblRadSvrCount      Integer32,
+        vServerradiusCfgTblListenPort       Integer32,
+
+        vServerradiusCfgTblAccountEnable    VenturiBooleanType,
+        vServerradiusCfgTblServerHost       IpAddress,
+        vServerradiusCfgTblServerPort       Integer32,
+        vServerradiusCfgTblSharedSecret     OCTET STRING
+    }
+
+vServerradiusCfgTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerradiusCfgTblEntry 1 }
+
+vServerradiusCfgTblRadEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents enable flag."
+    ::= { vServerradiusCfgTblEntry 2 }
+   
+vServerradiusCfgTblRadSvrRetryCount    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server retry count."
+    ::= { vServerradiusCfgTblEntry 3 }
+   
+vServerradiusCfgTblRadSvrTimeout    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server timeout."
+    ::= { vServerradiusCfgTblEntry 4 }
+   
+vServerradiusCfgTblRadSvrKey    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server Key."
+    ::= { vServerradiusCfgTblEntry 5 }
+
+vServerradiusCfgTblRadSvrCount    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server count."
+    ::= { vServerradiusCfgTblEntry 6 }
+   
+vServerradiusCfgTblListenPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS listen port."
+    ::= { vServerradiusCfgTblEntry 7 }
+
+
+vServerradiusCfgTblAccountEnable    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "AccountingEnable."
+    ::= { vServerradiusCfgTblEntry 8 }
+
+vServerradiusCfgTblServerHost    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "ServerHost."
+    ::= { vServerradiusCfgTblEntry 9 }
+
+vServerradiusCfgTblServerPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "ServerPort."
+    ::= { vServerradiusCfgTblEntry 10 }
+
+vServerradiusCfgTblSharedSecret    OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "SharedSecret."
+    ::= { vServerradiusCfgTblEntry 11 }
+
+
+
+
+-- ----------------------------------------------
+-- Radius Accounting Servers (radius_svr_cfg_table) 
+-- rad_svr_addr
+-- rad_svr_auth_port
+-- rad_svr_acct_port
+-- rad_svr_active
+-- ----------------------------------------------
+vServerradiusSvrCfgTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrradiusSvrCfgTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "A table of RADIUS server configuration."
+        ::= { vServerConfAuthTbls 2 }
+
+vServerradiusSvrCfgTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrradiusSvrCfgTblEntry
+    MAX-ACCESS    not-accessible 
+    STATUS        current 
+    DESCRIPTION   "An entry in the RADIUS server configuration table."
+    INDEX    { vServerradiusSvrCfgTblIndex }
+        ::= { vServerradiusSvrCfgTbl  1 }
+
+VSvrradiusSvrCfgTblEntry ::= 
+    SEQUENCE { 
+        vServerradiusSvrCfgTblIndex          Unsigned32, 
+        vServerradiusSvrCfgTblRadSvrAddr     IpAddress,
+        vServerradiusSvrCfgTblRadSvrAuthPort Integer32,
+        vServerradiusSvrCfgTblRadSvrAcctPort Integer32,
+        vServerradiusSvrCfgTblRadSvrActive   VenturiBooleanType
+    }
+
+vServerradiusSvrCfgTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerradiusSvrCfgTblEntry 1 }
+
+vServerradiusSvrCfgTblRadSvrAddr    OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server address."
+    ::= { vServerradiusSvrCfgTblEntry 2 }
+   
+vServerradiusSvrCfgTblRadSvrAuthPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server authentication port."
+    ::= { vServerradiusSvrCfgTblEntry 3 }
+
+vServerradiusSvrCfgTblRadSvrAcctPort    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server accept port."
+    ::= { vServerradiusSvrCfgTblEntry 4 }
+   
+vServerradiusSvrCfgTblRadSvrActive    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents RADIUS server active flag."
+    ::= { vServerradiusSvrCfgTblEntry 5 }
+  
+-- ---------------------------------------------------------
+-- Authentication Allow Deny table
+-- For Simple Auth Type
+-- ---------------------------------------------------------
+vServerAuthAllowDenyTbl          OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VSvrAuthAllowDenyTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "A table for Auth Allow Deny."
+    ::= { vServerConfAuthTbls 3 }
+
+vServerAuthAllowDenyTblEntry          OBJECT-TYPE
+    SYNTAX        VSvrAuthAllowDenyTblEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry for Auth Allow Deny."
+    INDEX    { vServerAuthAllowDenyTblIndex }
+    ::= { vServerAuthAllowDenyTbl  1 }
+
+VSvrAuthAllowDenyTblEntry ::= 
+    SEQUENCE { 
+        vServerAuthAllowDenyTblIndex            Unsigned32, 
+        vServerAuthAllowDenyTblAllowFlag        VenturiBooleanType,
+        vServerAuthAllowDenyTblPattern          OCTET STRING
+    }
+
+vServerAuthAllowDenyTblIndex    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents index of the row."
+    ::= { vServerAuthAllowDenyTblEntry 1 }
+
+vServerAuthAllowDenyTblAllowFlag    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Allow enable flag."
+    ::= { vServerAuthAllowDenyTblEntry 2 }
+   
+vServerAuthAllowDenyTblPattern    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Pattern to filter"
+    ::= { vServerAuthAllowDenyTblEntry 3 }
+  
+ 
+-- ---------------------------------------------------------
+-- VSERVER-USER-TABLE 
+-- ---------------------------------------------------------
+
+-- ---------------------------------------------------------
+-- SCHEDULED-BOOT
+-- Convert the values in GET/SET
+-- BootSched
+-- REBOOT_NONE 
+-- REBOOT_SCHED
+-- REBOOT_CANCEL
+--
+-- BootMode or Type
+-- REBOOT_PERIODIC
+-- REBOOT_AT     
+-- REBOOT_IN    
+-- ---------------------------------------------------------
+
+vServerConfScheduledBootScalars   
+    OBJECT IDENTIFIER ::= { vServerConfScheduledBoot 1 }
+vServerConfScheduledBootTbls   
+    OBJECT IDENTIFIER ::= { vServerConfScheduledBoot 2 }
+
+vServerConfScheduledBootActive                 OBJECT-TYPE
+    SYNTAX        INTEGER { rebootnone (1), rebootsched (2), rebootcancel (3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION "Represents type of scheduled Boot. 
+                 After scheduling the reboot it sets to rebootnone."
+    ::= { vServerConfScheduledBootScalars 1 }
+
+vServerConfScheduledBootMode                   OBJECT-TYPE
+    SYNTAX        INTEGER { rebootperiodic (1), rebootat (2), rebootin (3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION "Scheduled Boot Mode/Type."
+    ::= { vServerConfScheduledBootScalars 2 }
+
+vServerConfScheduledBootMonth                  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Scheduled Boot month 0-12
+         The value 0 is valid for rebootin mode"
+    ::= { vServerConfScheduledBootScalars 3 }
+
+vServerConfScheduledBootDay                    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Scheduled Boot day 0-31
+         The value 0 is valid for rebootin mode"
+    ::= { vServerConfScheduledBootScalars 4 }
+
+vServerConfScheduledBootHour                   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Scheduled Boot hour 0-23"
+    ::= { vServerConfScheduledBootScalars 5 }
+
+vServerConfScheduledBootMinute                 OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Scheduled Boot Minute 0-59.
+         Also this value cannot be less than 10 min if mode is PERIODIC"
+    ::= { vServerConfScheduledBootScalars 6 }
+
+-- ---------------------------------------------------------
+-- REGISTRATION TABLE
+-- ---------------------------------------------------------
+
+
+-- ---------------------------------------------------------
+-- Software Management 
+-- ---------------------------------------------------------
+
+vServerSoftwareMgmtScalars   
+    OBJECT IDENTIFIER ::= { vServerConfSoftwareMgmt 1 }
+
+vServerSoftwareMgmtBootFrom    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents current location of boot."
+    ::= { vServerSoftwareMgmtScalars 1 }
+   
+vServerSoftwareMgmtBootSlot    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents current boot slot."
+    ::= { vServerSoftwareMgmtScalars 2 }
+   
+vServerSoftwareMgmtLastURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Last URL used."
+    ::= { vServerSoftwareMgmtScalars 3 }
+   
+vServerSoftwareMgmtURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents current URL."
+    ::= { vServerSoftwareMgmtScalars 4 }
+   
+vServerSoftwareMgmtInstallDest    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents install destination i.e. disk:part0, disk:part1, flash:part0,
+                   flash:part1"
+    ::= { vServerSoftwareMgmtScalars 5 }
+   
+vServerSoftwareMgmtNextBoot    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents next boot location i.e. disk:part0, disk:part1, flash:part0,
+                   flash:part1"
+    ::= { vServerSoftwareMgmtScalars 6 }
+   
+vServerSoftwareMgmtDiskStatus    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents disk status."
+    ::= { vServerSoftwareMgmtScalars 7 }
+   
+vServerSoftwareMgmtInstStatus    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents install status
+                   SW_STATUS_NONE(0)
+                   SW_STATUS_SUCCESS(1)
+                   SW_STATUS_FAILED(2)
+                   SW_STATUS_INPROGRESS(3)"
+
+    ::= { vServerSoftwareMgmtScalars 8 }
+   
+vServerSoftwareMgmtInstStatusDetail    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents detailed install status. 0- Success 1-4-errors"
+    ::= { vServerSoftwareMgmtScalars 9 }
+   
+vServerSoftwareMgmtVPID    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Software Mgmt VPID. 
+                   Is used to avoid duplicate Install and Backup commands"
+    ::= { vServerSoftwareMgmtScalars 10 }
+   
+vServerSoftwareMgmtVerifyResult    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents Verify Result."
+    ::= { vServerSoftwareMgmtScalars 11 }
+   
+vServerSoftwareMgmtVerify    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Verify. If this is set to 1 the software files
+                   are checked for checksum and integrity and 
+                   the result is set in verisfyResult.
+                   The value of verify then reverts back to -1."
+    ::= { vServerSoftwareMgmtScalars 12 }
+   
+vServerSoftwareMgmtBackupURL    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Backup URL."
+    ::= { vServerSoftwareMgmtScalars 13 }
+   
+vServerSoftwareMgmtBackupSrc    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Backup Source Format: disk:part0, flash:part0, etc."
+    ::= { vServerSoftwareMgmtScalars 14 }
+   
+vServerSoftwareMgmtBackupType    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents Backup Type. The valid values are config or full."
+    ::= { vServerSoftwareMgmtScalars 15 }
+   
+vServerSoftwareMgmtBackupStatus    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents Backup Status
+                   SW_STATUS_NONE(0)
+                   SW_STATUS_SUCCESS(1)
+                   SW_STATUS_FAILED(2)
+                   SW_STATUS_INPROGRESS(3)"
+    ::= { vServerSoftwareMgmtScalars 16 }
+   
+vServerSoftwareMgmtBackupStatusDetailed    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Represents Detailed Backup Status."
+    ::= { vServerSoftwareMgmtScalars 17 }
+   
+vServerSoftwareMgmtRequireReboot    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents reboot is required or not (deprecated not used)."
+    ::= { vServerSoftwareMgmtScalars 18 }
+   
+
+-- ---------------------------------------------------------
+-- Security Management 
+-- Enable Maintenance Access
+-- Current Admin Password: 
+-- New Web Interface Password: 
+-- ---------------------------------------------------------
+
+vServerSecurityMgmtScalars   
+    OBJECT IDENTIFIER ::= { vServerConfSecurityMgmt 1 }
+
+vServerSecurityMgmtEnableMaintAccess    OBJECT-TYPE
+    SYNTAX        VenturiBooleanType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Enable/Disable Maintenance Access."
+    ::= { vServerSecurityMgmtScalars 1 }
+   
+vServerSecurityMgmtCurrAdminPwd    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents current Password."
+    ::= { vServerSecurityMgmtScalars 2 }
+   
+vServerSecurityMgmtNewAdminPwd    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..255))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Represents New Password."
+    ::= { vServerSecurityMgmtScalars 3 }
+
+vServerSecurityMgmtAdminPwdUpstatus    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Flag to check admin pwd has been changed or not. 2 means failure ,1 means success and 0 means no attempt yet had been made to change password"
+    ::= { vServerSecurityMgmtScalars 4 }
+  
+
+-- --------------------------------------------
+-- vServerConfActionSvcs
+-- DESCRIPTION:
+-- Defines the Conf for ActionSvcs
+-- --------------------------------------------
+vServerConfActionSvcsScalars    
+    OBJECT IDENTIFIER ::= { vServerConfActionSvcs 1 }
+
+vServerStagingCtlValResp    OBJECT-TYPE
+     SYNTAX        OCTET STRING (SIZE (0..128))
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Validation Response in String format."
+     ::= { vServerConfActionSvcsScalars 1 }
+
+vServerStagingCtlClearResp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Clear Response in String format."
+     ::= { vServerConfActionSvcsScalars 2 }
+   
+vServerStagingCtlCommitResp    OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (0..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Commit Response in String format."
+     ::= { vServerConfActionSvcsScalars 3 }
+   
+vServerStagingCtlClearResult    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "    
+        Do a GET on this variable to CLEAR
+        all the SETs done so far. 
+        Possible RETURN Codes:
+        STAGING_SUCCESS         1000
+        STAGING_FAIL            1001"
+     ::= { vServerConfActionSvcsScalars 4 }
+   
+vServerStagingCtlCommitResult    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "     
+
+        Do a GET on this variable to COMMIT
+        all the SETs done so far. This will also 
+        write the changes to startup config.
+
+        Possible RETURN Codes:
+        STAGING_SUCCESS         1000
+        STAGING_FAIL            1001
+        STAGING_VAL2_FAIL       1003
+        STAGING_COMMIT_FAIL     1004"
+     ::= { vServerConfActionSvcsScalars 5 }
+
+END
