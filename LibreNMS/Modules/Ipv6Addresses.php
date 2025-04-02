@@ -73,17 +73,21 @@ class Ipv6Addresses implements Module
                 return true;
             }
 
-            if ($ip->ipv6_compressed === '::1' || IPv6::parse($ip->ipv6_address)->isLinkLocal()) {
+            return $ip->ipv6_compressed === '::1';
+        })->each(function (Ipv6Address $ip) {
+            $ipv6 = IPv6::parse($ip->ipv6_address);
+
+            // do not set an network for link-local addresses as the exist on all interfaces
+            if ($ipv6->isLinkLocal()) {
                 $ip->ipv6_network_id = 0;
 
-                return true;
+                return;
             }
 
-            return false;
-        })->each(function (Ipv6Address $ip) {
-            if ($ip->ipv6_network_id === null && $ip->ipv6_prefixlen > 0 && $ip->ipv6_prefixlen <= 128) {
+            // if the os did not set a network id and the ip has a valid prefixlen (no host addresses)
+            if ($ip->ipv6_network_id === null && $ip->ipv6_prefixlen > 0 && $ip->ipv6_prefixlen < 128) {
                 $network = Ipv6Network::firstOrCreate([
-                    'ipv6_network' => IPv6::parse($ip->ipv6_address)->getNetwork($ip->ipv6_prefixlen),
+                    'ipv6_network' => $ipv6->getNetwork($ip->ipv6_prefixlen),
                     'context_name' => $ip->context_name,
                 ]);
 
