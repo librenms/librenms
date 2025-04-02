@@ -73,7 +73,13 @@ class Ipv6Addresses implements Module
                 return true;
             }
 
-            return $ip->ipv6_compressed === '::1';
+            if ($ip->ipv6_compressed === '::1' || IPv6::parse($ip->ipv6_address)->isLinkLocal()) {
+                $ip->ipv6_network_id = 0;
+
+                return true;
+            }
+
+            return false;
         })->each(function (Ipv6Address $ip) {
             if ($ip->ipv6_network_id === null && $ip->ipv6_prefixlen > 0 && $ip->ipv6_prefixlen <= 128) {
                 $network = Ipv6Network::firstOrCreate([
