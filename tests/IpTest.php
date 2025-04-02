@@ -69,6 +69,15 @@ class IpTest extends TestCase
         $this->assertFalse(IPv6::isValid('::1', true));
     }
 
+    public function testIpv6IsLinkLocal()
+    {
+        $this->assertFalse(IP::parse('169.254.1.1')->isLinkLocal());
+        $this->assertTrue(IP::parse('fe80::1')->isLinkLocal());
+        $this->assertTrue(IP::parse('FE80::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('fe80:8000::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('febf::1')->isLinkLocal());
+    }
+
     public function testIpParse(): void
     {
         $this->assertEquals('192.168.0.1', IP::parse('192.168.0.1'));

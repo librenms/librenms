@@ -47,7 +47,7 @@ class IPv6 extends IP
             throw new InvalidIpException("$ipv6 is not a valid ipv6 address");
         }
 
-        $this->ip = $this->compressed();  // store in compressed format
+        $this->ip = strtolower($this->uncompressed());  // store in uncompressed format
     }
 
     /**
@@ -82,6 +82,14 @@ class IPv6 extends IP
         }
 
         return filter_var($ipv6, FILTER_VALIDATE_IP, $filter) !== false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLinkLocal()
+    {
+        return substr($this->uncompressed(), 0, 20) == 'fe80:0000:0000:0000:';
     }
 
     /**
@@ -164,6 +172,10 @@ class IPv6 extends IP
     public function uncompressed()
     {
         $ip = $this->ip;
+
+        if (strlen($ip) === 39) {
+            return $ip; // already uncompressed
+        }
 
         // mapped ipv4 to hex
         if (str_contains($ip, '.') && str_contains($ip, ':')) {
