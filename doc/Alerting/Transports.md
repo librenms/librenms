@@ -130,6 +130,8 @@ that HTTP GET requests are usually limited in length.
 
 - The API-body allow sending data in the format required by the API endpoint.
 
+- Send as form. This option allows you to send the body content as form data url encoded. Enable this if your endpoint is expecting fields to be sent as key=value pairs. Please ensure newlines aren't present in any of your variables as can be the case with `$msg`.
+
 A few variables commonly used :
 
 | Variable            | Description |
