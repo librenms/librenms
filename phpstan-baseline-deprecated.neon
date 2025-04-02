@@ -1101,14 +1101,6 @@ parameters:
 				#^Call to deprecated function snmp_get\\(\\)\\:
 				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: LibreNMS/OS/Pulse.php
-
-		-
-			message: """
-				#^Call to deprecated function snmp_get\\(\\)\\:
-				Please use SnmpQuery instead$#
-			"""
 			count: 2
 			path: LibreNMS/OS/Quanta.php
 

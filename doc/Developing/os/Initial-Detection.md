@@ -184,10 +184,10 @@ modules:
 ```php
 public function discoverOS(\App\Models\Device $device): void
 {
-    $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
-    $device->version = $info['entPhysicalFirmwareRev'];
-    $device->hardware = $info['enclosureModel'];
-    $device->serial = $info['enclosureSerialNum'];
+    $response = SnmpQuery::next(['NAS-MIB::enclosureModel', 'NAS-MIB::enclosureSerialNum', 'ENTITY-MIB::entPhysicalFirmwareRev']);
+    $device->version = $response->value('ENTITY-MIB::entPhysicalFirmwareRev');
+    $device->hardware = $response->value('NAS-MIB::enclosureModel');
+    $device->serial = $response->value('NAS-MIB::enclosureSerialNum');
 }
 ```
 
