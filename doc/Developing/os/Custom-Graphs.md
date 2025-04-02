@@ -52,6 +52,7 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Pulse extends \LibreNMS\OS implements OSPolling
 {
@@ -106,32 +107,5 @@ $unit_text = 'Users';
 require 'includes/html/graphs/generic_simplex.inc.php';
 ```
 
-**Pulse Sessions**
-
-```bash
-includes/html/graphs/device/pulse_sessions.inc.php
-```
-
-```php
-<?php
-
-$rrd_filename = Rrd::name($device['hostname'], 'pulse_sessions');
-
-require 'includes/html/graphs/common.inc.php';
-
-$ds = 'sessions';
-
-$colour_area = '9999cc';
-$colour_line = '0000cc';
-
-$colour_area_max = '9999cc';
-
-$graph_max = 1;
-
-$unit_text = 'Sessions';
-
-require 'includes/graphs/generic_simplex.inc.php';
-```
-
-That should be it, after data has started to be collected graphs
+That should be it, after data has started to be collected graph
 should appear in the WebUI.
