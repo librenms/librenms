@@ -52,14 +52,14 @@ class Api extends Transport
 
         if ($method !== 'get') {
             $request_body = SimpleTemplate::parse($this->config['api-body'], $alert_data);
-            $content_type = 'text/plain';
             if ($as_form == true) {
                 $request_body = $this->parseUserOptions($request_body);
-                $content_type = 'application/x-www-form-urlencoded';
+                $method = 'postform';
+            } else {
+                // withBody always overrides Content-Type so we compute a proper set (with 'Content-Type' => 'text/plain'
+                // as default value, and replace all headers with our computed headers
+                $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => 'text/plain'], $request_headers));
             }
-            // withBody always overrides Content-Type so we compute a proper set (with 'Content-Type' => 'text/plain'
-            // as default value, and replace all headers with our computed headers
-            $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => $content_type], $request_headers));
         }
 
         if ($username) {
@@ -73,6 +73,7 @@ class Api extends Transport
         $res = match ($method) {
             'get' => $client->get($host),
             'put' => $client->put($host),
+            'postform' => $client->asForm()->post($host, $request_body),
             default => $client->post($host),
         };
 
