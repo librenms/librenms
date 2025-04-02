@@ -39,6 +39,7 @@ class Api extends Transport
         $request_body = $this->config['api-body'];
         $username = $this->config['api-auth-username'];
         $password = $this->config['api-auth-password'];
+        $as_form = $this->config['api-as-form'] ?? false;
 
         $method = strtolower($this->config['api-method']);
         $host = explode('?', $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
@@ -51,9 +52,14 @@ class Api extends Transport
 
         if ($method !== 'get') {
             $request_body = SimpleTemplate::parse($this->config['api-body'], $alert_data);
+            $content_type = 'text/plain';
+            if ($as_form == true) {
+                $request_body = $this->parseUserOptions($request_body);
+                $content_type = 'application/x-www-form-urlencoded';
+            }
             // withBody always overrides Content-Type so we compute a proper set (with 'Content-Type' => 'text/plain'
             // as default value, and replace all headers with our computed headers
-            $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => 'text/plain'], $request_headers));
+            $client->withBody($request_body)->replaceHeaders(array_merge(['Content-Type' => $content_type], $request_headers));
         }
 
         if ($username) {
@@ -64,6 +70,7 @@ class Api extends Transport
             'query' => $query,
         ]);
 
+        dd($client);
         $res = match ($method) {
             'get' => $client->get($host),
             'put' => $client->put($host),
@@ -93,6 +100,13 @@ class Api extends Transport
                         'POST' => 'POST',
                         'PUT' => 'PUT',
                     ],
+                ],
+                [
+                    'title' => 'Send as form',
+                    'name' => 'api-as-form',
+                    'descr' => 'Send post data as form',
+                    'type' => 'checkbox',
+                    'default' => true,
                 ],
                 [
                     'title' => 'API URL',
