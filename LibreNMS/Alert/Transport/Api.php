@@ -105,7 +105,7 @@ class Api extends Transport
                     'name' => 'api-as-form',
                     'descr' => 'Send post data as form',
                     'type' => 'checkbox',
-                    'default' => true,
+                    'default' => false,
                 ],
                 [
                     'title' => 'API URL',
