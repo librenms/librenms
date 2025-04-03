@@ -117,7 +117,7 @@ class ReportDevices extends LnmsCommand
 
         if ($output == 'csv') {
             $out = fopen('php://output', 'w');
-            if (!$this->option('no-header')) {
+            if (! $this->option('no-header')) {
                 fputcsv($out, $headers);
             }
             foreach ($rows as $row) {
@@ -137,7 +137,7 @@ class ReportDevices extends LnmsCommand
         }
 
         // print table
-        if (!$this->option('no-header')) {
+        if (! $this->option('no-header')) {
             $this->table($headers, $rows);
         } else {
             $this->table([], $rows);
