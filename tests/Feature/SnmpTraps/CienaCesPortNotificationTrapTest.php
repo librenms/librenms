@@ -68,6 +68,7 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifOperStatus, 'down');
     }
+
     public function testCienaCesPortUpNotification()
     {
         // make a device and associate a port with it
@@ -98,4 +99,5 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifOperStatus, 'up');
     }
+
 }
