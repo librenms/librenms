@@ -31,7 +31,7 @@ class GetConfigCommand extends LnmsCommand
      *
      * @return mixed
      */
-    public function handle(): void
+    public function handle()
     {
         $setting = $this->argument('setting');
 
