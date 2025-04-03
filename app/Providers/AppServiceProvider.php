@@ -81,7 +81,6 @@ class AppServiceProvider extends ServiceProvider
         $this->bootObservers();
 
         $this->bootAuth();
-        $this->bootRoute();
     }
 
     private function bootCustomBladeDirectives(): void
@@ -285,14 +284,5 @@ class AppServiceProvider extends ServiceProvider
 
             return null;
         });
-    }
-
-    public function bootRoute()
-    {
-        //RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60);
-        });
-
-        
     }
 }
