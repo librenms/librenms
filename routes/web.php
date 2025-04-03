@@ -207,7 +207,7 @@ Route::middleware(['auth'])->group(function () {
         // misc ajax controllers
         Route::get('search/bgp', Ajax\BgpSearchController::class);
         Route::get('search/device', Ajax\DeviceSearchController::class);
-        Route::get('search/port', Ajax\PortSearchController::class::class);
+        Route::get('search/port', Ajax\PortSearchController::class);
         Route::post('set_map_group', [Ajax\AvailabilityMapController::class, 'setGroup']);
         Route::post('set_map_view', [Ajax\AvailabilityMapController::class, 'setView']);
         Route::post('set_resolution', [Ajax\ResolutionController::class, 'set']);
