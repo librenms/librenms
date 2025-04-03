@@ -33,7 +33,7 @@ class Transceiver extends PortRelatedModel implements Keyable
     protected function casts(): array
     {
         return [
-            'ddm' => 'boolean'
+            'ddm' => 'boolean',
         ];
     }
 

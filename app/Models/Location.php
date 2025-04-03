@@ -50,7 +50,7 @@ class Location extends Model
     protected function casts(): array
     {
         return [
-            'lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'
+            'lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool',
         ];
     }
 
