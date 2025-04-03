@@ -30,10 +30,8 @@ class BashCompletionCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         $completions = new Collection();
         $line = getenv('COMP_LINE');
@@ -137,7 +135,7 @@ class BashCompletionCommand extends Command
      * Complete a command
      *
      * @param  string  $partial
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function completeCommand($partial)
     {
@@ -165,7 +163,7 @@ class BashCompletionCommand extends Command
      * @param  InputDefinition  $command
      * @param  string  $partial
      * @param  array  $prev_options  Previous words in the command
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function completeOption($command, $partial, $prev_options)
     {
@@ -220,7 +218,7 @@ class BashCompletionCommand extends Command
      *
      * @param  InputOption  $option
      * @param  string  $partial
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function completeOptionValue($option, $partial)
     {
@@ -243,7 +241,7 @@ class BashCompletionCommand extends Command
      * @param  string  $command  Name of the current command
      * @param  string  $partial
      * @param  string  $current_word
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function completeArguments($command, $partial, $current_word)
     {

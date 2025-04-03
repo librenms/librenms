@@ -47,6 +47,6 @@ class MplsService extends DeviceRelatedModel implements Keyable
 
     public function binds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'svc_id');
+        return $this->hasMany(MplsSdpBind::class, 'svc_id');
     }
 }

@@ -11,7 +11,7 @@ class PollingDevice
     use Dispatchable, SerializesModels;
 
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     public $device;
 

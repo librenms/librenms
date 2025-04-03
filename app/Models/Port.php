@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -312,12 +313,12 @@ class Port extends DeviceRelatedModel
 
     public function fdbEntries(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
+        return $this->hasMany(PortsFdb::class, 'port_id', 'port_id');
     }
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
+        return $this->belongsToMany(PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
     }
 
     public function ipv4(): HasMany
@@ -342,12 +343,12 @@ class Port extends DeviceRelatedModel
 
     public function links(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'local_port_id');
+        return $this->hasMany(Link::class, 'local_port_id');
     }
 
     public function remoteLinks(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'remote_port_id');
+        return $this->hasMany(Link::class, 'remote_port_id');
     }
 
     public function allLinks(): \Illuminate\Support\Collection
@@ -448,7 +449,7 @@ class Port extends DeviceRelatedModel
     public function users(): BelongsToMany
     {
         // FIXME does not include global read
-        return $this->belongsToMany(\App\Models\User::class, 'ports_perms', 'port_id', 'user_id');
+        return $this->belongsToMany(User::class, 'ports_perms', 'port_id', 'user_id');
     }
 
     public function vlans(): HasMany
@@ -456,7 +457,7 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(PortVlan::class, 'port_id');
     }
 
-    public function vrf()
+    public function vrf(): HasOne
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
     }

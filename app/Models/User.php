@@ -218,12 +218,12 @@ class User extends Authenticatable
 
     public function apiTokens(): HasMany
     {
-        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
     }
 
     public function bills(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Bill::class, 'bill_perms', 'user_id', 'bill_id');
+        return $this->belongsToMany(Bill::class, 'bill_perms', 'user_id', 'bill_id');
     }
 
     public function devices()
@@ -236,12 +236,12 @@ class User extends Authenticatable
 
     public function devicesOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'devices_perms', 'user_id', 'device_id');
+        return $this->belongsToMany(Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
     public function deviceGroups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -256,12 +256,12 @@ class User extends Authenticatable
 
     public function portsOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
     public function dashboards(): HasMany
     {
-        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+        return $this->hasMany(Dashboard::class, 'user_id');
     }
 
     public function notifications(): BelongsToMany
@@ -276,11 +276,11 @@ class User extends Authenticatable
 
     public function preferences(): HasMany
     {
-        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
+        return $this->hasMany(UserPref::class, 'user_id');
     }
 
     public function widgets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
+        return $this->hasMany(UserWidget::class, 'user_id');
     }
 }
