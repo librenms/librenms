@@ -26,12 +26,7 @@ class GetConfigCommand extends LnmsCommand
         $this->addOption('dump');
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle(): void
+    public function handle(): int
     {
         $setting = $this->argument('setting');
 
