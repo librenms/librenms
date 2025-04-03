@@ -44,36 +44,36 @@ class DeviceList extends LnmsCommand
 
         if ($this->option('json')) {
             // skip this to we don't need to rebuild the returned array unless additional info is wanted
-            if ($this->option('apps')||$this->option('ports')||$this->option('storage')||$this->option('sensors')) {
-                $new_devices=array();
+            if ($this->option('apps') || $this->option('ports') || $this->option('storage') || $this->option('sensors')) {
+                $new_devices = array();
                 foreach ($devices as $device) {
                     if ($this->option('apps')) {
-                        $device['apps']=Application::where('device_id', $device['device_id'])->get();
+                        $device['apps'] = Application::where('device_id', $device['device_id'])->get();
                     }
                     if ($this->option('storage')) {
-                        $device['storage']=Storage::where('device_id', $device['device_id'])->get();
+                        $device['storage'] = Storage::where('device_id', $device['device_id'])->get();
                     }
                     if ($this->option('sensors')) {
-                        $device['sensors']=Sensor::where('device_id', $device['device_id'])->get();
+                        $device['sensors'] = Sensor::where('device_id', $device['device_id'])->get();
                     }
                     if ($this->option('ports')) {
-                        $ports=Port::where('device_id', $device['device_id'])->get();
+                        $ports = Port::where('device_id', $device['device_id'])->get();
                         if ($this->option('ip')) {
-                            $new_ports=array();
+                            $new_ports = array();
                             foreach ($ports as $port) {
-                                $Ipv4Addresses=Ipv4Address::where('port_id', $port['port_id'])->get();
-                                $Ipv6Addresses=Ipv6Address::where('port_id', $port['port_id'])->get();
-                                $port['Ipv6Addresses']=$Ipv6Addresses;
-                                $port['Ipv4Addresses']=$Ipv4Addresses;
-                                $new_ports[]=$port;
+                                $Ipv4Addresses = Ipv4Address::where('port_id', $port['port_id'])->get();
+                                $Ipv6Addresses = Ipv6Address::where('port_id', $port['port_id'])->get();
+                                $port['Ipv6Addresses'] = $Ipv6Addresses;
+                                $port['Ipv4Addresses'] = $Ipv4Addresses;
+                                $new_ports[] = $port;
                             }
-                            $ports=$new_ports;
+                            $ports = $new_ports;
                         }
-                        $device['ports']=$ports;
+                        $device['ports'] = $ports;
                     }
-                    $new_devices[]=$device;
+                    $new_devices[] = $device;
                 }
-                $devices=$new_devices;
+                $devices = $new_devices;
             }
             echo json_encode($devices)."\n";
             return 0;
