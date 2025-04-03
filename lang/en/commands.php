@@ -108,11 +108,11 @@ return [
     'device:list' => [
         'description' => 'List devices via JSON. For text, see report:devices.',
         'options' => [
-            'apps' => 'Include app information. Added as the key Requires -j/--json to be specified.',
-            'ports' => 'Include port information. Requires -j/--json to be specified.',
-            'ip' => 'Include IP information for ports. Requires -p/--port be specified.',
-            'storage' => 'Include storage information. Requires -j/--json to be specified.',
-            'sensors' => 'Include sensor information. Requires -j/--json to be specified.',
+            'apps' => 'Include app information.',
+            'ports' => 'Include port information.',
+            'ip' => 'Include IP information for ports. Requires -p/--ports to be specified.',
+            'storage' => 'Include storage information.',
+            'sensors' => 'Include sensor information.',
             'device-per-line' => 'Print each device as a JSON per line instead of a all devices as a JSON array.',
         ],
     ],
