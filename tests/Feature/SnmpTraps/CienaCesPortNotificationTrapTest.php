@@ -51,12 +51,12 @@ UDP: [$device->ip]:57123->[192.168.4.4]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
 SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortDown
 CIENA-GLOBAL-MIB::cienaGlobalSeverity warning
-CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1 
+CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1
 CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex 1
 CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex 1
-CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex 
-CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled 
-CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disabled
+CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disable
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
