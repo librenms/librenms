@@ -30,7 +30,6 @@ class BashCompletionCommand extends Command
 
     /**
      * Execute the console command.
-     *
      */
     public function handle(): int
     {
