@@ -11,6 +11,7 @@
 use Illuminate\Support\Str;
 
 return [
+    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
 
     'connections' => [
         'mysql' => [
