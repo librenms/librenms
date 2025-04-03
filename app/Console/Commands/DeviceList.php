@@ -45,7 +45,7 @@ class DeviceList extends LnmsCommand
         if ($this->option('json')) {
             // skip this to we don't need to rebuild the returned array unless additional info is wanted
             if ($this->option('apps') || $this->option('ports') || $this->option('storage') || $this->option('sensors')) {
-                $new_devices = array();
+                $new_devices = [];
                 foreach ($devices as $device) {
                     if ($this->option('apps')) {
                         $device['apps'] = Application::where('device_id', $device['device_id'])->get();
@@ -59,7 +59,7 @@ class DeviceList extends LnmsCommand
                     if ($this->option('ports')) {
                         $ports = Port::where('device_id', $device['device_id'])->get();
                         if ($this->option('ip')) {
-                            $new_ports = array();
+                            $new_ports = [];
                             foreach ($ports as $port) {
                                 $Ipv4Addresses = Ipv4Address::where('port_id', $port['port_id'])->get();
                                 $Ipv6Addresses = Ipv6Address::where('port_id', $port['port_id'])->get();
@@ -75,12 +75,12 @@ class DeviceList extends LnmsCommand
                 }
                 $devices = $new_devices;
             }
-            echo json_encode($devices)."\n";
+            echo json_encode($devices) . "\n";
             return 0;
         }
 
         foreach ($devices as $device) {
-            print $device['device_id'].','.$device['hostname']."\n";
+            print $device['device_id'] . ',' . $device['hostname'] . "\n";
         }
 
         return 0;
