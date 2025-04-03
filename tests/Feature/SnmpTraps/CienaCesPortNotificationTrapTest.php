@@ -99,5 +99,4 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         $port = $port->fresh(); // refresh from database
         $this->assertEquals($port->ifOperStatus, 'up');
     }
-
 }
