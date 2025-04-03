@@ -37,7 +37,7 @@ class Plugin extends BaseModel
     protected function casts(): array
     {
         return [
-            'plugin_active' => 'bool', 'settings' => 'array'
+            'plugin_active' => 'bool', 'settings' => 'array',
         ];
     }
 

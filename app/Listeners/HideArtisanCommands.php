@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel;
 use LibreNMS\Util\Debug;
@@ -27,7 +26,7 @@ class HideArtisanCommands
             return;
         }
 
-        if (!($event->command === 'list' || $event->command === null)) {
+        if (! ($event->command === 'list' || $event->command === null)) {
             return;
         }
 

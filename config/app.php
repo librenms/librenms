@@ -9,14 +9,12 @@
  */
 
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
 
 return [
 
     'timezone' => ini_get('date.timezone') ?: 'UTC', // use existing timezone
 
     'default_locale' => env('APP_LOCALE', 'en'), // just a holder for the system set locale
-
 
     'aliases' => Facade::defaultAliases()->merge([
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,

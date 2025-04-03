@@ -15,7 +15,7 @@ class UserWidget extends Model
     protected function casts(): array
     {
         return [
-            'settings' => 'array'
+            'settings' => 'array',
         ];
     }
 

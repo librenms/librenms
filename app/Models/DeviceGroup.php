@@ -60,7 +60,7 @@ class DeviceGroup extends BaseModel
     protected function casts(): array
     {
         return [
-            'rules' => 'array'
+            'rules' => 'array',
         ];
     }
 

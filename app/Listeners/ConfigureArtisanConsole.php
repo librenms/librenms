@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-
 use Illuminate\Console\Events\ArtisanStarting;
 use LibreNMS\Util\Version;
 

@@ -10,7 +10,6 @@ use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
 {
-
     /**
      * Prepare for Dusk test execution.
      *

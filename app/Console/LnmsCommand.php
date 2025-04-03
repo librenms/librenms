@@ -64,11 +64,11 @@ abstract class LnmsCommand extends Command
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string $name
-     * @param int|null $mode
-     * @param string $description
-     * @param mixed|null $default
-     * @param array|\Closure $suggestedValues
+     * @param  string  $name
+     * @param  int|null  $mode
+     * @param  string  $description
+     * @param  mixed|null  $default
+     * @param  array|\Closure  $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
@@ -89,12 +89,12 @@ abstract class LnmsCommand extends Command
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string $name
-     * @param array|string|null $shortcut
-     * @param int|null $mode
-     * @param string $description
-     * @param mixed|null $default
-     * @param array|\Closure $suggestedValues
+     * @param  string  $name
+     * @param  array|string|null  $shortcut
+     * @param  int|null  $mode
+     * @param  string  $description
+     * @param  mixed|null  $default
+     * @param  array|\Closure  $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible

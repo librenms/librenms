@@ -8,10 +8,7 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
-use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
 

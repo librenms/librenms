@@ -203,7 +203,7 @@ Artisan::command('scan
 
 // mark schedule working
 Schedule::call(function () {
-        Cache::put('scheduler_working', now(), now()->addMinutes(6));
+    Cache::put('scheduler_working', now(), now()->addMinutes(6));
 })->everyFiveMinutes();
 
 // schedule maintenance, should be after all others

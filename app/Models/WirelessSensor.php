@@ -62,7 +62,7 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
     protected function casts(): array
     {
         return [
-            'sensor_oids' => 'array'
+            'sensor_oids' => 'array',
         ];
     }
 
