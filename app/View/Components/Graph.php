@@ -70,8 +70,8 @@ class Graph extends Component
      * @param  int|null  $width
      * @param  int|null  $height
      * @param  int  $absolute_size
-     * @param  \App\Models\Device|int|null  $device
-     * @param  \App\Models\Port|int|null  $port
+     * @param  Device|int|null  $device
+     * @param  Port|int|null  $port
      */
     public function __construct(
         string $type = '',

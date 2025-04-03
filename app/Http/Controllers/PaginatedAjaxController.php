@@ -51,10 +51,10 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines the base query for this resource
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @param  Request  $request
+     * @return Builder|\Illuminate\Database\Query\Builder
      */
-    abstract protected function baseQuery(\Illuminate\Http\Request $request);
+    abstract protected function baseQuery(Request $request);
 
     /**
      * @param  Paginator  $paginator
@@ -75,12 +75,12 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines search fields. They will be searched in order.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function searchFields(\Illuminate\Http\Request $request)
+    protected function searchFields(Request $request)
     {
         return [];
     }
@@ -88,12 +88,12 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines filter fields.  Request and table fields must match.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function filterFields(\Illuminate\Http\Request $request)
+    protected function filterFields(Request $request)
     {
         return [];
     }
@@ -101,12 +101,12 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Defines sortable fields.  The incoming sort field should be the key, the sql column or DB::raw() should be the value
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function sortFields(\Illuminate\Http\Request $request)
+    protected function sortFields(Request $request)
     {
         return [];
     }
@@ -198,7 +198,7 @@ abstract class PaginatedAjaxController extends Controller
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes

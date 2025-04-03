@@ -64,7 +64,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response|SymfonyResponse
      */
     public function render(\Illuminate\Http\Request $request)
     {

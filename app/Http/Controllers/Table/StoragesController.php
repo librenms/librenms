@@ -55,7 +55,7 @@ class StoragesController extends TableController
             'height' => 20,
             'width' => 80,
         ];
-        $mini_graph = URL::graphPopup($graph_array);
+        $mini_graph = Url::graphPopup($graph_array);
         $used = $this->usageBar($storage, $graph_array);
 
         if (\Request::input('view') == 'graphs') {
@@ -81,6 +81,6 @@ class StoragesController extends TableController
         $right_text = Number::formatBi($storage->storage_free);
         $bar = Html::percentageBar(400, 20, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
 
-        return URL::graphPopup($graph_array, $bar);
+        return Url::graphPopup($graph_array, $bar);
     }
 }

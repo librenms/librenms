@@ -31,7 +31,7 @@ class PollDevice implements ShouldQueue
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
-     * @var \LibreNMS\OS|\LibreNMS\OS\Generic
+     * @var OS|OS\Generic
      */
     private $os;
 
@@ -48,7 +48,7 @@ class PollDevice implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->initDevice();
         PollingDevice::dispatch($this->device);

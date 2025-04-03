@@ -35,6 +35,6 @@ class PortStp extends PortRelatedModel implements Keyable
 
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
+        return $this->belongsTo(Device::class, 'device_id', 'device_id');
     }
 }

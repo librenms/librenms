@@ -21,7 +21,6 @@ parameters:
 
     level: 5
 
-    checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
 
     checkFunctionNameCase: true
@@ -32,8 +31,6 @@ parameters:
     checkAlwaysTrueCheckTypeFunctionCall: true
     checkAlwaysTrueInstanceof: true
     checkAlwaysTrueStrictComparison: true
-
-    checkGenericClassInNonGenericObjectType: false
 
     ignoreErrors:
         - '#Unsafe usage of new static#'

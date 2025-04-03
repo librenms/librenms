@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // migrate roles
         $bouncerRoles = DB::table('bouncer_roles')->get();
@@ -27,7 +27,7 @@ return new class extends Migration
         // Migrate user-role assignments
         $rolesByUserId = DB::table('assigned_roles')
             ->join('roles', 'assigned_roles.role_id', '=', 'roles.id')
-            ->where('assigned_roles.entity_type', 'App\\Models\\User') // Adjust namespace if needed
+            ->where('assigned_roles.entity_type', \App\Models\User::class) // Adjust namespace if needed
             ->select(
                 'assigned_roles.entity_id as user_id',
                 'roles.name as role_name'
@@ -45,7 +45,7 @@ return new class extends Migration
             foreach ($roles as $role) {
                 DB::table('model_has_roles')->insertOrIgnore([
                     'role_id' => $newRoleIds->get($role),
-                    'model_type' => 'App\Models\User',
+                    'model_type' => \App\Models\User::class,
                     'model_id' => $user_id,
                 ]);
             }
@@ -57,7 +57,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         // Truncate Spatie tables, don't do this in production
 //        DB::statement('SET FOREIGN_KEY_CHECKS=0');

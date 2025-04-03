@@ -424,7 +424,7 @@ class RunAlerts
             $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
 
             if (! isset($array1_keys[$element2_key])) {
-                $added_elements [] = $element2;
+                $added_elements[] = $element2;
             } else {
                 // Remove matched elements
                 unset($array1_keys[$element2_key]);

@@ -37,6 +37,6 @@ class AlertTemplateMap extends BaseModel
 
     public function template(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\AlertTemplate::class, 'alert_templates_id');
+        return $this->belongsTo(AlertTemplate::class, 'alert_templates_id');
     }
 }

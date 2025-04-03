@@ -53,6 +53,6 @@ class Bill extends Model
 
     public function ports(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'bill_ports', 'bill_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');
     }
 }

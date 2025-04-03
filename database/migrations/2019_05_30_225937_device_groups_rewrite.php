@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('device_groups', function (Blueprint $table) {
                 $table->string('desc')->change();
                 $table->dropColumn(['type', 'rules']);

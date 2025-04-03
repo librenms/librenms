@@ -32,11 +32,11 @@ use LibreNMS\Alert\AlertRules;
 class RunAlertRulesAction
 {
     /**
-     * @var \LibreNMS\Alert\AlertRules
+     * @var AlertRules
      */
     private $rules;
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     private $device;
 

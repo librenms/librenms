@@ -49,6 +49,6 @@ class MplsLspPath extends Model implements Keyable
 
     public function lsp(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\MplsLsp::class, 'lsp_id');
+        return $this->belongsTo(MplsLsp::class, 'lsp_id');
     }
 }

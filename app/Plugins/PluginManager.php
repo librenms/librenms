@@ -238,7 +238,7 @@ class PluginManager implements PluginManagerInterface
      * @param  string  $hookType
      * @param  array  $args
      * @param  string|null  $onlyPlugin
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function hooksFor(string $hookType, array $args, ?string $onlyPlugin): Collection
     {

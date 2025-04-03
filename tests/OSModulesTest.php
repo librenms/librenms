@@ -172,7 +172,7 @@ class OSModulesTest extends DBTestCase
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+            $mock = \Mockery::mock(Fping::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;
