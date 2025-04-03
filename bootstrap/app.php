@@ -35,13 +35,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->group('auth', [
             \App\Http\Middleware\LegacyExternalAuth::class,
-            'authenticate',
+            \App\Http\Middleware\Authenticate::class,
             \App\Http\Middleware\VerifyTwoFactor::class,
             \App\Http\Middleware\LoadUserPreferences::class,
         ]);
 
         $middleware->group('minimal', [
-            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
             \Illuminate\Session\Middleware\StartSession::class,
         ]);
 
@@ -56,8 +56,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->priority([
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            Middleware\LegacyExternalAuth::class,
-            Middleware\Authenticate::class,
+            \App\Http\Middleware\LegacyExternalAuth::class,
+            \App\Http\Middleware\Authenticate::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
             \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
