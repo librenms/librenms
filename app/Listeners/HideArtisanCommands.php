@@ -5,6 +5,7 @@ namespace App\Listeners;
 
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Contracts\Console\Kernel;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Command\Command;
 
 class HideArtisanCommands
@@ -14,6 +15,14 @@ class HideArtisanCommands
      */
     public function handle(CommandStarting $event): void
     {
+        // intercept input and check for debug
+        if ($event->input->hasParameterOption(['-d', '--debug', '-vv', '-vvv'], true)) {
+            if ($event->input->hasParameterOption(['-vvv'], true)) {
+                Debug::setVerbose();
+            }
+            app()->booted('\LibreNMS\Util\Debug::set');
+        }
+
         if (ARTISAN_BINARY !== 'lnms') {
             return;
         }
