@@ -46,22 +46,22 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
-        $this->assertTrapLogsMessage("<UNKNOWN>
-        UDP: [$device->ip]:57123->[192.168.4.4]:162
-        DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
-        SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortDown
-        CIENA-GLOBAL-MIB::cienaGlobalSeverity warning
-        CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1 
-        CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex 1
-        CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex 1
-        CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex 
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled 
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disabled
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
+        $this->assertTrapLogsMessage("$device->hostname
+UDP: [$device->ip]:57123->[192.168.4.4]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
+SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortDown
+CIENA-GLOBAL-MIB::cienaGlobalSeverity warning
+CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1 
+CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex 1
+CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex 1
+CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex 
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled 
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disabled
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortDownNotification',
-        [Severity::Error, 'interface', $port->port_id],
+        [Severity::Error],
         );
 
         $port = $port->fresh(); // refresh from database
@@ -74,23 +74,23 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
-        $this->assertTrapLogsMessage("<UNKNOWN>
-        UDP: [$device->ip]:57123->[192.168.4.4]:162
-        DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
-        SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortUp
-        CIENA-GLOBAL-MIB::cienaGlobalSeverity warning
-        CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1
-        CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex 1
-        CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex 1
-        CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState enabled
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortType 1
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
+        $this->assertTrapLogsMessage("$device->hostname
+UDP: [$device->ip]:57123->[192.168.4.4]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
+SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortUp
+CIENA-GLOBAL-MIB::cienaGlobalSeverity warning
+CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex 1
+CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex 1
+CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex 1
+CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber $port->ifIndex
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState enabled
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortType 1
+CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port up on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortUpNotification',
-        [Severity::Ok, 'interface', $port->port_id],
+        [Severity::Ok],
         );
 
         $port = $port->fresh(); // refresh from database
