@@ -23,6 +23,7 @@ class ReportDevices extends LnmsCommand
         $this->addOption('fields', 'f', InputOption::VALUE_REQUIRED, default: 'hostname,ip');
         $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, __('commands.report:devices.options.output', ['types' => '[table, csv, none]']), 'table');
         $this->addOption('list-fields');
+        $this->addOption('no-header', 't', InputOption::VALUE_NONE);
     }
 
     /**
@@ -116,7 +117,9 @@ class ReportDevices extends LnmsCommand
 
         if ($output == 'csv') {
             $out = fopen('php://output', 'w');
-            fputcsv($out, $headers);
+            if (!$this->option('no-header')) {
+                fputcsv($out, $headers);
+            }
             foreach ($rows as $row) {
                 fputcsv($out, $row);
             }
@@ -134,7 +137,11 @@ class ReportDevices extends LnmsCommand
         }
 
         // print table
-        $this->table($headers, $rows);
+        if (!$this->option('no-header')) {
+            $this->table($headers, $rows);
+        } else {
+            $this->table([], $rows);
+        }
     }
 
     protected function printFields(): void
