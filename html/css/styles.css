@@ -2087,19 +2087,19 @@ label {
   padding-left:10px;
 }
 
-.widget-availability {
+.widget-availability, .widget-alert {
   float:left;
   margin:2px;
 }
 
-.widget-availability:empty {
+.widget-availability:empty, .widget-alert:empty {
   display: inline;
   min-width: 2.4em;
   min-height: 1.3em;
   max-height: 1.6em;
 }
 
-.widget-availability-host {
+.widget-availability-host, .widget-alert-totals {
   float:left;
   margin-bottom: 10px;
 }
@@ -2120,6 +2120,31 @@ label {
 
 .label-font-border.label-border {
   margin:0px 2px 0px 2px;
+}
+
+.alert-map-compact-ok {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #5CB85C;
+}
+
+.alert-map-compact-warning {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #F0AD4E;
+}
+
+.alert-map-compact-critical {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #D9534F;
+}
+
+.alert-map-widget-header {
+  line-height:34px;
 }
 
 .availability-map-oldview-box-up {
