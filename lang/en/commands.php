@@ -105,6 +105,12 @@ return [
             'added' => 'Added device :hostname (:device_id)',
         ],
     ],
+    'device:list' => [
+        'description' => 'List available devices.',
+        'arguments' => [
+            'json' => 'Output the information as JSON',
+        ],
+    ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
