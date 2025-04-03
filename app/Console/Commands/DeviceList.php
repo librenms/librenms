@@ -80,7 +80,7 @@ class DeviceList extends LnmsCommand
         }
 
         foreach ($devices as $device) {
-            print $device['device_id'] . ',' . $device['hostname'] . "\n";
+            echo $device['device_id'] . ',' . $device['hostname'] . "\n";
         }
 
         return 0;
