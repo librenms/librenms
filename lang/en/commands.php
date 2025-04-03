@@ -106,9 +106,14 @@ return [
         ],
     ],
     'device:list' => [
-        'description' => 'List available devices.',
-        'arguments' => [
-            'json' => 'Output the information as JSON',
+        'description' => 'List available devices device_id,hostname',
+        'options' => [
+            'json' => 'Output more detailed information as JSON',
+            'apps' => 'Include app information. Added as the key Requires -j/--json to be specified.',
+            'ports' => 'Include port information. Requires -j/--json to be specified.',
+            'ip' => 'Include IP information for ports. Requires -p/--port be specified.',
+            'storage' => 'Include storage information. Requires -j/--json to be specified.',
+            'sensors' => 'Include sensor information. Requires -j/--json to be specified.',
         ],
     ],
     'device:ping' => [
