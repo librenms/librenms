@@ -3,13 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
-use App\Models\Application;
 use App\Models\Device;
-use App\Models\Ipv4Address;
-use App\Models\Ipv6Address;
-use App\Models\Port;
-use App\Models\Sensor;
-use App\Models\Storage;
 use Symfony\Component\Console\Input\InputOption;
 
 class DeviceList extends LnmsCommand
@@ -49,6 +43,7 @@ class DeviceList extends LnmsCommand
             foreach ($devices as $device) {
                 echo json_encode($device) . "\n";
             }
+
             return 0;
         }
 
