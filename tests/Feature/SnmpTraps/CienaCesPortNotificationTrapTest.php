@@ -6,7 +6,7 @@
  * -Description-
  *
  * Test port up and down via Ciena's proprietary snmptraps.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -59,10 +59,10 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disable
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
-        "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
-        'Could not handle CienaCesPortDownNotification',
-        [Severity::Error],
-        $device,
+            "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
+            'Could not handle CienaCesPortDownNotification',
+            [Severity::Error],
+            $device,
         );
 
         $port = $port->fresh(); // refresh from database
@@ -89,10 +89,10 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState enabled
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortType 1
 CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
-        "Port up on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
-        'Could not handle CienaCesPortUpNotification',
-        [Severity::Ok],
-        $device,
+            "Port up on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
+            'Could not handle CienaCesPortUpNotification',
+            [Severity::Ok],
+            $device,
         );
 
         $port = $port->fresh(); // refresh from database
