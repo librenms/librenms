@@ -57,6 +57,9 @@ class DeviceGroup extends BaseModel
         });
     }
 
+    /**
+     * @return array{rules: 'array'}
+     */
     protected function casts(): array
     {
         return [
@@ -123,17 +126,25 @@ class DeviceGroup extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\AlertSchedule, $this>
+     */
     public function alertSchedules(): MorphToMany
     {
         return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devices(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Service, $this>
+     */
     public function services(): BelongsToMany
     {
         // $parentKey='id', $relatedKey='device_id' is required to generate the right SQL query.
@@ -141,11 +152,17 @@ class DeviceGroup extends BaseModel
         return $this->belongsToMany(Service::class, 'device_group_device', 'device_group_id', 'device_id', 'id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'devices_group_perms', 'device_group_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\ServiceTemplate, $this>
+     */
     public function serviceTemplates(): BelongsToMany
     {
         return $this->belongsToMany(ServiceTemplate::class, 'service_templates_device_group', 'device_group_id', 'service_template_id');

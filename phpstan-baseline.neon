@@ -156,11 +156,6 @@ parameters:
 			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
-			message: "#^PHPDoc type array of property App\\\\Http\\\\Kernel\\:\\:\\$middlewarePriority is not covariant with PHPDoc type array\\<string\\> of overridden property Illuminate\\\\Foundation\\\\Http\\\\Kernel\\:\\:\\$middlewarePriority\\.$#"
-			count: 1
-			path: app/Http/Kernel.php
-
-		-
 			message: "#^Cannot access property \\$password on object\\|string\\.$#"
 			count: 1
 			path: app/Http/Requests/UpdateUserRequest.php

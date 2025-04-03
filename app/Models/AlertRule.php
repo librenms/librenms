@@ -81,22 +81,33 @@ class AlertRule extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
+     */
     public function alerts(): HasMany
     {
         return $this->hasMany(Alert::class, 'rule_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devices(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'alert_device_map', 'rule_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(DeviceGroup::class, 'alert_group_map', 'rule_id', 'group_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Location, $this>
+     */
     public function locations(): BelongsToMany
     {
         return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');

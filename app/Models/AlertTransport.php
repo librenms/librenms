@@ -15,6 +15,9 @@ class AlertTransport extends Model
     public $timestamps = false;
     protected $fillable = ['transport_config'];
 
+    /**
+     * @return array{is_default: 'boolean', transport_config: 'array'}
+     */
     protected function casts(): array
     {
         return [

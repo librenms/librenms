@@ -34,10 +34,14 @@ class Plugin extends BaseModel
     protected $primaryKey = 'plugin_id';
     protected $fillable = ['plugin_name', 'plugin_active', 'version', 'settings'];
 
+    /**
+     * @return array{plugin_active: 'bool', settings: 'array'}
+     */
     protected function casts(): array
     {
         return [
-            'plugin_active' => 'bool', 'settings' => 'array',
+            'plugin_active' => 'bool',
+            'settings' => 'array',
         ];
     }
 

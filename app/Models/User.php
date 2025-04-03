@@ -38,6 +38,9 @@ class User extends Authenticatable
         'created' => UserCreated::class,
     ];
 
+    /**
+     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     */
     protected function casts(): array
     {
         return [
@@ -218,12 +221,17 @@ class User extends Authenticatable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
+     */
     public function apiTokens(): HasMany
     {
         return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
+     */
     public function bills(): BelongsToMany
     {
         return $this->belongsToMany(Bill::class, 'bill_perms', 'user_id', 'bill_id');
@@ -237,11 +245,17 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devicesOwned(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function deviceGroups(): BelongsToMany
     {
         return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
@@ -257,31 +271,49 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function portsOwned(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dashboard, $this>
+     */
     public function dashboards(): HasMany
     {
         return $this->hasMany(Dashboard::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Notification, $this>
+     */
     public function notifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class, 'notifications_attribs', 'user_id', 'notifications_id', 'user_id', 'notifications_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     */
     public function notificationAttribs(): HasMany
     {
         return $this->hasMany(NotificationAttrib::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserPref, $this>
+     */
     public function preferences(): HasMany
     {
         return $this->hasMany(UserPref::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserWidget, $this>
+     */
     public function widgets(): HasMany
     {
         return $this->hasMany(UserWidget::class, 'user_id');
