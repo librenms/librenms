@@ -76,6 +76,7 @@ class DeviceList extends LnmsCommand
                 $devices = $new_devices;
             }
             echo json_encode($devices) . "\n";
+
             return 0;
         }
 
