@@ -36,6 +36,9 @@ use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
 {
+    use RequiresDatabase;
+    use DatabaseTransactions;
+
     public function testCienaCesPortDownNotification()
     {
         // make a device and associate a port with it
@@ -43,7 +46,7 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
-        $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage("<UNKNOWN>
         UDP: [$device->ip]:57123->[192.168.4.4]:162
         DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
         SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortDown
@@ -55,9 +58,8 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortAdminState enabled 
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState disabled
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr
-        TRAP,
-        "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port:$port->ifIndex",
+        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
+        "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortDownNotification',
         [Severity::Error, 'interface', $port->port_id],
         );
@@ -72,7 +74,7 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
-        $this->assertTrapLogsMessage(<<<'TRAP'
+        $this->assertTrapLogsMessage("<UNKNOWN>
         UDP: [$device->ip]:57123->[192.168.4.4]:162
         DISMAN-EVENT-MIB::sysUpTimeInstance 2:15:07:12.87
         SNMPv2-MIB::snmpTrapOID.0 CIENA-CES-PORT-MIB::cienaCesPortNotificationPortUp
@@ -85,8 +87,7 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortOperState enabled
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName $port->ifName
         CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortType 1
-        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr"
-        TRAP,
+        CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port up on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortUpNotification',
         [Severity::Ok, 'interface', $port->port_id],
