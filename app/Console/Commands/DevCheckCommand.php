@@ -55,12 +55,7 @@ class DevCheckCommand extends LnmsCommand
         $this->addOption('commands', 'c', InputOption::VALUE_NONE);
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle(): void
+    public function handle(): int
     {
         $this->helper = new CiHelper();
         $this->parseInput();
@@ -76,7 +71,7 @@ class DevCheckCommand extends LnmsCommand
         return $result;
     }
 
-    private function parseInput()
+    private function parseInput(): void
     {
         $check = $this->argument('check');
         if (! in_array($check, ['all', 'lint', 'style', 'unit', 'web', 'ci'])) {

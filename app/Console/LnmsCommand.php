@@ -64,22 +64,23 @@ abstract class LnmsCommand extends Command
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param  string  $name  The argument name
-     * @param  int|null  $mode  The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param  string  $description  A description text
-     * @param  string|string[]|null  $default  The default value (for InputArgument::OPTIONAL mode only)
+     * @param string $name
+     * @param int|null $mode
+     * @param string $description
+     * @param mixed|null $default
+     * @param array|\Closure $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
      */
-    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
+    public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
         // use a generated translation location by default
         if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
-        parent::addArgument($name, $mode, $description, $default);
+        parent::addArgument($name, $mode, $description, $default, $suggestedValues);
 
         return $this;
     }
@@ -88,16 +89,17 @@ abstract class LnmsCommand extends Command
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param  string  $name  The option name
-     * @param  string|array|null  $shortcut  The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param  int|null  $mode  The option mode: One of the InputOption::VALUE_* constants
-     * @param  string  $description  A description text
-     * @param  string|string[]|int|bool|null  $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @param string $name
+     * @param array|string|null $shortcut
+     * @param int|null $mode
+     * @param string $description
+     * @param mixed|null $default
+     * @param array|\Closure $suggestedValues
      * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
      */
-    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
+    public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null, array|\Closure $suggestedValues = []): static
     {
         // use a generated translation location by default
         if (empty($description)) {
@@ -114,6 +116,7 @@ abstract class LnmsCommand extends Command
                 $default,
                 $this->getCallable('Defaults', $name),
                 $this->getCallable('Values', $name),
+                $suggestedValues,
             )
         );
 

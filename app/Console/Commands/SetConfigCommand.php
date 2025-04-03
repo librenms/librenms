@@ -34,12 +34,7 @@ class SetConfigCommand extends LnmsCommand
         $this->addOption('ignore-checks');
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle(DynamicConfig $definition): void
+    public function handle(DynamicConfig $definition): int
     {
         $setting = $this->argument('setting');
         $value = $this->argument('value');
