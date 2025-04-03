@@ -1,7 +1,9 @@
 <?php
 
+use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Symfony\Component\Process\Process;
 
 /*
@@ -199,6 +201,14 @@ Artisan::command('scan
     return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
 
+// mark schedule working
+Schedule::call(function () {
+        Cache::put('scheduler_working', now(), now()->addMinutes(6));
+})->everyFiveMinutes();
 
-$this->scheduleMarkWorking($schedule);
-$this->scheduleMaintenance($schedule);  // should be after all others
+// schedule maintenance, should be after all others
+$maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
+Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
+    ->weeklyOn(0, '1:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
