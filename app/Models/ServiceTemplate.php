@@ -77,6 +77,9 @@ class ServiceTemplate extends BaseModel
         });
     }
 
+    /**
+     * @return array{ignore: 'integer', disabled: 'integer', rules: 'array'}
+     */
     protected function casts(): array
     {
         return [
@@ -123,7 +126,6 @@ class ServiceTemplate extends BaseModel
             }])
             ->get()
             ->filter(function ($template) use ($device) {
-                /** @var ServiceTemplate $template */
                 if ($template->type == 'dynamic') {
                     try {
                         return $template->getDeviceParser()
@@ -201,17 +203,25 @@ class ServiceTemplate extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devices(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Service, $this>
+     */
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function groups(): BelongsToMany
     {
         return $this->belongsToMany(DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');

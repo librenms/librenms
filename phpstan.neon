@@ -28,10 +28,6 @@ parameters:
 
     checkModelProperties: true
 
-    checkAlwaysTrueCheckTypeFunctionCall: true
-    checkAlwaysTrueInstanceof: true
-    checkAlwaysTrueStrictComparison: true
-
     ignoreErrors:
         - '#Unsafe usage of new static#'
 

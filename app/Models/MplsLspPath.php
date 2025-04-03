@@ -46,7 +46,9 @@ class MplsLspPath extends Model implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\MplsLsp, $this>
+     */
     public function lsp(): BelongsTo
     {
         return $this->belongsTo(MplsLsp::class, 'lsp_id');

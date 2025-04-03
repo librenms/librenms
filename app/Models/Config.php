@@ -36,6 +36,9 @@ class Config extends BaseModel
         'config_value',
     ];
 
+    /**
+     * @return array{config_default: 'array'}
+     */
     protected function casts(): array
     {
         return [

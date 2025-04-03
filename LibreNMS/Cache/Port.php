@@ -170,6 +170,7 @@ class Port
         $primaryDevice = \DeviceCache::getPrimary();
         if ($primaryDevice->relationLoaded('ports')) {
             $port = $primaryDevice->ports->firstWhere('port_id', $port_id);
+
             if ($port !== null) {
                 $this->ports[$port_id] = $port; // cache the port here
 

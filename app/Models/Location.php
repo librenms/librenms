@@ -47,10 +47,15 @@ class Location extends Model
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
     private $location_ignore_regex = '/\(.*?\)/';
 
+    /**
+     * @return array{lat: 'float', lng: 'float', fixed_coordinates: 'bool'}
+     */
     protected function casts(): array
     {
         return [
-            'lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool',
+            'lat' => 'float',
+            'lng' => 'float',
+            'fixed_coordinates' => 'bool',
         ];
     }
 
@@ -176,7 +181,9 @@ class Location extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     */
     public function devices(): HasMany
     {
         return $this->hasMany(Device::class, 'location_id');

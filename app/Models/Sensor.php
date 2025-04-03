@@ -228,18 +228,27 @@ class Sensor extends DeviceRelatedModel implements Keyable
     {
         return ! $this->hasThresholds();
     }
-    // ---- Define Relationships ----
 
+    // ---- Define Relationships ----
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>
+     */
     public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough<\App\Models\StateIndex, \App\Models\SensorToStateIndex, $this>
+     */
     public function stateIndex(): HasOneThrough
     {
         return $this->hasOneThrough(StateIndex::class, SensorToStateIndex::class, 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\StateTranslation, $this>
+     */
     public function translations(): BelongsToMany
     {
         return $this->belongsToMany(StateTranslation::class, 'sensors_to_state_indexes', 'sensor_id', 'state_index_id', 'sensor_id', 'state_index_id');

@@ -135,7 +135,9 @@ class Notification extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     */
     public function attribs(): HasMany
     {
         return $this->hasMany(NotificationAttrib::class, 'notifications_id', 'notifications_id');

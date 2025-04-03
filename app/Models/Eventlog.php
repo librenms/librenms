@@ -38,6 +38,9 @@ class Eventlog extends DeviceRelatedModel
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
+    /**
+     * @return array{severity: 'LibreNMS\Enum\Severity'}
+     */
     protected function casts(): array
     {
         return [

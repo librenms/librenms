@@ -59,6 +59,9 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
         'rrd_type',
     ];
 
+    /**
+     * @return array{sensor_oids: 'array'}
+     */
     protected function casts(): array
     {
         return [

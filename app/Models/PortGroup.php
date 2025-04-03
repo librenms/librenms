@@ -43,6 +43,9 @@ class PortGroup extends BaseModel
         return $query;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function ports(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'port_group_port', 'port_group_id', 'port_id');

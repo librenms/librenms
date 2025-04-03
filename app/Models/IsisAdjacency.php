@@ -54,7 +54,9 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
     ];
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
     public function device(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'device_id');
