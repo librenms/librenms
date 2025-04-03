@@ -8,6 +8,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded,
     ])
+    ->registered(function ($app) {
+        $app->usePublicPath(path: realpath(base_path('html')));
+    })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
