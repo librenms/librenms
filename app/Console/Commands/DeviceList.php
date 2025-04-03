@@ -24,12 +24,12 @@ class DeviceList extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addOption('json', 'j', InputOption::VALUE_NONE);
         $this->addOption('apps', 'a', InputOption::VALUE_NONE);
         $this->addOption('ports', 'p', InputOption::VALUE_NONE);
         $this->addOption('ip', 'i', InputOption::VALUE_NONE);
         $this->addOption('storage', 's', InputOption::VALUE_NONE);
         $this->addOption('sensors', 'S', InputOption::VALUE_NONE);
+        $this->addOption('device-per-line', 'l', InputOption::VALUE_NONE);
     }
 
     /**
@@ -39,49 +39,20 @@ class DeviceList extends LnmsCommand
      */
     public function handle(): int
     {
-        $devices = Device::where('device_id', '>', 0)->get();
+        $devices = Device::when($this->option('apps'), fn ($q) => $q->with('applications'))
+            ->when($this->option('ports'), fn ($q) => $q->with(['ports', 'ports.ipv4', 'ports.ipv6']))
+            ->when($this->option('storage'), fn ($q) => $q->with('storage'))
+            ->when($this->option('storage'), fn ($q) => $q->with('sensors'))
+            ->get();
 
-        if ($this->option('json')) {
-            // skip this to we don't need to rebuild the returned array unless additional info is wanted
-            if ($this->option('apps') || $this->option('ports') || $this->option('storage') || $this->option('sensors')) {
-                $new_devices = [];
-                foreach ($devices as $device) {
-                    if ($this->option('apps')) {
-                        $device['apps'] = Application::where('device_id', $device['device_id'])->get();
-                    }
-                    if ($this->option('storage')) {
-                        $device['storage'] = Storage::where('device_id', $device['device_id'])->get();
-                    }
-                    if ($this->option('sensors')) {
-                        $device['sensors'] = Sensor::where('device_id', $device['device_id'])->get();
-                    }
-                    if ($this->option('ports')) {
-                        $ports = Port::where('device_id', $device['device_id'])->get();
-                        if ($this->option('ip')) {
-                            $new_ports = [];
-                            foreach ($ports as $port) {
-                                $Ipv4Addresses = Ipv4Address::where('port_id', $port['port_id'])->get();
-                                $Ipv6Addresses = Ipv6Address::where('port_id', $port['port_id'])->get();
-                                $port['Ipv6Addresses'] = $Ipv6Addresses;
-                                $port['Ipv4Addresses'] = $Ipv4Addresses;
-                                $new_ports[] = $port;
-                            }
-                            $ports = $new_ports;
-                        }
-                        $device['ports'] = $ports;
-                    }
-                    $new_devices[] = $device;
-                }
-                $devices = $new_devices;
+        if ($this->option('device-per-line')) {
+            foreach ($devices as $device) {
+                echo json_encode($device) . "\n";
             }
-            echo json_encode($devices) . "\n";
-
             return 0;
         }
 
-        foreach ($devices as $device) {
-            echo $device['device_id'] . ',' . $device['hostname'] . "\n";
-        }
+        echo json_encode($devices) . "\n";
 
         return 0;
     }
