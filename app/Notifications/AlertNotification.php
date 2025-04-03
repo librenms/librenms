@@ -33,7 +33,7 @@ use NotificationChannels\WebPush\WebPushMessage;
 class AlertNotification extends Notification
 {
     /**
-     * @var \NotificationChannels\WebPush\WebPushMessage
+     * @var WebPushMessage
      */
     public $message;
 
@@ -68,8 +68,8 @@ class AlertNotification extends Notification
 
     /**
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \NotificationChannels\WebPush\WebPushMessage
+     * @param  Notification  $notification
+     * @return WebPushMessage
      */
     public function toWebPush($notifiable, Notification $notification): WebPushMessage
     {

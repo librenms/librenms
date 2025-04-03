@@ -50,7 +50,7 @@ class AvailabilityMapController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string  $key
      * @return \Illuminate\Http\JsonResponse
      */

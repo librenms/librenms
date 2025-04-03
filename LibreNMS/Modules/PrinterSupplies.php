@@ -58,7 +58,7 @@ class PrinterSupplies implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -82,7 +82,7 @@ class PrinterSupplies implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {

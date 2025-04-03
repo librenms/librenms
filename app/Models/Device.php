@@ -453,7 +453,7 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  \App\Models\Location|string  $new_location  location data
+     * @param  Location|string  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
      */
     public function setLocation($new_location, bool $doLookup = false)
@@ -690,42 +690,42 @@ class Device extends BaseModel
 
     public function alerts(): HasMany
     {
-        return $this->hasMany(\App\Models\Alert::class, 'device_id');
+        return $this->hasMany(Alert::class, 'device_id');
     }
 
     public function alertLogs(): HasMany
     {
-        return $this->hasMany(\App\Models\AlertLog::class, 'device_id');
+        return $this->hasMany(AlertLog::class, 'device_id');
     }
 
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(\App\Models\AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
     public function applications(): HasMany
     {
-        return $this->hasMany(\App\Models\Application::class, 'device_id');
+        return $this->hasMany(Application::class, 'device_id');
     }
 
     public function attribs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+        return $this->hasMany(DeviceAttrib::class, 'device_id');
     }
 
     public function availability(): HasMany
     {
-        return $this->hasMany(\App\Models\Availability::class, 'device_id');
+        return $this->hasMany(Availability::class, 'device_id');
     }
 
     public function bgppeers(): HasMany
     {
-        return $this->hasMany(\App\Models\BgpPeer::class, 'device_id');
+        return $this->hasMany(BgpPeer::class, 'device_id');
     }
 
     public function cefSwitching(): HasMany
     {
-        return $this->hasMany(\App\Models\CefSwitching::class, 'device_id');
+        return $this->hasMany(CefSwitching::class, 'device_id');
     }
 
     public function children(): BelongsToMany
@@ -735,12 +735,12 @@ class Device extends BaseModel
 
     public function components(): HasMany
     {
-        return $this->hasMany(\App\Models\Component::class, 'device_id');
+        return $this->hasMany(Component::class, 'device_id');
     }
 
     public function diskIo(): HasMany
     {
-        return $this->hasMany(\App\Models\DiskIo::class, 'device_id');
+        return $this->hasMany(DiskIo::class, 'device_id');
     }
 
     public function hostResources(): HasMany
@@ -765,17 +765,17 @@ class Device extends BaseModel
 
     public function eventlogs(): HasMany
     {
-        return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
+        return $this->hasMany(Eventlog::class, 'device_id', 'device_id');
     }
 
     public function graphs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceGraph::class, 'device_id');
+        return $this->hasMany(DeviceGraph::class, 'device_id');
     }
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
     }
 
     public function ipsecTunnels(): HasMany
@@ -785,27 +785,27 @@ class Device extends BaseModel
 
     public function ipv4(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\Ipv4Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasManyThrough(Ipv4Address::class, Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
     public function ipv6(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\Ipv6Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasManyThrough(Ipv6Address::class, Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
     public function isisAdjacencies(): HasMany
     {
-        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+        return $this->hasMany(IsisAdjacency::class, 'device_id', 'device_id');
     }
 
     public function links(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'local_device_id');
+        return $this->hasMany(Link::class, 'local_device_id');
     }
 
     public function remoteLinks(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'remote_device_id');
+        return $this->hasMany(Link::class, 'remote_device_id');
     }
 
     public function allLinks(): \Illuminate\Support\Collection
@@ -815,7 +815,7 @@ class Device extends BaseModel
 
     public function location(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
+        return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
     public function macs(): HasMany
@@ -836,7 +836,7 @@ class Device extends BaseModel
 
     public function muninPlugins(): HasMany
     {
-        return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
+        return $this->hasMany(MuninPlugin::class, 'device_id');
     }
 
     public function nd(): HasMany
@@ -851,47 +851,47 @@ class Device extends BaseModel
 
     public function ospfAreas(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfArea::class, 'device_id');
+        return $this->hasMany(OspfArea::class, 'device_id');
     }
 
     public function ospfInstances(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+        return $this->hasMany(OspfInstance::class, 'device_id');
     }
 
     public function ospfNbrs(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
+        return $this->hasMany(OspfNbr::class, 'device_id');
     }
 
     public function ospfPorts(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+        return $this->hasMany(OspfPort::class, 'device_id');
     }
 
     public function ospfv3Areas(): HasMany
     {
-        return $this->hasMany(\App\Models\Ospfv3Area::class, 'device_id');
+        return $this->hasMany(Ospfv3Area::class, 'device_id');
     }
 
     public function ospfv3Instances(): HasMany
     {
-        return $this->hasMany(\App\Models\Ospfv3Instance::class, 'device_id');
+        return $this->hasMany(Ospfv3Instance::class, 'device_id');
     }
 
     public function ospfv3Nbrs(): HasMany
     {
-        return $this->hasMany(\App\Models\Ospfv3Nbr::class, 'device_id');
+        return $this->hasMany(Ospfv3Nbr::class, 'device_id');
     }
 
     public function ospfv3Ports(): HasMany
     {
-        return $this->hasMany(\App\Models\Ospfv3Port::class, 'device_id');
+        return $this->hasMany(Ospfv3Port::class, 'device_id');
     }
 
     public function packages(): HasMany
     {
-        return $this->hasMany(\App\Models\Package::class, 'device_id', 'device_id');
+        return $this->hasMany(Package::class, 'device_id', 'device_id');
     }
 
     public function parents(): BelongsToMany
@@ -901,52 +901,52 @@ class Device extends BaseModel
 
     public function ports(): HasMany
     {
-        return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
+        return $this->hasMany(Port::class, 'device_id', 'device_id');
     }
 
     public function portsAdsl(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\PortAdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+        return $this->hasManyThrough(PortAdsl::class, Port::class, 'device_id', 'port_id');
     }
 
     public function portsFdb(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
+        return $this->hasMany(PortsFdb::class, 'device_id', 'device_id');
     }
 
     public function portsNac(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+        return $this->hasMany(PortsNac::class, 'device_id', 'device_id');
     }
 
     public function portsStack(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
+        return $this->hasMany(PortStack::class, 'device_id', 'device_id');
     }
 
     public function portsStp(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+        return $this->hasMany(PortStp::class, 'device_id', 'device_id');
     }
 
     public function portsVdsl(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+        return $this->hasManyThrough(PortVdsl::class, Port::class, 'device_id', 'port_id');
     }
 
     public function portsVlan(): HasMany
     {
-        return $this->hasMany(\App\Models\PortVlan::class, 'device_id', 'device_id');
+        return $this->hasMany(PortVlan::class, 'device_id', 'device_id');
     }
 
     public function processes(): HasMany
     {
-        return $this->hasMany(\App\Models\Process::class, 'device_id');
+        return $this->hasMany(Process::class, 'device_id');
     }
 
     public function processors(): HasMany
     {
-        return $this->hasMany(\App\Models\Processor::class, 'device_id');
+        return $this->hasMany(Processor::class, 'device_id');
     }
 
     public function routes(): HasMany
@@ -956,27 +956,27 @@ class Device extends BaseModel
 
     public function rules(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
+        return $this->belongsToMany(AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
     }
 
     public function sensors(): HasMany
     {
-        return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+        return $this->hasMany(Sensor::class, 'device_id');
     }
 
     public function serviceTemplates(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
+        return $this->belongsToMany(ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
     }
 
     public function services(): HasMany
     {
-        return $this->hasMany(\App\Models\Service::class, 'device_id');
+        return $this->hasMany(Service::class, 'device_id');
     }
 
     public function storage(): HasMany
     {
-        return $this->hasMany(\App\Models\Storage::class, 'device_id');
+        return $this->hasMany(Storage::class, 'device_id');
     }
 
     public function stpInstances(): HasMany
@@ -986,52 +986,52 @@ class Device extends BaseModel
 
     public function stpPorts(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
+        return $this->hasMany(PortStp::class, 'device_id');
     }
 
     public function mempools(): HasMany
     {
-        return $this->hasMany(\App\Models\Mempool::class, 'device_id');
+        return $this->hasMany(Mempool::class, 'device_id');
     }
 
     public function mplsLsps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsLsp::class, 'device_id');
+        return $this->hasMany(MplsLsp::class, 'device_id');
     }
 
     public function mplsLspPaths(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsLspPath::class, 'device_id');
+        return $this->hasMany(MplsLspPath::class, 'device_id');
     }
 
     public function mplsSdps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdp::class, 'device_id');
+        return $this->hasMany(MplsSdp::class, 'device_id');
     }
 
     public function mplsServices(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsService::class, 'device_id');
+        return $this->hasMany(MplsService::class, 'device_id');
     }
 
     public function mplsSaps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSap::class, 'device_id');
+        return $this->hasMany(MplsSap::class, 'device_id');
     }
 
     public function mplsSdpBinds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'device_id');
+        return $this->hasMany(MplsSdpBind::class, 'device_id');
     }
 
     public function mplsTunnelArHops(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsTunnelArHop::class, 'device_id');
+        return $this->hasMany(MplsTunnelArHop::class, 'device_id');
     }
 
     public function mplsTunnelCHops(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+        return $this->hasMany(MplsTunnelCHop::class, 'device_id');
     }
 
     public function outages(): HasMany
@@ -1066,7 +1066,7 @@ class Device extends BaseModel
 
     public function syslogs(): HasMany
     {
-        return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
+        return $this->hasMany(Syslog::class, 'device_id', 'device_id');
     }
 
     public function tnmsNeInfo(): HasMany
@@ -1082,27 +1082,27 @@ class Device extends BaseModel
     public function users(): BelongsToMany
     {
         // FIXME does not include global read
-        return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
+        return $this->belongsToMany(User::class, 'devices_perms', 'device_id', 'user_id');
     }
 
     public function vminfo(): HasMany
     {
-        return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
+        return $this->hasMany(Vminfo::class, 'device_id');
     }
 
     public function vlans(): HasMany
     {
-        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
+        return $this->hasMany(Vlan::class, 'device_id');
     }
 
     public function vrfLites(): HasMany
     {
-        return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
+        return $this->hasMany(VrfLite::class, 'device_id');
     }
 
     public function vrfs(): HasMany
     {
-        return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+        return $this->hasMany(Vrf::class, 'device_id');
     }
 
     public function vServers(): HasMany
@@ -1112,6 +1112,6 @@ class Device extends BaseModel
 
     public function wirelessSensors(): HasMany
     {
-        return $this->hasMany(\App\Models\WirelessSensor::class, 'device_id');
+        return $this->hasMany(WirelessSensor::class, 'device_id');
     }
 }
