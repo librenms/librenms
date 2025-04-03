@@ -62,6 +62,7 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port down on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortDownNotification',
         [Severity::Error],
+        $device,
         );
 
         $port = $port->fresh(); // refresh from database
@@ -91,6 +92,7 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         "Port up on Chassis: 1 Shelf: 1 Slot: 1 Port: $port->ifIndex",
         'Could not handle CienaCesPortUpNotification',
         [Severity::Ok],
+        $device,
         );
 
         $port = $port->fresh(); // refresh from database
