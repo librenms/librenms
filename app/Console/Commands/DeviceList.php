@@ -10,7 +10,6 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\Storage;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputOption;
 
 class DeviceList extends LnmsCommand
