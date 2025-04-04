@@ -5,27 +5,30 @@ namespace LibreNMS\Tests\Unit\Data;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
-use Mockery;
 use RdKafka\Producer;
-use RdKafka\ProducerTopic;
 
 class KafkaDBStoreTest extends TestCase
 {
-    private function getKafkaMockedClusterConfig() {
+    private function getKafkaMockedClusterConfig()
+    {
         $clusterConf = new \RdKafka\Conf();
         $clusterConf->setLogCb(
-            function (Producer $producer, int $level, string $facility, string $message): void {            }
+            function (Producer $producer, int $level, string $facility, string $message): void {
+            }
         );
+
         return $clusterConf;
     }
-    
-    public function getMockedKafkaCluster() {
+
+    public function getMockedKafkaCluster()
+    {
         // Create mock cluster
         $numberOfBrokers = 3;
         $clusterConf = self::getKafkaMockedClusterConfig();
+
         return \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
     }
-    
+
     protected function setUp(): void
     {
         parent::setUp();
