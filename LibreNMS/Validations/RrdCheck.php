@@ -115,10 +115,10 @@ class RrdCheck extends BaseValidation
             $status = proc_get_status($process);
         }
 
-        if(($out = stream_get_contents($pipes[1])) !== false) {
+        if (($out = stream_get_contents($pipes[1])) !== false) {
             $stdOutput = $out;
         }
-        if(($err = stream_get_contents($pipes[2])) !== false) {
+        if (($err = stream_get_contents($pipes[2])) !== false) {
             $stdError = $err;
         }
         proc_close($process);

@@ -71,6 +71,6 @@ return [
     |
     */
 
-    'binary' => "lnms",
+    'binary' => 'lnms',
 
 ];

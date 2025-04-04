@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('port_group_port', function (Blueprint $table) {
             // check existing foreign key constraints because initially was in one migration
             $constraint_names = array_map(function ($constraint) {
-                return $constraint["name"];
+                return $constraint['name'];
             }, Schema::getForeignKeys('port_group_port'));
 
             if (! in_array('port_group_port_port_group_id_foreign', $constraint_names)) {
