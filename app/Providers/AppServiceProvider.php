@@ -37,7 +37,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->registerFacades();
         $this->registerGeocoder();
 
         $this->app->singleton('permissions', function () {
@@ -132,10 +131,6 @@ class AppServiceProvider extends ServiceProvider
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
         ], $sensor_types));
-    }
-
-    private function registerFacades()
-    {
     }
 
     private function registerGeocoder()

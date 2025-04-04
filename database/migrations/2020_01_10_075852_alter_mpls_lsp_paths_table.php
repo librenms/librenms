@@ -13,7 +13,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
         Schema::table('mpls_lsp_paths', function (Blueprint $table) {
             $table->unsignedInteger('mplsLspPathOperMetric')->nullable()->change();
         });
