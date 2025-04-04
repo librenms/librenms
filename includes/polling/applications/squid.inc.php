@@ -44,9 +44,7 @@ $oids = [
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.5',
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60',
 ];
-
-// apparently squid is notorious for returning unordered oids (which can result in loops)
-$returnedoids = SnmpQuery::allowUnordered()->numeric()->get($oids);
+$returnedoids = snmp_get_multi_oid($device, $oids);
 
 $memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];
 $swapmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.2.0'];
