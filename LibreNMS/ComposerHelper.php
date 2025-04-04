@@ -133,7 +133,9 @@ class ComposerHelper
             'group' => '',
         ];
 
-        @include 'config.php';
+        if (file_exists('config.php')) {
+            @include 'config.php';
+        }
 
         try {
             EnvHelper::init();
