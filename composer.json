@@ -43,6 +43,7 @@
         "librenms/laravel-vue-i18n-generator": "dev-master",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
+        "nesbot/carbon": "^2.0",
         "nunomaduro/laravel-console-summary": "^1.11",
         "paragonie/sodium_compat": "^1.9",
         "pear/console_color2": "^0.1",
