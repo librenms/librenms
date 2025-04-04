@@ -265,7 +265,7 @@ class Validator
      * @param-out array $output
      * @param-out int $code
      */
-    public function execAsUser(string $command, array &$output = null, int &$code = null): void
+    public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
         if (self::getUsername() === 'root') {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';

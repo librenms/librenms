@@ -44,7 +44,7 @@
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
         "nesbot/carbon": "^2.0",
-        "nunomaduro/laravel-console-summary": "*",
+        "nunomaduro/laravel-console-summary": "^1.13",
         "paragonie/sodium_compat": "^1.9",
         "pear/console_color2": "^0.1",
         "pear/console_table": "^1.3",
