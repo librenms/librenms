@@ -50,7 +50,7 @@ class Graph extends Component
      */
     private $link;
     /**
-     * @var bool|string
+     * @var bool
      */
     private $popup;
     /**

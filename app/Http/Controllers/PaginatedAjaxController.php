@@ -77,8 +77,6 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  Request  $request
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function searchFields(Request $request)
     {
@@ -90,8 +88,6 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  Request  $request
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function filterFields(Request $request)
     {
@@ -103,8 +99,6 @@ abstract class PaginatedAjaxController extends Controller
      *
      * @param  Request  $request
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function sortFields(Request $request)
     {
