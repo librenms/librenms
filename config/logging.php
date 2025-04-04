@@ -11,8 +11,15 @@
 use Monolog\Handler\StreamHandler;
 
 return [
+    'default' => env('LOG_CHANNEL', 'stack'),
 
     'channels' => [
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'flare'],
+            'ignore_exceptions' => false,
+        ],
+
         'console' => [
             'driver' => 'stack',
             'channels' => ['single', 'stdout', 'flare'],
