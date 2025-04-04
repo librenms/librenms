@@ -118,6 +118,7 @@ class SchemaTest extends TestCase
             ->getMock();
 
         $schema->method('getSchema')->willReturn($this->mock_schema);
+
         /** @var Schema $schema */
         return $schema;
     }
