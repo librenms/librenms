@@ -129,7 +129,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
+        /** @var Builder<\App\Models\DeviceRelatedModel> $query */
         return $query->with(['device' => function ($query) {
             return $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
@@ -137,11 +137,8 @@ class TopDevicesController extends WidgetController
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                /** @var Builder<\App\Models\DeviceRelatedModel> $query */
-                $inDeviceGroup = $query->inDeviceGroup($settings['device_group']);
-
-                return $inDeviceGroup;
+            ->when($settings['device_group'], function (Builder $query) use ($settings) {
+                return $query->inDeviceGroup($settings['device_group']);
             });
     }
 

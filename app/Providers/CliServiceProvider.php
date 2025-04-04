@@ -8,8 +8,9 @@ class CliServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Restrict LibreNMS CLI commands
-        if (defined('ARTISAN_BINARY') && ARTISAN_BINARY == 'lnms' && $this->app->environment() == 'production') {
+        // Restrict to LibreNMS CLI commands
+        /** @phpstan-ignore equal.alwaysFalse, booleanAnd.alwaysFalse */
+        if (defined('ARTISAN_BINARY') && ARTISAN_BINARY == 'lnms') {
             $this->app->register(\NunoMaduro\LaravelConsoleSummary\LaravelConsoleSummaryServiceProvider::class);
         }
     }
