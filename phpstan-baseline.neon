@@ -171,16 +171,6 @@ parameters:
 			path: app/Models/UserPref.php
 
 		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: app/Providers/CliServiceProvider.php
-
-		-
-			message: "#^Right side of && is always false\\.$#"
-			count: 1
-			path: app/Providers/CliServiceProvider.php
-
-		-
 			message: "#^Variable \\$username on left side of \\?\\? is never defined\\.$#"
 			count: 1
 			path: app/Providers/LegacyUserProvider.php

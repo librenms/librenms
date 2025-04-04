@@ -7,10 +7,6 @@ use LibreNMS\Util\Version;
 
 class ConfigureArtisanConsole
 {
-    private $commandsToHide = [
-        'make:cast',
-    ];
-
     /**
      * Create the event listener.
      */
