@@ -32,6 +32,8 @@ return [
         'BRIDGE-MIB::newRoot' => LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
         'BRIDGE-MIB::topologyChange' => LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
         'CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationEvent' => LibreNMS\Snmptrap\Handlers\CienaCesAAAUserAuthenticationEvent::class,
+        'CIENA-CES-PORT-MIB::cienaCesPortNotificationPortDown' => \LibreNMS\Snmptrap\Handlers\CienaCesPortNotificationPortDown::class,
+        'CIENA-CES-PORT-MIB::cienaCesPortNotificationPortUp' => \LibreNMS\Snmptrap\Handlers\CienaCesPortNotificationPortUp::class,
         'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
         'CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1' => LibreNMS\Snmptrap\Handlers\CiscoErrDisableInterfaceEvent::class,
         'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime' => LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStart::class,
