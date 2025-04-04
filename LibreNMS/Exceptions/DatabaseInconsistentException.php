@@ -27,6 +27,9 @@
 namespace LibreNMS\Exceptions;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validations\Database;
@@ -46,7 +49,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
         parent::__construct($message, $code, $previous);
     }
 
-    public static function upgrade($exception)
+    public static function upgrade(Throwable $exception): ?static
     {
         if ($exception instanceof QueryException || $exception->getPrevious() instanceof QueryException) {
             try {
@@ -71,10 +74,8 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
 
     /**
      * Render the exception into an HTTP or JSON response.
-     *
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    public function render(\Illuminate\Http\Request $request)
+    public function render(Request $request): Response|JsonResponse
     {
         $message = trans('exceptions.database_inconsistent.title');
         if (isset($this->validationResults[0])) {

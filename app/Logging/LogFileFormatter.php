@@ -2,7 +2,7 @@
 
 namespace App\Logging;
 
-class LogFileFormatter extends \Monolog\Formatter\LineFormatter
+class LogFileFormatter extends NoColorFormatter
 {
     public function __construct()
     {
@@ -12,10 +12,5 @@ class LogFileFormatter extends \Monolog\Formatter\LineFormatter
             true,
             true
         );
-    }
-
-    public function format(\Monolog\LogRecord $record): string
-    {
-        return parent::format($record);
     }
 }

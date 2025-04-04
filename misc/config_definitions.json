@@ -5826,7 +5826,7 @@
             "type": "boolean"
         },
         "reporting.throttle": {
-            "default": 300,
+            "default": 30,
             "type": "integer",
             "units": "seconds",
             "group": "system",

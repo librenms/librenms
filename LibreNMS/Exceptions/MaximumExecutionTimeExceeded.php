@@ -26,19 +26,20 @@
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Throwable;
 
 class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableException
 {
     /**
      * Try to convert the given Exception to a FilePermissionsException
-     *
-     * @param  \Exception  $exception
-     * @return static|null
      */
-    public static function upgrade($exception)
+    public static function upgrade(Throwable $exception): ?static
     {
         // cannot write to storage directory
         if ($exception instanceof FatalError &&
@@ -51,10 +52,8 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
 
     /**
      * Render the exception into an HTTP or JSON response.
-     *
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    public function render(\Illuminate\Http\Request $request)
+    public function render(Request $request): Response|JsonResponse
     {
         $title = preg_match('/ (\d+) /', $this->message, $matches)
             ? trans_choice('exceptions.maximum_execution_time_exceeded.title', (int) $matches[1], ['seconds' => (int) $matches[1]])

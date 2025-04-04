@@ -1,7 +1,6 @@
 <?php
-
 /**
- * UpgradeableException.php
+ * DeprecationDecorator.php
  *
  * -Description-
  *
@@ -20,27 +19,20 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\Exceptions;
+namespace App\Logging;
 
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Throwable;
+use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 
-interface UpgradeableException
+class DeprecationDecorator extends LineFormatter
 {
-    /**
-     * Try to convert the given Exception to this exception
-     * It should return null if the Exception cannot be upgraded.
-     *
-     * @param  Throwable  $exception
-     * @return static|null
-     */
-    public static function upgrade(Throwable $exception): ?static;
+    public function format(LogRecord $record): string
+    {
+        return "\033[32;1m$record->message\033[0m\n";
+    }
 
-    public function render(Request $request): Response|JsonResponse;
 }

@@ -8,7 +8,7 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-use Spatie\FlareClient\FlareMiddleware\AddGitInformation;
+
 use Spatie\FlareClient\FlareMiddleware\CensorRequestBodyFields;
 use Spatie\FlareClient\FlareMiddleware\CensorRequestHeaders;
 use Spatie\FlareClient\FlareMiddleware\RemoveRequestIp;
@@ -16,7 +16,6 @@ use Spatie\LaravelIgnition\FlareMiddleware\AddDumps;
 use Spatie\LaravelIgnition\FlareMiddleware\AddEnvironmentInformation;
 use Spatie\LaravelIgnition\FlareMiddleware\AddExceptionInformation;
 use Spatie\LaravelIgnition\FlareMiddleware\AddJobs;
-use Spatie\LaravelIgnition\FlareMiddleware\AddLogs;
 use Spatie\LaravelIgnition\FlareMiddleware\AddNotifierName;
 use Spatie\LaravelIgnition\FlareMiddleware\AddQueries;
 
@@ -46,7 +45,6 @@ return [
 
     'flare_middleware' => [
         RemoveRequestIp::class,
-        //AddGitInformation::class,
         AddNotifierName::class,
         AddEnvironmentInformation::class,
         AddExceptionInformation::class,
@@ -63,6 +61,15 @@ return [
         AddJobs::class => [
             'max_chained_job_reporting_depth' => 5,
         ],
+
+        // add git information, but cache it unlike the upstream provider
+        \App\Logging\Reporting\Middleware\AddGitInformation::class,
+
+        // Add more LibreNMS related info
+        \App\Logging\Reporting\Middleware\CleanContext::class,
+        \App\Logging\Reporting\Middleware\SetGroups::class,
+        \App\Logging\Reporting\Middleware\SetInstanceId::class,
+
         CensorRequestBodyFields::class => [
             'censor_fields' => [
                 'password',

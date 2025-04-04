@@ -5,9 +5,9 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->withProviders([
-        App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded,
-    ])
+    ->withExceptions(function (Exceptions $exceptions) {
+        new \App\Exceptions\ErrorReporting($exceptions);
+    })
     ->registered(function ($app) {
         $app->usePublicPath(path: realpath(base_path('html')));
     })
