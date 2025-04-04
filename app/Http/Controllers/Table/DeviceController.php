@@ -128,7 +128,7 @@ class DeviceController extends TableController
         }
 
         if ($field == 'state' && ! is_numeric($value)) {
-            return str_replace(['up', 'down'], [1, 0], $value);
+            return str_replace(['up', 'down'], ['1', '0'], $value);
         }
 
         return $value;
