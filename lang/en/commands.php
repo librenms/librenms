@@ -222,6 +222,12 @@ return [
             'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName',
             'output' => 'Output format to display the data :types',
             'no-header' => 'Do not add the header',
+            'apps' => 'Include app information. Requires JSON output.',
+            'ports' => 'Include port information. Requires JSON output.',
+            'ip' => 'Include IP information for ports. Requires -p/--ports to be specified.',
+            'storage' => 'Include storage information. Requires JSON output.',
+            'sensors' => 'Include sensor information. Requires JSON output.',
+            'device-per-line' => 'For JSON output, print each device as a JSON per line instead of a all devices as a JSON array.',
         ],
     ],
     'smokeping:generate' => [

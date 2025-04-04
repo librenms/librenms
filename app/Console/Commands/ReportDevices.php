@@ -21,9 +21,15 @@ class ReportDevices extends LnmsCommand
         parent::__construct();
         $this->addArgument('device spec', InputArgument::OPTIONAL);
         $this->addOption('fields', 'f', InputOption::VALUE_REQUIRED, default: 'hostname,ip');
-        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, __('commands.report:devices.options.output', ['types' => '[table, csv, none]']), 'table');
+        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, __('commands.report:devices.options.output', ['types' => '[table, csv, json, none]']), 'table');
         $this->addOption('list-fields');
         $this->addOption('no-header', 't', InputOption::VALUE_NONE);
+        $this->addOption('apps', 'a', InputOption::VALUE_NONE);
+        $this->addOption('ports', 'p', InputOption::VALUE_NONE);
+        $this->addOption('ip', 'i', InputOption::VALUE_NONE);
+        $this->addOption('storage', 's', InputOption::VALUE_NONE);
+        $this->addOption('sensors', 'S', InputOption::VALUE_NONE);
+        $this->addOption('device-per-line', 'l', InputOption::VALUE_NONE);
     }
 
     /**
@@ -33,6 +39,27 @@ class ReportDevices extends LnmsCommand
     {
         if ($this->option('list-fields')) {
             $this->printFields();
+
+            return 0;
+        }
+
+        // put this here since this does not need the complexity of the rest and functions in a very different manner
+        if ($this->option('output') == 'json') {
+            $devices = Device::when($this->option('apps'), fn ($q) => $q->with('applications'))
+                ->when($this->option('ports'), fn ($q) => $q->with(['ports', 'ports.ipv4', 'ports.ipv6']))
+                ->when($this->option('storage'), fn ($q) => $q->with('storage'))
+                ->when($this->option('storage'), fn ($q) => $q->with('sensors'))
+                ->whereDeviceSpec($this->argument('device spec'))->get();
+
+            if ($this->option('device-per-line')) {
+                foreach ($devices as $device) {
+                    echo json_encode($device) . "\n";
+                }
+
+                return 0;
+            }
+
+            echo json_encode($devices) . "\n";
 
             return 0;
         }
