@@ -35,13 +35,13 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 
     protected bool $console;
 
-    public function __construct()
+    public function __construct($format = "%message% %context% %extra%\n", $dateFormat = null, $allowInlineLineBreaks = true, $ignoreEmptyContextAndExtra = true)
     {
         parent::__construct(
-            "%message% %context% %extra%\n",
-            null,
-            true,
-            true
+            $format,
+            $dateFormat,
+            $allowInlineLineBreaks,
+            $ignoreEmptyContextAndExtra
         );
 
         $this->console_color = new \Console_Color2();
