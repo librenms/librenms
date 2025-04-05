@@ -6,7 +6,7 @@ use App\Models\Device;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DevicePolled
+class DeviceDiscovered
 {
     use Dispatchable, SerializesModels;
 
