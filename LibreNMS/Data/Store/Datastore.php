@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\DeviceCache;
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -100,7 +101,7 @@ class Datastore implements DataStorageInterface
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param  array  $device
+     * @param  array|Device|null  $device
      * @param  string  $measurement  Name of this measurement
      * @param  array  $tags  tags for the data (or to control rrdtool)
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
@@ -114,6 +115,12 @@ class Datastore implements DataStorageInterface
         // put($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
         if (! is_array($fields)) {
             $fields = [$measurement => $fields];
+        }
+
+        if ($device === null) {
+            $device = DeviceCache::getPrimary();
+        } elseif (is_array($device)) {
+            $device = DeviceCache::get($device['device_id']);
         }
 
         foreach ($this->stores as $store) {
