@@ -89,7 +89,7 @@ jobs:
         name: Install packages
         run: |
           sudo apt-get -qq update
-          sudo apt-get install -y fping python3-pip python3-setuptools snmp sqlite3
+          sudo apt-get install -y fping python3-pip python3-setuptools snmp sqlite3 librdkafka-dev
       -
         name: Pip install
         run: |

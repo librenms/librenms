@@ -41,6 +41,7 @@ class DatastoreServiceProvider extends ServiceProvider
         'LibreNMS\Data\Store\OpenTSDB',
         'LibreNMS\Data\Store\Prometheus',
         'LibreNMS\Data\Store\Rrd',
+        'LibreNMS\Data\Store\Kafka',
     ];
 
     public function register(): void
