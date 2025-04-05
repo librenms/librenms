@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Facades\DeviceCache;
+use App\Models\Device;
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
