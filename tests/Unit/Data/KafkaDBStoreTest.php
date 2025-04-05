@@ -6,7 +6,6 @@ use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
 use RdKafka\Producer;
-use Illuminate\Support\Facades\Log;
 
 class KafkaDBStoreTest extends TestCase
 {

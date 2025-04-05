@@ -193,7 +193,6 @@ class Kafka extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        Log::debug("Test");
         try {
             // get the singleton instance of the produced
             /** @var Producer $producer */
