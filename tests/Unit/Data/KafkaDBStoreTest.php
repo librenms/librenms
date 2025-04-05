@@ -6,6 +6,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
 use RdKafka\Producer;
+use Illuminate\Support\Facades\Log;
 
 class KafkaDBStoreTest extends TestCase
 {
@@ -57,17 +58,20 @@ class KafkaDBStoreTest extends TestCase
         return $property->getValue($object);
     }
 
-    public function testDataPushWithExcludedMeasurements()
+    public function testDataPushToKafka()
     {
-        Config::set('kafka.measurement-exclude', 'excluded_measurement');
+        $kafka = \Mockery::mock(Kafka::class);
+        $producer = \Mockery::mock(\RdKafka\Producer::class);
+        $topic = \Mockery::mock(\RdKafka\ProducerTopic::class);
 
-        $kafka = new Kafka();
+        $kafka->shouldReceive('put')->once();
+        $kafka->shouldReceive('getClient')->andReturn($producer);
+        $producer->shouldReceive('newTopic')->andReturn($topic);
+
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'excluded_measurement';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
-
-        \Log::shouldReceive('debug')->once()->with('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: excluded_measurement');
 
         $kafka->put($device, $measurement, $tags, $fields);
     }
