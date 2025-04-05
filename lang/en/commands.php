@@ -105,17 +105,6 @@ return [
             'added' => 'Added device :hostname (:device_id)',
         ],
     ],
-    'device:list' => [
-        'description' => 'List devices via JSON. For text, see report:devices.',
-        'options' => [
-            'apps' => 'Include app information.',
-            'ports' => 'Include port information.',
-            'ip' => 'Include IP information for ports. Requires -p/--ports to be specified.',
-            'storage' => 'Include storage information.',
-            'sensors' => 'Include sensor information.',
-            'device-per-line' => 'Print each device as a JSON per line instead of a all devices as a JSON array.',
-        ],
-    ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
