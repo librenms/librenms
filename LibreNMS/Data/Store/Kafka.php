@@ -242,10 +242,7 @@ class Kafka extends BaseDatastore
 
             $tmp_fields = [];
             $tmp_tags = [];
-            // NETMETRIX-LIBRENMS-CUSTOM-ADDED-BEGIN
-            // REASON: Add groups as tags
             $tmp_tags['device_groups'] = implode('|', $device_data->groups->pluck('name')->toArray());
-            // NETMETRIX-LIBRENMS-CUSTOM-ADDED-END
 
             foreach ($tags as $k => $v) {
                 if (empty($v)) {
