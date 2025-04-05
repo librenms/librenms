@@ -27,7 +27,7 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Facades\DeviceCache;
+use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
@@ -119,7 +119,7 @@ class InfluxDBv2 extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param  array  $device
+     * @param  Device  $device
      * @param  string  $measurement  Name of this measurement
      * @param  array  $tags  tags for the data (or to control rrdtool)
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
@@ -127,11 +127,10 @@ class InfluxDBv2 extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        $device_data = DeviceCache::get($device['device_id']);
         $excluded_groups = Config::get('influxdbv2.groups-exclude');
 
         if (! empty($excluded_groups)) {
-            $device_groups = $device_data->groups;
+            $device_groups = $device->groups;
             foreach ($device_groups as $group) {
                 // The group name will always be parsed as lowercase, even when uppercase in the GUI.
                 if (in_array(strtoupper($group->name), array_map('strtoupper', $excluded_groups))) {
@@ -144,7 +143,7 @@ class InfluxDBv2 extends BaseDatastore
 
         $stat = Measurement::start('write');
         $tmp_fields = [];
-        $tmp_tags['hostname'] = $device['hostname'];
+        $tmp_tags['hostname'] = $device->hostname;
         foreach ($tags as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
@@ -178,7 +177,7 @@ class InfluxDBv2 extends BaseDatastore
         try {
             // Construct data points using the InfluxDB2\Point class
             $point = Point::measurement($measurement)
-              ->addTag('hostname', $device['hostname'])
+              ->addTag('hostname', $device->hostname)
               ->time(microtime(true)); // Assuming you want to use the current time
 
             // Write the data points to the database using the WriteApi instance

@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
@@ -163,7 +164,7 @@ class Rrd extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param  array  $device  device array
+     * @param  Device  $device  device array
      * @param  string  $measurement  the name of this measurement (if no rrd_name tag is given, this will be used to name the file)
      * @param  array  $tags  tags to pass additional info to rrdtool
      * @param  array  $fields  data values to update
@@ -173,14 +174,14 @@ class Rrd extends BaseDatastore
         $rrd_name = isset($tags['rrd_name']) ? $tags['rrd_name'] : $measurement;
         $step = isset($tags['rrd_step']) ? $tags['rrd_step'] : $this->step;
         if (! empty($tags['rrd_oldname'])) {
-            self::renameFile($device, $tags['rrd_oldname'], $rrd_name);
+            self::renameFile($device->only(['hostname', 'device_id']), $tags['rrd_oldname'], $rrd_name);
         }
 
         if (isset($tags['rrd_proxmox_name'])) {
             $pmxvars = $tags['rrd_proxmox_name'];
             $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
         } else {
-            $rrd = self::name($device['hostname'], $rrd_name);
+            $rrd = self::name($device->hostname, $rrd_name);
         }
 
         if (isset($tags['rrd_def'])) {

@@ -99,9 +99,9 @@ class Prometheus extends BaseDatastore
             }
         }
 
-        $promurl = $device['hostname'] . $promtags;
+        $promurl = $device->hostname . $promtags;
         if (Config::get('prometheus.attach_sysname', false)) {
-            $promurl .= '/sysName/' . $device['sysName'];
+            $promurl .= '/sysName/' . $device->sysName;
         }
         $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 
