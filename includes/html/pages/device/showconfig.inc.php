@@ -4,7 +4,7 @@
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
-if (Auth::user()->hasGlobalAdmin() || ((Auth::user()->hasGlobalRead() && Config::get('oxidized.read_only_configs') == true))) {
+if (Auth::user()->hasGlobalAdmin() || (Auth::user()->hasGlobalRead() && Config::get('oxidized.read_only_configs') == true)) {
     if (! empty($rancid_file)) {
         echo '<div style="clear: both;">';
 
