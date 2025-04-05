@@ -292,7 +292,7 @@ return [
                 'not_detected' => 'A entrada cron do wrapper Python não está presente',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_DRIVER=redis',
+                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_STORE=redis',
                 'ok' => 'Redis está funcional',
                 'unavailable' => 'Redis está indisponível',
             ],

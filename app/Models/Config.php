@@ -35,9 +35,16 @@ class Config extends BaseModel
         'config_name',
         'config_value',
     ];
-    protected $casts = [
-        'config_default' => 'array',
-    ];
+
+    /**
+     * @return array{config_default: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'config_default' => 'array',
+        ];
+    }
 
     // ---- Accessors/Mutators ----
 

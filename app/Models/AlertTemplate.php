@@ -34,12 +34,17 @@ class AlertTemplate extends BaseModel
     public $timestamps = false;
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTemplateMap, $this>
+     */
     public function map(): HasMany
     {
         return $this->hasMany(AlertTemplateMap::class, 'alert_templates_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\AlertRule, \App\Models\AlertTemplateMap, $this>
+     */
     public function alert_rules(): HasManyThrough
     {
         return $this->hasManyThrough(AlertRule::class, AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')

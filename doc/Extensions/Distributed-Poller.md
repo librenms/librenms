@@ -79,7 +79,7 @@ A single Redis server, this is the simplest setup.
 ```
 REDIS_HOST=HOSTNAME or IP
 REDIS_PORT=6379
-CACHE_DRIVER=redis
+CACHE_STORE=redis
 ```
 
 #### Redis Sentinel
@@ -106,7 +106,7 @@ Under Settings > Global Settings > Distributed poller, you fill out the
 memcached host and port, and then in your `.env` file you will need to add:
 
 ```
-CACHE_DRIVER=memcached
+CACHE_STORE=memcached
 ```
 If you want to use memcached, you will also need to install an additional
 Python 3 python-memcached package.

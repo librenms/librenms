@@ -40,7 +40,9 @@ class MplsSdp extends Model implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdpBind, $this>
+     */
     public function binds(): HasMany
     {
         return $this->hasMany(MplsSdpBind::class, 'sdp_id');

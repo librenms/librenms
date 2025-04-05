@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Pseudowire.php
+ * DeprecationDecorator.php
  *
  * -Description-
  *
@@ -20,24 +19,20 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Models;
+namespace App\Logging;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 
-class Pseudowire extends PortRelatedModel
+class DeprecationDecorator extends LineFormatter
 {
-    public $timestamps = false;
-    protected $primaryKey = 'pseudowire_id';
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
-     */
-    public function endpoints(): HasMany
+    public function format(LogRecord $record): string
     {
-        return $this->hasMany(Pseudowire::class, 'cpwVcId', 'cpwVcId');
+        return "\033[32;1m$record->message\033[0m\n";
     }
+
 }

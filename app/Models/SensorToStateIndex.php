@@ -12,11 +12,17 @@ class SensorToStateIndex extends Model
     public $timestamps = false;
     protected $fillable = ['sensor_id', 'state_index_id'];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Sensor, $this>
+     */
     public function sensor(): HasOne
     {
         return $this->hasOne(Sensor::class, 'sensor_id', 'sensor_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\StateIndex, $this>
+     */
     public function stateIndex(): HasOne
     {
         return $this->hasOne(StateIndex::class, 'state_index_id', 'state_index_id');
