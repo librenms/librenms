@@ -16,26 +16,17 @@ class Kafka extends BaseDatastore
 {
     private $client;
     private $device_id;
-    private $isShuttingDown = false;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->client = self::getClient();
-
-        // Register shutdown function
-        register_shutdown_function(function () {
-            $this->isShuttingDown = true;
-            $this->safeFlush();
-        });
     }
 
     public function __destruct()
     {
-        if (! $this->isShuttingDown) {
-            $this->safeFlush();
-        }
+        $this->safeFlush();
         // Clear reference
         $this->client = null;
     }

@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use LibreNMS\Config;
+use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
 use RdKafka\Producer;
