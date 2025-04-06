@@ -27,15 +27,21 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\EntPhysical;
+use App\Models\Ipv6Address;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\OS;
 use LibreNMS\OS\Shared\Radlan;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class EltexMes23xx extends Radlan implements TransceiverDiscovery
+class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -94,5 +100,34 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery
     protected function normData(string $par = ''): string
     {
         return StringHelpers::isHex($par) ? StringHelpers::hexToAscii($par, ' ') : $par;
+    }
+
+    public function discoverIpv6Addresses(): Collection
+    {
+        $ips = new Collection;
+
+        $ips = $ips->merge(SnmpQuery::enumStrings()->walk([
+            'IP-MIB::ipAddressIfIndex.ipv6',
+            'RADLAN-IPv6::rlIpAddressTable',
+        ])->mapTable(function ($data, $addrType, $address = '') {
+            if ($addrType == 'ipv6') {
+                try {
+                    $ip = IPv6::fromHexString($address);
+
+                    return new Ipv6Address([
+                        'ipv6_address' => $ip->uncompressed(),
+                        'ipv6_compressed' => $ip->compressed(),
+                        'ipv6_prefixlen' => $data['RADLAN-IPv6::rlIpAddressPrefixLength'] ?? '',
+                        'ipv6_origin' => $data['RADLAN-IPv6::rlIpAddressType'] ?? 'unknown',
+                        'port_id' => PortCache::getIdFromIfIndex($data['IP-MIB::ipAddressIfIndex'], $this->getDevice()),
+                    ]);
+                } catch (InvalidIpException $e) {
+                    Log::error('Failed to parse IP: ' . $e->getMessage());
+
+                    return null;
+                }
+            }
+        }));
+        return $ips->filter();
     }
 }
