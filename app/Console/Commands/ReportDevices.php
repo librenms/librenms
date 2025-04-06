@@ -160,7 +160,7 @@ class ReportDevices extends LnmsCommand
         $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
             ->whereDeviceSpec($this->argument('device spec'))->get();
 
-        if (!$this->option('devices-as-array')) {
+        if (! $this->option('devices-as-array')) {
             foreach ($devices as $device) {
                 $this->line(json_encode($device));
             }
