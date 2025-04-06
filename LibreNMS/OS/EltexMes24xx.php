@@ -3,21 +3,20 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
-use App\Models\Ipv6Address;
 use App\Models\EntPhysical;
+use App\Models\Ipv6Address;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class EltexMes24xx extends OS implements TransceiverDiscovery,Ipv6AddressDiscovery
-
+class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
