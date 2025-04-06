@@ -142,6 +142,7 @@ class ReportDevices extends LnmsCommand
     protected function jsonRequestHandler(): int
     {
         $has_relationships = false;
+        $relationships = []; // make phpstan happy
         if ($this->option('relationships')) {
             /*
              * Clean up the return to ensure we have no white space or unintended empty items.
