@@ -34,11 +34,10 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\OS;
 use LibreNMS\OS\Shared\Radlan;
 use LibreNMS\OS\Traits\EntityMib;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDiscovery
@@ -128,6 +127,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 }
             }
         }));
+
         return $ips->filter();
     }
 }
