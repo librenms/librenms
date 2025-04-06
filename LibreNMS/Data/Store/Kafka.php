@@ -18,7 +18,7 @@ class Kafka extends BaseDatastore
     private $device_id;
     private $isShuttingDown = false;
 
-    public function __construct(Producer $client)
+    public function __construct($client)
     {
         parent::__construct();
 
