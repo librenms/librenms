@@ -13,7 +13,7 @@ class KafkaDBStoreTest extends TestCase
     private function getKafkaMockedClusterConfig()
     {
         $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(null);
+        $clusterConf->setLogCb(function (\RdKafka\Producer $producer, int $level, string $facility, string $message): void {});
 
         return $clusterConf;
     }
