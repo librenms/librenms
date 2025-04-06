@@ -33,7 +33,7 @@ class Kafka extends BaseDatastore
 
     public function __destruct()
     {
-        if (! $this->isShuttingDown) {
+        if ($this->isShuttingDown) {
             $this->safeFlush();
         }
         // Clear reference
