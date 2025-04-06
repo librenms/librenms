@@ -26,7 +26,6 @@ class Kafka extends BaseDatastore
 
     public function __destruct()
     {
-        $this->safeFlush();
         // Clear reference
         $this->client = null;
     }
@@ -117,39 +116,6 @@ class Kafka extends BaseDatastore
         }
 
         return new Producer($conf);
-    }
-
-    public function safeFlush()
-    {
-        // check if client instance exists
-        if (! $this->client) {
-            return;
-        }
-
-        try {
-            // get total number of messages in the queue
-            $outQLen = $this->client->getOutQLen();
-
-            if ($outQLen > 0) {
-                Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
-                $result = $this->client->flush(self::getKafkaFlushTimeout());
-
-                if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-                    Log::error('KAFKA: Flush failed', [
-                        'error' => Library::rd_kafka_err2str($result),
-                        'code' => $result,
-                        'device_id' => $this->device_id,
-                        'remaining' => $this->client->getOutQLen(),
-                    ]);
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::error('KAFKA: safeFlush failed with exception', [
-                'device_id' => $this->device_id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
     }
 
     public function getName()
