@@ -5,7 +5,6 @@ namespace LibreNMS\Tests\Unit\Data;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
-use RdKafka\Producer;
 
 class KafkaDBStoreTest extends TestCase
 {
