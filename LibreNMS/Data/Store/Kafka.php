@@ -199,7 +199,7 @@ class Kafka extends BaseDatastore
             $producer = $this->client;
             $this->device_id = $device['device_id'];
             $topic = $producer->newTopic(Kafka::getTopicName());
-            
+
             $device_data = DeviceCache::get($device['device_id']);
             $excluded_groups = Config::get('kafka.groups-exclude'); // comman separated string
             $excluded_measurement = Config::get('kafka.measurement-exclude'); // comman separated string

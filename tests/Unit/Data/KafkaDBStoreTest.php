@@ -9,6 +9,7 @@ use LibreNMS\Tests\TestCase;
 class KafkaDBStoreTest extends TestCase
 {
     protected $cluster;
+
     private function getKafkaMockedClusterConfig()
     {
         $clusterConf = new \RdKafka\Conf();
@@ -47,12 +48,12 @@ class KafkaDBStoreTest extends TestCase
         $topic->shouldReceive('produce')->once();
 
         $kafka = new Kafka(Kafka::getClient());
-        
+
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'excluded_measurement';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
-        
+
         $kafka->put($device, $measurement, $tags, $fields);
     }
 }
