@@ -51,6 +51,8 @@ class DevicePoll extends LnmsCommand
             Config::set('influxdbv2.enable', false);
             Config::set('prometheus.enable', false);
             Config::set('graphite.enable', false);
+            Config::set('graphite.enable', false);
+            Config::set('kafka.enable', false);
         }
 
         try {
