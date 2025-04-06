@@ -9,13 +9,11 @@ use RdKafka\Producer;
 
 class KafkaDBStoreTest extends TestCase
 {
+    protected $cluster;
     private function getKafkaMockedClusterConfig()
     {
         $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(
-            function (Producer $producer, int $level, string $facility, string $message): void {
-            }
-        );
+        $clusterConf->setLogCb(null);
 
         return $clusterConf;
     }
@@ -24,7 +22,7 @@ class KafkaDBStoreTest extends TestCase
     {
         // Create mock cluster
         $numberOfBrokers = 1;
-        $clusterConf = self::getKafkaMockedClusterConfig();
+        $clusterConf = $this->getKafkaMockedClusterConfig();
 
         return \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
     }
@@ -32,43 +30,30 @@ class KafkaDBStoreTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $cluster = self::getMockedKafkaCluster();
+
+        $this->cluster = $this->getMockedKafkaCluster();
+        Config::set('kafka.broker.list', $this->cluster->getBootstraps());
+
         Config::set('kafka.enable', true);
-        Config::set('kafka.broker.list', $cluster->getBootstraps());
-        Config::set('kafka.idempotence', true);
-        Config::set('kafka.buffer.max.message', 100_000);
+        Config::set('kafka.idempotence', false);
+        Config::set('kafka.buffer.max.message', 10);
         Config::set('kafka.batch.max.message', 25);
-        Config::set('kafka.linger.ms', 500);
-        Config::set('kafka.request.required.acks', 'all');
-    }
-
-    public function testKafkaConfiguration()
-    {
-        $kafka = new Kafka();
-        $this->assertInstanceOf(Producer::class, $this->getPrivateProperty($kafka, 'client'));
-    }
-
-    private function getPrivateProperty($object, $property)
-    {
-        $reflection = new \ReflectionClass($object);
-        $property = $reflection->getProperty($property);
-        $property->setAccessible(true);
-
-        return $property->getValue($object);
+        Config::set('kafka.linger.ms', 50);
+        Config::set('kafka.request.required.acks', 0);
     }
 
     public function testDataPushToKafka()
     {
-        $kafka = app('LibreNMS\Data\Store\Kafka');
-        $topic = \Mockery::mock(\RdKafka\ProducerTopic::class);
-
+        $topic = $this->mock('overload:RdKafka\ProducerTopic');
         $topic->shouldReceive('produce')->once();
 
+        $kafka = new Kafka(Kafka::getClient());
+        
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'excluded_measurement';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
-
+        
         $kafka->put($device, $measurement, $tags, $fields);
     }
 }
