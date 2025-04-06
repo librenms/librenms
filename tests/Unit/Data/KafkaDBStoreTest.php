@@ -59,13 +59,10 @@ class KafkaDBStoreTest extends TestCase
 
     public function testDataPushToKafka()
     {
-        $kafka = \Mockery::mock(Kafka::class);
-        $producer = \Mockery::mock(Producer::class);
+        $kafka = app('LibreNMS\Data\Store\Kafka');
         $topic = \Mockery::mock(\RdKafka\ProducerTopic::class);
 
-        $kafka->shouldReceive('put')->once();
-        $kafka->shouldReceive('getClient')->andReturn($producer);
-        $producer->shouldReceive('newTopic')->andReturn($topic);
+        $topic->shouldReceive('produce')->once();
 
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
         $measurement = 'excluded_measurement';
