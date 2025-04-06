@@ -8,23 +8,34 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use RdKafka\Conf;
+use RdKafka\FFI\Library;
 use RdKafka\Message;
 use RdKafka\Producer;
 
 class Kafka extends BaseDatastore
 {
-    private $client;
+    private $client = null;
     private $device_id;
+    private $isShuttingDown = false;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->client = self::getClient();
+
+        // Register shutdown function
+        register_shutdown_function(function () {
+            $this->isShuttingDown = true;
+            $this->safeFlush();
+        });
     }
 
     public function __destruct()
     {
+        if (! $this->isShuttingDown) {
+            $this->safeFlush();
+        }
         // Clear reference
         $this->client = null;
     }
@@ -115,6 +126,39 @@ class Kafka extends BaseDatastore
         }
 
         return new Producer($conf);
+    }
+
+    public function safeFlush()
+    {
+        // check if client instance exists
+        if (! $this->client) {
+            return;
+        }
+
+        try {
+            // get total number of messages in the queue
+            $outQLen = $this->client->getOutQLen();
+
+            if ($outQLen > 0) {
+                Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
+                $result = $this->client->flush(self::getKafkaFlushTimeout());
+
+                if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
+                    Log::error('KAFKA: Flush failed', [
+                        'error' => Library::rd_kafka_err2str($result),
+                        'code' => $result,
+                        'device_id' => $this->device_id,
+                        'remaining' => $this->client->getOutQLen(),
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('KAFKA: safeFlush failed with exception', [
+                'device_id' => $this->device_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 
     public function getName()
