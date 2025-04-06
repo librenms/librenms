@@ -56,6 +56,5 @@ class KafkaDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $kafka->put($device, $measurement, $tags, $fields);
-
     }
 }
