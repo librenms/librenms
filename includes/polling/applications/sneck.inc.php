@@ -17,10 +17,8 @@ if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
 }
 
 $old_debugs = [];
-$old_debugs_data = [];
 if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
-    $old_checks = array_keys($app->data['data']['debugs']);
-    $old_checks_data = $app->data['data']['debugs'];
+    $old_debugs = array_keys($app->data['data']['debugs']);
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
