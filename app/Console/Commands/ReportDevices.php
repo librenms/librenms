@@ -229,7 +229,6 @@ class ReportDevices extends LnmsCommand
         }
     }
 
-
     protected function printRelationships(): void
     {
         $relationships = $this->getRelationships();
