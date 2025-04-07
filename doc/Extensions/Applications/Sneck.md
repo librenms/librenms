@@ -94,11 +94,10 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
     */5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
     ```
 
-4. Set it up in the snmpd config and restart snmpd. The `-c` flag will
-   tell read it to read from cache instead of rerunning the checks.
+4. Set it up in the snmpd config and restart snmpd.
 
     ```bash
-    extend sneck /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -c
+    extend sneck /bin/cat /var/cache/sneck.cache.snmp
     ```
 
 5. In LibreNMS, enable the application for the server in question or wait for auto discovery to find it.
