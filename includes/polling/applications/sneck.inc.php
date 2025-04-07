@@ -97,7 +97,7 @@ $added_checks = array_values(array_diff($new_checks, $old_checks));
 $added_debugs = array_values(array_diff($new_debugs, $old_debugs));
 
 //check for removed checks/debugs
-$removed_debugs = array_values(array_diff($old_checks, $new_checks));
+$removed_checks = array_values(array_diff($old_checks, $new_checks));
 $removed_debugs = array_values(array_diff($old_debugs, $new_debugs));
 
 // if we have any check changes, log it
