@@ -27,7 +27,7 @@ class StoragesController extends TableController
     protected function searchFields(Request $request): array
     {
         return [
-            'device_hostname',
+            'hostname',
             'storage_descr',
         ];
     }
@@ -36,7 +36,7 @@ class StoragesController extends TableController
     {
         return Storage::query()
             ->hasAccess($request->user())
-            ->with(['device', 'device.location'])
+            ->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id')
             ->withAggregate('device', 'hostname');
     }
 
