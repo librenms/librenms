@@ -237,7 +237,7 @@ class ReportDevices extends LnmsCommand
             $this->line($relationship);
         }
     }
-  
+
     public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
     {
         if ($option->getName() == 'fields') {
@@ -245,6 +245,12 @@ class ReportDevices extends LnmsCommand
                 ->merge(Schema::getColumnListing('devices'))
                 ->merge(array_keys($this->getSyntheticFields()))
                 ->merge(Device::definedRelations())
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+        }
+
+        if ($option->getName() == 'relationships') {
+            return collect()
+                ->merge($this->getRelationships())
                 ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
         }
 
