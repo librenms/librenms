@@ -94,7 +94,8 @@ at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
     */5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
     ```
 
-4. Set it up in the snmpd config and restart snmpd.
+4. Set it up in the snmpd config and restart snmpd. If calling `sneck -c` instead or catting the non-snmp cache file, there is the possibility
+   of snmpd mangling the return. To avoid this cat the snmp cache file as below or call `sneck -c -b`.
 
     ```bash
     extend sneck /bin/cat /var/cache/sneck.cache.snmp
