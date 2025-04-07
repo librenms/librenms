@@ -53,10 +53,10 @@ if (isset($sneck_data)) {
 }
 
 if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sneck_check']])) || (isset($vars['sneck_debug']) && isset($app->data['data']['debugs'][$vars['sneck_debug']]))) {
-    $type='checks';
-    $type_name='';
+    $type = 'checks';
+    $type_name = '';
     if (isset($vars['sneck_debug'])) {
-        $type='debugs';
+        $type = 'debugs';
         $type_name = $vars['sneck_debug'];
     } else {
         $type_name = $vars['sneck_check'];
