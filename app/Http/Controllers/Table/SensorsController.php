@@ -38,17 +38,16 @@ class SensorsController extends TableController
     protected function searchFields(Request $request): array
     {
         return [
-            'device_hostname',
+            'hostname',
             'sensor_descr',
             'sensor_current',
-            'sensor_group',
         ];
     }
 
     protected function baseQuery(Request $request): Builder
     {
         $class = $request->input('class');
-        $relations = ['device', 'device.location'];
+        $relations = [];
         if ($class == 'state') {
             $relations[] = 'translations';
         }
@@ -56,6 +55,7 @@ class SensorsController extends TableController
         return Sensor::query()
             ->hasAccess($request->user())
             ->where('sensor_class', $class)
+            ->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id')
             ->with($relations)
             ->withAggregate('device', 'hostname');
     }
