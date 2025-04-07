@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
 use App\Models\Device;
@@ -228,11 +229,25 @@ class ReportDevices extends LnmsCommand
         }
     }
 
+
     protected function printRelationships(): void
     {
         $relationships = $this->getRelationships();
         foreach ($relationships as $relationship) {
             $this->line($relationship);
         }
+    }
+  
+    public function completeOptionValue(DynamicInputOption $option, string $current): ?Collection
+    {
+        if ($option->getName() == 'fields') {
+            return collect()
+                ->merge(Schema::getColumnListing('devices'))
+                ->merge(array_keys($this->getSyntheticFields()))
+                ->merge(Device::definedRelations())
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+        }
+
+        return null;
     }
 }

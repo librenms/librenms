@@ -27,7 +27,7 @@ class SchemaDumpCommand extends DumpCommand
      *
      * @return int
      */
-    public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
+    public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher): int
     {
         $database = $this->option('database');
 

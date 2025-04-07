@@ -11,7 +11,7 @@ class CreateBouncerTables extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('abilities')) {
             Schema::create('abilities', function (Blueprint $table) {
@@ -89,7 +89,7 @@ class CreateBouncerTables extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('permissions');
         Schema::drop('assigned_roles');

@@ -82,7 +82,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
      *
      * @param  string  $class
      * @param  string  $default
-     * @return \App\Models\Mempool
+     * @return Mempool
      */
     public function setClass($class = null, $default = 'system')
     {

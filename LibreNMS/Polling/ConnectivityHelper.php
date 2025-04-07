@@ -39,7 +39,7 @@ use Symfony\Component\Process\Process;
 class ConnectivityHelper
 {
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     private $device;
     /**
