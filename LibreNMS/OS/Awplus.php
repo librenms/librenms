@@ -26,13 +26,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Awplus extends OS implements OSDiscovery
+class Awplus extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -68,5 +72,19 @@ class Awplus extends OS implements OSDiscovery
         $device->serial = $serial;
         $device->hardware = $hardware;
         $device->features = $features ?? null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return \SnmpQuery::enumStrings()->walk('AT-SYSINFO-MIB::atPortInfoTransceiverTable')
+            ->mapTable(function ($data, $ifIndex) {
+
+                return new Transceiver([
+                    'port_id' => (int)PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                    'index' => $ifIndex,
+                    'type' => $data['AT-SYSINFO-MIB::atPortInfoTransceiverType'] ?? null,
+                    'entity_physical_index' => $ifIndex,
+                ]);
+            });
     }
 }
