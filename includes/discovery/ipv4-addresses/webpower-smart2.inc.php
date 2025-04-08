@@ -21,10 +21,8 @@
  * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
 $oids = SnmpQuery::cache()->hideMib()->walk('IP-MIB::ipAddrTable')->table(1);
 
-d_echo($oids);
 if (! empty($oids)) {
     unset($valid_v4);
     foreach ($oids as $key => $entry) {
