@@ -91,6 +91,16 @@ class ErrorReporting
 
     public function render(Throwable $exception, Request $request): ?Response
     {
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
+        if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+            return null;
+        }
+
+
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
             if ($exception instanceof \Illuminate\View\ViewException || $exception instanceof \Spatie\LaravelIgnition\Exceptions\ViewException) {
