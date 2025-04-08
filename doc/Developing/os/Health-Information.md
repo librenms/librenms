@@ -154,7 +154,8 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
 
 When referencing an oid in another table the full index will be used to match
 the other table. If the indexes of the two tables don't match, you will need
-to specify which indexes to use by their index position starting with 0.
+to specify which indexes to use by their index position starting with 0. The
+data for the other table must be fetched already.
 
 `{{ IF-MIB::ifName:2 }}`
 
