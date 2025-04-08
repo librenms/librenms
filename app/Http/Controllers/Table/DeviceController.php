@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceController.php
  *
@@ -88,7 +89,7 @@ class DeviceController extends TableController
      * Defines the base query for this resource
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
     {
@@ -127,7 +128,7 @@ class DeviceController extends TableController
         }
 
         if ($field == 'state' && ! is_numeric($value)) {
-            return str_replace(['up', 'down'], [1, 0], $value);
+            return str_replace(['up', 'down'], ['1', '0'], $value);
         }
 
         return $value;
@@ -198,7 +199,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
+            $warning_time = Config::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }

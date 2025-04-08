@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component.php
  *
@@ -79,11 +80,11 @@ class Component extends DeviceRelatedModel
 
     public function logs(): HasMany
     {
-        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+        return $this->hasMany(ComponentStatusLog::class, 'component_id', 'id');
     }
 
     public function prefs(): HasMany
     {
-        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
+        return $this->hasMany(ComponentPref::class, 'component', 'id');
     }
 }

@@ -74842,5 +74842,20 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "3261:3030:3a65:3630:3a61:6666:663a:3237",
+                    "ipv6_compressed": "3261:3030:3a65:3630:3a61:6666:663a:3237",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "3261:3030:3a65:3630::/64",
+                    "ifIndex": 3000
+                }
+            ]
+        }
     }
 }

@@ -1134,7 +1134,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Топ N по умолчанию',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Статистика по умолчанию',
         ],
         'nfsen_order_default' => [
@@ -1316,6 +1316,9 @@ return [
             ],
             'ospf' => [
                 'description' => 'OSPF',
+            ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
             ],
             'isis' => [
                 'description' => 'ISIS',

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TwoFactorPage.php
  *
@@ -47,7 +48,8 @@ class TwoFactorPage extends Page
      */
     public function assert(Browser $browser)
     {
-        $browser->assertPathIs($this->url());
+        $browser->waitFor('@input')
+            ->assertPathIs($this->url());
     }
 
     /**

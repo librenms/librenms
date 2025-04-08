@@ -104,11 +104,11 @@
                     <div>
                         {{ __('Error reporting:') }} <input type="checkbox" id="reporting.error" name="reporting" data-size="small" @if($error_reporting_status) checked @endif>
                     </div>
-                    <div class="tw-mt-2">
+                    <div class="tw:mt-2">
                     {{ __('Usage statistics:') }} <input type="checkbox" id="reporting.usage" name="reporting" data-size="small" @if($usage_reporting_status) checked @endif> <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
                     </div>
                     @if($reporting_clearable)
-                        <div class="tw-mt-2">
+                        <div class="tw:mt-2">
                             <button class='btn btn-danger btn-xs' type='submit' name='clear-reporting' id='clear-reporting'>{{ __('Clear reporting data') }}</button>
                         </div>
                     @endif

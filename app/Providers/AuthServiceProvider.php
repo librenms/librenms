@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use App\Guards\ApiTokenGuard;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -16,7 +16,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        \App\Models\User::class => \App\Policies\UserPolicy::class,
+        User::class => \App\Policies\UserPolicy::class,
         \App\Models\CustomMap::class => \App\Policies\CustomMapPolicy::class,
         \App\Models\Dashboard::class => \App\Policies\DashboardPolicy::class,
         \App\Models\Device::class => \App\Policies\DevicePolicy::class,
@@ -33,8 +33,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Bouncer::cache();
-
         Auth::provider('legacy', function ($app, array $config) {
             return new LegacyUserProvider();
         });
@@ -50,17 +48,30 @@ class AuthServiceProvider extends ServiceProvider
             return new ApiTokenGuard($userProvider, $request);
         });
 
-        Gate::define('global-admin', function ($user) {
-            return $user->hasGlobalAdmin();
+        Gate::define('global-admin', function (User $user) {
+            return $user->hasAnyRole('admin', 'demo');
         });
-        Gate::define('admin', function ($user) {
-            return $user->isAdmin();
+        Gate::define('admin', function (User $user) {
+            return $user->hasRole('admin');
         });
-        Gate::define('global-read', function ($user) {
-            return $user->hasGlobalRead();
+        Gate::define('global-read', function (User $user) {
+            return $user->hasAnyRole('admin', 'global-read');
         });
-        Gate::define('device', function ($user, $device) {
+        Gate::define('device', function (User $user, $device) {
             return $user->canAccessDevice($device);
+        });
+
+        // define super admin and global read
+        Gate::before(function (User $user, string $ability) {
+            if ($user->hasRole('admin')) {
+                return true;  // super admin
+            }
+
+            if (in_array($ability, ['view', 'viewAny']) && $user->hasRole('global-read')) {
+                return true; // global read access
+            }
+
+            return null;
         });
     }
 }

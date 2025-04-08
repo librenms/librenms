@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Version.php
  *
@@ -34,7 +35,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '25.2.0';
+    public const VERSION = '25.3.0';
 
     /** @var Git convenience instance */
     public $git;

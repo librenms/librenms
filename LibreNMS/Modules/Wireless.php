@@ -15,6 +15,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
 class Wireless implements Module
 {
@@ -110,7 +111,7 @@ class Wireless implements Module
                 // legacy discovery auto-fetched sensors with null current values
                 if ($model->sensor_current === null && ! empty($model->sensor_oids)) {
                     Log::debug("Data missing for $model->sensor_type $model->sensor_index, fetching");
-                    $value = \SnmpQuery::numeric()->get($model->sensor_oids)->values();
+                    $value = SnmpQuery::numeric()->get($model->sensor_oids)->values();
                     $model->fillValue($value);
                 }
 
@@ -161,7 +162,7 @@ class Wireless implements Module
 
         // fetch all standard sensors
         $standard_sensors = $sensors->pluck('sensor_oids')->flatten()->all();
-        $fetched_data = \SnmpQuery::numeric()->get($standard_sensors)->values();
+        $fetched_data = empty($standard_sensors) ? [] : SnmpQuery::numeric()->get($standard_sensors)->values();
 
         // poll standard sensors
         foreach ($sensors->groupBy('sensor_class') as $type => $type_sensors) {

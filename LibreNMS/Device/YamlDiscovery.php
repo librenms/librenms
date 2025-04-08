@@ -1,4 +1,5 @@
 <?php
+
 /**
  * YamlDiscovery.php
  *
@@ -145,7 +146,7 @@ class YamlDiscovery
     }
 
     /**
-     * @param  \LibreNMS\OS  $os  OS/device we are working on
+     * @param  OS  $os  OS/device we are working on
      * @param  array  $data  Array derived from YAML
      * @return string
      *
@@ -311,7 +312,7 @@ class YamlDiscovery
             foreach ($pre_cache as $table_name => $table) {
                 if (is_array($table) && isset($table[$index][$name])) {
                     $value = $table[$index][$name];
-                    Log::debug("Using $value from walked $table_name[$index][$name] for $name");
+                    Log::debug("Using $value from walked {$table_name}[$index][$name] for $name");
 
                     return $value;
                 }

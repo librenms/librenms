@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Mail.php
-
-		-
 			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php
@@ -111,11 +106,6 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 1
-			path: app/Console/Commands/AddUserCommand.php
-
-		-
 			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
@@ -134,11 +124,6 @@ parameters:
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/PortGroupController.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 2
-			path: app/Http/Controllers/Select/RoleController.php
 
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
@@ -176,18 +161,8 @@ parameters:
 			path: app/Http/Kernel.php
 
 		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 2
-			path: app/Http/Requests/StoreUserRequest.php
-
-		-
 			message: "#^Cannot access property \\$password on object\\|string\\.$#"
 			count: 1
-			path: app/Http/Requests/UpdateUserRequest.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 2
 			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
@@ -199,11 +174,6 @@ parameters:
 			message: "#^PHPDoc type array of property App\\\\Models\\\\UserPref\\:\\:\\$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$primaryKey\\.$#"
 			count: 1
 			path: app/Models/UserPref.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:cache\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 1
-			path: app/Providers/AuthServiceProvider.php
 
 		-
 			message: "#^Result of && is always false\\.$#"
@@ -224,31 +194,6 @@ parameters:
 			message: "#^Property App\\\\View\\\\SimpleTemplate\\:\\:\\$callback \\(callable\\) on left side of \\?\\? is not nullable\\.$#"
 			count: 1
 			path: app/View/SimpleTemplate.php
-
-		-
-			message: "#^Parameter \\#1 \\$abilities of method Silber\\\\Bouncer\\\\Conductors\\\\GivesAbilities\\:\\:to\\(\\) expects array\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\|int, string given\\.$#"
-			count: 1
-			path: database/factories/UserFactory.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 1
-			path: database/factories/UserFactory.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:refresh\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 2
-			path: database/migrations/2023_06_18_201914_migrate_level_to_roles.php
-
-		-
-			message: "#^Parameter \\#1 \\$abilities of method Silber\\\\Bouncer\\\\Conductors\\\\GivesAbilities\\:\\:to\\(\\) expects array\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\|int, string given\\.$#"
-			count: 1
-			path: database/seeders/RolesSeeder.php
-
-		-
-			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 2
-			path: database/seeders/RolesSeeder.php
 
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"

@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
             Schema::table('sensors_to_state_indexes', function (Blueprint $table) {
                 $table->dropForeign('sensors_to_state_indexes_ibfk_1');
                 $table->dropForeign('sensors_to_state_indexes_sensor_id_foreign');

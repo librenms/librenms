@@ -1,0 +1,3006 @@
+TROPIC-PTP-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE,
+      Unsigned32, Integer32, Counter64        FROM SNMPv2-SMI
+      MODULE-COMPLIANCE,
+      OBJECT-GROUP                            FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION, MacAddress,
+      RowStatus, TruthValue                   FROM SNMPv2-TC
+      InterfaceIndex,
+      InterfaceIndexOrZero                    FROM IF-MIB
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnPortModules,
+      tnPtpMIB                                FROM TROPIC-GLOBAL-REG;
+
+  tnPtpMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202205061200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "Nokia OPD-WDM MIB for 1588V2 module"
+
+      REVISION    "202205061200Z"
+      DESCRIPTION "1) Added the following to tnPtpClockDefaultDSInfoTable:
+                      tnPtpClockDefaultDSInfoSignalFail.
+                   2) Added the following to tnPtpPortDSConfigTable:
+                      tnPtpPortDSConfigSyncReceiptTimeout
+                      tnPtpPortDSConfigDelayRespReceiptTimeout.
+                   3) Added the following to tnPtpPortDSInfoTable:
+                      tnPtpPortDSInfoSignalFail."
+
+      REVISION    "202201211200Z"
+      DESCRIPTION "1) Added the following to tnPtpPortGenericTable:
+                      tnPtpPortIsVirtual.
+                   2) Added the following tables:
+                      tnPtpPortSourceInfoDSTable
+                      tnVirtualPtpPortTable."
+
+      REVISION    "202104231200Z"
+      DESCRIPTION "Added the following to tnPtpPortDSConfigTable:
+                   tnPtpPortDSConfigClearMsgCounter."
+
+      REVISION    "202007031200Z"
+      DESCRIPTION "Added the following to AluWdmtnPtpPortState:
+                   masterOriented(65537)
+                   to
+                   tcFaulty(65539)."
+
+      REVISION    "202004241200Z"
+      DESCRIPTION "Updated DESCRIPTION of the following:
+                   tnPtpClockDefaultDSInfoTwoStepFlag
+                   tnPtpClockCurrentDSCurrentTime
+                   tnPtpPortDSConfigTwoStepFlag."
+
+      REVISION    "202004101200Z"
+      DESCRIPTION "1) Updated DESCRIPTION of the following:
+                      AluWdmPtpClockIdentifier.
+                   2) Added the following textual convention:
+                      AluWdmPtpPortIdentity.
+                   3) Added the following tables:
+                      tnPtpClockGenericTable
+                      tnPtpTransparentClockDefaultDSTable
+                      tnPtpPortGenericTable
+                      tnPtpTransparentClockPortDSTable.
+                   4) Added the following to tnPtpPortDSConfigTable:
+                      tnPtpPortDSConfigAssociatedEntityType
+                      tnPtpPortDSConfigAssociatedEntityID."
+
+      REVISION    "202001101200Z"
+      DESCRIPTION "Added the following to tnPtpExtTodIfTable:
+                   tnPtpExtTodAlmProfName."
+
+      REVISION    "201911151200Z"
+      DESCRIPTION "Updated DESCRIPTION of the following:
+                   tnPtpExtTodIfToDFormat."
+
+      REVISION    "201906071200Z"
+      DESCRIPTION "Updated the DESCRIPTION of tnPtpPortDSConfigAssociatedPhysicalPort."
+
+      REVISION    "201809281200Z"
+      DESCRIPTION "Updated size of tnPtpExtTodIfAdditionalInfo from (SIZE (48))
+                   to (SIZE (0..48))"
+
+      REVISION    "201806221200Z"
+      DESCRIPTION "1) Added the following to tnPtpSystemTable:
+                      tnPtpSystemToDMessageType.
+                   2) Added the following to tnPtpExtTodIfTable:
+                      tnPtpExtTodIfTodClockClass.
+                   3) Updated the DESCRIPTION of tnPtpExtTodIfToDStatus."
+
+      REVISION    "201806081200Z"
+      DESCRIPTION "1) Added the following Table:
+                      tnPtpClockSyncOamTable.
+                   2) Added the following to tnPtpExtTodIfTable:
+                      tnPtpExtTodIfDegradeThreshold."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201801261200Z"
+      DESCRIPTION "1) Added the following to tnPtpClockDefaultDSConfigTable:
+                      tnPtpClockDefaultDSConfigMaxStepsRemoved
+                      tnPtpClockDefaultDSConfigEPRTCSupport
+                      tnPtpClockDefaultDSConfigSyncUncertainMon.
+                   2) Added the following to tnPtpClockTimePropertiesDSTable:
+                      tnPtpClockTimePropertiesDSSyncUncertainFlag.
+                   3) Added the following Table:
+                      tnPtpClockPathTraceDSTable."
+
+      REVISION    "201710271200Z"
+      DESCRIPTION "Added the following to tnPtpPortDSInfoTable:
+                   tnPtpPortDSInfoPhyPortMac."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201604081200Z"
+      DESCRIPTION "Added the following to tnPtpSystemTable:
+                   tnPtpSystemClockServoMode."
+
+      REVISION    "201603081200Z"
+      DESCRIPTION "Added the following to tnPtpExtTodIfTable:
+                   tnPtpExtCompenMeasureStatus."
+
+      REVISION    "201603031200Z"
+      DESCRIPTION "Added the following to tnPtpExtTodIfTable:
+                   tnPtpExtCompensationMode,
+                   tnPtpExtCompenAutoTestTrigger,
+                   tnPtpExtCompenManualValueIn,
+                   tnPtpExtCompenManualValueOut."
+
+      REVISION    "201602011200Z"
+      DESCRIPTION "Added the following to tnPtpPortDSInfoTable:
+                   tnPtpPortDSInfoFollowUpMsgTx,
+                   tnPtpPortDSInfoFollowUpMsgRx."
+
+      REVISION    "201512151200Z"
+      DESCRIPTION "1) Added the following to tnPtpSystemTable:
+                      tnPtpSystemClockProfile.
+                   2) Added the following to tnPtpClockDefaultDSConfigTable:
+                      tnPtpClockDefaultDSConfigLocalPriority.
+                   3) Added the following to tnPtpPortDSConfigTable:
+                      tnPtpPortDSConfigNotSlave,
+                      tnPtpPortDSConfigLocalPriority."
+
+      REVISION    "201301241200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnPtpPortSessionTable."
+
+      REVISION    "201301071200Z"
+      DESCRIPTION "Updated the copyright date."
+
+      REVISION    "201212051200Z"
+      DESCRIPTION "Updated DESCRIPTION of tnPtpPortDSConfigAddressingMode
+                   to support the value 2."
+
+      REVISION    "201210121200Z"
+      DESCRIPTION "Updated DESCRIPTION of tnPtpSystemTimeReference to
+                   support the value 4."
+
+      REVISION    "201209251200Z"
+      DESCRIPTION "1) Added the following to tnPtpPortDSConfigTable:
+                      tnPtpPortDSConfigConnectedPtpioTimingPort
+                      tnPtpPortDSConfigAutoLinkAsyMeasureTrigger.
+                   2) Added the following to tnPtpPortDSInfoTable:
+                      tnPtpPortDSInfoAutoLinkAsyMeasureStatus
+                      tnPtpPortDSInfoMeasuredLinkAsymmetry
+                      tnPtpPortDSInfoAnnounceMsgTx
+                      tnPtpPortDSInfoAnnounceMsgRx
+                      tnPtpPortDSInfoSyncMsgTx
+                      tnPtpPortDSInfoSyncMsgRx
+                      tnPtpPortDSInfoDelayReqMsgTx
+                      tnPtpPortDSInfoDelayReqMsgRx
+                      tnPtpPortDSInfoDelayRspMsgTx
+                      tnPtpPortDSInfoDelayRspMsgRx
+                      tnPtpPortDSInfoSignalingMsgTx
+                      tnPtpPortDSInfoSignalingMsgRx
+                      tnPtpPortDSInfoManagementMsgTx
+                      tnPtpPortDSInfoManagementMsgRx.
+                   3) Marked the following as deprecated:
+                      tnPtpPortDSConfigUnicastForDelayReq
+                      tnPtpPortDSInfoNumOfSessions
+                      tnPtpPortSessionTable."
+
+      REVISION    "201204061200Z"
+      DESCRIPTION "Updated with 1830PSS MIB conventions."
+
+      REVISION    "201112081200Z"
+      DESCRIPTION "Initial version based on
+                   - IEEE1588-2008
+                   - 1850TSS-5C R4.0 private MIB."
+
+      ::= { tnPortModules 7 }
+
+  tnPtpMIBObjects       OBJECT IDENTIFIER ::= { tnPtpMIB 1 }
+  tnPtpConformance      OBJECT IDENTIFIER ::= { tnPtpMIB 2 }
+  tnPtpGroups           OBJECT IDENTIFIER ::= { tnPtpConformance 1 }
+  tnPtpCompliances      OBJECT IDENTIFIER ::= { tnPtpConformance 2 }
+  tnPtpSystem           OBJECT IDENTIFIER ::= { tnPtpMIBObjects 1 }
+  tnPtpClock            OBJECT IDENTIFIER ::= { tnPtpMIBObjects 2 }
+  tnPtpPort             OBJECT IDENTIFIER ::= { tnPtpMIBObjects 3 }
+  tnPtpExtTodIf         OBJECT IDENTIFIER ::= { tnPtpMIBObjects 4 }
+
+-----------------------------------------------------------------------
+-- Textual conventions INET-ADDRESS-MIB
+-----------------------------------------------------------------------
+    InetAddressType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+         "A value that represents a type of Internet address.
+
+          unknown(0)  An unknown address type. This value MUST
+                      be used if the value of the corresponding
+                      InetAddress object is a zero-length string.
+                      It may also be used to indicate an IP address
+                      which is not in one of the formats defined
+                      below.
+
+          ipv4(1)     An IPv4 address as defined by the
+                      InetAddressIPv4 textual convention.
+
+          ipv6(2)     An IPv6 address as defined by the
+                      InetAddressIPv6 textual convention.
+
+          dns(16)     A DNS domain name as defined by the
+                      InetAddressDNS textual convention.
+
+          Each definition of a concrete InetAddressType value must be
+          accompanied by a definition of a textual convention for use
+          with that InetAddressType.
+
+          The InetAddressType textual convention SHOULD NOT be subtyped
+          in object type definitions to support future extensions. It
+          MAY be subtyped in compliance statements in order to require
+          only a subset of these address types for a compliant
+          implementation."
+        SYNTAX         INTEGER {
+                         unknown(0),
+                         ipv4(1),    -- these named numbers are aligned
+                         ipv6(2),    -- with AddressFamilyNumbers from
+                         dns(16)     -- IANA-ADDRESS-FAMILY-NUMBERS-MIB
+                       }
+
+    InetAddress ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+         "Denotes a generic Internet address.
+
+          An InetAddress value is always interpreted within the
+          context of an InetAddressType value. The InetAddressType
+          object which defines the context must be registered
+          immediately before the object which uses the InetAddress
+          textual convention. In other words, the object identifiers
+          for the InetAddressType object and the InetAddress object
+          MUST have the same length and the last sub-identifier of
+          the InetAddressType object MUST be 1 less than the last
+          sub-identifier of the InetAddress object.
+
+          When this textual convention is used as the syntax of an
+          index object, there may be issues with the limit of 128
+          sub-identifiers specified in SMIv2, STD 58. In this case,
+          the OBJECT-TYPE declaration MUST include a 'SIZE' clause
+          to limit the number of potential instance sub-identifiers."
+        SYNTAX         OCTET STRING (SIZE (0..255))
+
+-----------------------------------------------------------------------
+-- PTP (Precision Time Protocol) Textual Conventions
+-----------------------------------------------------------------------
+    AluWdmPtpClockIdentifier ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+        "This 64-bit extended unique identifier (EUI-64) is a constructed by
+         the external MAC address of the card and the clock number in the card.
+         For example, if the external MAC address is AC-DE-48-23-45-67, and the
+         clock number is 0x01.  The clock identifier shall be:
+
+           |        company_id       | fixed  |clockNum|   extension identifier  | field
+           |  AC   |   DE   |   48   |   FF   |   01   |   23   |   45   |   67  | hex
+           10101100 11011110 01001000 11111111 00000001 00100011 01000101 01100111 bits
+           |  |                                                               |  |
+           |  most-significant-byte                      least-significant-byte  |
+           most-significant-bit                              least-significant-bit."
+
+        SYNTAX         OCTET STRING (SIZE(8))
+
+    AluWdmPtpPortIdentity ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+        "This 80-bit extended unique PortIdentity is constructed by
+         64-bit ClockIdentity + 16-bit portNumber.
+         For example, if the ClockIdentity is AC-DE-48-FF-01-23-45-67 and the
+         port number is 0x0003, the PortIdentity shall be:
+           |        company_id       | fixed  |clockNum|   extension identifier   |   port number   | field
+           |  AC   |   DE   |   48   |   FF   |   01   |   23   |   45   |   67   |   00   |   03   | hex
+           10101100 11011110 01001000 11111111 00000001 00100011 01000101 01100111 00000000 00000011  bits
+           |  |                                                                                 |   |
+           |  most-significant-byte                                        least-significant-byte   |
+           most-significant-bit                                                 least-significant-bit."
+
+        SYNTAX         OCTET STRING (SIZE(10))
+
+    AluWdmPtpClockIndex ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The clock index of an PTP clock. A PTP clock has a
+                        unique index in a NE.
+
+                        The clock index consists of the following three
+                        parts:
+                        - Part_1: the highest byte with shelf index
+                        - Part_2: the next byte with slot index
+                        - Part_3: the next byte with clock number
+                                  (start from 1) in the card
+
+                            32 25  | 24  17 | 16   9  |  8  1 |
+                            +--- --+--------+---------+-------+
+                            |shelf |  slot  |  clock  | unused|
+                            +------+------- +---------+-------+"
+        SYNTAX         Integer32 (1..2147483647)
+
+    AluWdmPtpRecoveredClockState ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The state of the PTP clock."
+        SYNTAX         INTEGER {
+                         unknown(0),
+                         freeRun(1),
+                         acquiring(2),
+                         phasetracking(3),
+                         holdover(4),
+                         locked(5)
+                       }
+
+    AluWdmtnPtpPortState ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The state of the PTP port."
+        SYNTAX         INTEGER {
+                         unknown(0),
+                         initializing(1),
+                         faulty(2),
+                         disabled(3),
+                         listening(4),
+                         premaster(5),
+                         master(6),
+                         passive(7),
+                         uncalibrated(8),
+                         slave(9),
+                         masterOriented(65537),
+                         slaveOriented(65538),
+                         tcFaulty(65539)
+                      }
+
+-----------------------------------------------------------------------
+-- Global 1588 Configuration for a 1588-capable card
+-----------------------------------------------------------------------
+    tnPtpSystemTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpSystemEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides global parameters for a
+                        PTP-capable card."
+        ::= { tnPtpSystem 1 }
+
+    tnPtpSystemEntry OBJECT-TYPE
+        SYNTAX         TnPtpSystemEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Configuration information concerning PTP of the
+                        card."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPtpSystemTable 1 }
+
+    TnPtpSystemEntry ::=
+        SEQUENCE {
+            tnPtpSystemClockMode              Integer32,
+            tnPtpSystemFrequencyReference     Integer32,
+            tnPtpSystemTimeReference          Integer32,
+            tnPtpSystemNextClockNumber        Integer32,
+            tnPtpSystemClockProfile           Integer32,
+            tnPtpSystemClockServoMode         Integer32,
+            tnPtpSystemToDMessageType         INTEGER
+        }
+
+    tnPtpSystemClockMode OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the PTP operational
+                        mode of the card.  It is intended to be managed
+                        by the System Operator.
+
+                        0: 1588 function of this card is disabled
+                        1: Ordinary Clock - Slave
+                        2: Ordinary Clock - Master
+                        3: Boundary Clock
+                        4: End-to-End Transparent Clock
+                        5: Peer-to-Peer Transparent Clock
+                        6: End-to-End Transparent Clock And OC-Slave
+                        7: End-to-End Transparent Clock And BC
+                        8: Peer-to-Peer Transparent Clock And OC-Slave
+                        9: this card provides timestamping for the local
+                           ports only, need to work with the PTPCTL card
+                        10: ITU-T G.8275.1 T-GM
+                        11: ITU-T G.8275.1 T-BC
+                        12: ITU-T G.8275.1 T-TSC."
+        DEFVAL         { 0 }
+        ::= { tnPtpSystemEntry 1 }
+
+    tnPtpSystemFrequencyReference OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the frequency reference
+                        for the PTP clocks in the card.  It is intended
+                        to be managed by the System Operator.
+
+                        This parameter is valid when the
+                        tnPtpSystemClockMode = 1/2/3/6/7/8
+
+                        0: the local PTP clock uses the physical layer
+                           frequency reference, and this clock is syntonized
+                           with the PTP master.
+                        1: the local PTP clock uses the physical layer
+                           frequency reference, but this clock is'
+                           unsyntonized with the PTP master.
+                        2: the local PTP clock uses the packet layer
+                           frequency reference which is recovered from
+                           the PTP."
+        DEFVAL         { 0 }
+        ::= { tnPtpSystemEntry 2 }
+
+    tnPtpSystemTimeReference OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the time reference
+                        for the local PTP clocks in the card.  It is
+                        intended to be managed by the System Operator.
+                        This parameter is valid when the
+                        tnPtpSystemClockMode = 2/3
+
+                        0: no reference.
+                        1: the external 1pps. The local PTP clock
+                           aligns the 1588 time to the phase of the
+                           external 1pps.
+                        2: the external ToD
+                        3: the recovered PTP time.
+                        4: the external ToD or the recovered PTP time.
+
+                       Values of 0/1/2 apply to OC-Master only;
+                       Values of 2/3/4 apply to BC only."
+        DEFVAL         { 2 }
+        ::= { tnPtpSystemEntry 3 }
+
+    tnPtpSystemNextClockNumber OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates the next available
+                        clock number in the card, which will be used
+                        when the user wants to create a new row in the
+                        tnPtpClockDefaultDSConfigTable."
+        ::= { tnPtpSystemEntry 4 }
+
+    tnPtpSystemClockProfile OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ieee-1588-2008-CCSA(0), -- IEEE_1588_2008_CCSA
+                         g-8275-1(1)             -- G_8275_1
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the PTP profile
+                        of the card.  It is intended to be managed
+                        by the System Operator.
+
+                        0: IEEE_1588_2008_CCSA profile
+                        1: G_8275_1 profile."
+        DEFVAL         { 0 }
+        ::= { tnPtpSystemEntry 5 }
+
+    tnPtpSystemClockServoMode OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the PTP Servo Mode
+                        of the card.  It is intended to be managed
+                        by the System Operator.
+                        0: bellLabs
+                        1: standard"
+        DEFVAL         { 0 }
+        ::= { tnPtpSystemEntry 6 }
+
+    tnPtpSystemToDMessageType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ccsa(0),
+                         itu(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ToD message format type.
+
+                        0: ccsa
+                        1: itu."
+        ::= { tnPtpSystemEntry 7 }
+
+-----------------------------------------------------------------------
+-- Configuration Table for the Default Data Set of an OC/BC PTP Clock
+-- Generic PTP Clock attributes should be added to tnPtpClockGenericTable
+-----------------------------------------------------------------------
+    tnPtpClockDefaultDSConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockDefaultDSConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides configurable information
+                        for an OC/BC PTP clock.  For TC (E2E or P2P),
+                        this table is not available."
+        ::= { tnPtpClock 1 }
+
+    tnPtpClockDefaultDSConfigEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockDefaultDSConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Configurations of an OC/BC PTP clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockDefaultDSConfigTable 1 }
+
+    TnPtpClockDefaultDSConfigEntry ::=
+        SEQUENCE {
+            tnPtpClockIndex                            AluWdmPtpClockIndex,
+            tnPtpClockDefaultDSConfigDomain            Unsigned32,
+            tnPtpClockDefaultDSConfigPriority1         Unsigned32,
+            tnPtpClockDefaultDSConfigPriority2         Unsigned32,
+            tnPtpClockDefaultDSConfigPreferedGM        AluWdmPtpClockIdentifier,
+            tnPtpClockDefaultDSConfigIpAddressType     InetAddressType,
+            tnPtpClockDefaultDSConfigIpAddress         InetAddress,
+            tnPtpClockDefaultDSConfigAdminStatus       Integer32,
+            tnPtpClockDefaultDSConfigRowStatus         RowStatus,
+            tnPtpClockDefaultDSConfigLocalPriority     Unsigned32,
+            tnPtpClockDefaultDSConfigMaxStepsRemoved   Unsigned32,
+            tnPtpClockDefaultDSConfigEPRTCSupport      TruthValue,
+            tnPtpClockDefaultDSConfigSyncUncertainMon  TruthValue
+        }
+
+    tnPtpClockIndex OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A unique value which identifies a PTP clock in
+                        an NE."
+        ::= { tnPtpClockDefaultDSConfigEntry 1 }
+
+    tnPtpClockDefaultDSConfigDomain OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The domain associated with the PTP clock."
+        DEFVAL         { 0 }
+        ::= { tnPtpClockDefaultDSConfigEntry 2 }
+
+    tnPtpClockDefaultDSConfigPriority1 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The priority1 value of the PTP clock."
+        DEFVAL         { 255 }
+        ::= { tnPtpClockDefaultDSConfigEntry 3 }
+
+    tnPtpClockDefaultDSConfigPriority2 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The priority2 value of the PTP clock."
+        DEFVAL         { 255 }
+        ::= { tnPtpClockDefaultDSConfigEntry 4 }
+
+    tnPtpClockDefaultDSConfigPreferedGM OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The identifier of a PTP clock that the local
+                        PTP clock will lock to. It is for static master
+                        clock selection.  It is valid for OC-slave or
+                        BC. And for BC, it is valid only when
+                        tnPtpSystemTimeReference =3.  NULL is
+                        initializing value."
+        ::= { tnPtpClockDefaultDSConfigEntry 5 }
+
+    tnPtpClockDefaultDSConfigIpAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter indicates the IP address type
+                        for tnPtpClockDefaultDSConfigIpAddress.  The
+                        default value is IPv4(1)."
+        DEFVAL         { 1 }
+        ::= { tnPtpClockDefaultDSConfigEntry 6 }
+
+    tnPtpClockDefaultDSConfigIpAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The unicast IP address of the PTP clock.  NULL
+                        is initializing value."
+        ::= { tnPtpClockDefaultDSConfigEntry 7 }
+
+    tnPtpClockDefaultDSConfigAdminStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "It is used for the user to enable/disable the
+                        PTP clock.
+                       0: Disable
+                       1: Enable."
+        DEFVAL         { 0 }
+        ::= { tnPtpClockDefaultDSConfigEntry 8 }
+
+    tnPtpClockDefaultDSConfigRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The RowStatus of PTP clock entry."
+        ::= { tnPtpClockDefaultDSConfigEntry 9 }
+
+    tnPtpClockDefaultDSConfigLocalPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The localPriority value of the PTP clock."
+        DEFVAL         { 128 }
+        ::= { tnPtpClockDefaultDSConfigEntry 10 }
+
+    tnPtpClockDefaultDSConfigMaxStepsRemoved OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "A clock would not qualify any Announce messages
+                        received where the stepsRemoved field in the
+                        ingress header matched or exceeded the maxStepsRemoved
+                        field."
+        DEFVAL         { 255 }
+        ::= { tnPtpClockDefaultDSConfigEntry 11 }
+
+    tnPtpClockDefaultDSConfigEPRTCSupport OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable/Disable Enhanced Primary Reference Time Clock."
+        DEFVAL         { false }
+        ::= { tnPtpClockDefaultDSConfigEntry 12 }
+
+    tnPtpClockDefaultDSConfigSyncUncertainMon OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable/Disable Synchronization Uncertain Indication
+                        Monitoring."
+        DEFVAL         { false }
+        ::= { tnPtpClockDefaultDSConfigEntry 13 }
+
+-----------------------------------------------------------------------
+-- Information Table for the Default Data Set of an OC/BC PTP Clock
+-----------------------------------------------------------------------
+    tnPtpClockDefaultDSInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockDefaultDSInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides non-configurable information for
+                     an OC/BC PTP clock.  For TC (E2E or P2P), this table
+                     is not available."
+        ::= { tnPtpClock 2 }
+
+    tnPtpClockDefaultDSInfoEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockDefaultDSInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Information of an OC/BC PTP clock"
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockDefaultDSInfoTable 1 }
+
+    TnPtpClockDefaultDSInfoEntry ::=
+        SEQUENCE {
+            tnPtpClockDefaultDSInfoIdentifier               AluWdmPtpClockIdentifier,
+            tnPtpClockDefaultDSInfoTwoStepFlag              TruthValue,
+            tnPtpClockDefaultDSInfoNumberOfPorts            Unsigned32,
+            tnPtpClockDefaultDSInfoClass                    Unsigned32,
+            tnPtpClockDefaultDSInfoAccuracy                 Unsigned32,
+            tnPtpClockDefaultDSInfoOffsetScaledLogVariance  Integer32,
+            tnPtpClockDefaultDSInfoSignalFail               TruthValue
+        }
+
+    tnPtpClockDefaultDSInfoIdentifier OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The identifier of the PTP clock."
+        ::= { tnPtpClockDefaultDSInfoEntry 1 }
+
+
+    tnPtpClockDefaultDSInfoTwoStepFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is an indicator of whether master-slave
+                        synchronization utilizes follow-up messaging (IEEE
+                        1588-2008 Section 8.2.1.2.1.).  This parameter is
+                        read-only.  A PTP port has a configurable parameter
+                        which determines if follow-up messaging will be used
+                        for this port.
+
+                        true:  If some of the PTP ports in the clock use
+                               follow-up messaging.
+                        false: If none of the PTP ports in the clock use
+                               follow-up messaging.
+
+                        Only false is supported in the current PTP implementation."
+        ::= { tnPtpClockDefaultDSInfoEntry 2 }
+
+    tnPtpClockDefaultDSInfoNumberOfPorts OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of PTP ports in the PTP clock."
+        ::= { tnPtpClockDefaultDSInfoEntry 3 }
+
+    tnPtpClockDefaultDSInfoClass OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The clock class on the PTP clock (IEEE1588-2008
+                        Section 8.2.1.3.1.1)."
+        ::= { tnPtpClockDefaultDSInfoEntry 4 }
+
+    tnPtpClockDefaultDSInfoAccuracy OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The accuracy of the PTP clock"
+        ::= { tnPtpClockDefaultDSInfoEntry 5 }
+
+    tnPtpClockDefaultDSInfoOffsetScaledLogVariance OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The frequency offset scaled log variance of the
+                        PTP clock (IEEE P1588-2008 Section 7.6.3)."
+        ::= { tnPtpClockDefaultDSInfoEntry 6 }
+
+    tnPtpClockDefaultDSInfoSignalFail OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPClock Signal Fail Flag."
+        ::= { tnPtpClockDefaultDSInfoEntry 7 }
+
+-----------------------------------------------------------------------
+-- Information Table for the Current Data Set of an OC/BC PTP Clock
+-----------------------------------------------------------------------
+    tnPtpClockCurrentDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockCurrentDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides tn PTP Clock current Data
+                        Set for an OC/BC PTP Clock.  For TC (E2E or P2P),
+                        this table is not available."
+        ::= { tnPtpClock 3 }
+
+    tnPtpClockCurrentDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockCurrentDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Operational information of a PTP clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockCurrentDSTable 1 }
+
+    TnPtpClockCurrentDSEntry ::=
+        SEQUENCE {
+            tnPtpClockCurrentDSOffSetFromMaster     Integer32,
+            tnPtpClockCurrentDSMeanPathDelay        Unsigned32,
+            tnPtpClockCurrentDSCurrentTime          OCTET STRING,
+            tnPtpClockCurrentDSRecoveredClockState  AluWdmPtpRecoveredClockState,
+            tnPtpClockCurrentDSLockedPtpPort        Integer32,
+            tnPtpClockCurrentDSStepsRemoved         Unsigned32
+        }
+
+    tnPtpClockCurrentDSOffSetFromMaster OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current value of the time difference between
+                        a master and a slave as computed by the slave.
+                        The unit is ns (nano-seconds).  Refer to Section
+                        8.2.2.3 of IEEE1588-2008."
+        ::= { tnPtpClockCurrentDSEntry 1 }
+
+    tnPtpClockCurrentDSMeanPathDelay OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The mean propagation time between a master and
+                        a slave as computed by the slave.  The unit is
+                        ns (nano-seconds).  Refer to Section 8.2.2.4 of
+                        IEEE1588-2008."
+        ::= { tnPtpClockCurrentDSEntry 2 }
+
+    tnPtpClockCurrentDSCurrentTime OBJECT-TYPE
+        SYNTAX         OCTET STRING(SIZE(81))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current time of the PTP clock.  ASCII encoded
+                        decimal number in units of seconds with a precision
+                        of 9."
+        ::= { tnPtpClockCurrentDSEntry 3 }
+
+    tnPtpClockCurrentDSRecoveredClockState OBJECT-TYPE
+        SYNTAX         AluWdmPtpRecoveredClockState
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The synchronization state of the PTP clock."
+        ::= { tnPtpClockCurrentDSEntry 4 }
+
+    tnPtpClockCurrentDSLockedPtpPort OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number or index of the PTP port where the
+                        PTP clock is locked to.  This parameter together
+                        with the tnPtpClockIndex points to a row of the
+                        tnPtpPortDSConfigTable.  It is meaningful fo
+                        OC-slave or BC. And for BC, it is valid only
+                        when tnPtpSystemTimeReference = (the recovered
+                        PTP time)."
+        ::= { tnPtpClockCurrentDSEntry 5 }
+
+    tnPtpClockCurrentDSStepsRemoved OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of PTP clocks along the timing
+                        distribution path from the Grandmaster to the
+                        local PTP clock."
+        ::= { tnPtpClockCurrentDSEntry 6 }
+
+-----------------------------------------------------------------------
+-- Information Table for the Parent Data Set of an OC/BC PTP Clock
+-----------------------------------------------------------------------
+    tnPtpClockParentDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockParentDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides information of the Parent
+                        Data Set for an OC/BC PTP clock.  For TC (E2E
+                        or P2P), this table is not available."
+        ::= { tnPtpClock 4 }
+
+    tnPtpClockParentDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockParentDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Parent clock information of an OC/BC clock"
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockParentDSTable 1 }
+
+    TnPtpClockParentDSEntry ::=
+        SEQUENCE {
+            tnPtpClockParentDSIdentifier                          AluWdmPtpClockIdentifier,
+            tnPtpClockParentDSPortNum                             Integer32,
+            tnPtpClockParentDSStats                               TruthValue,
+            tnPtpClockParentDSOffsetScaledLogVariance             Integer32,
+            tnPtpClockParentDSPhaseChangeRate                     Integer32,
+            tnPtpClockParentDSGrandmasterClockId                  AluWdmPtpClockIdentifier,
+            tnPtpClockParentDSGrandmasterClass                    Unsigned32,
+            tnPtpClockParentDSGrandmasterAccuracy                 Unsigned32,
+            tnPtpClockParentDSGrandmasterOffsetScaledLogVariance  Unsigned32,
+            tnPtpClockParentDSGrandmasterPriority1                Unsigned32,
+            tnPtpClockParentDSGrandmasterPriority2                Unsigned32
+        }
+
+    tnPtpClockParentDSIdentifier OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Identifier of the parent clock which the local
+                        PTP clock locks to.  If a PTP clock locks to an
+                        external ToD input interface, it should be equal
+                        to:
+                          1 - for 1pps/ToD interface #1
+                          2 - for 1pps/ToD interface #2."
+        ::= { tnPtpClockParentDSEntry 1 }
+
+    tnPtpClockParentDSPortNum OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The PTP port number of the parent clock, via
+                        which the local PTP clock is synchronizing to
+                        the parent clock."
+        ::= { tnPtpClockParentDSEntry 2 }
+
+    tnPtpClockParentDSStats OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This is an indicator of whether the stats of
+                        the parent clock are collected by the local PTP
+                         clock."
+        ::= { tnPtpClockParentDSEntry 3 }
+
+    tnPtpClockParentDSOffsetScaledLogVariance OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The frequency offset scaled log variance of the
+                        parent clock (IEEE P1588-2008 Section 7.6.3)."
+        ::= { tnPtpClockParentDSEntry 4 }
+
+    tnPtpClockParentDSPhaseChangeRate OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The phase change rate of the parent clock(IEEE
+                        P1588-2008 Section 7.6.3)."
+        ::= { tnPtpClockParentDSEntry 5 }
+
+    tnPtpClockParentDSGrandmasterClockId OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The clock identifier of the grandmaster which
+                        the parent clock locks to."
+        ::= { tnPtpClockParentDSEntry 6 }
+
+    tnPtpClockParentDSGrandmasterClass OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The clock class of the grandmaster which the
+                        parent clock locks to."
+        ::= { tnPtpClockParentDSEntry 7 }
+
+    tnPtpClockParentDSGrandmasterAccuracy OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The accuracy of the grandmaster which the parent
+                        clock locks to."
+        ::= { tnPtpClockParentDSEntry 8 }
+
+    tnPtpClockParentDSGrandmasterOffsetScaledLogVariance OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OffsetScaledLogVariance value of the
+                        grandmaster which the parent clock locks to."
+        ::= { tnPtpClockParentDSEntry 9 }
+
+    tnPtpClockParentDSGrandmasterPriority1 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The priority1 value of the grandmaster which
+                        the parent clock locks to."
+        ::= { tnPtpClockParentDSEntry 10}
+
+    tnPtpClockParentDSGrandmasterPriority2 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The priority2 value of the grandmaster which
+                        the parent clock locks to."
+        ::= { tnPtpClockParentDSEntry 11 }
+
+-----------------------------------------------------------------------
+-- Information table for the Time Properties Data Set of an OC/BC PTP clock
+-----------------------------------------------------------------------
+    tnPtpClockTimePropertiesDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockTimePropertiesDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the information of the Time
+                        Properties Data Set for an OC/BC PTP clock.  For
+                        TC (E2E or P2P), this table is not available."
+        ::= { tnPtpClock 5 }
+
+    tnPtpClockTimePropertiesDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockTimePropertiesDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Time properties information of an OC/BC PTP clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockTimePropertiesDSTable 1 }
+
+    TnPtpClockTimePropertiesDSEntry ::=
+        SEQUENCE {
+            tnPtpClockTimePropertiesDSCurrentUtcOffset       Integer32,
+            tnPtpClockTimePropertiesDSCurrentUtcOffsetValid  TruthValue,
+            tnPtpClockTimePropertiesDSLeap59                 TruthValue,
+            tnPtpClockTimePropertiesDSLeap61                 TruthValue,
+            tnPtpClockTimePropertiesDSTimeTraceable          TruthValue,
+            tnPtpClockTimePropertiesDSFrequencyTraceable     TruthValue,
+            tnPtpClockTimePropertiesDSPtpTimescale           TruthValue,
+            tnPtpClockTimePropertiesDSPtpTimeSource          Unsigned32,
+            tnPtpClockTimePropertiesDSSyncUncertainFlag      TruthValue
+        }
+
+    tnPtpClockTimePropertiesDSCurrentUtcOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current UTC offset value. Refer to Section
+                        8.2.4.2 of IEEE1588-2008.  The unit is seconds."
+        ::= { tnPtpClockTimePropertiesDSEntry 1 }
+
+    tnPtpClockTimePropertiesDSCurrentUtcOffsetValid OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates whether current UTC
+                        offset is valid or not.  Refer to Section
+                        8.2.4.3 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 2 }
+
+    tnPtpClockTimePropertiesDSLeap59 OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates whether the last minute
+                        of the current UTC day contains 59 seconds or
+                        not.  Refer to Section 8.2.4.4 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 3 }
+
+    tnPtpClockTimePropertiesDSLeap61 OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates whether the last minute
+                        of the current UTC day contains 61 seconds or
+                        not.  Refer to Section 8.2.4.5 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 4 }
+
+    tnPtpClockTimePropertiesDSTimeTraceable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates whether the timescale
+                        or the current UTC offset are traceable to a
+                        primary reference or not.  Refer to Section
+                        8.2.4.6 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 5 }
+
+    tnPtpClockTimePropertiesDSFrequencyTraceable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates whether the frequency
+                        determining the timescale is traceable to a
+                        primary reference or not.  Refer to Section
+                        8.2.4.7 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 6 }
+
+    tnPtpClockTimePropertiesDSPtpTimescale OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates the type of time scale
+                        of the grandmaster clock:
+                        true:  PTP timescale
+                        false: ARB timescale
+
+                        Refer to Section 8.2.4.8 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 7 }
+
+    tnPtpClockTimePropertiesDSPtpTimeSource OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates the timesource used by
+                        grandmaster clock:
+                        -0x10: ATOMIC_CLOCK
+                        -0x20: GPS
+                        -0x30: TEERESTRIAL_RADIO
+                        -0x40: PTP
+                        -0x50: NTP
+                        -0x60: HAND_SET
+                        -0x90: OTHER
+                        -0xA0: INTERNAL_OSCILLATOR
+
+                        Refer to Section 8.2.4.9 of IEEE1588-2008."
+        ::= { tnPtpClockTimePropertiesDSEntry 8 }
+
+    tnPtpClockTimePropertiesDSSyncUncertainFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates if the SynchronizationUncertain
+                        flag of incoming announce message from the parent clock
+                        is TRUE or FALSE.  It is valid only when the PTP profile
+                        is itug8275dot1 and the SyncUncertainMon is ENABLE."
+        ::= { tnPtpClockTimePropertiesDSEntry 9 }
+
+-----------------------------------------------------------------------
+-- Table for the Path Trace Data Set of a PTP Clock
+-----------------------------------------------------------------------
+    tnPtpClockPathTraceDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockPathTraceDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides tn PTP Clock Path Trace Data Set
+                        for a PTP Clock."
+        ::= { tnPtpClock 6 }
+
+    tnPtpClockPathTraceDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockPathTraceDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Path Trace Data Set of a PTP Clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockPathTraceDSTable 1 }
+
+    TnPtpClockPathTraceDSEntry ::=
+        SEQUENCE {
+            tnPtpClockPathTraceDSEnable     TruthValue,
+            tnPtpClockPathTraceDSList       OCTET STRING
+        }
+
+    tnPtpClockPathTraceDSEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable/Disable the Path Trace mechanism."
+        DEFVAL         { false }
+        ::= { tnPtpClockPathTraceDSEntry 1 }
+
+    tnPtpClockPathTraceDSList OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE (0..256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A list of ClockIdentity values. The length of one
+                        ClockIdentity is 8."
+        DEFVAL         { "" }
+        ::= { tnPtpClockPathTraceDSEntry 2 }
+
+-----------------------------------------------------------------------
+-- Table for the PTP Clock Sync OAM
+-----------------------------------------------------------------------
+    tnPtpClockSyncOamTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockSyncOamEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the PTP Clock
+                        Sync OAM attributes."
+        ::= { tnPtpClock 7 }
+
+    tnPtpClockSyncOamEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockSyncOamEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "PTP Clock Sync OAM attributes."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockSyncOamTable 1 }
+
+    TnPtpClockSyncOamEntry ::=
+        SEQUENCE {
+            tnPtpClockRealtimeTimeOffsetDuration     Unsigned32,
+            tnPtpClockRealtimeTimeOffsetInterval     Unsigned32,
+            tnPtpClockRealtimeTimeOffset1            OCTET STRING,
+            tnPtpClockRealtimeTimeOffset2            OCTET STRING,
+            tnPtpClockRealtimeTimeOffset3            OCTET STRING,
+            tnPtpClockSyncLossDetectionInterval      Unsigned32,
+            tnPtpClockDelayRespLossDetectionInterval Unsigned32,
+            tnPtpClockPtpInputDegradeThreshold       Unsigned32,
+            tnPtpClockTimeErrorReferencePortIndex    InterfaceIndexOrZero
+        }
+
+    tnPtpClockRealtimeTimeOffsetDuration OBJECT-TYPE
+        SYNTAX         Unsigned32(1..15)
+        UNITS          "Minute"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Duration time(minute) for the PTP Clock
+                        Realtime Time Offset.
+                        Range: 1 to 15 minutes."
+        DEFVAL         { 1 }
+        ::= { tnPtpClockSyncOamEntry 1 }
+
+    tnPtpClockRealtimeTimeOffsetInterval OBJECT-TYPE
+        SYNTAX         Unsigned32(1..5)
+        UNITS          "Second"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Interval time(second) for the PTP Clock
+                        Realtime Time Offset.
+                        Range: 1 to 5 seconds."
+        DEFVAL         { 5 }
+        ::= { tnPtpClockSyncOamEntry 2 }
+
+    tnPtpClockRealtimeTimeOffset1 OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1200))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The PTP Clock Realtime Time Offset part 1.
+
+                        Every Time Offset value is an Integer32(4-byte).
+
+                        The maximum size of
+                        tnPtpClockRealtimeTimeOffset1,
+                        tnPtpClockRealtimeTimeOffset2, and
+                        tnPtpClockRealtimeTimeOffset3 is 1200-byte,
+                        which is 300 Time Offset values.
+
+                        The number of Time Offset is decided by
+                        Duration(tnPtpClockRealtimeTimeOffsetDuration) and
+                        Interval(tnPtpClockRealtimeTimeOffsetInterval).
+
+                        For example:
+                          Duration = 12(minutes), equals to 720 seconds;
+                          Interval = 2(seconds).
+                          Then the number of Time Offset = Duration / Interval
+                                                         = 720 / 2 = 360
+                          There will be totally 360 Time Offset values in
+                          tnPtpClockRealtimeTimeOffset1,
+                          tnPtpClockRealtimeTimeOffset2, and
+                          tnPtpClockRealtimeTimeOffset3.
+
+                          tnPtpClockRealtimeTimeOffset1 contains
+                          the Time Offset value 1 to 300, size will be
+                          300*4=1200 bytes, 300 Integer32 values.
+                          tnPtpClockRealtimeTimeOffset2 contains
+                          the Time Offset value 301 to 360, size will be
+                          60*4=240 bytes, 60 Integer32 values.
+                          tnPtpClockRealtimeTimeOffset3 contains
+                          NO Time Offset values, size will be 0 empty.
+
+                          The range of the Time Offset value is
+                          0x80000001(-2147483647) to 0x7FFFFFFF(2147483647).
+
+                          Special Time Offset value 0x80000000 represents
+                          that the Realtime Time Offset is Not Available(NA)."
+        DEFVAL         { "" }
+        ::= { tnPtpClockSyncOamEntry 3 }
+
+    tnPtpClockRealtimeTimeOffset2 OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1200))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The PTP Clock Realtime Time Offset part 2.
+
+                        Refer to tnPtpClockRealtimeTimeOffset1."
+        DEFVAL         { "" }
+        ::= { tnPtpClockSyncOamEntry 4 }
+
+    tnPtpClockRealtimeTimeOffset3 OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1200))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The PTP Clock Realtime Time Offset part 3.
+
+                        Refer to tnPtpClockRealtimeTimeOffset1."
+        DEFVAL         { "" }
+        ::= { tnPtpClockSyncOamEntry 5 }
+
+    tnPtpClockSyncLossDetectionInterval OBJECT-TYPE
+        SYNTAX         Unsigned32(2..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of SYNC Interval to raise
+                        PtpClock SYNCLOSS alarm.
+                        Range: 2 to 255."
+        DEFVAL         { 3 }
+        ::= { tnPtpClockSyncOamEntry 6 }
+
+    tnPtpClockDelayRespLossDetectionInterval OBJECT-TYPE
+        SYNTAX         Unsigned32(2..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of DELAY_RESP Interval to raise
+                        PtpClock DELAYRESPLOSS alarm.
+                        Range: 2 to 255."
+        DEFVAL         { 3 }
+        ::= { tnPtpClockSyncOamEntry 7 }
+
+    tnPtpClockPtpInputDegradeThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32(6..248)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Threshold value to raise PtpClock PTPINPUTDEG
+                        alarm.
+
+                        For IEEE_1588_2008_CCSA profile, valid values are
+                        6, 7, 8, 52, 187.
+
+                        For G_8275_1 profile, valid values are
+                        6, 7, 135, 140, 150, 160, 165, 248."
+        DEFVAL         { 6 }
+        ::= { tnPtpClockSyncOamEntry 8 }
+
+    tnPtpClockTimeErrorReferencePortIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Reference Input 1PPS/ToD port index for
+                        the PTP Time Error(PTERREF)."
+        DEFVAL         { 0 }
+        ::= { tnPtpClockSyncOamEntry 9 }
+
+-----------------------------------------------------------------------
+-- Generic PTP clock Table
+-----------------------------------------------------------------------
+    tnPtpClockGenericTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpClockGenericEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides generic information for a PTP clock."
+        ::= { tnPtpClock 8 }
+
+    tnPtpClockGenericEntry OBJECT-TYPE
+        SYNTAX         TnPtpClockGenericEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Generic information for a PTP clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpClockGenericTable 1 }
+
+    TnPtpClockGenericEntry ::=
+        SEQUENCE {
+            tnPtpClockMode            Unsigned32,
+            tnPtpClockAlmProfName     OCTET STRING
+        }
+
+    tnPtpClockMode OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the PTP operational mode of
+                        the card.  It is intended to be managed by the System
+                        Operator.
+
+                        0:  1588 function of this card is disabled
+                        1:  Ordinary Clock - Slave
+                        2:  Ordinary Clock - Master
+                        3:  Boundary Clock
+                        10: ITU-T G.8275.1 T-GM
+                        11: ITU-T G.8275.1 T-BC
+                        12: ITU-T G.8275.1 T-TSC
+                        13: ITU-T G.8275.1 T-TC Carrier TC
+                        14: Combined Carrier TC,
+                            ITU-T G.8275.1 T-TSC + Carrier TC
+                        15: ITU-T G.8275.1 T-TC Client TC."
+        DEFVAL         { 0 }
+        ::= { tnPtpClockGenericEntry 1 }
+
+    tnPtpClockAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ASAP (alarm severity assignment profile) Name for
+                        PTP clock."
+        ::= { tnPtpClockGenericEntry 2 }
+
+-----------------------------------------------------------------------
+-- Table for the Default Data Set of Transparent Clock
+-----------------------------------------------------------------------
+    tnPtpTransparentClockDefaultDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpTransparentClockDefaultDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the default data set of
+                        Transparent Clock.
+
+                        Refer to 8.3.2 transparentClockDefaultDS
+                        data set member specifications."
+        ::= { tnPtpClock 9 }
+
+    tnPtpTransparentClockDefaultDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpTransparentClockDefaultDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Default data set of Transparent Clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpTransparentClockDefaultDSTable 1 }
+
+    TnPtpTransparentClockDefaultDSEntry ::=
+        SEQUENCE {
+            tnPtpTransparentClockDefaultDSClockIdentity      AluWdmPtpClockIdentifier,
+            tnPtpTransparentClockDefaultDSNumberPorts        Unsigned32,
+            tnPtpTransparentClockDefaultDSDelayMechanism     INTEGER,
+            tnPtpTransparentClockDefaultDSPrimaryDomain      Unsigned32
+        }
+
+    tnPtpTransparentClockDefaultDSClockIdentity OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The clockIdentity of the Transparent Clock."
+        ::= { tnPtpTransparentClockDefaultDSEntry 1 }
+
+    tnPtpTransparentClockDefaultDSNumberPorts OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of PTPPorts of the Transparent Clock."
+        ::= { tnPtpTransparentClockDefaultDSEntry 2 }
+
+    tnPtpTransparentClockDefaultDSDelayMechanism OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         e2e(1),
+                         p2p(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "E2E(end-to-end) or P2P(peer-to-peer) Transparent Clock."
+        DEFVAL         { e2e }
+        ::= { tnPtpTransparentClockDefaultDSEntry 3 }
+
+    tnPtpTransparentClockDefaultDSPrimaryDomain OBJECT-TYPE
+        SYNTAX         Unsigned32 (24..43)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The domainNumber of the primary
+                        syntonization domain."
+        DEFVAL         { 24 }
+        ::= { tnPtpTransparentClockDefaultDSEntry 4 }
+
+-----------------------------------------------------------------------
+-- tnPtpPortNextIndexTable: Used to get the next available index when
+-- to create a new PTP port
+-----------------------------------------------------------------------
+    tnPtpPortNextIndexTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpPortNextIndexEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the next available index
+                        for a PTP port to be created in a PTP clock."
+        ::= { tnPtpPort 1 }
+
+    tnPtpPortNextIndexEntry OBJECT-TYPE
+        SYNTAX         TnPtpPortNextIndexEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Next available index for a PTP port to be
+                        created in a PTP clock."
+        INDEX { tnPtpClockIndex }
+        ::= { tnPtpPortNextIndexTable 1 }
+
+    TnPtpPortNextIndexEntry ::=
+        SEQUENCE {
+            tnPtpPortNextIndex     Integer32
+        }
+
+    tnPtpPortNextIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicates the next available index
+                        for a PTP port to be created in a PTP clock,
+                        which will be used when the user wants to create
+                        a new row in tnPtpPortDSConfigTable."
+        ::= { tnPtpPortNextIndexEntry 1 }
+
+-----------------------------------------------------------------------
+-- Configuration table for the the PTP port Data Set
+-- Generic PTP Port attributes should be added to tnPtpPortTable
+-----------------------------------------------------------------------
+    tnPtpPortDSConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpPortDSConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides configuration for a PTP port."
+        ::= { tnPtpPort 2 }
+
+    tnPtpPortDSConfigEntry OBJECT-TYPE
+        SYNTAX         TnPtpPortDSConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Configuration information concerning a PTP port."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnPtpPortDSConfigTable 1 }
+
+    TnPtpPortDSConfigEntry ::=
+        SEQUENCE {
+            tnPtpPortDSPortIndex                        Integer32,
+            tnPtpPortDSConfigAssociatedPhysicalPort     InterfaceIndex,
+            tnPtpPortDSConfigVlanVID                    Unsigned32,
+            tnPtpPortDSConfigVlanTPID                   Unsigned32,
+            tnPtpPortDSConfigAnnoRxTimeout              Integer32,
+            tnPtpPortDSConfigLogAnnoInterval            Integer32,
+            tnPtpPortDSConfigLogSyncInterval            Integer32,
+            tnPtpPortDSConfigLogDelayReqInterval        Integer32,
+            tnPtpPortDSConfigLogMinPDelayReqInterval    Integer32,
+            tnPtpPortDSConfigAdminStatus                Integer32,
+            tnPtpPortDSConfigRole                       Integer32,
+            tnPtpPortDSConfigDelayMechanism             INTEGER,
+            tnPtpPortDSConfigVersionNumber              INTEGER,
+            tnPtpPortDSConfigAsymCorrection             Integer32,
+            tnPtpPortDSConfigTwoStepFlag                TruthValue,
+            tnPtpPortDSConfigEncapType                  Unsigned32,
+            tnPtpPortDSConfigAddressingMode             Integer32,
+            tnPtpPortDSConfigUnicastForDelayReq         TruthValue,  -- deprecated
+            tnPtpPortDSConfigUnicastNegotiation         TruthValue,
+            tnPtpPortDSConfigDestMac                    MacAddress,
+            tnPtpPortDSConfigDestIpAddrType             InetAddressType,
+            tnPtpPortDSConfigDestIpAddr                 InetAddress,
+            tnPtpPortDSConfigRowStatus                  RowStatus,
+            tnPtpPortDSConfigConnectedPtpioTimingPort   InterfaceIndexOrZero,
+            tnPtpPortDSConfigAutoLinkAsyMeasureTrigger  TruthValue,
+            tnPtpPortDSConfigNotSlave                   TruthValue,
+            tnPtpPortDSConfigLocalPriority              Unsigned32,
+            tnPtpPortDSConfigAssociatedEntityType       Unsigned32,
+            tnPtpPortDSConfigAssociatedEntityID         OCTET STRING,
+            tnPtpPortDSConfigClearMsgCounter            Unsigned32,
+            tnPtpPortDSConfigSyncReceiptTimeout         Unsigned32,
+            tnPtpPortDSConfigDelayRespReceiptTimeout    Unsigned32
+        }
+
+    tnPtpPortDSPortIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The value of tnPtpPortDSPortIndex uniquely
+                        identifies a PTP port in a PTP clock.  It equals
+                        to the portNumber used in the PTP message.  Refer
+                        to Section 7.5.2.3 of IEEE1588-2008."
+        ::= { tnPtpPortDSConfigEntry 1 }
+
+    tnPtpPortDSConfigAssociatedPhysicalPort OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The physical port which this PTP port is
+                        associated to. For the same physical port, it
+                        has the same value as 'ifIndex' of the card's
+                        port table."
+        ::= { tnPtpPortDSConfigEntry 2 }
+
+    tnPtpPortDSConfigVlanVID OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The VLAN-ID of the Vlan tag for the tx/rx PTP
+                        messages.  It shall be within the range of
+                        [0,4094], 0 means untagged."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 3 }
+
+    tnPtpPortDSConfigVlanTPID OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The TPID of the Vlan tag for the tx/rx PTP
+                        messages.  It is valid when
+                        tnPtpPortDSConfigVlanVID is not 0."
+        DEFVAL         { '8100'H }
+        ::= { tnPtpPortDSConfigEntry 4 }
+
+    tnPtpPortDSConfigAnnoRxTimeout OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative value for the number of
+                        timeouts for the announce message associated
+                        with the 1588 PTP reference/port.  The total
+                        time in seconds to timeout is calculated by the
+                        tnPtpPortDSAnnoRxTimeout * 2 ^ tnPtpPortDSLogAnnoInterval.
+
+                        Current configurable range: 2 to 255."
+        DEFVAL         { 3 }
+        ::= { tnPtpPortDSConfigEntry 5 }
+
+    tnPtpPortDSConfigLogAnnoInterval OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative value, which is represented
+                        as logarithm to the base 2 of the transmission
+                        interval for the announce message in this PTP
+                        port.
+
+                        Valid values: -4, -3, -2, -1, 0, 1, 2, 3, 4."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 6 }
+
+    tnPtpPortDSConfigLogSyncInterval OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative value, which is represented
+                        as logarithm to the base 2 of the transmission
+                        interval for the sync message in this PTP port.
+
+                        Valid values: -7, -6, -5, -4, -3, -2, -1, 0, 1,
+                                      2, 3, 4."
+        DEFVAL         { -7 }
+        ::= { tnPtpPortDSConfigEntry 7 }
+
+    tnPtpPortDSConfigLogDelayReqInterval OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative value, which is represented
+                        as logarithm to the base 2 of the transmission
+                        interval for the delay_req message in this PTP
+                        port.
+
+                        Valid values: -7, -6, -5, -4, -3, -2, -1, 0, 1,
+                                      2, 3, 4."
+        DEFVAL         { -4 }
+        ::= { tnPtpPortDSConfigEntry 8 }
+
+    tnPtpPortDSConfigLogMinPDelayReqInterval OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative value, which is represented
+                        as logarithm to the base 2 of the transmission
+                        interval for the pdelay_req message in this PTP
+                        port.
+
+                        Valid values: -7, -6, -5, -4, -3, -2, -1, 0, 1,
+                                      2, 3, 4."
+        DEFVAL         { -4 }
+        ::= { tnPtpPortDSConfigEntry 9 }
+
+    tnPtpPortDSConfigAdminStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "It is used for the user to administratively
+                        manage the PTP protocols on the PTP port
+                        0: Disable
+                        1: Enable
+                        2: MT1 (maintenance state 1)
+                        3: MT2 (maintenance state 2)."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 10 }
+
+    tnPtpPortDSConfigRole OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "It is used for the user to set the role of the
+                        PTP port. It is valid for BC only.
+                        0: Automatic
+                        1: Slave
+                        2: Master
+                        3: Passive."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 11 }
+
+    tnPtpPortDSConfigDelayMechanism OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         e2e(1),
+                         p2p(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The delay mechanism for the PTP port."
+        DEFVAL         { 1 }
+        ::= { tnPtpPortDSConfigEntry 12 }
+
+    tnPtpPortDSConfigVersionNumber OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         v1(1),
+                         v2(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protocol version to be supported in the PTP
+                        port."
+
+        DEFVAL         { 2 }
+        ::= { tnPtpPortDSConfigEntry 13 }
+
+    tnPtpPortDSConfigAsymCorrection OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "It allows the user to specify the correction
+                        delay for asymmetrical network path.  Refer to
+                        Section 7.4.2 of IEEE1588-2008.
+
+                        Value range:  {-100ms, +100ms}.
+
+                        The unit of this attribute shall be ns and the
+                        steps of this attribute shall be 1ns."
+        ::= { tnPtpPortDSConfigEntry 14 }
+
+
+    tnPtpPortDSConfigTwoStepFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This  parameter determines if follow-up messaging
+                        will be used for this PTP port.
+
+                        true:  If the port will use follow-up messaging
+                        false: If the port will not use follow-up messaging.
+
+                        Only false is supported in the current PTP implementation."
+        DEFVAL         { false }
+        ::= { tnPtpPortDSConfigEntry 15 }
+
+    tnPtpPortDSConfigEncapType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The encapsulation type to transport PTP for the
+                        PTP port:
+                        1: UDP/IPv4 per IEEE1588-2008 Annex D
+                        2: UDP/IPv6 per IEEE1588-2008 Annex D
+                        3: Ethernet per IEEE1588-2008 Annex F."
+        DEFVAL         { 3 }
+        ::= { tnPtpPortDSConfigEntry 16 }
+
+    tnPtpPortDSConfigAddressingMode OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates addressing mode of the PTP message in
+                        the PTP port:
+                        - 0: Multicast for all PTP messages
+                        - 1: Unicast for all PTP messages with the
+                             provisioned destination address.
+                        - 2: Hybrid mode. The Delay_Req and Delay_Resp
+                             messages are sent with the unicast address
+                             while other PTP messages are sent with the
+                             multicast address."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 17 }
+
+    tnPtpPortDSConfigUnicastForDelayReq OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         deprecated
+        DESCRIPTION    "Indicates how the Delay_Req message is sent in
+                        the PTP port regarding the destination address.
+                        This parameter is valid only when
+                        tnPtpPortAddressingMode is Multicast
+
+                        true:  The port sends the Delay_Req message with
+                               unicast address.
+                        false: The port sends the Delay_Req message with
+                               multicast address."
+        DEFVAL         { false }
+        ::= { tnPtpPortDSConfigEntry 18 }
+
+    tnPtpPortDSConfigUnicastNegotiation OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "An administrative value indicating whether the
+                        unicast negotiation function is enabled or
+                        disabled for the PTP port.  It is valid when
+                        tnPtpPortAddressingMode is Multicast.
+
+                        true:  Unicast negotiation is enabled.
+                        false: Unicast negotiation is disabled."
+        DEFVAL         { false }
+        ::= { tnPtpPortDSConfigEntry 19 }
+
+    tnPtpPortDSConfigDestMac OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The unicast destination MAC address for the
+                        transmitted PTP messages of the PTP port.  It
+                        will only be applicable when
+                        (tnPtpPortEncapType == 3 ) and
+                        (tnPtpPortAddressingMode == 1)."
+        ::= { tnPtpPortDSConfigEntry 20 }
+
+    tnPtpPortDSConfigDestIpAddrType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter indicates the IP address type for
+                        tnPtpPortDSConfigDestIpAddr."
+        DEFVAL         { ipv4 }
+        ::= { tnPtpPortDSConfigEntry 21 }
+
+    tnPtpPortDSConfigDestIpAddr OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The unicast destination IPv4/IPv6 address for
+                        the transmitted PTP messages of the PTP port.
+                        It will only be applicable when
+                        (tnPtpPortEncapType  == 1 or 2) and
+                        (tnPtpPortAddressingMode == 1)."
+        ::= { tnPtpPortDSConfigEntry 22 }
+
+    tnPtpPortDSConfigRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The RowStatus of the PTP Port entry."
+        ::= { tnPtpPortDSConfigEntry 23 }
+
+    tnPtpPortDSConfigConnectedPtpioTimingPort OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The timing port of the PTPIO card which this PTP
+                        port is connected to.  It has the same value as
+                        'ifIndex' of the card's port table.  To unconnect
+                        a PTP port from a PTPIO timing port, set this
+                        parameter to 0."
+        ::= { tnPtpPortDSConfigEntry 24 }
+
+    tnPtpPortDSConfigAutoLinkAsyMeasureTrigger OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The action to trigger automatic link asymmetry
+                        measurement.
+                        true  - trigger automatic link asymmetry measurement
+                        false - no action."
+        DEFVAL         { false }
+        ::= { tnPtpPortDSConfigEntry 25 }
+
+    tnPtpPortDSConfigNotSlave OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "An administrative value indicating whether the
+                        ptp port can be placed in the SLAVE state."
+        DEFVAL         { false }
+        ::= { tnPtpPortDSConfigEntry 26 }
+
+    tnPtpPortDSConfigLocalPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The localPriority value of the PTP port."
+        DEFVAL         { 128 }
+        ::= { tnPtpPortDSConfigEntry 27 }
+
+    tnPtpPortDSConfigAssociatedEntityType OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..3)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the Associated Entity Type of the PTP port.
+
+                        0: N/A, NOT Applicable
+                        1: Physical PORT
+                        2: Service
+                        3: ERP Ring"
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 28 }
+
+    tnPtpPortDSConfigAssociatedEntityID OBJECT-TYPE
+        SYNTAX         OCTET STRING(SIZE(8))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the Associated Entity ID(8-byte) of the PTP
+                        port.
+
+                        The first 4-byte is shelfId/slotId/0/0.
+                        The last 4-byte is portId or serviceId or ringId
+                        depends on tnPtpPortDSConfigAssociatedEntityType."
+        ::= { tnPtpPortDSConfigEntry 29 }
+
+    tnPtpPortDSConfigClearMsgCounter OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Clears the Message Counter of the PTP port.  The 32-bit
+                        value is defined as below:
+
+                        +----------+----------------------------+
+                        | 32    11 | 10                       1 |
+                        +----------+----------------------------+
+                        | reserved | message type and direction |
+                        +----------+----------------------------+
+
+                        Bit 1 to bit 10 for type and direction of the message
+                          counter to be cleared. Set one or more bits to 1 to
+                          clear specified message counters.
+                        bit 1  - AnnounceTx
+                        bit 2  - AnnounceRx
+                        bit 3  - SyncTx
+                        bit 4  - SyncRx
+                        bit 5  - DelayReqTx
+                        bit 6  - DelayReqRx
+                        bit 7  - DelayRespTx
+                        bit 8  - DelayRespRx
+                        bit 9  - FollowUpTx
+                        bit 10 - FollowUpRx
+
+                        Other bits (bit 11 to bit 32) are reserved for future,
+                        and suggest to be 0."
+        DEFVAL         { 0 }
+        ::= { tnPtpPortDSConfigEntry 30 }
+
+    tnPtpPortDSConfigSyncReceiptTimeout OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of timeout intervals for the PTPPort
+                        sync message. The total time in seconds to timeout
+                        is calculated by
+                          tnPtpPortDSConfigSyncReceiptTimeout
+                          * ( 2 ^ tnPtpPortDSConfigLogSyncInterval )."
+        ::= { tnPtpPortDSConfigEntry 31 }
+
+    tnPtpPortDSConfigDelayRespReceiptTimeout OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of timeout intervals for the PTPPort
+                        DelayResponse message. The total time in seconds to
+                        timeout is calculated by
+                          tnPtpPortDSConfigDelayRespReceiptTimeout
+                          * ( 2 ^ tnPtpPortDSConfigLogDelayReqInterval )."
+        ::= { tnPtpPortDSConfigEntry 32 }
+
+-----------------------------------------------------------------------
+-- Information table for the the PTP port Data Set
+-----------------------------------------------------------------------
+    tnPtpPortDSInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpPortDSInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table contains non-configurable information
+                        of a PTP port"
+        ::= { tnPtpPort 3 }
+
+    tnPtpPortDSInfoEntry OBJECT-TYPE
+        SYNTAX         TnPtpPortDSInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Non-configurable information of a PTP port."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnPtpPortDSInfoTable 1 }
+
+    TnPtpPortDSInfoEntry ::=
+        SEQUENCE {
+            tnPtpPortDSInfoPeerPathDelay             Integer32,
+            tnPtpPortDSInfoPortOperState             AluWdmtnPtpPortState,
+            tnPtpPortDSInfoNumOfSessions             Integer32,  --deprecated
+            tnPtpPortDSInfoAutoLinkAsyMeasureStatus  Integer32,
+            tnPtpPortDSInfoMeasuredLinkAsymmetry     Integer32,
+            tnPtpPortDSInfoAnnounceMsgTx             Counter64,
+            tnPtpPortDSInfoAnnounceMsgRx             Counter64,
+            tnPtpPortDSInfoSyncMsgTx                 Counter64,
+            tnPtpPortDSInfoSyncMsgRx                 Counter64,
+            tnPtpPortDSInfoDelayReqMsgTx             Counter64,
+            tnPtpPortDSInfoDelayReqMsgRx             Counter64,
+            tnPtpPortDSInfoDelayRspMsgTx             Counter64,
+            tnPtpPortDSInfoDelayRspMsgRx             Counter64,
+            tnPtpPortDSInfoSignalingMsgTx            Counter64,
+            tnPtpPortDSInfoSignalingMsgRx            Counter64,
+            tnPtpPortDSInfoManagementMsgTx           Counter64,
+            tnPtpPortDSInfoManagementMsgRx           Counter64,
+            tnPtpPortDSInfoFollowUpMsgTx             Counter64,
+            tnPtpPortDSInfoFollowUpMsgRx             Counter64,
+            tnPtpPortDSInfoPhyPortMac                MacAddress,
+            tnPtpPortDSInfoSignalFail                TruthValue
+        }
+
+    tnPtpPortDSInfoPeerPathDelay OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "It's an estimate of the current one-way
+                        propagation delay on the link attached to the
+                        PTP port.  The unit is ns.  This attribute is
+                        valid only when tnPtpPortDSConfigDelayMechanism
+                        = p2p."
+        ::= { tnPtpPortDSInfoEntry 1 }
+
+    tnPtpPortDSInfoPortOperState OBJECT-TYPE
+        SYNTAX         AluWdmtnPtpPortState
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the PTP port."
+        ::= { tnPtpPortDSInfoEntry 2 }
+
+    tnPtpPortDSInfoNumOfSessions OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         deprecated
+        DESCRIPTION    "The parameter indicates the number of the active
+                        sessions of the PTP port."
+        ::= { tnPtpPortDSInfoEntry 3 }
+
+    tnPtpPortDSInfoAutoLinkAsyMeasureStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The parameter indicates the state of the automatic
+                        measurement trigger.
+                        0 - noTrigger
+                        1 - inProgress
+                        2 - successful
+                        3 - noMsgReceived
+                        4 - noMsgReceivedAfterSwap
+                        5 - oswFailure
+                        6 - unstable timestamps."
+        ::= { tnPtpPortDSInfoEntry 4 }
+
+    tnPtpPortDSInfoMeasuredLinkAsymmetry OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The parameter indicates the measured delay
+                        asymmetry of the PTP port.  It is valid only
+                        when tnPtpPortDSInfoAutoMeasureStatus = 1."
+        ::= { tnPtpPortDSInfoEntry 5 }
+
+    tnPtpPortDSInfoAnnounceMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Announce packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 6 }
+
+    tnPtpPortDSInfoAnnounceMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Announce packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 7 }
+
+    tnPtpPortDSInfoSyncMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Sync packets transmitted
+                        to this port."
+        ::= { tnPtpPortDSInfoEntry 8 }
+
+    tnPtpPortDSInfoSyncMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Sync packets received
+                        from this port."
+        ::= { tnPtpPortDSInfoEntry 9 }
+
+    tnPtpPortDSInfoDelayReqMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Delay Request packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 10 }
+
+    tnPtpPortDSInfoDelayReqMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Delay request packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 11 }
+
+    tnPtpPortDSInfoDelayRspMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Delay response packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 12 }
+
+    tnPtpPortDSInfoDelayRspMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Delay response packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 13 }
+
+    tnPtpPortDSInfoSignalingMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Signaling packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 14 }
+
+    tnPtpPortDSInfoSignalingMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Signaling packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 15 }
+
+    tnPtpPortDSInfoManagementMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Management packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 16 }
+
+    tnPtpPortDSInfoManagementMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of Management packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 17 }
+
+    tnPtpPortDSInfoFollowUpMsgTx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of FollowUp packets
+                        transmitted to this port."
+        ::= { tnPtpPortDSInfoEntry 18 }
+
+    tnPtpPortDSInfoFollowUpMsgRx OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the number of FollowUp packets
+                        received from this port."
+        ::= { tnPtpPortDSInfoEntry 19 }
+
+    tnPtpPortDSInfoPhyPortMac OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The MAC address of the associated physical port."
+        ::= { tnPtpPortDSInfoEntry 20 }
+
+    tnPtpPortDSInfoSignalFail OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Signal Fail Flag."
+        ::= { tnPtpPortDSInfoEntry 21 }
+
+-----------------------------------------------------------------------
+-- Session info for a PTP port in an OC/BC
+-----------------------------------------------------------------------
+--    obsolete
+--    tnPtpPortSessionTable OBJECT-TYPE ::= { tnPtpPort 4 }
+
+-----------------------------------------------------------------------
+-- Generic PTP port Table
+-----------------------------------------------------------------------
+    tnPtpPortGenericTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpPortGenericEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides generic information for a PTP port."
+        ::= { tnPtpPort 5 }
+
+    tnPtpPortGenericEntry OBJECT-TYPE
+        SYNTAX         TnPtpPortGenericEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Generic information for a PTP port."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnPtpPortGenericTable 1 }
+
+    TnPtpPortGenericEntry ::=
+        SEQUENCE {
+            tnPtpPortAlmProfName     OCTET STRING,
+            tnPtpPortIsVirtual       TruthValue
+        }
+
+    tnPtpPortAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ASAP(alarm severity assignment profile) Name for PTP port."
+        ::= { tnPtpPortGenericEntry 1 }
+
+    tnPtpPortIsVirtual OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This PTPPort is a Virtual PTPPort(associated with ToD
+                        port) or NOT."
+        ::= { tnPtpPortGenericEntry 2 }
+
+-----------------------------------------------------------------------
+-- Table for the Data Set of Transparent Clock PTP port
+-----------------------------------------------------------------------
+    tnPtpTransparentClockPortDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpTransparentClockPortDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the data set of Transparent Clock
+                        PTP port.
+
+                        Refer to 8.3.3 transparentClockPortDS data set member
+                        specifications."
+        ::= { tnPtpPort 6 }
+
+    tnPtpTransparentClockPortDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpTransparentClockPortDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Data set of the PTP port of Transparent Clock."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnPtpTransparentClockPortDSTable 1 }
+
+    TnPtpTransparentClockPortDSEntry ::=
+        SEQUENCE {
+            tnPtpTransparentClockPortDSPortIdentity     AluWdmPtpPortIdentity,
+            tnPtpTransparentClockPortDSFaultyFlag       TruthValue
+        }
+
+    tnPtpTransparentClockPortDSPortIdentity OBJECT-TYPE
+        SYNTAX         AluWdmPtpPortIdentity
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The PortIdentity attribute of the PTP port."
+        ::= { tnPtpTransparentClockPortDSEntry 1 }
+
+    tnPtpTransparentClockPortDSFaultyFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value shall be TRUE if the PTP port is faulty and
+                        FALSE if the PTP port is operating normally.  The
+                        initialization value shall be FALSE."
+        DEFVAL         { false }
+        ::= { tnPtpTransparentClockPortDSEntry 2 }
+
+-----------------------------------------------------------------------
+-- PTP port Source Information DS Table
+-----------------------------------------------------------------------
+    tnPtpPortSourceInfoDSTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpPortSourceInfoDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides the Source Information DataSet of
+                        a PTP port, to participate the Best Master Clock
+                        Comparison."
+        ::= { tnPtpPort 7 }
+
+    tnPtpPortSourceInfoDSEntry OBJECT-TYPE
+        SYNTAX         TnPtpPortSourceInfoDSEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Source Information DataSet of a Virtual PTP port."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnPtpPortSourceInfoDSTable 1 }
+
+    TnPtpPortSourceInfoDSEntry ::=
+        SEQUENCE {
+            tnPtpPortSourceInfoDSGmClockIdentity            AluWdmPtpClockIdentifier,
+            tnPtpPortSourceInfoDSGmClockClass               Unsigned32,
+            tnPtpPortSourceInfoDSGmClockAccuracy            Unsigned32,
+            tnPtpPortSourceInfoDSGmOffsetScaledLogVariance  Unsigned32,
+            tnPtpPortSourceInfoDSGmPriority1                Unsigned32,
+            tnPtpPortSourceInfoDSGmPriority2                Unsigned32,
+            tnPtpPortSourceInfoDSStepsRemoved               Unsigned32,
+            tnPtpPortSourceInfoDSReceiverClockIdentity      AluWdmPtpClockIdentifier,
+            tnPtpPortSourceInfoDSReceiverPortNumber         Unsigned32,
+            tnPtpPortSourceInfoDSSenderClockIdentity        AluWdmPtpClockIdentifier,
+            tnPtpPortSourceInfoDSSenderPortNumber           Unsigned32,
+            tnPtpPortSourceInfoDSTimeSource                 Unsigned32,
+            tnPtpPortSourceInfoDSTimeScale                  TruthValue,
+            tnPtpPortSourceInfoDSLocalPriority              Unsigned32
+        }
+
+    tnPtpPortSourceInfoDSGmClockIdentity OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM ClockIdentity."
+        ::= { tnPtpPortSourceInfoDSEntry 1 }
+
+    tnPtpPortSourceInfoDSGmClockClass OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM ClockClass."
+        ::= { tnPtpPortSourceInfoDSEntry 2 }
+
+    tnPtpPortSourceInfoDSGmClockAccuracy OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM ClockAccuracy."
+        ::= { tnPtpPortSourceInfoDSEntry 3 }
+
+    tnPtpPortSourceInfoDSGmOffsetScaledLogVariance OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM OffsetScaledLogVariance."
+        ::= { tnPtpPortSourceInfoDSEntry 4 }
+
+    tnPtpPortSourceInfoDSGmPriority1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM Priority1."
+        ::= { tnPtpPortSourceInfoDSEntry 5 }
+
+    tnPtpPortSourceInfoDSGmPriority2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information GM Priority2."
+        ::= { tnPtpPortSourceInfoDSEntry 6 }
+
+    tnPtpPortSourceInfoDSStepsRemoved OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information StepsRemoved."
+        ::= { tnPtpPortSourceInfoDSEntry 7 }
+
+    tnPtpPortSourceInfoDSReceiverClockIdentity OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information Receiver ClockIdentity."
+        ::= { tnPtpPortSourceInfoDSEntry 8 }
+
+    tnPtpPortSourceInfoDSReceiverPortNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information Receiver PortNumber."
+        ::= { tnPtpPortSourceInfoDSEntry 9 }
+
+    tnPtpPortSourceInfoDSSenderClockIdentity OBJECT-TYPE
+        SYNTAX         AluWdmPtpClockIdentifier
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information Sender ClockIdentity."
+        ::= { tnPtpPortSourceInfoDSEntry 10 }
+
+    tnPtpPortSourceInfoDSSenderPortNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information Sender PortNumber."
+        ::= { tnPtpPortSourceInfoDSEntry 11 }
+
+    tnPtpPortSourceInfoDSTimeSource OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information TimeSource."
+        ::= { tnPtpPortSourceInfoDSEntry 12 }
+
+    tnPtpPortSourceInfoDSTimeScale OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information TimeScale."
+        ::= { tnPtpPortSourceInfoDSEntry 13 }
+
+    tnPtpPortSourceInfoDSLocalPriority OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PTPPort Source Information LocalPriority."
+        ::= { tnPtpPortSourceInfoDSEntry 14 }
+
+-----------------------------------------------------------------------
+-- Virtual PTP port Table
+-----------------------------------------------------------------------
+    tnVirtualPtpPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnVirtualPtpPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides parameters for a Virtual PTP port."
+        ::= { tnPtpPort 8 }
+
+    tnVirtualPtpPortEntry OBJECT-TYPE
+        SYNTAX         TnVirtualPtpPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Parameters for a Virtual PTP port."
+        INDEX { tnPtpClockIndex,
+                tnPtpPortDSPortIndex }
+        ::= { tnVirtualPtpPortTable 1 }
+
+    TnVirtualPtpPortEntry ::=
+        SEQUENCE {
+            tnVirtualPtpPortGmPriority1         Unsigned32,
+            tnVirtualPtpPortGmPriority2         Unsigned32,
+            tnVirtualPtpPortGmClockAccuracy     Unsigned32
+        }
+
+    tnVirtualPtpPortGmPriority1 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Virtual PTPPort grandmasterPriority1."
+        DEFVAL         { 128 }
+        ::= { tnVirtualPtpPortEntry 1 }
+
+    tnVirtualPtpPortGmPriority2 OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Virtual PTPPort grandmasterPriority2."
+        DEFVAL         { 128 }
+        ::= { tnVirtualPtpPortEntry 2 }
+
+    tnVirtualPtpPortGmClockAccuracy OBJECT-TYPE
+        SYNTAX         Unsigned32 (32..33)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Virtual PTPPort grandmasterClockAccuracy."
+        DEFVAL         { 33 }
+        ::= { tnVirtualPtpPortEntry 3 }
+
+-----------------------------------------------------------------------
+-- 1PPS&ToD External Interface Table
+-----------------------------------------------------------------------
+    tnPtpExtTodIfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPtpExtTodIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table contains parameters of the external
+                        1PPS/ToD interfaces."
+        ::= { tnPtpExtTodIf 1 }
+
+    tnPtpExtTodIfEntry OBJECT-TYPE
+        SYNTAX         TnPtpExtTodIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Attributes of an external 1PPS&ToD interface."
+        INDEX { tnPtpExtTodIfIndex }
+        ::= { tnPtpExtTodIfTable 1 }
+
+    TnPtpExtTodIfEntry ::=
+        SEQUENCE {
+            tnPtpExtTodIfIndex               InterfaceIndex,
+            tnPtpExtTodIfDirection           Unsigned32,
+            tnPtpExtTodSignalValid           TruthValue,
+            tnPtpExtTodIfPulseFormat         Unsigned32,
+            tnPtpExtTodIfToDFormat           Unsigned32,
+            tnPtpExtTodIfCableCorrection     Integer32,
+            tnPtpExtTodIfAdminStatus         Integer32,
+            tnPtpExtTodIf1ppsStatus          Unsigned32,
+            tnPtpExtTodIfToDStatus           Unsigned32,
+            tnPtpExtTodIfAdditionalInfo      OCTET STRING,
+            tnPtpExtCompensationMode         Integer32,
+            tnPtpExtCompenAutoTestTrigger    TruthValue,
+            tnPtpExtCompenManualValueIn      Integer32,
+            tnPtpExtCompenManualValueOut     Integer32,
+            tnPtpExtCompenMeasureStatus      Integer32,
+            tnPtpExtTodIfDegradeThreshold    Unsigned32,
+            tnPtpExtTodIfTodClockClass       Unsigned32,
+            tnPtpExtTodAlmProfName           OCTET STRING
+        }
+
+    tnPtpExtTodIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The index of the 1pps/ToD interface.  It contains
+                        the shelf, slot and port number information and
+                        is equal to the ifIndex of the ifTable."
+        ::= { tnPtpExtTodIfEntry 1 }
+
+    tnPtpExtTodIfDirection OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The direction of the 1PPS&ToD interface.
+                        0: Input (to the node)
+                        1: Output (from the node)."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 2 }
+
+    tnPtpExtTodSignalValid OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter enables/disables the ToD signal
+                        of the 1PPS&ToD interface.
+                        true:  The ToD signal is enabled.
+                        false: The ToD signal is disabled."
+        DEFVAL         { true }
+        ::= { tnPtpExtTodIfEntry 3 }
+
+    tnPtpExtTodIfPulseFormat OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The format for the 1PPS signal of the 1PPS&ToD
+                        interface.
+                        0: 1 pulse per second
+                        1: 1 pulse per minute
+                        2: 1 pulse per hour."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 4 }
+
+    tnPtpExtTodIfToDFormat OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The format for the ToD signal of the 1PPS&ToD
+                        interface
+                        0: UBX
+                        1: IRIG-B
+                        2: IRIG-D
+                        3: ITU-T
+
+                        This parameter is valid only when
+                        tnPtpExtTodSignalValid is true."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 5 }
+
+    tnPtpExtTodIfCableCorrection OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The compensation value of the cable for the
+                        1PPS&ToD interface.
+
+                        Value range:  {-100ms, +100ms}.
+
+                        The unit of this attribute shall be ns and the
+                        steps of this attribute shall be 1ns."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 6 }
+
+    tnPtpExtTodIfAdminStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Admin status of the  1PPS&ToD interface.
+                        0: Disable
+                        1: Enable."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 7 }
+
+    tnPtpExtTodIf1ppsStatus OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The operational status of the 1PPS signal of the
+                        1PPS&ToD interface.
+                        1: Normal
+                        2: Loss.
+
+                        This parameter is valid only when
+                        tnPtpExtTodIfDirection is input."
+        ::= { tnPtpExtTodIfEntry 8 }
+
+    tnPtpExtTodIfToDStatus OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The operational status of the ToD signal of the
+                        1PPS&ToD interface.
+                        1: Normal
+                        2: Degraded
+                        3: Do Not used (default)
+                        4: Loss
+                        256: N/A - NotApplicable."
+
+        ::= { tnPtpExtTodIfEntry 9 }
+
+    tnPtpExtTodIfAdditionalInfo OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE (0..48))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The additional information for the 1PPS&ToD
+                        interface."
+        ::= { tnPtpExtTodIfEntry 10 }
+
+    tnPtpExtCompensationMode OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter determines the PTP Compensation
+                        mode.  It is intended to be managed by the
+                        System Operator.
+                        0: precalibrated mode
+                        1: auto mode
+                        2: manual mode"
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 11 }
+
+    tnPtpExtCompenAutoTestTrigger OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter enables/disables Compensation AutoTest
+                        true:  enabled Compensation AutoTest.
+                        false: disabled Compensation AutoTest."
+        DEFVAL         { false }
+        ::= { tnPtpExtTodIfEntry 12 }
+
+    tnPtpExtCompenManualValueIn OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The compensation manual value in for the
+                        1PPS&ToD interface.
+                        Value range:  {-127ns, +127ns}.
+                        The unit of this attribute shall be ns."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 13 }
+
+    tnPtpExtCompenManualValueOut OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The compensation manual value out for the
+                        1PPS&ToD interface.
+                        Value range:  {-127ns, +127ns}.
+
+                        The unit of this attribute shall be ns."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 14 }
+
+    tnPtpExtCompenMeasureStatus OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This parameter indicate the the status of automatical
+                        calibration measurement
+                        0: noTrigger
+                        1: inProgress
+                        2: successful
+                        2: failed."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 15 }
+
+    tnPtpExtTodIfDegradeThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Threshold value to raise ToD Degrade(TODDEG).
+
+                        For IEEE_1588_2008_CCSA profile,
+                        Range: 0 to 5;
+                        Default: 0.
+
+                        For G_8275_1 profile,
+                        valid values are 6, 7, 135, 140, 150, 160, 165, 248;
+                        Default: 6."
+        DEFVAL         { 0 }
+        ::= { tnPtpExtTodIfEntry 16 }
+
+    tnPtpExtTodIfTodClockClass OBJECT-TYPE
+        SYNTAX         Unsigned32(0..256)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ClockClass of the ToD signal with itu ToD message
+                        format type.
+
+                        Valid values are:
+                        0..255: ClockClass
+                        256: N/A - NotApplicable."
+        ::= { tnPtpExtTodIfEntry 17 }
+
+    tnPtpExtTodAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPtpExtTodIfEntry 18 }
+
+-----------------------------------------------------------------------
+-- Conformance Group Definitions
+-----------------------------------------------------------------------
+    tnPtpSystemGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpSystemClockMode,
+            tnPtpSystemFrequencyReference,
+            tnPtpSystemTimeReference,
+            tnPtpSystemNextClockNumber,
+            tnPtpSystemClockProfile,
+            tnPtpSystemClockServoMode,
+            tnPtpSystemToDMessageType
+        }
+        STATUS         current
+        DESCRIPTION    "PTP system information for the card."
+        ::= { tnPtpGroups 1 }
+
+    tnPtpClockDefaultDSConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockDefaultDSConfigDomain,
+            tnPtpClockDefaultDSConfigPriority1,
+            tnPtpClockDefaultDSConfigPriority2,
+            tnPtpClockDefaultDSConfigPreferedGM,
+            tnPtpClockDefaultDSConfigIpAddressType,
+            tnPtpClockDefaultDSConfigIpAddress,
+            tnPtpClockDefaultDSConfigAdminStatus,
+            tnPtpClockDefaultDSConfigRowStatus,
+            tnPtpClockDefaultDSConfigLocalPriority,
+            tnPtpClockDefaultDSConfigMaxStepsRemoved,
+            tnPtpClockDefaultDSConfigEPRTCSupport,
+            tnPtpClockDefaultDSConfigSyncUncertainMon
+        }
+        STATUS         current
+        DESCRIPTION    "Configurable information for a PTP clock."
+        ::= { tnPtpGroups 2 }
+
+    tnPtpClockDefaultDSInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockDefaultDSInfoIdentifier,
+            tnPtpClockDefaultDSInfoTwoStepFlag,
+            tnPtpClockDefaultDSInfoNumberOfPorts,
+            tnPtpClockDefaultDSInfoClass,
+            tnPtpClockDefaultDSInfoAccuracy,
+            tnPtpClockDefaultDSInfoOffsetScaledLogVariance,
+            tnPtpClockDefaultDSInfoSignalFail
+        }
+        STATUS         current
+        DESCRIPTION    "Non-configurable information for a PTP clock."
+        ::= { tnPtpGroups 3 }
+
+    tnPtpClockCurrentDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockCurrentDSOffSetFromMaster,
+            tnPtpClockCurrentDSMeanPathDelay,
+            tnPtpClockCurrentDSCurrentTime,
+            tnPtpClockCurrentDSRecoveredClockState,
+            tnPtpClockCurrentDSLockedPtpPort,
+            tnPtpClockCurrentDSStepsRemoved
+        }
+        STATUS         current
+        DESCRIPTION    "Operational information for a PTP clock."
+        ::= { tnPtpGroups 4 }
+
+    tnPtpClockParentDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockParentDSIdentifier,
+            tnPtpClockParentDSPortNum,
+            tnPtpClockParentDSStats,
+            tnPtpClockParentDSOffsetScaledLogVariance,
+            tnPtpClockParentDSPhaseChangeRate,
+            tnPtpClockParentDSGrandmasterClockId,
+            tnPtpClockParentDSGrandmasterClass,
+            tnPtpClockParentDSGrandmasterAccuracy,
+            tnPtpClockParentDSGrandmasterOffsetScaledLogVariance,
+            tnPtpClockParentDSGrandmasterPriority1,
+            tnPtpClockParentDSGrandmasterPriority2
+        }
+        STATUS         current
+        DESCRIPTION    "Parent clock information for a PTP clock."
+        ::= { tnPtpGroups 5 }
+
+    tnPtpClockTimePropertiesDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockTimePropertiesDSCurrentUtcOffset,
+            tnPtpClockTimePropertiesDSCurrentUtcOffsetValid,
+            tnPtpClockTimePropertiesDSLeap59,
+            tnPtpClockTimePropertiesDSLeap61,
+            tnPtpClockTimePropertiesDSTimeTraceable,
+            tnPtpClockTimePropertiesDSFrequencyTraceable,
+            tnPtpClockTimePropertiesDSPtpTimescale,
+            tnPtpClockTimePropertiesDSPtpTimeSource,
+            tnPtpClockTimePropertiesDSSyncUncertainFlag
+        }
+        STATUS         current
+        DESCRIPTION    "Time properties information for a PTP clock."
+        ::= { tnPtpGroups 6 }
+
+    tnPtpPortNextIndexGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpPortNextIndex
+        }
+        STATUS         current
+        DESCRIPTION    "Available next index for a PTP port to be
+                        created."
+        ::= { tnPtpGroups 7 }
+
+    tnPtpPortDSConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpPortDSConfigAssociatedPhysicalPort,
+            tnPtpPortDSConfigVlanVID,
+            tnPtpPortDSConfigVlanTPID,
+            tnPtpPortDSConfigAnnoRxTimeout,
+            tnPtpPortDSConfigLogAnnoInterval,
+            tnPtpPortDSConfigLogSyncInterval,
+            tnPtpPortDSConfigLogDelayReqInterval,
+            tnPtpPortDSConfigLogMinPDelayReqInterval,
+            tnPtpPortDSConfigAdminStatus,
+            tnPtpPortDSConfigRole,
+            tnPtpPortDSConfigDelayMechanism,
+            tnPtpPortDSConfigVersionNumber,
+            tnPtpPortDSConfigAsymCorrection,
+            tnPtpPortDSConfigTwoStepFlag,
+            tnPtpPortDSConfigEncapType,
+            tnPtpPortDSConfigAddressingMode,
+            tnPtpPortDSConfigUnicastForDelayReq,  -- deprecated
+            tnPtpPortDSConfigUnicastNegotiation,
+            tnPtpPortDSConfigDestMac,
+            tnPtpPortDSConfigDestIpAddrType,
+            tnPtpPortDSConfigDestIpAddr,
+            tnPtpPortDSConfigRowStatus,
+            tnPtpPortDSConfigConnectedPtpioTimingPort,
+            tnPtpPortDSConfigAutoLinkAsyMeasureTrigger,
+            tnPtpPortDSConfigNotSlave,
+            tnPtpPortDSConfigLocalPriority,
+            tnPtpPortDSConfigAssociatedEntityType,
+            tnPtpPortDSConfigAssociatedEntityID,
+            tnPtpPortDSConfigClearMsgCounter,
+            tnPtpPortDSConfigSyncReceiptTimeout,
+            tnPtpPortDSConfigDelayRespReceiptTimeout
+        }
+        STATUS         current
+        DESCRIPTION    "Configurable information for a PTP port."
+        ::= { tnPtpGroups 8 }
+
+    tnPtpPortDSInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpPortDSInfoPeerPathDelay,
+            tnPtpPortDSInfoPortOperState,
+            tnPtpPortDSInfoNumOfSessions,  --deprecated
+            tnPtpPortDSInfoAutoLinkAsyMeasureStatus,
+            tnPtpPortDSInfoMeasuredLinkAsymmetry,
+            tnPtpPortDSInfoAnnounceMsgTx,
+            tnPtpPortDSInfoAnnounceMsgRx,
+            tnPtpPortDSInfoSyncMsgTx,
+            tnPtpPortDSInfoSyncMsgRx,
+            tnPtpPortDSInfoDelayReqMsgTx,
+            tnPtpPortDSInfoDelayReqMsgRx,
+            tnPtpPortDSInfoDelayRspMsgTx,
+            tnPtpPortDSInfoDelayRspMsgRx,
+            tnPtpPortDSInfoSignalingMsgTx,
+            tnPtpPortDSInfoSignalingMsgRx,
+            tnPtpPortDSInfoManagementMsgTx,
+            tnPtpPortDSInfoManagementMsgRx,
+            tnPtpPortDSInfoFollowUpMsgTx,
+            tnPtpPortDSInfoFollowUpMsgRx,
+            tnPtpPortDSInfoPhyPortMac,
+            tnPtpPortDSInfoSignalFail
+        }
+        STATUS         current
+        DESCRIPTION    "Non-configurable information for a PTP port."
+        ::= { tnPtpGroups 9 }
+
+--    obsolete
+--    tnPtpPortSessionGroup OBJECT-GROUP ::= { tnPtpGroups 10 }
+
+    tnPtpExtTodIfGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpExtTodIfDirection,
+            tnPtpExtTodSignalValid,
+            tnPtpExtTodIfPulseFormat,
+            tnPtpExtTodIfToDFormat,
+            tnPtpExtTodIfCableCorrection,
+            tnPtpExtTodIfAdminStatus,
+            tnPtpExtTodIf1ppsStatus,
+            tnPtpExtTodIfToDStatus,
+            tnPtpExtTodIfAdditionalInfo,
+            tnPtpExtCompensationMode,
+            tnPtpExtCompenAutoTestTrigger,
+            tnPtpExtCompenManualValueIn,
+            tnPtpExtCompenManualValueOut,
+            tnPtpExtCompenMeasureStatus,
+            tnPtpExtTodIfDegradeThreshold,
+            tnPtpExtTodIfTodClockClass,
+            tnPtpExtTodAlmProfName
+        }
+        STATUS         current
+        DESCRIPTION    "Information for an external 1PPS&ToD port."
+        ::= { tnPtpGroups 11 }
+
+    tnPtpClockPathTraceDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockPathTraceDSEnable,
+            tnPtpClockPathTraceDSList
+        }
+        STATUS         current
+        DESCRIPTION    "Path Trace Data Set of a PTP Clock."
+        ::= { tnPtpGroups 12 }
+
+    tnPtpClockSyncOamGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockRealtimeTimeOffsetDuration,
+            tnPtpClockRealtimeTimeOffsetInterval,
+            tnPtpClockRealtimeTimeOffset1,
+            tnPtpClockRealtimeTimeOffset2,
+            tnPtpClockRealtimeTimeOffset3,
+            tnPtpClockSyncLossDetectionInterval,
+            tnPtpClockDelayRespLossDetectionInterval,
+            tnPtpClockPtpInputDegradeThreshold,
+            tnPtpClockTimeErrorReferencePortIndex
+        }
+        STATUS         current
+        DESCRIPTION    "PTP Clock Sync OAM."
+        ::= { tnPtpGroups 13 }
+
+    tnPtpClockGenericGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpClockMode,
+            tnPtpClockAlmProfName
+        }
+        STATUS         current
+        DESCRIPTION    "Generic PTP clock."
+        ::= { tnPtpGroups 14 }
+
+    tnPtpTransparentClockDefaultDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpTransparentClockDefaultDSClockIdentity,
+            tnPtpTransparentClockDefaultDSNumberPorts,
+            tnPtpTransparentClockDefaultDSDelayMechanism,
+            tnPtpTransparentClockDefaultDSPrimaryDomain
+        }
+        STATUS         current
+        DESCRIPTION    "Table for the Default Data Set of Transparent Clock."
+        ::= { tnPtpGroups 15 }
+
+    tnPtpPortGenericGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpPortAlmProfName,
+            tnPtpPortIsVirtual
+        }
+        STATUS         current
+        DESCRIPTION    "Generic information for a PTP port."
+        ::= { tnPtpGroups 16 }
+
+    tnPtpTransparentClockPortDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpTransparentClockPortDSPortIdentity,
+            tnPtpTransparentClockPortDSFaultyFlag
+        }
+        STATUS         current
+        DESCRIPTION    "Table for the Data Set of Transparent Clock PTP port."
+        ::= { tnPtpGroups 17 }
+
+    tnPtpPortSourceInfoDSGroup OBJECT-GROUP
+        OBJECTS {
+            tnPtpPortSourceInfoDSGmClockIdentity,
+            tnPtpPortSourceInfoDSGmClockClass,
+            tnPtpPortSourceInfoDSGmClockAccuracy,
+            tnPtpPortSourceInfoDSGmOffsetScaledLogVariance,
+            tnPtpPortSourceInfoDSGmPriority1,
+            tnPtpPortSourceInfoDSGmPriority2,
+            tnPtpPortSourceInfoDSStepsRemoved,
+            tnPtpPortSourceInfoDSReceiverClockIdentity,
+            tnPtpPortSourceInfoDSReceiverPortNumber,
+            tnPtpPortSourceInfoDSSenderClockIdentity,
+            tnPtpPortSourceInfoDSSenderPortNumber,
+            tnPtpPortSourceInfoDSTimeSource,
+            tnPtpPortSourceInfoDSTimeScale,
+            tnPtpPortSourceInfoDSLocalPriority
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPtpGroups 18 }
+
+    tnVirtualPtpPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnVirtualPtpPortGmPriority1,
+            tnVirtualPtpPortGmPriority2,
+            tnVirtualPtpPortGmClockAccuracy
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPtpGroups 19 }
+
+-----------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+-----------------------------------------------------------------------
+    tnPtpCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnPtpSystemGroup,
+            tnPtpClockDefaultDSConfigGroup,
+            tnPtpClockDefaultDSInfoGroup,
+            tnPtpClockCurrentDSGroup,
+            tnPtpClockParentDSGroup,
+            tnPtpClockTimePropertiesDSGroup,
+            tnPtpPortNextIndexGroup,
+            tnPtpPortDSConfigGroup,
+            tnPtpPortDSInfoGroup,
+--            obsolete
+--            tnPtpPortSessionGroup,
+            tnPtpExtTodIfGroup,
+            tnPtpClockPathTraceDSGroup,
+            tnPtpClockSyncOamGroup,
+            tnPtpClockGenericGroup,
+            tnPtpTransparentClockDefaultDSGroup,
+            tnPtpPortGenericGroup,
+            tnPtpTransparentClockPortDSGroup,
+            tnPtpPortSourceInfoDSGroup,
+            tnVirtualPtpPortGroup
+        }
+        ::= { tnPtpCompliances 1 }
+
+END  -- DEFINITION OF TROPIC-PTP-MIB

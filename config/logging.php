@@ -81,7 +81,7 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', base_path('logs/librenms.log')),
-            'formatter' => \App\Logging\LogFileFormatter::class,
+            'formatter' => App\Logging\LogFileFormatter::class,
             'level' => env('LOG_LEVEL', 'warning'),
             'replace_placeholders' => true,
         ],
@@ -89,7 +89,7 @@ return [
         'daily' => [
             'driver' => 'daily',
             'path' => env('APP_LOG', base_path('logs/librenms.log')),
-            'formatter' => \App\Logging\NoColorFormatter::class,
+            'formatter' => App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
             'replace_placeholders' => true,
@@ -120,7 +120,7 @@ return [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
-            'formatter' => env('LOG_STDERR_FORMATTER', \App\Logging\CliColorFormatter::class),
+            'formatter' => env('LOG_STDERR_FORMATTER', App\Logging\CliColorFormatter::class),
             'with' => [
                 'stream' => 'php://stderr',
             ],
@@ -130,7 +130,7 @@ return [
         'stdout_debug' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \App\Logging\CliColorFormatter::class,
+            'formatter' => App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://output',
             ],
@@ -140,7 +140,7 @@ return [
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \App\Logging\CliColorFormatter::class,
+            'formatter' => App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://output',
             ],

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FdbTablesController.php
  *
@@ -62,8 +63,8 @@ class FdbTablesController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @param  Request  $request
+     * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
     {

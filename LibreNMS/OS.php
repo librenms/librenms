@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OS.php
  *
@@ -386,7 +387,7 @@ class OS implements
         return $this->device['dynamic_discovery'] ?? [];
     }
 
-    public function hasYamlDiscovery(string $module = null)
+    public function hasYamlDiscovery(?string $module = null): bool
     {
         return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
     }

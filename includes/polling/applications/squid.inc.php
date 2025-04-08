@@ -44,7 +44,7 @@ $oids = [
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.5',
     '.1.3.6.1.4.1.3495.1.3.2.2.1.10.60',
 ];
-$returnedoids = snmp_get_multi_oid($device, $oids);
+$returnedoids = SnmpQuery::numeric()->get($oids);
 
 $memmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.1.0'];
 $swapmaxsize = $returnedoids['.1.3.6.1.4.1.3495.1.2.5.2.0'];
@@ -172,7 +172,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $squid_app_status = ($returnedoids == false) ? false : 'Data ok';
 update_application($app, $squid_app_status, $fields);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FpingTest.php
  *
@@ -138,7 +139,7 @@ OUT;
         return $process;
     }
 
-    public function testBulkPing()
+    public function testBulkPing(): void
     {
         $expected = [
             '192.168.1.4' => [3, 3, 0, 0.62, 0.93, 0.71, 0, 0],

@@ -222,7 +222,7 @@ class DeviceController extends Controller
 
         // SSH
         $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
-        $ssh_url = Config::has('gateone.server')
+        $ssh_url = Config::get('gateone.server')
             ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
             : 'ssh://' . $device->hostname . $ssh_port;
         $device_links['ssh'] = [

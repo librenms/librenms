@@ -1,4 +1,5 @@
 <?php
+
 /**
  * app/Models/AlertRule.php
  *
@@ -83,21 +84,21 @@ class AlertRule extends BaseModel
 
     public function alerts(): HasMany
     {
-        return $this->hasMany(\App\Models\Alert::class, 'rule_id');
+        return $this->hasMany(Alert::class, 'rule_id');
     }
 
     public function devices(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'alert_device_map', 'rule_id', 'device_id');
+        return $this->belongsToMany(Device::class, 'alert_device_map', 'rule_id', 'device_id');
     }
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'alert_group_map', 'rule_id', 'group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'alert_group_map', 'rule_id', 'group_id');
     }
 
     public function locations(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Location::class, 'alert_location_map', 'rule_id');
+        return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');
     }
 }

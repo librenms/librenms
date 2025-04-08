@@ -1,4 +1,5 @@
 <?php
+
 /* LibreNMS
  *
  * Copyright (C) 2017 Paul Blasquez <pblasquez@gmail.com>
