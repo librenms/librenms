@@ -96,10 +96,18 @@ class ErrorReporting
         // TODO FIX ME!
         // TODO FIX ME!
         // TODO FIX ME!
-        if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+        if (
+            $exception instanceof \Illuminate\Auth\AuthenticationException ||
+            $exception instanceof \Illuminate\Validation\ValidationException
+        ) {
             return null;
         }
-
+        dd($exception);
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
+        // TODO FIX ME!
 
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
