@@ -224,6 +224,10 @@ class LegacyUserProvider implements UserProvider
      */
     public function rehashPasswordIfRequired(Authenticatable $user, #[\SensitiveParameter] array $credentials, bool $force = false)
     {
+        // TODO: NEEDS TO BE VERIFIED CORRECT SOLUTION
+        if (! isset($credentials['password']) || empty($user->getAuthPassword())) {
+            return;
+        }
         $hasher = app(HasherContract::class);
 
         if (! $hasher->needsRehash($user->getAuthPassword()) && ! $force) {
