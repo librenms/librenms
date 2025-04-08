@@ -1,0 +1,35 @@
+--
+--  LigoWave 802.11 Central Configuration Module
+--
+
+LIGOWAVE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+ligowave MODULE-IDENTITY
+    LAST-UPDATED    "200809050000Z"
+    ORGANIZATION    "LigoWave"
+    CONTACT-INFO    "
+        LigoWave Customer Support
+        E-mail: support@ligowave.com"
+    DESCRIPTION
+        "LigoWave central configuration module."
+    REVISION    "200809050000Z"
+    DESCRIPTION
+        "First revision."
+    ::= { enterprises 32750 }
+
+-- subtree for product specific MIBs
+ligoProducts        OBJECT IDENTIFIER ::= { ligowave 1 }
+
+-- subtree for administrative information about product
+ligoAdmin           OBJECT IDENTIFIER ::= { ligowave 2 }
+
+-- subtree for management objects
+ligoMgmt            OBJECT IDENTIFIER ::= { ligowave 3 }
+
+-- subtree for experiments
+ligoExperimental    OBJECT IDENTIFIER ::= { ligowave 7 }
+END
