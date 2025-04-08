@@ -208,10 +208,10 @@ return [
         ],
         'options' => [
             'list-fields' => 'Print out a list of valid fields',
-            'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName',
+            'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName. Not used for json output.',
             'output' => 'Output format to display the data :types',
             'no-header' => 'Do not add the header',
-            'relationships' => 'A comma seperated list of relationships to include.',
+            'relationships' => 'A comma seperated list of relationships to include. Only used for json output.',
             'list-relationships' => 'Print out a list/description of relationships',
             'all-relationships' => 'Include all relationships. -r, --relationships takes presidence.',
             'devices-as-array' => 'Return the output as a JSON array instead of a JSON entry per device per line',
