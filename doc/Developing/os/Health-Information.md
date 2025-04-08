@@ -154,19 +154,18 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
 
 When referencing an oid in another table the full index will be used to match
 the other table. If the indexes of the two tables don't match, you will need
-to specify what indexes to use by their index position starting with 0.
+to specify which indexes to use by their index position starting with 0.
 
 `{{ IF-MIB::ifName:2 }}`
 
 This simple example shows using the 3rd (0 is the first) index value from
 the current table to fetch the IF-MIB::ifName value from the data.
 
-Additionally, you may specify more than one index values with either a
+Additionally, you may specify multiple index values with either a
 range or list of index positions.
 
 Range: `{{ IP-MIB::ipAddressPrefixOrigin:0-3 }}`
 List: `{{ IP-MIB::ipAddressPrefixOrigin:2.3.1.4 }}`
-
 
 #### Skipping rows of the returned data
 
