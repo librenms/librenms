@@ -50,7 +50,7 @@ class UserPreferencesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\View\View
      */
     public function index(Request $request)
@@ -59,7 +59,7 @@ class UserPreferencesController extends Controller
 
         $locales = $this->getValidLocales();
         $styles = $this->getValidStyles();
-        $default_locale = \config('app.locale');
+        $default_locale = \config('app.default_locale'); // always the system default
         $default_style = Config::get('site_style');
 
         $data = [
@@ -97,7 +97,7 @@ class UserPreferencesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)

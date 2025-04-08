@@ -6034,7 +6034,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 18
                 },
                 {
@@ -6043,7 +6043,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 23
                 },
                 {
@@ -6052,7 +6052,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 2
                 },
                 {
@@ -6061,7 +6061,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 10
                 },
                 {
@@ -6070,7 +6070,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 21
                 },
                 {
@@ -6079,7 +6079,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 25
                 },
                 {
@@ -6088,7 +6088,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "linklayer",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 24
                 }
             ]

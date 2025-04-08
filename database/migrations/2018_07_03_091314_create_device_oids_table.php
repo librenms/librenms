@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('object_type');
             $table->string('value')->nullable();
             $table->bigInteger('numvalue')->nullable();
-            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             } else {
                 $table->timestamp('last_modified')->useCurrent();

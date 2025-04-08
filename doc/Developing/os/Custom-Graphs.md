@@ -37,7 +37,7 @@ please speak to one of the core devs in
 Let's update our example file to add additional polling:
 
 ```bash
-includes/polling/os/pulse.inc.php
+LibreNMS/OS/Pulse.php
 ```
 
 We declare two specific graphs for users and sessions numbers. Theses
@@ -47,34 +47,31 @@ as it was written in the definition include file.
 ```php
 <?php
 
+namespace LibreNMS\OS;
+
+use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
-$users = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
+class Pulse extends \LibreNMS\OS implements OSPolling
+{
+    public function pollOS(DataStorageInterface $datastore): void
+    {
+        $users = SnmpQuery::get('PULSESECURE-PSG-MIB::iveConcurrentUsers.0')->value();
 
-if (is_numeric($users)) {
-    $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
+        if (is_numeric($users)) {
+            $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
 
-    $fields = array(
-        'users' => $users,
-    );
+            $fields = [
+                'users' => $users,
+            ];
 
-    $tags = compact('rrd_def');
-    app('Datastore')->put($device, 'pulse_users', $tags, $fields);
-    $os->enableGraph('pulse_users');
-}
-
-$sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
-
-if (is_numeric($sessions)) {
-    $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0);
-
-    $fields = array(
-        'sessions' => $sessions,
-    );
-
-    $tags = compact('rrd_def');
-    app('Datastore')->put($device, 'pulse_sessions', $tags, $fields);
-    $os->enableGraph('pulse_sessions');
+            $tags = compact('rrd_def');
+            $datastore->put($this->getDeviceArray(), 'pulse_users', $tags, $fields);
+            $this->enableGraph('pulse_users');
+        }
+    }
 }
 ```
 
@@ -110,32 +107,5 @@ $unit_text = 'Users';
 require 'includes/html/graphs/generic_simplex.inc.php';
 ```
 
-**Pulse Sessions**
-
-```bash
-includes/html/graphs/device/pulse_sessions.inc.php
-```
-
-```php
-<?php
-
-$rrd_filename = Rrd::name($device['hostname'], 'pulse_sessions');
-
-require 'includes/html/graphs/common.inc.php';
-
-$ds = 'sessions';
-
-$colour_area = '9999cc';
-$colour_line = '0000cc';
-
-$colour_area_max = '9999cc';
-
-$graph_max = 1;
-
-$unit_text = 'Sessions';
-
-require 'includes/graphs/generic_simplex.inc.php';
-```
-
-That should be it, after data has started to be collected graphs
+That should be it, after data has started to be collected graph
 should appear in the WebUI.

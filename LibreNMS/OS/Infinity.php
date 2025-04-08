@@ -31,5 +31,5 @@ use LibreNMS\OS;
 
 class Infinity extends OS implements ProcessorDiscovery
 {
-    use OS\Traits\FrogfootResources;
+    use Traits\FrogfootResources;
 }

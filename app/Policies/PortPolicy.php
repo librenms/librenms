@@ -14,7 +14,7 @@ class PortPolicy
     /**
      * Determine whether the user can view any ports.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      */
     public function viewAny(User $user): bool
     {
@@ -24,8 +24,8 @@ class PortPolicy
     /**
      * Determine whether the user can view the port.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Port  $port
+     * @param  User  $user
+     * @param  Port  $port
      */
     public function view(User $user, Port $port): bool
     {
@@ -35,7 +35,7 @@ class PortPolicy
     /**
      * Determine whether the user can create ports.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      */
     public function create(User $user): bool
     {
@@ -45,8 +45,8 @@ class PortPolicy
     /**
      * Determine whether the user can update the port.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Port  $port
+     * @param  User  $user
+     * @param  Port  $port
      */
     public function update(User $user, Port $port): bool
     {
@@ -56,8 +56,8 @@ class PortPolicy
     /**
      * Determine whether the user can delete the port.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Port  $port
+     * @param  User  $user
+     * @param  Port  $port
      */
     public function delete(User $user, Port $port): bool
     {
@@ -67,8 +67,8 @@ class PortPolicy
     /**
      * Determine whether the user can restore the port.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Port  $port
+     * @param  User  $user
+     * @param  Port  $port
      */
     public function restore(User $user, Port $port): bool
     {
@@ -78,8 +78,8 @@ class PortPolicy
     /**
      * Determine whether the user can permanently delete the port.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Port  $port
+     * @param  User  $user
+     * @param  Port  $port
      */
     public function forceDelete(User $user, Port $port): bool
     {
