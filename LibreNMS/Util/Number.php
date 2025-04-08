@@ -26,17 +26,46 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\Enum\IntegerType;
+use LibreNMS\Exceptions\InsufficientDataException;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
 
 class Number
 {
-    public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBase($value, $base = 1000, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         return $base == 1000
             ? self::formatSi($value, $round, $sf, $suffix)
             : self::formatBi($value, $round, $sf, $suffix);
     }
 
-    public static function formatSi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    private static function calcRound(float $value, int $round, int $sf): int
+    {
+        // If we want to track significat figures
+        if ($sf) {
+            $sfround = $sf;
+            if ($value > 1) {
+                // Get the number of digits to the left of the decimal
+                $sflen = strlen(strval(intval($value)));
+
+                if ($sflen >= $sf) {
+                    // We have enough significant figures to the left of the decimal point, so we don't need anything to the right
+                    $sfround = 0;
+                } else {
+                    // We can round one less for every digit to the left of the decimal place
+                    $sfround -= $sflen;
+                }
+            }
+            // If significant figures results in rounding to less decimal places, return this value
+            if ($sfround < $round) {
+                return $sfround;
+            }
+        }
+
+        // Default
+        return $round;
+    }
+
+    public static function formatSi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -60,14 +89,17 @@ class Number
             }
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
-    public static function formatBi($value, $round = 2, $sf = 3, $suffix = 'B'): string
+    public static function formatBi($value, $round = 2, $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -81,11 +113,14 @@ class Number
             $ext = $sizes[$i];
         }
 
+        // Re-calculate rounding based on $sf before converting back to a negative value
+        $round = self::calcRound($value, $round, $sf);
+
         if ($neg) {
             $value = $value * -1;
         }
 
-        return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+        return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
     /**
@@ -153,7 +188,8 @@ class Number
      */
     public static function calculatePercent($part, $total, int $precision = 2): float
     {
-        if ($total == 0) {
+        // ensure total is strict positive and part is positive
+        if ($total <= 0 || $part < 0) {
             return 0;
         }
 
@@ -168,7 +204,7 @@ class Number
             if ($value > $maxSignedValue) {
                 $signedValue = $value - $maxSignedValue * 2 - 2;
 
-                // if conversion was successfull, the number will still be in the valid range
+                // if conversion was successful, the number will still be in the valid range
                 if ($signedValue > $maxSignedValue) {
                     throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
                 }
@@ -191,5 +227,105 @@ class Number
         }
 
         return $value;
+    }
+
+    /**
+     * If a number is less than 0, assume it has overflowed 32bit INT_MAX
+     * And try to correct the value by adding INT_MAX
+     *
+     * @param  int|null  $value  The value to correct
+     * @param  int|null  $max  an upper bounds on the corrected value
+     * @return int|null
+     *
+     * @throws UncorrectableNegativeException
+     */
+    public static function correctIntegerOverflow(mixed $value, ?int $max = null): int|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $int_max = 4294967296;
+        if ($value < 0) {
+            // assume unsigned/signed issue
+            $value = $int_max + self::cast($value);
+            if (($max !== null && $value > $max) || $value > $int_max) {
+                throw new UncorrectableNegativeException;
+            }
+        }
+
+        return (int) $value;
+    }
+
+    /**
+     * Supply a minimum of two of the four values and the others will be filled.
+     *
+     * @throws InsufficientDataException
+     */
+    public static function fillMissingRatio(mixed $total = null, mixed $used = null, mixed $available = null, mixed $used_percent = null, int $precision = 2, int|float $multiplier = 1): array
+    {
+        // fix out of bounds percent
+        if ($used_percent) {
+            $used_percent = self::normalizePercent($used_percent);
+        }
+
+        // total is missing try to calculate it
+        if (! is_numeric($total)) {
+            if (isset($used, $available)) {
+                $total = $used + $available;
+            } elseif ($used && $used_percent) {
+                $total = $used / ($used_percent / 100);
+            } elseif ($available && $used_percent) {
+                $total = $available / (1 - ($used_percent / 100));
+            } elseif (is_numeric($used_percent)) {
+                $total = 100; // only have percent, mark total as 100
+            }
+        }
+
+        if (! is_numeric($total) || ($used === null && $available === null && ! is_numeric($used_percent))) {
+            throw new InsufficientDataException('Unable to calculate missing ratio values, not enough information. ' . json_encode(get_defined_vars()));
+        }
+
+        // fill used if it is missing
+        $used_is_null = $used === null;
+        if ($used_is_null) {
+            $used = $available !== null
+                ? $total - $available
+                : $total * ($used_percent ? ($used_percent / 100) : 0);
+        }
+
+        // fill percent if it is missing
+        if ($used_percent == null) {
+            $used_percent = static::calculatePercent($used, $total, $precision);
+        }
+
+        // fill available if it is missing
+        if ($available === null) {
+            $available = $used_is_null
+                ? $total * (1 - ($used_percent / 100))
+                : $total - $used;
+        }
+
+        // return nicely formatted values
+        return [
+            round($total * $multiplier, $precision),
+            round($used * $multiplier, $precision),
+            round($available * $multiplier, $precision),
+            round($used_percent, $precision),
+        ];
+    }
+
+    /**
+     * Handle a value that should be a percent, but is > 100 and assume it is off by some factor of 10
+     */
+    public static function normalizePercent(mixed $percent): float
+    {
+        $percent = floatval($percent);
+
+        while ($percent > 100) {
+            $percent = $percent / 10;
+        }
+
+        return $percent;
     }
 }

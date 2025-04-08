@@ -61,7 +61,7 @@ class IpTest extends TestCase
      */
     public function testIsValidIPv6ExcludeReserved(): void
     {
-        $this->assertFalse(IPv6::isValid('2001:db8:85a3::8a2e:370:7334', true));
+        $this->assertFalse(IPv6::isValid('::1', true));
     }
 
     public function testIpParse(): void

@@ -27,6 +27,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -80,7 +81,7 @@ class Core implements Module
             Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
             $os->getDeviceArray()['os'] = $device->os;
 
-            echo 'Changed ';
+            Log::info('OS Changed ');
         }
 
         // Set type to a predefined type for the OS if it's not already set
@@ -92,7 +93,7 @@ class Core implements Module
 
         $device->save();
 
-        echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
+        Log::notice('OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n");
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -125,17 +126,22 @@ class Core implements Module
         $device->save();
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // nothing to cleanup
+        return false; // no module specific data
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return 0; // nothing to cleanup
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
-        return false; // all data here is stored in the devices table and covered by the os module
+        return null; // all data here is stored in the devices table and covered by the os module
     }
 
     /**
@@ -165,7 +171,6 @@ class Core implements Module
         ];
 
         // check yaml files
-        \LibreNMS\Util\OS::loadAllDefinitions();
         $os_defs = Config::get('os');
 
         foreach ($os_defs as $os => $def) {
@@ -261,16 +266,16 @@ class Core implements Module
 
     private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
-        global $agent_data;
         $device = $os->getDevice();
 
         if (Config::get("os.$device->os.bad_uptime")) {
             return;
         }
 
+        $agent_data = Cache::driver('array')->get('agent_data');
         if (! empty($agent_data['uptime'])) {
             $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
-            echo "Using UNIX Agent Uptime ($uptime)\n";
+            Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 

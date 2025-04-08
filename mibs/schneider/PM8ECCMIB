@@ -1106,7 +1106,7 @@ PM8ECCMIB DEFINITIONS ::= BEGIN
         STATUS              mandatory
         DESCRIPTION         "Displays the current value for the I/O Point Digial
                             I/O: 1 = Active or 0 = Inactive
-                            
+
                             Analog I/O: Scaled input/output value"
         ::= { ioConfigurationEntry 4 }
 
@@ -1122,13 +1122,13 @@ PM8ECCMIB DEFINITIONS ::= BEGIN
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "For Digital Inputs and Outputs this object is
-                            always 0 indicating “Discrete”.
-                            
+                            always 0 indicating Discrete.
+
                             For Analog Inputs and Outputs this object indicates
                             the range of analog I/O values (used without
-                            units) 0 = 0 – 1 1 = 0 – 5 2 = 0 – 10 3 = 0 –
-                            20 4 = 1 – 5 5 = 4 – 20 6 = -5 – 5 7 = -10 –
-                            10 8 = -100 – 100 9 = User defined (values default
+                            units) 0 = 0 | 1 1 = 0 | 5 2 = 0 | 10 3 = 0 |
+                            20 4 = 1 | 5 5 = 4 | 20 6 = -5 | 5 7 = -10 |
+                            10 8 = -100 | 100 9 = User defined (values default
                             to 0)"
         ::= { ioConfigurationEntry 6 }
 
@@ -1138,11 +1138,11 @@ PM8ECCMIB DEFINITIONS ::= BEGIN
         STATUS              mandatory
         DESCRIPTION         "For Digital Inputs this object indicates input
                             type 1 = Unused 2 = AC/DC
-                            
+
                             For Digital Outputs this object indicates output
                             type 1 = solid state relay 2 = electromechanical
                             relay
-                            
+
                             For Analog Inputs and Outputs this object indicates
                             the digital resolution of the I/O hardware. 0
                             = 8-Bit, unipolar 1 = 10-Bit, unipolar 2 = 12-Bit,

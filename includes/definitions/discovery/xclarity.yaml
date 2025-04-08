@@ -1,19 +1,19 @@
 mib: LENOVO-XCC-MIB:LENOVO-XCC-ALERT-MIB:LENOVO-SMI-MIB:LENOVO-PRODUCTS-MIB
-modules: 
+modules:
     os:
         hardware: LENOVO-XCC-MIB::machineLevelProductName.0
         serial: LENOVO-XCC-MIB::machineLevelSerialNumber.0
-        version: LENOVO-XCC-MIB::xccVpdVersionString.1    
-    sensors: 
-        temperature: 
-            data: 
-                - 
+        version: LENOVO-XCC-MIB::xccVpdVersionString.1
+    sensors:
+        temperature:
+            data:
+                -
                     oid: temperature
                     value: tempReading
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.1.2.1.3.{{ $index }}'
                     index: 'tempReading.{{ $index }}'
                     descr: tempDescr
-                    high_limit: tempCritLimitHigh 
+                    high_limit: tempCritLimitHigh
                     low_limit: tempCritLimitLow
                     low_warn_limit: tempNonCritLimitLow
                     warn_limit: tempNonCritLimitHigh
@@ -64,3 +64,30 @@ modules:
                     low_limit: fanCritLimitLow
                     low_warn_limit: fanNonCritLimitLow
                     warn_limit: fanNonCritLimitHigh
+        power:
+            data:
+                -
+                    oid: fuelGaugeInformation
+                    value: fuelGaugeTotalPowerInUse
+                    num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.10.{{ $index }}'
+                    index: 'fuelGaugeTotalPowerInUse.{{ $index }}'
+                    descr: 'Total in use'
+                    high_limit: fuelGaugeTotalPowerAvailable
+                -
+                    oid: fuelGaugeInformation
+                    value: fuelGaugePowerConsumptionCpu
+                    num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.11.{{ $index }}'
+                    index: 'fuelGaugePowerConsumptionCpu.{{ $index }}'
+                    descr: 'CPU'
+                -
+                    oid: fuelGaugeInformation
+                    value: fuelGaugePowerConsumptionMemory
+                    num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.12.{{ $index }}'
+                    index: 'fuelGaugePowerConsumptionMemory.{{ $index }}'
+                    descr: 'Memory'
+                -
+                    oid: fuelGaugeInformation
+                    value: fuelGaugePowerConsumptionOther
+                    num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.13.{{ $index }}'
+                    index: 'fuelGaugePowerConsumptionOther.{{ $index }}'
+                    descr: 'Other'

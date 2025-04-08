@@ -110,7 +110,8 @@ the string to the equivalent OID representation.
   key with in the table or a static string, optionally using `{{ index }}`.
 - `group` (optional): Groups sensors together under in the webui,
   displaying this text. Not specifying this will put the sensors in
-  the default group.
+  the default group. If group is set to `transceiver` it will be shown with the port
+  instead of in with all the generic sensors (You must also set `entPhysicalIndex` to ifIndex)
 - `index` (optional): This is the index value we use to uniquely
   identify this sensor. `{{ $index }}` will be replaced by the `index`
   from the snmp walk.
@@ -240,7 +241,7 @@ then passed to `discover_sensor()`.
 
 `discover_sensor()` Accepts the following arguments:
 
-- &$valid = This is always $valid['sensor'], do not pass any other values.
+- &$valid = This is always null. This is unused.
 - $class = Required. This is the sensor class from the table above (i.e humidity).
 - $device = Required. This is the $device array.
 - $oid = Required. This must be the numerical OID for where the data
@@ -374,7 +375,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidRx,
@@ -396,7 +397,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'dbm',
                 $device,
                 $oidTx,

@@ -70,7 +70,6 @@ foreach ($count as &$countValue) {
         $num_oid = $symmetry_oid[$countValue - 1];
         $state = $state_numeric / $divisor;
         $descr = 'Battery banks symmetry ' . $countValue;
-        discover_sensor($valid['sensor'], 'state', $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $num_oid, $index, $state_name, $descr, $divisor, '1', null, null, null, $limit, $state);
     }
 }

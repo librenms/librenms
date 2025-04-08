@@ -26,15 +26,18 @@ theme:
   features:
     - navigation.footer
     - navigation.instant
-    - navigation.sections
     - navigation.tracking
     - navigation.top
+    - navigation.path
     - content.tabs.link
+    - content.action.edit
+    - content.code.copy
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
   - tables
   - admonition
+  - pymdownx.snippets
   - pymdownx.tasklist
   - pymdownx.tilde
   - pymdownx.superfences
@@ -52,9 +55,9 @@ plugins:
       j2_variable_start_string: '@='
       j2_variable_end_string: '=@'
   - search
+  - include_dir_to_nav
   - exclude:
       glob:
-        - "General/Changelogs/*"
         - "Dockerfile"
   - redirects:
       redirect_maps:
@@ -103,11 +106,11 @@ extra_javascript:
 extra:
   analytics:
     provider: google
-    property: UA-79149977-2
+    property: G-K0B7KB9765
   article_nav_top: false
   article_nav_bottom: true
   php:
-    version_min: 8.1
+    version_min: 8.2
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/librenms/
@@ -139,28 +142,30 @@ nav:
   - General:
     - Home: index.md
     - Features: Support/Features.md
-    - Changelog: General/Changelog.md
+    - Changelog:
+      - Current Changelog: General/Changelog.md
+      - Historical: General/Changelogs
     - Welcome to Observium users: General/Welcome-to-Observium-users.md
     - 3rd Party Libraries: General/Acknowledgement.md
 
-  - Installing:
+  - Installation:
     - Installing LibreNMS: Installation/Install-LibreNMS.md
     - Other Methods:
       - Docker: Installation/Docker.md
       - Virtual machines: Installation/Images.md
     - Choosing a release: General/Releases.md
     - Updating: General/Updating.md
-
-  - Getting started:
-    - Adding a device: Support/Adding-a-Device.md
-    - Grouping Devices: Extensions/Device-Groups.md
-    - Submitting stats: General/Callback-Stats-and-Privacy.md
-    - Migrating from Observium: Installation/Migrating-from-Observium.md
+    - First steps:
+      - Adding a device: Support/Adding-a-Device.md
+      - Grouping Devices: Extensions/Device-Groups.md
+      - Submitting stats: General/Callback-Stats-and-Privacy.md
+      - Migrating from Observium: Installation/Migrating-from-Observium.md
 
   - Setup:
-    - Applications: Extensions/Applications.md
+    - Application overview: Extensions/Applications.md
+      # Uses plugin include_dir_to_nav
+    - Applications: Extensions/Applications
     - Billing Module: Extensions/Billing-Module.md
-    - Check_MK Setup: Extensions/Agent-Setup.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
     - Network Maps:
@@ -194,21 +199,9 @@ nav:
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Varnish: Extensions/Varnish.md
-
-  - Alerting:
-    - Introduction: Alerting/index.md
-    - Setup:
-      - Rules: Alerting/Rules.md
-      - Templates: Alerting/Templates.md
-      - Transports: Alerting/Transports.md
-      - Creating Transports: Alerting/Creating-Transport.md
-      - Entities: Alerting/Entities.md
-      - Macros: Alerting/Macros.md
-      - Testing: Alerting/Testing.md
-      - Device Dependencies: Alerting/Device-Dependencies.md
-
   - 3rd Party Integration:
     - Integrations:
+      - Check_MK Setup: Extensions/Agent-Setup.md
       - Gateone: Extensions/Gateone.md
       - Graylog: Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
@@ -226,6 +219,18 @@ nav:
         - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
         - OpenTSDB: Extensions/metrics/OpenTSDB.md
         - Prometheus: Extensions/metrics/Prometheus.md
+
+  - Alerting:
+    - Introduction: Alerting/index.md
+    - Setup:
+      - Rules: Alerting/Rules.md
+      - Templates: Alerting/Templates.md
+      - Transports: Alerting/Transports.md
+      - Creating Transports: Alerting/Creating-Transport.md
+      - Entities: Alerting/Entities.md
+      - Macros: Alerting/Macros.md
+      - Testing: Alerting/Testing.md
+      - Device Dependencies: Alerting/Device-Dependencies.md
 
   - API:
     - Using the API: API/index.md

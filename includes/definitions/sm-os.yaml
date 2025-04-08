@@ -4,7 +4,9 @@ type: wireless
 icon: siae
 mib_dir: siae
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_rate, text: Rate }
+    - { graph: device_wireless_power, text: Power }
 discovery:
     -
         sysObjectID:

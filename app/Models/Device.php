@@ -167,6 +167,30 @@ class Device extends BaseModel
         return null;
     }
 
+    public function hasSnmpInfo(): bool
+    {
+        if ($this->snmpver == 'v3') {
+            if ($this->authlevel == 'authNoPriv') {
+                return ! empty($this->authname) && ! empty($this->authpass);
+            }
+
+            if ($this->authlevel == 'authPriv') {
+                return ! empty($this->authname)
+                    && ! empty($this->authpass)
+                    && ! empty($this->cryptoalgo)
+                    && ! empty($this->cryptopass);
+            }
+
+            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+        }
+
+        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
+            return ! empty($this->community);
+        }
+
+        return false; // no known snmpver
+    }
+
     /**
      * Get VRF contexts to poll.
      * If no contexts are found, return the default context ''
@@ -382,9 +406,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)
@@ -523,7 +547,6 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
-            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ]);
@@ -871,6 +894,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
     }
 
+    public function portsStack(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
+    }
+
     public function portsStp(): HasMany
     {
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
@@ -1001,6 +1029,11 @@ class Device extends BaseModel
         return $this->hasMany(LoadbalancerRserver::class, 'device_id');
     }
 
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'device_id');
+    }
+
     public function slas(): HasMany
     {
         return $this->hasMany(Sla::class, 'device_id');
@@ -1014,6 +1047,11 @@ class Device extends BaseModel
     public function tnmsNeInfo(): HasMany
     {
         return $this->hasMany(TnmsneInfo::class, 'device_id');
+    }
+
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
     }
 
     public function users(): BelongsToMany

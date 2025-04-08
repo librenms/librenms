@@ -17,11 +17,20 @@ modules:
                 free: .1.3.6.1.4.1.35265.41.1.2.1.1.7.0
                 descr: 'System Memory'
 
+    storage:
+        data:
+            -
+                descr: Internal Flash
+                free: RADLAN-File::rlFileFreeSizeOfFlash
+                size: RADLAN-File::rlFileTotalSizeOfFlash
+
     sensors:
         pre-cache:
             data:
                 -
                     oid:
+                        - entPhysicalName
+                        - ifName
                         - rlPhdUnitEnvParamEntry
         state:
             data:
@@ -49,17 +58,6 @@ modules:
                         - { value: 5, descr: Missing, graph: 1, generic: 3 }
                         - { value: 6, descr: BattFuseError, graph: 1, generic: 2 }
                         - { value: 7, descr: Charging, graph: 1, generic: 1 }
-                -
-                    oid: rlPhdUnitEnvParamEntry
-                    value: rlPhdUnitEnvParamMonitorTemperatureStatus
-                    num_oid: '.1.3.6.1.4.1.89.53.15.1.16.{{ $index }}'
-                    group: 'Chassis TEMP'
-                    descr: 'Chassis#{{ $index }} TEMP status'
-                    index: 'mesChassisTempStatus.{{ $index }}'
-                    states:
-                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: Critical, graph: 1, generic: 2 }
                 -
                     oid: rlPhdUnitEnvParamEntry
                     value: rlPhdUnitEnvParamMainPSStatus
@@ -94,6 +92,34 @@ modules:
                         - { value: 7, descr: restore, graph: 1, generic: 2 }
                         - { value: 8, descr: notAvailable, graph: 1, generic: 3 }
                         - { value: 9, descr: backingUp, graph: 1, generic: 1 }
+                -
+                    oid: rlPhdUnitEnvParamEntry
+                    value: rlPhdUnitEnvParamMonitorTemperatureStatus
+                    num_oid: '.1.3.6.1.4.1.89.53.15.1.16.{{ $index }}'
+                    group: 'Chassis TEMP'
+                    descr: 'Chassis#{{ $index }} TEMP status'
+                    index: 'mesChassisTempStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Critical, graph: 1, generic: 2 }
+                -
+                    oid: rlPhyTestGetTable
+                    value: rlPhyTestGetResult
+                    num_oid: '.1.3.6.1.4.1.89.90.1.2.1.3.{{ $subindex0 }}.11'
+                    group: 'transceiver'
+                    index: 'SfpLOS{{ $subindex0 }}'
+                    descr: 'SfpLOS-{{ $ifName:0 }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    states:
+                        - { value: 0, descr: 'False', graph: 1, generic: 0 }
+                        - { value: 1, descr: 'True', graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_regex
+                            value: '/^\d+\.rlPhyTestTableLOS$/'
         temperature:
             data:
                 -
