@@ -30,7 +30,6 @@ use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
@@ -355,8 +354,6 @@ class YamlDiscovery
                         continue;
                     }
 
-                    $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
-
                     foreach ($data_array as $data) {
                         foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
@@ -372,17 +369,10 @@ class YamlDiscovery
                                     $snmp_flag[] = '-Ih';
                                 }
 
-                                // disable bulk request for specific data
-                                if (isset($data['snmp_bulk'])) {
-                                    Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
-                                }
-
                                 $pre_cache[$oid] ??= [];
                                 SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
                                     ->numericIndex()->options($snmp_flag)
                                     ->walk($oid)->valuesByIndex($pre_cache[$oid]);
-
-                                Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }
