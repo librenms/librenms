@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             \App\Http\Middleware\EnforceJson::class,
-            'authenticate:token',
+            'auth:token',
         ]);
 
         $middleware->group('auth', [
