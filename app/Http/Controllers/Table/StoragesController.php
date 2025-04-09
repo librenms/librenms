@@ -36,7 +36,7 @@ class StoragesController extends TableController
     {
         return Storage::query()
             ->hasAccess($request->user())
-            ->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id')
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
             ->withAggregate('device', 'hostname');
     }
 

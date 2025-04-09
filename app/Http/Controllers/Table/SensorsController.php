@@ -55,7 +55,7 @@ class SensorsController extends TableController
         return Sensor::query()
             ->hasAccess($request->user())
             ->where('sensor_class', $class)
-            ->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id')
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
             ->with($relations)
             ->withAggregate('device', 'hostname');
     }

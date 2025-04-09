@@ -34,7 +34,7 @@ class ProcessorsController extends TableController
     {
         return Processor::query()
             ->hasAccess($request->user())
-            ->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id')
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname');
     }
 
