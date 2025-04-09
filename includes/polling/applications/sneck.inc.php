@@ -46,7 +46,7 @@ if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
 
 $new_debugs = [];
 if (isset($json_return['data']) and isset($json_return['data']['debugs'])) {
-    $new_debugs = array_keys($json_return['data']['checks']);
+    $new_debugs = array_keys($json_return['data']['debugs']);
 }
 
 $rrd_name = ['app', $name, $app->app_id];
