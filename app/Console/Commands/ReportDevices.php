@@ -6,10 +6,10 @@ use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
 use App\Models\Device;
-use LibreNMS\Config;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
