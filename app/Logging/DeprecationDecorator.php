@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeprecationDecorator.php
  *
@@ -34,5 +35,4 @@ class DeprecationDecorator extends LineFormatter
     {
         return "\033[32;1m$record->message\033[0m\n";
     }
-
 }

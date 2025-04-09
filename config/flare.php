@@ -8,7 +8,6 @@
  | request an environment variable to be created upstream or send a pull request.
  */
 
-
 use Spatie\FlareClient\FlareMiddleware\CensorRequestBodyFields;
 use Spatie\FlareClient\FlareMiddleware\CensorRequestHeaders;
 use Spatie\FlareClient\FlareMiddleware\RemoveRequestIp;
