@@ -222,10 +222,12 @@ class Ipv6Addresses implements Module
         // mis-formatted showing in dot notation
         if (str_contains($ipAddressAddr, '.')) {
             $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
+
             return IPv6::fromSnmpString($cleanSnmpIp);
         }
 
         $cleanHexIp = trim(substr($ipAddressAddr, 0, strrpos($ipAddressAddr, '%') ?: null), '"');
+
         return IPv6::fromHexString($cleanHexIp);
     }
 
@@ -240,7 +242,7 @@ class Ipv6Addresses implements Module
 
         if (preg_match('/(\d{1,3})]$/', $prefix, $prefix_match)) {
             return (int) $prefix_match[1];
-        };
+        }
 
         // try IP-MIB::ipAddressPrefixTable to get the prefix length
         if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
@@ -248,12 +250,12 @@ class Ipv6Addresses implements Module
             foreach ($origins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
                 foreach (array_keys($prefixData) as $prefixLen) {
                     try {
-                        if($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
+                        if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
                             return $prefixLen;
                         }
                     } catch (InvalidIpException) {
                         // ignore failures and return 0 if no matches found
-                       Log::debug("Failed to parse ipv6 prefix: $prefix");
+                        Log::debug("Failed to parse ipv6 prefix: $prefix");
                     }
                 }
             }
