@@ -29,6 +29,7 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -216,5 +217,25 @@ class LegacyUserProvider implements UserProvider
         }
 
         return $user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rehashPasswordIfRequired(Authenticatable $user, #[\SensitiveParameter] array $credentials, bool $force = false)
+    {
+        // TODO: NEEDS TO BE VERIFIED CORRECT SOLUTION
+        if (! isset($credentials['password']) || empty($user->getAuthPassword())) {
+            return;
+        }
+        $hasher = app(HasherContract::class);
+
+        if (! $hasher->needsRehash($user->getAuthPassword()) && ! $force) {
+            return;
+        }
+
+        $user->forceFill([
+            $user->getAuthPasswordName() => $hasher->make($credentials['password']),
+        ])->save();
     }
 }

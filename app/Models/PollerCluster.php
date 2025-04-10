@@ -37,9 +37,16 @@ class PollerCluster extends Model
     protected $table = 'poller_cluster';
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
-    protected $casts = [
-        'last_report' => 'datetime',
-    ];
+
+    /**
+     * @return array{last_report: 'datetime'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'last_report' => 'datetime',
+        ];
+    }
 
     // ---- Accessors/Mutators ----
 
@@ -285,7 +292,9 @@ class PollerCluster extends Model
     }
 
     // ---- Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PollerClusterStat, $this>
+     */
     public function stats(): HasMany
     {
         return $this->hasMany(PollerClusterStat::class, 'parent_poller', 'id');

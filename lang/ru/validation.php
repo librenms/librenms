@@ -291,7 +291,7 @@ return [
                 'not_detected' => 'Запись cron для обертки Python не присутствует',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Используется :driver для блокировки, вы должны установить CACHE_DRIVER=redis',
+                'bad_driver' => 'Используется :driver для блокировки, вы должны установить CACHE_STORE=redis',
                 'ok' => 'Redis функционирует',
                 'unavailable' => 'Redis недоступен',
             ],

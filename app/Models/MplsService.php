@@ -44,7 +44,9 @@ class MplsService extends DeviceRelatedModel implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdpBind, $this>
+     */
     public function binds(): HasMany
     {
         return $this->hasMany(MplsSdpBind::class, 'svc_id');

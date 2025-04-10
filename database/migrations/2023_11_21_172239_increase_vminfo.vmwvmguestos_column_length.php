@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
-            $table->string('vmwVmGuestOS', 256)->change();
+            $table->string('vmwVmGuestOS', 256)->nullable()->change();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
-            $table->string('vmwVmGuestOS', 128)->change();
+            $table->string('vmwVmGuestOS', 128)->nullable(false)->change();
         });
     }
 };

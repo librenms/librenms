@@ -44,7 +44,7 @@ trait VminfoLibvirt
             return new Collection;
         }
 
-        /* @var Collection<\App\Models\Vminfo> $vms */
+        /** @var Collection<\App\Models\Vminfo> $vms */
         $vms = new Collection;
 
         $ssh_ok = 0;
