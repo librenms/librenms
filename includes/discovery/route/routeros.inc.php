@@ -32,6 +32,11 @@ use LibreNMS\Util\IPv6;
 $oids = SnmpQuery::hideMib()->walk('IPV6-MIB::ipv6RouteTable')->table(3);
 
 foreach ($oids as $dst => $tdata) {
+    //skip invalid LL routes
+    if ($dst == 'fe80:0:0:0:0:0:0:0') {
+        continue;
+    }
+
     $pfxLen = key($tdata);
     $tdata = array_shift($tdata);
 
