@@ -1,0 +1,8 @@
+os:  vega12
+text: 'Sangoma Vega'
+type: network
+icon: sangoma
+mib_dir: sangoma
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4686.
