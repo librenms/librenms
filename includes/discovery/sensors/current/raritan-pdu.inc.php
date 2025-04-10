@@ -70,12 +70,12 @@ if ($outlet_oids) {
             if (! $outlet_descr) {
                 $outlet_descr = 'Outlet ' . $outletsuffix;
             }
-            $outlet_low_warn_limit = snmp_get($device, "outletSensorSignedLowerWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
-            $outlet_low_limit = snmp_get($device, "outletSensorSignedLowerCriticalThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
-            $outlet_high_warn_limit = snmp_get($device, "outletSensorSignedUpperWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
-            $outlet_high_limit = snmp_get($device, "outletSensorSignedUpperCriticalThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
             $outlet_divisor = pow(10, snmp_get($device, "outletSensorDecimalDigits.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB'));
-            $outlet_power = (snmp_get($device, "measurementsOutletSensorValue.1.$outlet_index.1", '-Ovq', 'PDU2-MIB') / $outlet_divisor);
+            $outlet_low_warn_limit = snmp_get($device, "outletSensorSignedLowerWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB') / $outlet_divisor;
+            $outlet_low_limit = snmp_get($device, "outletSensorSignedLowerCriticalThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB') / $outlet_divisor;
+            $outlet_high_warn_limit = snmp_get($device, "outletSensorSignedUpperWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB') / $outlet_divisor;
+            $outlet_high_limit = snmp_get($device, "outletSensorSignedUpperCriticalThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB') / $outlet_divisor;
+            $outlet_power = snmp_get($device, "measurementsOutletSensorValue.1.$outlet_index.1", '-Ovq', 'PDU2-MIB') / $outlet_divisor;
             if ($outlet_power >= 0) {
                 discover_sensor(null, 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_power);
             }
