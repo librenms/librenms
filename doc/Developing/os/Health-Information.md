@@ -1,4 +1,4 @@
-#### Sensors
+## Sensors
 
 This document will guide you through adding health / sensor
 information for your new device.
@@ -39,7 +39,7 @@ the values we expect to see the data in:
 | waterflow                       | l/m                         |
 | percent                         | %                           |
 
-#### Simple health discovery
+### Simple health discovery
 
 We have support for defining health / sensor discovery using YAML
 files so that you don't need to know how to write PHP.
@@ -150,9 +150,29 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-When referencing an oid in another table the full index will be used to match the other table.
-If this is undesirable, you may use a single sub index by appending the sub index after a colon to
-the variable name.  Example `{{ $ifName:2 }}`
+#### Fetching values from other tables/oids
+
+When referencing an oid in another table the full index will be used to match
+the other table. If the indexes of the two tables don't match, you will need
+to specify which indexes to use by their index position starting with 0. The
+data for the other table must be fetched already.
+
+`{{ IF-MIB::ifName:2 }}`
+
+This simple example shows using the 3rd (0 is the first) index value from
+the current table to fetch the IF-MIB::ifName value from the data.
+
+Additionally, you may specify multiple index values with either a
+range or list of index positions.
+
+Range: `{{ IP-MIB::ipAddressPrefixOrigin:0-3 }}`
+List: `{{ IP-MIB::ipAddressPrefixOrigin:2.3.1.4 }}`
+
+#### Skipping rows of the returned data
+
+You can filter rows of the data returned to only discover valid sensors.
+This is often useful when devices always return all sensors possible or
+mix sensor types in a single table.
 
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
@@ -220,7 +240,7 @@ Example:
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
-#### Advanced health discovery
+### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
 the discovery code in php. If it is possible to create via yaml, php discovery
@@ -290,7 +310,7 @@ where possible. The value for the OID is already available as `$sensor_value`.
 Graphing is performed automatically for sensors, no custom graphing is
 required or supported.
 
-#### Adding a new sensor class
+### Adding a new sensor class
 
 You will need to add code for your new sensor class in the following existing files:
 
