@@ -605,10 +605,25 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
             $fields = [
-                'sapIngressBits' => (($value['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0)) * 8,
-                'sapEgressBits' => (($value['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0)) * 8,
-                'sapIngressDroppedBits' => (($value['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0)) * 8,
-                'sapEgressDroppedBits' => (($value['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0)) * 8,
+                'sapIngressBits' => (
+                    (($value['sapIngressOctets'] ?? 0) + ($value['sapIngressHiOctets'] ?? 0))
+                    ?: (($value['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0))
+                ) * 8,
+
+                'sapEgressBits' => (
+                    (($value['sapEgressOctets'] ?? 0) + ($value['sapEgressHiOctets'] ?? 0))
+                    ?: (($value['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0))
+                ) * 8,
+
+                'sapIngressDroppedBits' => (
+                    ($value['sapIngressDroppedOctets'] ?? 0)
+                    ?: (($value['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($value['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0))
+                ) * 8,
+
+                'sapEgressDroppedBits' => (
+                    ($value['sapEgressDroppedOctets'] ?? 0)
+                    ?: (($value['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($value['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0))
+                ) * 8,
             ];
 
             $tags = [
