@@ -80,7 +80,7 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
+            $filter = '(' . trim(Config::get('auth_ldap_prefix'), '=') . '=' . $username . ')';
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
@@ -156,7 +156,7 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
+            $filter = '(' . trim(Config::get('auth_ldap_prefix'), '=') . '=' . $username . ')';
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
 
@@ -176,7 +176,7 @@ class LdapAuthorizer extends AuthorizerBase
     {
         $connection = $this->getLdapConnection();
 
-        $filter = '(' . Config::get('auth_ldap_prefix') . $this->userloginname . ')';
+        $filter = '(' . trim(Config::get('auth_ldap_prefix'), '=') . '=' . $this->userloginname . ')';
         if (Config::get('auth_ldap_userlist_filter') != null) {
             $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
         }
@@ -244,7 +244,7 @@ class LdapAuthorizer extends AuthorizerBase
      */
     protected function getFullDn($username)
     {
-        return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
+        return trim(Config::get('auth_ldap_prefix', ''), '=') . '=' . $username . ',' . trim(Config::get('auth_ldap_suffix', ''), ',');
     }
 
     /**
