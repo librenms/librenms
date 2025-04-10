@@ -127,12 +127,6 @@ if (! file_exists(Config::get('install_dir') . '/.env')) {
     exit(1);
 }
 
-if (\LibreNMS\DB\Eloquent::isConnected()) {
-    $validator->ok('Database connection successful', null, 'database');
-} else {
-    $validator->fail('Error connecting to your database.', null, 'database');
-}
-
 $precheck_complete = true; // disable shutdown function
 print_header();
 
