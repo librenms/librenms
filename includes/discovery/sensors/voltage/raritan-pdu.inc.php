@@ -38,4 +38,3 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         discover_sensor(null, 'voltage', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }
-
