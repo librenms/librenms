@@ -276,7 +276,7 @@ class YamlDiscovery
 
             // if subindex is a range, get them all, otherwise just get the first
             $index = isset($matches[3])
-                ? implode('.', array_slice($sub_indexes, (int) $matches[2], (int) $matches[3]))
+                ? implode('.', array_slice($sub_indexes, (int) $matches[2], (int) ($matches[3] - $matches[2] + 1)))
                 : $sub_indexes[(int) $matches[2]];
         }
 
