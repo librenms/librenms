@@ -206,6 +206,8 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
     $high_limit = set_null($high_limit);
     $current = Number::cast($current);
 
+    if ()
+
     if (! is_numeric($divisor)) {
         $divisor = 1;
     }
@@ -615,6 +617,36 @@ function discovery_process($os, $sensor_class, $pre_cache)
                                     $$limit = (new UserFuncHelper($$limit))->{$user_function}();
                                 }
                             }
+                        }
+                    }
+
+                    // check to see if the limits make sense
+                    $highs = (is_numeric($limits['high_limit']) || is_numeric($limits['warn_limit']) ? $limits['high_limit']) + $limits['warn_limit'] : null;
+                    $lows = (is_numeric($limits['low_limit']) || is_numeric($limits['low_warn_limit']) ? $limits['low_limit']) + $limits['low_warn_limit'] : null;
+
+                    if (isset($highs) || isset($lows)) {
+                        if ($highs + $lows === 0) {
+                            // all thresholds are zero - assume device probably has no thresholds set
+                            $limits['high_limit'] = null;                        
+                            $limits['warn_limit'] = null;                        
+                            $limits['low_limit'] = null;                        
+                            $limits['low_warn_limit'] = null;                        
+                        }
+
+                        if ($highs === $lows) {
+                            // high and low are identical - null the lows
+                            $limits['low_limit'] = null;                        
+                            $limits['low_warn_limit'] = null;                        
+                        }
+
+                        if (is_numeric($limits['low_limit']) && is_numeric($limits['low_warn_limit']) && $limits['low_limit'] === $limits['low_warn_limit']) {
+                            // low and low warn are identical - null the least severe
+                            $limits['low_warn_limit'] = null;
+                        }
+
+                        if (is_numeric($limits['high_limit']) && is_numeric($limits['warn_limit']) && $limits['high_limit'] === $limits['warn_limit']) {
+                            // high and high warn are identical - null the least severe
+                            $limits['warn_limit'] = null;
                         }
                     }
 
