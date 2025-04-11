@@ -206,8 +206,6 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
     $high_limit = set_null($high_limit);
     $current = Number::cast($current);
 
-    if ()
-
     if (! is_numeric($divisor)) {
         $divisor = 1;
     }
