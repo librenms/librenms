@@ -266,10 +266,6 @@ class Ospfv3 implements Module
      */
     public function dump(Device $device, string $type): ?array
     {
-        if ($type == 'discovery') {
-            return null;
-        }
-
         return [
             'ospfv3_ports' => $device->ospfv3Ports()
                 ->leftJoin('ports', 'ospfv3_ports.port_id', 'ports.port_id')

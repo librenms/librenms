@@ -8001,7 +8001,7 @@
         }
     },
     "ospfv3": {
-        "poller": {
+        "discovery": {
             "ospfv3_ports": [
                 {
                     "ospfv3IfIndex": 2,
@@ -8130,7 +8130,8 @@
                     "context_name": ""
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv6-addresses": {
         "discovery": {
