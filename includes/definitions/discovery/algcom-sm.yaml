@@ -1,15 +1,18 @@
 modules:
     sensors:
-        temperature:
+        pre-cache:
             data:
                 -
                     oid:
                         - ALGSMXS-v0-MIB::SensorNames
-                        - ALGSMXS-v0-MIB::SensorValues
                         - ALGSMXS-v0-MIB::SensorUnits
                         - ALGSMXS-v0-MIB::SensorThrMin
                         - ALGSMXS-v0-MIB::SensorThrMax
-                    num_oid: '.1.3.6.1.4.1.49136.1.1.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: ALGSMXS-v0-MIB::SensorValues
+                    num_oid: '.1.3.6.1.4.1.49136.100.3.{{ $index }}'
                     descr: ALGSMXS-v0-MIB::SensorNames
                     high_limit: ALGSMXS-v0-MIB::SensorThrMax
                     low_limit: ALGSMXS-v0-MIB::SensorThrMin
@@ -17,36 +20,26 @@ modules:
                     skip_values:
                         -
                             oid: ALGSMXS-v0-MIB::SensorUnits
-                            op: '='
+                            op: '!='
                             value: Fahrenheit
         humidity:
             data:
                 -
-                    oid:
-                        - ALGSMXS-v0-MIB::SensorNames
-                        - ALGSMXS-v0-MIB::SensorValues
-                        - ALGSMXS-v0-MIB::SensorUnits
-                        - ALGSMXS-v0-MIB::SensorThrMin
-                        - ALGSMXS-v0-MIB::SensorThrMax
-                    num_oid: '.1.3.6.1.4.1.49136.1.1.{{ $index }}'
+                    oid: ALGSMXS-v0-MIB::SensorValues
+                    num_oid: '.1.3.6.1.4.1.49136.100.3.{{ $index }}'
                     descr: ALGSMXS-v0-MIB::SensorNames
                     high_limit: ALGSMXS-v0-MIB::SensorThrMax
                     low_limit: ALGSMXS-v0-MIB::SensorThrMin
                     skip_values:
                         -
                             oid: ALGSMXS-v0-MIB::SensorUnits
-                            op: '='
+                            op: '!='
                             value: '%'
         voltage:
             data:
                 -
-                    oid:
-                        - ALGSMXS-v0-MIB::SensorNames
-                        - ALGSMXS-v0-MIB::SensorValues
-                        - ALGSMXS-v0-MIB::SensorUnits
-                        - ALGSMXS-v0-MIB::SensorThrMin
-                        - ALGSMXS-v0-MIB::SensorThrMax
-                    num_oid: '.1.3.6.1.4.1.49136.1.1.{{ $index }}'
+                    oid: ALGSMXS-v0-MIB::SensorValues
+                    num_oid: '.1.3.6.1.4.1.49136.100.3.{{ $index }}'
                     divisor: 1000
                     descr: ALGSMXS-v0-MIB::SensorNames
                     high_limit: ALGSMXS-v0-MIB::SensorThrMax
@@ -54,24 +47,20 @@ modules:
                     skip_values:
                         -
                             oid: ALGSMXS-v0-MIB::SensorUnits
-                            op: '='
+                            op: '!='
                             value: 'mV'
         state:
             data:
-                -   oid:
-                        - ALGSMXS-v0-MIB::SensorNames
-                        - ALGSMXS-v0-MIB::SensorValues
-                        - ALGSMXS-v0-MIB::SensorUnits
-                        - ALGSMXS-v0-MIB::SensorThrMin
-                        - ALGSMXS-v0-MIB::SensorThrMax
-                    num_oid: '.1.3.6.1.4.1.49136.1.1.{{ $index }}'
+                -
+                    oid: ALGSMXS-v0-MIB::SensorValues
+                    num_oid: '.1.3.6.1.4.1.49136.100.3.{{ $index }}'
                     descr: ALGSMXS-v0-MIB::SensorNames
                     high_limit: ALGSMXS-v0-MIB::SensorThrMax
                     low_limit: ALGSMXS-v0-MIB::SensorThrMin
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: open }
-                        - { value: 1, generic: 0, graph: 0, descr: closed }
+                        - { value: 0, generic: 3, graph: 0, descr: open }
+                        - { value: 1, generic: 3, graph: 0, descr: closed }
                     skip_values:
                         -   oid: ALGSMXS-v0-MIB::SensorUnits
-                            op: '='
+                            op: '!='
                             value: 'Boolean'

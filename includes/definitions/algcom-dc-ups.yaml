@@ -9,6 +9,9 @@ over:
     - { graph: device_temperature, text: Temperature }
 
 discovery:
-    - sysObjectID:
+    -
+        sysObjectID:
             - .1.3.6.1.4.1.49136
+        sysObjectID_except:
+            - .1.3.6.1.4.1.49136.100
 mib_dir: algcom
