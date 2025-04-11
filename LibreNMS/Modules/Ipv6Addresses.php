@@ -157,13 +157,13 @@ class Ipv6Addresses implements Module
                     try {
                         Log::debug("Attempting to parse $ipAddressAddr");
                         $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
-                        $ip = $this->parseIp($ipAddressAddr, $ifIndex);
+                        $ip = $this->parseIp($ipAddressAddr);
 
                         return new Ipv6Address([
                             'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
                             'ipv6_address' => $ip->uncompressed(),
                             'ipv6_compressed' => $ip->compressed(),
-                            'ipv6_prefixlen' => $this->parsePrefix($data['IP-MIB::ipAddressPrefix'] ?? ''),
+                            'ipv6_prefixlen' => $this->parsePrefixLen($data, $ipAddressAddrType, $ip),
                             'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
                             'context_name' => $context_name,
                         ]);
@@ -217,29 +217,50 @@ class Ipv6Addresses implements Module
     /**
      * @throws InvalidIpException
      */
-    private function parseIp(string $ipAddressAddr, string $ifIndex): IP|IPv4|IPv6|null
+    private function parseIp(string $ipAddressAddr): IP|IPv4|IPv6|null
     {
         // mis-formatted showing in dot notation
         if (str_contains($ipAddressAddr, '.')) {
             $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
-            $ip = IPv6::fromSnmpString($cleanSnmpIp);
-        } else {
-            $cleanHexIp = str_replace(['"', "%$ifIndex"], '', $ipAddressAddr);
-            $ip = IPv6::fromHexString($cleanHexIp);
+
+            return IPv6::fromSnmpString($cleanSnmpIp);
         }
 
-        return $ip;
+        $cleanHexIp = trim(substr($ipAddressAddr, 0, strrpos($ipAddressAddr, '%') ?: null), '"');
+
+        return IPv6::fromHexString($cleanHexIp);
     }
 
-    private function parsePrefix(string $prefix): string
+    private function parsePrefixLen(array $snmpRowData, string $ipAddressAddrType, IP $ip): int
     {
+        $prefix = $snmpRowData['IP-MIB::ipAddressPrefix'] ?? '';
+
         // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
         if (str_contains($prefix, '.')) {
-            return substr($prefix, strrpos($prefix, '.') + 1);
+            return (int) substr($prefix, strrpos($prefix, '.') + 1);
         }
 
-        preg_match('/(\d{1,3})]$/', $prefix, $prefix_match);
+        if (preg_match('/(\d{1,3})]$/', $prefix, $prefix_match)) {
+            return (int) $prefix_match[1];
+        }
 
-        return $prefix_match[1] ?? 0;
+        // try IP-MIB::ipAddressPrefixTable to get the prefix length
+        if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
+            $origins = SnmpQuery::cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4);
+            foreach ($origins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
+                foreach (array_keys($prefixData) as $prefixLen) {
+                    try {
+                        if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
+                            return $prefixLen;
+                        }
+                    } catch (InvalidIpException) {
+                        // ignore failures and return 0 if no matches found
+                        Log::debug("Failed to parse ipv6 prefix: $prefix");
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 }
