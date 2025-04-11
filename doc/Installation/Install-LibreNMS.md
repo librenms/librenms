@@ -77,6 +77,12 @@ Connect to the server command line and follow the instructions below.
         apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
         ```
 
+=== "Debian 13"
+    === "NGINX"
+        ```
+        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        ```
+
 ## Add librenms user
 
 ```
@@ -153,6 +159,12 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
     vi /etc/php/8.2/cli/php.ini
     ```
 
+=== "Debian 13"
+    ```bash
+    vi /etc/php/8.4/fpm/php.ini
+    vi /etc/php/8.4/cli/php.ini
+    ```
+
 Remember to set the system timezone as well.
 
 ```
@@ -183,6 +195,11 @@ timedatectl set-timezone Etc/UTC
     ```
 
 === "Debian 12"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
+
+=== "Debian 13"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
@@ -245,6 +262,12 @@ exit
     ```bash
     cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
     vi /etc/php/8.2/fpm/pool.d/librenms.conf
+    ```
+
+=== "Debian 13"
+    ```bash
+    cp /etc/php/8.4/fpm/pool.d/www.conf /etc/php/8.4/fpm/pool.d/librenms.conf
+    vi /etc/php/8.4/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -540,6 +563,44 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php8.2-fpm
         ```
 
+=== "Debian 13"
+    === "NGINX"
+        ```bash
+        vi /etc/nginx/sites-enabled/librenms.vhost
+        ```
+
+        Add the following config, edit `server_name` as required:
+
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+
+        ```bash
+        rm /etc/nginx/sites-enabled/default
+        systemctl reload nginx
+        systemctl restart php8.4-fpm
+        ```
+
 ## SELinux
 
 === "Ubuntu 24.04"
@@ -631,6 +692,8 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 === "Debian 12"
     Firewall not enabled by default
 
+=== "Debian 13"
+    Firewall not enabled by default
 
 ## Enable lnms command completion
 
