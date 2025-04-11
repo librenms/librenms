@@ -4,9 +4,9 @@ type: power
 icon: algcom
 
 over:
-    - { graph: device_current, text: Current }
-    - { graph: device_voltage, text: Voltage }
     - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
+    - { graph: device_voltage, text: Voltage }
 
 discovery:
     -
