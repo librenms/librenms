@@ -619,8 +619,8 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     // check to see if the limits make sense
-                    $highs = (is_numeric($limits['high_limit']) || is_numeric($limits['warn_limit']) ? $limits['high_limit']) + $limits['warn_limit'] : null;
-                    $lows = (is_numeric($limits['low_limit']) || is_numeric($limits['low_warn_limit']) ? $limits['low_limit']) + $limits['low_warn_limit'] : null;
+                    $highs = (is_numeric($limits['high_limit']) || is_numeric($limits['warn_limit'])) ? $limits['high_limit'] + $limits['warn_limit'] : null;
+                    $lows = (is_numeric($limits['low_limit']) || is_numeric($limits['low_warn_limit'])) ? $limits['low_limit'] + $limits['low_warn_limit'] : null;
 
                     if (isset($highs) || isset($lows)) {
                         if ($highs + $lows === 0) {
