@@ -625,16 +625,16 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     if (isset($highs) || isset($lows)) {
                         if ($highs + $lows === 0) {
                             // all thresholds are zero - assume device probably has no thresholds set
-                            $limits['high_limit'] = null;                        
-                            $limits['warn_limit'] = null;                        
-                            $limits['low_limit'] = null;                        
-                            $limits['low_warn_limit'] = null;                        
+                            $limits['high_limit'] = null;
+                            $limits['warn_limit'] = null;
+                            $limits['low_limit'] = null;
+                            $limits['low_warn_limit'] = null;
                         }
 
                         if ($highs === $lows) {
                             // high and low are identical - null the lows
-                            $limits['low_limit'] = null;                        
-                            $limits['low_warn_limit'] = null;                        
+                            $limits['low_limit'] = null;
+                            $limits['low_warn_limit'] = null;
                         }
 
                         if (is_numeric($limits['low_limit']) && is_numeric($limits['low_warn_limit']) && $limits['low_limit'] === $limits['low_warn_limit']) {
