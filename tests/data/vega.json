@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.4686.11",
+                    "sysDescr": "Vegastream IP Telephony Gateway (VEGA)",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "vega",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "sangoma.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
