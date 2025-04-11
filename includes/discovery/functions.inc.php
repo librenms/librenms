@@ -618,6 +618,36 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         }
                     }
 
+                    // check to see if the limits make sense
+                    $highs = (is_numeric($high_limit) || is_numeric($warn_limit)) ? $high_limit + $warn_limit : null;
+                    $lows = (is_numeric($low_limit) || is_numeric($low_warn_limit)) ? $low_limit + $low_warn_limit : null;
+
+                    if (isset($highs) || isset($lows)) {
+                        if ($highs + $lows === 0) {
+                            // all thresholds are zero - assume device probably has no thresholds set
+                            $high_limit = null;
+                            $warn_limit = null;
+                            $low_limit = null;
+                            $low_warn_limit = null;
+                        }
+
+                        if ($highs === $lows) {
+                            // high and low are identical - null the lows
+                            $low_limit = null;
+                            $low_warn_limit = null;
+                        }
+
+                        if (is_numeric($low_limit) && is_numeric($low_warn_limit) && $low_limit === $low_warn_limit) {
+                            // low and low warn are identical - null the least severe
+                            $low_warn_limit = null;
+                        }
+
+                        if (is_numeric($high_limit) && is_numeric($warn_limit) && $high_limit === $warn_limit) {
+                            // high and high warn are identical - null the least severe
+                            $warn_limit = null;
+                        }
+                    }
+
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
