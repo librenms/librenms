@@ -1,6 +1,6 @@
 @import './toast.css';
 
-@import "tailwindcss" prefix(tw);
+@import "tailwindcss" prefix(tw) important;
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
     button:not(:disabled),
