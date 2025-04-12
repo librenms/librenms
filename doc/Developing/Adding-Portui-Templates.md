@@ -3,7 +3,7 @@
 It is possible to add custom Physical Port layouts for devices by adding JSON output for said device in a hints file for when the automatic generation does not accurately match the physical presentation.
 Examples are the Aruba CX6100 with 49-52 on the left side of the chassis, or the Aruba CX8325 which is 3 rows of ports.
 
-These files live in `resources/views/device/portui/`
+These files live in `resources/portui/`
 The naming is `{brand}/{modelname}.json` where brand is based on the icon name assigned in LibreNMS e.g. "ubiquiti.svg" becomes directory ubiquiti.
 The contents are a identifier based on the "Hardware" tag, containing a JSON string with interface port mapping.
 
