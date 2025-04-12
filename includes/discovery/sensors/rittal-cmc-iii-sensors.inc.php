@@ -50,7 +50,11 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $sensor_id++;
         }
 
-        $sensor_desc = $entry['cmcIIIVarValueStr'] ?: $sensor_name;
+        if (str_contains($sensor_name, $entry['cmcIIIVarValueStr'])) {
+            $sensor_desc = $entry['cmcIIIVarValueStr'];
+        } else {
+            $sensor_desc = "$sensor_name {$entry['cmcIIIVarValueStr']}";
+        }
 
         $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
         $cmc_iii_sensors[$sensor_id]['desc'] = $sensor_desc;
@@ -138,7 +142,7 @@ foreach ($unique_desc_counter as $sensor_desc => $sensor_id_r) {
     }
 
     for ($index = 0; $index < count($sensor_id_r); $index++) {
-        $cmc_iii_sensors[$sensor_id_r[$index]]['desc'] .= ' ' . ($index + 1);
+        $cmc_iii_sensors[$sensor_id_r[$index]]['desc'] .= ' ' . str_pad($index + 1, 2, 0, STR_PAD_LEFT);
     }
 }
 
