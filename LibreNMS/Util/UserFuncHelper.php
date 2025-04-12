@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UserFuncHelper.php
  *
@@ -41,7 +42,7 @@ class UserFuncHelper
 
     public function dateToRuntime(): int
     {
-        return \LibreNMS\Util\Time::dateToMinutes($this->value_raw);
+        return Time::dateToMinutes($this->value_raw);
     }
 
     public function fsParseChannelValue(): float

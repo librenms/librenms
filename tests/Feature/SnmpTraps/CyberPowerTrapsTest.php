@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CyberPowerTrapsTest.php
  *

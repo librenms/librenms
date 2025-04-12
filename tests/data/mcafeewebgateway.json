@@ -1237,8 +1237,8 @@
                     "ifName": "ifb0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1337,8 +1337,8 @@
                     "ifName": "ifb1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1437,8 +1437,8 @@
                     "ifName": "gre0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1537,8 +1537,8 @@
                     "ifName": "gretap0",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1637,8 +1637,8 @@
                     "ifName": "erspan0",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1737,8 +1737,8 @@
                     "ifName": "ip6tnl0",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1837,8 +1837,8 @@
                     "ifName": "ip6gre0",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1937,8 +1937,8 @@
                     "ifName": "gre1",
                     "portName": null,
                     "ifIndex": 10,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5413,5 +5413,38 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "0000:0000:0000:0000:0000:0000:0000:0002",
+                    "ipv6_compressed": "::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "::/64",
+                    "ifIndex": 10
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:804b:e1ff:fe22:6c96",
+                    "ipv6_compressed": "fe80::804b:e1ff:fe22:6c96",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:ec56:8eff:fe38:95af",
+                    "ipv6_compressed": "fe80::ec56:8eff:fe38:95af",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 3
+                }
+            ]
+        }
     }
 }

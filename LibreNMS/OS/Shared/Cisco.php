@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cisco.php
  *
@@ -137,7 +138,9 @@ class Cisco extends OS implements
             }
         }
 
-        if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        if ((empty($hardware) || preg_match('/Switch System/', $hardware) || preg_match('/MIDPLANE/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+            $hardware = $data[1000]['entPhysicalModelName'];
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
@@ -158,6 +161,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
+        /* @var Collection<Mempool> $collection */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
@@ -507,7 +511,7 @@ class Cisco extends OS implements
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
                 [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
-                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'])->hex();
+                $mac_address = Mac::parse($portAuthSessionEntryParameters['cafSessionClientMacAddress'] ?? '')->hex();
 
                 $nac->put($mac_address, new PortsNac([
                     'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
@@ -687,7 +691,7 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM'];
+        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM', 'cevContainerQSFPDD', 'cevPortGigEthernet'];
 
         $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', $arrayOfContainers)->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {

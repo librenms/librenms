@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsController.php
  *
@@ -287,6 +288,10 @@ class PortsController implements DeviceTab
 
         if ($device->macs()->exists()) {
             $tabs[] = ['name' => __('port.tabs.arp'), 'url' => 'arp'];
+        }
+
+        if ($device->nd()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.nd'), 'url' => 'nd'];
         }
 
         if ($device->portsFdb()->exists()) {

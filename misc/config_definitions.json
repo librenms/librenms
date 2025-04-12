@@ -409,6 +409,41 @@
             "type": "boolean",
             "default": false
         },
+        "auth_ad_debug": {
+            "group": "auth",
+            "section": "ad",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_global_read": {
+            "group": "auth",
+            "section": "ad",
+            "order": 3,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_group": {
+            "group": "auth",
+            "section": "ad",
+            "order": 4,
+            "type": "text",
+            "default": null
+        },
+        "auth_ad_require_groupmembership": {
+            "group": "auth",
+            "section": "ad",
+            "order": 5,
+            "type": "boolean",
+            "default": true
+        },
+        "auth_ad_timeout": {
+            "group": "auth",
+            "section": "ad",
+            "order": 6,
+            "type": "integer",
+            "default": 5
+        },
         "auth.socialite.redirect": {
             "group": "auth",
             "section": "socialite",
@@ -486,13 +521,6 @@
             "order": 5,
             "type": "boolean"
         },
-        "auth_ad_debug": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 20,
-            "type": "boolean"
-        },
         "auth_ad_domain": {
             "group": "auth",
             "section": "ad",
@@ -553,15 +581,8 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"]
             }
-        },
-        "auth_ad_require_groupmembership": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 8,
-            "type": "boolean"
         },
         "auth_ad_starttls": {
             "default": "disabled",
@@ -686,7 +707,7 @@
             }
         },
         "auth_ldap_port": {
-            "default": 389,
+            "default": null,
             "group": "auth",
             "section": "ldap",
             "order": 1,
@@ -838,6 +859,10 @@
             "default": true,
             "type": "boolean"
         },
+        "autodiscovery.ospfv3": {
+            "default": true,
+            "type": "boolean"
+        },
         "autodiscovery.snmpscan": {
             "default": true,
             "type": "boolean"
@@ -946,6 +971,14 @@
             "default": 1000,
             "type": "integer"
         },
+        "branding": {
+            "default": null,
+            "type": "text"
+        },
+        "branding.default": {
+            "default": null,
+            "type": "text"
+        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
@@ -961,6 +994,10 @@
         "collectd_dir": {
             "default": null,
             "type": "directory"
+        },
+        "collectd_sock": {
+            "default": null,
+            "type": "text"
         },
         "core_descr": {
             "default": ["core"],
@@ -1508,6 +1545,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.ospfv3": {
+            "order": 235,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.cisco-cef": {
             "order": 50,
             "group": "discovery",
@@ -1960,6 +2004,10 @@
             "order": 1,
             "type": "text"
         },
+        "empty_ifdescr": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_billing": {
             "default": false,
             "type": "boolean"
@@ -1981,6 +2029,10 @@
             "type": "boolean"
         },
         "enable_libvirt": {
+            "default": false,
+            "type": "boolean"
+        },
+        "enable_proxmox": {
             "default": false,
             "type": "boolean"
         },
@@ -2019,6 +2071,10 @@
         "enable_vrfs": {
             "default": true,
             "type": "boolean"
+        },
+        "error_font": {
+            "default": null,
+            "type": "text"
         },
         "eventlog_purge": {
             "default": 30,
@@ -2087,6 +2143,14 @@
         "front_page_settings.top.ports": {
             "default": 10,
             "type": "integer"
+        },
+        "gateone.server": {
+            "default": null,
+            "type": "text"
+        },
+        "gateone.use_librenms_user": {
+            "default": false,
+            "type": "boolean"
         },
         "geoloc.api_key": {
             "default": "",
@@ -4186,6 +4250,22 @@
             "default": true,
             "type": "boolean"
         },
+        "ignore_bsd_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 6,
+            "default": [
+            ],
+            "type": "array"
+        },
+        "ignore_junos_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 7,
+            "default": [
+            ],
+            "type": "array"
+        },
         "ignore_mount": {
             "group": "discovery",
             "section": "storage",
@@ -4797,14 +4877,14 @@
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 1,
+            "order": 2,
             "type": "array"
         },
         "nfsen_subdirlayout": {
             "default": 1,
             "group": "external",
             "section": "nfsen",
-            "order": 2,
+            "order": 3,
             "type": "select",
             "options": {
                 "0": "0. flat layout",
@@ -4822,7 +4902,7 @@
             "default": 153600,
             "group": "external",
             "section": "nfsen",
-            "order": 3,
+            "order": 4,
             "type": "integer",
             "units": "seconds"
         },
@@ -4830,7 +4910,7 @@
             "default": 500,
             "group": "external",
             "section": "nfsen",
-            "order": 4,
+            "order": 5,
             "type": "integer"
         },
         "nfsen_top_N": {
@@ -4844,39 +4924,42 @@
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 5,
+            "order": 6,
             "type": "array"
         },
         "nfsen_top_default": {
             "default": 20,
             "group": "external",
             "section": "nfsen",
-            "order": 6,
+            "order": 7,
             "type": "integer"
         },
-        "nfsen_stat_default": {
+        "nfsen_stats_default": {
             "default": "srcip",
             "group": "external",
             "section": "nfsen",
-            "order": 7,
+            "order": 8,
             "type": "text"
         },
         "nfsen_order_default": {
             "default": "packets",
             "group": "external",
             "section": "nfsen",
-            "order": 8,
+            "order": 9,
             "type": "text"
         },
         "nfsen_last_default": {
             "default": 900,
             "group": "external",
             "section": "nfsen",
-            "order": 9,
+            "order": 10,
             "type": "integer",
             "units": "seconds"
         },
         "nfsen_lasts": {
+            "group": "external",
+            "section": "nfsen",
+            "order": 11,
             "default": {
                 "300": "5 minutes",
                 "600": "10 minutes",
@@ -4901,13 +4984,13 @@
         "nfsen_split_char": {
             "group": "external",
             "section": "nfsen",
-            "order": 11,
+            "order": 12,
             "type": "text"
         },
         "nfsen_suffix": {
             "group": "external",
             "section": "nfsen",
-            "order": 12,
+            "order": 13,
             "type": "text"
         },
         "nmap": {
@@ -4924,6 +5007,10 @@
             "order": 2,
             "type": "text"
         },
+        "norrd": {
+            "default": false,
+            "type": "boolean"
+        },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
@@ -4935,6 +5022,13 @@
         "old_graphs": {
             "default": true,
             "type": "boolean"
+        },
+        "opentsdb.co": {
+            "default": null,
+            "type": "boolean",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 3
         },
         "opentsdb.enable": {
             "default": false,
@@ -5111,6 +5205,34 @@
             "validate": {
                 "value": "url"
             }
+        },
+        "radius.default_level": {
+            "default": 1,
+            "type": "integer"
+        },
+        "radius.hostname": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.port": {
+            "default": null,
+            "type": "integer"
+        },
+        "radius.users_purge": {
+            "default": null,
+            "type": "boolean"
+        },
+        "radius.secret": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.suffix": {
+            "default": null,
+            "type": "text"
+        },
+        "rrd.enable": {
+            "default": true,
+            "type": "boolean"
         },
         "snmptraps.eventlog": {
             "default": "unhandled",
@@ -5367,6 +5489,13 @@
         },
         "poller_modules.ospf": {
             "order": 330,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.ospfv3": {
+            "order": 331,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -6268,6 +6397,9 @@
             "section": "cleanup",
             "order": 1,
             "type": "integer"
+        },
+        "syslog_xlate": {
+            "type": "array"
         },
         "temp_dir": {
             "type": "directory"

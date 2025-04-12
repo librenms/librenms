@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AppsController.php
  *

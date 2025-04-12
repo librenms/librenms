@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ComposerHelper.php
  *
@@ -63,7 +64,7 @@ class ComposerHelper
     {
     }
 
-    public static function addPlugin(string $package, string $version = null): int
+    public static function addPlugin(string $package, ?string $version = null): int
     {
         $package = escapeshellarg($package . ($version ? ":$version" : null));
 
@@ -74,7 +75,7 @@ class ComposerHelper
         return self::exec($cmds);
     }
 
-    public static function addPackage(string $package, string $version = null): int
+    public static function addPackage(string $package, ?string $version = null): int
     {
         $package = escapeshellarg($package . ($version ? ":$version" : null));
 
@@ -132,7 +133,9 @@ class ComposerHelper
             'group' => '',
         ];
 
-        @include 'config.php';
+        if (file_exists('config.php')) {
+            @include 'config.php';
+        }
 
         try {
             EnvHelper::init();

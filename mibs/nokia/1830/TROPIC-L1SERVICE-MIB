@@ -1,0 +1,4518 @@
+TROPIC-L1SERVICE-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      IpAddress,
+      Unsigned32, Integer32, Counter32        FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      TruthValue, RowStatus, MacAddress       FROM SNMPv2-TC
+      InterfaceIndex, ifIndex                 FROM IF-MIB
+      AluWdmEnabledDisabled,
+      TropicPortIndexType,
+      TropicChannelIndexType,
+      TnApsGroupId, TnPerHopBehaviourType,
+      AluWdmTypeOfNetIfOperation              FROM TROPIC-TC
+      InetAddressType, InetAddress,
+      InetAddressPrefixLength                 FROM INET-ADDRESS-MIB
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      ipCidrRouteEntry                        FROM IP-FORWARD-MIB
+      tnServiceModules, tnL1ServiceMIB        FROM TROPIC-GLOBAL-REG;
+
+  tnL1ServiceMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202207151200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "Control Network and APS MIB."
+
+      REVISION    "202207151200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkDHCPBootFileName
+                   tnCNLinkDHCPClassName."
+
+      REVISION    "202203251200Z"
+      DESCRIPTION "Added the following table:
+                   tnIpNonDefaultRedistBgpToOspfRuleTable."
+
+      REVISION    "202203181200Z"
+      DESCRIPTION "1) Added the following to tnIpRouteGlobal:
+                      tnIpDefaultRouteRedistributeOspfToBgpMode
+                      tnIpDefaultRouteRedistributeOspfToBgpMetric.
+                   2) Added the following table:
+                      tnIpNonDefaultRouteOspfToBgpCommTagTable."
+
+      REVISION    "202109031200Z"
+      DESCRIPTION "1) Added the following Textual Convention:
+                      NokiaCNLinkOspfRoutingState.
+                   2) Added the following to tnControlNetworkLinkTable:
+                      tnCNLinkOspfOscRoutingState
+                      tnCNLinkOspfv6OscRoutingState."
+
+      REVISION    "202107301200Z"
+      DESCRIPTION "Added the following to tnEthIfTable:
+                   tnEthIfOspfv3AreaNumberId
+                   tnEthIfOspfv3HelloInterval
+                   tnEthIfOspfv3Metric
+                   tnEthIfOspfv3Retransint
+                   tnEthIfOspfv3RtrDeadInterval
+                   tnEthIfOspfv3DrPriorityId
+                   tnEthIfOspfv3RouteState."
+
+      REVISION    "202107231200Z"
+      DESCRIPTION "1) Added the following to tnControlNetworkLinkTable:
+                      tnCNLinkOspfv3HelloInterval
+                      tnCNLinkOspfv3TeMetric
+                      tnCNLinkOspfv3Retransint
+                      tnCNLinkOspfv3RtrDeadInterval
+                      tnCNLinkOspfv3ConfigRtrPriority
+                      tnCNLinkOspfv3RoutingState.
+                   2) Added the following to tnIpRouteGlobal:
+                      tnIpOspfV3AreaNumberPPPId.
+                   3) Added the following to tnNetIfTable:
+                      tnNetIfOspfv3AreaNumberId
+                      tnNetIfOspfv3HelloInterval
+                      tnNetIfOspfv3Metric
+                      tnNetIfOspfv3Retransint
+                      tnNetIfOspfv3RtrDeadInterval
+                      tnNetIfOspfv3ConfigRtrPriority
+                      tnNetIfOspfv3Status."
+
+      REVISION    "202106251200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkAutoStateType
+                   tnCNLinkAutoStateStatus."
+
+      REVISION    "202104301200Z"
+      DESCRIPTION "Added the following to tnControlNetworkMapTable:
+                   tnCNMapIpv6InetAddress
+                   tnCNMapIpv4Address."
+
+      REVISION    "202101221200Z"
+      DESCRIPTION "Added the following to tnEthIfTable:
+                   tnEthIfRouterAdvAutonomousFlag
+                   tnEthIfRouterAdvDefaultLifeTime
+                   tnEthIfRouterAdvDefaultPreference
+                   tnEthIfRouterAdvMaxRtrAdvInterval
+                   tnEthIfRouterAdvManagedFlag
+                   tnEthIfRouterAdvOtherConfigFlag
+                   tnEthIfRouterAdvPreferredLifeTime
+                   tnEthIfRouterAdvSendAdvertState
+                   tnEthIfRouterAdvValidLifeTime."
+
+      REVISION    "202012111200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkRouterAdvAutonomousFlag
+                   tnCNLinkRouterAdvDefaultLifeTime
+                   tnCNLinkRouterAdvDefaultPreference
+                   tnCNLinkRouterAdvMaxRtrAdvInterval
+                   tnCNLinkRouterAdvManagedFlag
+                   tnCNLinkRouterAdvOtherConfigFlag
+                   tnCNLinkRouterAdvPreferredLifeTime
+                   tnCNLinkRouterAdvSendAdvertState
+                   tnCNLinkRouterAdvValidLifeTime."
+
+      REVISION    "202010091200Z"
+      DESCRIPTION "1) Added the following to tnCNLinkOscMode:
+                      base100FX1(4).
+                   2) Changed SYNTAX of the following from TruthValue to INTEGER:
+                      tnNetIfOspfStatus.
+                   3) Added the following to tnNetIfOspfStatus:
+                      redistribute(3)."
+
+      REVISION    "202008141200Z"
+      DESCRIPTION "1) Added the following to tnIpRouteGlobal:
+                      tnIpDefaultRouteRedistributeBgpToOspfMetricType
+                      tnIpDefaultRouteRedistributeBgpToOspfMetric
+                      tnIpDefaultRouteRedistributeBgpToOspfMode
+                      tnIpDefaultRouteRedistributeKernelToOspfMetricType
+                      tnIpDefaultRouteRedistributeKernelToOspfMetric
+                      tnIpDefaultRouteRedistributeKernelToOspfStatus
+                      tnIpStaticRouteRedistributeBgpMetric.
+                   2) Added the following index to tnStaticRouteTable:
+                      tnStaticRouteWithBgpDistribution."
+
+      REVISION    "202007101200Z"
+      DESCRIPTION "1) Added the following to tnControlNetworkLinkTable:
+                      tnCNLinkDHCPServerIPv6SLAAC.
+                   2) Added the following to tnEthIfTable:
+                      tnEthIfDHCPServerIPv6SLAAC."
+
+      REVISION    "202002211200Z"
+      DESCRIPTION "Added the following table:
+                   tnDhcpServerTable."
+
+      REVISION    "202001101200Z"
+      DESCRIPTION "Added the following to tnEthIfTable:
+                   tnEthIfAlmProfName."
+
+      REVISION    "201910181200Z"
+      DESCRIPTION "Added the following to tnEthIfTable:
+                   tnEthIfOperStatus."
+
+      REVISION    "201907051200Z"
+      DESCRIPTION "Modified the range from (SIZE(0..50)) to (SIZE(0..255))
+                   for the following attribute:
+                   tnCNLinkDescr."
+
+      REVISION    "201906141200Z"
+      DESCRIPTION "Added the following to tnNetIfTable:
+                   tnNetIfOspfStatus."
+
+      REVISION    "201905031200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkRole."
+
+      REVISION    "201904261200Z"
+      DESCRIPTION "Added the following to tnNetIfTable:
+                   tnNetIfLcpEchoInterval
+                   tnNetIfLcpEchoFailure."
+
+      REVISION    "201903221200Z"
+      DESCRIPTION "1) Added the following to tnControlNetworkLinkTable:
+                      tnCNLinkOspfNeighborRouterIp
+                      tnCNLinkOspfv3NeighborRouterIp
+                      tnCNLinkOspfNeighborIp
+                      tnCNLinkOspfv3NeighborInetAddress.
+                   2) Added the following to tnNetIfTable:
+                      tnNetIfOspfNeighborRouterIp
+                      tnNetIfOspfv3NeighborRouterIp
+                      tnNetIfOspfNeighborIp
+                      tnNetIfOspfv3NeighborInetAddress
+                      tnNetIfIPv6LinkLocalInetAddress."
+
+      REVISION    "201903011200Z"
+      DESCRIPTION "Added the following table:
+                   tnDhcpRelayRecordTable."
+
+      REVISION    "201806191200Z"
+      DESCRIPTION "Added the following index to tnStaticRouteTable:
+                   tnStaticRouteIdentifier."
+
+      REVISION    "201806081200Z"
+      DESCRIPTION "Changed the accessibility of following to read-create:
+                   tnEthIfOspfDrPriorityId."
+
+      REVISION    "201803301200Z"
+      DESCRIPTION "1) Added the following to tnControlNetworkLinkTable:
+                      tnCNLinkOspfRetransint
+                      tnCNLinkOspfv3AdjStateId.
+                   2) Added the following to tnNetIfTable:
+                      tnNetIfOspfRetransint
+                      tnNetIfOspfv3AdjStateId.
+                   3) Added the following to tnEthIfTable:
+                      tnEthIfOspfRetransint
+                      tnEthIfOspfv3AdjStateId.
+                   4) Added the following to tnIpRouteGlobal:
+                      tnIpOspfRouterId."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201802091200Z"
+      DESCRIPTION "Added the following tables:
+                   tnEthIfTable
+                   tnEthIfInterfaceTable."
+
+      REVISION    "201801191200Z"
+      DESCRIPTION "Added the following to tnCNLinkOscMode:
+                   oneGE(3)."
+
+      REVISION    "201707281200Z"
+      DESCRIPTION "Marked the following table as deprecated:
+                   tnIpStaticRouteTable."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201704211200Z"
+      DESCRIPTION "Added tnStaticRouteTable."
+
+      REVISION    "201704131200Z"
+      DESCRIPTION "Added the following to tnNetIfTable:
+                   tnNetIfOSPFAreaNumberId."
+
+      REVISION    "201703241200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkEtherPortIpV6SLAAC."
+
+      REVISION    "201703031200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkDHCPClientDfltGtwy."
+
+      REVISION    "201702101200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkAutoStateSourceInetAddressType
+                   tnCNLinkAutoStateSourceInetAddress
+                   tnCNLinkDhcpv6Enabled
+                   tnCNLinkDHCPv6Range
+                   tnCNLinkDHCPClient
+                   tnCNLinkDHCPv6Client."
+
+      REVISION    "201611221200Z"
+      DESCRIPTION "Added the following to tnApsGroupDirection:
+                   uniwoaps(3)."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info"
+
+      REVISION    "201610211200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkInetAddressType
+                   tnCNLinkInetAddress
+                   tnCNLinkPrefixLength."
+
+      REVISION    "201609301200Z"
+      DESCRIPTION "Updated the default value of tnPackApsGroupHoldOffTimer from 0 to 10"
+
+      REVISION    "201609271200Z"
+      DESCRIPTION "Updated the values of tnPackApsGroupCurrentStatus"
+
+      REVISION    "201605211200Z"
+      DESCRIPTION "Added the following to TropicProtectionLevel:
+                   onePlusOneOpticalSplitterG8731(6)."
+
+      REVISION    "201601251200Z"
+      DESCRIPTION "Added the following to tables:
+                   tnPackApsGroupTable."
+
+      REVISION    "201512171200Z"
+      DESCRIPTION "Added the following to tnApsGroupTable:
+                   tnApsHoldOffTimer."
+
+      REVISION    "201507211200Z"
+      DESCRIPTION "Added the following to tnApsGroupTable:
+                   tnApsGroupSdEnable."
+
+      REVISION    "201504031200Z"
+      DESCRIPTION "Added the description to tnIpStaticRouteMetric"
+
+      REVISION    "201501081200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkTdmxDcnConf."
+
+      REVISION    "201409121200Z"
+      DESCRIPTION "Added the following to tnCNLinkSpeed:
+                   rate1000Mbps(4)."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added DEFVAL to attributes."
+
+      REVISION    "201312051200Z"
+      DESCRIPTION "Added the following to tnNetIfTable:
+                   tnNetIfMtuNeg."
+
+      REVISION    "201309041200Z"
+      DESCRIPTION "Changed the accessibility of following to read-only:
+                   tnCNLinkAdjState and tnNetIfCnLinkAdjState."
+
+
+      REVISION    "201308141200Z"
+      DESCRIPTION "1) Added the following Textual Convention:
+                      TropicOspfAdjacencyStateType.
+                   2) Added the following to tnNetIfTable:
+                     tnCnNetIfLinkAdjState."
+
+      REVISION    "201211121200Z"
+      DESCRIPTION "Added the following tables:
+                   tnNetIfTable
+                   tnNetIfFacilityTable."
+
+      REVISION    "201105231200Z"
+      DESCRIPTION "Added DEFVAL for the following attributes:
+                   tnCNLinkTeMetric, 30
+                   tnCNLinkDHCPRange, 1."
+
+      REVISION    "201104251200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkOspfAuthentType
+                   tnCNLinkOspfAuthKey
+                   tnCNLinkOspfAuthKeyId."
+
+      REVISION    "201102091200Z"
+      DESCRIPTION "Added the following to tnControlNetworkLinkTable:
+                   tnCNLinkCitAutoStateCtrl
+                   tnCNLinkAutoStateSourceIP
+                   tnCNLinkSourceLossCount
+                   tnCNLinkSourceIPCheckInterval."
+
+      REVISION    "201012141200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnCNLinkTopologyId
+                   tnCNLinkBandwidth
+                   tnCNLinkAreaId
+                   tnCNLinkIfType
+                   tnCNLinkRtrPriority
+                   tnCNLinkTransitDelay
+                   tnCNLinkRetransInterval
+                   tnCNLinkNbmaPollInterval
+                   tnCNLinkAckInterval
+                   tnCNLinkMcastFwding
+                   tnCNLinkMaxMtuSize
+                   tnCNLinkDisableFlooding
+                   tnCNLinkMetricOverride
+                   tnCNLinkTeDelay
+                   tnCNLinkProtectionLevel
+                   tnCNLinkHoldingPriority
+                   tnCNLinkDestIpAddress
+                   tnCNLinkDestIfIndex
+                   tnCNLinkType
+                   tnCNLinkMgmtPortBootGateway."
+
+      REVISION    "201010181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnApsMemberPriority
+                   tnApsMemberControl
+                   tnApsMemberSignalDegrades
+                   tnApsMemberSignalFailures
+                   tnApsMemberSwitchovers
+                   tnApsMemberLastSwitchover
+                   tnApsMemberSwitchoverSeconds."
+
+      REVISION    "201006101200Z"
+      DESCRIPTION "1) Added ranges and defaults for the following:
+                      tnCNLinkHelloInterval
+                      tnCNLinkRtrDeadInterval
+                      tnCNLinkTeMetric.
+                   2) Added tnIpOspfAreaNumberPPPId to tnIpRouteGlobal."
+
+      REVISION    "201002091200Z"
+      DESCRIPTION "Changed lower bound of range for the following from 1 to 0:
+                   tnIpStaticRouteRedistributeMetric
+                   tnIpDefaultRouteRedistributeMetric."
+
+      REVISION    "201001291200Z"
+      DESCRIPTION "1) Added tnIpRouteGlobal.
+                   2) Added the following to tnIpRouteGlobal:
+                      tnIpStaticRouteRedistributeMetricType
+                      tnIpStaticRouteRedistributeMetric
+                      tnIpDefaultRouteRedistributeMetricType
+                      tnIpDefaultRouteRedistributeMetric."
+
+      REVISION    "200908281200Z"
+      DESCRIPTION "Updated descriptions for APS related attributes."
+
+      REVISION    "200908241200Z"
+      DESCRIPTION "Changed enum name of tnCNLinkOscMode from oc3 to oc3stm1."
+
+      REVISION    "200908211200Z"
+      DESCRIPTION "Updated descriptions in tnControlNetworkLinkTable."
+
+      REVISION    "200907281200Z"
+      DESCRIPTION "Added tnControlNetworkMapTable."
+
+      REVISION    "200906041200Z"
+      DESCRIPTION "Added tnCNLinkDHCPDfltGtwy to tnControlNetworkLinkTable."
+
+      REVISION    "200903031200Z"
+      DESCRIPTION "Used AluWdmEnabledDisabled common enum in TROPIC-TC."
+
+      REVISION    "200902271200Z"
+      DESCRIPTION "Used AluWdmEnabledDisabled common enum in SNMPv2-TC."
+
+      REVISION    "200902261200Z"
+      DESCRIPTION "Changed retry to router in the description of
+                   tnCNLinkRtrDeadInterval."
+
+      REVISION    "200902251200Z"
+      DESCRIPTION "Updated the description of tnCNLinkRtrDeadInterval
+                   with range for 1830."
+
+      REVISION    "200810161200Z"
+      DESCRIPTION "Marked the following as deprecated:
+                   tnApsMemberPriority
+                   tnApsMemberControl
+                   tnApsMemberSignalDegrades
+                   tnApsMemberSignalFailures
+                   tnApsMemberSwitchovers
+                   tnApsMemberLastSwitchover
+                   tnApsMemberSwitchoverSeconds."
+
+      REVISION    "200809091200Z"
+      DESCRIPTION "Removed tnApsGroupProtectionType since tnApsGroupMode
+                   can now be used to distinguish protection type."
+
+      REVISION    "200809041200Z"
+      DESCRIPTION "Added onePlusOneESNCP to TropicProtectionLevel to support
+                   E-SNCP."
+
+      REVISION    "200808221200Z"
+      DESCRIPTION "Added tnApsGroupProtectionType to distinguish protection
+                   type."
+
+      REVISION    "200807251200Z"
+      DESCRIPTION "Updated the description of tnApsGroupMembers
+                   to include how it is implemented for each product."
+
+      REVISION    "200805291200Z"
+      DESCRIPTION "Updated the description of tnControlNetworkLinkTable
+                   to include how the index is implemented for each product."
+
+      REVISION    "200803061200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added proxy arp, DHCP server, OSC and OSPF Adj
+                      State attributes to tnControlNetworkLinkTable."
+
+      ::= { tnServiceModules 1 }
+
+  tnL1ServiceConf             OBJECT IDENTIFIER ::= { tnL1ServiceMIB  1 }
+  tnL1ServiceGroups           OBJECT IDENTIFIER ::= { tnL1ServiceConf 1 }
+  tnL1ServiceCompliances      OBJECT IDENTIFIER ::= { tnL1ServiceConf 2 }
+  tnL1ServiceObjs             OBJECT IDENTIFIER ::= { tnL1ServiceMIB  2 }
+  tnControlNetworkLink        OBJECT IDENTIFIER ::= { tnL1ServiceObjs 1 }
+  tnDataNetworkLink           OBJECT IDENTIFIER ::= { tnL1ServiceObjs 2 }
+  tnIpRoute                   OBJECT IDENTIFIER ::= { tnL1ServiceObjs 4 }
+  tnSharedRiskGroupObjs       OBJECT IDENTIFIER ::= { tnL1ServiceObjs 5 }
+  tnL1NetworkLink             OBJECT IDENTIFIER ::= { tnSharedRiskGroupObjs 1 }
+  tnL1Hop                     OBJECT IDENTIFIER ::= { tnSharedRiskGroupObjs 2 }
+  tnL1Fiber                   OBJECT IDENTIFIER ::= { tnSharedRiskGroupObjs 3 }
+  tnL1Conduit                 OBJECT IDENTIFIER ::= { tnSharedRiskGroupObjs 4 }
+  tnL1Protection              OBJECT IDENTIFIER ::= { tnL1ServiceObjs 6 }
+  tnIpTunnel                  OBJECT IDENTIFIER ::= { tnL1ServiceObjs 7 }
+  tnControlNetworkMap         OBJECT IDENTIFIER ::= { tnL1ServiceObjs 8 }
+  tnNetworkInterface          OBJECT IDENTIFIER ::= { tnL1ServiceObjs 9 }
+  tnStaticRoute               OBJECT IDENTIFIER ::= { tnL1ServiceObjs 10 }
+  tnEthernetInterface         OBJECT IDENTIFIER ::= { tnL1ServiceObjs 11 }
+  tnDhcpRelay                 OBJECT IDENTIFIER ::= { tnL1ServiceObjs 12 }
+  tnDhcpServer                OBJECT IDENTIFIER ::= { tnL1ServiceObjs 13 }
+
+---------------------------------------------------------------
+-- Textual Conventions
+---------------------------------------------------------------
+    ApsK1K2 ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "This Textual Convention describes an object
+                        that stores a SONET K1 and K2 byte APS protocol
+                        field.
+
+        K1 is located in the first octet, K2 is located in
+        the second octet. Bits are numbered from left to right.
+
+        Bits 1-4 of the K1 byte indicate a request.
+
+        1111  Lockout of Protection
+        1110  Forced Switch
+        1101  SF - High Priority
+        1100  SF - Low Priority
+        1011  SD - High Priority
+        1010  SD - Low Priority
+        1001  not used
+        1000  Manual Switch
+        0111  not used
+        0110  Wait-to-Restore
+        0101  not used
+        0100  Exercise
+        0011  not used
+        0010  Reverse Request
+        0001  Do Not Revert
+        0000  No Request
+
+        Bits 5-8 of the K1 byte indicate the channel associated with the
+        request defined in bits 1-4.
+
+        0000 is the Null channel.
+
+        1-14 are working channels.
+        15   is the extra traffic channel
+
+        Bits 1-4 of the K2 byte indicate a channel. The channel is
+        defined with the same syntax as K1 Bits 5-8.
+
+        Bit 5 of the K2 byte indicates the
+        architecture.
+
+        0 if the architecture is 1+1
+        1 if the architecture is 1:n
+
+        Bits 6-8 of the K2 byte indicates the
+        mode.
+
+        000 - 011 are reserved for future use
+
+        100  indicates the mode is unidirectional
+        101  indicates the mode is bidirectional
+
+        110  RDI-L
+
+        111  AIS-L
+        "
+        REFERENCE      "Bellcore (Telcordia Technologies) GR-253-CORE,
+                        Issue 2, Revision 2 (January 1999), 5.3.5."
+        SYNTAX         OCTET STRING (SIZE (2))
+
+    TropicProtectionLevel ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         INTEGER {
+                         unprotected(1),
+                         oneForOne(2),
+                         onePlusOne(3),
+                         onePlusOneOpticalSplitter(4),
+                         onePlusOneESNCP(5),
+                         onePlusOneOpticalSplitterG8731(6)
+                       }
+
+    TropicLinkAdminStateType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         testing(3),
+                         locked(4)
+                       }
+
+    TropicLinkOperationalStateType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         INTEGER {
+                         up(1),
+                         down(2),
+                         testing(3),
+                         unknown(4)
+                       }
+
+    TropicOspfAdjacencyStateType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "This Textual convention describes applicable
+                        OSPF adjacency states."
+        SYNTAX         INTEGER {
+                         down(1),
+                         init(2),
+                         twoWay(3),
+                         exchangeStart(4),
+                         exchange(5),
+                         loading(6),
+                         full(7)
+                       }
+
+    AluPortYcableMode ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The desired Ycalbe mode of this port."
+        SYNTAX         INTEGER {
+                         legacy(1),
+                         standard(2)
+                       }
+
+    NokiaCNLinkOspfRoutingState ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Control Network Link OSPF Routing State."
+        SYNTAX         INTEGER {
+                         disable(1),      -- no dynamic routing
+                         enable(2),       -- OSPF
+                         redistribute(3)  -- redistribute
+                       }
+
+---------------------------------------------------------------
+-- Control Network Link Table
+---------------------------------------------------------------
+    tnControlNetworkLinkTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnControlNetworkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The control network link table."
+        ::= { tnControlNetworkLink 1 }
+
+    tnControlNetworkLinkEntry OBJECT-TYPE
+        SYNTAX         TnControlNetworkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Control Network connection entry. For the
+                        1696R, the index is a logical derived value
+                        created by the system.  For the 1830 PSS-32,
+                        the index is the physical shelf/slot/port with
+                        an exception for attribute tnCNLinkPhysicalIfIndex
+                        where the index is an integer (1..20)."
+        INDEX { ifIndex }
+        ::= { tnControlNetworkLinkTable 1 }
+
+    TnControlNetworkEntry ::=
+        SEQUENCE {
+            tnCNLinkDescr                           SnmpAdminString,
+            tnCNLinkAdminStatus                     TropicLinkAdminStateType,
+            tnCNLinkOperStatus                      TropicLinkOperationalStateType,
+--            obsolete
+--            tnCNLinkTopologyId                      Unsigned32,
+            tnCNLinkPhysicalIfIndex                 InterfaceIndex,
+--            obsolete
+--            tnCNLinkBandwidth                       Unsigned32,
+            tnCNLinkIpAddress                       IpAddress,
+            tnCNLinkSubnetMask                      IpAddress,
+--            obsolete
+--            tnCNLinkAreaId                          IpAddress,
+--            tnCNLinkIfType                          INTEGER,
+--            tnCNLinkRtrPriority                     Unsigned32,
+--            tnCNLinkTransitDelay                    Unsigned32,
+--            tnCNLinkRetransInterval                 Unsigned32,
+            tnCNLinkHelloInterval                   Unsigned32,
+            tnCNLinkRtrDeadInterval                 Unsigned32,
+--            obsolete
+--            tnCNLinkNbmaPollInterval                Unsigned32,
+--            tnCNLinkAckInterval                     Unsigned32,
+--            tnCNLinkMcastFwding                     INTEGER,
+--            tnCNLinkMaxMtuSize                      Unsigned32,
+--            tnCNLinkDisableFlooding                 TruthValue,
+--            tnCNLinkMetricOverride                  TruthValue,
+            tnCNLinkTeMetric                        Unsigned32,
+--            obsolete
+--            tnCNLinkTeDelay                         Unsigned32,
+--            tnCNLinkProtectionLevel                 TropicProtectionLevel,
+--            tnCNLinkHoldingPriority                 INTEGER,
+--            tnCNLinkDestIpAddress                   IpAddress,
+--            tnCNLinkDestIfIndex                     InterfaceIndex,
+--            tnCNLinkType                            INTEGER,
+--            tnCNLinkMgmtPortLocation                INTEGER,
+--            tnCNLinkMgmtPortBootGateway             IpAddress,
+            tnCNLinkOspfRoutingState                NokiaCNLinkOspfRoutingState,
+            tnCNLinkConfigIfType                    INTEGER,
+            tnCNLinkConfigRtrPriority               Unsigned32,
+            tnCNLinkEquipOperStatus                 TropicLinkOperationalStateType,
+            tnCNLinkDhcpEnabled                     TruthValue,
+            tnCNLinkSpeed                           INTEGER,
+            tnCNLinkDuplex                          INTEGER,
+            tnCNLinkProxyArp                        TruthValue,
+            tnCNLinkDHCPServer                      TruthValue,
+            tnCNLinkDHCPRange                       Unsigned32,
+            tnCNLinkAdjState                        TropicOspfAdjacencyStateType,
+            tnCNLinkOscMode                         INTEGER,
+            tnCNLinkDHCPDfltGtwy                    TruthValue,
+            tnCNLinkCitAutoStateCtrl                TruthValue,
+            tnCNLinkAutoStateSourceIP               IpAddress,
+            tnCNLinkSourceLossCount                 Unsigned32,
+            tnCNLinkSourceIPCheckInterval           Unsigned32,
+            tnCNLinkOspfAuthentType                 INTEGER,
+            tnCNLinkOspfAuthKey                     SnmpAdminString,
+            tnCNLinkOspfAuthKeyId                   Unsigned32,
+            tnCNLinkTdmxDcnConf                     INTEGER,
+            tnCNLinkInetAddressType                 InetAddressType,
+            tnCNLinkInetAddress                     InetAddress,
+            tnCNLinkPrefixLength                    InetAddressPrefixLength,
+            tnCNLinkAutoStateSourceInetAddressType  InetAddressType,
+            tnCNLinkAutoStateSourceInetAddress      InetAddress,
+            tnCNLinkDhcpv6Enabled                   TruthValue,
+            tnCNLinkDHCPv6Range                     Unsigned32,
+            tnCNLinkDHCPClient                      TruthValue,
+            tnCNLinkDHCPv6Client                    TruthValue,
+            tnCNLinkDHCPClientDfltGtwy              TruthValue,
+            tnCNLinkEtherPortIpV6SLAAC              TruthValue,
+            tnCNLinkOspfRetransint                  Unsigned32,
+            tnCNLinkOspfv3AdjStateId                TropicOspfAdjacencyStateType,
+            tnCNLinkOspfNeighborRouterIp            IpAddress,
+            tnCNLinkOspfv3NeighborRouterIp          IpAddress,
+            tnCNLinkOspfNeighborIp                  IpAddress,
+            tnCNLinkOspfv3NeighborInetAddress       InetAddress,
+            tnCNLinkRole                            INTEGER,
+            tnCNLinkDHCPServerIPv6SLAAC             SnmpAdminString,
+            tnCNLinkRouterAdvAutonomousFlag         TruthValue,
+            tnCNLinkRouterAdvDefaultLifeTime        Unsigned32,
+            tnCNLinkRouterAdvDefaultPreference      INTEGER,
+            tnCNLinkRouterAdvMaxRtrAdvInterval      Unsigned32,
+            tnCNLinkRouterAdvManagedFlag            TruthValue,
+            tnCNLinkRouterAdvOtherConfigFlag        TruthValue,
+            tnCNLinkRouterAdvPreferredLifeTime      Unsigned32,
+            tnCNLinkRouterAdvSendAdvertState        TruthValue,
+            tnCNLinkRouterAdvValidLifeTime          Unsigned32,
+            tnCNLinkAutoStateType                   INTEGER,
+            tnCNLinkAutoStateStatus                 INTEGER,
+            tnCNLinkOspfv3HelloInterval             Unsigned32,
+            tnCNLinkOspfv3TeMetric                  Unsigned32,
+            tnCNLinkOspfv3Retransint                Unsigned32,
+            tnCNLinkOspfv3RtrDeadInterval           Unsigned32,
+            tnCNLinkOspfv3ConfigRtrPriority         Unsigned32,
+            tnCNLinkOspfv3RoutingState              NokiaCNLinkOspfRoutingState,
+            tnCNLinkOspfOscRoutingState             NokiaCNLinkOspfRoutingState,
+            tnCNLinkOspfv6OscRoutingState           NokiaCNLinkOspfRoutingState,
+            tnCNLinkDHCPBootFileName                OCTET STRING,
+            tnCNLinkDHCPClassName                   OCTET STRING
+         }
+
+    tnCNLinkDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnControlNetworkLinkEntry 1 }
+
+    tnCNLinkAdminStatus OBJECT-TYPE
+        SYNTAX         TropicLinkAdminStateType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Admin status of the link."
+        DEFVAL         { enabled }
+        ::= { tnControlNetworkLinkEntry 2 }
+
+    tnCNLinkOperStatus OBJECT-TYPE
+        SYNTAX         TropicLinkOperationalStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Operational status of the link."
+        ::= { tnControlNetworkLinkEntry 3 }
+
+--    obsolete
+--    tnCNLinkTopologyId OBJECT-TYPE ::= { tnControlNetworkLinkEntry 4 }
+
+    tnCNLinkPhysicalIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The physical interface index of the link.
+                        SET on this attribute is currently not supported."
+        ::= { tnControlNetworkLinkEntry 5 }
+
+--    obsolete
+--    tnCNLinkBandwidth OBJECT-TYPE ::= { tnControlNetworkLinkEntry 6 }
+
+    tnCNLinkIpAddress OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlNetworkLinkEntry 7 }
+
+    tnCNLinkSubnetMask OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnControlNetworkLinkEntry 8 }
+
+--    obsolete
+--    tnCNLinkAreaId OBJECT-TYPE ::= { tnControlNetworkLinkEntry 9 }
+--    tnCNLinkIfType OBJECT-TYPE ::= { tnControlNetworkLinkEntry 10 }
+--    tnCNLinkRtrPriority OBJECT-TYPE ::= { tnControlNetworkLinkEntry 11 }
+--    tnCNLinkTransitDelay OBJECT-TYPE ::= { tnControlNetworkLinkEntry 12 }
+--    tnCNLinkRetransInterval OBJECT-TYPE ::= { tnControlNetworkLinkEntry 13 }
+
+    tnCNLinkHelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..'FFFF'h)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The hello interval of the link.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnControlNetworkLinkEntry 14 }
+
+    tnCNLinkRtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'7FFFFFFF'h)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The router dead interval of the link.  For 1830, the
+                        range is (1..'FFFF'h)."
+        DEFVAL         { 40 }
+        ::= { tnControlNetworkLinkEntry 15 }
+
+--    obsolete
+--    tnCNLinkNbmaPollInterval OBJECT-TYPE ::= { tnControlNetworkLinkEntry 16 }
+--    tnCNLinkAckInterval      OBJECT-TYPE ::= { tnControlNetworkLinkEntry 17 }
+--    tnCNLinkMcastFwding      OBJECT-TYPE ::= { tnControlNetworkLinkEntry 18 }
+--    tnCNLinkMaxMtuSize       OBJECT-TYPE ::= { tnControlNetworkLinkEntry 19 }
+--    tnCNLinkDisableFlooding  OBJECT-TYPE ::= { tnControlNetworkLinkEntry 20 }
+--    tnCNLinkMetricOverride   OBJECT-TYPE ::= { tnControlNetworkLinkEntry 21 }
+
+    tnCNLinkTeMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Traffic eng metric of the link.  For OSC, default is
+                        10; for GCC OTU1, default is 40; for GCC OTU2 default is
+                        30; for GCC OTU3 default is 20.
+
+                        Current configurable range: 1 to 65535."
+        ::= { tnControlNetworkLinkEntry 22 }
+
+--    obsolete
+--    tnCNLinkTeDelay             OBJECT-TYPE ::= { tnControlNetworkLinkEntry 23 }
+--    tnCNLinkProtectionLevel     OBJECT-TYPE ::= { tnControlNetworkLinkEntry 24 }
+--    tnCNLinkHoldingPriority     OBJECT-TYPE ::= { tnControlNetworkLinkEntry 25 }
+--    tnCNLinkDestIpAddress       OBJECT-TYPE ::= { tnControlNetworkLinkEntry 26 }
+--    tnCNLinkDestIfIndex         OBJECT-TYPE ::= { tnControlNetworkLinkEntry 27 }
+--    tnCNLinkType                OBJECT-TYPE ::= { tnControlNetworkLinkEntry 28 }
+--    tnCNLinkMgmtPortLocation    OBJECT-TYPE ::= { tnControlNetworkLinkEntry 29 }
+--    tnCNLinkMgmtPortBootGateway OBJECT-TYPE ::= { tnControlNetworkLinkEntry 30 }
+
+    tnCNLinkOspfRoutingState OBJECT-TYPE
+        SYNTAX         NokiaCNLinkOspfRoutingState
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnControlNetworkLinkEntry 31 }
+
+    tnCNLinkConfigIfType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notValid(1),
+                         broadcast(2),
+                         nonBroadcastMultipleAccess(3),
+                         pointToPoint(4),
+                         virtual(5),
+                         pointToMultipoint(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The OSPF interface type of the link."
+        DEFVAL         { broadcast }
+        ::= { tnControlNetworkLinkEntry 32 }
+
+    tnCNLinkConfigRtrPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'FF'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The router priority of the link."
+        DEFVAL         { 1 }
+        ::= { tnControlNetworkLinkEntry 33 }
+
+    tnCNLinkEquipOperStatus OBJECT-TYPE
+        SYNTAX         TropicLinkOperationalStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Operational status of the
+                        associated physical link."
+        DEFVAL         { down }
+        ::= { tnControlNetworkLinkEntry 34 }
+
+    tnCNLinkDhcpEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if DHCP is enabled on the link.
+                        Sets are restricted to the local
+                        ethernet port CN link."
+        ::= { tnControlNetworkLinkEntry 35 }
+
+    tnCNLinkSpeed OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         rate10Mbps(2),
+                         rate100Mbps(3),
+                         rate1000Mbps(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { auto }
+        ::= { tnControlNetworkLinkEntry 36 }
+
+    tnCNLinkDuplex OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         half(2),
+                         full(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { auto }
+        ::= { tnControlNetworkLinkEntry 37 }
+
+    tnCNLinkProxyArp OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Proxy Arp configured."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 38 }
+
+    tnCNLinkDHCPServer OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DHCP server configured."
+        DEFVAL         { true }
+        ::= { tnControlNetworkLinkEntry 39 }
+
+    tnCNLinkDHCPRange OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DHCP range.
+
+                        Current configurable range: 0 to 10"
+        DEFVAL         { 1 }
+        ::= { tnControlNetworkLinkEntry 40 }
+
+    tnCNLinkAdjState OBJECT-TYPE
+        SYNTAX         TropicOspfAdjacencyStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPF Adj state."
+        DEFVAL         { down }
+        ::= { tnControlNetworkLinkEntry 41 }
+
+    tnCNLinkOscMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         oc3stm1(1),
+                         base100FX(2),
+                         oneGE(3),
+                         base100FX1(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSC mode."
+        DEFVAL         { oc3stm1 }
+        ::= { tnControlNetworkLinkEntry 42 }
+
+    tnCNLinkDHCPDfltGtwy OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if default gateway IP address is
+                        distributed via DHCP on this interface."
+        DEFVAL         { true }
+        ::= { tnControlNetworkLinkEntry 43 }
+
+    tnCNLinkCitAutoStateCtrl OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "false - System is not in auto_state.  CIT
+                                enable/disable is done by ifAdminStatus.
+                        true  - System is in auto_state.  CIT
+                                enable/disable is done by the connectivity
+                                status of source_ip.
+                        The CIT port will be disabled when the source IP
+                        is reachable and enabled when source IP becomes
+                        un-reachable.  Provisioning of this attribute is
+                        restricted to administrators only."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 44 }
+
+    tnCNLinkAutoStateSourceIP OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "A source IP address that the system shall
+                        monitor when tnCNLinkCitAutoStateCtrl is true.
+                        This can be the 1350 OMS server address or
+                        another IP."
+        DEFVAL         { '00000000'H }
+        ::= { tnControlNetworkLinkEntry 45 }
+
+    tnCNLinkSourceLossCount OBJECT-TYPE
+        SYNTAX         Unsigned32 (5..10000)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of consecutive retries that
+                        tnCNLinkAutoStateSourceIP is un-reachable when
+                        tnCNLinkCitAutoStateCtrl is true, which results
+                        in CIT port to be auto-enabled.
+
+                        Current configurable range: 5 to 10000."
+        DEFVAL         { 10 }
+        ::= { tnControlNetworkLinkEntry 46 }
+
+    tnCNLinkSourceIPCheckInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (10..7200)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interval to contact tnCNLinkAutoStateSourceIP
+                        when tnCNLinkCitAutoStateCtrl is true.
+
+                        Current configurable range: 10 to 7200."
+        DEFVAL         { 30 }
+        ::= { tnControlNetworkLinkEntry 47 }
+
+    tnCNLinkOspfAuthentType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         simple(2),
+                         md5(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnControlNetworkLinkEntry 48 }
+
+    tnCNLinkOspfAuthKey OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnControlNetworkLinkEntry 49 }
+
+    tnCNLinkOspfAuthKeyId OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 1 }
+        ::= { tnControlNetworkLinkEntry 50 }
+
+    tnCNLinkTdmxDcnConf OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         internal(1),
+                         external(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { internal }
+        ::= { tnControlNetworkLinkEntry 51 }
+
+    tnCNLinkInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value specifies the type of
+                        Internet address stored in tnCNLinkInetAddress"
+        DEFVAL         { unknown }
+        ::= { tnControlNetworkLinkEntry 52 }
+
+    tnCNLinkInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of the port"
+        DEFVAL         { ''H }
+        ::= { tnControlNetworkLinkEntry 53 }
+
+    tnCNLinkPrefixLength OBJECT-TYPE
+        SYNTAX         InetAddressPrefixLength
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Prefix length of the IPV6 of the port"
+        DEFVAL         { 0 }
+        ::= { tnControlNetworkLinkEntry 54 }
+
+    tnCNLinkAutoStateSourceInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value specifies the type of Internet address
+                        stored tnCNLinkAutoStateSourceInetAddress"
+        DEFVAL         { unknown }
+        ::= { tnControlNetworkLinkEntry 55 }
+
+    tnCNLinkAutoStateSourceInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address"
+        DEFVAL         { ''H }
+        ::= { tnControlNetworkLinkEntry 56 }
+
+    tnCNLinkDhcpv6Enabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if DHCP version 6 is enabled on the link.
+                        Sets are restricted to the local
+                        ethernet port CN link."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 57 }
+
+    tnCNLinkDHCPv6Range OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DHCP version 6 range.
+
+                        Current configurable range: 0 to 10"
+        DEFVAL         { 1 }
+        ::= { tnControlNetworkLinkEntry 58 }
+
+    tnCNLinkDHCPClient OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if default gateway IP address is
+                        distributed via DHCP  on this interface."
+        DEFVAL         { true }
+        ::= { tnControlNetworkLinkEntry 59 }
+
+    tnCNLinkDHCPv6Client OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable/Disable DHCPv6 client on the port."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 60 }
+
+    tnCNLinkDHCPClientDfltGtwy OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if default gateway IP address is
+                        distributed via DHCP Client on this interface."
+        DEFVAL         { true }
+        ::= { tnControlNetworkLinkEntry 61 }
+
+    tnCNLinkEtherPortIpV6SLAAC OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable or disable a StateLess Address AutoConfig (SLAAC)
+                        client on the port."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 62 }
+
+    tnCNLinkOspfRetransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPF will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPF neighbor.  The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network.  Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                        will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnControlNetworkLinkEntry 63 }
+
+    tnCNLinkOspfv3AdjStateId OBJECT-TYPE
+        SYNTAX         TropicOspfAdjacencyStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Adj state."
+        DEFVAL         { down }
+        ::= { tnControlNetworkLinkEntry 64 }
+
+    tnCNLinkOspfNeighborRouterIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPF Neighbor Router ID."
+        DEFVAL         { '00000000'H }
+        ::= { tnControlNetworkLinkEntry 65 }
+
+    tnCNLinkOspfv3NeighborRouterIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Neighbor Router ID."
+        DEFVAL         { '00000000'H }
+        ::= { tnControlNetworkLinkEntry 66 }
+
+    tnCNLinkOspfNeighborIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPF Neighbor IP Address."
+        DEFVAL         { '00000000'H }
+        ::= { tnControlNetworkLinkEntry 67 }
+
+    tnCNLinkOspfv3NeighborInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of OSPFv3 Neighbor."
+        DEFVAL         { ''H }
+        ::= { tnControlNetworkLinkEntry 68 }
+
+    tnCNLinkRole OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(0),
+                         oamp(1),
+                         aux(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set the role of the port to OAMP (for interconnection
+                        towards management system) or AUX (for general purpose
+                        interconnection towards other TPS systems).
+
+                          Default: oamp - for LAN1
+                          Default: aux  - for LAN2
+
+                        Changing the role of a port, will implicitly modify other
+                        default LAN parameters and the default system ACLs of the
+                        port."
+        ::= { tnControlNetworkLinkEntry 69 }
+
+    tnCNLinkDHCPServerIPv6SLAAC OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnControlNetworkLinkEntry 70 }
+
+    tnCNLinkRouterAdvAutonomousFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When enabled, indicates that the IPv6 prefix can be used
+                        for autonomous stateless address autoconfiguration (SLAAC)."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 71 }
+
+    tnCNLinkRouterAdvDefaultLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..9000)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The lifetime associated with the default router."
+        DEFVAL         { 0 }
+        ::= { tnControlNetworkLinkEntry 72 }
+
+    tnCNLinkRouterAdvDefaultPreference OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         low(1),
+                         medium(2),
+                         high(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The preference associated with the default router."
+        DEFVAL         { medium }
+        ::= { tnControlNetworkLinkEntry 73 }
+
+    tnCNLinkRouterAdvMaxRtrAdvInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (10..1800)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The maximum time allowed between sending unsolicited
+                        multicast Router Advertisements from the interface."
+        DEFVAL         { 600 }
+        ::= { tnControlNetworkLinkEntry 74 }
+
+    tnCNLinkRouterAdvManagedFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When enabled, hosts use the administered (stateful) DHCPv6
+                        protocol for address autoconfiguration in addition to any
+                        addresses autoconfigured using stateless address
+                        autoconfiguration (SLAAC)."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 75 }
+
+    tnCNLinkRouterAdvOtherConfigFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When set, hosts use the administered (stateful) protocol
+                        for autoconfiguration of other (non-address) information."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 76 }
+
+    tnCNLinkRouterAdvPreferredLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The length of time in seconds (relative to the time the
+                        packet is sent) that addresses generated from the prefix
+                        via stateless address autoconfiguration remain preferred."
+        DEFVAL         { 14400 }
+        ::= { tnControlNetworkLinkEntry 77 }
+
+    tnCNLinkRouterAdvSendAdvertState OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Configures the administrative state for the port."
+        DEFVAL         { false }
+        ::= { tnControlNetworkLinkEntry 78 }
+
+    tnCNLinkRouterAdvValidLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The length of time in seconds (relative to the time the
+                        packet is sent) that the interface prefix is valid for
+                        the purpose of on-link determination."
+        DEFVAL         { 86400 }
+        ::= { tnControlNetworkLinkEntry 79 }
+
+    tnCNLinkAutoStateType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         neInitiated(1),
+                         nmsInitiated(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Mechanism used for monitoring the connection with
+                        an NMS:
+                         - neInitiated
+                           NE periodically sends ping messages to the NMS.
+                         - nmsInitiated
+                           An NMS periodically performs an SNMP GET on object
+                           SNMPv2-MIB::sysUpTime."
+        DEFVAL         { neInitiated }
+        ::= { tnControlNetworkLinkEntry 80 }
+
+    tnCNLinkAutoStateStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         connected(1),
+                         notConnected(2),
+                         notApplicable(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The connection status between NE and NMS.
+                         - connected(1):     NE and NMS are connected
+                         - notConnected(2):  NE and NMS are not connected
+                         - notApplicable(3): Fixed value to be used when
+                           tnCNLinkCitAutoStateCtrl for this port is false(2)."
+        ::= { tnControlNetworkLinkEntry 81 }
+
+    tnCNLinkOspfv3HelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..'FFFF'h)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The hello interval of the link.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnControlNetworkLinkEntry 82 }
+
+    tnCNLinkOspfv3TeMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Traffic eng metric of the link.
+
+                        Current configurable range: 1 to 65535."
+        ::= { tnControlNetworkLinkEntry 83 }
+
+    tnCNLinkOspfv3Retransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPFv3 will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPFv3 neighbor.  The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network.  Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                        will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnControlNetworkLinkEntry 84 }
+
+    tnCNLinkOspfv3RtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'7FFFFFFF'h)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The router dead interval of the link.  For 1830, the
+                        range is (1..'FFFF'h)."
+        DEFVAL         { 40 }
+        ::= { tnControlNetworkLinkEntry 85 }
+
+    tnCNLinkOspfv3ConfigRtrPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'FF'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The router priority of the link."
+        DEFVAL         { 1 }
+        ::= { tnControlNetworkLinkEntry 86 }
+
+    tnCNLinkOspfv3RoutingState OBJECT-TYPE
+        SYNTAX         NokiaCNLinkOspfRoutingState
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnControlNetworkLinkEntry 87 }
+
+    tnCNLinkOspfOscRoutingState OBJECT-TYPE
+        SYNTAX         NokiaCNLinkOspfRoutingState
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { enable }
+        ::= { tnControlNetworkLinkEntry 88 }
+
+    tnCNLinkOspfv6OscRoutingState OBJECT-TYPE
+        SYNTAX         NokiaCNLinkOspfRoutingState
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnControlNetworkLinkEntry 89 }
+
+    tnCNLinkDHCPBootFileName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..128))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnControlNetworkLinkEntry 90 }
+
+    tnCNLinkDHCPClassName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnControlNetworkLinkEntry 91 }
+
+---------------------------------------------------------------
+-- Control Network Link Via Channel Table
+---------------------------------------------------------------
+    tnCNLinkViaChannelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnCNLinkViaChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This is a read-only table.  It provides a
+                        secondary way of reading CN Link information."
+        ::= { tnControlNetworkLink 2 }
+
+    tnCNLinkViaChannelEntry OBJECT-TYPE
+        SYNTAX         TnCNLinkViaChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The index has a shelf/slot/port/channel
+                        granularity."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnPortIndex,
+                tnChannelIndex }
+        ::= { tnCNLinkViaChannelTable 1 }
+
+    TnCNLinkViaChannelEntry ::=
+        SEQUENCE {
+            tnPortIndex               TropicPortIndexType,
+            tnChannelIndex            TropicChannelIndexType,
+            tnCNLinkViaChannelIfIndex InterfaceIndex
+         }
+
+    tnPortIndex OBJECT-TYPE
+        SYNTAX         TropicPortIndexType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The port portion of the index of the link."
+        ::= { tnCNLinkViaChannelEntry 1 }
+
+    tnChannelIndex OBJECT-TYPE
+        SYNTAX         TropicChannelIndexType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The channel portion of the index of the link."
+        ::= { tnCNLinkViaChannelEntry 2 }
+
+    tnCNLinkViaChannelIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The interface index of the link, a
+                        derived value created by the system."
+        ::= { tnCNLinkViaChannelEntry 3 }
+
+---------------------------------------------------------------
+-- Ip Static Route Table
+---------------------------------------------------------------
+    tnIpStaticRouteTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnIpStaticRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpRoute 1 }
+
+    tnIpStaticRouteEntry OBJECT-TYPE
+        SYNTAX         TnIpStaticRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        INDEX { tnIpStaticRouteDest,
+                tnIpStaticRouteMask,
+                tnIpStaticRouteTos,
+                tnIpStaticRouteNextHop }
+        ::= { tnIpStaticRouteTable 1 }
+
+    TnIpStaticRouteEntry ::= SEQUENCE {
+        tnIpStaticRouteDest               IpAddress,  -- deprecated
+        tnIpStaticRouteMask               IpAddress,  -- deprecated
+        tnIpStaticRouteTos                Integer32,  -- deprecated
+        tnIpStaticRouteNextHop            Unsigned32,  -- deprecated
+--        obsolete
+--        tnIpStaticRouteIfIndex            InterfaceIndex,
+        tnIpStaticRouteMetric             Integer32,  -- deprecated
+        tnIpStaticRouteWithRedistribution TruthValue,  -- deprecated
+        tnIpStaticRouteRowStatus          RowStatus  -- deprecated
+    }
+
+    tnIpStaticRouteDest OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpStaticRouteEntry 1 }
+
+    tnIpStaticRouteMask OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpStaticRouteEntry 2 }
+
+    tnIpStaticRouteTos OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpStaticRouteEntry 3 }
+
+    tnIpStaticRouteNextHop OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpStaticRouteEntry 4 }
+
+--    obsolete
+--    tnIpStaticRouteIfIndex OBJECT-TYPE ::= { tnIpStaticRouteEntry 5 }
+
+    tnIpStaticRouteMetric OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         deprecated
+        DESCRIPTION    "Determines which route to be entered in the NE routing table
+                        when there are multiple identical routes discovered through
+                        different routing protocols. Lower values have higher precedence.
+
+                        Note: If a value of 255 is entered, the route will NOT be installed in
+                        the routing table. A value of 255 is used to indicate an Unknown route."
+        DEFVAL         { -1 }
+        ::= { tnIpStaticRouteEntry 6 }
+
+    tnIpStaticRouteWithRedistribution OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         deprecated
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnIpStaticRouteEntry 7 }
+
+    tnIpStaticRouteRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnIpStaticRouteEntry 8 }
+
+---------------------------------------------------------------
+-- Ip Cidr Route Table
+---------------------------------------------------------------
+    tnIpCidrRouteTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnIpCidrRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpRoute 2 }
+
+    tnIpCidrRouteEntry OBJECT-TYPE
+        SYNTAX         TnIpCidrRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        AUGMENTS       { ipCidrRouteEntry }
+        ::= { tnIpCidrRouteTable 1 }
+
+    TnIpCidrRouteEntry ::= SEQUENCE {
+        tnIpCidrRouteWithRedistribution TruthValue
+    }
+
+    tnIpCidrRouteWithRedistribution OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnIpCidrRouteEntry 1 }
+
+---------------------------------------------------------------
+-- IP Globals
+---------------------------------------------------------------
+    tnIpRouteGlobal OBJECT IDENTIFIER ::= { tnIpRoute 3 }
+
+    tnIpStaticRouteRedistributeMetricType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric type for static routes.
+
+                        Current configurable range: 1 to 2."
+        DEFVAL         { 2 }
+        ::= { tnIpRouteGlobal 1 }
+
+    tnIpStaticRouteRedistributeMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric for static routes.
+
+                        Current configurable range: 0 to 16777214."
+        DEFVAL         { 20 }
+        ::= { tnIpRouteGlobal 2 }
+
+    tnIpDefaultRouteRedistributeMetricType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric type for the default route.
+
+                        Current configurable range: 1 to 2."
+        DEFVAL         { 2 }
+        ::= { tnIpRouteGlobal 3 }
+
+    tnIpDefaultRouteRedistributeMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric for the default route.
+
+                        Current configurable range: 0 to 16777214."
+        DEFVAL         { 10 }
+        ::= { tnIpRouteGlobal 4 }
+
+    tnIpOspfAreaNumberPPPId OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "For all OSC/GCC interfaces, it will use the
+                        same OSPF area which can be provisioned to
+                        something other than the default 0.0.0.0.
+
+                        Current configurable range: 0 to 3."
+        DEFVAL         { 0 }
+        ::= { tnIpRouteGlobal 5 }
+
+    tnIpOspfRouterId OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 'AC100101'H }
+        ::= { tnIpRouteGlobal 6 }
+
+    tnIpDefaultRouteRedistributeBgpToOspfMetricType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric type for default Bgp to Ospf.
+
+                        Current configurable range: 1 to 2."
+        DEFVAL         { 2 }
+        ::= { tnIpRouteGlobal 7 }
+
+    tnIpDefaultRouteRedistributeBgpToOspfMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric for the default route Bgp to Ospf.
+
+                        Current configurable range: 0 to 16777214."
+        DEFVAL         { 10 }
+        ::= { tnIpRouteGlobal 8 }
+
+    tnIpDefaultRouteRedistributeBgpToOspfMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disable(1),
+                         useMetric(2),
+                         useBgpMed(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnIpRouteGlobal 9 }
+
+    tnIpDefaultRouteRedistributeKernelToOspfMetricType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Redistribute metric type for default Kernel to Ospf.
+
+                        Current configurable range: 1 to 2."
+        DEFVAL         { 2 }
+        ::= { tnIpRouteGlobal 10 }
+
+    tnIpDefaultRouteRedistributeKernelToOspfMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Current configurable range: 0 to 16777214."
+        DEFVAL         { 10 }
+        ::= { tnIpRouteGlobal 11 }
+
+    tnIpDefaultRouteRedistributeKernelToOspfStatus OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnIpRouteGlobal 12 }
+
+    tnIpStaticRouteRedistributeBgpMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Current configurable range: 0 to 16777214."
+        DEFVAL         { 1 }
+        ::= { tnIpRouteGlobal 13 }
+
+    tnIpOspfV3AreaNumberPPPId OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "For all OSC/GCC interfaces, it will use the
+                        same OSPF V3 area which can be provisioned to
+                        something other than the default 0.0.0.0.
+
+                        Current configurable range: 0 to 3."
+        DEFVAL         { 0 }
+        ::= { tnIpRouteGlobal 14 }
+
+    tnIpDefaultRouteRedistributeOspfToBgpMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disable(1),
+                         useOspfMetric(2),
+                         userDefined(3)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnIpRouteGlobal 15 }
+
+    tnIpDefaultRouteRedistributeOspfToBgpMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpRouteGlobal 16 }
+
+---------------------------------------------------------------
+-- Ip Non Detail Route Ospf To Bgp Comm Tag Table
+---------------------------------------------------------------
+    tnIpNonDefaultRouteOspfToBgpCommTagTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnIpNonDefaultRouteOspfToBgpCommTagEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpRoute 4 }
+
+    tnIpNonDefaultRouteOspfToBgpCommTagEntry OBJECT-TYPE
+        SYNTAX         TnIpNonDefaultRouteOspfToBgpCommTagEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnIpNonDefaultRouteOspfToBgpCommTagIndex  }
+        ::= { tnIpNonDefaultRouteOspfToBgpCommTagTable 1 }
+
+    TnIpNonDefaultRouteOspfToBgpCommTagEntry ::= SEQUENCE {
+        tnIpNonDefaultRouteOspfToBgpCommTagIndex         Unsigned32,
+        tnIpNonDefaultRouteOspfToBgpCommTagRowStatus     RowStatus,
+        tnIpNonDefaultRouteOspfToBgpCommTag              SnmpAdminString
+    }
+
+    tnIpNonDefaultRouteOspfToBgpCommTagIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpNonDefaultRouteOspfToBgpCommTagEntry 1 }
+
+    tnIpNonDefaultRouteOspfToBgpCommTagRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.  Sets
+                        are permitted for the following values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnIpNonDefaultRouteOspfToBgpCommTagEntry 2 }
+
+    tnIpNonDefaultRouteOspfToBgpCommTag OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnIpNonDefaultRouteOspfToBgpCommTagEntry 3 }
+
+---------------------------------------------------------------
+-- Ip Non Detail Redist Bgp to Ospf Rule Table
+---------------------------------------------------------------
+    tnIpNonDefaultRedistBgpToOspfRuleTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnIpNonDefaultRedistBgpToOspfRuleEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpRoute 5 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleEntry OBJECT-TYPE
+        SYNTAX         TnIpNonDefaultRedistBgpToOspfRuleEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnIpNonDefaultRedistBgpToOspfRuleIndex  }
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleTable 1 }
+
+    TnIpNonDefaultRedistBgpToOspfRuleEntry ::= SEQUENCE {
+        tnIpNonDefaultRedistBgpToOspfRuleIndex          OCTET STRING,
+        tnIpNonDefaultRedistBgpToOspfRuleRowStatus      RowStatus,
+        tnIpNonDefaultRedistBgpToOspfRuleOspfTag        Unsigned32,
+        tnIpNonDefaultRedistBgpToOspfRuleMode           INTEGER,
+        tnIpNonDefaultRedistBgpToOspfRuleMetric         Unsigned32,
+        tnIpNonDefaultRedistBgpToOspfRuleMetricType     Unsigned32
+    }
+
+    tnIpNonDefaultRedistBgpToOspfRuleIndex OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 1 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.  Sets
+                        are permitted for the following values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 2 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleOspfTag OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 3 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         useBgpMed(1),
+                         userDefined(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Setting of OSPF metric on this route."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 4 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Ospf metrics."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 5 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleMetricType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Ospf Metric Type."
+        ::= { tnIpNonDefaultRedistBgpToOspfRuleEntry 6 }
+
+---------------------------------------------------------------
+-- L1 Traffic Parameter Table
+---------------------------------------------------------------
+    tnL1TrafficParamTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnL1TrafficParamEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDataNetworkLink 3 }
+
+    tnL1TrafficParamEntry OBJECT-TYPE
+        SYNTAX         TnL1TrafficParamEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnL1TrafficParamPerHopBehaviour }
+        ::= { tnL1TrafficParamTable 1 }
+
+    TnL1TrafficParamEntry ::=
+        SEQUENCE {
+            tnL1TrafficParamPerHopBehaviour    TnPerHopBehaviourType,
+            tnL1TrafficParamBookingFactor      Unsigned32,
+            tnL1TrafficParamMaximumLoad        Unsigned32,
+            tnL1TrafficParamPMF                Unsigned32,
+            tnL1TrafficParamAvailableBandwidth Unsigned32
+        }
+
+    tnL1TrafficParamPerHopBehaviour OBJECT-TYPE
+        SYNTAX         TnPerHopBehaviourType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The value of this object identifies the Class
+                        of Service."
+        ::= { tnL1TrafficParamEntry 1 }
+
+    tnL1TrafficParamBookingFactor OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "percentage"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1TrafficParamEntry 2 }
+
+    tnL1TrafficParamMaximumLoad OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "percentage"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1TrafficParamEntry 3 }
+
+    tnL1TrafficParamPMF OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "percentage"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1TrafficParamEntry 4 }
+
+    tnL1TrafficParamAvailableBandwidth OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "Mb/s"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1TrafficParamEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--   tnL1NetworkLinkTable OBJECT-TYPE ::= { tnL1NetworkLink 1 }
+--   tnL1HopTable OBJECT-TYPE ::= { tnL1Hop 1 }
+--   tnL1FiberTable OBJECT-TYPE ::= { tnL1Fiber 1 }
+--   tnL1ConduitTable OBJECT-TYPE ::= { tnL1Conduit 1 }
+
+---------------------------------------------------------------
+-- L1 Automatic Protection Switched Group Table
+---------------------------------------------------------------
+    tnApsGroupTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The automatic protection switch group table."
+        ::= { tnL1Protection 1 }
+
+    tnApsGroupEntry OBJECT-TYPE
+        SYNTAX         TnApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnApsGroupId }
+        ::= { tnApsGroupTable 1 }
+
+    TnApsGroupEntry ::=
+        SEQUENCE {
+            tnApsGroupId                 TnApsGroupId,
+            tnApsGroupRowStatus          RowStatus,
+            tnApsGroupDescr              SnmpAdminString,
+            tnApsGroupMode               TropicProtectionLevel,
+            tnApsGroupRevert             INTEGER,
+            tnApsGroupDirection          INTEGER,
+            tnApsGroupExtraTraffic       AluWdmEnabledDisabled,
+            tnApsGroupWaitToRestore      Unsigned32,
+            tnApsGroupK1K2Rcv            ApsK1K2,
+            tnApsGroupK1K2Trans          ApsK1K2,
+            tnApsGroupCurrentStatus      BITS,
+            tnApsGroupModeMismatches     Counter32,
+            tnApsGroupChannelMismatches  Counter32,
+            tnApsGroupPSBFs              Counter32,
+            tnApsGroupFEPLFs             Counter32,
+            tnApsGroupSwitchedIfIndex    InterfaceIndex,
+            tnApsGroupMembers            SnmpAdminString,
+            tnApsGroupSdEnable           TruthValue,
+            tnApsHoldOffTimer            Unsigned32
+        }
+
+    tnApsGroupId OBJECT-TYPE
+        SYNTAX         TnApsGroupId
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 1 }
+
+    tnApsGroupRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 2 }
+
+    tnApsGroupDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE (0..50))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 3 }
+
+    tnApsGroupMode OBJECT-TYPE
+        SYNTAX         TropicProtectionLevel
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { onePlusOneOpticalSplitter }
+        ::= { tnApsGroupEntry 4 }
+
+    tnApsGroupRevert OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         nonrevertive(1),
+                         revertive(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { nonrevertive }
+        ::= { tnApsGroupEntry 5 }
+
+    tnApsGroupDirection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unidirectional(1),
+                         bidirectional(2),
+                         uniwoaps(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { unidirectional }
+        ::= { tnApsGroupEntry 6 }
+
+    tnApsGroupExtraTraffic OBJECT-TYPE
+        SYNTAX         AluWdmEnabledDisabled
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disabled }
+        ::= { tnApsGroupEntry 7 }
+
+    tnApsGroupWaitToRestore OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "minutes"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: 1 to 20."
+        DEFVAL         { 5 }
+        ::= { tnApsGroupEntry 8 }
+
+    tnApsGroupK1K2Rcv OBJECT-TYPE
+        SYNTAX         ApsK1K2
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 9 }
+
+    tnApsGroupK1K2Trans OBJECT-TYPE
+        SYNTAX         ApsK1K2
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 10 }
+
+    tnApsGroupCurrentStatus OBJECT-TYPE
+        SYNTAX         BITS {
+                         modeMismatch(0),
+                         channelMismatch(1),
+                         psbf(2),
+                         feplf(3),
+                         extraTraffic(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 11 }
+
+    tnApsGroupModeMismatches OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnApsGroupEntry 12 }
+
+    tnApsGroupChannelMismatches OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnApsGroupEntry 13 }
+
+    tnApsGroupPSBFs OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnApsGroupEntry 14 }
+
+    tnApsGroupFEPLFs OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnApsGroupEntry 15 }
+
+    tnApsGroupSwitchedIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsGroupEntry 16 }
+
+    tnApsGroupMembers OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute must be set with the following
+                        format:
+
+                        For the 1696R and 1830 PSS-32 single line ported
+                        cards:
+                          <protChIfIndex>:<workChIfIndex>
+
+                        For the 1830 PSS-1 GBE and MD4H, and 1830 PSS-32
+                        4DAP4A (i.e., all dual-line ported cards):
+                          <protLineIfIndex>:<workLineIfIndex>:<clientIfIndex>
+
+                        The ifIndices must be in decimal ASCII and
+                        delimited by a colon.  If this format is not followed,
+                        the set will fail.  This attribute can only be
+                        set in conjunction with setting tnApsGroupRowStatus.
+
+                        For a row status of createAndGo:
+
+                        If the ifIndices do not represent protection
+                        supported ports, provisioned in the supported
+                        slots, the set will be failed.  Setting this
+                        attribute will result in creating 2 interface
+                        entries in table tnApsMemberTable.
+
+                        For a row status of destroy:
+
+                        If both ifIndices are not set to zero, the set
+                        will be failed.  Setting this attribute will
+                        result in deleting 2 interface entries in table
+                        tnApsMemberTable.
+
+                        No other row status values are supported with
+                        this attribute."
+        ::= { tnApsGroupEntry 17 }
+
+    tnApsGroupSdEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not Signal Degrade is used
+                        for protection switching."
+        DEFVAL         { false }
+        ::= { tnApsGroupEntry 18 }
+
+    tnApsHoldOffTimer OBJECT-TYPE
+        SYNTAX         Unsigned32(0..10000)
+        UNITS          "milli-seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hold Off Time for automatic switching.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnApsGroupEntry 19 }
+
+---------------------------------------------------------------
+-- L1 Automatic Protection Switch Member Table
+---------------------------------------------------------------
+    tnApsMemberTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnApsMemberEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The automatic protection switch group member table."
+        ::= { tnL1Protection 2 }
+
+    tnApsMemberEntry OBJECT-TYPE
+        SYNTAX         TnApsMemberEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnApsGroupId,
+                tnApsMemberIfIndex }
+        ::= { tnApsMemberTable 1 }
+
+    TnApsMemberEntry ::=
+        SEQUENCE {
+            tnApsMemberIfIndex            InterfaceIndex,
+            tnApsMemberRowStatus          RowStatus,
+            tnApsMemberConfigNumber       Integer32,
+--            obsolete
+--            tnApsMemberPriority           INTEGER,
+            tnApsMemberSwitch             INTEGER,
+--            obsolete
+--            tnApsMemberControl            INTEGER,
+            tnApsMemberCurrentStatus      BITS
+--            obsolete
+--            tnApsMemberSignalDegrades     Counter32,
+--            tnApsMemberSignalFailures     Counter32,
+--            tnApsMemberSwitchovers        Counter32,
+--            tnApsMemberLastSwitchover     Unsigned32,
+--            tnApsMemberSwitchoverSeconds  Counter32
+        }
+
+    tnApsMemberIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnApsMemberEntry 1 }
+
+    tnApsMemberRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Changing the row status is currently not supported."
+        ::= { tnApsMemberEntry 2 }
+
+    tnApsMemberConfigNumber OBJECT-TYPE
+        SYNTAX         Integer32 (0..14)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently, only the first two values are used:
+                          0 - Protection
+                          1 - Working
+                        The rest of values (2..14) are not used."
+        ::= { tnApsMemberEntry 3 }
+
+--    obsolete
+--    tnApsMemberPriority OBJECT-TYPE ::= { tnApsMemberEntry 4 }
+
+    tnApsMemberSwitch OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         clear(2),
+                         lockoutOfProtection(3),
+                         forcedSwitchWorkToProtect(4),
+                         forcedSwitchProtectToWork(5),
+                         manualSwitchWorkToProtect(6),
+                         manualSwitchProtectToWork(7),
+                         exercise(8)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of protection switch."
+        DEFVAL         { noCmd }
+        ::= { tnApsMemberEntry 5 }
+
+--    obsolete
+--    tnApsMemberControl OBJECT-TYPE ::= { tnApsMemberEntry 6 }
+
+    tnApsMemberCurrentStatus OBJECT-TYPE
+        SYNTAX         BITS {
+                         lockedOut(0),
+                         sd(1),
+                         sf(2),
+                         switched(3),
+                         txActive(4),
+                         txStandby(5),
+                         rxActive(6),
+                         rxStandby(7)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current protection status."
+        ::= { tnApsMemberEntry 7 }
+
+--    obsolete
+--    tnApsMemberSignalDegrades    OBJECT-TYPE ::= { tnApsMemberEntry 8 }
+--    tnApsMemberSignalFailures    OBJECT-TYPE ::= { tnApsMemberEntry 9 }
+--    tnApsMemberSwitchovers       OBJECT-TYPE ::= { tnApsMemberEntry 10 }
+--    tnApsMemberLastSwitchover    OBJECT-TYPE ::= { tnApsMemberEntry 11 }
+--    tnApsMemberSwitchoverSeconds OBJECT-TYPE ::= { tnApsMemberEntry 12 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnCnIpTunnelTable OBJECT-TYPE ::= { tnIpTunnel 1 }
+
+---------------------------------------------------------------
+-- Control Network Map Table
+---------------------------------------------------------------
+    tnControlNetworkMapTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnControlNetworkMapEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The control network map table."
+        ::= { tnControlNetworkMap 1 }
+
+    tnControlNetworkMapEntry OBJECT-TYPE
+        SYNTAX         TnControlNetworkMapEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Control Network map entry.  This is the
+                        information on the neighbors of this NE."
+        INDEX { tnCNMapTableIndex }
+        ::= { tnControlNetworkMapTable 1 }
+
+    TnControlNetworkMapEntry ::=
+        SEQUENCE {
+            tnCNMapTableIndex           Unsigned32,
+            tnCNMapIpAddress            IpAddress,
+            tnCNMapNeName               OCTET STRING,
+            tnCNMapSoftwareRelease      OCTET STRING,
+            tnCNMapIpv6InetAddress      SnmpAdminString,
+            tnCNMapIpv4Address          IpAddress
+         }
+
+    tnCNMapTableIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The index into the map table."
+        ::= { tnControlNetworkMapEntry 1 }
+
+    tnCNMapIpAddress OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The IP address of the node."
+        ::= { tnControlNetworkMapEntry 2 }
+
+    tnCNMapNeName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..81))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The name of the node."
+        ::= { tnControlNetworkMapEntry 3 }
+
+    tnCNMapSoftwareRelease OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..81))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The software release of the node."
+        ::= { tnControlNetworkMapEntry 4 }
+
+    tnCNMapIpv6InetAddress OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address."
+        DEFVAL         { ''H }
+        ::= { tnControlNetworkMapEntry 5 }
+
+    tnCNMapIpv4Address OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "IP Address."
+        DEFVAL         { '00000000'H }
+        ::= { tnControlNetworkMapEntry 6 }
+
+---------------------------------------------------------------
+-- Network Interface Table
+---------------------------------------------------------------
+    tnNetIfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnNetIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The network interface table."
+        ::= { tnNetworkInterface 1 }
+
+    tnNetIfEntry OBJECT-TYPE
+        SYNTAX         TnNetIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnNetIfIndex }
+        ::= { tnNetIfTable 1 }
+
+    TnNetIfEntry ::=
+        SEQUENCE {
+            tnNetIfIndex                         Unsigned32,
+            tnNetIfTypeOfOperation               AluWdmTypeOfNetIfOperation,
+            tnNetIfStatus                        INTEGER,
+            tnNetIfPacketType                    INTEGER,
+            tnNetIfMtu                           Integer32,
+            tnNetIfHelloInterval                 Unsigned32,
+            tnNetIfRtrDeadInterval               Unsigned32,
+            tnNetIfMetric                        Unsigned32,
+            tnNetIfOspfAuthentType               INTEGER,
+            tnNetIfOspfAuthKey                   OCTET STRING,
+            tnNetIfOspfAuthKeyId                 Unsigned32,
+            tnNetIfCnLinkAdjState                TropicOspfAdjacencyStateType,
+            tnNetIfMtuNeg                        Integer32,
+            tnNetIfOSPFAreaNumberId              Integer32,
+            tnNetIfOspfRetransint                Unsigned32,
+            tnNetIfOspfv3AdjStateId              TropicOspfAdjacencyStateType,
+            tnNetIfOspfNeighborRouterIp          IpAddress,
+            tnNetIfOspfv3NeighborRouterIp        IpAddress,
+            tnNetIfOspfNeighborIp                IpAddress,
+            tnNetIfOspfv3NeighborInetAddress     InetAddress,
+            tnNetIfIPv6LinkLocalInetAddress      InetAddress,
+            tnNetIfLcpEchoInterval               Unsigned32,
+            tnNetIfLcpEchoFailure                Unsigned32,
+            tnNetIfOspfStatus                    INTEGER,
+            tnNetIfOspfv3AreaNumberId            Integer32,
+            tnNetIfOspfv3HelloInterval           Unsigned32,
+            tnNetIfOspfv3Metric                  Unsigned32,
+            tnNetIfOspfv3Retransint              Unsigned32,
+            tnNetIfOspfv3RtrDeadInterval         Unsigned32,
+            tnNetIfOspfv3ConfigRtrPriority       Unsigned32,
+            tnNetIfOspfv3Status                  INTEGER
+         }
+
+    tnNetIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..512)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Access identifier for the Network Interface Index."
+        ::= { tnNetIfEntry 1 }
+
+    tnNetIfTypeOfOperation OBJECT-TYPE
+        SYNTAX         AluWdmTypeOfNetIfOperation
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Create, delete, or modify a network interface
+                        instance over an ECC."
+        ::= { tnNetIfEntry 2 }
+
+    tnNetIfStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Administrative status of the network interface."
+        DEFVAL         { disable }
+        ::= { tnNetIfEntry 3 }
+
+    tnNetIfPacketType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         std(1),
+                         non-std(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "GCC packet type, which indicates if the NETIF
+                        packet type is standard (std) or non-standard
+                        (nonstd).  Only provisionable for 4DPA4, 11DPE12,
+                        11STAR1, and 11STMM10 pack related NETIFs.  If
+                        tnNetIfPacketType is std, tnNetIfMtu can be
+                        changed.  If tnNetIfPacketType is nonStd,
+                        tnNetIfMtu is always the default value and
+                        cannot be changed.  Changing tnNetIfPacketType
+                        from std to nonStd results in tnNetIfMtu of
+                        the NETIF being changed to the default value.
+
+
+                        Default:
+                          nonstd for 4DPA4, 11DPE12, 11STAR1, and 11STMM10.
+                          std for all others."
+        ::= { tnNetIfEntry 4 }
+
+    tnNetIfMtu OBJECT-TYPE
+        SYNTAX         Integer32 (576..1500)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Maximum Transmission Unit size, in units of
+                        bytes.  This attribute can only be changed if
+                        tnNetIfPacketType is std.
+
+                        Current configurable range: 576 to 1500.
+
+                        Default:
+                          1473 for 4DPA4, 11DPE12, 11STAR1, and 11STMM10.
+                          1500 for all others."
+        ::= { tnNetIfEntry 5 }
+
+    tnNetIfHelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the hello interval for the interface.
+                        The Hello interval specifies how often (in
+                        seconds) a hello packet is sent out on the
+                        interface. Hello packets are used to establish
+                        and maintain relationships with neighboring network
+                        elements.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnNetIfEntry 6 }
+
+    tnNetIfRtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPF Router Dead Interval of the interface.
+                        This is the time elapsed between not hearing a
+                        router's Hello PDU before the interface OSPF
+                        state is declared down.  The dead interval is
+                        a timer used to timeout inactive adjacencies.
+                        The dead interval value should always be greater
+                        than the hello interval value.  By default, the
+                        interface shall be set to four times the value
+                        of the HELLOINT, so the default is 40 seconds.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 40 }
+        ::= { tnNetIfEntry 7 }
+
+    tnNetIfMetric OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPF Metric or Cost of the interface.  The lower
+                        the cost, the more preferred the interface is
+                        for the routing of packets.
+
+                        Current configurable range: 1 to 65535.
+
+                        Default:
+                          14 for ODU4/OTU4 NETIF
+                          18 for ODU3e2/OTU3e2 NETIF
+                          20 for ODU3/OTU3 NETIF
+                          28 for ODU2e/OTU2e NETIF
+                          30 for ODU2/OTU2 NETIF
+                          40 for ODU1/OTU1 NETIF."
+        ::= { tnNetIfEntry 8 }
+
+    tnNetIfOspfAuthentType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         simple(2),
+                         md5(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies OSPF authentication on the interface
+                        - only none and MD5 are currently supported."
+        DEFVAL         { none }
+        ::= { tnNetIfEntry 9 }
+
+    tnNetIfOspfAuthKey OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Key used for OSPF MD5 128 bit hash value key
+                        calculation on the interface.  The string shall
+                        be 0 to 16 uppercase or lowercase alphanumeric
+                        characters."
+        DEFVAL         { "" }
+        ::= { tnNetIfEntry 10 }
+
+    tnNetIfOspfAuthKeyId OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Key used for OSPF MD5 128 bit hash value key
+                        calculation on the interface.
+
+                        Current configurable range: 1 to 255."
+        DEFVAL         { 1 }
+        ::= { tnNetIfEntry 11 }
+
+    tnNetIfCnLinkAdjState OBJECT-TYPE
+        SYNTAX         TropicOspfAdjacencyStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "NETIF OSPF adjacency state."
+        DEFVAL         { down }
+        ::= { tnNetIfEntry 12 }
+
+    tnNetIfMtuNeg OBJECT-TYPE
+        SYNTAX         Integer32 (-1..1500)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The actual (negotiated) Maximum Transmission
+                        Unit size,in units of bytes with default value
+                        -1, when the MTU size has not yet been negotiated.
+                        The default value -1 should be interpreted by
+                        UIs as '-'."
+        DEFVAL         { -1 }
+        ::= { tnNetIfEntry 13 }
+
+    tnNetIfOSPFAreaNumberId OBJECT-TYPE
+        SYNTAX         Integer32 (0..3)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NETIF OSPF area id."
+        DEFVAL         { 0 }
+        ::= { tnNetIfEntry 14 }
+
+    tnNetIfOspfRetransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPF will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPF neighbor.  The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network.  Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                        will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnNetIfEntry 15 }
+
+    tnNetIfOspfv3AdjStateId OBJECT-TYPE
+        SYNTAX         TropicOspfAdjacencyStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Adj state."
+        DEFVAL         { down }
+        ::= { tnNetIfEntry 16 }
+
+    tnNetIfOspfNeighborRouterIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPF Neighbor Router ID."
+        DEFVAL         { '00000000'H }
+        ::= { tnNetIfEntry 17 }
+
+    tnNetIfOspfv3NeighborRouterIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Neighbor Router ID."
+        DEFVAL         { '00000000'H }
+        ::= { tnNetIfEntry 18 }
+
+    tnNetIfOspfNeighborIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPF Neighbor IP Address."
+        DEFVAL         { '00000000'H }
+        ::= { tnNetIfEntry 19 }
+
+    tnNetIfOspfv3NeighborInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of OSPFv3 Neighbor."
+        DEFVAL         { ''H }
+        ::= { tnNetIfEntry 20 }
+
+    tnNetIfIPv6LinkLocalInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of Link Local."
+        DEFVAL         { ''H }
+        ::= { tnNetIfEntry 21 }
+
+    tnNetIfLcpEchoInterval OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NetIf LCP Echo Interval."
+        DEFVAL         { 3 }
+        ::= { tnNetIfEntry 22 }
+
+    tnNetIfLcpEchoFailure OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NetIf LCP Echo Failure."
+        DEFVAL         { 20 }
+        ::= { tnNetIfEntry 23 }
+
+    tnNetIfOspfStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         true(1),
+                         false(2),
+                         redistribute(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NetIf ospf status."
+        DEFVAL         { true }
+        ::= { tnNetIfEntry 24 }
+
+    tnNetIfOspfv3AreaNumberId OBJECT-TYPE
+        SYNTAX         Integer32 (0..3)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NETIF OSPFv3 area id."
+        DEFVAL         { 0 }
+        ::= { tnNetIfEntry 25 }
+
+    tnNetIfOspfv3HelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the hello interval for the interface.
+                        The Hello interval specifies how often (in
+                        seconds) a hello packet is sent out on the
+                        interface. Hello packets are used to establish
+                        and maintain relationships with neighboring network
+                        elements.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnNetIfEntry 26 }
+
+    tnNetIfOspfv3Metric OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Metric or Cost of the interface.  The lower
+                        the cost, the more preferred the interface is
+                        for the routing of packets.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnNetIfEntry 27 }
+
+    tnNetIfOspfv3Retransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPFv3 will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPFv3 neighbor.  The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network.  Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                        will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnNetIfEntry 28 }
+
+    tnNetIfOspfv3RtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Router Dead Interval of the interface.
+                        This is the time elapsed between not hearing a
+                        router's Hello PDU before the interface OSPFv3
+                        state is declared down.  The dead interval is
+                        a timer used to timeout inactive adjacencies.
+                        The dead interval value should always be greater
+                        than the hello interval value.  By default, the
+                        interface shall be set to four times the value
+                        of the HELLOINT, so the default is 40 seconds.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 40 }
+        ::= { tnNetIfEntry 29 }
+
+    tnNetIfOspfv3ConfigRtrPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'FF'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The router priority of the link."
+        DEFVAL         { 1 }
+        ::= { tnNetIfEntry 30 }
+
+    tnNetIfOspfv3Status OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         true(1),
+                         false(2),
+                         redistribute(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "NetIf ospfv3 status."
+        DEFVAL         { true }
+        ::= { tnNetIfEntry 31 }
+
+---------------------------------------------------------------
+-- Network Interface Facility Table
+---------------------------------------------------------------
+    tnNetIfFacilityTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnNetIfFacilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Network interface facility table."
+        ::= { tnNetworkInterface 2 }
+
+    tnNetIfFacilityEntry OBJECT-TYPE
+        SYNTAX         TnNetIfFacilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnNetIfIndex,
+                tnNetIfFacilityIfIndex,
+                tnNetIfFacilityIfIndexLo }
+        ::= { tnNetIfFacilityTable 1 }
+
+    TnNetIfFacilityEntry ::=
+        SEQUENCE {
+            tnNetIfFacilityIfIndex             Unsigned32,
+            tnNetIfFacilityIfIndexLo           Unsigned32,
+            tnNetIfFacilityTypeOfOperation     AluWdmTypeOfNetIfOperation,
+            tnNetIfFacilityEccChanType         INTEGER
+    }
+
+    tnNetIfFacilityIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The facility carrying the ECC.  The format
+                        of the first 32 bits of the 64 index is as
+                        follows:
+
+                 8               8       1          13                2
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |    shelf      |     slot      |0|   port/hoOdu/oduptf     |dir|
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                        tnNetIfFacilityIfIndexLo (below) is the next
+                        32 bits of the 64 bit index.
+
+                        Refer to the 1830 PSS R6.0 XCOM RRS for valid
+                        values of facility and shelf and slot and port
+                        ranges for each supported circuit pack type."
+        ::= { tnNetIfFacilityEntry 1 }
+
+    tnNetIfFacilityIfIndexLo OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The facility carrying the ECC.  tnNetIfFacilityIfIndex
+                        (above) is the first 32 bits of the 64 bit index.
+                        The format of the second 32 bit of the index is
+                        as follows:
+
+                 9           3    2   2     4         6           6
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |   loOdu/optsg   | tcm |pos|res|facType|  subFac   |     25    |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                        Refer to the 1830 PSS R6.0 XCOM RRS for valid
+                        values of facility and shelf and slot and port
+                        ranges for each supported circuit pack type."
+        ::= { tnNetIfFacilityEntry 2 }
+
+    tnNetIfFacilityTypeOfOperation OBJECT-TYPE
+        SYNTAX         AluWdmTypeOfNetIfOperation
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Create, delete, or modify the facility information
+                        of a network interface instance."
+        ::= { tnNetIfFacilityEntry 3 }
+
+    tnNetIfFacilityEccChanType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         gcc0(1),  -- the referred ECC is a GCC0
+                         gcc1(2),  -- the referred ECC is a GCC1
+                         gcc2(3)   -- the referred ECC is a GCC2
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the ECC type of the referred ECC channel.
+
+                        Default:
+                          gcc0 if NETIF addresses an OTU
+                          gcc1 if NETIF addresses an ODU.
+
+                        Refer to the 1830 PSS R6.0 XCOM RRS for valid
+                        values of eccchnl supported on facility and
+                        shelf and slot and port ranges for each supported
+                        circuit pack type."
+        ::= { tnNetIfFacilityEntry 4 }
+
+--------------------------------------------------------------------------------
+-- PACK APS Table
+--------------------------------------------------------------------------------
+    tnPackApsGroupTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPackApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1Protection 3 }
+
+    tnPackApsGroupEntry OBJECT-TYPE
+        SYNTAX         TnPackApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnPackApsGroupID }
+        ::= { tnPackApsGroupTable 1 }
+
+    TnPackApsGroupEntry ::=
+        SEQUENCE {
+            tnPackApsGroupID                 Unsigned32,
+            tnPackApsGroupRowStatus          RowStatus,
+            tnPackApsGroupWorkIfIndex        Integer32,
+            tnPackApsGroupProtIfIndex        Integer32,
+            tnPackApsGroupDescr              SnmpAdminString,
+            tnPackApsGroupRevert             INTEGER,
+            tnPackApsGroupDirection          INTEGER,
+            tnPackApsGroupWaitToRestore      Unsigned32,
+            tnPackApsGroupHoldOffTimer       Unsigned32,
+            tnPackApsGroupSwitchCmd          INTEGER,
+            tnPackApsGroupActSide            INTEGER,
+            tnPackApsGroupCurrentStatus      INTEGER,
+            tnPackApsGroupWorkStatus         INTEGER,
+            tnPackApsGroupProtStatus         INTEGER,
+            tnPackApsGroupPortFailEnable     TruthValue
+    }
+
+    tnPackApsGroupID OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPackApsGroupEntry 1 }
+
+    tnPackApsGroupRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPackApsGroupEntry 2 }
+
+    tnPackApsGroupWorkIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index in the working pack."
+        ::= { tnPackApsGroupEntry 3 }
+
+    tnPackApsGroupProtIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index in the protection pack."
+        ::= { tnPackApsGroupEntry 4 }
+
+    tnPackApsGroupDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..63))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Description for the APS group."
+        ::= { tnPackApsGroupEntry 5 }
+
+    tnPackApsGroupRevert OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         nonrevertive(1),
+                         revertive(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The revertive attribute of the APS group."
+        ::= { tnPackApsGroupEntry 6 }
+
+    tnPackApsGroupDirection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unidirectional(1),
+                         bidirectional(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection direction of the APS Group.Only Unidirection"
+        ::= { tnPackApsGroupEntry 7 }
+
+    tnPackApsGroupWaitToRestore OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..15)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The wait-to-restore time for the revertive mode
+                        automatic switching.  The values are in minutes.
+
+                        Current configurable range: 1 to 15."
+        DEFVAL         { 5 }
+        ::= { tnPackApsGroupEntry 8 }
+
+    tnPackApsGroupHoldOffTimer OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..10000)
+        UNITS          "milli-seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hold Off Time for automatic switching.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 10 }
+        ::= { tnPackApsGroupEntry 9 }
+
+    tnPackApsGroupSwitchCmd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         clear(2),
+                         lockoutOfProtection(3),
+                         forcedSwitchWorkToProtect(4),
+                         forcedSwitchProtectToWork(5),
+                         manualSwitchWorkToProtect(6),
+                         manualSwitchProtectToWork(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The switch command applied to the APS group."
+        DEFVAL         { noCmd }
+        ::= { tnPackApsGroupEntry 10 }
+
+    tnPackApsGroupActSide OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         working(1),
+                         protection(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Active side in the Pack APS group."
+        DEFVAL         { working }
+        ::= { tnPackApsGroupEntry 11 }
+
+    tnPackApsGroupCurrentStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         lockoutNe(1),
+                         frcdNe(2),
+                         sfNe(3),
+                         sdNe(4),
+                         manNe(5),
+                         wtrNe(6),
+                         dnr(7),
+                         nr(8),
+                         lockoutFe(9),
+                         frcdFe(10),
+                         sfFe(11),
+                         sdFe(12),
+                         manFe(13),
+                         wtrFe(14),
+                         exerNe(15),
+                         exerFe(16)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Currently active switch request for a Pack APS."
+        DEFVAL         { nr }
+        ::= { tnPackApsGroupEntry 12 }
+
+    tnPackApsGroupWorkStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sf(1),
+                         sd(2),
+                         none(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the working pack in
+                        the APS group."
+        DEFVAL         { none }
+        ::= { tnPackApsGroupEntry 13 }
+
+    tnPackApsGroupProtStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sf(1),
+                         sd(2),
+                         none(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the protection pack
+                        in the APS group."
+        DEFVAL         { none }
+        ::= { tnPackApsGroupEntry 14 }
+
+    tnPackApsGroupPortFailEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not Port fail is used
+                        for protection switching."
+        DEFVAL         { false }
+        ::= { tnPackApsGroupEntry 15 }
+
+---------------------------------------------------------------
+-- Static Route Table
+---------------------------------------------------------------
+    tnStaticRouteTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnStaticRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRoute 1 }
+
+    tnStaticRouteEntry OBJECT-TYPE
+        SYNTAX         TnStaticRouteEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnStaticRouteIdentifier,
+                tnStaticRouteDestInetAddressType,
+                tnStaticRouteDestInetAddress,
+                tnStaticRouteMaskPrefix,
+                tnStaticRouteTos,
+                tnStaticRouteNextHopType,
+                tnStaticRouteNextHop
+              }
+        ::= { tnStaticRouteTable 1 }
+
+    TnStaticRouteEntry ::= SEQUENCE {
+        tnStaticRouteDestInetAddressType   InetAddressType,
+        tnStaticRouteDestInetAddress       InetAddress,
+        tnStaticRouteMaskPrefix            Unsigned32,
+        tnStaticRouteTos                   Integer32,
+        tnStaticRouteNextHopType           INTEGER,
+        tnStaticRouteNextHop               OCTET STRING,
+        tnStaticRouteMetric                Integer32,
+        tnStaticRouteWithRedistribution    TruthValue,
+        tnStaticRouteRowStatus             RowStatus,
+        tnStaticRouteIdentifier            Integer32,
+        tnStaticRouteWithBgpDistribution   TruthValue
+    }
+
+    tnStaticRouteDestInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 1 }
+
+    tnStaticRouteDestInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 2 }
+
+    tnStaticRouteMaskPrefix OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 3 }
+
+    tnStaticRouteTos OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 4 }
+
+    tnStaticRouteNextHopType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ipv4(1),
+                         ipv6(2),
+                         netIf(3),
+                         ifIndex(4)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 5 }
+
+    tnStaticRouteNextHop OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 6 }
+
+    tnStaticRouteMetric OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Determines which route to be entered in the NE routing table
+                        when there are multiple identical routes discovered through
+                        different routing protocols. Lower values have higher precedence.
+
+                        Note: If a value of 255 is entered, the route will NOT be installed in
+                        the routing table. A value of 255 is used to indicate an Unknown route."
+        DEFVAL         { -1 }
+        ::= { tnStaticRouteEntry 7 }
+
+    tnStaticRouteWithRedistribution OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnStaticRouteEntry 8 }
+
+    tnStaticRouteRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 9 }
+
+    tnStaticRouteIdentifier OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 10 }
+
+    tnStaticRouteWithBgpDistribution OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnStaticRouteEntry 11 }
+
+---------------------------------------------------------------
+-- Ethernet Table
+---------------------------------------------------------------
+    tnEthIfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnEthIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Ethernet table."
+        ::= { tnEthernetInterface 1 }
+
+    tnEthIfEntry OBJECT-TYPE
+        SYNTAX         TnEthIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnEthIfIndex }
+        ::= { tnEthIfTable 1 }
+
+    TnEthIfEntry ::=
+        SEQUENCE {
+            tnEthIfIndex                          Unsigned32,
+            tnEthIfTypeOfOperation                AluWdmTypeOfNetIfOperation,
+            tnEthIfStatus                         INTEGER,
+            tnEthIfHelloInterval                  Unsigned32,
+            tnEthIfRtrDeadInterval                Unsigned32,
+            tnEthIfMetric                         Unsigned32,
+            tnEthIfOspfAuthentType                INTEGER,
+            tnEthIfOspfAuthKey                    OCTET STRING,
+            tnEthIfOspfAuthKeyId                  Unsigned32,
+            tnEthIfOSPFAreaNumberId               Integer32,
+            tnEthIfProxyArp                       INTEGER,
+            tnEthIfOspfRouteState                 INTEGER,
+            tnEthIfDhcpEnabled                    TruthValue,
+            tnEthIfDHCPRange                      Unsigned32,
+            tnEthIfDHCPDfltGtwy                   TruthValue,
+            tnEthIfDhcpv6Enabled                  TruthValue,
+            tnEthIfDHCPv6Range                    Unsigned32,
+            tnEthIfDHCPClient                     TruthValue,
+            tnEthIfDHCPClientDfltGtwy             TruthValue,
+            tnEthIfIpV6SLAAC                      TruthValue,
+            tnEthIfIpAddress                      IpAddress,
+            tnEthIfSubnetMask                     IpAddress,
+            tnEthIfInetAddressType                InetAddressType,
+            tnEthIfInetAddress                    InetAddress,
+            tnEthIfPrefixLength                   InetAddressPrefixLength,
+            tnEthIfDescription                    SnmpAdminString,
+            tnEthIfOspfAdjStateId                 INTEGER,
+            tnEthIfOspfDrPriorityId               Integer32,
+            tnEthIfOspfRetransint                 Unsigned32,
+            tnEthIfOspfv3AdjStateId               TropicOspfAdjacencyStateType,
+            tnEthIfOperStatus                     TropicLinkOperationalStateType,
+            tnEthIfAlmProfName                    OCTET STRING,
+            tnEthIfDHCPServerIPv6SLAAC            SnmpAdminString,
+            tnEthIfRouterAdvAutonomousFlag        TruthValue,
+            tnEthIfRouterAdvDefaultLifeTime       Unsigned32,
+            tnEthIfRouterAdvDefaultPreference     INTEGER,
+            tnEthIfRouterAdvMaxRtrAdvInterval     Unsigned32,
+            tnEthIfRouterAdvManagedFlag           TruthValue,
+            tnEthIfRouterAdvOtherConfigFlag       TruthValue,
+            tnEthIfRouterAdvPreferredLifeTime     Unsigned32,
+            tnEthIfRouterAdvSendAdvertState       TruthValue,
+            tnEthIfRouterAdvValidLifeTime         Unsigned32,
+            tnEthIfOspfv3AreaNumberId             Integer32,
+            tnEthIfOspfv3HelloInterval            Unsigned32,
+            tnEthIfOspfv3Metric                   Unsigned32,
+            tnEthIfOspfv3Retransint               Unsigned32,
+            tnEthIfOspfv3RtrDeadInterval          Unsigned32,
+            tnEthIfOspfv3DrPriorityId             Integer32,
+            tnEthIfOspfv3RouteState               INTEGER
+        }
+
+    tnEthIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..64)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Access identifier for the Ethernet Index."
+        ::= { tnEthIfEntry 1 }
+
+    tnEthIfTypeOfOperation OBJECT-TYPE
+        SYNTAX         AluWdmTypeOfNetIfOperation
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfEntry 2 }
+
+    tnEthIfStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Administrative status of the Ethernet."
+        DEFVAL         { disable }
+        ::= { tnEthIfEntry 3 }
+
+    tnEthIfHelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the hello interval for the interface.  The
+                        Hello interval specifies how often (in seconds) a hello
+                        packet is sent out on the interface.  Hello packets are
+                        used to establish and maintain relationships with
+                        neighboring network elements.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnEthIfEntry 4 }
+
+    tnEthIfRtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPF Router Dead Interval of the interface.  This is the
+                        time elapsed between not hearing a router's Hello PDU
+                        before the interface OSPF state is declared down.  The
+                        dead interval is a timer used to timeout inactive
+                        adjacencies.  The dead interval value should always be
+                        greater than the hello interval value.  By default, the
+                        interface shall be set to four times the value of the
+                        HELLOINT, so the default is 40 seconds.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 40 }
+        ::= { tnEthIfEntry 5 }
+
+    tnEthIfMetric OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPF metric or cost of the interface.  The lower the cost,
+                        the more preferred the interface is for the routing of
+                        packets.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 16 }
+        ::= { tnEthIfEntry 6 }
+
+    tnEthIfOspfAuthentType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         simple(2),
+                         md5(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies OSPF authentication on the interface - only
+                        none and MD5 are currently supported."
+        DEFVAL         { none }
+        ::= { tnEthIfEntry 7 }
+
+    tnEthIfOspfAuthKey OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Key used for OSPF MD5 128 bit hash value key calculation
+                        on the interface.  The string shall be 0 to 16 uppercase
+                        or lowercase alphanumeric
+                        characters."
+        DEFVAL         { "" }
+        ::= { tnEthIfEntry 8 }
+
+    tnEthIfOspfAuthKeyId OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Key used for OSPF MD5 128 bit hash value key calculation
+                        on the interface.
+
+                        Current configurable range: 1 to 255."
+        DEFVAL         { 1 }
+        ::= { tnEthIfEntry 9 }
+
+    tnEthIfOSPFAreaNumberId OBJECT-TYPE
+        SYNTAX         Integer32 (0..3)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ETHIF OSPF area id."
+        DEFVAL         { 0 }
+        ::= { tnEthIfEntry 10 }
+
+    tnEthIfProxyArp OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disable }
+        ::= { tnEthIfEntry 11 }
+
+    tnEthIfOspfRouteState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noDynamicRouting(1),
+                         redistribute(2),
+                         oSPF(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the OSPF routing state of the ETHIF interface."
+        DEFVAL         { noDynamicRouting }
+        ::= { tnEthIfEntry 12 }
+
+    tnEthIfDhcpEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 13 }
+
+    tnEthIfDHCPRange OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DHCP range.
+
+                        Current configurable range: 0 to 10."
+        DEFVAL         { 1 }
+        ::= { tnEthIfEntry 14 }
+
+    tnEthIfDHCPDfltGtwy OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { true }
+        ::= { tnEthIfEntry 15 }
+
+    tnEthIfDhcpv6Enabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 16 }
+
+    tnEthIfDHCPv6Range OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DHCP version 6 range.
+
+                        Current configurable range: 0 to 10."
+        DEFVAL         { 1 }
+        ::= { tnEthIfEntry 17 }
+
+    tnEthIfDHCPClient OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if default gateway IP address is distributed
+                        via DHCP  on this interface."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 18 }
+
+    tnEthIfDHCPClientDfltGtwy OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if default gateway IP address is distributed
+                        via DHCP Client on this interface."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 19 }
+
+    tnEthIfIpV6SLAAC OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable or disable a StateLess Address AutoConfig (SLAAC)."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 20 }
+
+    tnEthIfIpAddress OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfEntry 21 }
+
+    tnEthIfSubnetMask OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfEntry 22 }
+
+    tnEthIfInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { unknown }
+        ::= { tnEthIfEntry 23 }
+
+    tnEthIfInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address."
+        DEFVAL         { ''H }
+        ::= { tnEthIfEntry 24 }
+
+    tnEthIfPrefixLength OBJECT-TYPE
+        SYNTAX         InetAddressPrefixLength
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Prefix length of the IPV6"
+        DEFVAL         { 0 }
+        ::= { tnEthIfEntry 25 }
+
+    tnEthIfDescription OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Ethif Description."
+        DEFVAL         { "" }
+        ::= { tnEthIfEntry 26 }
+
+    tnEthIfOspfAdjStateId OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         init(2),
+                         twoWay(3),
+                         exchangeStart(4),
+                         exchange(5),
+                         loading(6),
+                         full(7)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Specifies OSPF adj state"
+        DEFVAL         { down }
+        ::= { tnEthIfEntry 27 }
+
+    tnEthIfOspfDrPriorityId OBJECT-TYPE
+        SYNTAX         Integer32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 1 }
+        ::= { tnEthIfEntry 28 }
+
+    tnEthIfOspfRetransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPF will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPF neighbor. The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network. Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                         will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnEthIfEntry 29 }
+
+    tnEthIfOspfv3AdjStateId OBJECT-TYPE
+        SYNTAX         TropicOspfAdjacencyStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Adj state."
+        DEFVAL         { down }
+        ::= { tnEthIfEntry 30 }
+
+    tnEthIfOperStatus OBJECT-TYPE
+        SYNTAX         TropicLinkOperationalStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Operational status of the IBM link."
+        ::= { tnEthIfEntry 31 }
+
+    tnEthIfAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Alarm profile for IBM link."
+        ::= { tnEthIfEntry 32 }
+
+    tnEthIfDHCPServerIPv6SLAAC OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnEthIfEntry 33 }
+
+    tnEthIfRouterAdvAutonomousFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When enabled, indicates that the interface prefix can
+                        be used for autonomous stateless address configuration."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 34 }
+
+    tnEthIfRouterAdvDefaultLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..9000)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The lifetime associated with the default router."
+        DEFVAL         { 0 }
+        ::= { tnEthIfEntry 35 }
+
+    tnEthIfRouterAdvDefaultPreference OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         low(1),
+                         medium(2),
+                         high(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The preference associated with the default router."
+        DEFVAL         { medium }
+        ::= { tnEthIfEntry 36 }
+
+    tnEthIfRouterAdvMaxRtrAdvInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (10..1800)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The maximum time allowed between sending unsolicited
+                        multicast Router Advertisements from the interface."
+        DEFVAL         { 600 }
+        ::= { tnEthIfEntry 37 }
+
+    tnEthIfRouterAdvManagedFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When enabled, hosts use the administered (stateful)
+                        protocol for address autoconfiguration in addition to
+                        any addresses autoconfigured using stateless address
+                        autoconfiguration (SLAAC)."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 38 }
+
+    tnEthIfRouterAdvOtherConfigFlag OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When set, hosts use the administered (stateful) protocol
+                        for autoconfiguration of other (non-address) information."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 39 }
+
+    tnEthIfRouterAdvPreferredLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The length of time in seconds (relative to the time the
+                        packet is sent) that addresses generated from the prefix
+                        via stateless address autoconfiguration remain preferred."
+        DEFVAL         { 14400 }
+        ::= { tnEthIfEntry 40 }
+
+    tnEthIfRouterAdvSendAdvertState OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set administrative status of the ETHIF interface."
+        DEFVAL         { false }
+        ::= { tnEthIfEntry 41 }
+
+    tnEthIfRouterAdvValidLifeTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The length of time in seconds (relative to the time the
+                        packet is sent) that the interface prefix is valid for
+                        the purpose of on-link determination."
+        DEFVAL         { 86400 }
+        ::= { tnEthIfEntry 42 }
+
+    tnEthIfOspfv3AreaNumberId OBJECT-TYPE
+        SYNTAX         Integer32 (0..3)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ETHIF OSPFv3 area id."
+        DEFVAL         { 0 }
+        ::= { tnEthIfEntry 43 }
+
+    tnEthIfOspfv3HelloInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the hello interval for the interface.  The
+                        Hello interval specifies how often (in seconds) a hello
+                        packet is sent out on the interface.  Hello packets are
+                        used to establish and maintain relationships with
+                        neighboring network elements.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 10 }
+        ::= { tnEthIfEntry 44 }
+
+    tnEthIfOspfv3Metric OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPFv3 metric or cost of the interface.  The lower the cost,
+                        the more preferred the interface is for the routing of
+                        packets.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 16 }
+        ::= { tnEthIfEntry 45 }
+
+    tnEthIfOspfv3Retransint OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of time, in seconds, that OSPFv3 will
+                        wait before retransmitting an unacknowledged link state
+                        advertisement (LSA) to an OSPFv3 neighbor. The value should
+                        be longer than the expected round trip delay between any
+                        two NEs on the network. Once the retransmit-interval
+                        expires and no acknowledgement has been received, the LSA
+                         will be retransmitted.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 5 }
+        ::= { tnEthIfEntry 46 }
+
+    tnEthIfOspfv3RtrDeadInterval OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSPFv3 Router Dead Interval of the interface.  This is the
+                        time elapsed between not hearing a router's Hello PDU
+                        before the interface OSPFv3 state is declared down.  The
+                        dead interval is a timer used to timeout inactive
+                        adjacencies.  The dead interval value should always be
+                        greater than the hello interval value.  By default, the
+                        interface shall be set to four times the value of the
+                        HELLOINT, so the default is 40 seconds.
+
+                        Current configurable range: 1 to 65535."
+        DEFVAL         { 40 }
+        ::= { tnEthIfEntry 47 }
+
+    tnEthIfOspfv3DrPriorityId OBJECT-TYPE
+        SYNTAX         Integer32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 1 }
+        ::= { tnEthIfEntry 48 }
+
+    tnEthIfOspfv3RouteState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noDynamicRouting(1),
+                         redistribute(2),
+                         oSPF(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the OSPFv3 routing state of the ETHIF interface."
+        DEFVAL         { noDynamicRouting }
+        ::= { tnEthIfEntry 49 }
+
+---------------------------------------------------------------
+-- Ethernet Interface Table
+---------------------------------------------------------------
+    tnEthIfInterfaceTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnEthIfInterfaceEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Ethernet Interface table."
+        ::= { tnEthernetInterface 2 }
+
+    tnEthIfInterfaceEntry OBJECT-TYPE
+        SYNTAX         TnEthIfInterfaceEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnEthIfIndex,
+                tnEthIfInterfaceIfIndex }
+        ::= { tnEthIfInterfaceTable 1 }
+
+    TnEthIfInterfaceEntry ::=
+        SEQUENCE {
+            tnEthIfInterfaceIfIndex             Unsigned32,
+            tnEthIfInterfaceVlanId              Unsigned32,
+            tnEthIfInterfaceTypeOfOperation     AluWdmTypeOfNetIfOperation
+    }
+
+    tnEthIfInterfaceIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfInterfaceEntry 1 }
+
+    tnEthIfInterfaceVlanId OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfInterfaceEntry 2 }
+
+    tnEthIfInterfaceTypeOfOperation OBJECT-TYPE
+        SYNTAX         AluWdmTypeOfNetIfOperation
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEthIfInterfaceEntry 3 }
+
+---------------------------------------------------------------
+-- Dhcp Relay Table
+---------------------------------------------------------------
+    tnDhcpRelayRecordTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnDhcpRelayRecordEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Dhcp Relay Table."
+        ::= { tnDhcpRelay 1 }
+
+    tnDhcpRelayRecordEntry OBJECT-TYPE
+        SYNTAX         TnDhcpRelayRecordEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnDhcpRelayRecordIndex1,
+                tnDhcpRelayRecordIndex2,
+                tnDhcpRelayRecordInetAddressType,
+                tnDhcpRelayRecordInetAddress }
+
+        ::= { tnDhcpRelayRecordTable 1 }
+
+    TnDhcpRelayRecordEntry ::=
+        SEQUENCE {
+            tnDhcpRelayRecordIndex1              Integer32,
+            tnDhcpRelayRecordIndex2              Integer32,
+            tnDhcpRelayRecordInetAddressType     InetAddressType,
+            tnDhcpRelayRecordInetAddress         InetAddress,
+            tnDhcpRelayRecordRowStatus           RowStatus,
+            tnDhcpRelayRecordRailIdDescr         SnmpAdminString
+        }
+
+    tnDhcpRelayRecordIndex1 OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDhcpRelayRecordEntry 1 }
+
+    tnDhcpRelayRecordIndex2 OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDhcpRelayRecordEntry 2 }
+
+    tnDhcpRelayRecordInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The value specifies the type of
+                        Internet address stored in tnDhcpRelayRecordInetAddress."
+        ::= { tnDhcpRelayRecordEntry 3 }
+
+    tnDhcpRelayRecordInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Indicates the IPv6 address of the port."
+        ::= { tnDhcpRelayRecordEntry 4 }
+
+    tnDhcpRelayRecordRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.  Sets
+                        are permitted for the following values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnDhcpRelayRecordEntry 5 }
+
+
+    tnDhcpRelayRecordRailIdDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnDhcpRelayRecordEntry 6 }
+
+------------------------------------------------------------------------------
+-- Dhcp Server Table which is used by 1830 TPS when ZTP is not available
+------------------------------------------------------------------------------
+    tnDhcpServerTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnDhcpServerEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The Dhcp Server Table."
+        ::= { tnDhcpServer 1 }
+
+    tnDhcpServerEntry OBJECT-TYPE
+        SYNTAX         TnDhcpServerEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnDhcpServerInetAddressType,
+                tnDhcpServerInetAddress }
+        ::= { tnDhcpServerTable 1 }
+
+    TnDhcpServerEntry ::=
+        SEQUENCE {
+            tnDhcpServerInetAddressType     InetAddressType,
+            tnDhcpServerInetAddress         InetAddress,
+            tnDhcpServerSerialno            OCTET STRING,
+            tnDhcpServerMacAddress          MacAddress,
+            tnDhcpServerPort                Integer32,
+            tnDhcpServerRowStatus           RowStatus
+        }
+
+    tnDhcpServerInetAddressType OBJECT-TYPE
+        SYNTAX         InetAddressType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The address type of tnDhcpServerInetAddress."
+        ::= { tnDhcpServerEntry 1 }
+
+    tnDhcpServerInetAddress OBJECT-TYPE
+        SYNTAX         InetAddress
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The IP address to which this entry's addressing
+                        information pertains.  The address type of this object
+                        is specified in ipAddressAddrType.
+
+                        Implementors need to be aware that if the size of
+                        ipAddressAddr exceeds 116 octets, then OIDS of
+                        instances of columns in this row will have more than
+                        128 sub-identifiers and cannot be accessed using SNMPv1,
+                        SNMPv2c, or SNMPv3."
+        ::= { tnDhcpServerEntry 2 }
+
+    tnDhcpServerSerialno OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Serial number of system which wants to get IP address
+                        via DHCP"
+        ::= { tnDhcpServerEntry 3 }
+
+    tnDhcpServerMacAddress OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "{xx:xx:xx:xx:xx:xx | xx-xx-xx-xx-xx-xx} - 6-byte unicast
+                        MAC address of the remote ethman port,where xx are
+                        hexadecimal numbers."
+        ::= { tnDhcpServerEntry 4 }
+
+    tnDhcpServerPort OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Serial number of system which wants to get IP address
+                        via DHCP."
+        ::= { tnDhcpServerEntry 5 }
+
+    tnDhcpServerRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.  Sets
+                        are permitted for the following values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnDhcpServerEntry 6 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnControlNetworkLinkGroup OBJECT-GROUP
+        OBJECTS {
+            tnCNLinkDescr,
+            tnCNLinkAdminStatus,
+            tnCNLinkOperStatus,
+--            obsolete
+--            tnCNLinkTopologyId,
+            tnCNLinkPhysicalIfIndex,
+--            obsolete
+--            tnCNLinkBandwidth,
+            tnCNLinkIpAddress,
+            tnCNLinkSubnetMask,
+--            obsolete
+--            tnCNLinkAreaId,
+--            tnCNLinkIfType,
+--            tnCNLinkRtrPriority,
+--            tnCNLinkTransitDelay,
+--            tnCNLinkRetransInterval,
+            tnCNLinkHelloInterval,
+            tnCNLinkRtrDeadInterval,
+--            obsolete
+--            tnCNLinkNbmaPollInterval,
+--            tnCNLinkAckInterval,
+--            tnCNLinkMcastFwding,
+--            tnCNLinkMaxMtuSize,
+--            tnCNLinkDisableFlooding,
+--            tnCNLinkMetricOverride,
+            tnCNLinkTeMetric,
+--            obsolete
+--            tnCNLinkTeDelay,
+--            tnCNLinkProtectionLevel,
+--            tnCNLinkHoldingPriority,
+--            tnCNLinkDestIpAddress,
+--            tnCNLinkDestIfIndex,
+--            tnCNLinkType,
+--            tnCNLinkMgmtPortLocation,
+--            tnCNLinkMgmtPortBootGateway,
+            tnCNLinkOspfRoutingState,
+            tnCNLinkConfigIfType,
+            tnCNLinkConfigRtrPriority,
+            tnCNLinkEquipOperStatus,
+            tnCNLinkDhcpEnabled,
+            tnCNLinkSpeed,
+            tnCNLinkDuplex,
+            tnCNLinkProxyArp,
+            tnCNLinkDHCPServer,
+            tnCNLinkDHCPRange,
+            tnCNLinkAdjState,
+            tnCNLinkOscMode,
+            tnCNLinkDHCPDfltGtwy,
+            tnCNLinkCitAutoStateCtrl,
+            tnCNLinkAutoStateSourceIP,
+            tnCNLinkSourceLossCount,
+            tnCNLinkSourceIPCheckInterval,
+            tnCNLinkOspfAuthentType,
+            tnCNLinkOspfAuthKey,
+            tnCNLinkOspfAuthKeyId,
+            tnCNLinkTdmxDcnConf,
+            tnCNLinkInetAddressType,
+            tnCNLinkInetAddress,
+            tnCNLinkPrefixLength,
+            tnCNLinkAutoStateSourceInetAddressType,
+            tnCNLinkAutoStateSourceInetAddress,
+            tnCNLinkDhcpv6Enabled,
+            tnCNLinkDHCPv6Range,
+            tnCNLinkDHCPClient,
+            tnCNLinkDHCPv6Client,
+            tnCNLinkDHCPClientDfltGtwy,
+            tnCNLinkEtherPortIpV6SLAAC,
+            tnCNLinkOspfRetransint,
+            tnCNLinkOspfv3AdjStateId,
+            tnCNLinkOspfNeighborRouterIp,
+            tnCNLinkOspfv3NeighborRouterIp,
+            tnCNLinkOspfNeighborIp,
+            tnCNLinkOspfv3NeighborInetAddress,
+            tnCNLinkRole,
+            tnCNLinkDHCPServerIPv6SLAAC,
+            tnCNLinkRouterAdvAutonomousFlag,
+            tnCNLinkRouterAdvDefaultLifeTime,
+            tnCNLinkRouterAdvDefaultPreference,
+            tnCNLinkRouterAdvMaxRtrAdvInterval,
+            tnCNLinkRouterAdvManagedFlag,
+            tnCNLinkRouterAdvOtherConfigFlag,
+            tnCNLinkRouterAdvPreferredLifeTime,
+            tnCNLinkRouterAdvSendAdvertState,
+            tnCNLinkRouterAdvValidLifeTime,
+            tnCNLinkAutoStateType,
+            tnCNLinkAutoStateStatus,
+            tnCNLinkOspfv3HelloInterval,
+            tnCNLinkOspfv3TeMetric,
+            tnCNLinkOspfv3Retransint,
+            tnCNLinkOspfv3RtrDeadInterval,
+            tnCNLinkOspfv3ConfigRtrPriority,
+            tnCNLinkOspfv3RoutingState,
+            tnCNLinkOspfOscRoutingState,
+            tnCNLinkOspfv6OscRoutingState,
+            tnCNLinkDHCPBootFileName,
+            tnCNLinkDHCPClassName
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 1 }
+
+    tnCNLinkViaChannelGroup OBJECT-GROUP
+        OBJECTS {
+            tnCNLinkViaChannelIfIndex
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 2 }
+
+    tnIpStaticRouteGroup OBJECT-GROUP
+        OBJECTS {
+--            obsolete
+--            tnIpStaticRouteIfIndex,
+            tnIpStaticRouteMetric,  -- deprecated
+            tnIpStaticRouteWithRedistribution,  -- deprecated
+            tnIpStaticRouteRowStatus  -- deprecated
+        }
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 3 }
+
+    tnIpCidrRouteGroup OBJECT-GROUP
+        OBJECTS {
+            tnIpCidrRouteWithRedistribution
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 4 }
+
+    tnL1TrafficParmGroup OBJECT-GROUP
+        OBJECTS {
+            tnL1TrafficParamBookingFactor,
+            tnL1TrafficParamMaximumLoad,
+            tnL1TrafficParamPMF,
+            tnL1TrafficParamAvailableBandwidth
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 5 }
+
+    tnIpRouteGlobalGroup OBJECT-GROUP
+        OBJECTS {
+            tnIpStaticRouteRedistributeMetricType,
+            tnIpStaticRouteRedistributeMetric,
+            tnIpDefaultRouteRedistributeMetricType,
+            tnIpDefaultRouteRedistributeMetric,
+            tnIpOspfAreaNumberPPPId,
+            tnIpOspfRouterId,
+            tnIpDefaultRouteRedistributeBgpToOspfMetricType,
+            tnIpDefaultRouteRedistributeBgpToOspfMetric,
+            tnIpDefaultRouteRedistributeBgpToOspfMode,
+            tnIpDefaultRouteRedistributeKernelToOspfMetricType,
+            tnIpDefaultRouteRedistributeKernelToOspfMetric,
+            tnIpDefaultRouteRedistributeKernelToOspfStatus,
+            tnIpStaticRouteRedistributeBgpMetric,
+            tnIpOspfV3AreaNumberPPPId,
+            tnIpDefaultRouteRedistributeOspfToBgpMode,
+            tnIpDefaultRouteRedistributeOspfToBgpMetric
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 6 }
+
+    tnStaticRouteGroup OBJECT-GROUP
+        OBJECTS {
+            tnStaticRouteMetric,
+            tnStaticRouteWithRedistribution,
+            tnStaticRouteRowStatus,
+            tnStaticRouteIdentifier,
+            tnStaticRouteWithBgpDistribution
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 7 }
+
+    tnIpNonDefaultRouteOspfToBgpCommTagGroup OBJECT-GROUP
+        OBJECTS {
+            tnIpNonDefaultRouteOspfToBgpCommTagRowStatus,
+            tnIpNonDefaultRouteOspfToBgpCommTag
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 8 }
+
+    tnIpNonDefaultRedistBgpToOspfRuleGroup OBJECT-GROUP
+        OBJECTS {
+            tnIpNonDefaultRedistBgpToOspfRuleRowStatus,
+            tnIpNonDefaultRedistBgpToOspfRuleOspfTag,
+            tnIpNonDefaultRedistBgpToOspfRuleMode,
+            tnIpNonDefaultRedistBgpToOspfRuleMetric,
+            tnIpNonDefaultRedistBgpToOspfRuleMetricType
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 9 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnL1NetworkLinkGroup OBJECT-GROUP ::= { tnL1ServiceGroups 6 }
+--    tnL1HopGroup         OBJECT-GROUP ::= { tnL1ServiceGroups 7 }
+--    tnL1FiberGroup       OBJECT-GROUP ::= { tnL1ServiceGroups 8 }
+--    tnL1ConduitGroup     OBJECT-GROUP ::= { tnL1ServiceGroups 9 }
+
+    tnApsGroup OBJECT-GROUP
+        OBJECTS {
+            tnApsGroupRowStatus,
+            tnApsGroupDescr,
+            tnApsGroupMode,
+            tnApsGroupRevert,
+            tnApsGroupDirection,
+            tnApsGroupExtraTraffic,
+            tnApsGroupWaitToRestore,
+            tnApsGroupK1K2Rcv,
+            tnApsGroupK1K2Trans,
+            tnApsGroupCurrentStatus,
+            tnApsGroupModeMismatches,
+            tnApsGroupChannelMismatches,
+            tnApsGroupPSBFs,
+            tnApsGroupFEPLFs,
+            tnApsGroupSwitchedIfIndex,
+            tnApsGroupMembers,
+            tnApsGroupSdEnable,
+            tnApsHoldOffTimer
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 10 }
+
+    tnApsMemberGroup OBJECT-GROUP
+        OBJECTS {
+            tnApsMemberRowStatus,
+            tnApsMemberConfigNumber,
+--            obsolete
+--            tnApsMemberPriority,
+            tnApsMemberSwitch,
+--            obsolete
+--            tnApsMemberControl,
+            tnApsMemberCurrentStatus
+--            obsolete
+--            tnApsMemberSignalDegrades,
+--            tnApsMemberSignalFailures,
+--            tnApsMemberSwitchovers,
+--            tnApsMemberLastSwitchover,
+--            tnApsMemberSwitchoverSeconds
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 11 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnCnIpTunnelGroup OBJECT-GROUP::= { tnL1ServiceGroups 12 }
+
+    tnControlNetworkMapGroup OBJECT-GROUP
+        OBJECTS {
+            tnCNMapIpAddress,
+            tnCNMapNeName,
+            tnCNMapSoftwareRelease,
+            tnCNMapIpv6InetAddress,
+            tnCNMapIpv4Address
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 13 }
+
+    tnNetIfGroup OBJECT-GROUP
+        OBJECTS {
+            tnNetIfTypeOfOperation,
+            tnNetIfStatus,
+            tnNetIfPacketType,
+            tnNetIfMtu,
+            tnNetIfHelloInterval,
+            tnNetIfRtrDeadInterval,
+            tnNetIfMetric,
+            tnNetIfOspfAuthentType,
+            tnNetIfOspfAuthKey,
+            tnNetIfOspfAuthKeyId,
+            tnNetIfCnLinkAdjState,
+            tnNetIfMtuNeg,
+            tnNetIfOSPFAreaNumberId,
+            tnNetIfOspfRetransint,
+            tnNetIfOspfv3AdjStateId,
+            tnNetIfOspfNeighborRouterIp,
+            tnNetIfOspfv3NeighborRouterIp,
+            tnNetIfOspfNeighborIp,
+            tnNetIfOspfv3NeighborInetAddress,
+            tnNetIfIPv6LinkLocalInetAddress,
+            tnNetIfLcpEchoInterval,
+            tnNetIfLcpEchoFailure,
+            tnNetIfOspfStatus,
+            tnNetIfOspfv3AreaNumberId,
+            tnNetIfOspfv3HelloInterval,
+            tnNetIfOspfv3Metric,
+            tnNetIfOspfv3Retransint,
+            tnNetIfOspfv3RtrDeadInterval,
+            tnNetIfOspfv3ConfigRtrPriority,
+            tnNetIfOspfv3Status
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 14 }
+
+    tnNetIfFacilityGroup OBJECT-GROUP
+        OBJECTS {
+            tnNetIfFacilityTypeOfOperation,
+            tnNetIfFacilityEccChanType
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 15 }
+
+    tnPackApsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPackApsGroupRowStatus,
+            tnPackApsGroupWorkIfIndex,
+            tnPackApsGroupProtIfIndex,
+            tnPackApsGroupDescr,
+            tnPackApsGroupRevert,
+            tnPackApsGroupDirection,
+            tnPackApsGroupWaitToRestore,
+            tnPackApsGroupHoldOffTimer,
+            tnPackApsGroupSwitchCmd,
+            tnPackApsGroupActSide,
+            tnPackApsGroupCurrentStatus,
+            tnPackApsGroupWorkStatus,
+            tnPackApsGroupProtStatus,
+            tnPackApsGroupPortFailEnable
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 16 }
+
+    tnEthIfGroup OBJECT-GROUP
+        OBJECTS {
+            tnEthIfTypeOfOperation,
+            tnEthIfStatus,
+            tnEthIfHelloInterval,
+            tnEthIfRtrDeadInterval,
+            tnEthIfMetric,
+            tnEthIfOspfAuthentType,
+            tnEthIfOspfAuthKey,
+            tnEthIfOspfAuthKeyId,
+            tnEthIfOSPFAreaNumberId,
+            tnEthIfProxyArp,
+            tnEthIfOspfRouteState,
+            tnEthIfDhcpEnabled,
+            tnEthIfDHCPRange,
+            tnEthIfDHCPDfltGtwy,
+            tnEthIfDhcpv6Enabled,
+            tnEthIfDHCPv6Range,
+            tnEthIfDHCPClient,
+            tnEthIfDHCPClientDfltGtwy,
+            tnEthIfIpV6SLAAC,
+            tnEthIfIpAddress,
+            tnEthIfSubnetMask,
+            tnEthIfInetAddressType,
+            tnEthIfInetAddress,
+            tnEthIfPrefixLength,
+            tnEthIfDescription,
+            tnEthIfOspfAdjStateId,
+            tnEthIfOspfDrPriorityId,
+            tnEthIfOspfRetransint,
+            tnEthIfOspfv3AdjStateId,
+            tnEthIfOperStatus,
+            tnEthIfAlmProfName,
+            tnEthIfDHCPServerIPv6SLAAC,
+            tnEthIfRouterAdvAutonomousFlag,
+            tnEthIfRouterAdvDefaultLifeTime,
+            tnEthIfRouterAdvDefaultPreference,
+            tnEthIfRouterAdvMaxRtrAdvInterval,
+            tnEthIfRouterAdvManagedFlag,
+            tnEthIfRouterAdvOtherConfigFlag,
+            tnEthIfRouterAdvPreferredLifeTime,
+            tnEthIfRouterAdvSendAdvertState,
+            tnEthIfRouterAdvValidLifeTime,
+            tnEthIfOspfv3AreaNumberId,
+            tnEthIfOspfv3HelloInterval,
+            tnEthIfOspfv3Metric,
+            tnEthIfOspfv3Retransint,
+            tnEthIfOspfv3RtrDeadInterval,
+            tnEthIfOspfv3DrPriorityId,
+            tnEthIfOspfv3RouteState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 17 }
+
+    tnEthIfInterfaceGroup OBJECT-GROUP
+        OBJECTS {
+            tnEthIfInterfaceVlanId,
+            tnEthIfInterfaceTypeOfOperation
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 18 }
+
+    tnDhcpRelayRecordGroup OBJECT-GROUP
+        OBJECTS {
+            tnDhcpRelayRecordRowStatus,
+            tnDhcpRelayRecordRailIdDescr
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 19 }
+
+    tnDhcpServerGroup OBJECT-GROUP
+        OBJECTS {
+            tnDhcpServerSerialno,
+            tnDhcpServerMacAddress,
+            tnDhcpServerPort,
+            tnDhcpServerRowStatus
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnL1ServiceGroups 20 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnL1ServiceCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnControlNetworkLinkGroup,
+            tnCNLinkViaChannelGroup,
+            tnIpStaticRouteGroup,
+            tnIpCidrRouteGroup,
+            tnL1TrafficParmGroup,
+            tnIpRouteGlobalGroup,
+--            obsolete
+--            tnL1NetworkLinkGroup,
+--            tnL1HopGroup,
+--            tnL1FiberGroup,
+--            tnL1ConduitGroup,
+            tnApsGroup,
+            tnApsMemberGroup,
+--            obsolete
+--            tnCnIpTunnelGroup,
+            tnControlNetworkMapGroup,
+            tnNetIfGroup,
+            tnNetIfFacilityGroup,
+            tnPackApsGroup,
+            tnStaticRouteGroup,
+            tnEthIfGroup,
+            tnEthIfInterfaceGroup,
+            tnDhcpRelayRecordGroup,
+            tnDhcpServerGroup,
+            tnIpNonDefaultRouteOspfToBgpCommTagGroup,
+            tnIpNonDefaultRedistBgpToOspfRuleGroup
+        }
+        ::= { tnL1ServiceCompliances 1 }
+
+END -- DEFINITION OF TROPIC-L1SERVICE-MIB

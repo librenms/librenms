@@ -7,7 +7,7 @@ use Hash;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Config;
-use Silber\Bouncer\BouncerFacade as Bouncer;
+use Spatie\Permission\Models\Role;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -22,7 +22,7 @@ class UpdateUserRequest extends FormRequest
         $user = $this->route('user');
         if ($user && $this->user()->can('update', $user)) {
             // normal users cannot update their roles or ability to modify a password
-            if ($this->user()->cannot('manage', Bouncer::role())) {
+            if ($this->user()->cannot('manage', Role::class)) {
                 unset($this['roles']);
             }
 
@@ -52,7 +52,7 @@ class UpdateUserRequest extends FormRequest
                 'new_password_confirmation' => 'nullable|same:new_password',
                 'dashboard' => 'int',
                 'roles' => 'array',
-                'roles.*' => Rule::in(Bouncer::role()->pluck('name')),
+                'roles.*' => Rule::in(Role::query()->pluck('name')),
                 'enabled' => 'nullable',
                 'can_modify_passwd' => 'nullable',
             ];

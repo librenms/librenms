@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Menu.php
  *
@@ -178,6 +179,16 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
+                    ],
+                ];
+            }
+
+            if ($routing_count['ospfv3']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'ospfv3',
+                        'icon' => 'circle-o-notch fa-rotate-180',
+                        'text' => 'OSPFv3 Devices',
                     ],
                 ];
             }

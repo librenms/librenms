@@ -14,15 +14,17 @@ use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
-use Silber\Bouncer\BouncerFacade as Bouncer;
-use Silber\Bouncer\Database\HasRolesAndAbilities;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
-    use HasRolesAndAbilities, Notifiable, HasFactory, HasPushSubscriptions;
+    use HasFactory;
+    use HasPushSubscriptions;
+    use HasRoles;
+    use Notifiable;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
@@ -52,42 +54,34 @@ class User extends Authenticatable
 
     /**
      * Test if this user has global read access
-     *
-     * @return bool
      */
-    public function hasGlobalRead()
+    public function hasGlobalRead(): bool
     {
-        return $this->isA('admin', 'global-read');
+        return $this->can('global-read');
     }
 
     /**
      * Test if this user has global admin access
-     *
-     * @return bool
      */
-    public function hasGlobalAdmin()
+    public function hasGlobalAdmin(): bool
     {
-        return $this->isA('admin', 'demo');
+        return $this->can('global-admin');
     }
 
     /**
      * Test if the User is an admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->isA('admin');
+        return $this->can('admin');
     }
 
     /**
      * Test if this user is the demo user
-     *
-     * @return bool
      */
-    public function isDemo()
+    public function isDemo(): bool
     {
-        return $this->isA('demo');
+        return $this->hasRole('demo');
     }
 
     /**
@@ -96,7 +90,7 @@ class User extends Authenticatable
      * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
-    public function canAccessDevice($device)
+    public function canAccessDevice($device): bool
     {
         return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
@@ -109,20 +103,6 @@ class User extends Authenticatable
     public function setPassword($password)
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
-    }
-
-    /**
-     * Set roles and remove extra roles, optionally creating non-existent roles, flush permissions cache for this user if roles changed
-     */
-    public function setRoles(array $roles, bool $create = false): void
-    {
-        if ($roles != $this->getRoles()) {
-            if ($create) {
-                $this->assign($roles);
-            }
-            Bouncer::sync($this)->roles($roles);
-            Bouncer::refresh($this);
-        }
     }
 
     /**
@@ -144,7 +124,7 @@ class User extends Authenticatable
         return false;
     }
 
-    public function getNotifications(string $type = null): int|Collection
+    public function getNotifications(?string $type = null): int|Collection
     {
         return match ($type) {
             'total' => $this->notifications()->count(),
@@ -194,7 +174,7 @@ class User extends Authenticatable
 
     public function scopeAdminOnly($query)
     {
-        $query->whereIs('admin');
+        $query->role('admin');
     }
 
     // ---- Accessors/Mutators ----
@@ -238,12 +218,12 @@ class User extends Authenticatable
 
     public function apiTokens(): HasMany
     {
-        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
     }
 
     public function bills(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Bill::class, 'bill_perms', 'user_id', 'bill_id');
+        return $this->belongsToMany(Bill::class, 'bill_perms', 'user_id', 'bill_id');
     }
 
     public function devices()
@@ -256,12 +236,12 @@ class User extends Authenticatable
 
     public function devicesOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'devices_perms', 'user_id', 'device_id');
+        return $this->belongsToMany(Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
     public function deviceGroups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -276,12 +256,12 @@ class User extends Authenticatable
 
     public function portsOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
     public function dashboards(): HasMany
     {
-        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+        return $this->hasMany(Dashboard::class, 'user_id');
     }
 
     public function notifications(): BelongsToMany
@@ -296,11 +276,11 @@ class User extends Authenticatable
 
     public function preferences(): HasMany
     {
-        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
+        return $this->hasMany(UserPref::class, 'user_id');
     }
 
     public function widgets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
+        return $this->hasMany(UserWidget::class, 'user_id');
     }
 }

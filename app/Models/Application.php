@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Applications.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LibreNMS\Util\StringHelpers;
 
@@ -52,7 +54,7 @@ class Application extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function metrics()
+    public function metrics(): HasMany
     {
         return $this->hasMany(ApplicationMetric::class, 'app_id', 'app_id');
     }

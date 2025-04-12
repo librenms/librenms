@@ -1,5 +1,8 @@
 <?php
 
+// laravel routing uses section for sub-tab navigation
+$vars['proto'] ??= $vars['section'] ?? null;
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -19,6 +22,7 @@ $type_text['netscaler_vsvr'] = 'VServers';
 $type_text['bgp'] = 'BGP';
 $type_text['cef'] = 'CEF';
 $type_text['ospf'] = 'OSPF';
+$type_text['ospfv3'] = 'OSPFv3';
 $type_text['isis'] = 'ISIS';
 $type_text['vrf'] = 'VRFs';
 $type_text['routes'] = 'Routing Table';

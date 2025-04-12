@@ -3084,5 +3084,65 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0042:04ff:fed1:3f1b",
+                    "ipv6_compressed": "fe80::42:4ff:fed1:3f1b",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 9
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0042:daff:fe84:d933",
+                    "ipv6_compressed": "fe80::42:daff:fe84:d933",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 10
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0250:56ff:fe9e:669c",
+                    "ipv6_compressed": "fe80::250:56ff:fe9e:669c",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:20d6:9eff:fe50:d881",
+                    "ipv6_compressed": "fe80::20d6:9eff:fe50:d881",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 14
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:940b:1cff:feb0:a0c9",
+                    "ipv6_compressed": "fe80::940b:1cff:feb0:a0c9",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 23
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:c880:50ff:fedf:867f",
+                    "ipv6_compressed": "fe80::c880:50ff:fedf:867f",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 12
+                }
+            ]
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RuckusDiassocTrap.php
  *

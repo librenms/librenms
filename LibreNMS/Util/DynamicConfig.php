@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DynamicConfig.php
  *
@@ -71,7 +72,7 @@ class DynamicConfig
     /**
      * Get all groups defined
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function getGroups()
     {

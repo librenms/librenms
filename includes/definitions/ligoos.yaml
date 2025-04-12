@@ -2,9 +2,11 @@ os: ligoos
 text: 'LigoWave LigoOS'
 type: wireless
 icon: ligowave
+mib_dir: ligoos
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
     -
         sysDescr_regex:
             - '/^LigoPTP/'
+            - '/^LigoDLB/'

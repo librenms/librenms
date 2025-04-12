@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ObjectCache.php
  *
@@ -33,6 +34,7 @@ use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Models\Mpls;
 use App\Models\OspfInstance;
+use App\Models\Ospfv3Instance;
 use App\Models\Port;
 use App\Models\PrinterSupply;
 use App\Models\Pseudowire;
@@ -70,6 +72,7 @@ class ObjectCache
                 'vrf' => Vrf::hasAccess($user)->count(),
                 'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
+                'ospfv3' => Ospfv3Instance::hasAccess($user)->count(),
                 'isis' => IsisAdjacency::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),

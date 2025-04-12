@@ -1,4 +1,5 @@
 <?php
+
 /**
  * wireless-sensor.inc.php
  *

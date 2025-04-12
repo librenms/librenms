@@ -1,4 +1,5 @@
 <?php
+
 /*
  * cpu temp for raspberry pi
  * requires snmp extend agent script from librenms-agent

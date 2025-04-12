@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace LibreNMS\Tests\Unit;
 
 use Illuminate\Support\Carbon;
 use LibreNMS\Tests\TestCase;

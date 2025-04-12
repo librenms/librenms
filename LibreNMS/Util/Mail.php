@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Mail.php
  *
@@ -86,7 +87,7 @@ class Mail
             }
 
             // add addresses
-            $addMethod = $bcc ? 'addBcc' : 'addAddress';
+            $addMethod = $bcc ? 'addBCC' : 'addAddress';
             foreach ($emails as $email => $email_name) {
                 $mail->$addMethod($email, $email_name);
             }
