@@ -59,6 +59,7 @@ class HealthCheck extends Command
 
                 if (! $health_file) {
                     $this->warn('Dispatcher service health file not enabled, set service_health_file');
+
                     return 0;
                 }
 
