@@ -1221,6 +1221,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'read_only_configs' => [
+                'description' => 'Allow read only user config access',
+                'help' => 'When true all read only users are able to access Oxidized backups',
+            ],
             'ignore_groups' => [
                 'description' => 'Do not backup these Oxidized groups',
                 'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
