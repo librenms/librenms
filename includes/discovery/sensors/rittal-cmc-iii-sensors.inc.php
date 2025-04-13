@@ -28,6 +28,8 @@ use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
+$last_index_prefix = $current_index_prefix = '';
+$unique_desc_counter = [];
 
 foreach ($cmc_iii_var_table as $index => $entry) {
     $var_name_parts = explode('.', $entry['cmcIIIVarName']);
@@ -36,15 +38,34 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     $var_type = $entry['cmcIIIVarType'];
     $sensor_id = count($cmc_iii_sensors);
 
-    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name) {
+    $index_r = explode('.', $index);
+    if (count($index_r) > 1) {
+        $current_index_prefix = $index_r[0];
+    }
+
+    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
         if ($sensor_id == 0) {
             $sensor_id = 1;
         } else {
             $sensor_id++;
         }
 
+        if (str_contains($sensor_name, $entry['cmcIIIVarValueStr'])) {
+            $sensor_desc = $entry['cmcIIIVarValueStr'];
+        } else {
+            $sensor_desc = "$sensor_name {$entry['cmcIIIVarValueStr']}";
+        }
+
         $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
-        $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'] ?: $sensor_name;
+        $cmc_iii_sensors[$sensor_id]['desc'] = $sensor_desc;
+
+        // count descriptions => used to generate unique description count suffix later
+        if (! isset($unique_desc_counter[$sensor_desc])) {
+            $unique_desc_counter[$sensor_desc] = [];
+        }
+        array_push($unique_desc_counter[$sensor_desc], $sensor_id);
+
+        $last_index_prefix = $current_index_prefix;
     }
 
     switch ($var_type) {
@@ -111,6 +132,17 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             }
             $cmc_iii_sensors[$sensor_id]['type'] = $type;
             break;
+    }
+}
+
+// generate unique sensor descriptions
+foreach ($unique_desc_counter as $sensor_desc => $sensor_id_r) {
+    if (count($sensor_id_r) < 2) {
+        continue;
+    }
+
+    for ($index = 0; $index < count($sensor_id_r); $index++) {
+        $cmc_iii_sensors[$sensor_id_r[$index]]['desc'] .= ' ' . str_pad($index + 1, 2, 0, STR_PAD_LEFT);
     }
 }
 
@@ -197,4 +229,4 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? 1, $sensor_data['multiplier'] ?? 1, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
 }
 
-unset($cmc_iii_var_table, $cmc_iii_sensors, $index, $entry, $var_name_parts, $sensor_name, $var_type, $sensor_id, $sensor_logic, $unit, $type, $sensor_data, $serial_number);
+unset($cmc_iii_var_table, $cmc_iii_sensors, $last_index_prefix, $current_index_prefix, $unique_desc_counter, $index, $entry, $var_name_parts, $sensor_name, $sensor_desc, $var_type, $sensor_id, $sensor_logic, $unit, $type, $sensor_data, $serial_number);
