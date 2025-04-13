@@ -638,7 +638,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         is_numeric($warn_limit) && $warn_limit === 0 &&
                         is_numeric($low_limit) && $low_limit === 0 &&
                         is_numeric($low_warn_limit) && $low_warn_limit === 0) {
-                            Low::warning("Discarding all limits - all limits set to zero by device");
+                            Log::warning("Discarding all limits - all limits set to zero by device");
                             $high_limit = null;
                             $warn_limit = null;
                             $low_limit = null;
@@ -646,12 +646,12 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     if (is_numeric($high_limit) && is_numeric($warn_limit) && $high_limit === $warn_limit) {
-                        Low::warning("Discarding high warning limit - high and warn set to the same value by device");
+                        Log::warning("Discarding high warning limit - high and warn set to the same value by device");
                         $warn_limit = null;
                     }
 
                     if (is_numeric($low_limit) && is_numeric($low_warn_limit) && $low_limit === $low_warn_limit) {
-                        Low::warning("Discarding low warning limit - low and low warning set to the same value by device");
+                        Log::warning("Discarding low warning limit - low and low warning set to the same value by device");
                         $low_warn_limit = null;
                     }
 
