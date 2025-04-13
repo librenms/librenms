@@ -5124,13 +5124,6 @@
             "order": 0,
             "type": "boolean"
         },
-        "oxidized.read_only_configs": {
-            "default": false,
-            "group": "external",
-            "section": "oxidized",
-            "order": 3,
-            "type": "boolean"
-        },
         "oxidized.features.versioning": {
             "default": false,
             "group": "external",
