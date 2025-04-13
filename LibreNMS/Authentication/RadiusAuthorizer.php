@@ -52,7 +52,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
             }
 
             if (Config::get('radius.enforce_roles') || $new_user) {
-                $user->setRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles(), true);
+                $user->syncRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles());
             }
 
             return true;

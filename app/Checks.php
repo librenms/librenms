@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Checks.php
  *
@@ -33,6 +34,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Validations\Php;
 
 class Checks
 {
@@ -55,6 +57,11 @@ class Checks
             $notifications = Notification::isUnread($user)->where('severity', '>', Severity::Ok->value)->get();
             foreach ($notifications as $notification) {
                 toast()->warning($notification->title, "<a href='notifications/'>$notification->body</a>");
+            }
+
+            if (version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '<')) {
+                $message = 'Web server PHP version does not meet the minimum requirements. PHP ' . Php::PHP_MIN_VERSION . ' is the minimum supported version as of ' . Php::PHP_MIN_VERSION_DATE . '. We recommend you update PHP to a supported version (' . Php::PHP_RECOMMENDED_VERSION . ' suggested) and check your cli PHP version matches by running ./validate.php on your server.';
+                toast()->warning('PHP unsupported', $message);
             }
 
             $warn_sec = Config::get('rrd.step', 300) * 3;

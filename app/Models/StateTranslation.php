@@ -1,4 +1,5 @@
 <?php
+
 /*
  * StateTranslation.php
  *
@@ -27,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class StateTranslation extends Model implements Keyable
@@ -40,6 +42,11 @@ class StateTranslation extends Model implements Keyable
         'state_value',
         'state_generic_value',
     ];
+
+    public function severity(): Severity
+    {
+        return Severity::tryFrom((int) $this->state_generic_value) ?? Severity::Unknown;
+    }
 
     public function stateIndex(): BelongsTo
     {

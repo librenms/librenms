@@ -1,4 +1,5 @@
 <?php
+
 /*
  * DatabaseVersionTooLow.php
  *

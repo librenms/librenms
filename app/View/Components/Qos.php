@@ -9,7 +9,7 @@ use Illuminate\View\Component;
 
 class Qos extends Component
 {
-    public \App\Models\Qos|null $qosGraph = null;
+    public ?\App\Models\Qos $qosGraph = null;
     public string $typePrefix;
 
     /**
@@ -17,9 +17,9 @@ class Qos extends Component
      */
     public function __construct(
         public Collection $qosItems,
-        public int|null $show = null,
-        public int|null $portId = null,
-        public int|null $parentId = null,
+        public ?int $show = null,
+        public ?int $portId = null,
+        public ?int $parentId = null,
     ) {
         $this->typePrefix = is_null($portId) ? 'device_qos_' : 'port_qos_';
         if (! is_null($show)) {

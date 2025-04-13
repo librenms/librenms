@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpTest.php
  *
@@ -42,6 +43,12 @@ class IpTest extends TestCase
         $this->assertFalse(IPv6::isValid('192.168.0.1'));
         $this->assertFalse(IP::isValid('not_an_ip'));
 
+        $this->assertTrue(IP::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertTrue(IPv6::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertFalse(IPv4::isValid('0:0:0:0:0:0:a9fe:901'));
+        $this->assertTrue(IP::isValid('::169.254.12.3'));
+        $this->assertTrue(IP::isValid('::ffff:169.254.12.3'));
+
         $this->assertTrue(IPv4::isValid('8.8.8.8', true));
         $this->assertTrue(IP::isValid('8.8.8.8', true));
         $this->assertTrue(IPv4::isValid('192.168.0.1', true));
@@ -60,6 +67,15 @@ class IpTest extends TestCase
     public function testIsValidIPv6ExcludeReserved(): void
     {
         $this->assertFalse(IPv6::isValid('::1', true));
+    }
+
+    public function testIpv6IsLinkLocal()
+    {
+        $this->assertFalse(IP::parse('169.254.1.1')->isLinkLocal());
+        $this->assertTrue(IP::parse('fe80::1')->isLinkLocal());
+        $this->assertTrue(IP::parse('FE80::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('fe80:8000::1')->isLinkLocal());
+        $this->assertFalse(IP::parse('febf::1')->isLinkLocal());
     }
 
     public function testIpParse(): void
@@ -151,6 +167,9 @@ class IpTest extends TestCase
         $this->assertSame('::', IP::parse('0:0:0:0:0:0:0:0')->compressed());
         $this->assertSame('::', IP::parse('0000:0000:0000:0000:0000:0000:0000:0000')->compressed());
         $this->assertSame('2001:db8:85a3::8a2e:370:7334', IP::parse('2001:0db8:85a3:0000:0000:8a2e:0370:7334')->compressed());
+        $this->assertSame('::169.254.9.1', IP::parse('0:0:0:0:0:0:a9fe:901')->compressed());
+        $this->assertSame('::169.254.12.3', IP::parse('::169.254.12.3')->compressed());
+        $this->assertSame('::ffff:169.254.12.3', IP::parse('::ffff:169.254.12.3')->compressed());
     }
 
     public function testIpv6Uncompress(): void
@@ -159,6 +178,9 @@ class IpTest extends TestCase
         $this->assertSame('0000:0000:0000:0000:0000:0000:0000:0000', IP::parse('::')->uncompressed());
         $this->assertSame('2001:0db8:85a3:0000:0000:8a2e:0370:7334', IP::parse('2001:db8:85a3::8a2e:370:7334')->uncompressed());
         $this->assertSame('2001:0db8:85a3:0001:0001:8a2e:0370:7334', IP::parse('2001:db8:85a3:1:1:8a2e:370:7334')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:0000:a9fe:0901', IP::parse('0:0:0:0:0:0:a9fe:901')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:0000:a9fe:0c03', IP::parse('::169.254.12.3')->uncompressed());
+        $this->assertSame('0000:0000:0000:0000:0000:ffff:a9fe:0c03', IP::parse('::ffff:169.254.12.3')->uncompressed());
     }
 
     public function testNetworkFromIp(): void

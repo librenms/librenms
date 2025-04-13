@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validator.php
  *
@@ -258,8 +259,8 @@ class Validator
      * Arguments match exec()
      *
      * @param  string  $command  the command to run
-     * @param  array|null  $output  will hold the output of the command
-     * @param  int|null  $code  will hold the return code from the command
+     * @param  array  $output  will hold the output of the command
+     * @param  int  $code  will hold the return code from the command
      */
     public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {

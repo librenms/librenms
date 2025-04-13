@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WidgetSettingsController.php
  *

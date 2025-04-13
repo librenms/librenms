@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sinr.inc.php
  *

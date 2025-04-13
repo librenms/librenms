@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Arubaos.php
  *
@@ -40,7 +41,7 @@ use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Arubaos extends OS implements
-    OsDiscovery,
+    OSDiscovery,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,

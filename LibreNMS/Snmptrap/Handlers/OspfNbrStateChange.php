@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OspfNbrStateChange.php
  *

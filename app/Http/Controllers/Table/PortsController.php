@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PortsController.php
  *
@@ -142,7 +143,7 @@ class PortsController extends TableController
     }
 
     /**
-     * @param  \App\Models\Port  $port
+     * @param  Port  $port
      * @return array
      */
     public function formatItem($port)

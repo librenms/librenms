@@ -1221,6 +1221,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'read_only_configs' => [
+                'description' => 'Allow read only user config access',
+                'help' => 'When true all read only users are able to access Oxidized backups',
+            ],
             'ignore_groups' => [
                 'description' => 'Do not backup these Oxidized groups',
                 'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
@@ -1677,7 +1681,7 @@ return [
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
-            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+            'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated. Sets the default value for all nodes.',
         ],
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',

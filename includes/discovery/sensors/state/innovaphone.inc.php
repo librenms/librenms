@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS sensors state discovery module for HP Procurve
  *

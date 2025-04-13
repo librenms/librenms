@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SlaPolling.php
  *

@@ -95,7 +95,7 @@ if ($device['os_group'] == 'cisco') {
                 ];
 
                 $tags = compact('ifIndex', 'mac', 'rrd_name', 'rrd_def');
-                data_update($device, 'cip', $tags, $fields);
+                app('Datastore')->put($device, 'cip', $tags, $fields);
 
                 if ($acc['update']) {
                     // Do Updates

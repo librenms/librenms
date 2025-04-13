@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BridgeMib.php
  *
@@ -73,7 +74,7 @@ trait BridgeMib
         $drBridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         \Log::info(sprintf('VLAN: %s Bridge: %s DR: %s', $vlan ?: 1, $bridge->readable(), $drBridge->readable()));
 
-        $instance = new \App\Models\Stp([
+        $instance = new Stp([
             'vlan' => $vlan,
             'rootBridge' => $bridgeMac == $drBridge->hex() ? 1 : 0,
             'bridgeAddress' => $bridgeMac,

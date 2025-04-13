@@ -1,4 +1,5 @@
 <?php
+
 /**
  * devices.inc.php
  *
