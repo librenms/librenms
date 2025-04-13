@@ -63,7 +63,6 @@ function loopEntPhysical($device, $ent, $level)
     foreach ($ents as $ent) {
         if ($ent['entPhysicalClass'] == 'port') {
             $entphysical[$ent['entPhysicalName']] = $ent;
-        // echo print_r($ent, true);
         } elseif ($ent['entPhysicalClass'] == 'container') {
             $entphysical[$ent['entPhysicalName']] = $ent;
         }
