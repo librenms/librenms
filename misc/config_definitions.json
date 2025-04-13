@@ -6156,6 +6156,13 @@
             "type": "integer",
             "units": "seconds"
         },
+        "service_health_file": {
+            "default": "/tmp/librenms.health",
+            "group": "poller",
+            "section": "distributed",
+            "order": 29,
+            "type": "string"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
