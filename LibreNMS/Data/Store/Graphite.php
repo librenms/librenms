@@ -27,6 +27,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use LibreNMS\Config;
@@ -79,7 +80,7 @@ class Graphite extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param  array  $device
+     * @param  array|Device|null  $device
      * @param  string  $measurement  Name of this measurement
      * @param  array  $tags  tags for the data (or to control rrdtool)
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
@@ -93,6 +94,10 @@ class Graphite extends BaseDatastore
             return;
         }
 
+        if (! $device instanceof Device) {
+            throw new \Exception('Expecting App/Models/Device');
+        }
+
         $timestamp = Carbon::now()->timestamp;
 
         if ($measurement == 'ports') {
@@ -101,7 +106,7 @@ class Graphite extends BaseDatastore
 
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
-        $hostname = preg_replace('/\./', '_', $device['hostname']);
+        $hostname = preg_replace('/\./', '_', $device->hostname);
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
 
