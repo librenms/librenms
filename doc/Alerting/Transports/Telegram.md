@@ -43,3 +43,4 @@
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
 | Format | HTML or MARKDOWN |
+| Send PNG Graph Mode | photo or file |
