@@ -6157,7 +6157,7 @@
             "units": "seconds"
         },
         "service_health_file": {
-            "default": "/tmp/librenms.health",
+            "default": "",
             "group": "poller",
             "section": "distributed",
             "order": 29,
