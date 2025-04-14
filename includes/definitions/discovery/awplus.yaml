@@ -44,7 +44,7 @@ modules:
                     index: 'atPluggableDiagVccStatusReading.{{ $index }}'
                     high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccAlarmMax
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMax
-                    low_warn: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMin
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccAlarmMin
                     group: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -69,7 +69,7 @@ modules:
                     index: 'atPluggableDiagTempStatusReading.{{ $index }}'
                     high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempAlarmMax
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMax
-                    low_warn: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMin
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempAlarmMin
                     group: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -85,7 +85,7 @@ modules:
                     index: 'atPluggableDiagTxBiasStatusReading.{{ $index }}'
                     high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasAlarmMax
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMax
-                    low_warn: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMin
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasAlarmMin
                     group: transceiver
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -101,7 +101,7 @@ modules:
                     index: 'atPluggableDiagTxPowerStatusReading.{{ $index }}'
                     high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerAlarmMax
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMax
-                    low_warn: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMin
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerAlarmMin
                     user_func: mw_to_dbm
                     group: transceiver
@@ -116,7 +116,7 @@ modules:
                     index: 'atPluggableDiagRxPowerStatusReading.{{ $index }}'
                     high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerAlarmMax
                     warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMax
-                    low_warn: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMin
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMin
                     low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerAlarmMin
                     user_func: mw_to_dbm
                     group: transceiver
