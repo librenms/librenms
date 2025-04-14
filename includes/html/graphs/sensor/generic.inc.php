@@ -25,7 +25,6 @@ if ($unit_label == '°F') {
     $field = 'far';
 }
 
-
 if ($sensor->hasThresholds()) {
     $rrd_options .= ' COMMENT:"Alert thresholds\:"';
     $rrd_options .= ($sensor->sensor_limit_low !== null) ? '  LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . $sensor->formatValue('sensor_limit_low') . '":dashes' : '';

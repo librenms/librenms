@@ -17,7 +17,6 @@ $unit_long = $sensors->first()->unitLong();
 $col_w = 7 + strlen($unit_short);
 $rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
 
-
 foreach ($sensors as $index => $sensor) {
     // FIXME generic colour function
     $colour = match ($index % 7) {
