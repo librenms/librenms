@@ -24,7 +24,7 @@
  * @author     Nick Hilliard <nick@foobar.org>
  */
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
-    $group = (string) $data['portAlias'];
+    $portAlias = (string) $data['portAlias'];
 
     // Discover Rx Power
     if (is_numeric($data['portRxOpticalPower']) && in_array($data['portAdminStatus'], ['up', '3'], true)) {
