@@ -163,10 +163,11 @@ nav:
       - Migrating from Observium: Installation/Migrating-from-Observium.md
 
   - Setup:
-    - Application overview: Extensions/Applications.md
+    - Applications overview: Extensions/Applications.md
       # Uses plugin include_dir_to_nav
     - Applications: Extensions/Applications
     - Billing Module: Extensions/Billing-Module.md
+    - Configuration: Support/Configuration.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
     - Network Maps:
@@ -183,7 +184,6 @@ nav:
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
-      - Configuration Docs: Support/Configuration.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
       - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
       - Environment Variables: Support/Environment-Variables.md
@@ -203,38 +203,37 @@ nav:
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Varnish: Extensions/Varnish.md
   - 3rd Party Integration:
-    - Integrations:
-      - Check_MK Setup: Extensions/Agent-Setup.md
-      - Gateone: Extensions/Gateone.md
-      - Graylog: Extensions/Graylog.md
-      - Nagios Plugins: Extensions/Services.md
-      - NFSen: Extensions/NFSen.md
-      - Oxidized: Extensions/Oxidized.md
-      - PeeringDB: Extensions/PeeringDB.md
-      - Proxmox: Extensions/Proxmox.md
-      - Rancid: Extensions/Rancid.md
-      - Smokeping: Extensions/Smokeping.md
-      - Weathermap: Extensions/Weathermap.md
-      - Storing Metrics:
-        - Intro: Extensions/Metric-Storage.md
-        - Graphite: Extensions/metrics/Graphite.md
-        - InfluxDB: Extensions/metrics/InfluxDB.md
-        - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
-        - Kafka: Extensions/metrics/Kafka.md
-        - OpenTSDB: Extensions/metrics/OpenTSDB.md
-        - Prometheus: Extensions/metrics/Prometheus.md
+    - Check_MK Setup: Extensions/Agent-Setup.md
+    - Gateone: Extensions/Gateone.md
+    - Graylog: Extensions/Graylog.md
+    - Nagios Plugins: Extensions/Services.md
+    - NFSen: Extensions/NFSen.md
+    - Oxidized: Extensions/Oxidized.md
+    - PeeringDB: Extensions/PeeringDB.md
+    - Proxmox: Extensions/Proxmox.md
+    - Rancid: Extensions/Rancid.md
+    - Smokeping: Extensions/Smokeping.md
+    - Weathermap: Extensions/Weathermap.md
+    - Storing Metrics:
+      - Intro: Extensions/Metric-Storage.md
+      - Graphite: Extensions/metrics/Graphite.md
+      - InfluxDB: Extensions/metrics/InfluxDB.md
+      - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
+      - OpenTSDB: Extensions/metrics/OpenTSDB.md
+      - Prometheus: Extensions/metrics/Prometheus.md
+      - Kafka: Extensions/metrics/Kafka.md
 
   - Alerting:
     - Introduction: Alerting/index.md
-    - Setup:
-      - Rules: Alerting/Rules.md
-      - Templates: Alerting/Templates.md
-      - Transports: Alerting/Transports.md
-      - Creating Transports: Alerting/Creating-Transport.md
-      - Entities: Alerting/Entities.md
-      - Macros: Alerting/Macros.md
-      - Testing: Alerting/Testing.md
-      - Device Dependencies: Alerting/Device-Dependencies.md
+    - Rules: Alerting/Rules.md
+    - Templates: Alerting/Templates.md
+    - Transport Overview: Alerting/Transports.md
+    - Transports: Alerting/Transports
+    - Creating Transports: Alerting/Creating-Transport.md
+    - Entities: Alerting/Entities.md
+    - Macros: Alerting/Macros.md
+    - Testing: Alerting/Testing.md
+    - Device Dependencies: Alerting/Device-Dependencies.md
 
   - API:
     - Using the API: API/index.md

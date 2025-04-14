@@ -25,7 +25,7 @@ class ProcessorsController extends TableController
     protected function searchFields(Request $request): array
     {
         return [
-            'device_hostname',
+            'hostname',
             'processor_descr',
         ];
     }
@@ -34,7 +34,7 @@ class ProcessorsController extends TableController
     {
         return Processor::query()
             ->hasAccess($request->user())
-            ->with(['device', 'device.location'])
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname');
     }
 

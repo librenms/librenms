@@ -1804,6 +1804,10 @@ return [
             'description' => 'Log File to Watch',
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
         ],
+        'service_health_file' => [
+            'description' => 'Service Health File',
+            'help' => 'Path to health file to ensure the dispatcher service is running',
+        ],
         'sfdp' => [
             'description' => 'Path to sfdp',
         ],

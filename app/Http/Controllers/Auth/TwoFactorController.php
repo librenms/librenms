@@ -98,7 +98,7 @@ class TwoFactorController extends Controller
      * Show the form for creating a new resource.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function create(Request $request)
     {
@@ -125,7 +125,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
     {
@@ -139,7 +139,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function cancelAdd(Request $request)
     {

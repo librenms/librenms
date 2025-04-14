@@ -161,6 +161,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
+        /* @var Collection<Mempool> $collection */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
