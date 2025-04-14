@@ -47,14 +47,13 @@ class RuckusSzApRadiusServerUnreachableTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $apName = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName'));
-        $apMac = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr'));
         $apIpv4 = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP'));
         $apIpv6 = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIPv6'));
         $radiusIp = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp'));
 
-        $message = "AP $apName \(.$apMac, $apIpv4\) is unable to reach radius server $radiusIp";
+        $message = "AP $apName ($apIpv4) is unable to reach radius server $radiusIp";
         if (!empty($apIpv6)){
-            $message = "AP $apName \(.$apMac, $apIpv4, $apIpv6\) is unable to reach radius server $radiusIp";
+            $message = "AP $apName ($apIpv4, $apIpv6) is unable to reach radius server $radiusIp";
         }
 
         $trap->log("$message", Severity::Warning);
