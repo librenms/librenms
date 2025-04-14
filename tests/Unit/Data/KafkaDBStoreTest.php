@@ -48,6 +48,8 @@ class KafkaDBStoreTest extends TestCase
         $producer = \Mockery::mock(Kafka::getClient());
         $producer->shouldReceive('newTopic')->once();
 
+        /** @var \RdKafka\Producer $producer */
+        $producer = $producer;
         $kafka = new Kafka($producer);
 
         $device = ['device_id' => 1, 'hostname' => 'testhost'];
