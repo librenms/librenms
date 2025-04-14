@@ -8,7 +8,10 @@ use LibreNMS\Tests\TestCase;
 
 class KafkaDBStoreTest extends TestCase
 {
-    protected $cluster;
+    /**
+     * @var \RdKafka\Test\MockCluster
+     */
+    protected $cluster = null;
 
     private function getKafkaMockedClusterConfig()
     {
@@ -58,5 +61,17 @@ class KafkaDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $kafka->put($device, $measurement, $tags, $fields);
+    }
+
+    protected function tearDown(): void
+    {
+        // Close the cluster
+        if ($this->cluster != null) {
+            /** @var \FFI\CData $cluster */
+            $cluster = $this->cluster;
+            \RdKafka\FFI\Library::rd_kafka_mock_cluster_destroy($cluster);
+        }
+
+        parent::tearDown();
     }
 }
