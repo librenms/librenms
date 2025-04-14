@@ -8,35 +8,10 @@ use LibreNMS\Tests\TestCase;
 
 class KafkaDBStoreTest extends TestCase
 {
-    /**
-     * @var \RdKafka\Test\MockCluster
-     */
-    protected $cluster = null;
-
-    private function getKafkaMockedClusterConfig()
-    {
-        $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(function (\RdKafka\Producer $producer, int $level, string $facility, string $message): void {
-        });
-
-        return $clusterConf;
-    }
-
-    public function getMockedKafkaCluster()
-    {
-        // Create mock cluster
-        $numberOfBrokers = 1;
-        $clusterConf = $this->getKafkaMockedClusterConfig();
-
-        return \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
-    }
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->cluster = $this->getMockedKafkaCluster();
-        Config::set('kafka.broker.list', $this->cluster->getBootstraps());
 
         Config::set('kafka.enable', true);
         Config::set('kafka.idempotence', false);
@@ -61,17 +36,5 @@ class KafkaDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $kafka->put($device, $measurement, $tags, $fields);
-    }
-
-    protected function tearDown(): void
-    {
-        // Close the cluster
-        if ($this->cluster != null) {
-            /** @var \FFI\CData $cluster */
-            $cluster = $this->cluster;
-            \RdKafka\FFI\Library::rd_kafka_mock_cluster_destroy($cluster);
-        }
-
-        parent::tearDown();
     }
 }
