@@ -105,7 +105,7 @@ class ServiceConfig(DBConfig):
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
-    health_file = "/tmp/librenms.health"
+    health_file = ""  # disabled by default
 
     def populate(self):
         config = LibreNMS.get_config_data(self.BASE_DIR)
@@ -415,8 +415,11 @@ class Service:
             )
         else:
             logger.info("Watchdog is disabled.")
-        with open(self.config.health_file, "a") as f:
-            utime(self.config.health_file)
+        if self.config.health_file:
+            with open(self.config.health_file, "a") as f:
+                utime(self.config.health_file)
+        else:
+            logger.info("Service health file disabled.")
         self.systemd_watchdog_timer = LibreNMS.RecurringTimer(
             10, self.systemd_watchdog, "systemd-watchdog"
         )
@@ -920,7 +923,8 @@ class Service:
             )
 
     def systemd_watchdog(self):
-        utime(self.config.health_file)
+        if self.config.health_file:
+            utime(self.config.health_file)
         if "systemd.daemon" in sys.modules:
             notify("WATCHDOG=1")
 
