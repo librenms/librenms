@@ -15,7 +15,7 @@ use RdKafka\Producer;
 class Kafka extends BaseDatastore
 {
     private $client = null;
-    private $device_id;
+    private $device_id = 0;
     private $isShuttingDown = false;
 
     public function __construct(Producer $client)
@@ -153,11 +153,7 @@ class Kafka extends BaseDatastore
                 }
             }
         } catch (\Throwable $e) {
-            Log::error('KAFKA: safeFlush failed with exception', [
-                'device_id' => $this->device_id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            Log::error('KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString());
         }
     }
 
