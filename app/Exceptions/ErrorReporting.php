@@ -34,7 +34,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class ErrorReporting
@@ -92,24 +91,6 @@ class ErrorReporting
 
     public function render(Throwable $exception, Request $request): ?Response
     {
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-        if (
-            $exception instanceof \Illuminate\Auth\AuthenticationException ||
-            $exception instanceof \Illuminate\Validation\ValidationException
-        ) {
-            return null;
-        }
-        dd($exception);
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-        // TODO FIX ME!
-
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
             if ($exception instanceof \Illuminate\View\ViewException || $exception instanceof \Spatie\LaravelIgnition\Exceptions\ViewException) {
@@ -120,11 +101,6 @@ class ErrorReporting
                 if ($new = $class::upgrade($base ?? $exception)) {
                     return $new->render($request);
                 }
-            }
-
-            // debug is not enabled, render a more helpful error
-            if (! $exception instanceof HttpExceptionInterface) {
-                return response()->view('errors.generic', ['content' => 'Server Error: Set APP_DEBUG=true to see details or check the librenms.log file']);
             }
         }
 
