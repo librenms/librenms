@@ -11,10 +11,6 @@ body {
   overflow-y: scroll;
 }
 
-ul { margin: 0px; padding: 0px; list-style: disc outside; }
-ul ul { list-style: circle outside; }
-ul ul ul { list-style: square outside; }
-
 .rounded-2px {
   /* Rounded Corners */
   -moz-border-radius: 2px;
