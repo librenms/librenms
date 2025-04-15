@@ -305,7 +305,7 @@ If you want to get a better idea of what is usable, call
 on some device that has the app in question you are curious about and pay attention
 to the app data chunk.
 
-`[0]` is there in the string as the legacy apps proxmox and drdb don't use make
+`[0]` is there as the legacy apps proxmox and drdb don't use make
 use of app data and instead can have multiple instances.
 
 ## Examples HTML
