@@ -169,22 +169,14 @@ class ReportDevices extends LnmsCommand
             return 0;
         }
 
-        // get the first device
-        $device = Device::when($has_relationships, fn ($q) => $q->with($relationships))
-            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->first();
-
-        /* Print the device info and see if we can fetch the next one.
-         *
+        /*
          * This way if the fetch takes awhile if something is processing the output it can proceed
          * with processing one device while we fetch the info for the next.
          */
-        while (isset($device)) {
-            $this->line(json_encode($device));
-
-            $device = Device::when($has_relationships, fn ($q) => $q->with($relationships))
-                ->whereDeviceSpec($this->argument('device spec'))->where('device_id', '>', $device['device_id'])
-                ->orderBy('device_id')->first();
-        }
+        Device::when($has_relationships, fn ($q) => $q->with($relationships))
+            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device) {
+                $this->line(json_encode($device));
+            });
 
         return 0;
     }
