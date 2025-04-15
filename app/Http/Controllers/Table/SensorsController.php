@@ -78,7 +78,7 @@ class SensorsController extends TableController
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $sensor->device]);
         $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor->sensor_class]);
         $descr = Url::graphPopup($graph_array, $sensor->sensor_descr, $link);
-        $mini_graph = Url::graphPopup($graph_array);
+        $mini_graph = Url::graphPopup($graph_array, null, $link);
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
         $alert = $sensor->currentStatus() == Severity::Error ? '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>' : '';
 
