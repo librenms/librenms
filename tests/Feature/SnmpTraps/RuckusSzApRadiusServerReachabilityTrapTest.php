@@ -53,9 +53,9 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPGPSCoordinates.0 0.0000 0.0000
 RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp.0 10.0.0.1
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIPv6.0
 TRAP,
-        'AP test-ap-720 (192.168.0.1) is unable to reach radius server 10.0.0.1',
-        'Could not handle RuckusSzApRadiusServerUnreachableTrapTest IPv4 only.',
-        [Severity::Warning],
+            'AP test-ap-720 (192.168.0.1) is unable to reach radius server 10.0.0.1',
+            'Could not handle RuckusSzApRadiusServerUnreachableTrapTest IPv4 only.',
+            [Severity::Warning],
         );
     }
 
@@ -78,9 +78,9 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPGPSCoordinates.0 0.0000 0.0000
 RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp.0 10.0.0.1
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIPv6.0 2001:db8::dead:beef
 TRAP,
-        'AP test-ap-720 (192.168.0.1, 2001:db8::dead:beef) is unable to reach radius server 10.0.0.1',
-        'Could not handle RuckusSzApRadiusServerUnreachableTrapTest IPv4 and IPv6.',
-        [Severity::Warning],
+            'AP test-ap-720 (192.168.0.1, 2001:db8::dead:beef) is unable to reach radius server 10.0.0.1',
+            'Could not handle RuckusSzApRadiusServerUnreachableTrapTest IPv4 and IPv6.',
+            [Severity::Warning],
         );
     }
 
@@ -103,9 +103,9 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPGPSCoordinates.0 180.0000 180.000
 RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp.0 10.0.0.1
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIPv6.0 
 TRAP,
-        'AP test-ap-22 (192.168.0.1) is able to reach radius server 10.0.0.1',
-        'Could not handle RuckusSZAPRadiusServerReachableTrap IPv4 only.',
-        [Severity::Ok],
+            'AP test-ap-22 (192.168.0.1) is able to reach radius server 10.0.0.1',
+            'Could not handle RuckusSZAPRadiusServerReachableTrap IPv4 only.',
+            [Severity::Ok],
         );
     }
 
@@ -128,9 +128,9 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPGPSCoordinates.0 180.0000 180.000
 RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp.0 10.0.0.1
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIPv6.0 2001:db8::dead:beef
 TRAP,
-        'AP test-ap-22 (192.168.0.1, 2001:db8::dead:beef) is able to reach radius server 10.0.0.1',
-        'Could not handle RuckusSZAPRadiusServerReachableTrap IPv4 and IPv6.',
-        [Severity::Ok],
+            'AP test-ap-22 (192.168.0.1, 2001:db8::dead:beef) is able to reach radius server 10.0.0.1',
+            'Could not handle RuckusSZAPRadiusServerReachableTrap IPv4 and IPv6.',
+            [Severity::Ok],
         );
     }
 }

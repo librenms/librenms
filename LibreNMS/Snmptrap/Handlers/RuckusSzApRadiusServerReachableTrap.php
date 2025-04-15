@@ -53,7 +53,7 @@ class RuckusSzApRadiusServerReachableTrap implements SnmptrapHandler
         $radiusIp = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp'));
 
         $message = "AP $apName ($apIpv4) is able to reach radius server $radiusIp";
-        if (! empty($apIpv6)){
+        if (! empty($apIpv6)) {
             $message = "AP $apName ($apIpv4, $apIpv6) is able to reach radius server $radiusIp";
         }
 
