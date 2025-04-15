@@ -177,7 +177,7 @@ class ReportDevices extends LnmsCommand
          */
         Device::when($has_relationships, fn ($q) => $q->with($relationships))
             ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device) {
-                $this->line(json_encode($device));
+                $this->line(json_encode($device[0]));
             });
 
         return 0;
