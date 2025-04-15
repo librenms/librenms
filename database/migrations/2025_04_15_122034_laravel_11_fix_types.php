@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('locations', function (Blueprint $table) {
-            $table->double('lat')->nullable()->change();
-            $table->double('lng')->nullable()->change();
+            $table->decimal('lat', 10, 8)->nullable()->change();
+            $table->decimal('lng', 11, 8)->nullable()->change();
         });
 
         Schema::table('slas', function (Blueprint $table) {
-            $table->double('rtt')->unsigned()->nullable()->change();
+            $table->double('rtt')->nullable()->change();
+        });
+
+        Schema::table('poller_cluster_stats', function (Blueprint $table) {
+            $table->double('worker_seconds')->change();
         });
     }
 };
