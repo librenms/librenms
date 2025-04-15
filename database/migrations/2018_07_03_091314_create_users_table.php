@@ -12,6 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        DB::statement("SET TIME_ZONE='+00:00'"); // force UTC for default timestamp value
         Schema::create('users', function (Blueprint $table) {
             $table->increments('user_id');
             $table->string('auth_type', 32)->nullable();

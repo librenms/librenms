@@ -976,8 +976,8 @@ locations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: location, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
-    - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
+    - { Field: lat, Type: double, 'Null': true, Extra: '' }
+    - { Field: lng, Type: double, 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
     - { Field: fixed_coordinates, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
@@ -2252,7 +2252,7 @@ slas:
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
+    - { Field: rtt, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

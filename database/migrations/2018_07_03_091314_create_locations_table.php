@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('locations', function (Blueprint $table) {
             $table->increments('id');
             $table->string('location')->unique();
-            $table->double('lat')->nullable();
-            $table->double('lng')->nullable();
+            $table->float('lat')->nullable();
+            $table->float('lng')->nullable();
             $table->dateTime('timestamp');
         });
     }

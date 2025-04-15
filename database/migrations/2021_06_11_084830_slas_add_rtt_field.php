@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('slas', function (Blueprint $table) {
             $table->unsignedInteger('sla_nr')->change();
-            $table->float('rtt')->unsigned()->nullable()->after('rtt_type');
+            $table->double('rtt')->unsigned()->nullable()->after('rtt_type');
         });
     }
 
