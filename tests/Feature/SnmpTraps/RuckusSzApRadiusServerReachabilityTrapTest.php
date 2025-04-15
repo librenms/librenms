@@ -1,11 +1,13 @@
 <?php
 
 /**
- * RuckusSzApRadiusServerUnreachableTrapTest.php
+ * RuckusSzApRadiusServerReachabilityTrapTest.php
  *
  * -Description-
  *
- * Test port up and down via Ciena's proprietary snmptraps.
+ * Test Ruckus RADIUS reachability traps.
+ * Tests RuckusSzApRadiusServerUnreachableTrap and
+ * RuckusSzApRadiusServerReachableTrap.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +30,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class RuckusSzApRadiusServerUnreachableTrapTest extends SnmpTrapTestCase
+class RuckusSzApRadiusServerReachabilityTrapTest extends SnmpTrapTestCase
 {
     public function testRadiusUnreachableIpv4()
     {
