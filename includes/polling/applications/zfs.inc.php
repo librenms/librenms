@@ -287,6 +287,7 @@ $metrics = $zfs; // copy $zfs data to $metrics
 unset($metrics['pools']); // remove pools it is an array, re-add data below
 
 $zpool_status = $app->data['status_info'] ?? [];
+$unhealthy_pool_statuses = '';
 foreach ($zfs['pools'] as $pool) {
     $pools[] = $pool['name'];
     $rrd_name = ['app', $name, $app->app_id, $pool['name']];
@@ -324,6 +325,11 @@ foreach ($zfs['pools'] as $pool) {
     // save the status if it exists
     if (isset($pool['status'])) {
         $zpool_status[$pool['name']] = $pool['status'];
+
+        // .pools.$pool.health a numeric value indicating why it is unhealth if not zero
+        if (isset($pool['health']) && is_numeric($pool['health']) && $pool['health']) {
+            $unhealthy_pool_statuses = $unhealthy_pool_statuses . "\n\n" . $pool['status'];
+        }
     }
 }
 
@@ -370,6 +376,7 @@ $app->data = [
     'version' => $all_return['version'],
     'l2_errors' => $zfs['l2_errors'],
     'status_info' => $zpool_status,
+    'unhealthy_pool_statuses' => $unhealthy_pool_statuses,
 ];
 
 update_application($app, 'OK', $metrics);
