@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Quanta.php
  *
@@ -31,5 +32,5 @@ use LibreNMS\OS;
 
 class Quanta extends OS implements ProcessorDiscovery, ProcessorPolling
 {
-    use OS\Traits\VxworksProcessorUsage;
+    use Traits\VxworksProcessorUsage;
 }

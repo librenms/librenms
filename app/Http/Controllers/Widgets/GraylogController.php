@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraylogController.php
  *

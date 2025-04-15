@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ipv6Address.php
  *
@@ -27,8 +28,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ipv6Address extends PortRelatedModel
+class Ipv6Address extends PortRelatedModel implements Keyable
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
@@ -45,5 +47,10 @@ class Ipv6Address extends PortRelatedModel
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv6Network::class, 'ipv6_network_id', 'ipv6_network_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "$this->ipv6_address-$this->ipv6_prefixlen-$this->port_id-$this->context_name";
     }
 }

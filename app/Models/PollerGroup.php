@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PollerGroup.php
  *
@@ -55,6 +56,6 @@ class PollerGroup extends Model
 
     public function devices(): HasMany
     {
-        return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
+        return $this->hasMany(Device::class, 'poller_group', 'id');
     }
 }

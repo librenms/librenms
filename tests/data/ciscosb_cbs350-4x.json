@@ -20388,5 +20388,20 @@
                 }
             ]
         }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fd69:11c0:85b2:0001:b28b:d0ff:fe95:3389",
+                    "ipv6_compressed": "fd69:11c0:85b2:1:b28b:d0ff:fe95:3389",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 100000
+                }
+            ]
+        }
     }
 }

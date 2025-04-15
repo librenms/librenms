@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fs-switch.php
  *

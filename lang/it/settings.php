@@ -915,7 +915,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [
@@ -1309,7 +1309,7 @@ return [
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
-            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+            'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated. Sets the default value for all nodes.',
         ],
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',

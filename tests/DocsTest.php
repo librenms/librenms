@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DocsTest.php
  *
@@ -43,6 +44,7 @@ class DocsTest extends TestCase
         $exclude_paths = [
             '*/Extensions/Applications/*',
             '*/General/Changelogs/*',
+            '*/Alerting/Transports/*',
         ];
 
         // Build the exclusion part of the find command

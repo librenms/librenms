@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckSchemaVersion.php
  *

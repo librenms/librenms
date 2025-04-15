@@ -1,4 +1,5 @@
 <?php
+
 /* LibreNMS
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +45,7 @@ class Grafana extends Transport
         $graph_url = url('graph.php') . '/' . str_replace('&', '/', http_build_query($graph_args));
 
         $data = [
-            'alert_uid' => $alert_data['id'] ?: $alert_data['uid'],
+            'alert_uid' => $alert_data['id'],
             'title' => $alert_data['title'] ?? null,
             'image_url' => $graph_url,
             'link_to_upstream_details' => Url::deviceUrl($device),

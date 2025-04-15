@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiHelper.php
  *
@@ -34,7 +35,7 @@ class CiHelper
     private ?array $os = null;
     private array $unitEnv = [];
     private array $duskEnv = ['APP_ENV' => 'testing'];
-    private Snmpsim|null $snmpsim = null;
+    private ?Snmpsim $snmpsim = null;
 
     private array $completedChecks = [
         'lint' => false,
@@ -94,9 +95,9 @@ class CiHelper
     public function enableSnmpsim(): void
     {
         if ($this->snmpsim === null) {
-            $snmpsim = new Snmpsim('127.1.6.2', 1162);
-            $snmpsim->setupVenv();
-            $snmpsim->start();
+            $this->snmpsim = new Snmpsim('127.1.6.2', 1162);
+            $this->snmpsim->setupVenv();
+            $this->snmpsim->start();
         }
 
         $this->unitEnv['SNMPSIM'] = '127.1.6.2:1162';

@@ -187,7 +187,7 @@
     @endconfig
 
     <x-panel title="{{ __('Roles') }}">
-        @forelse(auth()->user()->roles->pluck('title') as $role)
+        @forelse($user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) as $role)
             <span class="label label-info tw:mr-1">{{ $role }}</span>
         @empty
             <strong class="red">{{ __('No roles!') }}</strong>
@@ -195,9 +195,9 @@
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @if(auth()->user()->hasGlobalAdmin())
+        @if($user->can('global-admin'))
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseif(auth()->user()->hasGlobalRead())
+        @elseif($user->can('global-read'))
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * edgeswitch.inc.php
  *

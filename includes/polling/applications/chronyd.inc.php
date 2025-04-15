@@ -43,7 +43,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // process sources data
 
@@ -86,7 +86,7 @@ foreach ($chronyd['sources'] as $source) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     // insert flattened source metrics into the metrics array
     foreach ($fields as $field => $value) {

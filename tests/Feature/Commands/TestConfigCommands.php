@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TestSetConfigCommand.php
  *
@@ -123,7 +124,7 @@ class TestConfigCommands extends InMemoryDbTestCase
      */
     private function assertCliGets(string $setting, $expected): void
     {
-        $this->assertSame($expected, \LibreNMS\Config::get($setting));
+        $this->assertSame($expected, Config::get($setting));
 
         $command = $this->artisan('config:get', ['setting' => $setting]);
         if ($expected === null) {

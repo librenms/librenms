@@ -14,7 +14,7 @@ use LibreNMS\Config;
 class OverviewController extends Controller
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
@@ -32,7 +32,7 @@ class OverviewController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function simple(Request $request)

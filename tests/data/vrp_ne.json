@@ -7687,5 +7687,65 @@
                 }
             ]
         }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2001:07f8:002f:0000:0000:0000:0000:0130",
+                    "ipv6_compressed": "2001:7f8:2f::130",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:7f8:2f::/64",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv6_address": "2001:07f8:007f:0000:0000:0000:0000:0222",
+                    "ipv6_compressed": "2001:7f8:7f::222",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:7f8:7f::/64",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv6_address": "2a00:12a8:0001:0021:0000:0000:0000:0002",
+                    "ipv6_compressed": "2a00:12a8:1:21::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2a00:12a8:1:21::/64",
+                    "ifIndex": 51
+                },
+                {
+                    "ipv6_address": "2a00:12a8:0001:0022:0000:0000:0000:0002",
+                    "ipv6_compressed": "2a00:12a8:1:22::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2a00:12a8:1:22::/64",
+                    "ifIndex": 52
+                },
+                {
+                    "ipv6_address": "2a03:2760:0000:0001:0000:0000:0000:0001",
+                    "ipv6_compressed": "2a03:2760:0:1::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2a03:2760:0:1::/64",
+                    "ifIndex": 49
+                },
+                {
+                    "ipv6_address": "fd00:0099:0099:0000:0000:0000:0000:0003",
+                    "ipv6_compressed": "fd00:99:99::3",
+                    "ipv6_prefixlen": 128,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 50
+                }
+            ]
+        }
     }
 }

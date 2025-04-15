@@ -27,6 +27,7 @@ use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Nbr;
 use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
@@ -421,6 +422,7 @@ function add_device(Illuminate\Http\Request $request)
             'display',
             'overwrite_ip',
             'location_id',
+            'override_sysLocation',
             'port',
             'transport',
             'poller_group',
@@ -844,7 +846,7 @@ function list_ospfv3(Illuminate\Http\Request $request)
     $hostname = $request->get('hostname');
     $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
 
-    $ospf_neighbours = \App\Models\OspfNbr::whereHasAccess(Auth::user())
+    $ospf_neighbours = Ospfv3Nbr::hasAccess(Auth::user())
         ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
         ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
         ->get();
@@ -853,18 +855,22 @@ function list_ospfv3(Illuminate\Http\Request $request)
         return api_error(500, 'Error retrieving ospfv3_nbrs');
     }
 
-    return api_success($ospf_neighbours, 'ospfv3_neighbours');
+    return api_success($ospf_neighbours, 'ospfv3_neighbours', count: $ospf_neighbours->count());
 }
 
 function list_ospfv3_ports(Illuminate\Http\Request $request)
 {
+    $hostname = $request->get('hostname');
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+
     $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
-              ->get();
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->get();
     if ($ospf_ports->isEmpty()) {
         return api_error(404, 'Ospfv3 ports do not exist');
     }
 
-    return api_success($ospf_ports, 'ospfv3_ports', null, 200, $ospf_ports->count());
+    return api_success($ospf_ports, 'ospfv3_ports', count: $ospf_ports->count());
 }
 
 function get_graph_by_portgroup(Request $request)

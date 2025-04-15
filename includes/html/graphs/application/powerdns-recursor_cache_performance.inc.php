@@ -1,4 +1,5 @@
 <?php
+
 /**
  * powerdns-recursor_cache_performance.inc.php
  *

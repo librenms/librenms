@@ -1,0 +1,3864 @@
+TROPIC-OTH-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32, Counter64        FROM SNMPv2-SMI
+      TruthValue, RowStatus                   FROM SNMPv2-TC
+      AluWdmOdukStatus,
+      AluWdmTimDetMode,
+      AluWdmTtiStatus,
+      AluWdmOthOdukRate,
+      AluWdmOthOdukXcRate,
+      AluWdmOthOdukCurrentStatusBits,
+      AluWdmEnabledDisabled,
+      TropicOperationalCapabilityType,
+      TnCommand,
+      TropicStateQualifierType,
+      AluWdmDMInfoCurrentStatus               FROM TROPIC-TC
+      ApsK1K2                                 FROM TROPIC-L1SERVICE-MIB
+      tnPortModules,
+      tnOthMIB                                FROM TROPIC-GLOBAL-REG;
+
+  tnOthMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202301201200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "DWDM OTH MIB attributes."
+
+      REVISION    "202301201200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukXcTable:
+                      tnOthOdukXcCpConnId.
+                   2) Added the following to tnOthOdukApsGroupTable:
+                      tnOthOdukApsCpConnId."
+
+      REVISION    "202301061200Z"
+      DESCRIPTION "Added the following to tnOthOdukApsGroupCurrentStatus:
+                   rr(17)"
+
+      REVISION    "202206171200Z"
+      DESCRIPTION "Added the following to tnOthOdukOduCTypeNMValue:
+                   oduc5(5)"
+
+      REVISION    "202204291200Z"
+      DESCRIPTION "1) Added the following to tnOduPrbsTable:
+                      tnOduPrbsTseRatio
+                      tnOduPrbsTseTotalBits.
+                   2) Added the following to tnOduPrbsPattern:
+                      prbs11(3)"
+
+      REVISION    "202112031200Z"
+      DESCRIPTION "Added the following to tnOthOdukTable:
+                   tnOthOdukFacilityDescriptorConnPtId
+                   tnOthOdukFacilityDescCustLifeCycleState
+                   tnOthOdukFacilityDescAdminState."
+
+      REVISION    "202108271200Z"
+      DESCRIPTION "Added the following to tnOthOdukTtpTable:
+                   tnOthOdukTtpMsimResp."
+
+      REVISION    "202103191200Z"
+      DESCRIPTION "Added the following table:
+                   tnOduPrbsTable."
+
+      REVISION    "202009251200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukTtpTable:
+                      tnOthOdukTtpDegPeriod.
+                   2) Added the following to tnOthOdukNimTable:
+                      tnOthOdukNimDegPeriod.
+                   3) Added the following to tnOthOdukTTable:
+                      tnOthOdukTDegPeriod.
+                   4) Updated description for the following:
+                      tnOthOdukNimDegM
+                      tnOthOdukTtpDegM
+                      tnOthOdukTDegM."
+
+      REVISION    "202008071200Z"
+      DESCRIPTION "Added the following to tnOthOdukXcTable:
+                   tnOthOdukXcYangConnectionName."
+
+      REVISION    "202007101200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukXcTable:
+                      tnOthOdukXcResize
+                      tnOthOdukXcNewFromTsList
+                      tnOthOdukXcNewToTsList.
+                   2) Added the following to tnOthOdukApsGroupTable:
+                      tnOthOdukApsReSize
+                      tnOthOdukApsNewFromedTsList
+                      tnOthOdukApsNewFromingTsList."
+
+      REVISION    "202003131200Z"
+      DESCRIPTION "Added the following to tnOthOdukFlexClientType:
+                   fC3200(11)
+                   twentyFiveGbe(12)."
+
+      REVISION    "202002211200Z"
+      DESCRIPTION "Added the following to tnOthOdukTable:
+                   tnOthOdukFacilityDescriptorName
+                   tnOthOdukFacilityDescriptorDesc
+                   tnOthOdukFacilityDescriptorCirId."
+
+      REVISION    "201912131200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukFlexClientType:
+                      fourHunGbe(10).
+                   2) Added the following to tnOthOdukTTable:
+                      tnOthOdukOduCTypeNMValue."
+
+      REVISION    "201910041200Z"
+      DESCRIPTION "Added the following table:
+                   tnOduChanPoolTable."
+
+      REVISION    "201909271200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukOduChanPools
+                   tnOthOdukMaxTribNumber
+                   tnOthOdukActualTribNumber."
+
+      REVISION    "201909131200Z"
+      DESCRIPTION "Added the following to tnOthOdukEncryptionTable:
+                   tnOthOdukEncryptionEipcch."
+
+      REVISION    "201903081200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukTcmDMInvoke
+                   tnOthOdukTcmDMTimeStamp
+                   tnOthOdukTcmDMCMEPMode
+                   tnOthOdukTcmDMStatus
+                   tnOthOdukTcmDMTime."
+
+      REVISION    "201807201200Z"
+      DESCRIPTION "Added the following to tnOthOdukTable:
+                   tnOthOdukMsiSup."
+
+      REVISION    "201807061200Z"
+      DESCRIPTION "Changed the accessibility of following to read-create:
+                   tnOthOdukFlexGfpSize."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201710271200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukDMConfigTable:
+                      tnOthOdukDMConfigInvoke.
+                   2) Added the following to tnOthOdukDMInfoTable:
+                      tnOthOdukDMInfoTimeStamp."
+
+      REVISION    "201707111200Z"
+      DESCRIPTION "Added the following to tnOthOdukApsSwitchCmd:
+                   exercise(8)."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukApsMode:
+                      sncs(4).
+                   2) Fixed MIB compile issues."
+
+      REVISION    "201703101200Z"
+      DESCRIPTION "Added the following table:
+                   tnOthOdukEncryptionTable."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201609301200Z"
+      DESCRIPTION "Added the following to tnOthOdukApsGroupTable:
+                   tnOthOdukApsCascadedUse."
+
+      REVISION    "201607281200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukTtpCsfType."
+
+      REVISION    "201605251200Z"
+      DESCRIPTION "1) Remove the following from tnOthOdukNimTable:
+                      tnOthOdukNimAlmProfName.
+                   2) Remove the following from tnOthOdukTtpTable:
+                      tnOthOdukTtpAlmProfName."
+
+      REVISION    "201605211200Z"
+      DESCRIPTION "Added the following to tnOthOdukTable:
+                   tnOthOdukFlexType
+                   tnOthOdukFlexClientType
+                   tnOthOdukFlexGfpSize."
+
+      REVISION    "201604271200Z"
+      DESCRIPTION "1) Marked the following as deprecated:
+                      tnOthOdukNimAlmProfName
+                      tnOthOdukTtpAlmProfName.
+                   2) Added the following to tnOthOdukTable:
+                      tnOthOdukAlmProfName."
+
+      REVISION    "201604181200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukTcmOperationalCapability
+                   tnOthOdukTcmStateQualifier."
+
+      REVISION    "201604081200Z"
+      DESCRIPTION "Added the following to tnOthOdukTable:
+                   tnOthOdukMgracd."
+
+      REVISION    "201604051200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukTcmincstat."
+
+      REVISION    "201602261200Z"
+      DESCRIPTION "Added the following to tnOthOdukTTable:
+                   tnOthOdukTcmOperStatus
+                   tnOthOdukTcmMgracd."
+
+      REVISION    "201602191200Z"
+      DESCRIPTION "Added the following to tnOthOdukTtpTable:
+                   tnOthOdukTtpManualOduPtf."
+
+      REVISION    "201508061200Z"
+      DESCRIPTION "Added the following from tnOthOdukXcTable:
+                   tnOthOdukXcTopology."
+
+      REVISION    "201506021200Z"
+      DESCRIPTION "Removed the following from tnOthOdukApsGroupTable:
+                   tnOthOdukApsSwitchingType."
+
+      REVISION    "201505261200Z"
+      DESCRIPTION "Added the following to tnOthOdukApsGroupTable
+                   tnOthOdukApsSwitchingType."
+
+      REVISION    "201505181200Z"
+      DESCRIPTION "Changed the default value of tnOthOdukApsSdEnable
+                   as false."
+
+      REVISION    "201505151200Z"
+      DESCRIPTION "1) Added the following to tnOthOdukNimTable:
+                      tnOthOdukNimAlmProfName.
+                   2) Added the following to tnOthOdukTtpTable:
+                      tnOthOdukTtpAlmProfName.
+                   3) Added the following to tnOthOdukTTable:
+                      tnOthOdukTTcmAlmProfName."
+
+      REVISION    "201503261200Z"
+      DESCRIPTION "Added the following to tnOthOdukTtpTable:
+                   tnOthOdukTtpCndRes
+                   tnOthOdukTtpCmEmphasis."
+
+      REVISION    "201502061200Z"
+      DESCRIPTION "1) Updated description for tnOthOdukXcId and tnOthOdukApsGroupID.
+                   2) Added new value convertToUnprotFroming to tnOthOdukApsAction.
+                   3) Added the following to tnOthOdukApsGroupTable:
+                      tnOthOdukApsGroupCurrentStatus
+                      tnOthOdukApsSwitchCmd
+                      tnOthOdukApsActSide
+                      tnOthOdukApsFromedSfd
+                      tnOthOdukApsFromingSfd."
+
+      REVISION    "201412121200Z"
+      DESCRIPTION "Updated description of tnOthIfIndex in tnOthOdukTable."
+
+      REVISION    "201411131200Z"
+      DESCRIPTION "1) Changed the following from obsolete to current in tnOthOdukTtpTable:
+                      tnOthOdukTtpDapiExpected
+                      tnOthOdukTtpDegThr
+                      tnOthOdukTtpDegM
+                      tnOthOdukRxPayloadType
+                   2) Added the following to tnOthOdukTtpTable:
+                      tnOthOdukTtpDapiAccepted
+                      tnOthOdukTtpDapiTransmitted
+                      tnOthOdukTtpOsAccepted
+                      tnOthOdukTtpOsTransmitted
+                      tnOthOdukRxMSI
+                   3) Changed the following from obsolete to current in tnOthOdukNimTable:
+                      tnOthOdukNimDapiExpected
+                      tnOthOdukNimDegThr
+                      tnOthOdukNimDegM
+                   4) Added the following to tnOthOdukNimTable:
+                      tnOthOdukNimDapiAccepted
+                      tnOthOdukNimOsAccepted
+                   5) Added the following to tnOthOdukTTable:
+                      tnOthOdukTDegThr
+                      tnOthOdukTDegM
+                      tnOthOdukTDapiAccepted
+                      tnOthOdukTDapiExpected
+                      tnOthOdukTDapiTransmitted
+                      tnOthOdukTOsAccepted
+                      tnOthOdukTOsTransmitted."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Changed SYTAX of the following to use
+                   AluWdmDMInfoCurrentStatus:
+                   tnOthOdukDMInfoCurrentStatus."
+
+      REVISION    "201401071200Z"
+      DESCRIPTION "Updated DESCRIPTION of the following from microseconds
+                   to 10**(-7) seconds:
+                   tnOthOdukDMInfoCurrentValue."
+
+      REVISION    "201311131200Z"
+      DESCRIPTION "Updated DESCRIPTION of tnOthIfIndex for 260SCX2."
+
+      REVISION    "201309111200Z"
+      DESCRIPTION "Changed INDEX of tnOthOdukTTable from
+                   tnOthIfIndex
+                   tnOthIfIndexLo
+                   to
+                   tnOthOdukTcmIfIndex
+                   tnOthOdukTcmIfIndexLo."
+
+      REVISION    "201308161200Z"
+      DESCRIPTION "Updated DESCRIPTION of tnOthIfIndexLo for TCM."
+
+      REVISION    "201308051200Z"
+      DESCRIPTION "Changed SIZE of tnOthOdukTSapiTransmitted from 64
+                   to 16."
+
+      REVISION    "201306211200Z"
+      DESCRIPTION "Changed SYNTAX of the following from Integer32
+                   to Unsigned32:
+                   tnOthIfIndex
+                   tnOthIfIndexLo."
+
+      REVISION    "201304161200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnOthOdukTNimTable
+                   tnOthOdukTtpDapiExpected
+                   tnOthOdukTtpDegThr
+                   tnOthOdukTtpDegM
+                   tnOthOdukRxPayloadType
+                   tnOthOdukNimDapiExpected
+                   tnOthOdukNimDegThr
+                   tnOthOdukNimDegM
+                   tnOthOdukNimCurrentStatus."
+
+      REVISION    "201304011200Z"
+      DESCRIPTION "Removed the following as indexes from tnOthOdukTTable:
+                   tnOthOdukTTcmField
+                   tnOthOdukTDirectionality."
+
+      REVISION    "201301241200Z"
+      DESCRIPTION "Updated DESCRIPTION of tnOthIfIndex and tnOthIfIndexLo."
+
+      REVISION    "201211061200Z"
+      DESCRIPTION "Added the following table:
+                   tnOthOdukIncFtflInfoTable."
+
+      REVISION    "201211051200Z"
+      DESCRIPTION "Added the following to tnOthOdukTtpTable:
+                   tnOthOdukOdu0Interwk."
+
+      REVISION    "201210121200Z"
+      DESCRIPTION "Added the following table:
+                   tnOthOdukDMConfigTable
+                   tnOthOdukDMInfoTable."
+
+      REVISION    "201209281200Z"
+      DESCRIPTION "Added the following table:
+                   tnOthOdukOptsgTable."
+
+      REVISION    "201203161200Z"
+      DESCRIPTION "Added the following tables:
+                   tnOthOdukTable
+                   tnOthOdukTtpTable
+                   tnOthOdukNimTable
+                   tnOthGcc12Table
+                   tnOthOdukTTable
+                   tnOthOdukTNimTable
+                   tnOthOdukXcTable
+                   tnOthOdukApsGroupTable
+                   tnOthOdukMemberTable
+                   tnOthOdukApsGroupIdTable."
+
+      ::= { tnPortModules 8 }
+
+  tnOthConf        OBJECT IDENTIFIER ::= { tnOthMIB 1 }
+  tnOthGroups      OBJECT IDENTIFIER ::= { tnOthConf 1 }
+  tnOthCompliances OBJECT IDENTIFIER ::= { tnOthConf 2 }
+  tnOthObjs        OBJECT IDENTIFIER ::= { tnOthMIB 2 }
+  tnOthBasics      OBJECT IDENTIFIER ::= { tnOthObjs 1 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 1 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Table
+--------------------------------------------------------------------------------
+    tnOthOdukTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 2 }
+
+    tnOthOdukEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukTable 1 }
+
+    TnOthOdukEntry ::= SEQUENCE {
+        tnOthIfIndex                                Unsigned32,
+        tnOthIfIndexLo                              Unsigned32,
+        tnOthOdukDirectionality                     INTEGER,
+        tnOthOdukRate                               AluWdmOthOdukRate,
+        tnOthOdukTcmFieldsInUse                     BITS,
+        tnOthOdukTtpPresent                         TruthValue,
+        tnOthOdukAdminStatus                        AluWdmOdukStatus,
+        tnOthOdukStateAINS                          TruthValue,
+        tnOthOdukOperStatus                         AluWdmOdukStatus,
+        tnOthOdukStateQualifier                     TropicStateQualifierType,
+        tnOthOdukOperationalCapability              TropicOperationalCapabilityType,
+        tnOthOdukAINSDebounceTime                   Integer32,
+        tnOthOdukUsingSysAINSDebounceTime           TruthValue,
+        tnOthOdukAINSDebounceTimeRemaining          Unsigned32,
+        tnOthOdukForceAdminStatus                   TnCommand,
+        tnOthOdukMgracd                             INTEGER,
+        tnOthOdukAlmProfName                        OCTET STRING,
+        tnOthOdukFlexType                           INTEGER,
+        tnOthOdukFlexClientType                     INTEGER,
+        tnOthOdukFlexGfpSize                        Unsigned32,
+        tnOthOdukMsiSup                             TruthValue,
+        tnOthOdukFacilityDescriptorName             SnmpAdminString,
+        tnOthOdukFacilityDescriptorDesc             SnmpAdminString,
+        tnOthOdukFacilityDescriptorCirId            SnmpAdminString,
+        tnOthOdukFacilityDescriptorConnPtId         SnmpAdminString,
+        tnOthOdukFacilityDescCustLifeCycleState     SnmpAdminString,
+        tnOthOdukFacilityDescAdminState             INTEGER
+    }
+
+    tnOthIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A unique index, greater than zero, for each ODU
+                        entity.  This is the high-order index part.
+
+            ------------------------------------------------------
+            | Bit31-Bit24 | Bit23-Bit16 | Bit15-Bit3 | Bit2-Bit0 |
+            --------------+-------------+------------+------------
+            | 8 bits      | 8 bits      | 13 bits    | 3 bits    |
+            --------------+-------------+------------+------------
+            | shelf       | slot        | HO-ODU     | Reserved  |
+            |             |             | Number     | as 0      |
+            ------------------------------------------------------
+
+                        For the 260SCX2 card, the bits in this attribute
+                        are used as the following:
+
+            ------------------------------------------------------
+            | Bit31-Bit24 | Bit23-Bit16 | Bit15-Bit8 | Bit7-Bit0 |
+            --------------+-------------+------------+------------
+            | 8 bits      | 8 bits      | 8 bits     | 8 bits    |
+            --------------+-------------+------------+------------
+            | shelf       | slot        | port       | Reserved  |
+            |             |             |            | as 0      |
+            ------------------------------------------------------
+
+                        The bits in the port are further broken down
+                        as the following:
+
+            For L1Ch1/L1CH2 ports
+           Broken 8 bits of port (Bit15 to Bit8) into  3 bits for port
+           Broken 8 bits of reserved (Bit7-Bit0) into 4 Bits of Channel
+
+            -------------------------------------------------------------------
+            | Bit31-Bit24 | Bit23-Bit16 | Bit15-Bit11 | Bit10-Bit8  | Bit7-Bit4   | Bit3-Bit0
+            --------------+-------------+------------+--------------+------------------------
+            | 8 bits      | 8 bits      |            |  3 bits      |  4  bits    |  4 bits |
+            --------------+-------------+------------+-------------+-------------+------------
+            | shelf       | slot        | Reserved   |  port        |  Channel    |  Reserved 4 bits as zero |
+
+            "
+        ::= { tnOthOdukEntry 1 }
+
+    tnOthIfIndexLo OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A unique index, greater than zero, for each ODU
+                        entity.  This is the low-order index part.
+
+            -----------------------------------------------------------
+            | Bit31-Bit29 | Bit28-Bit27   | Bit26-Bit25 | Bit24-Bit16 |
+            --------------+---------------+-------------+-------------+
+            | 3 bits      | 2 bits        | 2 bits      | 9 bits      |
+            --------------+---------------+-------------+-------------+
+            | TCM Level   | TCM Direction | Reserved    | Lo-ODUID    |
+            | (1-6)       | (AM=1, BM=2)  | as 0        |             |
+            -----------------------------------------------------------
+
+            ---------------------------------------
+            | Bit15-Bit10 | Bit9-Bit5 | Bit4-Bit0 |
+            --------------+-----------+-----------+
+            | 6 bits      | 5 bits    | 5 bits    |
+            --------------+-----------+------------
+            | Container   | HO-ODU    | LO-ODU    |
+            | Type        | ODU Type  | ODU Type  |
+            ---------------------------------------
+
+              Container Type                    |  Value
+            ------------------------------------+---------
+              NULL                              |    0
+              HO-ODU NIM                        |    1
+              Client Transparent ODU            |    2
+              LO-ODU NIM                        |    3
+              ODU-TP                            |    4
+              ODU POOL                          |    5
+              ODU1PTF (11dpm12/4qpa8 specific)  |    6
+              OPTSG                             |    7
+
+              ODUTYPE       |  Value
+            ----------------+---------
+              NULL          |    0
+              ODU0          |    1
+              ODU1          |    2
+              ODU1e         |    3
+              ODU1f         |    4
+              ODU2          |    5
+              ODU2e         |    6
+              ODU2f         |    7
+              ODU3          |    8
+              ODU3e1        |    9
+              ODU3e2        |   10
+              ODU4          |   11
+              ODUflex(CBR)  |   12
+              OPTSG         |   13
+              ODUflex(GFP)  |   14
+                       "
+        ::= { tnOthOdukEntry 2 }
+
+    tnOthOdukDirectionality OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sink(1),
+                         source(2),
+                         bidirectional(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the directionality of the entity."
+        ::= { tnOthOdukEntry 3 }
+
+    tnOthOdukRate OBJECT-TYPE
+        SYNTAX         AluWdmOthOdukRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the ODUk entity rate."
+        ::= { tnOthOdukEntry 4 }
+
+    tnOthOdukTcmFieldsInUse OBJECT-TYPE
+        SYNTAX         BITS {
+                         tcmField1-am-nim(0),
+                         tcmField1-am-ttp(1),
+                         tcmField1-bm-nim(2),
+                         tcmField1-bm-ttp(3),
+                         tcmField2-am-nim(4),
+                         tcmField2-am-ttp(5),
+                         tcmField2-bm-nim(6),
+                         tcmField2-bm-ttp(7),
+                         tcmField3-am-nim(8),
+                         tcmField3-am-ttp(9),
+                         tcmField3-bm-nim(10),
+                         tcmField3-bm-ttp(11),
+                         tcmField4-am-nim(12),
+                         tcmField4-am-ttp(13),
+                         tcmField4-bm-nim(14),
+                         tcmField4-bm-ttp(15),
+                         tcmField5-am-nim(16),
+                         tcmField5-am-ttp(17),
+                         tcmField5-bm-nim(18),
+                         tcmField5-bm-ttp(19),
+                         tcmField6-am-nim(20),
+                         tcmField6-am-ttp(21),
+                         tcmField6-bm-nim(22),
+                         tcmField6-bm-ttp(23)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the TCM fields and TTP/NIM attributes
+                        that are currently in use.  A bit that is set
+                        to 1 means that the corresponding TCM field is
+                        used.  This object will be updated when rows are
+                        created in or deleted from tnOthOdukTTable."
+        ::= { tnOthOdukEntry 5 }
+
+    tnOthOdukTtpPresent OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This object has the value true(1) if the ifEntry
+                        under which it is instantiated contains an ODUk
+                        Trail Termination Point, i.e., the endpoint of
+                        an ODUk path.  In that case there will be a
+                        corresponding row in the ODUk TTP config table
+                        and it will not be possible to create corresponding
+                        rows in tnOthOdukNimTable.  This object has the
+                        value false(2) if the ifEntry under which it is
+                        instantiated contains an  intermediate ODUk
+                        Connection Termination Point.  In that case there
+                        is no corresponding row in tnOthOdukTtpTable, but
+                        it will be possible to create corresponding rows
+                        in tnOthOdukNimTable.  This object also affects
+                        the allowable options in rows created in
+                        tnOthGcc12Table, as specified in the DESCRIPTION
+                        clauses of the columns in those tables."
+        ::= { tnOthOdukEntry 6 }
+
+    tnOthOdukAdminStatus OBJECT-TYPE
+        SYNTAX         AluWdmOdukStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ODUk administrative state.  It may be used to
+                        suppress the alarms or disable consequent
+                        actions on the ODU entity."
+        ::= { tnOthOdukEntry 7 }
+
+    tnOthOdukStateAINS OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ODUk state AINS attributes."
+        ::= { tnOthOdukEntry 8 }
+
+    tnOthOdukOperStatus OBJECT-TYPE
+        SYNTAX         AluWdmOdukStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk operational state of the interface."
+        ::= { tnOthOdukEntry 9 }
+
+    tnOthOdukStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the state qualifier (i.e., the
+                        secondary state) of the ODUk state."
+        ::= { tnOthOdukEntry 10 }
+
+    tnOthOdukOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The partiallyEnabled(3) state means an abnormal
+                        state."
+        ::= { tnOthOdukEntry 11 }
+
+    tnOthOdukAINSDebounceTime OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute must be set in multiples of 60s.
+                        It is equal to system AINS debounce time when
+                        port AINS use system default is true.  Setting
+                        the OTUk AINS debounce time and OTUk AINS use
+                        system default to true in the same set request
+                        is restricted.
+
+                        Current configurable range: 1m to 96h 0m."
+        ::= { tnOthOdukEntry 12 }
+
+    tnOthOdukUsingSysAINSDebounceTime OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Using system AINS debounce time.  Sets with a
+                        value of false are restricted.  The network
+                        operator must set OTUk AINS debounce time to
+                        some valid value to disable the use of system
+                        AINS debounce time.  Setting the port AINS
+                        debounce time and port AINS use system default
+                        to true in the same set request is restricted."
+        ::= { tnOthOdukEntry 13 }
+
+    tnOthOdukAINSDebounceTimeRemaining OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "Seconds"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Number of seconds until the OTUk AINS debounce
+                        time expires.  If port AINS is false or port
+                        AINS debounce time is 0, the value of this
+                        attribute will be 0."
+        ::= { tnOthOdukEntry 14 }
+
+    tnOthOdukForceAdminStatus OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Setting this attribute to execute will force
+                        tnOthOdukAdminStatus change.  This works only
+                        when tnOthOdukAdminStatus is down.  When queried,
+                        this attribute returns a value of noCmd."
+        ::= { tnOthOdukEntry 15 }
+
+    tnOthOdukMgracd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         cp(2),
+                         mgnpln(3),
+                         cpmgnpln(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if managed by CP, MGNPLN, shared by both or free."
+        DEFVAL         { none }
+        ::= { tnOthOdukEntry 16 }
+
+    tnOthOdukAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukEntry 17 }
+
+    tnOthOdukFlexType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         oduflexGfp(2),
+                         oduflexCBR(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "LO-ODU OduFlex Type to distinguish two oduflex subTypes GFP or CBR."
+        ::= { tnOthOdukEntry 18 }
+
+    tnOthOdukFlexClientType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         fC400(2),
+                         fC800(3),
+                         fC1600(4),
+                         g3SDI18(5),
+                         iBSDR(6),
+                         iBDDR(7),
+                         iBQDR(8),
+                         g3SDI19(9),
+                         fourHunGbe(10),
+                         fC3200(11),
+                         twentyFiveGbe(12)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates client type/CBR signal carried by the oduflex
+                        and it is applicable to CBR."
+        ::= { tnOthOdukEntry 19 }
+
+    tnOthOdukFlexGfpSize OBJECT-TYPE
+        SYNTAX         Unsigned32(0..80)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the size in terms of tributary slots and its applicable
+                        to only ODUFLEX GFP."
+        ::= { tnOthOdukEntry 20 }
+
+    tnOthOdukMsiSup OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "MSI Supervision determines whether the incoming MSI
+                        is supervised/monitored in order to detect dMSIM defects
+                        for all contained LO-ODus.
+
+                        true  - incoming MSI is used to monitor dMSIM for all contained LO-ODus
+                        false - incoming MSI is not used for supervised."
+        DEFVAL         { true }
+        ::= { tnOthOdukEntry 21 }
+
+    tnOthOdukFacilityDescriptorName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukEntry 22 }
+
+    tnOthOdukFacilityDescriptorDesc OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukEntry 23 }
+
+    tnOthOdukFacilityDescriptorCirId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukEntry 24 }
+
+    tnOthOdukFacilityDescriptorConnPtId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Connection Point Id."
+        ::= { tnOthOdukEntry 25 }
+
+    tnOthOdukFacilityDescCustLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Customer life cycle state."
+        ::= { tnOthOdukEntry 26 }
+
+    tnOthOdukFacilityDescAdminState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         mt(2),
+                         unassigned(3),
+                         up(4),
+                         invalid(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Admin state."
+        ::= { tnOthOdukEntry 27 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk TTP Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukTtpAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 3 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk TTP Table
+--------------------------------------------------------------------------------
+    tnOthOdukTtpTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukTtpEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 4 }
+
+    tnOthOdukTtpEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukTtpEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukTtpTable 1 }
+
+    TnOthOdukTtpEntry ::= SEQUENCE {
+        tnOthOdukTtpSapiTransmitted             OCTET STRING,
+        tnOthOdukTtpDapiExpected                OCTET STRING,
+        tnOthOdukTtpSapiExpected                OCTET STRING,
+        tnOthOdukTtpTraceIdentifierAccepted     OCTET STRING,
+        tnOthOdukTtpTimDetMode                  AluWdmTimDetMode,
+        tnOthOdukTtpTimActEnabled               TruthValue,
+        tnOthOdukTtpTtiStatus                   AluWdmTtiStatus,
+        tnOthOdukTtpDegThr                      Unsigned32,
+        tnOthOdukTtpDegM                        Unsigned32,
+        tnOthOdukPayloadType                    Unsigned32,
+        tnOthOdukRxPayloadType                  Unsigned32,
+        tnOthOdukPlmConsequenceAction           TruthValue,
+        tnOthOdukTxOduStruct                    SnmpAdminString,
+        tnOthOdukRxOduStruct                    SnmpAdminString,
+        tnOthOdukTtpCurrentStatus               AluWdmOthOdukCurrentStatusBits,
+        tnOthOdukOdu0Interwk                    AluWdmEnabledDisabled,
+        tnOthOdukTtpDapiAccepted                OCTET STRING,
+        tnOthOdukTtpDapiTransmitted             OCTET STRING,
+        tnOthOdukTtpOsAccepted                  OCTET STRING,
+        tnOthOdukTtpOsTransmitted               OCTET STRING,
+        tnOthOdukRxMSI                          OCTET STRING,
+        tnOthOdukTtpCndRes                      INTEGER,
+        tnOthOdukTtpCmEmphasis                  INTEGER,
+        tnOthOdukTtpManualOduPtf                INTEGER,
+        tnOthOdukTtpCsfType                     INTEGER,
+        tnOthOdukOduChanPools                   OCTET STRING,
+        tnOthOdukMaxTribNumber                  Unsigned32,
+        tnOthOdukActualTribNumber               Unsigned32,
+        tnOthOdukOduCTypeNMValue                INTEGER,
+        tnOthOdukTtpDegPeriod                   INTEGER,
+        tnOthOdukTtpMsimResp                    TruthValue
+    }
+
+    tnOthOdukTtpSapiTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SAPI bytes in the trace identifier
+                        transmitted.  This object is applicable when
+                        tnOthOdukDirectionality has the value source(2)
+                        or bidirectional(3).  It must not be instantiated
+                        in rows where tnOthOdukDirectionality has the
+                        value sink(1).  TXSAPI is the fist 16 Octets
+                        (TTI[0]-TTI[15]) and TTI[0] (i.e., SAPI[0])
+                        shall be fixed to all 0s."
+        ::= { tnOthOdukTtpEntry 1 }
+
+    tnOthOdukTtpDapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes expected by the receiver."
+        ::= { tnOthOdukTtpEntry 2 }
+
+    tnOthOdukTtpSapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SAPI expected by the receiver.  This object
+                        is applicable only to the sink function, i.e.,
+                        only when tnOthOdukDirectionality has the value
+                        sink(1) or bidirectional(3).  It must not be
+                        instantiated in rows where tnOthOdukDirectionality
+                        has the value source(2).  This object has no
+                        effect when tnOthOdukTtpTimDetMode has the value
+                        off(1)."
+        ::= { tnOthOdukTtpEntry 3 }
+
+    tnOthOdukTtpTraceIdentifierAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(64))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The actual trace identifier accepted.  This
+                        object is applicable only to the sink function,
+                        i.e., only when tnOthOdukDirectionality has the
+                        value sink(1) or bidirectional(3).  It must not
+                        be instantiated in rows where tnOthOdukDirectionality
+                        has the value source(2).  The value of this
+                        object is unspecified when tnOthOdukTtpCurrentStatus
+                        indicates a near-end defect (i.e., oci(0), lck(1),
+                        ssf(5)) that prevents extraction of the trace
+                        message.  It consists of the following three parts:
+                        - RXSAPI is the fist 16 octets (TTI[0]-TTI[15])
+                        - RXDAPI is the second 16 octets (TTI[16]-TTI[31])
+                        - RXOS (operator specific) is the last 32 octets
+                            (TTI[32]-TTI[63])
+                        TTI[0] (i.e., SAPI[0]) and TTI[16] (i.e., DAPI[0])
+                        shall be fixed to all 0s."
+        ::= { tnOthOdukTtpEntry 4 }
+
+    tnOthOdukTtpTimDetMode OBJECT-TYPE
+        SYNTAX         AluWdmTimDetMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the mode of the Trace Identifier
+                        Mismatch (TIM) Detection function.  This object
+                        is applicable only to the sink function, i.e.,
+                        only when tnOthOdukDirectionality has the value
+                        sink(1) or bidirectional(3).  It must not be
+                        instantiated in rows where tnOthOdukDirectionality
+                        has the value source(2)."
+        DEFVAL         { off }
+        ::= { tnOthOdukTtpEntry 5 }
+
+    tnOthOdukTtpTimActEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether the Trace Identifier Mismatch
+                        (TIM).  Consequent Action function is enabled.
+                        This object is applicable only to the sink
+                        function; i.e., only when tnOthOdukDirectionality
+                        has the value sink(1) or bidirectional(3).  It
+                        must not be instantiated in rows where
+                        tnOthOdukDirectionality has the value source(2).
+                        This object has no effect when
+                        tnOthOdukTtpTimDetMode has the value off(1)."
+        ::= { tnOthOdukTtpEntry 6 }
+
+    tnOthOdukTtpTtiStatus OBJECT-TYPE
+        SYNTAX         AluWdmTtiStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk TTI status."
+        ::= { tnOthOdukTtpEntry 7 }
+
+
+    tnOthOdukTtpDegThr OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the burst threshold as a number of
+                        errored blocks on the ODU layer.  A second is
+                        declared as good if the number of detected
+                        errored blocks within one second is less than
+                        tnOthOdukTtpDegThr, otherwise the second is
+                        declared as bad second."
+        ::= { tnOthOdukTtpEntry 8 }
+
+    tnOthOdukTtpDegM OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the number of consecutive bad seconds
+                        (tnOthOdukTtpDegM* tnOthOdukTtpDegPeriod)
+                        to be detected before declaring a signal degrade
+                        defect on the ODU.  The defect is cleared if
+                        tnOthOdukTtpDegM* tnOthOdukTtpDegPeriod  consecutive
+                        good seconds are detected.
+
+                        Current Configurable range:
+
+                        1 to 10."
+        ::= { tnOthOdukTtpEntry 9 }
+
+    tnOthOdukPayloadType OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The ODUk payload type value provisioned on the
+                        transmitting direction.  This is applicable only
+                        to an ODU adaptation function."
+        ::= { tnOthOdukTtpEntry 10 }
+
+    tnOthOdukRxPayloadType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The received ODUk payload type value.
+
+                        Current Range:
+
+                        0 to 255."
+        ::= { tnOthOdukTtpEntry 11 }
+
+    tnOthOdukPlmConsequenceAction OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "PLM consequence action."
+        ::= { tnOthOdukTtpEntry 12 }
+
+    tnOthOdukTxOduStruct OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2047))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The transmitted ODU payload structure value.
+                        It is programmed into the transmitted ODU MSI
+                        bytes."
+        ::= { tnOthOdukTtpEntry 13 }
+
+    tnOthOdukRxOduStruct OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The received ODU payload structure value.  It
+                        is retrieved from the received ODU MSI bytes."
+        ::= { tnOthOdukTtpEntry 14 }
+
+    tnOthOdukTtpCurrentStatus OBJECT-TYPE
+        SYNTAX         AluWdmOthOdukCurrentStatusBits
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the defect condition of the entity, if
+                        any.  This object is applicable only to the sink
+                        function, i.e., only when tnOthOdukDirectionality
+                        has the value sink(1) or bidirectional(3).  It
+                        must not be instantiated in rows where
+                        tnOthOdukDirectionality has the value source(2)."
+        ::= { tnOthOdukTtpEntry 15 }
+
+    tnOthOdukOdu0Interwk OBJECT-TYPE
+        SYNTAX         AluWdmEnabledDisabled
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Oduk Odu0 interworking."
+        ::= { tnOthOdukTtpEntry 16 }
+
+    tnOthOdukTtpDapiAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes received."
+        ::= { tnOthOdukTtpEntry 17 }
+
+    tnOthOdukTtpDapiTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes transmitted.  The TTI[17] to
+                        TTI[31] contain the 15-character destination
+                        access point identifier (DAPI)."
+        ::= { tnOthOdukTtpEntry 18 }
+
+    tnOthOdukTtpOsAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OS bytes received"
+        ::= { tnOthOdukTtpEntry 19 }
+
+    tnOthOdukTtpOsTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The OS bytes transmitted.  The TTI[32] to TTI[63]
+                        contain the 32-character Operator Specific(OS)."
+        ::= { tnOthOdukTtpEntry 20 }
+
+    tnOthOdukRxMSI OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the MSI values.  The MSI is reported
+                        as two Hex bytes per each Timeslot (TS) in the
+                        range of [00 FF].  For example, ODU4 MSI under
+                        PT=0x21 will be reported as 160 HEX Bytes for
+                        80 TS."
+        ::= { tnOthOdukTtpEntry 21 }
+
+    tnOthOdukTtpCndRes OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         c1d(1),
+                         c8d(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { c1d }
+        ::= { tnOthOdukTtpEntry 22 }
+
+    tnOthOdukTtpCmEmphasis OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disable(1),
+                         enable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { enable }
+        ::= { tnOthOdukTtpEntry 23 }
+
+    tnOthOdukTtpManualOduPtf OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         create(2),
+                         delete(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { noCmd }
+        ::= { tnOthOdukTtpEntry 24 }
+
+    tnOthOdukTtpCsfType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unused(1),
+                         lcs(2),
+                         lccs(3),
+                         unknown(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { lccs }
+        ::= { tnOthOdukTtpEntry 25 }
+
+    tnOthOdukOduChanPools OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..40))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukTtpEntry 26 }
+
+    tnOthOdukMaxTribNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukTtpEntry 27 }
+
+    tnOthOdukActualTribNumber OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukTtpEntry 28 }
+
+    tnOthOdukOduCTypeNMValue OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         oduc1(1),
+                         oduc2(2),
+                         oduc3(3),
+                         oduc4(4),
+                         oduc5(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { oduc4 }
+        ::= { tnOthOdukTtpEntry 29 }
+
+    tnOthOdukTtpDegPeriod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         thousandMS(1),
+                         hundredMS(2),
+                         tenMS(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the detection time unit for a signal degrade
+                        defect on the ODU.  The signal degrade detection time
+                        window is specified by tnOthOdukTtpDegPeriod multiplied
+                        by tnOthOdukTtpDegM."
+        DEFVAL         { thousandMS }
+        ::= { tnOthOdukTtpEntry 30 }
+
+    tnOthOdukTtpMsimResp OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Control whether an MSIM consequent action is enabled or not."
+        ::= { tnOthOdukTtpEntry 31 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk NIM Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukNimAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 5 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk NIM Table
+--------------------------------------------------------------------------------
+    tnOthOdukNimTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukNimEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 6 }
+
+    tnOthOdukNimEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukNimEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo,
+                tnOthOdukNimDirectionality }
+        ::= { tnOthOdukNimTable 1 }
+
+    TnOthOdukNimEntry ::= SEQUENCE {
+        tnOthOdukNimDirectionality              INTEGER,
+        tnOthOdukNimDapiExpected                OCTET STRING,
+        tnOthOdukNimSapiExpected                OCTET STRING,
+        tnOthOdukNimTraceIdentifierAccepted     OCTET STRING,
+        tnOthOdukNimTimDetMode                  AluWdmTimDetMode,
+        tnOthOdukNimTimActEnabled               TruthValue,
+        tnOthOdukNimTtiStatus                   AluWdmTtiStatus,
+        tnOthOdukNimDegThr                      Unsigned32,
+        tnOthOdukNimDegM                        Unsigned32,
+--        tnOthOdukNimCurrentStatus               AluWdmOthOdukCurrentStatusBits,
+        tnOthOdukNimPom                         TruthValue,
+        tnOthOdukNimDapiAccepted                OCTET STRING,
+        tnOthOdukNimOsAccepted                  OCTET STRING,
+        tnOthOdukNimDegPeriod                   INTEGER
+    }
+
+    tnOthOdukNimDirectionality OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sink(1),
+                         source(2)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Specifies the monitor point for the ODUk Path
+                        non-intrusive monitoring function.  The value
+                        source(2) is not allowed if the corresponding
+                        instance of tnOthOdukDirectionality has the
+                        value sink(1), and the value sink(1) is not
+                        allowed if the corresponding instance of
+                        tnOthOdukDirectionality has the value source(2).
+                        Either the value sink(1) or source(2) is allowed
+                        if the corresponding instance of
+                        tnOthOdukDirectionality has the value
+                        bidirectional(3).  The value sink(1) means
+                        monitoring at the sink direction path signal of
+                        the ODUk CTP.  The value source(2) means monitoring
+                        at the source direction path signal of the ODUk
+                        CTP.  Monitoring the source direction of an ODUk
+                        CTP is necessary in those cases where the ODUk
+                        CTP is at an SNCP (Subnetwork Connection
+                        Protection) end (e.g., see Figure I.1.2/G.874.1).
+                        If one would like to get the performance of the
+                        protected connection, one cannot use the NIM
+                        function at both ODUk CTP sinks (before the
+                        matrix), instead one should monitor the signal
+                        at the source ODUk CTP after the matrix."
+        ::= { tnOthOdukNimEntry 1 }
+
+    tnOthOdukNimDapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes expected by the receiver."
+        ::= { tnOthOdukNimEntry 2 }
+
+    tnOthOdukNimSapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SAPI expected by the receiver.  This object
+                        has no effect when tnOthOdukNimTimDetMode has
+                        the value off(1)."
+        ::= { tnOthOdukNimEntry 3 }
+
+    tnOthOdukNimTraceIdentifierAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(64))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The actual trace identifier accepted.  The value
+                        of this object is unspecified if
+                        tnOthOdukNimCurrentStatus has any of the bit
+                        positions oci(0), lck(1), or ssf(5) set or if
+                        tnOthOdukNimRowStatus has any value other than
+                        active(1).  It consists of three parts:
+                        - RXSAPI is the fist 16 octets (TTI[0]-TTI[15])
+                        - RXDAPI is the second 16 octets (TTI[16]- TTI[31])
+                        - RXOS (operator specific) is the last 32 octets
+                            (TTI[32]- TTI[63]).
+                        TTI[0] (i.e., SAPI[0]) and TTI[16] (i.e., DAPI[0])
+                        shall be fixed to all 0s."
+        ::= { tnOthOdukNimEntry 4 }
+
+    tnOthOdukNimTimDetMode OBJECT-TYPE
+        SYNTAX         AluWdmTimDetMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the mode of the Trace Identifier
+                        Mismatch (TIM) Detection function."
+        ::= { tnOthOdukNimEntry 5 }
+
+    tnOthOdukNimTimActEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether the Trace Identifier Mismatch
+                        (TIM) Consequent Action function is enabled."
+        ::= { tnOthOdukNimEntry 6 }
+
+    tnOthOdukNimTtiStatus OBJECT-TYPE
+        SYNTAX         AluWdmTtiStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk Nim TTI status."
+        ::= { tnOthOdukNimEntry 7 }
+
+    tnOthOdukNimDegThr OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the burst threshold as a number of
+                        errored blocks on the ODU layer.  A second is
+                        declared as good if the number of detected
+                        errored blocks within one second is less than
+                        tnOthOdukNimDegThr, otherwise the second is
+                        declared as bad second."
+        ::= { tnOthOdukNimEntry 8 }
+
+    tnOthOdukNimDegM OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the number of consecutive bad seconds
+                        (tnOthOdukNimDegM* tnOthOdukNimDegPeriod)
+                        to be detected before declaring a signal degrade
+                        defect on the ODU.  The defect is cleared if
+                        tnOthOdukNimDegM* tnOthOdukNimDegPeriod  consecutive
+                        good seconds are detected.
+
+                        Current configurable range:
+
+                        1 to 10."
+        ::= { tnOthOdukNimEntry 9 }
+--    tnOthOdukNimCurrentStatus OBJECT-TYPE ::= { tnOthOdukNimEntry 10 }
+
+    tnOthOdukNimPom OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This object is used to model the activateNim and
+                        deactivateNim operations of an OTUk_CTP for
+                        non-intrusive monitoring control as defined in
+                        G.874.1.  Setting this object to true implies
+                        activateNim, and setting this object to false
+                        implies deactivateNim."
+        ::= { tnOthOdukNimEntry 11 }
+
+    tnOthOdukNimDapiAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes received."
+        ::= { tnOthOdukNimEntry 12 }
+
+    tnOthOdukNimOsAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OS bytes received."
+        ::= { tnOthOdukNimEntry 13 }
+
+    tnOthOdukNimDegPeriod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         thousandMS(1),
+                         hundredMS(2),
+                         tenMS(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the detection time unit for a signal degrade
+                        defect on the ODU. The signal degrade detection time
+                        window is specified by tnOthOdukNimDegPeriod multiplied
+                        by tnOthOdukNimDegM."
+        DEFVAL         { thousandMS }
+        ::= { tnOthOdukNimEntry 14 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) GCC12 Scalars
+--------------------------------------------------------------------------------
+    tnOthGcc12AttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 7 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) GCC12 Table
+--------------------------------------------------------------------------------
+    tnOthGcc12Table OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthGcc12Entry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 8 }
+
+    tnOthGcc12Entry OBJECT-TYPE
+        SYNTAX         TnOthGcc12Entry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo,
+                tnOthGcc12Codirectional,
+                tnOthGcc12GccAccess }
+        ::= { tnOthGcc12Table 1 }
+
+    TnOthGcc12Entry ::= SEQUENCE {
+        tnOthGcc12Codirectional      TruthValue,
+        tnOthGcc12GccAccess          INTEGER,
+        tnOthGcc12RowStatus          RowStatus,
+        tnOthGcc12GccPassThrough     TruthValue,
+        tnOthGcc12Application        OCTET STRING
+    }
+
+    tnOthGcc12Codirectional OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Indicates the directionality of the GCC12
+                        termination with respect to the associated ODUk
+                        CTP.  The value true(1) means that the sink part
+                        of the GCC12 extracts COMMS data from the signal
+                        at the input to the ODUk CTP sink and the source
+                        part of the GCC12 inserts COMMS data into the
+                        signal at the output of the ODUk CTP source.  The
+                        value false(2) means that the sink part of the
+                        GCC12 extracts COMMS data from the signal at the
+                        output of the ODUk CTP source and the source part
+                        of the GCC12 inserts COMMS data into the signal
+                        at the input of the ODUk CTP sink.  This attribute
+                        may assume either value when the corresponding
+                        instance of tnOthOdukTtpPresent has the value
+                        false(2).  When the value of the corresponding
+                        instance of tnOthOdukTtpPresent is true(1) then
+                        the only value allowed for this attribute is
+                        true(1)."
+        ::= { tnOthGcc12Entry 1 }
+
+    tnOthGcc12GccAccess OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         gcc1(1),
+                         gcc2(2),
+                         gcc1and2(3)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Indicates the GCC access represented by the
+                        entity."
+        ::= { tnOthGcc12Entry 2 }
+
+    tnOthGcc12RowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This columnar object is used for creating and
+                        deleting a conceptual row of the tnOthGcc12
+                        config table.  It is used to model the
+                        addGCC12Access and removeGCC12Access operations
+                        of an ODUk CTP or ODUk TTP for GCC12 access
+                        control as defined in G.874.1.  Setting RowStatus
+                        to createAndGo or createAndWait implies
+                        addGCC12Access.  Setting RowStatus to destroy
+                        implies removeGCC12Access."
+        ::= { tnOthGcc12Entry 3 }
+
+    tnOthGcc12GccPassThrough OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Controls whether the selected GCC overhead
+                        bytes are passed through or modified.  The value
+                        true(1) means that the selected GCC overhead
+                        bytes are passed through unmodified from the
+                        ODUk CTP input to the ODUk CTP output.  The
+                        value false(2) means that the selected GCC
+                        overhead bytes are set to zero at the ODUk CTP
+                        output after the extraction of the COMMS data.
+                        This object has no effect if the corresponding
+                        instance of tnOthOdukTtpPresent has the value
+                        true(1).  The value of this object may not be
+                        changed when tnOthGcc12RowStatus has the value
+                        active(1)."
+        ::= { tnOthGcc12Entry 4 }
+
+    tnOthGcc12Application OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the application transported by the
+                        GCC12 entity.  Example applications are ECC,
+                        User data channel. The value of this object may
+                        not be changed when tnOthGcc12RowStatus has the
+                        value active(1)."
+        ::= { tnOthGcc12Entry 5 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUkT Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukTAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 9 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUkT Table
+--------------------------------------------------------------------------------
+    tnOthOdukTTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukTEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 10 }
+
+    tnOthOdukTEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukTEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthOdukTcmIfIndex,
+                tnOthOdukTcmIfIndexLo
+--                obsolete
+--                tnOthOdukTTcmField,
+--                tnOthOdukTDirectionality
+                               }
+        ::= { tnOthOdukTTable 1 }
+
+    TnOthOdukTEntry ::= SEQUENCE {
+--        obsolete
+--        tnOthOdukTTcmField                    Unsigned32,
+--        tnOthOdukTDirectionality              INTEGER,
+        tnOthOdukTRowStatus                   RowStatus,
+        tnOthOdukTTcmMode                     INTEGER,
+        tnOthOdukTPosSeq                      Unsigned32,
+        tnOthOdukTAdminStatus                 AluWdmOdukStatus,
+        tnOthOdukTSapiTransmitted             OCTET STRING,
+        tnOthOdukTSapiExpected                OCTET STRING,
+        tnOthOdukTTraceIdentifierAccepted     OCTET STRING,
+        tnOthOdukTTimDetMode                  AluWdmTimDetMode,
+        tnOthOdukTTimActEnabled               TruthValue,
+        tnOthOdukTTtpTtiStatus                AluWdmTtiStatus,
+        tnOthOdukTAisOnDef                    INTEGER,
+        tnOthOdukTLtcResp                     INTEGER,
+        tnOthOdukTOhAdd                       TruthValue,
+        tnOthOdukTOhRmv                       TruthValue,
+        tnOthOdukTcmIfIndex                   Unsigned32,
+        tnOthOdukTcmIfIndexLo                 Unsigned32,
+        tnOthOdukTDegThr                      Unsigned32,
+        tnOthOdukTDegM                        Unsigned32,
+        tnOthOdukTDapiAccepted                OCTET STRING,
+        tnOthOdukTDapiExpected                OCTET STRING,
+        tnOthOdukTDapiTransmitted             OCTET STRING,
+        tnOthOdukTOsAccepted                  OCTET STRING,
+        tnOthOdukTOsTransmitted               OCTET STRING,
+        tnOthOdukTTcmAlmProfName              OCTET STRING,
+        tnOthOdukTcmOperStatus                INTEGER,
+        tnOthOdukTcmMgracd                    INTEGER,
+        tnOthOdukTcmincstat                   Unsigned32,
+        tnOthOdukTcmOperationalCapability     TropicOperationalCapabilityType,
+        tnOthOdukTcmStateQualifier            TropicStateQualifierType,
+        tnOthOdukTcmDMInvoke                  TruthValue,
+        tnOthOdukTcmDMTimeStamp               Unsigned32,
+        tnOthOdukTcmDMCMEPMode                INTEGER,
+        tnOthOdukTcmDMStatus                  INTEGER,
+        tnOthOdukTcmDMTime                    Unsigned32,
+        tnOthOdukTDegPeriod                   INTEGER
+    }
+
+--    obsolete
+--    tnOthOdukTTcmField       OBJECT-TYPE ::= { tnOthOdukTEntry 1 }
+--    tnOthOdukTDirectionality OBJECT-TYPE ::= { tnOthOdukTEntry 2 }
+
+    tnOthOdukTRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This columnar object is used for creating and
+                        deleting a conceptual row of tnOthOdukTable.
+                        It is used to model the addTCM and removeTCM
+                        operations of an ODUk_CTP or ODUk_TTP for Tandem
+                        connection monitoring as defined in ITU-T G.874.1.
+                        Setting RowStatus to createAndGo or createAndWait
+                        implies addTCM.  Setting RowStatus to destroy
+                        implies removeTCM."
+        ::= { tnOthOdukTEntry 3 }
+
+    tnOthOdukTTcmMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         termination(1),
+                         nonIntrusive(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the TCM termination mode.  There are
+                        two valid values, termination or non-intrusive
+                        monitoring (NIM).  An TCM entity is created
+                        either in termination mode or in NIM mode."
+        ::= { tnOthOdukTEntry 4 }
+
+    tnOthOdukTPosSeq OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..6)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the relative position of the TCM
+                        monitor point.  The lower the position sequence,
+                        the closer the TCM monitor point to the
+                        client/matrix.  This means that the consequent
+                        action of the lower numbered position sequence
+                        TCM monitor point affects the higher numbered
+                        position sequence TCM monitor point.  It is 1
+                        by default."
+        ::= { tnOthOdukTEntry 5 }
+
+    tnOthOdukTAdminStatus OBJECT-TYPE
+        SYNTAX         AluWdmOdukStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ODUk TCM administrative state.  It is used to
+                        suppress the alarms the ODU TCM entity."
+        ::= { tnOthOdukTEntry 6 }
+
+    tnOthOdukTSapiTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SAPI bytes in trace identifier transmitted
+                        in the TCM layer.  This object is applicable when
+                        tnOthOdukDirectionality has the value source(2)
+                        or bidirectional(3).  It must not be instantiated
+                        in rows where tnOthOdukDirectionality is equal
+                        to sink(1).  TXSAPI is the fist 16 Octets
+                        (TTI[0]-TTI[15]) TTI[0] (i.e., SAPI[0]) shall be
+                        fixed to all 0s. This object is applicable when
+                        tnOthOdukTTcmMode is equal to Termination."
+        ::= { tnOthOdukTEntry 7 }
+
+    tnOthOdukTSapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SAPI expected by the receiver.  This object
+                        has no effect when tnOthOdukTTimDetMode is equal
+                        to off(1)."
+        ::= { tnOthOdukTEntry 8 }
+
+    tnOthOdukTTraceIdentifierAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(64))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The actual trace identifier accepted.  This
+                        object is applicable only to the following three
+                        cases.
+                        (i)   tnOthOdukDirectionality has the value
+                              bidirectional(3), or
+                        (ii)  tnOthOdukDirectionality has the value
+                              sink(1) and tnOthOdukTCodirectional has
+                              the value true(1), or
+                        (iii) tnOthOdukDirectionality has the value
+                              source(3) and tnOthOdukTCodirectional has
+                              the value false(2).
+                        It must not be instantiated in rows for all other
+                        cases.  The value of this object is unspecified
+                        when tnOthOdukTCurrentStatus indicates a near-end
+                        defect (i.e., oci(0), lck(1), ssf(5)) that
+                        prevents extraction of the trace message.  It
+                        consists of the following three parts:
+                        - RXSAPI is the fist 16 Octets (TTI[0]-TTI[15])
+                        - RXDAPI is the second 16 octets (TTI[16]-TTI[31])
+                        - RXOS (operator specific) is the last 32 octets
+                            (TTI[32]-TTI[63]).
+                        TTI[0] (i.e., SAPI[0]) and TTI[16] (i.e., DAPI[0])
+                        shall be fixed to all 0s."
+        ::= { tnOthOdukTEntry 9 }
+
+    tnOthOdukTTimDetMode OBJECT-TYPE
+        SYNTAX         AluWdmTimDetMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the mode of the Trace Identifier
+                        Mismatch (TIM) Detection function."
+        DEFVAL         { off }
+        ::= { tnOthOdukTEntry 10 }
+
+    tnOthOdukTTimActEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether the Trace Identifier Mismatch
+                        (TIM) Consequent Action function is enabled.  This
+                        object has no effect when tnOthOdukTTimDetMode is
+                        equal to off(1)."
+        DEFVAL         { false }
+        ::= { tnOthOdukTEntry 11 }
+
+    tnOthOdukTTtpTtiStatus OBJECT-TYPE
+        SYNTAX         AluWdmTtiStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUkT TTI status."
+        ::= { tnOthOdukTEntry 12 }
+
+    tnOthOdukTAisOnDef OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Determines if consequent action of sending AIS
+                        will be taken on the TCM defect.  enable enables
+                        Consequent Action of TCM defect, while disable
+                        disables Consequent Action of TCM defect.  This
+                        object is applicable when tnOthOdukTTcmMode is
+                        equal to termination."
+        ::= { tnOthOdukTEntry 13 }
+
+    tnOthOdukTLtcResp OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "LTC defect Response.  This parameter determines
+                        whether a LTC defect contributes to the Consequent
+                        Action or not. It is disabled(2) by default.  This
+                        object is applicable when tnOthOdukTTcmMode is
+                        equal termination."
+        ::= { tnOthOdukTEntry 14 }
+
+    tnOthOdukTOhAdd OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Determines if the provisioned TCM Overhead is
+                        inserted or not.  It is false by default. This
+                        object is applicable when tnOthOdukTTcmMode is
+                        equal to termination."
+        ::= { tnOthOdukTEntry 15 }
+
+    tnOthOdukTOhRmv OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Determines if the received TCM Overhead is
+                        discarded or not.  It is false by default.
+                        This object is applicable when tnOthOdukTTcmMode
+                        is equal to termination."
+        ::= { tnOthOdukTEntry 16 }
+
+    tnOthOdukTcmIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A unique index, greater than zero, for each ODU
+                        entity.  This is the high-order index part.
+
+            ------------------------------------------------------
+            | Bit31-Bit24 | Bit23-Bit16 | Bit15-Bit3 | Bit2-Bit0 |
+            --------------+-------------+------------+------------
+            | 8 bits      | 8 bits      | 13 bits    | 3 bits    |
+            --------------+-------------+------------+------------
+            | shelf       | slot        | HO-ODU     | Reserved  |
+            |             |             | Number     | as 0      |
+            ------------------------------------------------------
+                       "
+        ::= { tnOthOdukTEntry 17 }
+
+    tnOthOdukTcmIfIndexLo OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A unique index, greater than zero, for each ODU
+                        entity.  This is the low-order index part.
+
+            ---------------------------------------------------------
+            | Bit31-Bit23 | Bit22-Bit18 | Bit17-Bit16 | Bit15-Bit10 |
+            --------------+-------------+-------------+-------------+
+            | 9 bits      | 5 bits      | 2 bits      | 6 bits      |
+            --------------+-------------+---------------+-----------+
+            | LO-ODU ID   | HO-ODU      | Reserved    | Container   |
+            |             | ODU Type    |             | Type        |
+            ---------------------------------------------------------
+
+            ------------------------------------------
+            | Bit9-Bit7 | Bit6-Bit5     | Bit4-Bit0 |
+            ------------+---------------+-----------+
+            | 3 bits    | 2 bits        | 5 bits    |
+            ------------+---------------+------------
+            | TCM Level | TCM Direction | LO-ODU    |
+            | (1-6)     | (AM=1, BM=2)  | ODU Type  |
+            -----------------------------------------
+                       "
+        ::= { tnOthOdukTEntry 18 }
+
+    tnOthOdukTDegThr OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the burst threshold as a number of
+                        errored blocks on the ODU layer.  A second is
+                        declared as good if the number of detected
+                        errored blocks within one second is less than
+                        tnOthOdukTDegThr, otherwise the second is
+                        declared as bad second."
+        ::= { tnOthOdukTEntry 19 }
+
+    tnOthOdukTDegM OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the number of consecutive bad seconds
+                        (tnOthOdukRTDegM* tnOthOdukTDegPeriod)
+                        to be detected before declaring a signal degrade
+                        defect on the ODU.  The defect is cleared if
+                        tnOthOdukTDegM* tnOthOdukTDegPeriod  consecutive
+                        good seconds  are detected.
+
+                        Current configurable range:
+
+                        1 to 10."
+        ::= { tnOthOdukTEntry 20 }
+
+    tnOthOdukTDapiAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes received."
+        ::= { tnOthOdukTEntry 21 }
+
+    tnOthOdukTDapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes expected by the receiver."
+        ::= { tnOthOdukTEntry 22 }
+
+    tnOthOdukTDapiTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes transmitted.  The TTI[17] to
+                        TTI[31] contain the 15-character destination
+                        access point identifie (DAPI)."
+        ::= { tnOthOdukTEntry 23 }
+
+    tnOthOdukTOsAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OS bytes received."
+        ::= { tnOthOdukTEntry 24 }
+
+    tnOthOdukTOsTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The OS bytes transmitted.  The TTI[32] to
+                        TTI[63] contain the 32-character Operator
+                        Specific (OS)."
+        ::= { tnOthOdukTEntry 25 }
+
+    tnOthOdukTTcmAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukTEntry 26 }
+
+    tnOthOdukTcmOperStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         down(2),
+                         up(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ODUk TCM Operational state."
+        DEFVAL         { unknown }
+        ::= { tnOthOdukTEntry 27 }
+
+    tnOthOdukTcmMgracd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         cp(2),
+                         mgnpln(3),
+                         cpmgnpln(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if managed by CP, MGNPLN, shared by both or free."
+        DEFVAL         { none }
+        ::= { tnOthOdukTEntry 28 }
+
+    tnOthOdukTcmincstat OBJECT-TYPE
+        SYNTAX         Unsigned32(0..7)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Displays the accepted TCM stat byte value including status information."
+        DEFVAL         { 0 }
+        ::= { tnOthOdukTEntry 29 }
+
+    tnOthOdukTcmOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk TCM Operational Capability."
+        DEFVAL         { disabled }
+        ::= { tnOthOdukTEntry 30 }
+
+    tnOthOdukTcmStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the state qualifier (i.e., the
+                        secondary state) of the ODUk TCM State."
+        ::= { tnOthOdukTEntry 31 }
+
+    tnOthOdukTcmDMInvoke OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Invokes a single delay measurement by toggling
+                        once the DM bit."
+        DEFVAL         { false }
+        ::= { tnOthOdukTEntry 32 }
+
+    tnOthOdukTcmDMTimeStamp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Time-stamp for the reported delay measurement."
+        DEFVAL         { 0 }
+        ::= { tnOthOdukTEntry 33 }
+
+    tnOthOdukTcmDMCMEPMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         bypass(1),
+                         source(2),
+                         destination(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Connection Monitoring End Point Mode defined for
+                        delay measurement."
+        DEFVAL         { bypass }
+        ::= { tnOthOdukTEntry 34 }
+
+    tnOthOdukTcmDMStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         invalid(1),
+                         valid(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Delay Measurement Status."
+        DEFVAL         { invalid }
+        ::= { tnOthOdukTEntry 35 }
+
+    tnOthOdukTcmDMTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Time for the reported delay measurement."
+        DEFVAL         { 0 }
+        ::= { tnOthOdukTEntry 36 }
+
+    tnOthOdukTDegPeriod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         thousandMS(1),
+                         hundredMS(2),
+                         tenMS(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the detection time unit for a signal degrade
+                        defect on the ODU.  The signal degrade detection time
+                        window is specified by tnOthOdukTDegPeriod multiplied
+                        by tnOthOdukTDegM."
+        DEFVAL         { thousandMS }
+        ::= { tnOthOdukTEntry 37 }
+
+--    obsolete
+--    tnOthOdukTNimAttributeTotal OBJECT-TYPE ::= { tnOthBasics 11 }
+--    tnOthOdukTNimTable          OBJECT-TYPE ::= { tnOthBasics 12 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk XC Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukXcAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 13 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk XC Table
+--------------------------------------------------------------------------------
+    tnOthOdukXcTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukXcEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 14 }
+
+    tnOthOdukXcEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukXcEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthOdukXcSrcIfIndex,
+                tnOthOdukXcSrcIfIndexLo,
+                tnOthOdukXcDestIfIndex,
+                tnOthOdukXcDestIfIndexLo }
+        ::= { tnOthOdukXcTable 1 }
+
+    TnOthOdukXcEntry ::= SEQUENCE {
+        tnOthOdukXcSrcIfIndex          Integer32,
+        tnOthOdukXcSrcIfIndexLo        Integer32,
+        tnOthOdukXcDestIfIndex         Integer32,
+        tnOthOdukXcDestIfIndexLo       Integer32,
+        tnOthOdukXcRowStatus           RowStatus,
+        tnOthOdukXcId                  Unsigned32,
+        tnOthOdukXcRate                AluWdmOthOdukXcRate,
+        tnOthOdukXcBidirectional       TruthValue,
+        tnOthOdukXcName                SnmpAdminString,
+        tnOthOdukXcProtectionState     INTEGER,
+        tnOthOdukXcTopology            OCTET STRING,
+        tnOthOdukXcResize              Integer32,
+        tnOthOdukXcNewFromTsList       SnmpAdminString,
+        tnOthOdukXcNewToTsList         SnmpAdminString,
+        tnOthOdukXcYangConnectionName  SnmpAdminString,
+        tnOthOdukXcCpConnId            Counter64
+    }
+
+    tnOthOdukXcSrcIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface index of the ODUk crossconnect
+                        source, high-order index part."
+        ::= { tnOthOdukXcEntry 1 }
+
+    tnOthOdukXcSrcIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface index of the ODUk crossconnect
+                        source, low-order index part."
+        ::= { tnOthOdukXcEntry 2 }
+
+    tnOthOdukXcDestIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface index of the ODUk crossconnect
+                        destination, high-order index part. "
+        ::= { tnOthOdukXcEntry 3 }
+
+    tnOthOdukXcDestIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface index of the ODUk crossconnect
+                        destination, low-order index part."
+        ::= { tnOthOdukXcEntry 4 }
+
+    tnOthOdukXcRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of
+                        active.  Sets are permitted for the following
+                        values:
+                        - active(1)
+                        - createAndGo(4)
+                        - destroy(6)."
+        ::= { tnOthOdukXcEntry 5 }
+
+    tnOthOdukXcId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Contains shelf id and the connection id assigned by the system.
+
+                        ------------------+------------------
+                        | Bit 31 - Bit 24 | Bit 23 - Bit 0  |
+                        ------------------+------------------
+                        |    8 Bit        |     24 Bit      |
+                        ------------------+------------------
+                        |  Shelf ID       | XCID or GroupID |
+                        ------------------+------------------."
+
+        ::= { tnOthOdukXcEntry 6 }
+
+    tnOthOdukXcRate OBJECT-TYPE
+        SYNTAX         AluWdmOthOdukXcRate
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates the ODUk entity rate."
+        ::= { tnOthOdukXcEntry 7 }
+
+    tnOthOdukXcBidirectional OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if this connection is unidirectional
+                        or bidirectional."
+        ::= { tnOthOdukXcEntry 8 }
+
+    tnOthOdukXcName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description of the ODUk XC."
+        DEFVAL         { "" }
+        ::= { tnOthOdukXcEntry 9 }
+
+    tnOthOdukXcProtectionState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         protection(2),
+                         working(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ODUk XC protection state."
+        ::= { tnOthOdukXcEntry 10 }
+
+    tnOthOdukXcTopology OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ODUk XC topology expressed as port ifindex. "
+        ::= { tnOthOdukXcEntry 11 }
+
+    tnOthOdukXcResize OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukXcEntry 12 }
+
+    tnOthOdukXcNewFromTsList OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOthOdukXcEntry 13 }
+
+    tnOthOdukXcNewToTsList OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOthOdukXcEntry 14 }
+
+    tnOthOdukXcYangConnectionName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukXcEntry 15 }
+
+    tnOthOdukXcCpConnId OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukXcEntry 16 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk APS Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukApsGroupAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 15 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk APS Table
+--------------------------------------------------------------------------------
+    tnOthOdukApsGroupTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 16 }
+
+    tnOthOdukApsGroupEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukApsGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthOdukApsToIfIndex,
+                tnOthOdukApsToIfIndexLo }
+        ::= { tnOthOdukApsGroupTable 1 }
+
+    TnOthOdukApsGroupEntry ::= SEQUENCE {
+        tnOthOdukApsToIfIndex            Integer32,
+        tnOthOdukApsToIfIndexLo          Integer32,
+        tnOthOdukApsFromedIfIndex        Integer32,
+        tnOthOdukApsFromedIfIndexLo      Integer32,
+        tnOthOdukApsFromingIfIndex       Integer32,
+        tnOthOdukApsFromingIfIndexLo     Integer32,
+        tnOthOdukApsAction               INTEGER,
+        tnOthOdukApsDescr                SnmpAdminString,
+        tnOthOdukApsMode                 INTEGER,
+        tnOthOdukApsRevert               INTEGER,
+        tnOthOdukApsDirection            INTEGER,
+        tnOthOdukApsXcBidirectional      INTEGER,
+        tnOthOdukApsWaitToRestore        Unsigned32,
+        tnOthOdukApsHoldOffTimer         Unsigned32,
+        tnOthOdukApsGroupK1K2Trans       ApsK1K2,
+        tnOthOdukApsGroupMethod          INTEGER,
+        tnOthOdukApsPingMethod           INTEGER,
+        tnOthOdukApsSdEnable             TruthValue,
+        tnOthOdukApsCurrentStatus        BITS,
+        tnOthOdukApsGroupID              Unsigned32,
+        tnOthOdukApsOduXcRate            AluWdmOthOdukXcRate,
+        tnOthOdukApsGroupCurrentStatus   INTEGER,
+        tnOthOdukApsSwitchCmd            INTEGER,
+        tnOthOdukApsActSide              INTEGER,
+        tnOthOdukApsFromedSfd            INTEGER,
+        tnOthOdukApsFromingSfd           INTEGER,
+        tnOthOdukApsCascadedUse          TruthValue,
+        tnOthOdukApsReSize               INTEGER,
+        tnOthOdukApsNewFromedTsList      SnmpAdminString,
+        tnOthOdukApsNewFromingTsList     SnmpAdminString,
+        tnOthOdukApsCpConnId             Counter64
+    }
+
+    tnOthOdukApsToIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface Index (high-order part) of the
+                        ODUk entity within the SNCP."
+        ::= { tnOthOdukApsGroupEntry 1 }
+
+    tnOthOdukApsToIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface Index (low-order part) of the ODUk
+                        entity within the SNCP."
+        ::= { tnOthOdukApsGroupEntry 2 }
+
+    tnOthOdukApsFromedIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index (high-order part) of the
+                        ODUk entity in the working leg."
+        ::= { tnOthOdukApsGroupEntry 3 }
+
+    tnOthOdukApsFromedIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index (low-order part)  of the
+                        ODUk entity in the working leg."
+        ::= { tnOthOdukApsGroupEntry 4 }
+
+    tnOthOdukApsFromingIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index (high-order part) of the
+                        ODUk entity in the protection leg."
+        ::= { tnOthOdukApsGroupEntry 5 }
+
+    tnOthOdukApsFromingIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The interface Index (low-order part) of the
+                        ODUk entity in the protection leg."
+        ::= { tnOthOdukApsGroupEntry 6 }
+
+    tnOthOdukApsAction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         create(1),
+                         delete(2),
+                         update(3),
+                         convertToProt(4),
+                         convertToUnprot(5),
+                         noCommand(6),
+                         convertToUnprotFroming(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The action command to control the APS group.
+                        Its value has an effect on the status of
+                        entries in tnOthOdukXcTable,
+                        tnOthOdukApsGroupTable, and tnOthOdukMemberTable."
+        ::= { tnOthOdukApsGroupEntry 7 }
+
+    tnOthOdukApsDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Description for the APS group."
+        ::= { tnOthOdukApsGroupEntry 8 }
+
+    tnOthOdukApsMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sncn(1),
+                         sncnc(2),
+                         snci(3),
+                         sncs(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection type of the APS group.
+                          sncn  - subnetwork connection with
+                                  non-intrusive monitoring.
+                          sncnc - subnetwork connection based on ODUk
+                                  client signal with non-intrusive
+                                  monitoring.
+                          snci  - subnetwork connection with inherent
+                                  monitoring.
+                          sncs  - subnetwork connection protection with
+                                  sublayer monitoring."
+        DEFVAL         { sncn }
+        ::= { tnOthOdukApsGroupEntry 9 }
+
+    tnOthOdukApsRevert OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         nonrevertive(1),
+                         revertive(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The revertive attribute of the APS group."
+        ::= { tnOthOdukApsGroupEntry 10 }
+
+    tnOthOdukApsDirection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unidirectional(1),
+                         bidirectional(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection direction of the APS Group."
+        ::= { tnOthOdukApsGroupEntry 11 }
+
+    tnOthOdukApsXcBidirectional OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         oneWaySNCP(1),
+                         twoWaySNCP(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "It indicates the connection direction of the APS
+                        group."
+        ::= { tnOthOdukApsGroupEntry 12 }
+
+    tnOthOdukApsWaitToRestore OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..15)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The wait-to-restore time for the revertive mode
+                        automatic switching.  The values are in minutes.
+
+                        Current configurable range: 1 to 15."
+        DEFVAL         { 5 }
+        ::= { tnOthOdukApsGroupEntry 13 }
+
+    tnOthOdukApsHoldOffTimer OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..10000)
+        UNITS          "milli-seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hold Off Time for automatic switching.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnOthOdukApsGroupEntry 14 }
+
+    tnOthOdukApsGroupK1K2Trans OBJECT-TYPE
+        SYNTAX         ApsK1K2
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute is used to display the possible
+                        mapping of switch command and switch status to
+                        K1/K2 bytes."
+        ::= { tnOthOdukApsGroupEntry 15 }
+
+    tnOthOdukApsGroupMethod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         pnim(1),
+                         tcm1(2),
+                         tcm2(3),
+                         tcm3(4),
+                         tcm4(5),
+                         tcm5(6),
+                         tcm6(7),
+                         padapt(8)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection method of the working leg.  Default
+                        is pnim for sncn and sncnc, and padapt for snci."
+        ::= { tnOthOdukApsGroupEntry 16 }
+
+    tnOthOdukApsPingMethod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         pnim(1),
+                         tcm1(2),
+                         tcm2(3),
+                         tcm3(4),
+                         tcm4(5),
+                         tcm5(6),
+                         tcm6(7),
+                         padapt(8)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection method of the protection leg.
+                        Default is pnim for sncn and sncnc, and padapt
+                        for snci."
+        ::= { tnOthOdukApsGroupEntry 17 }
+
+    tnOthOdukApsSdEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not Signal Degrade is used
+                        for protection switching."
+        DEFVAL         { false }
+        ::= { tnOthOdukApsGroupEntry 18 }
+
+    tnOthOdukApsCurrentStatus OBJECT-TYPE
+        SYNTAX         BITS {
+                         modeMismatch(0),
+                         channelMismatch(1),
+                         psbf(2),
+                         feplf(3),
+                         extraTraffic(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the APS group."
+        ::= { tnOthOdukApsGroupEntry 19 }
+
+    tnOthOdukApsGroupID OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Contains shelf ID and the ID assigned to
+                        the APS group by the system.
+                        ------------------+------------------
+                        | Bit 31 - Bit 24 | Bit 23 - Bit 0  |
+                        ------------------+------------------
+                        |    8 Bit        |     24 Bit      |
+                        ------------------+------------------
+                        |  Shelf ID       |   GroupID       |
+                        ------------------+------------------."
+
+        ::= { tnOthOdukApsGroupEntry 20 }
+
+    tnOthOdukApsOduXcRate OBJECT-TYPE
+        SYNTAX         AluWdmOthOdukXcRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the ODUk XC rate in the APS group."
+        ::= { tnOthOdukApsGroupEntry 21 }
+
+
+    tnOthOdukApsGroupCurrentStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         lockoutNe(1),
+                         frcdNe(2),
+                         sfNe(3),
+                         sdNe(4),
+                         manNe(5),
+                         wtrNe(6),
+                         dnr(7),
+                         nr(8),
+                         lockoutFe(9),
+                         frcdFe(10),
+                         sfFe(11),
+                         sdFe(12),
+                         manFe(13),
+                         wtrFe(14),
+                         exerNe(15),
+                         exerFe(16),
+                         rr(17)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Currently active switch request for a SNCP."
+        DEFVAL         { nr }
+        ::= { tnOthOdukApsGroupEntry 22 }
+
+    tnOthOdukApsSwitchCmd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         clear(2),
+                         lockoutOfProtection(3),
+                         forcedSwitchWorkToProtect(4),
+                         forcedSwitchProtectToWork(5),
+                         manualSwitchWorkToProtect(6),
+                         manualSwitchProtectToWork(7),
+                         exercise(8)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The switch command applied to the APS group."
+        DEFVAL         { noCmd }
+        ::= { tnOthOdukApsGroupEntry 23 }
+
+    tnOthOdukApsActSide OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         working(1),
+                         protection(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Active side of the working ODUk entity in
+                        the APS group."
+        DEFVAL         { working }
+        ::= { tnOthOdukApsGroupEntry 24 }
+
+    tnOthOdukApsFromedSfd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sf(1),
+                         sd(2),
+                         none(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the working ODUk entity in
+                        the APS group."
+        DEFVAL         { none }
+        ::= { tnOthOdukApsGroupEntry 25 }
+
+    tnOthOdukApsFromingSfd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         sf(1),
+                         sd(2),
+                         none(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the protection ODUk entity
+                        in the APS group."
+        DEFVAL         { none }
+        ::= { tnOthOdukApsGroupEntry 26 }
+
+    tnOthOdukApsCascadedUse OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not protection is used in cascaded configuration."
+        DEFVAL         { false }
+        ::= { tnOthOdukApsGroupEntry 27 }
+
+    tnOthOdukApsReSize OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukApsGroupEntry 28 }
+
+    tnOthOdukApsNewFromedTsList OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOthOdukApsGroupEntry 29 }
+
+    tnOthOdukApsNewFromingTsList OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOthOdukApsGroupEntry 30 }
+
+    tnOthOdukApsCpConnId OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukApsGroupEntry 31 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Member Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukMemberAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 17 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Member Table
+--------------------------------------------------------------------------------
+    tnOthOdukMemberTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukMemberEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 18 }
+
+    tnOthOdukMemberEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukMemberEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthOdukApsToIfIndex,
+                tnOthOdukApsToIfIndexLo,
+                tnOthOdukApsMemberIfIndex,
+                tnOthOdukApsMemberIfIndexLo }
+        ::= { tnOthOdukMemberTable 1 }
+
+    TnOthOdukMemberEntry ::= SEQUENCE {
+        tnOthOdukApsMemberIfIndex           Integer32,
+        tnOthOdukApsMemberIfIndexLo         Integer32,
+        tnOthOdukApsMemberRowStatus         RowStatus,
+        tnOthOdukApsMemberConfigNumber      INTEGER,
+        tnOthOdukApsMemberSwitch            INTEGER,
+        tnOthOdukApsMemberCurrentStatus     BITS
+    }
+
+    tnOthOdukApsMemberIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface Index (high-order part) for each
+                        ODU entity."
+        ::= { tnOthOdukMemberEntry 1 }
+
+    tnOthOdukApsMemberIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The interface Index (low-order part) for each ODU entity."
+        ::= { tnOthOdukMemberEntry 2 }
+
+    tnOthOdukApsMemberRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Changing the row status is currently not supported."
+        ::= { tnOthOdukMemberEntry 3 }
+
+    tnOthOdukApsMemberConfigNumber OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         protection(1),
+                         working(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthOdukMemberEntry 4 }
+
+    tnOthOdukApsMemberSwitch OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         clear(2),
+                         lockoutOfProtection(3),
+                         forcedSwitchWorkToProtect(4),
+                         forcedSwitchProtectToWork(5),
+                         manualSwitchWorkToProtect(6),
+                         manualSwitchProtectToWork(7),
+                         exercise(8)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The switch command applied to the member of the
+                        APS group."
+        ::= { tnOthOdukMemberEntry 5 }
+
+    tnOthOdukApsMemberCurrentStatus OBJECT-TYPE
+        SYNTAX         BITS {
+                         lockedOut(0),
+                         sd(1),
+                         sf(2),
+                         switched(3),
+                         txActive(4),
+                         txStandby(5),
+                         rxActive(6),
+                         rxStandby(7)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The status of the ODUk entity in the APS group."
+        ::= { tnOthOdukMemberEntry 6 }
+
+--------------------------------------------------------------------------------
+-- OTH Automatic Protection Switch (APS) Group ID Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukApsGroupIdAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 19 }
+
+--------------------------------------------------------------------------------
+-- OTH Automatic Protection Switch (APS) Group ID Table
+--------------------------------------------------------------------------------
+    tnOthOdukApsGroupIdTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukApsGroupIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 20 }
+
+    tnOthOdukApsGroupIdEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukApsGroupIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthOdukApsGroupID }
+        ::= { tnOthOdukApsGroupIdTable 1 }
+
+    TnOthOdukApsGroupIdEntry ::= SEQUENCE {
+        tnOthOdukApsGroupIdToIfIndex       Integer32,
+        tnOthOdukApsGroupIdToIfIndexLo     Integer32
+    }
+
+    tnOthOdukApsGroupIdToIfIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The interface index (high-order part) of the
+                        ODUk entity with the APS group."
+        ::= { tnOthOdukApsGroupIdEntry 1 }
+
+    tnOthOdukApsGroupIdToIfIndexLo OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The interface index (low-order part) of the
+                        ODUk entity with the APS group."
+        ::= { tnOthOdukApsGroupIdEntry 2 }
+
+--------------------------------------------------------------------------------
+-- OTH OPTSG Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukOptsgAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 21 }
+
+--------------------------------------------------------------------------------
+-- OTH OPTSG Table
+--------------------------------------------------------------------------------
+    tnOthOdukOptsgTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukOptsgEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 22 }
+
+    tnOthOdukOptsgEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukOptsgEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukOptsgTable 1 }
+
+    TnOthOdukOptsgEntry ::= SEQUENCE {
+        tnOptsgStruct        SnmpAdminString,
+        tnIncOptsgStruct     SnmpAdminString
+    }
+
+    tnOptsgStruct OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The transmit OPTSG payload structure value."
+        ::= { tnOthOdukOptsgEntry 1 }
+
+    tnIncOptsgStruct OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The received OPTSG payload structure value.  It
+                        is retrieved from the received OPTSG bytes."
+        ::= { tnOthOdukOptsgEntry 2 }
+
+----------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Delay Measurement (DM) Config Scalars
+----------------------------------------------------------------------------------
+    tnOthOdukDMConfigAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 23 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Delay Measurement (DM) Config Table
+--------------------------------------------------------------------------------
+    tnOthOdukDMConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukDMConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 24 }
+
+    tnOthOdukDMConfigEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukDMConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukDMConfigTable 1 }
+
+    TnOthOdukDMConfigEntry ::= SEQUENCE {
+        tnOthOdukDMConfigCMEPMode     INTEGER,
+        tnOthOdukDMConfigEnable       INTEGER,
+        tnOthOdukDMConfigInvoke       TruthValue
+    }
+
+    tnOthOdukDMConfigCMEPMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         bypass(1),
+                         source(2),
+                         destination(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Connection Monitoring End Point Mode defined for
+                        delay measurement on the specified ODUk entity."
+        DEFVAL         { bypass }
+        ::= { tnOthOdukDMConfigEntry 1 }
+
+    tnOthOdukDMConfigEnable OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         enable(1),
+                         disable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute is used to enable or disable the
+                        DM function."
+        DEFVAL         { disable }
+        ::= { tnOthOdukDMConfigEntry 2 }
+
+    tnOthOdukDMConfigInvoke OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Invokes a single delay measurement by toggling
+                        once the DM bit."
+        DEFVAL         { false }
+        ::= { tnOthOdukDMConfigEntry 3 }
+
+----------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Delay Measurement Information Scalars
+----------------------------------------------------------------------------------
+    tnOthOdukDMInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 25 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Delay Measurement Information Table
+--------------------------------------------------------------------------------
+    tnOthOdukDMInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukDMInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 26 }
+
+    tnOthOdukDMInfoEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukDMInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukDMInfoTable 1 }
+
+    TnOthOdukDMInfoEntry ::= SEQUENCE {
+        tnOthOdukDMInfoCurrentStatus     AluWdmDMInfoCurrentStatus,
+        tnOthOdukDMInfoCurrentValue      Unsigned32,
+        tnOthOdukDMInfoTimeStamp         Unsigned32
+    }
+
+    tnOthOdukDMInfoCurrentStatus OBJECT-TYPE
+        SYNTAX         AluWdmDMInfoCurrentStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether this DM test is valid."
+        ::= { tnOthOdukDMInfoEntry 1 }
+
+    tnOthOdukDMInfoCurrentValue OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Reports the DM value in 10**(-7) seconds in the
+                        current Interval."
+        ::= { tnOthOdukDMInfoEntry 2 }
+
+    tnOthOdukDMInfoTimeStamp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Time-stamp for the reported delay measurement."
+        DEFVAL         { 0 }
+        ::= { tnOthOdukDMInfoEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Incoming Fault Type and Fault
+-- Location (FTFL) Information Scalars
+--------------------------------------------------------------------------------
+    tnOthOdukIncFtflInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 27 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) ODUk Incoming Fault Type and Fault
+-- Location (FTFL) Information Table
+--------------------------------------------------------------------------------
+    tnOthOdukIncFtflInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukIncFtflInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 28 }
+
+    tnOthOdukIncFtflInfoEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukIncFtflInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukIncFtflInfoTable 1 }
+
+    TnOthOdukIncFtflInfoEntry ::= SEQUENCE {
+        tnOthOdukIncFtflFwTypeID     OCTET STRING,
+        tnOthOdukIncFtflFwOperID     OCTET STRING,
+        tnOthOdukIncFtflBwTypeID     OCTET STRING,
+        tnOthOdukIncFtflBwOperID     OCTET STRING,
+        tnOthOdukIncFtflExp          OCTET STRING
+    }
+
+    tnOthOdukIncFtflFwTypeID OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk incoming forward fault type and fault
+                        location (FTFL) type ID."
+        ::= { tnOthOdukIncFtflInfoEntry 1 }
+
+    tnOthOdukIncFtflFwOperID OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk incoming forward FTFL operator ID."
+        ::= { tnOthOdukIncFtflInfoEntry 2 }
+
+    tnOthOdukIncFtflBwTypeID OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk incoming backward FTFL type ID."
+        ::= { tnOthOdukIncFtflInfoEntry 3 }
+
+    tnOthOdukIncFtflBwOperID OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk incoming backward FTFL operator ID."
+        ::= { tnOthOdukIncFtflInfoEntry 4 }
+
+    tnOthOdukIncFtflExp OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "ODUk incoming exp (experimental)."
+        ::= { tnOthOdukIncFtflInfoEntry 5 }
+
+----------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) Encryption Config Scalars
+----------------------------------------------------------------------------------
+    tnOthOdukEncryptionAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 29 }
+
+--------------------------------------------------------------------------------
+-- Optical Transmission Hierarchy (OTH) Encryption Config Table
+--------------------------------------------------------------------------------
+    tnOthOdukEncryptionTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOthOdukEncryptionEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 30 }
+
+    tnOthOdukEncryptionEntry OBJECT-TYPE
+        SYNTAX         TnOthOdukEncryptionEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOthIfIndex,
+                tnOthIfIndexLo }
+        ::= { tnOthOdukEncryptionTable 1 }
+
+    TnOthOdukEncryptionEntry ::= SEQUENCE {
+        tnOthOdukEncryptionOperateKeySwitch    INTEGER,
+        tnOthOdukEncryptionState               TruthValue,
+        tnOthOdukEncryptionNextKey             OCTET STRING,
+        tnOthOdukEncryptionWKAT                OCTET STRING,
+        tnOthOdukEncryptionCurrentKeyInfo      SnmpAdminString,
+        tnOthOdukEncryptionNextKeyInfo         SnmpAdminString,
+        tnOthOdukEncryptionEipcch              INTEGER
+    }
+
+    tnOthOdukEncryptionOperateKeySwitch OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         idle(1),
+                         swapKeys(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Request the port to switch to the standby
+                        encryption key."
+        DEFVAL         { idle }
+        ::= { tnOthOdukEncryptionEntry 1 }
+
+    tnOthOdukEncryptionState OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Encryption State.
+                        true  - on
+                        false - off."
+        DEFVAL         { false }
+        ::= { tnOthOdukEncryptionEntry 2 }
+
+    tnOthOdukEncryptionNextKey OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Next encryption key to use."
+        ::= { tnOthOdukEncryptionEntry 3 }
+
+    tnOthOdukEncryptionWKAT OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..16))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The WKAT string used to authenticate the far
+                        end and validate the keys are correct."
+        ::= { tnOthOdukEncryptionEntry 4 }
+
+    tnOthOdukEncryptionCurrentKeyInfo OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Read current key info."
+        ::= { tnOthOdukEncryptionEntry 5 }
+
+    tnOthOdukEncryptionNextKeyInfo OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Read next key info."
+        ::= { tnOthOdukEncryptionEntry 6 }
+
+    tnOthOdukEncryptionEipcch OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         gcc0(2),
+                         gcc1(3),
+                         gcc2(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to configure the channel to be used for
+                        Encryption Interface Protocol for Communication."
+        DEFVAL         { none }
+        ::= { tnOthOdukEncryptionEntry 7 }
+
+--------------------------------------------------------------------------------
+-- OduChanPool Table
+--------------------------------------------------------------------------------
+    tnOduChanPoolTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOduChanPoolEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of OduChanPool attributes."
+        ::= { tnOthBasics 31 }
+
+    tnOduChanPoolEntry OBJECT-TYPE
+        SYNTAX         TnOduChanPoolEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOduChanPoolIndex }
+        ::= { tnOduChanPoolTable 1 }
+
+    TnOduChanPoolEntry ::=
+        SEQUENCE {
+            tnOduChanPoolIndex                 Integer32,
+            tnOduChanPoolPortList              OCTET STRING,
+            tnOduChanPoolOTUIdList             OCTET STRING,
+            tnOduChanPoolNumberOfChan          Integer32,
+            tnOduChanPoolNumberOfResChan       Integer32,
+            tnOduChanPoolResChanList           OCTET STRING,
+            tnOduChanPoolNumberOfSharedChan    Integer32,
+            tnOduChanPoolNumberOfFreeChan      Integer32
+        }
+
+    tnOduChanPoolIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOduChanPoolEntry 1 }
+
+    tnOduChanPoolPortList OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Ordered list of port numbers associated with the pool."
+        ::= { tnOduChanPoolEntry 2 }
+
+    tnOduChanPoolOTUIdList OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Ordered list of otu-ids associated with the pool."
+        ::= { tnOduChanPoolEntry 3 }
+
+    tnOduChanPoolNumberOfChan OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Defines the overall number of available channel for a pool."
+        DEFVAL         { 190 }
+        ::= { tnOduChanPoolEntry 4 }
+
+    tnOduChanPoolNumberOfResChan OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Defines the number of reserved channels per OTU4."
+        DEFVAL         { 10 }
+        ::= { tnOduChanPoolEntry 5 }
+
+    tnOduChanPoolResChanList OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..40))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "List of provisioned OTU facilities together
+                        the reserved channel information."
+        ::= { tnOduChanPoolEntry 6 }
+
+    tnOduChanPoolNumberOfSharedChan OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of allocated channels as shared resource."
+        DEFVAL         { 0 }
+        ::= { tnOduChanPoolEntry 7 }
+
+    tnOduChanPoolNumberOfFreeChan OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of channels free for shared allocation."
+        DEFVAL         { 190 }
+        ::= { tnOduChanPoolEntry 8 }
+
+----------------------------------------------------------------------------------
+-- Pseudo Random Binary Sequence (PRBS) Test Config Scalars
+----------------------------------------------------------------------------------
+    tnOduPrbsAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 32 }
+
+--------------------------------------------------------------------------------
+-- Pseudo Random Binary Sequence (PRBS) Test Table
+--------------------------------------------------------------------------------
+    tnOduPrbsTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOduPrbsEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthBasics 33 }
+
+    tnOduPrbsEntry OBJECT-TYPE
+        SYNTAX         TnOduPrbsEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOduPrbsIfIndex,
+                tnOduPrbsIfIndexLo }
+        ::= { tnOduPrbsTable 1 }
+
+    TnOduPrbsEntry ::= SEQUENCE {
+            tnOduPrbsIfIndex           Unsigned32,
+            tnOduPrbsIfIndexLo         Unsigned32,
+            tnOduPrbsPattern           INTEGER,
+            tnOduPrbsPosition          INTEGER,
+            tnOduPrbsTestMode          TruthValue,
+            tnOduPrbsInSyncState       TruthValue,
+            tnOduPrbsInSyncSeconds     Integer32,
+            tnOduPrbsNoSyncSeconds     Integer32,
+            tnOduPrbsTseCounter        Counter64,
+            tnOduPrbsTseRatio          Counter64,
+            tnOduPrbsTseTotalBits      Counter64
+        }
+
+    tnOduPrbsIfIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOduPrbsEntry 1 }
+
+    tnOduPrbsIfIndexLo OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOduPrbsEntry 2 }
+
+    tnOduPrbsPattern OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         prbs31(1),
+                         invprbs31(2),
+                         prbs11(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Prbs pattern which is used for the test signal
+
+                        prbs31    - a PRBS31 test signal
+                        invprbs31 - an inverted PRBS31 test signal
+                        prbs11    - a PRBS11 test signal."
+
+        DEFVAL         { invprbs31 }
+        ::= { tnOduPrbsEntry 3 }
+
+    tnOduPrbsPosition OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         bm(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "position where the test signal is applied
+
+                        bm - test signal is applied with position Before Matrix."
+        DEFVAL         { bm }
+        ::= { tnOduPrbsEntry 4 }
+
+    tnOduPrbsTestMode OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Mode of the test signal.  If testmode is set to enabled,
+                        a new measurement for the test signal starts with all-zero
+                        counter values as initial value.
+
+                        disabled - test signal insertion and monitoring are disabled
+                        enabled  - test signal insertion and monitoring are enabled."
+        DEFVAL         { false }
+        ::= { tnOduPrbsEntry 5 }
+
+    tnOduPrbsInSyncState OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "In Sync State."
+        ::= { tnOduPrbsEntry 6 }
+
+    tnOduPrbsInSyncSeconds OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "In Sync Seconds."
+        ::= { tnOduPrbsEntry 7 }
+
+    tnOduPrbsNoSyncSeconds OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "No Sync Seconds."
+        ::= { tnOduPrbsEntry 8 }
+
+    tnOduPrbsTseCounter OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "TSE counter."
+        ::= { tnOduPrbsEntry 9 }
+
+    tnOduPrbsTseRatio OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "TSE bit error ratio, ranges 0 to 4000."
+        ::= { tnOduPrbsEntry 10 }
+
+    tnOduPrbsTseTotalBits OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Number of total bits for a test sequence."
+        ::= { tnOduPrbsEntry 11 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnOthOdukScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 1 }
+
+    tnOthOdukGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukDirectionality,
+            tnOthOdukRate,
+            tnOthOdukTcmFieldsInUse,
+            tnOthOdukTtpPresent,
+            tnOthOdukAdminStatus,
+            tnOthOdukStateAINS,
+            tnOthOdukOperStatus,
+            tnOthOdukStateQualifier,
+            tnOthOdukOperationalCapability,
+            tnOthOdukAINSDebounceTime,
+            tnOthOdukUsingSysAINSDebounceTime,
+            tnOthOdukAINSDebounceTimeRemaining,
+            tnOthOdukForceAdminStatus,
+            tnOthOdukMgracd,
+            tnOthOdukAlmProfName,
+            tnOthOdukFlexType,
+            tnOthOdukFlexClientType,
+            tnOthOdukFlexGfpSize,
+            tnOthOdukMsiSup,
+            tnOthOdukFacilityDescriptorName,
+            tnOthOdukFacilityDescriptorDesc,
+            tnOthOdukFacilityDescriptorCirId,
+            tnOthOdukFacilityDescriptorConnPtId,
+            tnOthOdukFacilityDescCustLifeCycleState,
+            tnOthOdukFacilityDescAdminState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 2 }
+
+    tnOthOdukTtpScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukTtpAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 3 }
+
+    tnOthOdukTtpGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukTtpSapiTransmitted,
+            tnOthOdukTtpDapiExpected,
+            tnOthOdukTtpSapiExpected,
+            tnOthOdukTtpTraceIdentifierAccepted,
+            tnOthOdukTtpTimDetMode,
+            tnOthOdukTtpTimActEnabled,
+            tnOthOdukTtpTtiStatus,
+            tnOthOdukTtpDegThr,
+            tnOthOdukTtpDegM,
+            tnOthOdukPayloadType,
+            tnOthOdukRxPayloadType,
+            tnOthOdukPlmConsequenceAction,
+            tnOthOdukTxOduStruct,
+            tnOthOdukRxOduStruct,
+            tnOthOdukTtpCurrentStatus,
+            tnOthOdukOdu0Interwk,
+            tnOthOdukTtpDapiAccepted,
+            tnOthOdukTtpDapiTransmitted,
+            tnOthOdukTtpOsAccepted,
+            tnOthOdukTtpOsTransmitted,
+            tnOthOdukRxMSI,
+            tnOthOdukTtpCndRes,
+            tnOthOdukTtpCmEmphasis,
+            tnOthOdukTtpManualOduPtf,
+            tnOthOdukTtpCsfType,
+            tnOthOdukOduChanPools,
+            tnOthOdukMaxTribNumber,
+            tnOthOdukActualTribNumber,
+            tnOthOdukOduCTypeNMValue,
+            tnOthOdukTtpDegPeriod,
+            tnOthOdukTtpMsimResp
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 4 }
+
+    tnOthOdukNimScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukNimAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 5 }
+
+    tnOthOdukNimGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukNimDapiExpected,
+            tnOthOdukNimSapiExpected,
+            tnOthOdukNimTraceIdentifierAccepted,
+            tnOthOdukNimTimDetMode,
+            tnOthOdukNimTimActEnabled,
+            tnOthOdukNimTtiStatus,
+            tnOthOdukNimDegThr,
+            tnOthOdukNimDegM,
+--            tnOthOdukNimCurrentStatus,
+            tnOthOdukNimPom,
+            tnOthOdukNimDapiAccepted,
+            tnOthOdukNimOsAccepted,
+            tnOthOdukNimDegPeriod
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 6 }
+
+    tnOthGcc12ScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthGcc12AttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 7 }
+
+    tnOthGcc12Group OBJECT-GROUP
+        OBJECTS {
+            tnOthGcc12RowStatus,
+            tnOthGcc12GccPassThrough,
+            tnOthGcc12Application
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 8 }
+
+    tnOthOdukTScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukTAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 9 }
+
+    tnOthOdukTGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukTRowStatus,
+            tnOthOdukTTcmMode,
+            tnOthOdukTPosSeq,
+            tnOthOdukTAdminStatus,
+            tnOthOdukTSapiTransmitted,
+            tnOthOdukTSapiExpected,
+            tnOthOdukTTraceIdentifierAccepted,
+            tnOthOdukTTimDetMode,
+            tnOthOdukTTimActEnabled,
+            tnOthOdukTTtpTtiStatus,
+            tnOthOdukTAisOnDef,
+            tnOthOdukTLtcResp,
+            tnOthOdukTOhAdd,
+            tnOthOdukTOhRmv,
+            tnOthOdukTDegThr,
+            tnOthOdukTDegM,
+            tnOthOdukTDapiAccepted,
+            tnOthOdukTDapiExpected,
+            tnOthOdukTDapiTransmitted,
+            tnOthOdukTOsAccepted,
+            tnOthOdukTOsTransmitted,
+            tnOthOdukTTcmAlmProfName,
+            tnOthOdukTcmOperStatus,
+            tnOthOdukTcmMgracd,
+            tnOthOdukTcmincstat,
+            tnOthOdukTcmOperationalCapability,
+            tnOthOdukTcmStateQualifier,
+            tnOthOdukTcmDMInvoke,
+            tnOthOdukTcmDMTimeStamp,
+            tnOthOdukTcmDMCMEPMode,
+            tnOthOdukTcmDMStatus,
+            tnOthOdukTcmDMTime,
+            tnOthOdukTDegPeriod
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 10 }
+
+--    obsolete
+--    tnOthOdukTNimScalarsGroup OBJECT-GROUP ::= { tnOthGroups 11 }
+--    tnOthOdukTNimGroup        OBJECT-GROUP ::= { tnOthGroups 12 }
+
+    tnOthOdukXcScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukXcAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 13 }
+
+    tnOthOdukXcGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukXcRowStatus,
+            tnOthOdukXcId,
+            tnOthOdukXcRate,
+            tnOthOdukXcBidirectional,
+            tnOthOdukXcName,
+            tnOthOdukXcProtectionState,
+            tnOthOdukXcTopology,
+            tnOthOdukXcResize,
+            tnOthOdukXcNewFromTsList,
+            tnOthOdukXcNewToTsList,
+            tnOthOdukXcYangConnectionName,
+            tnOthOdukXcCpConnId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 14 }
+
+    tnOthOdukApsScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukApsGroupAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 15 }
+
+    tnOthOdukApsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukApsFromedIfIndex,
+            tnOthOdukApsFromedIfIndexLo,
+            tnOthOdukApsFromingIfIndex,
+            tnOthOdukApsFromingIfIndexLo,
+            tnOthOdukApsAction,
+            tnOthOdukApsDescr,
+            tnOthOdukApsMode,
+            tnOthOdukApsRevert,
+            tnOthOdukApsDirection,
+            tnOthOdukApsXcBidirectional,
+            tnOthOdukApsWaitToRestore,
+            tnOthOdukApsHoldOffTimer,
+            tnOthOdukApsGroupK1K2Trans,
+            tnOthOdukApsGroupMethod,
+            tnOthOdukApsPingMethod,
+            tnOthOdukApsSdEnable,
+            tnOthOdukApsCurrentStatus,
+            tnOthOdukApsGroupID,
+            tnOthOdukApsOduXcRate,
+            tnOthOdukApsGroupCurrentStatus,
+            tnOthOdukApsSwitchCmd,
+            tnOthOdukApsActSide,
+            tnOthOdukApsFromedSfd,
+            tnOthOdukApsFromingSfd,
+            tnOthOdukApsCascadedUse,
+            tnOthOdukApsReSize,
+            tnOthOdukApsNewFromedTsList,
+            tnOthOdukApsNewFromingTsList,
+            tnOthOdukApsCpConnId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 16 }
+
+    tnOthOdukMemberScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukMemberAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 17 }
+
+    tnOthOdukMemberGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukApsMemberRowStatus,
+            tnOthOdukApsMemberConfigNumber,
+            tnOthOdukApsMemberSwitch,
+            tnOthOdukApsMemberCurrentStatus
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 18 }
+
+    tnOthOdukApsGroupIdScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukApsGroupIdAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 19 }
+
+    tnOthOdukApsGroupIdGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukApsGroupIdToIfIndex,
+            tnOthOdukApsGroupIdToIfIndexLo
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 20 }
+
+    tnOthOdukOptsgScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukOptsgAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 21 }
+
+    tnOthOdukOptsgGroup OBJECT-GROUP
+        OBJECTS {
+            tnOptsgStruct,
+            tnIncOptsgStruct
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 22 }
+
+    tnOthOdukDMConfigScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukDMConfigAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 23 }
+
+    tnOthOdukDMConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukDMConfigCMEPMode,
+            tnOthOdukDMConfigEnable,
+            tnOthOdukDMConfigInvoke
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 24 }
+
+    tnOthOdukDMInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukDMInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 25 }
+
+    tnOthOdukDMInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukDMInfoCurrentStatus,
+            tnOthOdukDMInfoCurrentValue,
+            tnOthOdukDMInfoTimeStamp
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 26 }
+
+    tnOthOdukIncFtflInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukIncFtflInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 27 }
+
+    tnOthOdukIncFtflInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukIncFtflFwTypeID,
+            tnOthOdukIncFtflFwOperID,
+            tnOthOdukIncFtflBwTypeID,
+            tnOthOdukIncFtflBwOperID,
+            tnOthOdukIncFtflExp
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 28 }
+
+    tnOthOdukEncryptionScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukEncryptionAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 29 }
+
+    tnOthOdukEncryptionGroup OBJECT-GROUP
+        OBJECTS {
+            tnOthOdukEncryptionOperateKeySwitch,
+            tnOthOdukEncryptionState,
+            tnOthOdukEncryptionNextKey,
+            tnOthOdukEncryptionWKAT,
+            tnOthOdukEncryptionCurrentKeyInfo,
+            tnOthOdukEncryptionNextKeyInfo,
+            tnOthOdukEncryptionEipcch
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 30 }
+
+    tnOduChanPoolGroup OBJECT-GROUP
+        OBJECTS {
+            tnOduChanPoolPortList,
+            tnOduChanPoolOTUIdList,
+            tnOduChanPoolNumberOfChan,
+            tnOduChanPoolNumberOfResChan,
+            tnOduChanPoolResChanList,
+            tnOduChanPoolNumberOfSharedChan,
+            tnOduChanPoolNumberOfFreeChan
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 31 }
+
+    tnOduPrbsScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOduPrbsAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 32 }
+
+    tnOduPrbsGroup OBJECT-GROUP
+        OBJECTS {
+            tnOduPrbsPattern,
+            tnOduPrbsPosition,
+            tnOduPrbsTestMode,
+            tnOduPrbsInSyncState,
+            tnOduPrbsInSyncSeconds,
+            tnOduPrbsNoSyncSeconds,
+            tnOduPrbsTseCounter,
+            tnOduPrbsTseRatio,
+            tnOduPrbsTseTotalBits
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOthGroups 33 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnOthCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnOthOdukScalarsGroup,
+            tnOthOdukGroup,
+            tnOthOdukTtpScalarsGroup,
+            tnOthOdukTtpGroup,
+            tnOthOdukNimScalarsGroup,
+            tnOthOdukNimGroup,
+            tnOthGcc12ScalarsGroup,
+            tnOthGcc12Group,
+            tnOthOdukTScalarsGroup,
+            tnOthOdukTGroup,
+--            obsolete
+--            tnOthOdukTNimScalarsGroup,
+--            tnOthOdukTNimGroup,
+            tnOthOdukXcScalarsGroup,
+            tnOthOdukXcGroup,
+            tnOthOdukApsScalarsGroup,
+            tnOthOdukApsGroup,
+            tnOthOdukMemberScalarsGroup,
+            tnOthOdukMemberGroup,
+            tnOthOdukApsGroupIdScalarsGroup,
+            tnOthOdukApsGroupIdGroup,
+            tnOthOdukOptsgScalarsGroup,
+            tnOthOdukOptsgGroup,
+            tnOthOdukDMConfigScalarsGroup,
+            tnOthOdukDMConfigGroup,
+            tnOthOdukDMInfoScalarsGroup,
+            tnOthOdukDMInfoGroup,
+            tnOthOdukIncFtflInfoScalarsGroup,
+            tnOthOdukIncFtflInfoGroup,
+            tnOthOdukEncryptionScalarsGroup,
+            tnOthOdukEncryptionGroup,
+            tnOduChanPoolGroup,
+            tnOduPrbsScalarsGroup,
+            tnOduPrbsGroup
+        }
+        ::= { tnOthCompliances 1 }
+
+END -- DEFINITION OF TROPIC-OTH-MIB

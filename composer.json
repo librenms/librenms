@@ -16,7 +16,7 @@
     "license": "GPL-3.0-or-later",
     "require":
     {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-curl": "*",
         "ext-gd": "*",
         "ext-json": "*",
@@ -53,9 +53,9 @@
         "php-amqplib/php-amqplib": "^3.1",
         "phpmailer/phpmailer": "~6.0",
         "predis/predis": "^2.0",
-        "silber/bouncer": "^1.0",
         "socialiteproviders/manager": "^4.3",
         "spatie/laravel-ignition": "^2.0",
+        "spatie/laravel-permission": "^6.16",
         "symfony/yaml": "^6.2",
         "tecnickcom/tcpdf": "^6.4",
         "tightenco/ziggy": "^1.6.0"

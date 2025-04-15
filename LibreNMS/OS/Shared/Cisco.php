@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cisco.php
  *
@@ -137,7 +138,9 @@ class Cisco extends OS implements
             }
         }
 
-        if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        if ((empty($hardware) || preg_match('/Switch System/', $hardware) || preg_match('/MIDPLANE/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+            $hardware = $data[1000]['entPhysicalModelName'];
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
@@ -158,6 +161,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
+        /* @var Collection<Mempool> $collection */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 

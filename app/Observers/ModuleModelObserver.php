@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ModuleModelObserver.php
  *
@@ -31,7 +32,7 @@ class ModuleModelObserver
     /**
      * Install observers to output +, -, U for models being created, deleted, and updated
      *
-     * @param  string|\Illuminate\Database\Eloquent\Model  $model  The model name including namespace
+     * @param  string|Eloquent  $model  The model name including namespace
      */
     public static function observe($model)
     {
@@ -66,7 +67,7 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
-    public function restored($model)
+    public function restored($model): void
     {
         d_echo('Restored data:', 'R');
         d_echo($model->getDirty());
