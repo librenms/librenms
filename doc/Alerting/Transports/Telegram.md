@@ -36,11 +36,41 @@
 
 [Telegram Docs](https://core.telegram.org/api)
 
-**Example:**
+**Configuration Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Chat ID | 34243432 |
 | Token | 3ed32wwf235234 |
 | Format | HTML or MARKDOWN |
-| Send PNG Graph Mode | photo or file |
+| Send PNG Graph As | photo or file |
+
+**Template Example:**
+
+This will send a set of images (photos or files) followed by the text message, every [signedGraphTag](../Templates/#signedgraphtag) helper will be removed from the message content. 
+
+```php
+{{ $alert->title }}
+Device Name: {{ $alert->hostname }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@foreach ($alert->faults as $key => $value)
+Physical Interface: {{ $value['ifDescr'] }}
+Interface Description: {{ $value['ifAlias'] }}
+Interface Speed: {{ ($value['ifSpeed']/1000000000) }} Gbs
+Inbound Utilization: {{ (($value['ifInOctets_rate']*8)/$value['ifSpeed'])*100 }}
+Outbound Utilization: {{ (($value['ifOutOctets_rate']*8)/$value['ifSpeed'])*100 }}
+@signedGraphTag([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+    'width' => 700, 
+    'height' => 250,
+    'title' => 'yes',
+])
+@endforeach
+
+```
