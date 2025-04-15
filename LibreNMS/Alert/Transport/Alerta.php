@@ -21,7 +21,6 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use LibreNMS\Util\Url;
 
 class Alerta extends Transport
 {
