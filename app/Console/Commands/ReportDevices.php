@@ -161,10 +161,12 @@ class ReportDevices extends LnmsCommand
             $has_relationships = true;
         }
 
-        // end this here as this is the simple one
+        // handle as array differently as it does not benefit from chunk processing and needs searched for differently
         if ($this->option('devices-as-array')) {
             $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
                 ->whereDeviceSpec($this->argument('device spec'))->get();
+
+            $this->line(json_encode($devices));
 
             return 0;
         }
