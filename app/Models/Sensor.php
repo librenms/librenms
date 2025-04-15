@@ -170,7 +170,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
         return match ($this->sensor_class) {
             'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : "$value °C",
-            'state' => $this->currentTranslation()?->state_descr ?? 'Unknown',
+            'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),
             'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
