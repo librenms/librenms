@@ -34,7 +34,6 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
-use App\Models\Application;
 use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
@@ -132,15 +131,7 @@ class RunAlerts
         }
         $extra = $alert['details'];
 
-        // finds all applications for the device and includes those
-        $applications = Application::where('device_id', $device->device_id)->get();
-        if (count($applications) > 0) {
-            $obj['applications'] = [];
-            // change it into a hash for usability purposes
-            foreach ($applications as $application) {
-                $obj['applications'][$application['app_type']] = $application;
-            }
-        }
+        $obj['applications'] = $device->applications->groupBy('app_type');
 
         $tpl = new Template;
         $template = $tpl->getTemplate($obj);

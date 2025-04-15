@@ -263,7 +263,7 @@ Timestamp: {{ $alert->timestamp }}
 Unique-ID: {{ $alert->uid }}
 @if ($alert->description) Description: {{ $alert->description }} @endif
 @if ($alert->notes) Notes: {{ $alert->notes }} @endif
-Alert String: {{ $alert->applications['sneck']['data']['data']['alertString'] }}
+Alert String: {{ $alert->applications['sneck'][0]['data']['data']['alertString'] }}
 ```
 
 ### Advanced options
@@ -296,14 +296,17 @@ Application data may be used in a alert template. `$alert->applications` is a
 associative array that contains the various applications for the device in
 question the alert is for. Each sub array contains that line from the
 applications table. So if you wanted for example access the app data for Sneck,
-it would be `$alert->applications['sneck']['data']` and thus if we wanted to
+it would be `$alert->applications['sneck'][0]['data']` and thus if we wanted to
 make us of the value `.data.alertString` in the stored return JSON, we would
-use `$alert->applications['sneck']['data']['data']['alertString']`.
+use `$alert->applications['sneck'][0]['data']['data']['alertString']`.
 
 If you want to get a better idea of what is usable, call
 `lnms report:devices -o json -r applications $device | jq -S .applications | less`
 on some device that has the app in question you are curious about and pay attention
 to the app data chunk.
+
+`[0]` is there in the string as the legacy apps proxmox and drdb don't use make
+use of app data and instead can have multiple instances.
 
 ## Examples HTML
 
