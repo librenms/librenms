@@ -290,6 +290,21 @@ email or just the hostname in any other transport:
 @endif
 ```
 
+### Using Application Data In Alert Templates
+
+Application data may be used in a alert template. `$alert->applications` is a
+associative array that contains the various applications for the device in
+question the alert is for. Each sub array contains that line from the
+applications table. So if you wanted for example access the app data for Sneck,
+it would be `$alert->applications['sneck']['data']` and thus if we wanted to
+make us of the value `.data.alertString` in the stored return JSON, we would
+use `$alert->applications['sneck']['data']['data']['alertString']`.
+
+If you want to get a better idea of what is usable, call
+`lnms report:devices -o json -r applications $device | jq -S .applications | less`
+on some device that has the app in question you are curious about and pay attention
+to the app data chunk.
+
 ## Examples HTML
 
 Note: To use HTML emails you must set HTML email to Yes in the WebUI
