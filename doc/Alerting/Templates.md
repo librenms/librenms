@@ -87,6 +87,7 @@ been up for 30344 seconds`.
 - Transport name: `$alert->transport_name`
 - Contacts, must be iterated in a foreach, `$key` holds email and
   `$value` holds name: `$alert->contacts`
+- Application Data: `$alert->applications`
 
 Placeholders can be used within the subjects for templates as well
 although $faults is most likely going to be worthless.
@@ -250,6 +251,19 @@ Server: {{ $alert->hostname }}
 Memory Description: {{ $value['mempool_descr'] }}
 Percent Utilized: {{ $value['mempool_perc'] }}
 @endforeach
+```
+
+#### Sneck Alert
+
+```text
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+@if ($alert->description) Description: {{ $alert->description }} @endif
+@if ($alert->notes) Notes: {{ $alert->notes }} @endif
+Alert String: {{ $alert->applications['sneck']['data']['data']['alertString'] }}
 ```
 
 ### Advanced options
