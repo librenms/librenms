@@ -1,7 +1,7 @@
 <?php
 
 /**
- * RuckusSZAPRadiusServerReachableTrap.php
+ * RuckusSzApRadiusServerReachableTrap.php
  *
  * -Description-
  *
@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * Ruckus RuckusSZAPRadiusServerReachableTrapTrap occurs when the SmartZone receives
+ * Ruckus RuckusSZAPRadiusServerReachableTrap occurs when the SmartZone receives
  * an event from a connected access point that it detects the RADIUS server as up from
  * down.
  *
@@ -35,7 +35,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class RuckusSZAPRadiusServerReachableTrap implements SnmptrapHandler
+class RuckusSzApRadiusServerReachableTrap implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -53,7 +53,7 @@ class RuckusSZAPRadiusServerReachableTrap implements SnmptrapHandler
         $radiusIp = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZRadSrvrIp'));
 
         $message = "AP $apName ($apIpv4) is able to reach radius server $radiusIp";
-        if (!empty($apIpv6)){
+        if (! empty($apIpv6)){
             $message = "AP $apName ($apIpv4, $apIpv6) is able to reach radius server $radiusIp";
         }
 
