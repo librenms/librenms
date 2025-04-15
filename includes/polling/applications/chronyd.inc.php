@@ -65,7 +65,6 @@ $source_rrd_def = RrdDefinition::make()
     ->addDataset('offset', 'GAUGE', -1000, 1000)
     ->addDataset('stddev', 'GAUGE', -1000, 1000);
 
-
 foreach ($chronyd['sources'] as $source) {
     $sources[] = $source['source_name'];
     $rrd_name = ['app', $name, $app->app_id, $source['source_name']];
