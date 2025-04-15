@@ -175,7 +175,7 @@ class ReportDevices extends LnmsCommand
 
         /* Print the device info and see if we can fetch the next one.
          *
-         *  This way if the fetch takes awhile if something is processing the output it can proceed
+         * This way if the fetch takes awhile if something is processing the output it can proceed
          * with processing one device while we fetch the info for the next.
          */
         while (isset($device)) {
