@@ -12,26 +12,27 @@ default and within 5 minutes for new devices).
 Please note that you need at least ONE device added before
 auto-discovery will work.
 
-The first thing to do though is add the required configuration options to `config.php`.
+The first thing to do though is add the required configuration options.
 
 ## SNMP Details
 
 To add devices automatically we need to know your snmp details,
 examples of SNMP v1, v2c and v3 are below:
 
-```php
-// v1 or v2c
-$config['snmp']['community'][] = "my_custom_community";
-$config['snmp']['community'][] = "another_community";
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.community.+ my_custom_community
+    lnms config:set snmp.community.+ another_community
 
-// v3
-$config['snmp']['v3'][0]['authlevel'] = 'authPriv';
-$config['snmp']['v3'][0]['authname'] = 'my_username';
-$config['snmp']['v3'][0]['authpass'] = 'my_password';
-$config['snmp']['v3'][0]['authalgo'] = 'SHA';
-$config['snmp']['v3'][0]['cryptopass'] = 'my_crypto';
-$config['snmp']['v3'][0]['cryptoalgo'] = 'AES';
-```
+    lnms config:set snmp.v3.+ '{
+        "authlevel": "authPriv",
+        "authname": "my_username",
+        "authpass": "my_password",
+        "authalgo": "SHA",
+        "cryptopass": "my_crypto",
+        "cryptoalgo": "AES"
+    }'
+    ```
 
 These details will be attempted when adding devices, you can specify
 any mixture of these.
@@ -114,9 +115,12 @@ within the Modules section.
 
 ### XDP
 
-Enabled by default.
+Enabled by default. Can be disabled with:
 
-`$config['autodiscovery']['xdp'] = false;` to disable.
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.xdp false
+    ```
 
 This includes FDP, CDP and LLDP support based on the device type.
 
@@ -125,47 +129,50 @@ However, LibreNMS will only try to add the new devices discovered with LLDP/xDP 
 
 Devices may be excluded from xdp discovery by sysName and sysDescr.
 
-```php
-//Exclude devices by name
-$config['autodiscovery']['xdp_exclude']['sysname_regexp'][] = '/host1/';
-$config['autodiscovery']['xdp_exclude']['sysname_regexp'][] = '/^dev/';
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.xdp_exclude.sysname_regexp.+ '/host1/'
+    lnms config:set autodiscovery.xdp_exclude.sysname_regexp.+ '/^dev/'
+    
+    lnms config:set autodiscovery.xdp_exclude.sysdescr_regexp.+ '/-K9W8/'
+    lnms config:set autodiscovery.xdp_exclude.sysdescr_regexp.+ '/Vendor X/'
+    ```
 
-//Exclude devices by description
-$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/Vendor X/';
-$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/Vendor Y/';
-```
+Devices may be excluded from cdp discovery by platform. (CDP only)
 
-Devices may be excluded from cdp discovery by platform.
-
-```php
-//Exclude devices by platform(Cisco only)
-$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/WS-C3750G/';
-```
-
-These devices are excluded by default:
-
-```php
-$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8/'; // Cisco Lightweight Access Point
-$config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
-```
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.cdp_exclude.platform_regexp.+ '/WS-C3750G/'
+    lnms config:set autodiscovery.cdp_exclude.platform_regexp.+ '/^Cisco IP Phone/'
+    ```
 
 ### OSPF
 
 Enabled by default.
 
-`$config['autodiscovery']['ospf'] = false;` to disable.
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.ospf false
+    ```
 
 ### OSPFv3
 
 Enabled by default.
 
-`$config['autodiscovery']['ospfv3'] = false;` to disable.
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.ospfv3 false
+    ```
+
 
 ### BGP
 
 Enabled by default.
 
-`$config['autodiscovery']['bgp'] = false;` to disable.
+!!! setting "discovery/autodiscovery"
+    ```bash
+    lnms config:set autodiscovery.bgp false
+    ```
 
 This module is invoked from bgp-peers discovery module.
 
@@ -209,4 +216,10 @@ optional arguments:
 
 Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
 
-When using distributed polling, this value can be changed locally by setting `$config['default_poller_group']` in config.php or globally by using `lnms config:set`.
+When using distributed polling, this value can be changed locally by setting `default_poller_group`
+
+!!! setting "poller/distributed"
+    ```bash
+    lnms config:set default_poller_group 3
+    ```
+
