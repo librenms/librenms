@@ -12,8 +12,8 @@
     </div>
     <div class="pull-right">
         @foreach($overview_graphs as $graph)
-            <div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px;' class='tw:rounded-md'>
-                <div style="width: {{ $graph['width'] }}px; height: {{ $graph['height'] }}px;">{!! \LibreNMS\Util\Url::graphPopup($graph) !!}</div>
+            <div style='float: right; text-align: center; padding: 1px 5px; margin: 0 1px; ' class='rounded-5px'>
+                <x-graph-popup :vars="$graph" :type="$graph['type']" :width="$graph['width']" :height="$graph['height']" :popup-title="$graph['popup_title']" :device="$device"></x-graph-popup>
                 <div style='font-weight: bold; font-size: 7pt; margin: -3px;'>{{ $graph['popup_title'] }}</div>
             </div>
         @endforeach
