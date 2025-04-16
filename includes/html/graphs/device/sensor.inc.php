@@ -11,8 +11,8 @@ if ($sensors->isEmpty()) {
     throw new RrdGraphException('No Sensors');
 }
 
-$unit_short = $sensors->first()->unit();
-$unit_long = $sensors->first()->unitLong();
+$unit_short = str_replace('%', '%%', $sensors->first()->unit());
+$unit_long = str_replace('%', '%%', $sensors->first()->unitLong());
 
 $col_w = 7 + strlen($unit_short);
 $rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
