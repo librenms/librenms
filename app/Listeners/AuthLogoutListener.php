@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\User;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 class AuthLogoutListener
 {
