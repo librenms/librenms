@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Util\Html;
 
 function printEntPhysical($device, $ent, $level, $class)
 {
@@ -65,7 +66,7 @@ function printEntPhysical($device, $ent, $level, $class)
                 echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
                 //echo "<span style='color: #000099;'>" . $sensor->sensor_class . ': ' . $sensor->sensor_descr . '</span>';
                 echo ' ';
-                echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
+                echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
                 echo '</a>';
             }
         }
@@ -125,7 +126,7 @@ function printEntPhysical($device, $ent, $level, $class)
                 echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
                 echo "<span style='color: #000099;'>" . $disp_name . ' ' . $sensor->sensor_class . '</span>';
                 echo ' ';
-                echo $sensor->sensor_class == 'state' ? get_state_label($sensor->toArray()) : get_sensor_label_color($sensor->toArray());
+                echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
                 echo '</a><br>';
             }
             echo '</div>';

@@ -104,6 +104,15 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="temp_units" class="col-sm-4 control-label">{{ __('Temperature Units') }}</label>
+                <div class="col-sm-4">
+                    <select class="form-control ajax-select" name="temperature" data-pref="temp_units" data-previous="{{ $temp_units }}">
+                        <option value="default">{{ __('Celsius') }}</option>
+                        <option value="f" @if($temp_units == 'f') selected @endif>{{ __('Fahrenheit') }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
