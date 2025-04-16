@@ -6982,14 +6982,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/graphs/sla-jitter-jitter.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/graphs/storage/auth.inc.php
 
 		-
