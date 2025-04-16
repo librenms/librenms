@@ -30,9 +30,9 @@
         "alert.macros.rule": {
             "type": "array",
             "validate": {
-                 "value": "array",
-                 "value.*": "string"
-             }
+                "value": "array",
+                "value.*": "string"
+            }
         },
         "alert_colour.ok": {
             "default": "#00ff00",
@@ -325,13 +325,7 @@
             "type": "boolean"
         },
         "api.cors.allowmethods": {
-            "default": [
-                "POST",
-                "GET",
-                "PUT",
-                "DELETE",
-                "PATCH"
-            ],
+            "default": ["POST", "GET", "PUT", "DELETE", "PATCH"],
             "group": "api",
             "section": "cors",
             "order": 2,
@@ -466,7 +460,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "array",
-                "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.listener": [
+                    "not_regex:/[:|@]/",
+                    "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"
+                ],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
                 "value.saml.acs": "url",
@@ -485,11 +482,11 @@
             "order": 5,
             "type": "select",
             "default": "none",
-            "options" : {
-                "none" : "No Access",
-                "normal" : "Normal Access",
-                "global-read" : "Global Viewing Access",
-                "admin" : "Global Administrative Access"
+            "options": {
+                "none": "No Access",
+                "normal": "Normal Access",
+                "global-read": "Global Viewing Access",
+                "admin": "Global Administrative Access"
             }
         },
         "auth.socialite.claims": {
@@ -581,7 +578,9 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"]
+                "value": [
+                    "regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"
+                ]
             }
         },
         "auth_ad_starttls": {
@@ -838,9 +837,7 @@
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
             "type": "array",
-            "default": [
-                "/^Cisco IP Phone/"
-            ]
+            "default": ["/^Cisco IP Phone/"]
         },
         "autodiscovery.nets-exclude": {
             "group": "discovery",
@@ -873,9 +870,7 @@
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
-            "default": [
-                "/-K9W8/"
-            ]
+            "default": ["/-K9W8/"]
         },
         "bad_entity_sensor_regex": {
             "default": null,
@@ -923,10 +918,7 @@
             "group": "discovery",
             "section": "ports",
             "order": 1,
-            "default": [
-                "/^ng[0-9]+$/",
-                "/^sl[0-9]/"
-            ],
+            "default": ["/^ng[0-9]+$/", "/^sl[0-9]/"],
             "validate": {
                 "value.*": "is_regex"
             }
@@ -957,9 +949,7 @@
             "group": "discovery",
             "section": "ports",
             "order": 4,
-            "default": [
-                "notPresent"
-            ]
+            "default": ["notPresent"]
         },
         "base_url": {
             "group": "system",
@@ -1033,9 +1023,9 @@
             "section": "custom-map",
             "order": 100,
             "options": {
-                "Streets":  "Streets",
+                "Streets": "Streets",
                 "Sattelite": "Sattelite",
-                "Topography":  "Topography"
+                "Topography": "Topography"
             },
             "when": {
                 "setting": "custom_map.background_type",
@@ -1062,9 +1052,9 @@
             "section": "custom-map",
             "order": 104,
             "options": {
-                "Streets":  "Streets",
+                "Streets": "Streets",
                 "Sattelite": "Sattelite",
-                "Topography":  "Topography"
+                "Topography": "Topography"
             },
             "when": {
                 "setting": "custom_map.background_type",
@@ -1148,9 +1138,9 @@
             "default": null,
             "type": "array",
             "validate": {
-                 "value": "array",
-                 "value.*": "string"
-             }
+                "value": "array",
+                "value.*": "string"
+            }
         },
         "custom_map.node_align": {
             "default": 10,
@@ -1331,9 +1321,9 @@
             "type": "select",
             "options": {
                 "{{ $hostname }}": "hostname",
-                "{{ $sysName_fallback }}":  "sysName_fallback",
-                "{{ $sysName }}":  "sysName",
-                "{{ $ip }}":  "ip"
+                "{{ $sysName_fallback }}": "sysName_fallback",
+                "{{ $sysName }}": "sysName",
+                "{{ $ip }}": "ip"
             }
         },
         "device_traffic_descr": {
@@ -1807,12 +1797,7 @@
             "group": "poller",
             "section": "availability",
             "order": 1,
-            "default": [
-                86400,
-                604800,
-                2592000,
-                31536000
-            ],
+            "default": [86400, 604800, 2592000, 31536000],
             "type": "array",
             "validate": {
                 "value": "array",
@@ -1840,6 +1825,48 @@
                 "setting": "email_backend",
                 "operator": "equals",
                 "value": "smtp"
+            }
+        },
+        "email_smtp_verifypeer": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 11,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
+        "email_smtp_allowselfsigned": {
+            "default": false,
+            "group": "alerting",
+            "section": "email",
+            "order": 12,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
             }
         },
         "email_attach_graphs": {
@@ -1921,7 +1948,7 @@
             "order": 13,
             "type": "password",
             "when": {
-                "and" : [
+                "and": [
                     {
                         "setting": "email_backend",
                         "operator": "equals",
@@ -2161,12 +2188,7 @@
             "when": {
                 "setting": "geoloc.engine",
                 "operator": "in",
-                "value": [
-                    "google",
-                    "mapquest",
-                    "bing",
-                    "esri"
-                ]
+                "value": ["google", "mapquest", "bing", "esri"]
             }
         },
         "geoloc.dns": {
@@ -2199,11 +2221,7 @@
             "when": {
                 "setting": "geoloc.engine",
                 "operator": "in",
-                "value": [
-                    "google",
-                    "mapquest",
-                    "bing"
-                ]
+                "value": ["google", "mapquest", "bing"]
             }
         },
         "geoloc.layer": {
@@ -2213,19 +2231,14 @@
             "order": 7,
             "type": "select",
             "options": {
-                "Streets":  "Streets",
+                "Streets": "Streets",
                 "Sattelite": "Sattelite",
-                "Topography":  "Topography"
+                "Topography": "Topography"
             },
             "when": {
                 "setting": "geoloc.engine",
                 "operator": "in",
-                "value": [
-                    "google",
-                    "mapquest",
-                    "bing",
-                    "esri"
-                ]
+                "value": ["google", "mapquest", "bing", "esri"]
             }
         },
         "github_api": {
@@ -4228,10 +4241,7 @@
             "order": 0,
             "type": "text",
             "validate": {
-                "value": [
-                    "nullable",
-                    "starts_with:http://,https://,tcp://"
-                ]
+                "value": ["nullable", "starts_with:http://,https://,tcp://"]
             }
         },
         "https_proxy": {
@@ -4240,10 +4250,7 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": [
-                    "nullable",
-                    "starts_with:http://,https://,tcp://"
-                ]
+                "value": ["nullable", "starts_with:http://,https://,tcp://"]
             }
         },
         "icmp_check": {
@@ -4254,16 +4261,14 @@
             "group": "discovery",
             "section": "storage",
             "order": 6,
-            "default": [
-            ],
+            "default": [],
             "type": "array"
         },
         "ignore_junos_os_drives": {
             "group": "discovery",
             "section": "storage",
             "order": 7,
-            "default": [
-            ],
+            "default": [],
             "type": "array"
         },
         "ignore_mount": {
@@ -4403,7 +4408,7 @@
             "section": "influxdb",
             "order": 8
         },
-	"influxdbv2.enable": {
+        "influxdbv2.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
@@ -4483,8 +4488,7 @@
             "section": "influxdbv2",
             "order": 10,
             "type": "array",
-            "default": [
-            ]
+            "default": []
         },
         "influxdbv2.timeout": {
             "default": 1,
@@ -4538,12 +4542,7 @@
             "type": "boolean"
         },
         "ipmi.type": {
-            "default": [
-                "lanplus",
-                "lan",
-                "imb",
-                "open"
-            ],
+            "default": ["lanplus", "lan", "imb", "open"],
             "type": "array"
         },
         "ipmi_unit": {
@@ -4620,7 +4619,7 @@
             "type": "text"
         },
         "leaflet.default_lat": {
-            "default": 51.4800,
+            "default": 51.48,
             "type": "float"
         },
         "leaflet.default_lng": {
@@ -4640,10 +4639,7 @@
             "type": "text"
         },
         "libvirt_protocols": {
-            "default": [
-                "qemu+ssh",
-                "xen+ssh"
-            ],
+            "default": ["qemu+ssh", "xen+ssh"],
             "type": "array"
         },
         "libvirt_username": {
@@ -4772,10 +4768,7 @@
             "type": "text"
         },
         "network_map_items": {
-            "default": [
-                "xdp",
-                "mac"
-            ],
+            "default": ["xdp", "mac"],
             "type": "array"
         },
         "network_map_legend": {
@@ -4872,9 +4865,7 @@
             "type": "boolean"
         },
         "nfsen_rrds": {
-            "default": [
-                "/var/nfsen/profiles-stat/live"
-            ],
+            "default": ["/var/nfsen/profiles-stat/live"],
             "group": "external",
             "section": "nfsen",
             "order": 2,
@@ -4914,14 +4905,7 @@
             "type": "integer"
         },
         "nfsen_top_N": {
-            "default": [
-                10,
-                20,
-                50,
-                100,
-                200,
-                500
-            ],
+            "default": [10, 20, 50, 100, 200, 500],
             "group": "external",
             "section": "nfsen",
             "order": 6,
@@ -5112,7 +5096,7 @@
         },
         "oxidized.ignore_groups": {
             "default": [],
-            "type" : "array",
+            "type": "array",
             "group": "external",
             "section": "oxidized",
             "order": 5
@@ -5162,17 +5146,17 @@
             "default": {
                 "os": {
                     "os": [
-                        {"match": "airos-af-ltu", "value": "airfiber"},
-                        {"match": "airos-af", "value": "airfiber"},
-                        {"match": "arista_eos", "value": "eos"},
-                        {"match": "ciscosb", "value": "ciscosmb"},
-                        {"match": "f5", "value": "tmos"},
-                        {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
-                        {"match": "fortiswitch", "value": "fortios"},
-                        {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"},
-                        {"match": "oneaccess", "value": "oneos"}
+                        { "match": "airos-af-ltu", "value": "airfiber" },
+                        { "match": "airos-af", "value": "airfiber" },
+                        { "match": "arista_eos", "value": "eos" },
+                        { "match": "ciscosb", "value": "ciscosmb" },
+                        { "match": "f5", "value": "tmos" },
+                        { "match": "fireware", "value": "firewareos" },
+                        { "match": "fortigate", "value": "fortios" },
+                        { "match": "fortiswitch", "value": "fortios" },
+                        { "match": "vyos", "value": "vyatta" },
+                        { "match": "slms", "value": "zhoneolt" },
+                        { "match": "oneaccess", "value": "oneos" }
                     ]
                 }
             },
@@ -5255,10 +5239,7 @@
             "when": {
                 "setting": "snmptraps.eventlog",
                 "operator": "in",
-                "value": [
-                    "all",
-                    "unhandled"
-                ]
+                "value": ["all", "unhandled"]
             }
         },
         "page_refresh": {
@@ -5281,9 +5262,7 @@
             "order": 6
         },
         "peering_descr": {
-            "default": [
-                "peering"
-            ],
+            "default": ["peering"],
             "type": "array",
             "group": "webui",
             "section": "port-descr",
@@ -5443,7 +5422,6 @@
         "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.bgp-peers": {
             "order": 30,
@@ -5692,7 +5670,7 @@
         "ports_page_default": {
             "default": "details",
             "type": "select",
-            "options":{
+            "options": {
                 "basic": "Basic",
                 "details": "Details",
                 "arp": "ARP",
@@ -6219,9 +6197,7 @@
             "section": "snmp",
             "order": 2,
             "type": "array",
-            "default": [
-                "public"
-            ]
+            "default": ["public"]
         },
         "snmp.unescape": {
             "type": "boolean"
@@ -6285,12 +6261,7 @@
             "section": "snmp",
             "order": 0,
             "type": "array",
-            "default": [
-                "udp",
-                "udp6",
-                "tcp",
-                "tcp6"
-            ]
+            "default": ["udp", "udp6", "tcp", "tcp6"]
         },
         "snmp.v3": {
             "group": "poller",
@@ -6317,11 +6288,7 @@
             "section": "snmp",
             "order": 1,
             "type": "array",
-            "default": [
-                "v2c",
-                "v3",
-                "v1"
-            ],
+            "default": ["v2c", "v3", "v1"],
             "validate": {
                 "value.*": "in:v1,v2c,v3"
             }
