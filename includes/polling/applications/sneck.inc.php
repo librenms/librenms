@@ -11,14 +11,14 @@ $name = 'sneck';
 
 $old_checks = [];
 $old_checks_data = [];
-if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
-    $old_checks = array_keys($app->data['data']['checks']);
-    $old_checks_data = $app->data['data']['checks'];
+if (isset($app->data['checks'])) {
+    $old_checks = array_keys($app->data['checks']);
+    $old_checks_data = $app->data['checks'];
 }
 
 $old_debugs = [];
-if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
-    $old_debugs = array_keys($app->data['data']['debugs']);
+if (isset($app->data['data']['debugs'])) {
+    $old_debugs = array_keys($app->data['debugs']);
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -37,7 +37,7 @@ try {
     return;
 }
 
-$app->data = $json_return;
+$app->data = $json_return['data'];
 
 $new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
