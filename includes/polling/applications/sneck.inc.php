@@ -17,7 +17,7 @@ if (isset($app->data['checks'])) {
 }
 
 $old_debugs = [];
-if (isset($app->data['data']['debugs'])) {
+if (isset($app->data['debugs'])) {
     $old_debugs = array_keys($app->data['debugs']);
 }
 
