@@ -136,7 +136,15 @@ class RunAlerts
         foreach ($obj['applications'] as $app_name => $app_instances) {
             $obj['applications_metrics'][$app_name] = [];
             foreach ($app_instances as $app) {
-                $obj['applications_metrics'][$app_name][] = ApplicationMetric::where(['app_id' => $app->app_id])->get();
+                $app_metrics = ApplicationMetric::where(['app_id' => $app->app_id])->get();
+                $rendered_app_metrics = [];
+                foreach ($app_metrics as $metric) {
+                    $rendered_app_metrics[$metrics['metric']] = [
+                        'value' => $metrics['value'],
+                        'value_prev' => $metrics['value_prev'],
+                    ];
+                }
+                $obj['applications_metrics'][$app_name][] = $rendered_app_metrics;
             }
         }
 
