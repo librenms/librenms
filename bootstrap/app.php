@@ -20,46 +20,40 @@ return Application::configure(basePath: dirname(__DIR__))
             '/auth/*/callback',
         ]);
 
-        $middleware->append(\App\Http\Middleware\HandleCors::class);
+        $middleware->authenticateSessions();
 
         $middleware->web([
             \App\Http\Middleware\CheckInstalled::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \App\Http\Middleware\VerifyUserEnabled::class,
-        ]);
-
-        $middleware->api([
-            \App\Http\Middleware\EnforceJson::class,
-            'auth:token',
-        ]);
-
-        $middleware->group('auth', [
             \App\Http\Middleware\LegacyExternalAuth::class,
-            \App\Http\Middleware\Authenticate::class,
+            \App\Http\Middleware\VerifyUserEnabled::class,
             \App\Http\Middleware\VerifyTwoFactor::class,
             \App\Http\Middleware\LoadUserPreferences::class,
         ]);
 
-        $middleware->group('minimal', [
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Session\Middleware\StartSession::class,
+        $middleware->api([
+            \App\Http\Middleware\EnforceJson::class,  // prevent redirect to login page
+            'auth:token',
         ]);
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
+        $middleware->replace(\Illuminate\Http\Middleware\HandleCors::class, \App\Http\Middleware\HandleCors::class);
 
         $middleware->alias([
-            'auth' => \App\Http\Middleware\Authenticate::class,
             'deny-demo' => \App\Http\Middleware\DenyDemoUser::class,
-            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
 
         $middleware->priority([
+            \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\LegacyExternalAuth::class,
-            \App\Http\Middleware\Authenticate::class,
+            \App\Http\Middleware\EnforceJson::class, // must be before auth
+            \App\Http\Middleware\LegacyExternalAuth::class, // must be before auth
+            \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
-            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\Routing\Middleware\ThrottleRequestsWithRedis::class,
+            \Illuminate\Contracts\Session\Middleware\AuthenticatesSessions::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Auth\Middleware\Authorize::class,
         ]);
