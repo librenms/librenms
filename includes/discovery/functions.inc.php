@@ -600,6 +600,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                     // process the limits
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
+                    $prev = null;
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
@@ -616,7 +617,45 @@ function discovery_process($os, $sensor_class, $pre_cache)
                                 }
                             }
                         }
+
+                        // valid values for limits are numbers or null at this point, so set anything that is not a number to null
+                        if (!is_numeric($$limit)) {
+                            $$limit = null;
+                        }
+                        // if it is a number check that the limit is greater than the previous non-null limit
+                        elseif (isset($prev) && $$limit < $prev) {
+                            // note that we don't discard equal limits here as we want the most severe to take precedence, not the least recently added
+                            Log::warning("Discarding $limit - previous limit $prev is higher than proposed limit of $$limit");
+                            $$limit = null;
+                        }
+                        // if it is a number and higher than the previous limit accept it as valid
+                        else {
+                            $prev = $$limit;
+                        }
                     }
+
+                    if (is_numeric($high_limit) && $high_limit === 0 &&
+                        is_numeric($warn_limit) && $warn_limit === 0 &&
+                        is_numeric($low_limit) && $low_limit === 0 &&
+                        is_numeric($low_warn_limit) && $low_warn_limit === 0) {
+                            Log::warning("Discarding all limits - all limits set to zero by device");
+                            $high_limit = null;
+                            $warn_limit = null;
+                            $low_limit = null;
+                            $low_warn_limit = null;
+                    }
+
+                    if (is_numeric($high_limit) && is_numeric($warn_limit) && $high_limit === $warn_limit) {
+                        Log::warning("Discarding high warning limit - high and warn set to the same value by device");
+                        $warn_limit = null;
+                    }
+
+                    if (is_numeric($low_limit) && is_numeric($low_warn_limit) && $low_limit === $low_warn_limit) {
+                        Log::warning("Discarding low warning limit - low and low warning set to the same value by device");
+                        $low_warn_limit = null;
+                    }
+
+                    // do something clever here to detect the case where one of high/warn is set to the same value as one of low/low warn
 
                     $sensor_name = $device['os'];
 
