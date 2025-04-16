@@ -88,6 +88,7 @@ been up for 30344 seconds`.
 - Contacts, must be iterated in a foreach, `$key` holds email and
   `$value` holds name: `$alert->contacts`
 - Application Data: `$alert->applications`
+- Application Metrics: `$alert->applications_metrics`
 
 Placeholders can be used within the subjects for templates as well
 although $faults is most likely going to be worthless.
@@ -307,6 +308,18 @@ to the app data chunk.
 
 `[0]` is there as the legacy apps proxmox and drdb don't use make
 use of app data and instead can have multiple instances.
+
+#### Metrics
+
+Application metrics are also available via `$alert->application_metrics`.
+
+For example for ZFS if you wanted to include error info, you could do this.
+
+```
+Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value'] }}
+Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value'] }}
+Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value'] }}
+```
 
 ## Examples HTML
 
