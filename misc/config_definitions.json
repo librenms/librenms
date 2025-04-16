@@ -834,17 +834,24 @@
         },
         "autodiscovery.bgp": {
             "default": true,
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 12,
             "type": "boolean"
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
             "type": "array",
-            "default": [
-                "/^Cisco IP Phone/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 7,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "autodiscovery.nets-exclude": {
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 2,
             "type": "array",
             "default": [
@@ -856,26 +863,45 @@
             ]
         },
         "autodiscovery.ospf": {
+            "type": "boolean",
             "default": true,
-            "type": "boolean"
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 13
         },
         "autodiscovery.ospfv3": {
             "default": true,
-            "type": "boolean"
-        },
-        "autodiscovery.snmpscan": {
-            "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 14
         },
         "autodiscovery.xdp": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 4
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
-            "default": [
-                "/-K9W8/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 6,
+            "validate": {
+                "value.*": "is_regex"
+            }
+        },
+        "autodiscovery.xdp_exclude.sysname_regexp": {
+            "type": "array",
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 5,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_entity_sensor_regex": {
             "default": null,
@@ -892,7 +918,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 0,
+            "order": 1,
             "default": [
                 "voip-null",
                 "virtual-",
@@ -922,7 +948,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 1,
+            "order": 2,
             "default": [
                 "/^ng[0-9]+$/",
                 "/^sl[0-9]/"
@@ -1278,7 +1304,7 @@
             "default": 0,
             "type": "select-dynamic",
             "group": "discovery",
-            "section": "networks",
+            "section": "ports",
             "order": 0,
             "options": {
                 "target": "port-group"
@@ -4764,7 +4790,7 @@
             "type": "array",
             "default": [],
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 1
         },
         "network_map_dependencymap_vis_options": {
