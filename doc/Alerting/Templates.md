@@ -316,9 +316,13 @@ Application metrics are also available via `$alert->application_metrics`.
 For example for ZFS if you wanted to include error info, you could do this.
 
 ```
-Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value'] }}
-Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value'] }}
-Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value'] }}
+Current Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value'] }}
+Current Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value'] }}
+Current Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value'] }}
+
+Previous Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value_prev'] }}
+Previous Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value_prev'] }}
+Previous Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value_prev'] }}
 ```
 
 ## Examples HTML
