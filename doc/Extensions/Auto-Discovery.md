@@ -218,6 +218,13 @@ Newly discovered devices will be added to the `default_poller_group`, this value
 
 When using distributed polling, this value can be changed locally by setting `default_poller_group`
 
+To set per-poller, set this in each poller's config.php file:
+```php
+$config['default_poller_group'] = 3;
+```
+
+Set globally
+
 !!! setting "poller/distributed"
     ```bash
     lnms config:set default_poller_group 3
