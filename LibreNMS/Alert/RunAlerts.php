@@ -132,6 +132,14 @@ class RunAlerts
         $extra = $alert['details'];
 
         $obj['applications'] = $device->applications->groupBy('app_type');
+        $obj['applications_metrics'] = [];
+        foreach ($obj['applications'] as $app_name => $app_instances) {
+            $obj['applications_metrics'][$app_name] = [];
+            foreach ($app_instances as $app) {
+                $app_metrics = ApplicationMetric::where(['app_id' => $app->app_id])->get();
+                $metrics[$app_name][]=ApplicationMetric::where(['app_id' => $app->app_id])->get();
+            }
+        }
 
         $tpl = new Template;
         $template = $tpl->getTemplate($obj);
