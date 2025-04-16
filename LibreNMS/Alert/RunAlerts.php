@@ -34,6 +34,7 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
+use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
