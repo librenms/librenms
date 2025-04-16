@@ -111,7 +111,7 @@ foreach ($instances as $instance) {
         echo '
                   <tbody>
                     <tr>
-                      <td>' .  ($ospfPort->port ? Blade::render('<x-port-link :port="$port"/>', ['port' => $ospfPort->port]) : '') . '</td>
+                      <td>' . ($ospfPort->port ? Blade::render('<x-port-link :port="$port"/>', ['port' => $ospfPort->port]) : '') . '</td>
                       <td>' . $ospfPort->ospfv3IfType . '</td>
                       <td>' . $ospfPort->ospfv3IfState . '</td>
                       <td>' . $ospfPort->ospfv3IfMetricValue . '</td>
