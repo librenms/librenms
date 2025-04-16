@@ -264,7 +264,7 @@ Timestamp: {{ $alert->timestamp }}
 Unique-ID: {{ $alert->uid }}
 @if ($alert->description) Description: {{ $alert->description }} @endif
 @if ($alert->notes) Notes: {{ $alert->notes }} @endif
-Alert String: {{ $alert->applications['sneck'][0]['data']['data']['alertString'] }}
+Alert String: {{ $alert->applications['sneck'][0]['data']['alertString'] }}
 ```
 
 ### Advanced options
