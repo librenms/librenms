@@ -191,7 +191,7 @@ if (! empty($peers)) {
                     $address = (string) $peer_ip;
                     $bgpPeer = $bgpPeers[$address];
                     $peer_data = [];
-                    if (count(array_keys($bgpPeer)) == 1) { // We have only one vrf with a peer with this IP
+                    if ($bgpPeer && count(array_keys($bgpPeer)) == 1) { // We have only one vrf with a peer with this IP
                         $vrfInstance = array_keys($bgpPeer)[0];
                         $peer_data['bgpPeerState'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerState'];
                         $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerAdminStatus'];
@@ -524,7 +524,7 @@ if (! empty($peers)) {
             'rrd_name' => $peer_rrd_name,
             'rrd_def' => $peer_rrd_def,
         ];
-        data_update($device, 'bgp', $tags, $fields);
+        app('Datastore')->put($device, 'bgp', $tags, $fields);
 
         // --- Update Database data ---
         $peer['update'] = array_diff_assoc($peer_data, $peer);
@@ -813,7 +813,7 @@ if (! empty($peers)) {
                     'rrd_name' => $cbgp_rrd_name,
                     'rrd_def' => $cbgp_rrd_def,
                 ];
-                data_update($device, 'cbgp', $tags, $fields);
+                app('Datastore')->put($device, 'cbgp', $tags, $fields);
             } //end foreach
         } //end if
         echo "\n";

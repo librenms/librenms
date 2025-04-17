@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessSinrPolling.php
  *

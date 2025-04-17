@@ -40,7 +40,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 }
 
 if ($total > 0 && ! isset($vars['archive'])) {
-    echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif tw-mr-2" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
+    echo '<button class="btn btn-success pull-right fa fa-eye read-all-notif tw:mr-2" data-toggle="tooltip" data-placement="bottom" title="Mark all as Read" style="margin-top:-10px;"></button>';
 }
 ?>
       </h4>

@@ -1,18 +1,3 @@
-abilities:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: only_owned, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: options, Type: longtext, 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
-    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
-    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    abilities_scope_index: { Name: abilities_scope_index, Columns: [scope], Unique: false, Type: BTREE }
 access_points:
   Columns:
     - { Field: accesspoint_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -200,22 +185,6 @@ application_metrics:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     application_metrics_app_id_metric_unique: { Name: application_metrics_app_id_metric_unique, Columns: [app_id, metric], Unique: true, Type: BTREE }
-assigned_roles:
-  Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: restricted_to_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: restricted_to_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    assigned_roles_entity_index: { Name: assigned_roles_entity_index, Columns: [entity_id, entity_type, scope], Unique: false, Type: BTREE }
-    assigned_roles_role_id_index: { Name: assigned_roles_role_id_index, Columns: [role_id], Unique: false, Type: BTREE }
-    assigned_roles_scope_index: { Name: assigned_roles_scope_index, Columns: [scope], Unique: false, Type: BTREE }
-  Constraints:
-    assigned_roles_role_id_foreign: { name: assigned_roles_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
 authlog:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -911,7 +880,7 @@ ipv6_addresses:
     - { Field: ipv6_compressed, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_prefixlen, Type: int, 'Null': false, Extra: '' }
     - { Field: ipv6_origin, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: ipv6_network_id, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
@@ -1091,6 +1060,26 @@ migrations:
     - { Field: batch, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+model_has_permissions:
+  Columns:
+    - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: model_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: model_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [permission_id, model_id, model_type], Unique: true, Type: BTREE }
+    model_has_permissions_model_id_model_type_index: { Name: model_has_permissions_model_id_model_type_index, Columns: [model_id, model_type], Unique: false, Type: BTREE }
+  Constraints:
+    model_has_permissions_permission_id_foreign: { name: model_has_permissions_permission_id_foreign, foreign_key: permission_id, table: permissions, key: id, extra: 'ON DELETE CASCADE' }
+model_has_roles:
+  Columns:
+    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: model_type, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: model_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [role_id, model_id, model_type], Unique: true, Type: BTREE }
+    model_has_roles_model_id_model_type_index: { Name: model_has_roles_model_id_model_type_index, Columns: [model_id, model_type], Unique: false, Type: BTREE }
+  Constraints:
+    model_has_roles_role_id_foreign: { name: model_has_roles_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE' }
 mpls_lsps:
   Columns:
     - { Field: lsp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1344,6 +1333,126 @@ notifications_attribs:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [attrib_id], Unique: true, Type: BTREE }
     notifications_attribs_notifications_id_user_id_index: { Name: notifications_attribs_notifications_id_user_id_index, Columns: [notifications_id, user_id], Unique: false, Type: BTREE }
+ospfv3_areas:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaImportAsExtern, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaSpfRuns, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaAsBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaScopeLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaSummary, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaStubMetric, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaStubMetricType, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorRole, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorState, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorStabInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaTEEnabled, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ospfv3AreaId: { Name: ospfv3AreaId, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
+    ospfv3_areas_device_id_ospfv3areaid_context_name_unique: { Name: ospfv3_areas_device_id_ospfv3areaid_context_name_unique, Columns: [device_id, ospfv3AreaId, context_name], Unique: true, Type: BTREE }
+ospfv3_instances:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: router_id, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RouterId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AdminStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3VersionNumber, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3ASBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3OriginateNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RxNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3ExtLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3ExtAreaLsdbLimit, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfv3AsScopeLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AsScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3ExitOverflowInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3ReferenceBandwidth, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ospfv3_instances_device_id_context_name_unique: { Name: ospfv3_instances_device_id_context_name_unique, Columns: [device_id, context_name], Unique: true, Type: BTREE }
+ospfv3_nbrs:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: router_id, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrIfIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrIfInstId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRtrId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrAddressType, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrAddress, Type: varchar(39), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrOptions, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrPriority, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrState, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrLsRetransQLen, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrIfId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperAge, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperExitReason, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ospfv3_nbrs_device_id_index_context_name_unique: { Name: ospfv3_nbrs_device_id_index_context_name_unique, Columns: [device_id, ospfv3NbrIfIndex, ospfv3NbrIfInstId, ospfv3NbrRtrId, context_name], Unique: true, Type: BTREE }
+    ospfv3_nbrs_ospfv3_instance_id_index: { Name: ospfv3_nbrs_ospfv3_instance_id_index, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
+ospfv3_ports:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3_area_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfInstId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfAreaId, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfType, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfRtrPriority, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfTransitDelay, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfRetransInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfHelloInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfRtrDeadInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfPollInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfState, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfBackupDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfDemand, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfMetricValue, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfLinkScopeLsaCount, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfLinkLsaCksumSum, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfDemandNbrProbe, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3IfDemandNbrProbeRetransLimit, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfDemandNbrProbeInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfTEDisabled, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3IfLinkLSASuppression, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ospfv3_area_id: { Name: ospfv3_area_id, Columns: [ospfv3_instance_id], Unique: false, Type: BTREE }
+    ospfv3_ports_device_id_index_context_name_unique: { Name: ospfv3_ports_device_id_index_context_name_unique, Columns: [device_id, ospfv3IfIndex, ospfv3IfInstId, context_name], Unique: true, Type: BTREE }
 ospf_areas:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1441,96 +1550,6 @@ ospf_ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     ospf_ports_device_id_ospf_port_id_context_name_unique: { Name: ospf_ports_device_id_ospf_port_id_context_name_unique, Columns: [device_id, ospf_port_id, context_name], Unique: true, Type: BTREE }
-ospfv3_areas:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaImportAsExtern, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaSpfRuns, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaBdrRtrCount, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaAsBdrRtrCount, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaScopeLsaCount, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaScopeLsaCksumSum, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaSummary, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaStubMetric, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaStubMetricType, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_areas_device_id_ospfv3areaid_context_name_unique: { Name: ospfv3_areas_device_id_ospfv3areaid_context_name_unique, Columns: [device_id, ospfv3AreaId, context_name], Unique: true, Type: BTREE }
-ospfv3_instances:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RouterId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AdminStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3VersionNumber, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3ASBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3ExtLsaCount, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3OriginateNewLsas, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3RxNewLsas, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3ExtAreaLsdbLimit, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3AsScopeLsaCount, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3ExitOverflowInterval, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3AsScopeLsaCksumSum, Type: int, 'Null': true, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_instances_device_id_ospfv3_instance_id_context_name_uniq: { Name: ospfv3_instances_device_id_ospfv3_instance_id_context_name_uniq, Columns: [device_id, ospfv3_instance_id, context_name], Unique: true, Type: BTREE }
-ospfv3_nbrs:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3_nbr_id, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrIfId, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrIfIndex, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrIfInstId, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrAddressType, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrAddress, Type: varchar(39), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrRtrId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrOptions, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrPriority, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrState, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrEvents, Type: 'int', 'Null': true, Extra: '' }
-    - { Field: ospfv3NbrLsRetransQLen, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique: { Name: ospfv3_nbrs_device_id_ospfv3_nbr_id_context_name_unique, Columns: [device_id, ospfv3_instance_id, ospfv3_nbr_id, context_name], Unique: true, Type: BTREE }
-ospfv3_ports:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3_port_id, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3IfIndex, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfInstId, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfv3IfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3IfType, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfRtrPriority, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfTransitDelay, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfRetransInterval, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfHelloInterval, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfRtrDeadInterval, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfPollInterval, Type: int, 'Null': true, Extra: '' }
-    - { Field: ospfv3IfState, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfBackupDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfEvents, Type: 'int', 'Null': true, Extra: '' }
-    - { Field: ospfv3IfDemand, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3IfMetricValue, Type: int, 'Null': true, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ospfv3_ports_device_id_ospfv3_port_id_context_name_unique: { Name: ospfv3_ports_device_id_ospfv3_port_id_context_name_unique, Columns: [device_id, ospfv3_instance_id, ospfv3_port_id, context_name], Unique: true, Type: BTREE }
 packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1570,18 +1589,13 @@ pdb_ix_peers:
 permissions:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: ability_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: entity_id, Type: 'bigint unsigned', 'Null': true, Extra: '' }
-    - { Field: entity_type, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: forbidden, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: guard_name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    permissions_ability_id_index: { Name: permissions_ability_id_index, Columns: [ability_id], Unique: false, Type: BTREE }
-    permissions_entity_index: { Name: permissions_entity_index, Columns: [entity_id, entity_type, scope], Unique: false, Type: BTREE }
-    permissions_scope_index: { Name: permissions_scope_index, Columns: [scope], Unique: false, Type: BTREE }
-  Constraints:
-    permissions_ability_id_foreign: { name: permissions_ability_id_foreign, foreign_key: ability_id, table: abilities, key: id, extra: 'ON DELETE CASCADE ON UPDATE CASCADE' }
+    permissions_name_guard_name_unique: { Name: permissions_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
 plugins:
   Columns:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1727,9 +1741,9 @@ ports:
     - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
+    ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
     ports_ifalias_port_descr_descr_portname_index: { Name: ports_ifalias_port_descr_descr_portname_index, Columns: [ifAlias, port_descr_descr, portName], Unique: false, Type: BTREE }
     ports_ifdescr_ifname_index: { Name: ports_ifdescr_ifname_index, Columns: [ifDescr, ifName], Unique: false, Type: BTREE }
-    ports_device_id_ifindex_index: { Name: ports_device_id_ifindex_index, Columns: [device_id, ifIndex], Unique: false, Type: BTREE }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -2068,14 +2082,22 @@ roles:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: title, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: scope, Type: int, 'Null': true, Extra: '' }
+    - { Field: guard_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    roles_name_unique: { Name: roles_name_unique, Columns: [name, scope], Unique: true, Type: BTREE }
-    roles_scope_index: { Name: roles_scope_index, Columns: [scope], Unique: false, Type: BTREE }
+    roles_name_guard_name_unique: { Name: roles_name_guard_name_unique, Columns: [name, guard_name], Unique: true, Type: BTREE }
+role_has_permissions:
+  Columns:
+    - { Field: permission_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: role_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [permission_id, role_id], Unique: true, Type: BTREE }
+    role_has_permissions_role_id_foreign: { Name: role_has_permissions_role_id_foreign, Columns: [role_id], Unique: false, Type: BTREE }
+  Constraints:
+    role_has_permissions_permission_id_foreign: { name: role_has_permissions_permission_id_foreign, foreign_key: permission_id, table: permissions, key: id, extra: 'ON DELETE CASCADE' }
+    role_has_permissions_role_id_foreign: { name: role_has_permissions_role_id_foreign, foreign_key: role_id, table: roles, key: id, extra: 'ON DELETE CASCADE' }
 route:
   Columns:
     - { Field: route_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

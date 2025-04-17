@@ -1,4 +1,5 @@
 <?php
+
 /**
  * eltek-webpower.inc.php
  *

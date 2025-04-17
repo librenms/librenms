@@ -286,7 +286,7 @@ def poll_worker(
                     executable, wrappers[wrapper_type]["option"], device_id
                 )
                 if modules is not None and len(str(modules).strip()):
-                    module_str = re.sub("\s", "", str(modules).strip())
+                    module_str = re.sub(r"\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)
 
                 # enable debug output otherwise, set -q for lnms commands
@@ -301,7 +301,7 @@ def poll_worker(
                     timeout=PER_DEVICE_TIMEOUT,
                     valid_exit_codes=VALID_EXIT_CODES,
                 )
-                if exit_code not in [0, 6]:
+                if exit_code not in VALID_EXIT_CODES:
                     logger.error(
                         "Thread {} exited with code {}".format(
                             threading.current_thread().name, exit_code

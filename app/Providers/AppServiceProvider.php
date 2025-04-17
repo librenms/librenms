@@ -92,17 +92,26 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('graphImage', function ($vars, $flags = 0) {
             return "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>";
         });
+
+        Blade::directive('vuei18n', function () {
+            return "<?php
+             \$manifest_file = public_path('js/lang/manifest.json');
+             \$manifest = is_readable(\$manifest_file) ? json_decode(file_get_contents(\$manifest_file), true) : [];
+             \$locales = array_unique(['en', app()->getLocale()]);
+             echo implode(PHP_EOL, array_map(fn (\$locale) => '<script src=\"' . asset(\$manifest[\$locale] ?? \"/js/lang/\$locale.js\") . '\"></script>', \$locales));
+ ?>";
+        });
     }
 
     private function configureMorphAliases()
     {
         $sensor_types = [];
         foreach (Sensor::getTypes() as $sensor_type) {
-            $sensor_types[$sensor_type] = \App\Models\Sensor::class;
+            $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
-            'sensor' => \App\Models\Sensor::class,
+            'sensor' => Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
@@ -144,13 +153,16 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Mempool::observe(\App\Observers\MempoolObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
         \App\Models\Qos::observe(\App\Observers\QosObserver::class);
-        \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
+        Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
+        \App\Models\Storage::observe(\App\Observers\StorageObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
         \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
+        \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
 
     private function bootCustomValidators()

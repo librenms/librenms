@@ -2537,8 +2537,8 @@
                     "ifName": "imq0",
                     "portName": null,
                     "ifIndex": 18,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3137,8 +3137,8 @@
                     "ifName": "tun0",
                     "portName": null,
                     "ifIndex": 26,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4111,5 +4111,38 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:0200:5efe:53a6:cb5a",
+                    "ipv6_compressed": "fe80::200:5efe:53a6:cb5a",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 26
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:822a:a8ff:fe4d:a438",
+                    "ipv6_compressed": "fe80::822a:a8ff:fe4d:a438",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 23
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:822a:a8ff:fe4d:a439",
+                    "ipv6_compressed": "fe80::822a:a8ff:fe4d:a439",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 5
+                }
+            ]
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Teleste Luminato ASI/QAM bitrate
  *

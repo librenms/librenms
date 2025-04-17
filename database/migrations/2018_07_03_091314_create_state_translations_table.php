@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('state_draw_graph');
             $table->smallInteger('state_value')->default(0);
             $table->boolean('state_generic_value');
-            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 $table->timestamp('state_lastupdated')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
             } else {
                 $table->timestamp('state_lastupdated')->useCurrent();

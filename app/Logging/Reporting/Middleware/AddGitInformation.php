@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AddGitInformation.php
  *

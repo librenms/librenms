@@ -12,7 +12,7 @@
             </div>
             <div>
               <center>
-                <div class="tw-text-red-600" id="imagedeleteerror"></div>
+                <div class="tw:text-red-600" id="imagedeleteerror"></div>
               </center>
             </div>
         </div>

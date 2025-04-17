@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckRedis.php
  *
@@ -35,8 +36,8 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
      */
     public function validate(): ValidationResult
     {
+        $driver = config('cache.default');
         if ($this->redisIsAvailable()) {
-            $driver = config('cache.default');
             if ($driver != 'redis') {
                 return ValidationResult::warn(trans('validation.validations.poller.CheckRedis.bad_driver', ['driver' => $driver]));
             }
@@ -44,7 +45,8 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
             return ValidationResult::ok(trans('validation.validations.poller.CheckRedis.ok'));
         }
 
-        if (\LibreNMS\Config::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2) {
+        // cache driver set to redis, it is required. Otherwise, if there are 2 or more distrubted poller nodes, it is required
+        if ($driver == 'redis' || (\LibreNMS\Config::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2)) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckRedis.unavailable'));
         }
 

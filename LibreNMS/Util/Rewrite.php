@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rewrite.php
  *
@@ -400,5 +401,10 @@ class Rewrite
     public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
+
+    public static function celsiusToFahrenheit(float $celsius): float
+    {
+        return round($celsius * 1.8 + 32, 2);
     }
 }

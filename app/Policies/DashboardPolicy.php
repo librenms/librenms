@@ -23,7 +23,7 @@ class DashboardPolicy
     /**
      * Determine whether the user can view any dashboard.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      */
     public function viewAny(User $user): bool
     {
@@ -33,8 +33,8 @@ class DashboardPolicy
     /**
      * Determine whether the user can view the dashboard.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
      */
     public function view(User $user, Dashboard $dashboard): bool
     {
@@ -44,7 +44,7 @@ class DashboardPolicy
     /**
      * Determine whether the user can create dashboards.
      *
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      */
     public function create(User $user): bool
     {
@@ -54,8 +54,8 @@ class DashboardPolicy
     /**
      * Determine whether the user can update the dashboard.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
      */
     public function update(User $user, Dashboard $dashboard): bool
     {
@@ -65,8 +65,8 @@ class DashboardPolicy
     /**
      * Determine whether the user can delete the dashboard.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
      */
     public function delete(User $user, Dashboard $dashboard): bool
     {
@@ -76,8 +76,8 @@ class DashboardPolicy
     /**
      * Determine whether the user can copy the dashboard.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
      * @param  int  $target_user_id
      */
     public function copy(User $user, Dashboard $dashboard, int $target_user_id): bool

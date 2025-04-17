@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Time;
 
 class Sensor extends DeviceRelatedModel implements Keyable
 {
@@ -85,6 +88,13 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function unit(): string
     {
+        if ($this->sensor_class == 'temperature') {
+            /** @var ?User $user */
+            $user = auth()->user();
+
+            return $user && UserPref::getPref($user, 'temp_units') == 'f' ? '°F' : '°C';
+        }
+
         return __('sensors.' . $this->sensor_class . '.unit');
     }
 
@@ -142,17 +152,52 @@ class Sensor extends DeviceRelatedModel implements Keyable
     /**
      * Format current value for user display including units.
      */
-    public function formatValue(): string
+    public function formatValue($field = 'sensor_current'): string
     {
+        $value = $this->$field;
+
+        if ($value === null) {
+            return $field == 'sensor_current' ? 'NaN' : '-';
+        }
+
+        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
+        }
+
+        /** @var ?User $user */
+        $user = auth()->user();
+
         return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
-            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
-            default => $this->sensor_current . ' ' . $this->unit(),
+            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : "$value °C",
+            'state' => $this->currentTranslation()?->state_descr ?? 'Unknown',
+            'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
+            'runtime' => Time::formatInterval($value * 60),
+            'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
+            'dbm' => round($value, 3) . ' ' . $this->unit(),
+            default => $value . ' ' . $this->unit(),
         };
+    }
+
+    public function currentTranslation(): ?StateTranslation
+    {
+        if ($this->sensor_class !== 'state') {
+            return null;
+        }
+
+        return $this->translations->firstWhere('state_value', $this->sensor_current);
     }
 
     public function currentStatus(): Severity
     {
+        if ($this->sensor_class == 'state') {
+            return $this->currentTranslation()?->severity() ?? Severity::Unknown;
+        }
+
+        if ($this->sensor_current === null) {
+            return Severity::Unknown;
+        }
+
         if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
             return Severity::Error;
         }

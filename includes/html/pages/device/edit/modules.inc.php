@@ -95,11 +95,11 @@ foreach ($poller_modules as $module => $module_status) {
        </td>
        <td style="vertical-align: middle">';
 
-    echo '<button type="button" class="btn btn-default tw-mr-1 poller-reset-button" id="poller-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['poll_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
+    echo '<button type="button" class="btn btn-default tw:mr-1 poller-reset-button" id="poller-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['poll_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
 
     $moduleInstance = Module::fromName($module);
     if ($moduleInstance->dataExists(DeviceCache::getPrimary())) {
-        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw-text-red-600"></button>';
+        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw:text-red-600"></button>';
     }
 
 echo '</td>
@@ -190,11 +190,11 @@ foreach ($discovery_modules as $module => $module_status) {
         </td>
        <td style="vertical-align: middle">';
 
-    echo '<button type="button" class="btn btn-default tw-mr-1 discovery-reset-button" id="discovery-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['discover_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
+    echo '<button type="button" class="btn btn-default tw:mr-1 discovery-reset-button" id="discovery-reset-button-' . $module . '" style="visibility: ' . (isset($attribs['discover_' . $module]) ? 'visible' : 'hidden') . '" title="Reset device override"><i class="fa fa-lg fa-solid fa-rotate-left"></i></button>';
 
     $moduleInstance = Module::fromName($module);
     if ($moduleInstance->dataExists(DeviceCache::getPrimary())) {
-        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw-text-red-600"></button>';
+        echo '<button type="button" class="btn btn-default delete-button-' . $module . '" title="Delete Module Data" data-toggle="modal" data-target="#delete-module-data" data-module="' . $module . '" data-module-name="' . $module_name . '"><i class="fa fa-lg fa-solid fa-trash tw:text-red-600"></button>';
     }
 
     echo '</td>

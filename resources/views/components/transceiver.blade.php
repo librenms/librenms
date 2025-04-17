@@ -1,9 +1,9 @@
 @props(['transceiver', 'portlink' => true])
 
-<div class="tw-flex sm:tw-flex-row tw-flex-col" {{ $attributes }}>
-    <div class="tw-pr-8">
+<div class="tw:flex tw:sm:flex-row tw:flex-col" {{ $attributes }}>
+    <div class="tw:pr-8">
         @if($portlink && $transceiver->port)<x-port-link :port="$transceiver->port"></x-port-link>@endif
-        @if($transceiver->vendor || $transceiver->type)<p class="tw-text-2xl tw-font-bold">{{ $transceiver->vendor }} {{ $transceiver->type }}</p>@endif
+        @if($transceiver->vendor || $transceiver->type)<p class="tw:text-2xl tw:font-bold">{{ $transceiver->vendor }} {{ $transceiver->type }}</p>@endif
         @if($transceiver->model)<p>{{ __('port.transceivers.fields.model', $transceiver->only('model')) }}</p>@endif
         @if($transceiver->serial)<p>{{ __('port.transceivers.fields.serial', $transceiver->only('serial')) }}</p>@endif
         <p>@if($transceiver->revision){{ __('port.transceivers.fields.revision', $transceiver->only('revision')) }}@endif @if($transceiver->date){{ __('port.transceivers.fields.date', $transceiver->only('date')) }}@endif</p>

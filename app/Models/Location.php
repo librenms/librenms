@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Location.php
  *
@@ -172,7 +173,7 @@ class Location extends Model
 
     public function devices(): HasMany
     {
-        return $this->hasMany(\App\Models\Device::class, 'location_id');
+        return $this->hasMany(Device::class, 'location_id');
     }
 
     public function __toString()

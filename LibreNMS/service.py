@@ -20,6 +20,7 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD
 from uuid import uuid1
+from os import utime
 
 try:
     from systemd.daemon import notify
@@ -104,6 +105,7 @@ class ServiceConfig(DBConfig):
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
+    health_file = ""  # disabled by default
 
     def populate(self):
         config = LibreNMS.get_config_data(self.BASE_DIR)
@@ -276,6 +278,7 @@ class ServiceConfig(DBConfig):
         )
         self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
         self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
+        self.health_file = config.get("service_health_file", ServiceConfig.health_file)
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -412,6 +415,11 @@ class Service:
             )
         else:
             logger.info("Watchdog is disabled.")
+        if self.config.health_file:
+            with open(self.config.health_file, "a") as f:
+                utime(self.config.health_file)
+        else:
+            logger.info("Service health file disabled.")
         self.systemd_watchdog_timer = LibreNMS.RecurringTimer(
             10, self.systemd_watchdog, "systemd-watchdog"
         )
@@ -616,7 +624,7 @@ class Service:
                 """SELECT `device_id`,
                   `poller_group`,
                   IF(last_discovered IS NULL AND last_polled IS NULL, 0, COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND), 1)) AS `poll`,
-                  IF(status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
+                  IF(status=0, IF(last_discovered IS NULL, 1, 0), IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR
@@ -915,6 +923,8 @@ class Service:
             )
 
     def systemd_watchdog(self):
+        if self.config.health_file:
+            utime(self.config.health_file)
         if "systemd.daemon" in sys.modules:
             notify("WATCHDOG=1")
 

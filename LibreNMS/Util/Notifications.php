@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Notifications.php
  *

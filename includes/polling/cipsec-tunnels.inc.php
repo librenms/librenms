@@ -34,7 +34,7 @@ if ($device['os_group'] == 'cisco') {
 
         echo "Tunnel $index (" . $tunnel_full['cipSecTunIkeTunnelIndex'] . ")\n";
 
-        $address = isset($tunnel_full['cikeTunRemoteValue']) ? $tunnel_full['cikeTunRemoteValue'] : (string) IP::fromHexString($tunnel_full['cipSecTunRemoteAddr']);
+        $address = isset($tunnel_full['cikeTunRemoteValue']) ? $tunnel_full['cikeTunRemoteValue'] : (string) IP::fromHexString($tunnel_full['cipSecTunRemoteAddr'], true);
 
         echo 'Address ' . $address . "\n";
 
@@ -126,7 +126,7 @@ if ($device['os_group'] == 'cisco') {
 
         if (isset($address)) {
             $tags = compact('address', 'rrd_name', 'rrd_def');
-            data_update($device, 'ipsectunnel', $tags, $fields);
+            app('Datastore')->put($device, 'ipsectunnel', $tags, $fields);
 
             // $os->enableGraph('ipsec_tunnels');
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * TrippliteAlarmRemoved.php
  *
