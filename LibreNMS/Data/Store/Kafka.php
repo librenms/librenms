@@ -159,7 +159,7 @@ class Kafka extends BaseDatastore
                     );
                     
                     if ($this->isShuttingDown) {
-                        error_log($error_msg);
+                        d_echo($error_msg);
                     } else {
                         Log::error('KAFKA: Flush failed', [
                             'error' => Library::rd_kafka_err2str($result),
