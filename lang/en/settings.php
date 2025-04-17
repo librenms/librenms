@@ -754,6 +754,14 @@ return [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
         ],
+        'email_smtp_verifypeer' => [
+            'description' => 'Verify peer certificate',
+            'help' => 'Do not verify peer certificate when connecting to SMTP server via TLS',
+        ],
+        'email_smtp_allowselfsigned' => [
+            'description' => 'Allow self-signed certificate',
+            'help' => 'Allow self-signed certificate when connecting to SMTP server via TLS',
+        ],
         'email_attach_graphs' => [
             'description' => 'Attach graph images',
             'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
