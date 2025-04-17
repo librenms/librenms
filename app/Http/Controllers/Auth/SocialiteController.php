@@ -173,7 +173,7 @@ class SocialiteController extends Controller
                 }
             }
             if (count($roles) > 0) {
-                $user->setRoles(array_unique($roles), true);
+                $user->syncRoles(array_unique($roles));
 
                 return true;
             }
