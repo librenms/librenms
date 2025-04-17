@@ -68,7 +68,9 @@ class Ospfv3Port extends PortRelatedModel implements Keyable
     ];
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ospfv3Area, $this>
+     */
     public function area(): BelongsTo
     {
         return $this->belongsTo(Ospfv3Area::class);

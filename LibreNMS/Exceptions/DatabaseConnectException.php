@@ -27,6 +27,9 @@
 namespace LibreNMS\Exceptions;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 
 class DatabaseConnectException extends \Exception implements UpgradeableException
@@ -37,7 +40,7 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
      * @param  \Exception  $exception
      * @return static|null
      */
-    public static function upgrade($exception)
+    public static function upgrade($exception): ?static
     {
         // connect exception, convert to our standard connection exception
         return $exception instanceof QueryException && in_array($exception->getCode(), [1044, 1045, 2002]) ?
@@ -51,10 +54,8 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
 
     /**
      * Render the exception into an HTTP or JSON response.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function render(\Illuminate\Http\Request $request)
+    public function render(Request $request): Response|JsonResponse
     {
         $title = trans('exceptions.database_connect.title');
 

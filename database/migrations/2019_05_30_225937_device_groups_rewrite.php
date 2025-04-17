@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('device_groups', function (Blueprint $table) {
-            $table->string('desc')->nullable()->change();
+            $table->string('desc')->nullable()->default('')->change();
             $table->string('type', 16)->default('dynamic')->after('desc');
             $table->text('rules')->nullable()->after('type');
             $table->dropColumn('params');

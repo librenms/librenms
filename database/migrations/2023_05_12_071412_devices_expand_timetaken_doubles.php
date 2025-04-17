@@ -14,9 +14,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->unsignedFloat('last_polled_timetaken')->nullable()->change();
-            $table->unsignedFloat('last_discovered_timetaken')->nullable()->change();
-            $table->unsignedFloat('last_ping_timetaken')->nullable()->change();
+            $table->float('last_polled_timetaken')->unsigned()->nullable()->change();
+            $table->float('last_discovered_timetaken')->unsigned()->nullable()->change();
+            $table->float('last_ping_timetaken')->unsigned()->nullable()->change();
         });
     }
 

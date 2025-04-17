@@ -31,7 +31,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class StreamedOutput extends StreamOutput
 {
-    protected function doWrite($message, $newline)
+    protected function doWrite($message, $newline): void
     {
         if (false === @fwrite($this->getStream(), $message) || ($newline && (false === @fwrite($this->getStream(), PHP_EOL)))) {
             throw new RuntimeException('Unable to write output.');

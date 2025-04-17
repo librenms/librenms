@@ -62,17 +62,25 @@ class Ospfv3Instance extends DeviceRelatedModel implements Keyable
     ];
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Area, $this>
+     */
     public function areas(): HasMany
     {
         return $this->hasMany(Ospfv3Area::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Nbr, $this>
+     */
     public function nbrs(): HasMany
     {
         return $this->hasMany(Ospfv3Nbr::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Port, $this>
+     */
     public function ospfv3Ports(): HasMany
     {
         return $this->hasMany(Ospfv3Port::class);

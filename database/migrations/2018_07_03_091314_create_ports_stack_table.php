@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('low_ifIndex');
             $table->unsignedBigInteger('low_port_id')->nullable();
             $table->string('ifStackStatus', 32);
-            $table->unique(['device_id', 'high_ifIndex', 'low_ifIndex']);
+            $table->unique(['device_id', 'high_ifIndex', 'low_ifIndex'], 'ports_stack_device_id_port_id_high_port_id_low_unique');
         });
     }
 

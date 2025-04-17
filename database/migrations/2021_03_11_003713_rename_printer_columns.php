@@ -46,7 +46,7 @@ return new class extends Migration
         });
 
         Schema::table('printer_supplies', function (Blueprint $table) {
-            $table->string('supply_descr', 255)->change();
+            $table->string('supply_descr', 255)->default('')->change();
         });
     }
 
@@ -90,7 +90,7 @@ return new class extends Migration
         });
 
         Schema::table('printer_supplies', function (Blueprint $table) {
-            $table->string('toner_descr', 32)->change();
+            $table->string('toner_descr', 32)->default('')->change();
         });
     }
 };
