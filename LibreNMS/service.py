@@ -393,6 +393,7 @@ class Service:
         self.config.populate()
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
+        self.prom_metrics = None
 
         threading.current_thread().name = self.config.name  # rename main thread
         self.attach_signals()
@@ -536,6 +537,55 @@ class Service:
             )
         else:
             logger.warning("Maintenance tasks are disabled.")
+
+        # check some config variable here...
+        if True:
+            try:
+                from prometheus_client import start_http_server, Gauge
+                # Start the HTTP server to expose metrics on port 8000
+                start_http_server(8000)
+
+                # Initialize the dictionary to hold our metrics
+                prom_metrics = {}
+
+                # Create Gauge metrics with a label for poller_type
+                prom_metrics['dispatcher_depth'] = Gauge(
+                    'librenms_dispatcher_depth',
+                    'Dispatcher depth metric for various pollers',
+                    ['poller_type']
+                )
+                prom_metrics['dispatcher_devices'] = Gauge(
+                    'librenms_dispatcher_devices',
+                    'Dispatcher devices count for various pollers',
+                    ['poller_type']
+                )
+                prom_metrics['dispatcher_workers'] = Gauge(
+                    'librenms_dispatcher_workers',
+                    'Number of workers for various pollers',
+                    ['poller_type']
+                )
+                prom_metrics['dispatcher_worker_seconds'] = Gauge(
+                    'librenms_dispatcher_worker_seconds',
+                    'Worker seconds for various pollers',
+                    ['poller_type']
+                )
+                prom_metrics['dispatcher_frequency'] = Gauge(
+                    'librenms_dispatcher_frequency',
+                    'Dispatcher frequency for various pollers',
+                    ['poller_type']
+                )
+                prom_metrics['node_master'] = Gauge(
+                    'librenms_node_master',
+                    'Indicates if the node is the current leader (1 for master, 0 for non-master)'
+                )
+                logger.info("Prometheus metrics initialized.")
+            except ImportError:
+                logger.info("Prometheus client is not available. Metrics will be disabled.")
+                # Disable metrics if the module is not installed.
+                prom_metrics = None
+            self.prom_metrics = prom_metrics
+        else:
+            logger.info("Prometheus metrics not enabled in config.")
 
         # Main dispatcher loop
         try:
@@ -874,6 +924,9 @@ class Service:
     def log_performance_stats(self):
         logger.info("Counting up time spent polling")
 
+        if self.prom_metrics is not None:
+            self.prom_metrics['node_master'].set(1 if self.is_master else 0)
+
         try:
             # Report on the poller instance as a whole
             self._db.query(
@@ -897,6 +950,22 @@ class Service:
 
             for worker_type, manager in self.queue_managers.items():
                 worker_seconds, devices = manager.performance.reset()
+                depth = sum(
+                            [
+                                manager.get_queue(group).qsize()
+                                for group in self.config.group
+                            ]
+                        )
+                workers = getattr(self.config, worker_type).workers
+                frequency = getattr(self.config, worker_type).frequency
+
+                # Update metrics
+                if self.prom_metrics is not None:
+                    self.prom_metrics['dispatcher_depth'].labels(poller_type=worker_type).set(depth)
+                    self.prom_metrics['dispatcher_devices'].labels(poller_type=worker_type).set(devices)
+                    self.prom_metrics['dispatcher_workers'].labels(poller_type=worker_type).set(workers)
+                    self.prom_metrics['dispatcher_worker_seconds'].labels(poller_type=worker_type).set(worker_seconds)
+                    self.prom_metrics['dispatcher_frequency'].labels(poller_type=worker_type).set(frequency)
 
                 # Record the queue state
                 self._db.query(
@@ -904,16 +973,11 @@ class Service:
                     'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
                     "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; ".format(
                         worker_type,
-                        sum(
-                            [
-                                manager.get_queue(group).qsize()
-                                for group in self.config.group
-                            ]
-                        ),
+                        depth,
                         devices,
                         worker_seconds,
-                        getattr(self.config, worker_type).workers,
-                        getattr(self.config, worker_type).frequency,
+                        workers,
+                        frequency,
                     )
                 )
         except (pymysql.err.Error, ConnectionResetError, RedisConnectionError):
