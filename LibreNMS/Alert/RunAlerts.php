@@ -477,6 +477,9 @@ class RunAlerts
             $noiss = false;
             $noacc = false;
             $updet = false;
+            // column alerted will be set to 1 even if alert transport is disabled
+            $set_alerted = false;
+
             $rextra = json_decode($alert['extra'], true);
             if (! isset($rextra['recovery'])) {
                 // backwards compatibility check
@@ -488,7 +491,13 @@ class RunAlerts
                 $alert['details']['count'] = 0;
             }
 
-            $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
+            $chk = dbFetchRow(
+                'SELECT alerts.alerted,devices.ignore,devices.disabled,devices.disable_alert_transport '
+                    . 'FROM alerts,devices '
+                    . 'WHERE alerts.device_id = ? '
+                    . '&& devices.device_id = alerts.device_id '
+                    . '&& alerts.rule_id = ?',
+                [$alert['device_id'], $alert['rule_id']]);
 
             if ($chk['alerted'] == $alert['state']) {
                 $noiss = true;
@@ -546,6 +555,11 @@ class RunAlerts
                 $noacc = false;
             }
 
+            if ($chk['disable_alert_transport'] == 1) {
+                $noiss = true;
+                $set_alerted = true;
+            }
+
             if (AlertUtil::isMaintenance($alert['device_id'])) {
                 $noiss = true;
                 $noacc = true;
@@ -572,6 +586,12 @@ class RunAlerts
 
             if (! $noiss) {
                 $this->issueAlert($alert);
+            }
+
+            if (! $noiss || $set_alerted) {
+                // If $set_alerted: After 'disable_alert_transport' has been set
+                // to 0 again, recovery alerts will be sent but no actual error
+                // messages (which would happen with a possibly large delay)
                 dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
             }
 

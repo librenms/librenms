@@ -35,6 +35,7 @@ if (! empty($_POST['editing'])) {
         $device_model->ignore_status = (int) isset($_POST['ignore_status']);
         $device_model->disabled = (int) isset($_POST['disabled']);
         $device_model->disable_notify = (int) isset($_POST['disable_notify']);
+        $device_model->disable_alert_transport = (int) isset($_POST['disable_alert_transport']);
         $device_model->type = $_POST['type'];
         $device_model->overwrite_ip = $_POST['overwrite_ip'];
 
@@ -301,6 +302,21 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
                 }
                 ?> />
       </div>
+    </div>
+    <div class="form-group">
+        <label for="disable_alert_transport" class="col-sm-2 control-label"
+            title="Tag device to not send any alert messages via configured transports as long as
+this switch is enabled.
+After turning off, an erroneous device may trigger recovery alert messages
+if they are enabled at the corresponding alert rule.">Disable alert transports</label>
+        <div class="col-sm-6">
+            <input id="disable_alert_transport" type="checkbox" name="disable_alert_transport" data-size="small"
+                <?php
+                if ($device_model->disable_alert_transport) {
+                    echo 'checked=checked';
+                }
+                ?> />
+        </div>
     </div>
     <div class="form-group">
         <label for="ignore" class="col-sm-2 control-label" title="Tag device to ignore alerts. Alert checks will still run.

@@ -47,6 +47,7 @@ class Device extends BaseModel
         'community',
         'cryptoalgo',
         'cryptopass',
+        'disable_alert_transport',
         'disable_notify',
         'disabled',
         'features',
