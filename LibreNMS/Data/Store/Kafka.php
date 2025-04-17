@@ -146,7 +146,7 @@ class Kafka extends BaseDatastore
                 } else {
                     Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
                 }
-                
+
                 $result = $this->client->flush(self::getKafkaFlushTimeout());
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
@@ -157,7 +157,7 @@ class Kafka extends BaseDatastore
                         $this->device_id,
                         $this->client->getOutQLen()
                     );
-                    
+
                     if ($this->isShuttingDown) {
                         d_echo($error_msg);
                     } else {
