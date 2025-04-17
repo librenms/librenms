@@ -137,6 +137,8 @@ return [
         'RUCKUS-SZ-EVENT-MIB::ruckusSZAPConnectedTrap' => LibreNMS\Snmptrap\Handlers\RuckusSzApConnect::class,
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterInMaintenanceStateTrap' => LibreNMS\Snmptrap\Handlers\RuckusSzClusterInMaintenance::class,
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterBackToInServiceTrap' => LibreNMS\Snmptrap\Handlers\RuckusSzClusterInService::class,
+        'RUCKUS-SZ-EVENT-MIB::ruckusSZAPRadiusServerUnreachableTrap' => LibreNMS\Snmptrap\Handlers\RuckusSzApRadiusServerUnreachableTrap::class,
+        'RUCKUS-SZ-EVENT-MIB::ruckusSZAPRadiusServerReachableTrap' => LibreNMS\Snmptrap\Handlers\RuckusSzApRadiusServerReachableTrap::class,
         'SNMPv2-MIB::authenticationFailure' => LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
         'SNMPv2-MIB::coldStart' => LibreNMS\Snmptrap\Handlers\ColdBoot::class,
         'SNMPv2-MIB::warmStart' => LibreNMS\Snmptrap\Handlers\WarmBoot::class,
