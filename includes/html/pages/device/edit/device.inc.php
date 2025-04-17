@@ -193,7 +193,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" title="To set coordinates, include [latitude,longitude]">
         <div class="col-sm-2"></div>
         <div class="col-sm-6">
-          <input id="sysLocation" name="sysLocation" class="form-control"
+            <input id="sysLocation" name="sysLocation" class="form-control"
                 <?php
                 if (! $device_model->override_sysLocation) {
                     echo ' disabled="1"';
@@ -202,29 +202,28 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
         </div>
     </div>
     <div class="form-group">
-      <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
-      <div class="col-sm-6">
+        <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
+        <div class="col-sm-6">
         <input onChange="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
-    <?php
-    if ($override_sysContact_bool) {
-        echo ' checked="1"';
-    }
-    ?>
-   />
+            <?php
+            if ($override_sysContact_bool) {
+                echo ' checked="1"';
+            }
+            ?> />
       </div>
     </div>
     <div class="form-group">
-      <div class="col-sm-2">
-      </div>
-      <div class="col-sm-6">
-        <input id="sysContact" class="form-control" name="sysContact" size="32"
-    <?php
-    if (! $override_sysContact_bool) {
-        echo ' disabled="1"';
-    }
-    ?>
-    value="<?php echo htmlentities($override_sysContact_string); ?>" />
-      </div>
+        <div class="col-sm-2"></div>
+        <div class="col-sm-6">
+            <input id="sysContact" class="form-control" name="sysContact" size="32"
+                <?php
+                if (! $override_sysContact_bool) {
+                echo ' disabled="1"';
+                }
+                ?>
+                value="<?php echo htmlentities($override_sysContact_string); ?>"
+                />
+        </div>
     </div>
     <div class="form-group">
         <label for="parent_id" class="col-sm-2 control-label">This device depends on</label>
@@ -253,55 +252,54 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
             </select>
         </div>
     </div>
-<?php
-if (\LibreNMS\Config::get('distributed_poller') === true) {
-                    ?>
-   <div class="form-group">
-       <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
-       <div class="col-sm-6">
-           <select name="poller_group" id="poller_group" class="form-control input-sm">
-           <option value="0">General<?=\LibreNMS\Config::get('distributed_poller_group') == 0 ? ' (default Poller)' : ''?></option>
     <?php
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-        echo '<option value="' . $group['id'] . '"' .
-        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . $group['group_name'];
-        echo \LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)' : '';
-        echo '</option>';
-    } ?>
+    if (\LibreNMS\Config::get('distributed_poller') === true) {
+    ?>
+    <div class="form-group">
+        <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
+        <div class="col-sm-6">
+            <select name="poller_group" id="poller_group" class="form-control input-sm">
+            <option value="0">General<?=\LibreNMS\Config::get('distributed_poller_group') == 0 ? ' (default Poller)' : ''?></option>
+            <?php
+            foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+                echo '<option value="' . $group['id'] . '"' .
+                ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . $group['group_name'];
+                echo \LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)' : '';
+                echo '</option>';
+            } ?>
            </select>
-       </div>
-   </div>
+        </div>
+    </div>
     <?php
-                }//endif
-?>
+    }  # endif
+    ?>
     <div class="form-group">
         <label for="disabled" class="col-sm-2 control-label">Disable polling and alerting</label>
         <div class="col-sm-6">
-          <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
-                <?php
-                if ($device_model->disabled) {
-                    echo 'checked=checked';
-                }
-                ?> />
+            <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
+            <?php
+            if ($device_model->disabled) {
+                echo 'checked=checked';
+            }
+            ?> />
         </div>
     </div>
     <div class="form-group">
-      <label for="maintenance" class="col-sm-2 control-label"></label>
-      <div class="col-sm-6">
-      <button type="button" id="maintenance" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
-      </div>
+        <label for="maintenance" class="col-sm-2 control-label"></label>
+        <div class="col-sm-6">
+            <button type="button" id="maintenance" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
+        </div>
     </div>
-
     <div class="form-group">
-      <label for="disable_notify" class="col-sm-2 control-label">Disable alerting</label>
-      <div class="col-sm-6">
-        <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
-                <?php
-                if ($device_model->disable_notify) {
-                    echo 'checked=checked';
-                }
-                ?> />
-      </div>
+        <label for="disable_notify" class="col-sm-2 control-label">Disable alerting</label>
+            <div class="col-sm-6">
+                <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
+                    <?php
+                    if ($device_model->disable_notify) {
+                        echo 'checked=checked';
+                    }
+                    ?> />
+        </div>
     </div>
     <div class="form-group">
         <label for="disable_alert_transport" class="col-sm-2 control-label"
@@ -323,7 +321,7 @@ if they are enabled at the corresponding alert rule.">Disable alert transports</
 However, ignore tag can be read in alert rules.
 If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore alert tag is on, the alert rule won't match.">Ignore alert tag</label>
         <div class="col-sm-6">
-           <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
+            <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore) {
                     echo 'checked=checked';
@@ -334,7 +332,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
     <div class="form-group">
         <label for="ignore_status" class="col-sm-2 control-label" title="Tag device to ignore Status. It will always be shown as online.">Ignore Device Status</label>
         <div class="col-sm-6">
-           <input name="ignore_status" type="checkbox" id="ignore_status" value="1" data-size="small"
+            <input name="ignore_status" type="checkbox" id="ignore_status" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore_status) {
                     echo 'checked=checked';
