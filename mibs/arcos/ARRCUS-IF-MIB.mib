@@ -1,0 +1,97 @@
+-- ARRCUS Enterprise MIB for Interface Information
+ARRCUS-IF-MIB DEFINITIONS ::= BEGIN
+IMPORTS  MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+;
+aRRCUS-IF-MIB MODULE-IDENTITY
+    LAST-UPDATED "202007270000Z"
+    ORGANIZATION "@ARRCUS"
+    CONTACT-INFO "@arrcus.com"
+    DESCRIPTION "This module defines the model for viewing Arrcus specific interface information"
+    REVISION "202007270000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { 1 3 6 1 4 1 51604 3 4 }
+
+InterfaceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface or
+            interface sub-layer in the managed system.  It is
+            recommended that values are assigned contiguously starting
+            from 1.  The value for each interface sub-layer must remain
+            constant at least from one re-initialization of the entity's
+            network management system to the next re-initialization."
+    SYNTAX       Integer32 (1..2147483647)
+
+interfaces   OBJECT IDENTIFIER ::= { aRRCUS-IF-MIB 1 }
+
+ifNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of network interfaces (regardless of their
+            current state) present on this system."
+    ::= { interfaces 1 }
+
+-- the Interfaces table
+
+-- The Interfaces table contains information on the entity's
+
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+ifTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of ifNumber."
+    ::= { interfaces 2 }
+
+ifEntry OBJECT-TYPE
+    SYNTAX      IfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."
+    INDEX   { ifIndex }
+    ::= { ifTable 1 }
+
+IfEntry ::=
+    SEQUENCE {
+        ifIndex                   InterfaceIndex,
+        ifCarrierTransitionCount  Counter64
+    }
+
+ifIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { ifEntry 1 }
+
+ifCarrierTransitionCount OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of times the interface state has transitioned between up and
+            down since the time the device restarted or the last-clear time,
+            whichever is most recent."
+    ::= { ifEntry 2 }
+
+END

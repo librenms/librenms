@@ -1,0 +1,118 @@
+OPENCONFIG-ACL DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+;
+
+oPENCONFIG-ACL MODULE-IDENTITY
+    LAST-UPDATED "201705260000Z"
+    ORGANIZATION "@ARRCUS"
+    CONTACT-INFO "@arrcus.com"
+    DESCRIPTION "This module defines configuration and operational state
+data for network access control lists (i.e., filters, rules,
+etc.).  ACLs are organized into ACL sets, with each set
+containing one or more ACL entries.  ACL sets are identified
+by a unique name, while each entry within a set is assigned
+a sequence-id that determines the order in which the ACL
+rules are applied to a packet.
+
+Individual ACL rules specify match criteria based on fields in
+the packet, along with an action that defines how matching
+packets should be handled. Entries have a type that indicates
+the type of match criteria, e.g., MAC layer, IPv4, IPv6, etc."
+    REVISION "201705260000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { 1 3 6 1 4 1 51604 3 2 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+Ipv4Prefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION "confd:ipv4Prefix"
+    SYNTAX      OCTET STRING (SIZE (5))
+
+Ipv6Prefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x/1d"
+    STATUS      current
+    DESCRIPTION "confd:ipv6Prefix"
+    SYNTAX      OCTET STRING (SIZE (17))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+-- Access Control Lists (ACL)
+-- tagpath /acl
+acl OBJECT IDENTIFIER ::= { oPENCONFIG-ACL 1 }
+
+-- Access list entries variables enclosing container
+-- tagpath /acl/acl-sets
+aclAcl-sets OBJECT IDENTIFIER ::= { acl 1 }
+
+-- tagpath /acl/acl-sets/acl-set
+aclAcl-setsAcl-setTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclAcl-setsAcl-setEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An ACL set comprised of ACL entries, indexed by name and type"
+    ::= { aclAcl-sets 1 }
+
+-- tagpath /acl/acl-sets/acl-set
+aclAcl-setsAcl-setEntry OBJECT-TYPE
+    SYNTAX      AclAcl-setsAcl-setEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { aclAcl-setsAcl-setName, aclAcl-setsAcl-setType }
+        ::= { aclAcl-setsAcl-setTable 1 }
+
+AclAcl-setsAcl-setEntry ::=
+    SEQUENCE {
+        aclAcl-setsAcl-setName DisplayString,
+        aclAcl-setsAcl-setType DisplayString,
+        aclAcl-setsAcl-setDescription DisplayString
+    }
+
+-- tagpath /acl/acl-sets/acl-set/name
+aclAcl-setsAcl-setName OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The name of the access-list set"
+    ::= { aclAcl-setsAcl-setEntry 1 }
+
+-- tagpath /acl/acl-sets/acl-set/type
+aclAcl-setsAcl-setType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of the acl-set: ACL_IPV4, ACL_IPV6 or ACL_L2"
+    ::= { aclAcl-setsAcl-setEntry 2 }
+
+-- tagpath /acl/acl-sets/acl-set/config/description
+aclAcl-setsAcl-setDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Description, or comment, for the ACL set"
+    ::= { aclAcl-setsAcl-setEntry 3 }
+
+END
