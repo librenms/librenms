@@ -66,7 +66,7 @@ if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device
 }
 
 Log::info('IPV6-MIB::ipv6RouteTable');
-$oids = SnmpQuery::hideMib()->walk('IPV6-MIB::ipv6RouteTable')->table(3) ?? [];
+$oids = SnmpQuery::hideMib()->walk('IPV6-MIB::ipv6RouteTable')->table(3);
 
 foreach ($oids as $dst => $tdata) {
     if ($dst == 'fe80:0:0:0:0:0:0:0') { // routeros v7.18.2
