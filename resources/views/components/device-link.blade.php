@@ -1,10 +1,10 @@
 <x-popup>
-    <a class="tw:font-bold @if($status=='disabled') tw:text-gray-400 tw:visited:text-gray-400 @elseif($status=='down') tw:text-red-600 tw:visited:text-red-600 @else tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100 @endif" href="{{ route('device', ['device' => $device->device_id ?? 1, 'tab' => $tab, 'section' => $section]) }}">
+    <a class="tw:font-bold @if($status=='disabled') tw:text-gray-400 tw:visited:text-gray-400 @elseif($status=='down') tw:text-red-600 tw:visited:text-red-600 @else tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100 @endif" :$href>
         {{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
     </a>
     <x-slot name="title">
         <span class="tw:text-nowrap tw:pr-1">
-            <span class="tw:text-xl tw:font-bold">{{ $device->displayName() }}</span>
+            <a :$href class="tw:text-xl tw:font-bold">{{ $device->displayName() }}</a>
             {{ $device->hardware }}
         </span>
         <span class="tw:text-nowrap tw:pl-2 tw:pr-1">
