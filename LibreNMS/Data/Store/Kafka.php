@@ -39,9 +39,7 @@ class Kafka extends BaseDatastore
 
     public function __destruct()
     {
-        if ($this->isShuttingDown) {
-            $this->safeFlush();
-        }
+        $this->safeFlush();
         // Clear reference
         $this->client = null;
     }
@@ -62,25 +60,31 @@ class Kafka extends BaseDatastore
         // Set the log callback for logs
         $conf->setLogCb(
             function (Producer $producer, int $level, string $facility, string $message): void {
-                switch ($level) {
-                    case LOG_CRIT:
-                        Log::critical($message);
-                        break;
-                    case LOG_ERR:
-                        Log::warning($message);
-                        break;
-                    case LOG_WARNING:
-                        Log::warning($message);
-                        break;
-                    case LOG_NOTICE:
-                        Log::notice($message);
-                        break;
-                    case LOG_INFO:
-                        Log::info($message);
-                        break;
-                    default:
-                        Log::debug($message);
-                        break;
+                // During shutdown we can't reliably use Laravel's Log facade
+                if (function_exists('app') && app()->has('log')) {
+                    switch ($level) {
+                        case LOG_CRIT:
+                            Log::critical($message);
+                            break;
+                        case LOG_ERR:
+                            Log::warning($message);
+                            break;
+                        case LOG_WARNING:
+                            Log::warning($message);
+                            break;
+                        case LOG_NOTICE:
+                            Log::notice($message);
+                            break;
+                        case LOG_INFO:
+                            Log::info($message);
+                            break;
+                        default:
+                            Log::debug($message);
+                            break;
+                    }
+                } else {
+                    // Fallback to d_echo during shutdown
+                    d_echo("KAFKA: $message");
                 }
             }
         );
@@ -146,9 +150,9 @@ class Kafka extends BaseDatastore
             $outQLen = $this->client->getOutQLen();
 
             if ($outQLen > 0) {
-                // During shutdown, Log facades might not work properly, use error_log as fallback
+                // During shutdown, Log facades might not work properly, use d_echo as fallback
                 if ($this->isShuttingDown) {
-                    error_log("KAFKA: Flushing {$outQLen} remaining messages");
+                    d_echo("KAFKA: Flushing {$outQLen} remaining messages");
                 } else {
                     Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
                 }
@@ -180,7 +184,7 @@ class Kafka extends BaseDatastore
         } catch (\Throwable $e) {
             $error_msg = 'KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
             if ($this->isShuttingDown) {
-                error_log($error_msg);
+                d_echo($error_msg);
             } else {
                 Log::error($error_msg);
             }
