@@ -140,20 +140,43 @@ class Kafka extends BaseDatastore
             $outQLen = $this->client->getOutQLen();
 
             if ($outQLen > 0) {
-                Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
+                // During shutdown, Log facades might not work properly, use error_log as fallback
+                if ($this->isShuttingDown) {
+                    error_log("KAFKA: Flushing {$outQLen} remaining messages");
+                } else {
+                    Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
+                }
+                
                 $result = $this->client->flush(self::getKafkaFlushTimeout());
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-                    Log::error('KAFKA: Flush failed', [
-                        'error' => Library::rd_kafka_err2str($result),
-                        'code' => $result,
-                        'device_id' => $this->device_id,
-                        'remaining' => $this->client->getOutQLen(),
-                    ]);
+                    $error_msg = sprintf(
+                        'KAFKA: Flush failed. Error: %s, Code: %d, Device ID: %d, Remaining: %d',
+                        Library::rd_kafka_err2str($result),
+                        $result,
+                        $this->device_id,
+                        $this->client->getOutQLen()
+                    );
+                    
+                    if ($this->isShuttingDown) {
+                        error_log($error_msg);
+                    } else {
+                        Log::error('KAFKA: Flush failed', [
+                            'error' => Library::rd_kafka_err2str($result),
+                            'code' => $result,
+                            'device_id' => $this->device_id,
+                            'remaining' => $this->client->getOutQLen(),
+                        ]);
+                    }
                 }
             }
         } catch (\Throwable $e) {
-            Log::error('KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString());
+            $error_msg = 'KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
+            if ($this->isShuttingDown) {
+                error_log($error_msg);
+            } else {
+                Log::error($error_msg);
+            }
         }
     }
 
