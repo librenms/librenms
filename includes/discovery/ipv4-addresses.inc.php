@@ -24,11 +24,10 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         include Config::get('install_dir') . "/includes/discovery/ipv4-addresses/{$device['os']}.inc.php";
     } else {
         unset($valid_v4);
-        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAdEntIfIndex')->table(1);
-        foreach ($oids as $ipv4_address => $indexArray) {
-            $ifIndex = intval($indexArray['ipAdEntIfIndex']);
-            $mask = SnmpQuery::get('IP-MIB::ipAdEntNetMask.' . $ipv4_address)->value();
-            discover_process_ipv4($valid_v4, $device, $ifIndex, $ipv4_address, $mask, $context_name);
+        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAddrTable')->table(1);
+        foreach ($oids as $normalAdressEntry => $data) {
+            $address = $data['ipAdEntAddr'] ?? $normalAdressEntry; //fix broken MIB index
+            discover_process_ipv4($valid_v4, $device, $data['ipAdEntIfIndex'], $address, $data['ipAdEntNetMask'], $context_name);
         }
     } // if [custom / standard]
 
