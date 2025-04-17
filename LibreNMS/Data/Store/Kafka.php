@@ -17,12 +17,18 @@ class Kafka extends BaseDatastore
     private $client = null;
     private $device_id = 0;
     private $isShuttingDown = false;
+    private static $kafkaFlushTimeout = null;
 
     public function __construct(Producer $client)
     {
         parent::__construct();
 
         $this->client = $client;
+
+        // Cache the flush timeout value early to avoid Config during shutdown
+        if (self::$kafkaFlushTimeout === null) {
+            self::$kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
+        }
 
         // Register shutdown function
         register_shutdown_function(function () {
@@ -147,7 +153,8 @@ class Kafka extends BaseDatastore
                     Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
                 }
 
-                $result = $this->client->flush(self::getKafkaFlushTimeout());
+                // Use cached timeout value to avoid Config during shutdown
+                $result = $this->client->flush(self::$kafkaFlushTimeout);
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
                     $error_msg = sprintf(
@@ -192,7 +199,11 @@ class Kafka extends BaseDatastore
 
     public static function getKafkaFlushTimeout()
     {
-        return Config::get('kafka.flush.timeout', 50);
+        if (self::$kafkaFlushTimeout === null) {
+            self::$kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
+        }
+
+        return self::$kafkaFlushTimeout;
     }
 
     /**
