@@ -31,7 +31,12 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'Reallocated_Event_Count',
+        'descr' => 'Reall Evnt Cnt',
+        'ds' => 'id196',
+    ];
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => 'Crnt Pnd Sct Cnt',
         'ds' => 'id197',
     ];
     $rrd_list[] = [
