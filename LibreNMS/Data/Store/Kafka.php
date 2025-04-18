@@ -26,7 +26,7 @@ class Kafka extends BaseDatastore
         $this->client = $client;
 
         // Cache the flush timeout value early to avoid Config during shutdown
-        if (self::$kafkaFlushTimeout === null) {
+        if (self::$kafkaFlushTimeout == null) {
             self::$kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
         }
 
@@ -53,39 +53,14 @@ class Kafka extends BaseDatastore
         $conf->setDrMsgCb(
             function (Producer $producer, Message $message): void {
                 if ($message->err !== RD_KAFKA_RESP_ERR_NO_ERROR) {
-                    Log::error($message->errstr());
+                    d_echo($message->errstr());
                 }
             }
         );
         // Set the log callback for logs
         $conf->setLogCb(
             function (Producer $producer, int $level, string $facility, string $message): void {
-                // During shutdown we can't reliably use Laravel's Log facade
-                if (function_exists('app') && app()->has('log')) {
-                    switch ($level) {
-                        case LOG_CRIT:
-                            Log::critical($message);
-                            break;
-                        case LOG_ERR:
-                            Log::warning($message);
-                            break;
-                        case LOG_WARNING:
-                            Log::warning($message);
-                            break;
-                        case LOG_NOTICE:
-                            Log::notice($message);
-                            break;
-                        case LOG_INFO:
-                            Log::info($message);
-                            break;
-                        default:
-                            Log::debug($message);
-                            break;
-                    }
-                } else {
-                    // Fallback to d_echo during shutdown
-                    d_echo("KAFKA: $message");
-                }
+                d_echo("KAFKA: $message");
             }
         );
 
@@ -141,7 +116,7 @@ class Kafka extends BaseDatastore
     public function safeFlush()
     {
         // check if client instance exists
-        if (! $this->client) {
+        if ($this->client === null) {
             return;
         }
 
@@ -151,11 +126,7 @@ class Kafka extends BaseDatastore
 
             if ($outQLen > 0) {
                 // During shutdown, Log facades might not work properly, use d_echo as fallback
-                if ($this->isShuttingDown) {
-                    d_echo("KAFKA: Flushing {$outQLen} remaining messages");
-                } else {
-                    Log::debug("KAFKA: Flushing {$outQLen} remaining messages");
-                }
+                d_echo("KAFKA: Flushing {$outQLen} remaining messages");
 
                 // Use cached timeout value to avoid Config during shutdown
                 $result = $this->client->flush(self::$kafkaFlushTimeout);
@@ -169,25 +140,12 @@ class Kafka extends BaseDatastore
                         $this->client->getOutQLen()
                     );
 
-                    if ($this->isShuttingDown) {
-                        d_echo($error_msg);
-                    } else {
-                        Log::error('KAFKA: Flush failed', [
-                            'error' => Library::rd_kafka_err2str($result),
-                            'code' => $result,
-                            'device_id' => $this->device_id,
-                            'remaining' => $this->client->getOutQLen(),
-                        ]);
-                    }
+                    d_echo($error_msg);
                 }
             }
         } catch (\Throwable $e) {
             $error_msg = 'KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
-            if ($this->isShuttingDown) {
-                d_echo($error_msg);
-            } else {
-                Log::error($error_msg);
-            }
+            d_echo($error_msg);
         }
     }
 
