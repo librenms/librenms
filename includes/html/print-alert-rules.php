@@ -132,13 +132,16 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $device_rules = 'SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)';
     $param[] = $device['device_id'];
 
-    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
+    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.invert_map AND ar3.id NOT IN (SELECT agm3.rule_id FROM alert_group_map AS agm3  LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
+    $param[] = $device['device_id'];
+
+    $device_group_rules_invert = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE NOT ar3.invert_map AND ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
     $param[] = $device['device_id'];
 
     $device_location_rules = 'SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)';
     $param[] = $device['device_id'];
 
-    $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_location_rules . ')';
+    $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_group_rules_invert . ') UNION DISTINCT (' . $device_location_rules . ')';
 } else {
     // no device selected
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
