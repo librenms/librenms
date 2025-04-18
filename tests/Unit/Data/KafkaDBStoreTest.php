@@ -8,11 +8,27 @@ use LibreNMS\Tests\TestCase;
 
 class KafkaDBStoreTest extends TestCase
 {
+    private ?\RdKafka\Test\MockCluster $cluster = null;
+
+    private function createMockCluster() : \RdKafka\Test\MockCluster
+    {
+        $clusterConf = new \RdKafka\Conf();
+        $clusterConf->setLogCb(null);
+
+        $numberOfBrokers = 1;
+        $cluster = \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
+
+        return $cluster;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->cluster = $this->createMockCluster();
+
         Config::set('kafka.enable', true);
+        Config::set('kafka.broker.list', $this->cluster->getBootstraps());
         Config::set('kafka.idempotence', false);
         Config::set('kafka.buffer.max.message', 10);
         Config::set('kafka.batch.max.message', 25);
@@ -35,5 +51,12 @@ class KafkaDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $kafka->put($device, $measurement, $tags, $fields);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cluster = null;
+        Config::set('kafka.enable', false);
+        parent::tearDown();
     }
 }
