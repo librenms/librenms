@@ -16,8 +16,7 @@ class Kafka extends BaseDatastore
 {
     private $client = null;
     private $device_id = 0;
-    private $isShuttingDown = false;
-    private static $kafkaFlushTimeout = null;
+    private $kafkaFlushTimeout = 50;
 
     public function __construct(Producer $client)
     {
@@ -26,13 +25,12 @@ class Kafka extends BaseDatastore
         $this->client = $client;
 
         // Cache the flush timeout value early to avoid Config during shutdown
-        if (self::$kafkaFlushTimeout == null) {
-            self::$kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
+        if ($this->kafkaFlushTimeout == null) {
+            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
         }
 
         // Register shutdown function
         register_shutdown_function(function () {
-            $this->isShuttingDown = true;
             $this->safeFlush();
         });
     }
@@ -53,14 +51,14 @@ class Kafka extends BaseDatastore
         $conf->setDrMsgCb(
             function (Producer $producer, Message $message): void {
                 if ($message->err !== RD_KAFKA_RESP_ERR_NO_ERROR) {
-                    d_echo($message->errstr());
+                    error_log($message->errstr());
                 }
             }
         );
         // Set the log callback for logs
         $conf->setLogCb(
             function (Producer $producer, int $level, string $facility, string $message): void {
-                d_echo("KAFKA: $message");
+                error_log("KAFKA: $message");
             }
         );
 
@@ -126,10 +124,10 @@ class Kafka extends BaseDatastore
 
             if ($outQLen > 0) {
                 // During shutdown, Log facades might not work properly, use d_echo as fallback
-                d_echo("KAFKA: Flushing {$outQLen} remaining messages");
+                error_log("KAFKA: Flushing {$outQLen} remaining messages");
 
                 // Use cached timeout value to avoid Config during shutdown
-                $result = $this->client->flush(self::$kafkaFlushTimeout);
+                $result = $this->client->flush($this->kafkaFlushTimeout);
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
                     $error_msg = sprintf(
@@ -140,12 +138,12 @@ class Kafka extends BaseDatastore
                         $this->client->getOutQLen()
                     );
 
-                    d_echo($error_msg);
+                    error_log($error_msg);
                 }
             }
         } catch (\Throwable $e) {
             $error_msg = 'KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
-            d_echo($error_msg);
+            error_log($error_msg);
         }
     }
 
@@ -159,13 +157,9 @@ class Kafka extends BaseDatastore
         return Config::get('kafka.enable', false);
     }
 
-    public static function getKafkaFlushTimeout()
+    public function getKafkaFlushTimeout()
     {
-        if (self::$kafkaFlushTimeout === null) {
-            self::$kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
-        }
-
-        return self::$kafkaFlushTimeout;
+        return $this->kafkaFlushTimeout;
     }
 
     /**
