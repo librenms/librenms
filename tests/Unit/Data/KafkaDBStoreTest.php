@@ -10,7 +10,7 @@ class KafkaDBStoreTest extends TestCase
 {
     private ?\RdKafka\Test\MockCluster $cluster = null;
 
-    private function createMockCluster() : \RdKafka\Test\MockCluster
+    private function createMockCluster(): \RdKafka\Test\MockCluster
     {
         $clusterConf = new \RdKafka\Conf();
         $clusterConf->setLogCb(null);
