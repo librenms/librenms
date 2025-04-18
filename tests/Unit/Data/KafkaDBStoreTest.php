@@ -15,7 +15,7 @@ class KafkaDBStoreTest extends TestCase
         $clusterConf = new \RdKafka\Conf();
         $clusterConf->setLogCb(
             function (\RdKafka\Producer $producer, int $level, string $facility, string $message): void {
-                error_log("KAFKA: " . $message);
+                error_log('KAFKA: ' . $message);
             }
         );
 

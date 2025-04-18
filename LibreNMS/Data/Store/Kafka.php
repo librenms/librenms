@@ -58,7 +58,7 @@ class Kafka extends BaseDatastore
         // Set the log callback for logs
         $conf->setLogCb(
             function (Producer $producer, int $level, string $facility, string $message): void {
-                error_log("KAFKA: " . $message);
+                error_log('KAFKA: ' . $message);
             }
         );
 
