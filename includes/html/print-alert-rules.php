@@ -85,7 +85,6 @@ require_once 'includes/html/modal/edit_alert_transport.inc.php';
 
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
-
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
 } else {
