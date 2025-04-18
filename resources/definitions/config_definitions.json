@@ -1859,6 +1859,20 @@
             "order": 2,
             "type": "integer"
         },
+        "distributed_poller_metricsendpoint": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 4,
+            "type": "boolean"
+        },
+        "distributed_poller_metricsendpoint_port": {
+            "default": 8080,
+            "group": "poller",
+            "section": "distributed",
+            "order": 5,
+            "type": "integer"
+        },
         "graphing.availability": {
             "group": "poller",
             "section": "availability",

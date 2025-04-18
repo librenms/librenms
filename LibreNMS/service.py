@@ -107,6 +107,9 @@ class ServiceConfig(DBConfig):
     watchdog_logfile = "logs/librenms.log"
     health_file = ""  # disabled by default
 
+    metricsendpoint = False
+    metricsendpoint_port = 8080
+
     def populate(self):
         config = LibreNMS.get_config_data(self.BASE_DIR)
 
@@ -279,6 +282,13 @@ class ServiceConfig(DBConfig):
         self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
         self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
         self.health_file = config.get("service_health_file", ServiceConfig.health_file)
+
+        self.metricsendpoint = config.get(
+            "distributed_poller_metricsendpoint", ServiceConfig.metricsendpoint
+        )
+        self.metricsendpoint = config.get(
+            "distributed_poller_metricsendpoint_port", ServiceConfig.metricsendpoint_port
+        )
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -539,11 +549,13 @@ class Service:
             logger.warning("Maintenance tasks are disabled.")
 
         # check some config variable here...
-        if True:
+        if self.config.metricsendpoint:
             try:
                 from prometheus_client import start_http_server, Gauge
-                # Start the HTTP server to expose metrics on port 8000
-                start_http_server(8000)
+                start_http_server(self.config.metricsendpoint_port)
+                logger.info(
+                    "Prometheus metrics available on http://localhost:{}/metrics".format(self.config.metricsendpoint_port)
+                )
 
                 # Initialize the dictionary to hold our metrics
                 prom_metrics = {}
