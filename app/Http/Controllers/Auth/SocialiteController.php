@@ -167,11 +167,26 @@ class SocialiteController extends Controller
             $roles = [];
             $attributes = $this->socialite_user->getRaw();
 
+            if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
+                $parsed_attributes = [];
+                foreach ($attributes as $attribute_object) {
+                    $attribute_name = $attribute_object->getName();
+                    $attribute_values = $attribute_object->getAllAttributeValues();
+                    $parsed_attributes[$attribute_name] = $attribute_values;
+                }
+                $attributes = $parsed_attributes;
+            }
+
             foreach ($scopes as $scope) {
-                foreach (Arr::wrap($attributes[$scope] ?? []) as $scope_data) {
-                    $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+                foreach ($attributes as $attribute_name => $attribute_values){
+                    if (strpos($attribute_name, $scope) !== false){
+                        foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
+                            $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+                        }
+                    }
                 }
             }
+
             if (count($roles) > 0) {
                 $user->syncRoles(array_unique($roles));
 
