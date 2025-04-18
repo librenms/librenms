@@ -59,6 +59,7 @@ return [
             'distributed' => ['name' => 'Distributed Poller'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
+            'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
