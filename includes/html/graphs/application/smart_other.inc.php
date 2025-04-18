@@ -3,8 +3,8 @@
 $name = 'smart';
 $unit_text = '';
 $unitlen = 10;
-$bigdescrlen = 25;
-$smalldescrlen = 25;
+$bigdescrlen = 18;
+$smalldescrlen = 18;
 $colours = 'mega';
 $dostack = 0;
 $printtotal = 0;
@@ -16,17 +16,17 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $var
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'Spin_Retry_Count',
+        'descr' => 'Spin Retry Count',
         'ds' => 'id10',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'Runtime_Bad_Block',
+        'descr' => 'Runtime Bad Block',
         'ds' => 'id183',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'End-to-End_Error',
+        'descr' => 'End-to-End Error',
         'ds' => 'id184',
     ];
     $rrd_list[] = [
@@ -41,7 +41,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'UDMA_CRC_Error_Count',
+        'descr' => 'UDMA CRC Err Count',
         'ds' => 'id199',
     ];
 }
