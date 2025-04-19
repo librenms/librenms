@@ -119,7 +119,6 @@ trait YamlOSDiscovery
                 $location = $location_temp;
             }
         }
-        
         return new Location([
             'location' => StringHelpers::inferEncoding($location),
             'lat' => $this->findFirst($data, $lat, $numeric),
