@@ -102,7 +102,6 @@ trait YamlOSDiscovery
 
         $location_temp = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
         if (!preg_match('/\[[0-9]+\.[0-9]+,[0-9]+\.[0-9]+\]/', $location_temp)){
-           //// lokacia s ciarkou ale bez zatvoriek
            if (preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp)){
               preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp,$comma);
               preg_match ('/^.*?(?=[0-9]+\.[0-9]+,[0-9]+\.[0-9]+)/', $location_temp,$text);
