@@ -100,26 +100,24 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml location data:', $data);
 
-        $location_temp = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
-        if (!preg_match('/\[[0-9]+\.[0-9]+,[0-9]+\.[0-9]+\]/', $location_temp)){
-           if (preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp)){
-              preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp,$comma);
-              preg_match ('/^.*?(?=[0-9]+\.[0-9]+,[0-9]+\.[0-9]+)/', $location_temp,$text);
-              $location = $text[0] . "[" . $comma[0] . "]";
-           }
-           if (preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp)){
-              preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp, $space);
-              if (strpos($space[0],',') === false) {
-                 $location_temp = str_replace(" ",",",$space[0]);
-              }
-              $location = "[" . $location_temp . "]";
-           }
-           if (!preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp) && !preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+$/', $location_temp )) {
-              $location = $location_temp;
-           }
-        }
-        else {
-           $location = $location_temp;
+        $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+        if (!preg_match('/\[[0-9]+\.[0-9]+,[0-9]+\.[0-9]+\]/', $location)){
+            $location_temp = $location;
+            if (preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp)){
+                preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+/', $location_temp,$comma);
+                preg_match ('/^.*?(?=[0-9]+\.[0-9]+,[0-9]+\.[0-9]+)/', $location_temp,$text);
+                $location = $text[0] . "[" . $comma[0] . "]";
+            }
+            if (preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp)){
+                preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp, $space);
+                if (strpos($space[0],',') === false) {
+                    $location_temp = str_replace(" ",",",$space[0]);
+                }
+                $location = "[" . $location_temp . "]";
+            }
+            if (!preg_match ('/[0-9]+\.[0-9]+\s[0-9]+\.[0-9]+/', $location_temp) && !preg_match ('/[0-9]+\.[0-9]+,[0-9]+\.[0-9]+$/', $location_temp )) {
+                $location = $location_temp;
+            }
         }
         return new Location([
             'location' => StringHelpers::inferEncoding($location),
