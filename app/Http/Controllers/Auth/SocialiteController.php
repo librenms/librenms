@@ -178,8 +178,8 @@ class SocialiteController extends Controller
             }
 
             foreach ($scopes as $scope) {
-                foreach ($attributes as $attribute_name => $attribute_values){
-                    if (strpos($attribute_name, $scope) !== false){
+                foreach ($attributes as $attribute_name => $attribute_values) {
+                    if (strpos($attribute_name, $scope) !== false) {
                         foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
                             $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
                         }
