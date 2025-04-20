@@ -642,7 +642,7 @@ $link_array = [
 $apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 $proxmox = 0;
 foreach ($apps as $app) {
-    if ($proxmox > 0 && $app->app_type == "proxmox") {
+    if ($proxmox > 0 && $app->app_type == 'proxmox') {
         continue;
     }
     $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
@@ -662,7 +662,7 @@ foreach ($apps as $app) {
         echo '</span>';
     }
     $sep = ' | ';
-    if ($app->app_type == "proxmox") {
+    if ($app->app_type == 'proxmox') {
         $proxmox++;
     }
 }
