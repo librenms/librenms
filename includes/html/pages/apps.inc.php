@@ -640,7 +640,11 @@ $link_array = [
 ];
 
 $apps = LibreNMS\Util\ObjectCache::applications()->flatten();
+$proxmox = 0;
 foreach ($apps as $app) {
+    if ($proxmox > 0 && $app->app_type == "proxmox") {
+        continue;
+    }
     $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
@@ -658,6 +662,9 @@ foreach ($apps as $app) {
         echo '</span>';
     }
     $sep = ' | ';
+    if ($app->app_type == "proxmox") {
+        $proxmox++;
+    }
 }
 echo '</div>';
 echo '<div class="panel-body">';
