@@ -6,9 +6,8 @@ $graphs['proxmox'] = [
 ];
 
 $pmxcl = dbFetchRows('SELECT DISTINCT(`app_instance`) FROM `applications` WHERE `app_type` = ?', ['proxmox']);
-$default_instance = !empty($pmxcl) ? $pmxcl[0]['app_instance'] : null;
+$default_instance = ! empty($pmxcl) ? $pmxcl[0]['app_instance'] : null;
 $instance = $vars['instance'] ?? $default_instance;
-
 
 print_optionbar_start();
 
