@@ -286,7 +286,7 @@ class ServiceConfig(DBConfig):
         self.metricsendpoint = config.get(
             "distributed_poller_metricsendpoint", ServiceConfig.metricsendpoint
         )
-        self.metricsendpoint = config.get(
+        self.metricsendpoint_port = config.get(
             "distributed_poller_metricsendpoint_port",
             ServiceConfig.metricsendpoint_port,
         )
