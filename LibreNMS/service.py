@@ -550,13 +550,13 @@ class Service:
             logger.warning("Maintenance tasks are disabled.")
 
         if self.config.metricsendpoint:
-            logger.debug( 'Prometheus metrics init')
+            logger.debug("Prometheus metrics init")
             try:
                 from prometheus_client import Gauge, MetricsHandler
 
                 class ServiceMetricsHandler(MetricsHandler):
                     def do_GET(self):
-                        if self.path in ['/health', '/healthz']:
+                        if self.path in ["/health", "/healthz"]:
                             # potentially in the future we could do some checks based on watchdog flags
                             # ie. lnms health:check
                             self.send_response(200)
@@ -568,9 +568,12 @@ class Service:
                             super().do_GET()
 
                 from http.server import HTTPServer
-                httpd = HTTPServer(('', self.config.metricsendpoint_port), ServiceMetricsHandler)
+
+                httpd = HTTPServer(
+                    ("", self.config.metricsendpoint_port), ServiceMetricsHandler
+                )
                 thread = threading.Thread(target=httpd.serve_forever)
-                thread.daemon = True  
+                thread.daemon = True
                 thread.start()
 
                 logger.info(
@@ -1060,4 +1063,3 @@ class Service:
     def exit(self, code=0):
         sys.stdout.flush()
         sys.exit(code)
-
