@@ -549,7 +549,6 @@ class Service:
         else:
             logger.warning("Maintenance tasks are disabled.")
 
-        # check some config variable here...
         if self.config.metricsendpoint:
             logger.debug( 'Prometheus metrics init')
             try:
@@ -565,7 +564,7 @@ class Service:
                             self.end_headers()
                             self.wfile.write(b"OK")
                         else:
-                            # Delegate to the default /metrics handling
+                            # default /metrics handling
                             super().do_GET()
 
                 from http.server import HTTPServer
