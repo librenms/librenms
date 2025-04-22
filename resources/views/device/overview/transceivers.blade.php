@@ -21,7 +21,7 @@
                                 <td>
                                     <div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
                                         <div>{{ $sensor->sensor_descr }}</div>
-                                        <div><x-graph loading="lazy" popup="true" :popup-title="DeviceCache::getPrimary()->displayName() . ' - ' . $sensor->sensor_descr" type="sensor_{{ $sensor->sensor_class }}" width="100" height="24" :vars="['id' => $sensor->sensor_id]"></x-graph></div>
+                                        <div><x-graph :vars="['id' => $sensor->sensor_id]" :type="'sensor_' . $sensor->sensor_class" :width="100" :height="24" :popup-title="DeviceCache::getPrimary()->displayName() . ' - ' . $sensor->sensor_descr" :device="'540'"></x-graph-popup></div>
                                         <div><x-label :status="$sensor->currentStatus()">{{ $sensor->formatValue() }}</x-label></div>
                                     </div>
                                 </td>
