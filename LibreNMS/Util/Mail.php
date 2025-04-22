@@ -119,12 +119,12 @@ class Mail
                     $mail->Password = Config::get('email_smtp_password');
                     $mail->SMTPAutoTLS = Config::get('email_auto_tls');
                     $mail->SMTPDebug = 0;
-                    $mail->SMTPOptions = array(
-                        'ssl' => array(
-                            'verify_peer' => Config::get('email_smtp_verifypeer'),
-                            'allow_self_signed' => Config::get('email_smtp_allowselfsigned')
-                        )
-                    );
+                    $mail->SMTPOptions = [
+                        'ssl' => [
+                            'verify_peer' => Config::get('email_smtp_verifypeer', true),
+                            'allow_self_signed' => Config::get('email_smtp_allowselfsigned', false),
+                        ],
+                    ];
                     break;
                 default:
                     $mail->Mailer = 'mail';
