@@ -123,9 +123,11 @@ class Location extends Model
         foreach ($this->location_regexes as $regex) {
             if (preg_match($regex, $this->location, $parsed)) {
                 $this->fill($parsed);
+
                 return true;
             }
         }
+
         return false;
     }
 
