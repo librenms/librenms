@@ -278,7 +278,7 @@ if ($format == 'graph') {
     $state = isset($vars['state']) ? $vars['state'] : '';
     $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
         "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
-        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option><select>';
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option></select>';
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
