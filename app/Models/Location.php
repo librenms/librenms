@@ -45,7 +45,12 @@ class Location extends Model
     const UPDATED_AT = 'timestamp';
     protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
-    private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
+    private $location_regexes = [
+        // Format: [xx.xxx,xx.xxx]
+        '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{0,1},\s{0,1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/',
+        // Format: xx.xxx xx.xxx
+        '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
+    ];
     private $location_ignore_regex = '/\(.*?\)/';
 
     // ---- Helper Functions ----
@@ -109,18 +114,18 @@ class Location extends Model
      */
     public function display($withCoords = false)
     {
-        return (trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location)
+        return (trim(preg_replace($this->location_regexes, '', $this->location)) ?: $this->location)
             . ($withCoords && $this->coordinatesValid() ? " [$this->lat,$this->lng]" : '');
     }
 
     protected function parseCoordinates()
     {
-        if (preg_match($this->location_regex, $this->location, $parsed)) {
-            $this->fill($parsed);
-
-            return true;
+        foreach ($this->location_regexes as $regex) {
+            if (preg_match($regex, $this->location, $parsed)) {
+                $this->fill($parsed);
+                return true;
+            }
         }
-
         return false;
     }
 
