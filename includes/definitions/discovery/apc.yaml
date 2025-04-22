@@ -1339,6 +1339,5 @@ modules:
                     index: 'upsAdvBatteryRecommendedReplaceDate.{{ $index }}'
                     descr: 'Battery Recommended Days Remaining'
                     user_func: dateToRuntime
-                    low_warn_limit: 43200
-                        # 30 Days
+                    low_warn_limit: 43200  # 30 Days
                     low_limit: 0
