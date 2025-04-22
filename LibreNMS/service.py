@@ -551,10 +551,29 @@ class Service:
 
         # check some config variable here...
         if self.config.metricsendpoint:
+            logger.debug( 'Prometheus metrics init')
             try:
-                from prometheus_client import start_http_server, Gauge
+                from prometheus_client import Gauge, MetricsHandler
 
-                start_http_server(self.config.metricsendpoint_port)
+                class ServiceMetricsHandler(MetricsHandler):
+                    def do_GET(self):
+                        if self.path in ['/health', '/healthz']:
+                            # potentially in the future we could do some checks based on watchdog flags
+                            # ie. lnms health:check
+                            self.send_response(200)
+                            self.send_header("Content-type", "text/plain")
+                            self.end_headers()
+                            self.wfile.write(b"OK")
+                        else:
+                            # Delegate to the default /metrics handling
+                            super().do_GET()
+
+                from http.server import HTTPServer
+                httpd = HTTPServer(('', self.config.metricsendpoint_port), ServiceMetricsHandler)
+                thread = threading.Thread(target=httpd.serve_forever)
+                thread.daemon = True  
+                thread.start()
+
                 logger.info(
                     "Prometheus metrics available on http://localhost:{}/metrics".format(
                         self.config.metricsendpoint_port
@@ -1042,3 +1061,4 @@ class Service:
     def exit(self, code=0):
         sys.stdout.flush()
         sys.exit(code)
+
