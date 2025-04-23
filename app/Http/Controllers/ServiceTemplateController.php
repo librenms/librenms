@@ -62,8 +62,7 @@ class ServiceTemplateController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $this->validate(
-            $request, [
+        $request->validate([
                 'name' => 'required|string|unique:service_templates',
                 'groups' => 'array',
                 'groups.*' => 'integer',
@@ -78,8 +77,7 @@ class ServiceTemplateController extends Controller
                 'changed' => 'integer',
                 'disabled' => 'integer',
                 'ignore' => 'integer',
-            ]
-        );
+            ]);
 
         $template = ServiceTemplate::make(
             $request->only(
@@ -148,8 +146,7 @@ class ServiceTemplateController extends Controller
      */
     public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
     {
-        $this->validate(
-            $request, [
+        $request->validate([
                 'name' => [
                     'required',
                     'string',
@@ -172,8 +169,7 @@ class ServiceTemplateController extends Controller
                 'changed' => 'integer',
                 'disabled' => 'integer',
                 'ignore' => 'integer',
-            ]
-        );
+            ]);
 
         $template->fill(
             $request->only(

@@ -34,7 +34,7 @@ class WidgetSettingsController extends Controller
 {
     public function update(Request $request, UserWidget $widget): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'settings' => 'array',
             'settings.refresh' => 'int|min:1',
         ]);

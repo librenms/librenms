@@ -177,7 +177,7 @@ class DashboardController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'dashboard_name' => 'string|max:255',
         ]);
 
@@ -197,7 +197,7 @@ class DashboardController extends Controller
 
     public function update(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $validated = $this->validate($request, [
+        $validated = $request->validate([
             'dashboard_name' => 'string|max:255',
             'access' => 'int|in:0,1,2',
         ]);
@@ -224,7 +224,7 @@ class DashboardController extends Controller
 
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'target_user_id' => 'required|exists:App\Models\User,user_id',
         ]);
 

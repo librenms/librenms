@@ -33,7 +33,7 @@ class ResolutionController extends Controller
 {
     public function set(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'width' => 'required|numeric',
             'height' => 'required|numeric',
         ]);

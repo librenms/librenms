@@ -218,7 +218,7 @@ class CustomMapDataController extends Controller
     {
         $this->authorize('update', $map);
 
-        $data = $this->validate($request, [
+        $data = $request->validate([
             'newnodeconf' => 'array',
             'newedgeconf' => 'array',
             'nodes' => 'array',

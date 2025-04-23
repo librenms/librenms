@@ -32,7 +32,7 @@ class PluginSettingsController extends Controller
 
     public function update(Request $request, Plugin $plugin): \Illuminate\Http\RedirectResponse
     {
-        $plugin->fill($this->validate($request, [
+        $plugin->fill($request->validate([
             'plugin_active' => 'in:0,1',
             'settings' => 'array',
         ]));

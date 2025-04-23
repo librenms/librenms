@@ -51,7 +51,7 @@ class DeviceGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required|string|unique:device_groups',
             'type' => 'required|in:dynamic,static',
             'devices' => 'array|required_if:type,static',
@@ -112,7 +112,7 @@ class DeviceGroupController extends Controller
      */
     public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => [
                 'required',
                 'string',

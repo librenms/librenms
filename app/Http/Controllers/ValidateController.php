@@ -25,7 +25,7 @@ class ValidateController extends Controller
 
     public function runFixer(Request $request): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'fixer' => [
                 'starts_with:LibreNMS\Validations',
                 function ($attribute, $value, $fail) {
