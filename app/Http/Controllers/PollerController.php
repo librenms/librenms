@@ -74,7 +74,7 @@ class PollerController extends Controller
 
     protected function pollerStatus($poller, $last)
     {
-        $since_last_poll = Carbon::parse($last)->diffInSeconds();
+        $since_last_poll = (int) Carbon::parse($last)->diffInSeconds(null, true);
 
         $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
         $poller->long_not_polled = (\Auth::user()->hasGlobalAdmin() && ($since_last_poll > ($this->rrdstep * 2)));
