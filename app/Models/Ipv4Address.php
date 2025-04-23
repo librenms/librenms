@@ -43,6 +43,9 @@ class Ipv4Address extends PortRelatedModel
         'context_name',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ipv4Network, $this>
+     */
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv4Network::class, 'ipv4_network_id', 'ipv4_network_id');

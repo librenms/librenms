@@ -156,11 +156,6 @@ parameters:
 			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
-			message: "#^PHPDoc type array of property App\\\\Http\\\\Kernel\\:\\:\\$middlewarePriority is not covariant with PHPDoc type array\\<string\\> of overridden property Illuminate\\\\Foundation\\\\Http\\\\Kernel\\:\\:\\$middlewarePriority\\.$#"
-			count: 1
-			path: app/Http/Kernel.php
-
-		-
 			message: "#^Cannot access property \\$password on object\\|string\\.$#"
 			count: 1
 			path: app/Http/Requests/UpdateUserRequest.php
@@ -174,16 +169,6 @@ parameters:
 			message: "#^PHPDoc type array of property App\\\\Models\\\\UserPref\\:\\:\\$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$primaryKey\\.$#"
 			count: 1
 			path: app/Models/UserPref.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: app/Providers/CliServiceProvider.php
-
-		-
-			message: "#^Right side of && is always false\\.$#"
-			count: 1
-			path: app/Providers/CliServiceProvider.php
 
 		-
 			message: "#^Variable \\$username on left side of \\?\\? is never defined\\.$#"

@@ -292,7 +292,7 @@ return [
                 'not_detected' => 'Python包装器cron条目不存在',
             ],
             'CheckRedis' => [
-                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_DRIVER=redis',
+                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_STORE=redis',
                 'ok' => 'Redis功能正常',
                 'unavailable' => 'Redis不可用',
             ],

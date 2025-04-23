@@ -11736,7 +11736,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 47.84,
+                    "rtt": 47.841,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11746,7 +11746,7 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 22.84,
+                    "rtt": 22.843,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11756,7 +11756,7 @@
                     "owner": "test-twamp1",
                     "tag": "twamp",
                     "rtt_type": "twamp",
-                    "rtt": 27.01,
+                    "rtt": 27.008,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11770,7 +11770,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 51.32,
+                    "rtt": 51.324,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11780,7 +11780,7 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 24.56,
+                    "rtt": 24.562,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
