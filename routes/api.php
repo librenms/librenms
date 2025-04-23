@@ -133,8 +133,8 @@ Route::prefix('v0')->group(function () {
         Route::get('{hostname}/ports/{ifname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_by_port_hostname'])->name('get_graph_by_port_hostname');
         Route::get('{hostname}/services/{id}/graphs/{datasource}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_by_service'])->name('get_graph_by_service');
 
-	Route::get('{hostname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
-	Route::get('', [\App\Api\Controllers\LegacyApiController::class, 'get_all_devices'])->name('get_all_devices');
+        Route::get('{hostname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
+        Route::get('', [\App\Api\Controllers\LegacyApiController::class, 'get_all_devices'])->name('get_all_devices');
     });
 
     Route::prefix('ports')->group(function () {
