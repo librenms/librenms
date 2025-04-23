@@ -26,6 +26,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Dashboard;
 use App\Models\User;
@@ -37,7 +39,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
     /** @var string[] */
     public static $widgets = [
@@ -67,13 +69,15 @@ class DashboardController extends Controller
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('can:viewAny,App\Models\Dashboard')->only('index');
-        $this->middleware('can:view,dashboard')->only('show');
-        $this->middleware('can:create,App\Models\Dashboard')->only('create', 'store');
-        $this->middleware('can:update,dashboard')->only('edit', 'update');
-        $this->middleware('can:delete,dashboard')->only('destroy');
+        return [
+            new Middleware('can:viewAny,App\Models\Dashboard', only: ['index']),
+            new Middleware('can:view,dashboard', only: ['show']),
+            new Middleware('can:create,App\Models\Dashboard', only: ['create', 'store']),
+            new Middleware('can:update,dashboard', only: ['edit', 'update']),
+            new Middleware('can:delete,dashboard', only: ['destroy']),
+        ];
     }
 
     /**

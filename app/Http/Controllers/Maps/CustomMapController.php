@@ -26,6 +26,8 @@
 
 namespace App\Http\Controllers\Maps;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
@@ -38,15 +40,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 
-class CustomMapController extends Controller
+class CustomMapController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('can:viewAny,App\Models\CustomMap')->only('index');
-        $this->middleware('can:view,map')->only('show');
-        $this->middleware('can:create,App\Models\CustomMap')->only('create', 'store');
-        $this->middleware('can:update,map')->only('edit', 'update');
-        $this->middleware('can:delete,map')->only('destroy');
+        return [
+            new Middleware('can:viewAny,App\Models\CustomMap', only: ['index']),
+            new Middleware('can:view,map', only: ['show']),
+            new Middleware('can:create,App\Models\CustomMap', only: ['create', 'store']),
+            new Middleware('can:update,map', only: ['edit', 'update']),
+            new Middleware('can:delete,map', only: ['destroy']),
+        ];
     }
 
     public function index(): View
