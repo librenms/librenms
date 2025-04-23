@@ -15,7 +15,7 @@ class SensorObserver
 
     public function __construct(Application $app)
     {
-        $this->runningInConsole = $app->runningInConsole();
+        $this->runningInConsole = $app->runningInConsole() && ! $app->runningUnitTests();
     }
 
     public function saving(Sensor $sensor): void
