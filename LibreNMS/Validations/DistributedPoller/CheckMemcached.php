@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Config;
-use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
 
@@ -38,15 +38,15 @@ class CheckMemcached implements Validation
      */
     public function validate(): ValidationResult
     {
-        if (! LibreNMSConfig::get('distributed_poller_memcached_host')) {
+        if (! LibrenmsConfig::get('distributed_poller_memcached_host')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckMemcached.not_configured_host'), 'lnms config:set distributed_poller_memcached_host <hostname>');
         }
 
-        if (! LibreNMSConfig::get('distributed_poller_memcached_port')) {
+        if (! LibrenmsConfig::get('distributed_poller_memcached_port')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckMemcached.not_configured_port'), 'lnms config:set distributed_poller_memcached_port <port>');
         }
 
-        $connection = @fsockopen(LibreNMSConfig::get('distributed_poller_memcached_host'), LibreNMSConfig::get('distributed_poller_memcached_port'));
+        $connection = @fsockopen(LibrenmsConfig::get('distributed_poller_memcached_host'), LibrenmsConfig::get('distributed_poller_memcached_port'));
         if (! is_resource($connection)) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckMemcached.could_not_connect'));
         }
@@ -61,6 +61,6 @@ class CheckMemcached implements Validation
      */
     public function enabled(): bool
     {
-        return LibreNMSConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached';
+        return LibrenmsConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached';
     }
 }

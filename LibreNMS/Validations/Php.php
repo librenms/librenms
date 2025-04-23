@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Config;
-use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Validator;
 
 class Php extends BaseValidation
@@ -53,7 +53,7 @@ class Php extends BaseValidation
     private function checkVersion(Validator $validator)
     {
         // if update is not set to false and version is min or newer
-        if (LibreNMSConfig::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
+        if (LibrenmsConfig::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
             $validator->warn('PHP version ' . self::PHP_MIN_VERSION . ' is the minimum supported version as of ' . self::PHP_MIN_VERSION_DATE . '. We recommend you update PHP to a supported version (' . self::PHP_RECOMMENDED_VERSION . ' suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
         }
 
@@ -68,7 +68,7 @@ class Php extends BaseValidation
     {
         $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
-        if (LibreNMSConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached') {
+        if (LibrenmsConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached') {
             $required_modules[] = 'memcached';
         }
 
