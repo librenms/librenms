@@ -48,6 +48,9 @@ class StateTranslation extends Model implements Keyable
         return Severity::tryFrom((int) $this->state_generic_value) ?? Severity::Unknown;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\StateIndex, $this>
+     */
     public function stateIndex(): BelongsTo
     {
         return $this->belongsTo(StateIndex::class, 'state_index_id', 'state_index_id');
