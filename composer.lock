@@ -7267,6 +7267,18 @@
         },
         {
             "name": "symfony/http-client",
+<<<<<<< HEAD
+            "version": "v6.4.15",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-client.git",
+                "reference": "cb4073c905cd12b8496d24ac428a9228c1750670"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-client/zipball/cb4073c905cd12b8496d24ac428a9228c1750670",
+                "reference": "cb4073c905cd12b8496d24ac428a9228c1750670",
+=======
             "version": "v7.2.4",
             "source": {
                 "type": "git",
@@ -7277,6 +7289,7 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/http-client/zipball/78981a2ffef6437ed92d4d7e2a86a82f256c6dc6",
                 "reference": "78981a2ffef6437ed92d4d7e2a86a82f256c6dc6",
+>>>>>>> master
                 "shasum": ""
             },
             "require": {
@@ -7342,7 +7355,11 @@
                 "http"
             ],
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/http-client/tree/v6.4.15"
+=======
                 "source": "https://github.com/symfony/http-client/tree/v7.2.4"
+>>>>>>> master
             },
             "funding": [
                 {
@@ -7358,7 +7375,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-11-13T13:40:18+00:00"
+=======
             "time": "2025-02-13T10:27:23+00:00"
+>>>>>>> master
         },
         {
             "name": "symfony/http-client-contracts",
@@ -8484,6 +8505,9 @@
                 "reference": "2fb86d65e2d424369ad2905e83b236a8805ba491",
 >>>>>>> master
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 60cb000eda8ced7d7e297d4ab56c0af578197e5d
                 "shasum": ""
             },
             "require": {
@@ -8555,6 +8579,8 @@
         },
         {
             "name": "symfony/polyfill-php83",
+<<<<<<< HEAD
+=======
             "version": "v1.31.0",
             "source": {
                 "type": "git",
@@ -8725,6 +8751,7 @@
         },
         {
             "name": "symfony/polyfill-php83",
+>>>>>>> 60cb000eda8ced7d7e297d4ab56c0af578197e5d
             "version": "v1.30.0",
             "source": {
                 "type": "git",
@@ -8743,9 +8770,12 @@
             "type": "library",
             "extra": {
                 "thanks": {
+<<<<<<< HEAD
+=======
 =======
 >>>>>>> 31ef976996175de47b42d8b7b432d8fa732f7696
 >>>>>>> 2df3e9b7132c8ff978737a16b295fa01ce38d93b
+>>>>>>> 60cb000eda8ced7d7e297d4ab56c0af578197e5d
                     "name": "symfony/polyfill",
                     "url": "https://github.com/symfony/polyfill"
 =======
