@@ -23,7 +23,7 @@ class PushNotificationController extends Controller
 
     public function register(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'description' => 'string',
             'subscription.endpoint' => 'required|url',
             'subscription.keys.auth' => 'required|string',
@@ -45,7 +45,7 @@ class PushNotificationController extends Controller
 
     public function unregister(Request $request): void
     {
-        $this->validate($request, [
+        $request->validate([
             'endpoint' => 'required|url',
         ]);
 

@@ -10,7 +10,7 @@ class InventoryController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $this->validate($request, [
+        $request->validate([
             'device' => 'nullable|int',
             'descr' => 'nullable|string',
             'model' => 'nullable|string',

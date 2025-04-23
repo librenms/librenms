@@ -41,7 +41,7 @@ class TwoFactorController extends Controller
 {
     public function verifyTwoFactor(Request $request, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'twofactor' => 'required|numeric',
         ]);
 
@@ -104,7 +104,7 @@ class TwoFactorController extends Controller
      */
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'twofactor' => Rule::in('time', 'counter'),
         ]);
 

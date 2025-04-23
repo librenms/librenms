@@ -31,7 +31,7 @@ class PluginPageController extends Controller
 
     public function update(Request $request, Plugin $plugin): \Illuminate\Http\RedirectResponse
     {
-        $validated = $this->validate($request, [
+        $validated = $request->validate([
             'plugin_active' => 'in:0,1',
             'settings' => 'array',
         ]);

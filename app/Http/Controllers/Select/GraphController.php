@@ -45,7 +45,7 @@ class GraphController extends Controller
 
     public function __invoke(Request $request)
     {
-        $this->validate($request, $this->rules);
+        $request->validate($this->rules);
 
         $data = [];
         $search = $request->get('term');

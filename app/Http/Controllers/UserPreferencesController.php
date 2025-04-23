@@ -123,7 +123,7 @@ class UserPreferencesController extends Controller
             'global_search_ctrlf_focus' => 'required|integer',
         ];
 
-        $this->validate($request, [
+        $request->validate([
             'pref' => ['required', Rule::in(array_keys($valid_prefs))],
             'value' => $valid_prefs[$request->pref] ?? 'required|integer',
         ]);

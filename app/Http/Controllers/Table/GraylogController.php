@@ -54,7 +54,7 @@ class GraylogController extends SimpleTableController
             ], 503);
         }
 
-        $this->validate($request, [
+        $request->validate([
             'stream' => 'nullable|alpha_num',
             'device' => 'nullable|int',
             'range' => 'nullable|int',

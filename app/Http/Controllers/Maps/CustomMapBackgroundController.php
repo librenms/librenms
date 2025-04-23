@@ -64,7 +64,7 @@ class CustomMapBackgroundController extends Controller
     public function save(FormRequest $request, CustomMap $map)
     {
         $this->authorize('update', $map);
-        $this->validate($request, [
+        $request->validate([
             'type' => 'in:image,color,map,none',
             'image' => 'required_if:type,image|mimes:png,jpg,svg,gif',
             'color' => 'required_if:type,color|regex:/^#[0-9a-f]{6,8}$/',

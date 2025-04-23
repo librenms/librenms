@@ -69,7 +69,7 @@ class CustomMapNodeImageController extends Controller
     public function store(FormRequest $request): JsonResponse
     {
         $this->authorize('update');
-        $this->validate($request, [
+        $request->validate([
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
         ]);
@@ -95,7 +95,7 @@ class CustomMapNodeImageController extends Controller
     public function update(FormRequest $request, CustomMapNodeImage $image): JsonResponse
     {
         $this->authorize('update', $image);
-        $this->validate($request, [
+        $request->validate([
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
         ]);

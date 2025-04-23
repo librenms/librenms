@@ -16,7 +16,7 @@ class ModuleController extends Controller
     {
         Gate::authorize('update', $device);
 
-        $this->validate($request, [
+        $request->validate([
             'discovery' => 'in:true,false,clear',
             'polling' => 'in:true,false,clear',
         ]);
