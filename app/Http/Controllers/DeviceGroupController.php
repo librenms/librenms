@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
@@ -13,7 +14,11 @@ class DeviceGroupController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(DeviceGroup::class, 'device_group');
+        $this->middleware('can:viewAny,App\Models\DeviceGroup')->only('index');
+        $this->middleware('can:view,device_group')->only('show');
+        $this->middleware('can:create,App\Models\DeviceGroup')->only('create', 'store');
+        $this->middleware('can:update,device_group')->only('edit', 'update');
+        $this->middleware('can:delete,device_group')->only('destroy');
     }
 
     /**
@@ -23,7 +28,7 @@ class DeviceGroupController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', DeviceGroup::class);
+        Gate::authorize('manage', DeviceGroup::class);
 
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),

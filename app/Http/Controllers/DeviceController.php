@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
@@ -76,9 +77,9 @@ class DeviceController extends Controller
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
             $port = $device->ports()->findOrFail($vars->get('port'));
-            $this->authorize('view', $port);
+            Gate::authorize('view', $port);
         } else {
-            $this->authorize('view', $device);
+            Gate::authorize('view', $device);
         }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');

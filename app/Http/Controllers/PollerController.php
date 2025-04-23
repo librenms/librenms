@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -22,7 +23,7 @@ class PollerController extends Controller
 
     public function logTab(Request $request)
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        Gate::authorize('viewAny', PollerCluster::class);
 
         return view('poller.log', [
             'current_tab' => 'log',
@@ -32,7 +33,7 @@ class PollerController extends Controller
 
     public function groupsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        Gate::authorize('manage', PollerCluster::class);
 
         return view('poller.groups', [
             'current_tab' => 'groups',
@@ -44,7 +45,7 @@ class PollerController extends Controller
 
     public function pollerTab()
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        Gate::authorize('viewAny', PollerCluster::class);
 
         return view('poller.poller', [
             'current_tab' => 'poller',
@@ -55,7 +56,7 @@ class PollerController extends Controller
 
     public function settingsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        Gate::authorize('manage', PollerCluster::class);
         $pollerClusters = PollerCluster::all()->keyBy('id');
 
         return view('poller.settings', [
@@ -67,7 +68,7 @@ class PollerController extends Controller
 
     public function performanceTab()
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        Gate::authorize('viewAny', PollerCluster::class);
 
         return view('poller.performance', ['current_tab' => 'performance']);
     }
