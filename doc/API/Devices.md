@@ -1,3 +1,56 @@
+### `get_all_devices`
+
+Get all devices.
+
+Route: `/api/v0/devices`
+
+  -
+
+Input:
+
+- columns: Comma separated list of columns you want returned.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?columns=device_id%2Chostname%2Cip%2CsysName
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "devices": [
+    {
+      "device_id": 2,
+      "hostname": "10.10.10.2",
+      "ip": "10.10.10.5",
+      "sysName": "host_02"
+    },
+    {
+      "device_id": 3,
+      "hostname": "10.10.10.3",
+      "ip": "10.10.10.6",
+      "sysName": "host_03"
+    },
+    {
+      "device_id": 4,
+      "hostname": "10.10.10.4",
+      "ip": "10.10.10.4",
+      "sysName": "host_04"
+    },
+    ...
+    {
+      "device_id": 5,
+      "hostname": "10.10.10.5",
+      "ip": "10.10.10.5",
+      "sysName": "host_05"
+    }
+    ]
+}
+```
+
 ### `del_device`
 
 Delete a given device.
@@ -1097,7 +1150,7 @@ Output:
 
 Return a list of devices.
 
-Route: `/api/v0/devices`
+Route: `/api/v0/devices/list_devices`
 
 Input:
 
@@ -1126,7 +1179,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?order=hostname%20DESC&type=down
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/list_devices?order=hostname%20DESC&type=down
 ```
 
 Output:
@@ -1150,7 +1203,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?type=mac&query=00000c9ff013
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/list_devices?type=mac&query=00000c9ff013
 ```
 
 Output:
@@ -1626,7 +1679,7 @@ from `list_devices`.  See that entry point for more detailed information.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://librenms.org/api/v0/devices?type=device_id&query=34'
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://librenms.org/api/v0/devices/list_devices?type=device_id&query=34'
 ```
 
 Output:

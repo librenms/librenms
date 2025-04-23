@@ -404,6 +404,17 @@ function list_devices(Illuminate\Http\Request $request)
     return api_success($devices, 'devices');
 }
 
+function get_all_devices(Illuminate\Http\Request $request): JsonResponse
+{
+    $columns = validate_column_list($request->get('columns'), 'devices', ['device_id', 'hostname', 'ip', 'sysName']);
+
+    $devices = Device::hasAccess(Auth::user())
+        ->select($columns)
+        ->get();
+
+    return api_success($devices, 'devices');
+}
+
 function add_device(Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json

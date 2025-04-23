@@ -108,6 +108,7 @@ Route::prefix('v0')->group(function () {
 
     // restricted by access
     Route::prefix('devices')->group(function () {
+        Route::get('list_devices', [\App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
         Route::get('{hostname}', [\App\Api\Controllers\LegacyApiController::class, 'get_device'])->name('get_device');
         Route::get('{hostname}/discover', [\App\Api\Controllers\LegacyApiController::class, 'trigger_device_discovery'])->name('trigger_device_discovery');
         Route::get('{hostname}/availability', [\App\Api\Controllers\LegacyApiController::class, 'device_availability'])->name('device_availability');
@@ -132,8 +133,8 @@ Route::prefix('v0')->group(function () {
         Route::get('{hostname}/ports/{ifname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_by_port_hostname'])->name('get_graph_by_port_hostname');
         Route::get('{hostname}/services/{id}/graphs/{datasource}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_by_service'])->name('get_graph_by_service');
 
-        Route::get('{hostname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
-        Route::get('', [\App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
+	Route::get('{hostname}/{type}', [\App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
+	Route::get('', [\App\Api\Controllers\LegacyApiController::class, 'get_all_devices'])->name('get_all_devices');
     });
 
     Route::prefix('ports')->group(function () {
