@@ -26,18 +26,18 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
-use Laravel\Socialite\AbstractUser;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Models\User;
+use Laravel\Socialite\AbstractUser;
+use LibreNMS\Tests\TestCase;
 
 class SocialiteControllerTest extends TestCase
 {
     /**
      * Helper to test setRolesFromClaim().
      *
-     * @param array $rawAttributes The simulated raw user data from getRaw().
-     * @param array $expectedRoles The roles expected to be passed to syncRoles().
+     * @param  array  $rawAttributes  The simulated raw user data from getRaw().
+     * @param  array  $expectedRoles  The roles expected to be passed to syncRoles().
      * @return bool The return value from setRolesFromClaim().
      */
     private function runSetRolesFromClaimTest(array $rawAttributes, array $expectedRoles): bool
@@ -82,17 +82,17 @@ class SocialiteControllerTest extends TestCase
     {
         // Test with a 'groups' value that should result in a role of ['admin'].
         $rawAttributes = [
-            'sub'                => '00REDACTED',
-            'name'               => 'Citizen, John',
-            'locale'             => 'en_US',
-            'email'              => 'John.Citizen@example.com',
+            'sub' => '00REDACTED',
+            'name' => 'Citizen, John',
+            'locale' => 'en_US',
+            'email' => 'John.Citizen@example.com',
             'preferred_username' => 'johnc@sub.example.com',
-            'given_name'         => 'John',
-            'family_name'        => 'Citizen',
-            'zoneinfo'           => 'America/Los_Angeles',
-            'updated_at'         => 1715015601,
-            'email_verified'     => 1,
-            'groups'             => ['Example-Admin-Group'],
+            'given_name' => 'John',
+            'family_name' => 'Citizen',
+            'zoneinfo' => 'America/Los_Angeles',
+            'updated_at' => 1715015601,
+            'email_verified' => 1,
+            'groups' => ['Example-Admin-Group'],
         ];
 
         $result = $this->runSetRolesFromClaimTest($rawAttributes, ['admin']);
@@ -103,17 +103,17 @@ class SocialiteControllerTest extends TestCase
     {
         // Test with a 'groups' value that should result in a role of ['global-read'].
         $rawAttributes = [
-            'sub'                => '00REDACTED',
-            'name'               => 'Citizen, John',
-            'locale'             => 'en_US',
-            'email'              => 'John.Citizen@example.com',
+            'sub' => '00REDACTED',
+            'name' => 'Citizen, John',
+            'locale' => 'en_US',
+            'email' => 'John.Citizen@example.com',
             'preferred_username' => 'johnc@sub.example.com',
-            'given_name'         => 'John',
-            'family_name'        => 'Citizen',
-            'zoneinfo'           => 'America/Los_Angeles',
-            'updated_at'         => 1715015601,
-            'email_verified'     => 1,
-            'groups'             => ['Example-ReadOnly-Group'],
+            'given_name' => 'John',
+            'family_name' => 'Citizen',
+            'zoneinfo' => 'America/Los_Angeles',
+            'updated_at' => 1715015601,
+            'email_verified' => 1,
+            'groups' => ['Example-ReadOnly-Group'],
         ];
 
         $result = $this->runSetRolesFromClaimTest($rawAttributes, ['global-read']);
