@@ -29,7 +29,6 @@ namespace LibreNMS\Modules;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\IsisAdjacency;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -78,7 +77,6 @@ class Isis implements Module
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        ModuleModelObserver::observe(IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 

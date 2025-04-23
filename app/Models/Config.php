@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 class Config extends BaseModel
 {
     public $timestamps = false;
@@ -60,7 +62,8 @@ class Config extends BaseModel
 
     // ---- Query Scopes ----
 
-    public function scopeWithChildren($query, $name)
+    #[Scope]
+    protected function withChildren($query, $name)
     {
         return $query->where('config_name', $name)
             ->orWhere('config_name', 'like', "$name.%");

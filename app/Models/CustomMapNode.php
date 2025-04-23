@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,7 +43,8 @@ class CustomMapNode extends BaseModel
                 ->whereRelation('device', fn ($q) => $q->isDown())->exists();
     }
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use App\Facades\DeviceCache;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -33,12 +34,14 @@ class DeviceRelatedModel extends BaseModel
 {
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         return $this->hasDeviceAccess($query, $user);
     }
 
-    public function scopeInDeviceGroup($query, $deviceGroup)
+    #[Scope]
+    protected function inDeviceGroup($query, $deviceGroup)
     {
         // Build the list of device IDs in SQL
         $deviceIdsSubquery = \DB::table('device_group_device')

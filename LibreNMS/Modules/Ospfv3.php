@@ -32,7 +32,6 @@ use App\Models\Ospfv3Area;
 use App\Models\Ospfv3Instance;
 use App\Models\Ospfv3Nbr;
 use App\Models\Ospfv3Port;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -90,7 +89,6 @@ class Ospfv3 implements Module
             return;
         }
 
-        ModuleModelObserver::observe(Ospfv3Instance::class);
         $this->syncModels($os->getDevice(), 'ospfv3Instances', $instances);
         Log::info(' (Total processes: ' . $instances->count() . ')');
 
@@ -104,7 +102,6 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Area::class);
         $ospf_areas = $this->syncModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
         Log::info(' (Total areas: ' . $ospf_areas->count() . ')');
 
@@ -118,7 +115,6 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Port::class);
         $this->syncModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
         Log::info(' (Total ports: ' . $ospf_ports->count() . ')');
 
@@ -132,7 +128,6 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Nbr::class);
         $this->syncModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
     }
@@ -156,7 +151,7 @@ class Ospfv3 implements Module
 
         // go through each instance (unique context) and fetch values displayed in ui
         Log::info('Instances: ');
-        ModuleModelObserver::observe(Ospfv3Instance::class);
+
         $instances->each(function (Ospfv3Instance $instance) {
             $instanceValues = SnmpQuery::context($instance->context_name)->enumStrings()->get([
                 'OSPFV3-MIB::ospfv3AdminStatus.0',
@@ -183,7 +178,7 @@ class Ospfv3 implements Module
         // fill data in new areas
         Ospfv3Area::creating([$this, 'fetchAndFillArea']);
         Log::info("\nAreas: ");
-        ModuleModelObserver::observe(Ospfv3Area::class);
+
         $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
 
         // Ports
@@ -203,7 +198,7 @@ class Ospfv3 implements Module
 
         Ospfv3Port::creating([$this, 'fetchAndFillPort']);
         Log::info("\nPorts: ");
-        ModuleModelObserver::observe(Ospfv3Port::class);
+
         $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
 
         // Neighbors
@@ -220,7 +215,7 @@ class Ospfv3 implements Module
 
         Ospfv3Nbr::creating([$this, 'fetchAndFillNeighbor']);
         Log::info("\nNeighbors: ");
-        ModuleModelObserver::observe(Ospfv3Nbr::class);
+
         $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
 
         // Create device-wide statistics RRD

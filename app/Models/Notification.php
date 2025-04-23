@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -95,7 +96,8 @@ class Notification extends Model
      * @param  User  $user
      * @return mixed
      */
-    public function scopeIsUnread(Builder $query, User $user)
+    #[Scope]
+    protected function isUnread(Builder $query, User $user)
     {
         return $query->whereNotExists(function ($query) use ($user) {
             $query->select(DB::raw(1))
@@ -110,7 +112,8 @@ class Notification extends Model
      *
      * @param  Builder<Notification>  $query
      */
-    public function scopeIsSticky(Builder $query)
+    #[Scope]
+    protected function isSticky(Builder $query)
     {
         $query->leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', 'notifications.notifications_id')
             ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);
@@ -120,7 +123,8 @@ class Notification extends Model
      * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
-    public function scopeLimit(Builder $query)
+    #[Scope]
+    protected function limit(Builder $query)
     {
         return $query->select('notifications.*', 'key', 'users.username');
     }
@@ -129,7 +133,8 @@ class Notification extends Model
      * @param  Builder<Notification>  $query
      * @return Builder|static
      */
-    public function scopeSource(Builder $query)
+    #[Scope]
+    protected function source(Builder $query)
     {
         return $query->leftJoin('users', 'notifications.source', '=', 'users.user_id');
     }

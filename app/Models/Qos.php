@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\QosObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([\App\Observers\QosObserver::class])]
 class Qos extends Model implements Keyable
 {
     use HasFactory;

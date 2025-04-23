@@ -34,7 +34,6 @@ use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use App\Models\Transceiver;
-use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -403,7 +402,6 @@ class Vrp extends OS implements
                 }
             }
 
-            ModuleModelObserver::observe(AccessPoint::class);
             $this->syncModels($this->getDevice(), 'accessPoints', $aps);
         }
     }

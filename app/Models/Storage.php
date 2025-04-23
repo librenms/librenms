@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\StorageObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([\App\Observers\StorageObserver::class])]
 class Storage extends DeviceRelatedModel implements Keyable
 {
     protected $table = 'storage';

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -159,7 +160,8 @@ class Location extends Model
      * @param  User  $user
      * @return Builder
      */
-    public function scopeHasAccess($query, $user)
+    #[Scope]
+    protected function hasAccess($query, $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;
@@ -173,7 +175,8 @@ class Location extends Model
         return $query->whereIntegerInRaw('id', $ids);
     }
 
-    public function scopeInDeviceGroup($query, $deviceGroup)
+    #[Scope]
+    protected function inDeviceGroup($query, $deviceGroup)
     {
         return $query->whereHas('devices.groups', function ($query) use ($deviceGroup) {
             $query->where('device_groups.id', $deviceGroup);

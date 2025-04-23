@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiToken extends BaseModel
@@ -88,7 +89,8 @@ class ApiToken extends BaseModel
 
     // ---- Query scopes ----
 
-    public function scopeIsEnabled($query)
+    #[Scope]
+    protected function isEnabled($query)
     {
         return $query->where('disabled', 0);
     }

@@ -27,7 +27,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -60,7 +59,6 @@ class Storage implements Module
     {
         $storages = $os->discoverStorage()->filter->isValid($os->getName());
 
-        ModuleModelObserver::observe(\App\Models\Storage::class);
         $saved = $this->syncModels($os->getDevice(), 'storage', $storages);
 
         Log::info('');

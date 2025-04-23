@@ -24,7 +24,6 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\PrinterSupply;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -68,7 +67,6 @@ class PrinterSupplies implements Module
             ->concat($this->discoveryLevels($device))
             ->concat($this->discoveryPapers($device));
 
-        ModuleModelObserver::observe(PrinterSupply::class);
         $this->syncModels($os->getDevice(), 'printerSupplies', $data);
     }
 

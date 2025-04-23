@@ -26,13 +26,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 abstract class PortRelatedModel extends BaseModel
 {
     // ---- Query scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         return $this->hasPortAccess($query, $user);
     }

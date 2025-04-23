@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -166,7 +167,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDeleted($query)
+    #[Scope]
+    protected function isDeleted($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), 1],
@@ -177,7 +179,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsNotDeleted($query)
+    #[Scope]
+    protected function isNotDeleted($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), 0],
@@ -188,7 +191,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsUp($query)
+    #[Scope]
+    protected function isUp($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -202,7 +206,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDown($query)
+    #[Scope]
+    protected function isDown($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -217,7 +222,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsShutdown($query)
+    #[Scope]
+    protected function isShutdown($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -231,7 +237,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsIgnored($query)
+    #[Scope]
+    protected function isIgnored($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -243,7 +250,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDisabled($query)
+    #[Scope]
+    protected function isDisabled($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -255,7 +263,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeHasErrors($query)
+    #[Scope]
+    protected function hasErrors($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -272,7 +281,8 @@ class Port extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsValid($query)
+    #[Scope]
+    protected function isValid($query)
     {
         return $query->where([
             [$this->qualifyColumn('deleted'), '=', 0],
@@ -280,12 +290,14 @@ class Port extends DeviceRelatedModel
         ]);
     }
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         return $this->hasPortAccess($query, $user);
     }
 
-    public function scopeInPortGroup($query, $portGroup)
+    #[Scope]
+    protected function inPortGroup($query, $portGroup)
     {
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
             $query->select('port_id')

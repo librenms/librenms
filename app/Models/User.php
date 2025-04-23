@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use App\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +22,7 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
+#[ObservedBy([\App\Observers\UserObserver::class])]
 class User extends Authenticatable
 {
     use HasFactory;
@@ -166,7 +170,8 @@ class User extends Authenticatable
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeThisAuth($query)
+    #[Scope]
+    protected function thisAuth($query)
     {
         // find user including ones where we might not know the auth type
         $type = LegacyAuth::getType();
@@ -178,7 +183,8 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeAdminOnly($query)
+    #[Scope]
+    protected function adminOnly($query)
     {
         $query->role('admin');
     }

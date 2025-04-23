@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use App\Observers\ServiceObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 
+#[ObservedBy([\App\Observers\ServiceObserver::class])]
 class Service extends DeviceRelatedModel
 {
     public $timestamps = false;
@@ -31,7 +35,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsActive($query)
+    #[Scope]
+    protected function isActive($query)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -43,7 +48,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsOk($query)
+    #[Scope]
+    protected function isOk($query)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -56,7 +62,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsCritical($query)
+    #[Scope]
+    protected function isCritical($query)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -69,7 +76,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsWarning($query)
+    #[Scope]
+    protected function isWarning($query)
     {
         return $query->where([
             ['service_ignore', '=', 0],
@@ -82,7 +90,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsIgnored($query)
+    #[Scope]
+    protected function isIgnored($query)
     {
         return $query->where([
             ['service_ignore', '=', 1],
@@ -94,7 +103,8 @@ class Service extends DeviceRelatedModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDisabled($query)
+    #[Scope]
+    protected function isDisabled($query)
     {
         return $query->where('service_disabled', 1);
     }

@@ -32,7 +32,6 @@ use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -77,7 +76,6 @@ class Ospf implements Module
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
             Log::info('Processes: ');
-            ModuleModelObserver::observe(OspfInstance::class);
 
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
@@ -117,7 +115,6 @@ class Ospf implements Module
             }
 
             Log::info('Areas: ');
-            ModuleModelObserver::observe(OspfArea::class);
 
             // Pull data from device
             $ospf_areas = SnmpQuery::context($context_name)
@@ -139,7 +136,6 @@ class Ospf implements Module
             Log::info('Total areas: ' . $ospf_areas->count());
 
             Log::info('Ports: ');
-            ModuleModelObserver::observe(OspfPort::class);
 
             // Pull data from device
             $ospf_ports = SnmpQuery::context($context_name)
@@ -167,7 +163,6 @@ class Ospf implements Module
             Log::info('Total Ports: ' . $ospf_ports->count());
 
             Log::info('Neighbours: ');
-            ModuleModelObserver::observe(OspfNbr::class);
 
             // Pull data from device
             $ospf_neighbours = SnmpQuery::context($context_name)

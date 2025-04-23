@@ -3,8 +3,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Models\EntPhysical;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -46,7 +44,6 @@ class EntityPhysical implements Module
     {
         $inventory = $os->discoverEntityPhysical();
 
-        ModuleModelObserver::observe(EntPhysical::class);
         $this->syncModels($os->getDevice(), 'entityPhysical', $inventory);
     }
 

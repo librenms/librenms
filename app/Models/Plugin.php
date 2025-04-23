@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 
 class Plugin extends BaseModel
@@ -51,17 +52,20 @@ class Plugin extends BaseModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsActive($query)
+    #[Scope]
+    protected function isActive($query)
     {
         return $query->where('plugin_active', 1);
     }
 
-    public function scopeVersionOne($query)
+    #[Scope]
+    protected function versionOne($query)
     {
         return $query->where('version', 1);
     }
 
-    public function scopeVersionTwo($query)
+    #[Scope]
+    protected function versionTwo($query)
     {
         return $query->where('version', 2);
     }

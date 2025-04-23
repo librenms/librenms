@@ -26,10 +26,13 @@
 
 namespace App\Models;
 
+use App\Observers\WirelessSensorObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([\App\Observers\WirelessSensorObserver::class])]
 class WirelessSensor extends DeviceRelatedModel implements Keyable
 {
     const CREATED_AT = null;

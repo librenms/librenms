@@ -163,17 +163,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootObservers()
     {
-        \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
-        \App\Models\Mempool::observe(\App\Observers\MempoolObserver::class);
-        \App\Models\Package::observe(\App\Observers\PackageObserver::class);
-        \App\Models\Qos::observe(\App\Observers\QosObserver::class);
-        Sensor::observe(\App\Observers\SensorObserver::class);
-        \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
-        \App\Models\Storage::observe(\App\Observers\StorageObserver::class);
-        \App\Models\Stp::observe(\App\Observers\StpObserver::class);
-        \App\Models\User::observe(\App\Observers\UserObserver::class);
-        \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
-        \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
+
     }
 
     private function bootCustomValidators()

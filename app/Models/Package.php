@@ -26,8 +26,11 @@
 
 namespace App\Models;
 
+use App\Observers\PackageObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use LibreNMS\Interfaces\Models\Keyable;
 
+#[ObservedBy([\App\Observers\PackageObserver::class])]
 class Package extends DeviceRelatedModel implements Keyable
 {
     public $timestamps = false;

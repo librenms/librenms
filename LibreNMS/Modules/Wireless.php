@@ -4,7 +4,6 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\WirelessSensor;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
@@ -82,7 +81,6 @@ class Wireless implements Module
         $types = array_intersect($this->types, $submodules);
         $existingSensors = $os->getDevice()->wirelessSensors()->get()->groupBy('sensor_class');
 
-        ModuleModelObserver::observe(WirelessSensor::class);
         foreach ($types as $type) {
             $typeInterface = $this->getDiscoveryInterface($type);
             if (! interface_exists($typeInterface)) {

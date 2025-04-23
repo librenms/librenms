@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
@@ -94,7 +95,8 @@ class DeviceGroup extends BaseModel
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;
@@ -103,7 +105,8 @@ class DeviceGroup extends BaseModel
         return $query->whereIntegerInRaw('id', Permissions::deviceGroupsForUser($user));
     }
 
-    public function scopeInServiceTemplate($query, $serviceTemplate)
+    #[Scope]
+    protected function inServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
@@ -114,7 +117,8 @@ class DeviceGroup extends BaseModel
         );
     }
 
-    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    #[Scope]
+    protected function notInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
             $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {

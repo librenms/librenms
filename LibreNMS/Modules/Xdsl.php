@@ -31,7 +31,6 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -179,8 +178,6 @@ class Xdsl implements Module
             $adslPorts->push($portAdsl);
         }
 
-        ModuleModelObserver::observe(PortAdsl::class);
-
         return $this->syncModels($os->getDevice(), 'portsAdsl', $adslPorts);
     }
 
@@ -216,8 +213,6 @@ class Xdsl implements Module
 
             $vdslPorts->push($portVdsl);
         }
-
-        ModuleModelObserver::observe(PortVdsl::class);
 
         return $this->syncModels($os->getDevice(), 'portsVdsl', $vdslPorts);
     }
