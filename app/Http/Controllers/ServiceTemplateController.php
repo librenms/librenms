@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -12,15 +14,17 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
 
-class ServiceTemplateController extends Controller
+class ServiceTemplateController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('can:viewAny,App\Models\ServiceTemplate')->only('index');
-        $this->middleware('can:view,template')->only('show');
-        $this->middleware('can:create,App\Models\ServiceTemplate')->only('create', 'store');
-        $this->middleware('can:update,template')->only('edit', 'update');
-        $this->middleware('can:delete,template')->only('destroy');
+        return [
+            new Middleware('can:viewAny,App\Models\ServiceTemplate', only: ['index']),
+            new Middleware('can:view,template', only: ['show']),
+            new Middleware('can:create,App\Models\ServiceTemplate', only: ['create', 'store']),
+            new Middleware('can:update,template', only: ['edit', 'update']),
+            new Middleware('can:delete,template', only: ['destroy']),
+        ];
     }
 
     /**

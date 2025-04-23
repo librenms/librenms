@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\DeviceGroup;
@@ -10,15 +12,17 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 
-class DeviceGroupController extends Controller
+class DeviceGroupController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('can:viewAny,App\Models\DeviceGroup')->only('index');
-        $this->middleware('can:view,device_group')->only('show');
-        $this->middleware('can:create,App\Models\DeviceGroup')->only('create', 'store');
-        $this->middleware('can:update,device_group')->only('edit', 'update');
-        $this->middleware('can:delete,device_group')->only('destroy');
+        return [
+            new Middleware('can:viewAny,App\Models\DeviceGroup', only: ['index']),
+            new Middleware('can:view,device_group', only: ['show']),
+            new Middleware('can:create,App\Models\DeviceGroup', only: ['create', 'store']),
+            new Middleware('can:update,device_group', only: ['edit', 'update']),
+            new Middleware('can:delete,device_group', only: ['destroy']),
+        ];
     }
 
     /**
