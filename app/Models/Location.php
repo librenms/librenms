@@ -43,7 +43,6 @@ class Location extends Model
     public $fillable = ['location', 'lat', 'lng'];
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
-    protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
     private $location_regexes = [
         // Format: [xx.xxx,xx.xxx]
@@ -52,6 +51,18 @@ class Location extends Model
         '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
     ];
     private $location_ignore_regex = '/\(.*?\)/';
+
+    /**
+     * @return array{lat: 'float', lng: 'float', fixed_coordinates: 'bool'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'lat' => 'float',
+            'lng' => 'float',
+            'fixed_coordinates' => 'bool',
+        ];
+    }
 
     // ---- Helper Functions ----
 
@@ -177,7 +188,9 @@ class Location extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     */
     public function devices(): HasMany
     {
         return $this->hasMany(Device::class, 'location_id');
