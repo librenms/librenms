@@ -1,4 +1,4 @@
-os: mpb
+os: mpb-srp
 text: 'MPB SRP'
 type: network
 icon: mpb
