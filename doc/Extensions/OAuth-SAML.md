@@ -383,7 +383,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
     ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
     ```bash
-    echo "SESSION_SAME_SITE_COOKIE=none" >> .env
+    echo "SESSION_SAME_SITE=none" >> .env
     lnms plugin:add socialiteproviders/saml2
     lnms config:set auth.socialite.redirect true
     lnms config:set auth.socialite.register true
@@ -440,10 +440,10 @@ Now we just need to define the listener service within LibreNMS:
     lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
     ```
 
-### SESSION_SAME_SITE_COOKIE
+### SESSION_SAME_SITE
 
-You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
-If you get an error with http code 419, you should try to remove `SESSION_SAME_SITE_COOKIE=none` from your `.env`.
+You most likely will need to set `SESSION_SAME_SITE=none` in `.env` if you use SAML2!
+If you get an error with http code 419, you should try to remove `SESSION_SAME_SITE=none` from your `.env`.
 
 !!! note
     Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache

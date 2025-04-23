@@ -688,6 +688,12 @@ What type of mail transport to use for delivering emails. Valid
 options for `email_backend` are mail, sendmail or smtp. The varying
 options after that are to support the different transports.
 
+For security reasons, the SMTP server connection via TLS will try to verify the validity of the certificate. If for some reason you need to disable verification, you can use the email_smtp_verifypeer option (true by default) and email_smtp_allowselfsigned (false by default).
+```bash
+    lnms config:set email_smtp_verifypeer false
+    lnms config:set email_smtp_allowselfsigned true
+```
+
 ## Alerting
 
 Please refer to [Alerting](../Alerting/index.md)
