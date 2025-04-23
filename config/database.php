@@ -10,6 +10,20 @@
 
 use Illuminate\Support\Str;
 
+$sentinelHosts = array_map(function ($entry) {
+    [$host, $port] = explode(':', $entry, 2);
+
+    $username = env('REDIS_USERNAME', '');
+    $password = env('REDIS_PASSWORD', '');
+
+    $query = http_build_query(array_filter([
+        'username' => $username ?: null,
+        'password' => $password ?: null,
+    ]));
+
+    return 'tcp://' . trim($host) . ':' . (int) $port . ($query ? '?' . $query : '');
+}, array_filter(explode(',', env('REDIS_SENTINEL', ''))));
+
 return [
 
     /*
@@ -211,7 +225,6 @@ return [
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
-            'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
@@ -234,6 +247,29 @@ return [
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
         ],
+
+        'sentinel_session' => array_merge($sentinelHosts, [
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_PASSWORD'),
+                    'sentinel_password' => env('REDIS_SENTINEL_PASSWORD'),
+                    'database' => env('REDIS_SESSION_DB', '0'),
+                ],
+            ],
+        ]),
+
+        'sentinel_cache' => array_merge($sentinelHosts, [
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_SENTINEL_PASSWORD'),
+                    'database' => env('REDIS_CACHE_DB', '1'),
+                ],
+            ],
+        ]),
 
     ],
 
