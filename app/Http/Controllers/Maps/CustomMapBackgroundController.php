@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Maps;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapBackground;
@@ -37,7 +38,7 @@ class CustomMapBackgroundController extends Controller
 {
     public function get(CustomMap $map)
     {
-        $this->authorize('view', $map);
+        Gate::authorize('view', $map);
 
         if ($map->background_type !== 'image') {
             abort(404);
@@ -63,7 +64,7 @@ class CustomMapBackgroundController extends Controller
 
     public function save(FormRequest $request, CustomMap $map)
     {
-        $this->authorize('update', $map);
+        Gate::authorize('update', $map);
         $request->validate([
             'type' => 'in:image,color,map,none',
             'image' => 'required_if:type,image|mimes:png,jpg,svg,gif',

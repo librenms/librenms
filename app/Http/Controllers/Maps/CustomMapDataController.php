@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Maps;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapEdge;
@@ -42,7 +43,7 @@ class CustomMapDataController extends Controller
 {
     public function get(Request $request, CustomMap $map): JsonResponse
     {
-        $this->authorize('view', $map);
+        Gate::authorize('view', $map);
 
         // eager load relationships
         $map->load(['nodes.device', 'nodes.device.location', 'nodes.linked_map']);
@@ -216,7 +217,7 @@ class CustomMapDataController extends Controller
 
     public function save(Request $request, CustomMap $map): JsonResponse
     {
-        $this->authorize('update', $map);
+        Gate::authorize('update', $map);
 
         $data = $request->validate([
             'newnodeconf' => 'array',

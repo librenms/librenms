@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -56,7 +57,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', User::class);
+        Gate::authorize('manage', User::class);
 
         return view('user.index', [
             'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
@@ -73,7 +74,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', User::class);
+        Gate::authorize('create', User::class);
 
         $tmp_user = new User;
         $tmp_user->can_modify_passwd = LegacyAuth::getType() == 'mysql' ? 1 : 0; // default to true mysql
@@ -127,7 +128,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $this->authorize('view', $user);
+        Gate::authorize('view', $user);
 
         return $user->username;
     }
@@ -142,7 +143,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $this->authorize('update', $user);
+        Gate::authorize('update', $user);
 
         $data = [
             'user' => $user,
@@ -225,7 +226,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $this->authorize('delete', $user);
+        Gate::authorize('delete', $user);
 
         $user->delete();
 
@@ -282,7 +283,7 @@ class UserController extends Controller
 
     public function authlog()
     {
-        $this->authorize('manage', User::class);
+        Gate::authorize('manage', User::class);
 
         return view('user.authlog', [
             'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),

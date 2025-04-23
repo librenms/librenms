@@ -42,7 +42,11 @@ class CustomMapController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(CustomMap::class, 'map');
+        $this->middleware('can:viewAny,App\Models\CustomMap')->only('index');
+        $this->middleware('can:view,map')->only('show');
+        $this->middleware('can:create,App\Models\CustomMap')->only('create', 'store');
+        $this->middleware('can:update,map')->only('edit', 'update');
+        $this->middleware('can:delete,map')->only('destroy');
     }
 
     public function index(): View

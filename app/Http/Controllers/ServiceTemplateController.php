@@ -16,7 +16,11 @@ class ServiceTemplateController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(ServiceTemplate::class, 'template');
+        $this->middleware('can:viewAny,App\Models\ServiceTemplate')->only('index');
+        $this->middleware('can:view,template')->only('show');
+        $this->middleware('can:create,App\Models\ServiceTemplate')->only('create', 'store');
+        $this->middleware('can:update,template')->only('edit', 'update');
+        $this->middleware('can:delete,template')->only('destroy');
     }
 
     /**

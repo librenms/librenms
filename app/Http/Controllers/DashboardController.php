@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Gate;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -68,7 +69,11 @@ class DashboardController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(Dashboard::class, 'dashboard');
+        $this->middleware('can:viewAny,App\Models\Dashboard')->only('index');
+        $this->middleware('can:view,dashboard')->only('show');
+        $this->middleware('can:create,App\Models\Dashboard')->only('create', 'store');
+        $this->middleware('can:update,dashboard')->only('edit', 'update');
+        $this->middleware('can:delete,dashboard')->only('destroy');
     }
 
     /**
@@ -230,7 +235,7 @@ class DashboardController extends Controller
 
         $target_user_id = $request->get('target_user_id');
 
-        $this->authorize('copy', [$dashboard, $target_user_id]);
+        Gate::authorize('copy', [$dashboard, $target_user_id]);
 
         $dashboard_copy = $dashboard->replicate()->fill([
             'user_id' => $target_user_id,
