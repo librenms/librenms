@@ -45,9 +45,15 @@ class CustomMapController extends Controller
         $this->authorizeResource(CustomMap::class, 'map');
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('map.custom-manage', [
+        $request->validate([
+            'list' => 'boolean',
+        ]);
+
+        $blade = $request->boolean('list') ? 'map.custom-list' : 'map.custom-manage';
+
+        return view($blade, [
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
             'menu_group' => null,
