@@ -52,4 +52,6 @@ if (getenv('DBTEST')) {
 
 LibrenmsConfig::invalidateAndReload();
 
+\Illuminate\Foundation\Bootstrap\HandleExceptions::flushState(); // Reset Laravels error handler
+
 app()->terminate(); // destroy the bootstrap Laravel application

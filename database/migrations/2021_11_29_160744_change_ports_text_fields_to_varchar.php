@@ -14,9 +14,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->string('ifAlias')->change();
-            $table->string('ifType', 64)->change();
-            $table->string('ifPhysAddress', 64)->change();
+            $table->string('ifAlias')->nullable()->change();
+            $table->string('ifType', 64)->nullable()->change();
+            $table->string('ifPhysAddress', 64)->nullable()->change();
         });
     }
 
@@ -28,9 +28,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ports', function (Blueprint $table) {
-            $table->text('ifAlias')->change();
-            $table->text('ifType')->change();
-            $table->text('ifPhysAddress')->change();
+            $table->text('ifAlias')->nullable()->change();
+            $table->text('ifType')->nullable()->change();
+            $table->text('ifPhysAddress')->nullable()->change();
         });
     }
 };
