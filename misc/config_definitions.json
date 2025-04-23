@@ -1842,6 +1842,48 @@
                 "value": "smtp"
             }
         },
+        "email_smtp_verifypeer": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 11,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
+        "email_smtp_allowselfsigned": {
+            "default": false,
+            "group": "alerting",
+            "section": "email",
+            "order": 12,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
         "email_attach_graphs": {
             "default": true,
             "group": "alerting",
