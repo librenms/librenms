@@ -132,7 +132,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
-        Route::get('customlist/{group?}', [CustomMapListController::class, 'index'])->name('maps.custom.list');
+        Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
         Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');

@@ -33,8 +33,10 @@ use Illuminate\Http\Request;
 
 class CustomMapListController extends Controller
 {
-    public function index(Request $request, string $group = ''): View
+    public function index(Request $request): View
     {
+        $group = $request->input('group') ?? '';
+
         return view('map.custom-list', [
             'maps' => CustomMap::hasAccess($request->user())->orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'group' => $group,
