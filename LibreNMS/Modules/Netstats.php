@@ -216,7 +216,7 @@ class Netstats implements Module
                     foreach ($this->oids[$type] as $oid) {
                         // if a high capacity (HC) oid exists, override the non-HC value so we preserve the field name
                         if (preg_match("/(.+::.+)HC(.+\.[0-9]+)/", $oid, $matches)
-                         && array_key_exists($data[$matches[1] . $matches[2]])
+                         && array_key_exists($matches[1] . $matches[2], $data)
                         ) {
                             $data[$matches[1] . $matches[2]] = $data[$oid] ?? $data[$matches[1] . $matches[2]];
                             continue;
