@@ -2,8 +2,8 @@
 
 $regexes = [
     '[x.xx,x.xx] (brackets with comma)' => '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{0,1},\s{0,1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/',
-    'x.xx x.xx (space)'    => '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
-    'x.xx,x.xx (comma)'    => '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{0,1},\s{0,1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
+    'x.xx x.xx (space)' => '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
+    'x.xx,x.xx (comma)' => '/^(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s{0,1},\s{0,1}(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))$/',
 ];
 
 $locations = [
@@ -32,13 +32,13 @@ foreach ($locations as $location) {
     foreach ($regexes as $label => $regex) {
         if (preg_match($regex, $location, $matches)) {
             echo "  ✔  Valid via '$label' regex:\n";
-            echo "    → lat: " . $matches['lat'] . ", lng: " . $matches['lng'] . "\n";
+            echo '    → lat: ' . $matches['lat'] . ', lng: ' . $matches['lng'] . "\n";
             $matched = true;
             break;
         }
     }
 
-    if (!$matched) {
+    if (! $matched) {
         echo "  ✘ No valid location \n";
     }
 
