@@ -83,13 +83,19 @@ class Device extends BaseModel
         'uptime',
     ];
 
-    protected $casts = [
-        'inserted' => 'datetime',
-        'last_discovered' => 'datetime',
-        'last_polled' => 'datetime',
-        'last_ping' => 'datetime',
-        'status' => 'boolean',
-    ];
+    /**
+     * @return array{inserted: 'datetime', last_discovered: 'datetime', last_polled: 'datetime', last_ping: 'datetime', status: 'boolean'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'inserted' => 'datetime',
+            'last_discovered' => 'datetime',
+            'last_polled' => 'datetime',
+            'last_ping' => 'datetime',
+            'status' => 'boolean',
+        ];
+    }
 
     // ---- Helper Functions ----
 
@@ -306,7 +312,7 @@ class Device extends BaseModel
         $deviceOutage = $this->getCurrentOutage();
 
         if ($deviceOutage) {
-            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down, session('preferences.timezone'));
         }
 
         return $this->last_polled ?? Carbon::now();
@@ -333,7 +339,7 @@ class Device extends BaseModel
 
     public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : $this->last_polled?->diffInSeconds();
+        $time = ($this->status == 1) ? $this->uptime : (int) $this->last_polled?->diffInSeconds(null, true);
 
         return Time::formatInterval($time, $short);
     }
@@ -406,9 +412,9 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name)
+    public function getAttrib($name, $default = null)
     {
-        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
     public function setAttrib($name, $value)
@@ -453,7 +459,7 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  \App\Models\Location|string  $new_location  location data
+     * @param  Location|string  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
      */
     public function setLocation($new_location, bool $doLookup = false)
@@ -547,7 +553,6 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
-            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ]);
@@ -683,130 +688,204 @@ class Device extends BaseModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AccessPoint, $this>
+     */
     public function accessPoints(): HasMany
     {
         return $this->hasMany(AccessPoint::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
+     */
     public function alerts(): HasMany
     {
-        return $this->hasMany(\App\Models\Alert::class, 'device_id');
+        return $this->hasMany(Alert::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertLog, $this>
+     */
     public function alertLogs(): HasMany
     {
-        return $this->hasMany(\App\Models\AlertLog::class, 'device_id');
+        return $this->hasMany(AlertLog::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\AlertSchedule, $this>
+     */
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(\App\Models\AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Application, $this>
+     */
     public function applications(): HasMany
     {
-        return $this->hasMany(\App\Models\Application::class, 'device_id');
+        return $this->hasMany(Application::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceAttrib, $this>
+     */
     public function attribs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+        return $this->hasMany(DeviceAttrib::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Availability, $this>
+     */
     public function availability(): HasMany
     {
-        return $this->hasMany(\App\Models\Availability::class, 'device_id');
+        return $this->hasMany(Availability::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\BgpPeer, $this>
+     */
     public function bgppeers(): HasMany
     {
-        return $this->hasMany(\App\Models\BgpPeer::class, 'device_id');
+        return $this->hasMany(BgpPeer::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CefSwitching, $this>
+     */
     public function cefSwitching(): HasMany
     {
-        return $this->hasMany(\App\Models\CefSwitching::class, 'device_id');
+        return $this->hasMany(CefSwitching::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function children(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Component, $this>
+     */
     public function components(): HasMany
     {
-        return $this->hasMany(\App\Models\Component::class, 'device_id');
+        return $this->hasMany(Component::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DiskIo, $this>
+     */
     public function diskIo(): HasMany
     {
-        return $this->hasMany(\App\Models\DiskIo::class, 'device_id');
+        return $this->hasMany(DiskIo::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\HrDevice, $this>
+     */
     public function hostResources(): HasMany
     {
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\HrSystem, $this>
+     */
     public function hostResourceValues(): HasOne
     {
         return $this->hasOne(HrSystem::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\EntPhysical, $this>
+     */
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\EntityState, $this>
+     */
     public function entityState(): HasMany
     {
         return $this->hasMany(EntityState::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Eventlog, $this>
+     */
     public function eventlogs(): HasMany
     {
-        return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
+        return $this->hasMany(Eventlog::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceGraph, $this>
+     */
     public function graphs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceGraph::class, 'device_id');
+        return $this->hasMany(DeviceGraph::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\IpsecTunnel, $this>
+     */
     public function ipsecTunnels(): HasMany
     {
         return $this->hasMany(IpsecTunnel::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv4Address, \App\Models\Port, $this>
+     */
     public function ipv4(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\Ipv4Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasManyThrough(Ipv4Address::class, Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv6Address, \App\Models\Port, $this>
+     */
     public function ipv6(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\Ipv6Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasManyThrough(Ipv6Address::class, Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\IsisAdjacency, $this>
+     */
     public function isisAdjacencies(): HasMany
     {
-        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+        return $this->hasMany(IsisAdjacency::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     */
     public function links(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'local_device_id');
+        return $this->hasMany(Link::class, 'local_device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     */
     public function remoteLinks(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'remote_device_id');
+        return $this->hasMany(Link::class, 'remote_device_id');
     }
 
     public function allLinks(): \Illuminate\Support\Collection
@@ -814,270 +893,485 @@ class Device extends BaseModel
         return $this->links->merge($this->remoteLinks);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Location, $this>
+     */
     public function location(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
+        return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Mac, $this>
+     */
     public function macs(): HasMany
     {
         return $this->hasMany(Ipv4Mac::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\CustomMap, \App\Models\CustomMapNode, $this>
+     */
     public function maps(): HasManyThrough
     {
         return $this->hasManyThrough(CustomMap::class, CustomMapNode::class, 'device_id', 'custom_map_id', 'device_id', 'custom_map_id')
             ->distinct();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MefInfo, $this>
+     */
     public function mefInfo(): HasMany
     {
         return $this->hasMany(MefInfo::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MuninPlugin, $this>
+     */
     public function muninPlugins(): HasMany
     {
-        return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
+        return $this->hasMany(MuninPlugin::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Nd, $this>
+     */
+    public function nd(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NetscalerVserver, $this>
+     */
     public function netscalerVservers(): HasMany
     {
         return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfArea, $this>
+     */
     public function ospfAreas(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfArea::class, 'device_id');
+        return $this->hasMany(OspfArea::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfInstance, $this>
+     */
     public function ospfInstances(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+        return $this->hasMany(OspfInstance::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfNbr, $this>
+     */
     public function ospfNbrs(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
+        return $this->hasMany(OspfNbr::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfPort, $this>
+     */
     public function ospfPorts(): HasMany
     {
-        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+        return $this->hasMany(OspfPort::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Area, $this>
+     */
+    public function ospfv3Areas(): HasMany
+    {
+        return $this->hasMany(Ospfv3Area::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Instance, $this>
+     */
+    public function ospfv3Instances(): HasMany
+    {
+        return $this->hasMany(Ospfv3Instance::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Nbr, $this>
+     */
+    public function ospfv3Nbrs(): HasMany
+    {
+        return $this->hasMany(Ospfv3Nbr::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Port, $this>
+     */
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(Ospfv3Port::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Package, $this>
+     */
     public function packages(): HasMany
     {
-        return $this->hasMany(\App\Models\Package::class, 'device_id', 'device_id');
+        return $this->hasMany(Package::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function parents(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Port, $this>
+     */
     public function ports(): HasMany
     {
-        return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
+        return $this->hasMany(Port::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortAdsl, \App\Models\Port, $this>
+     */
     public function portsAdsl(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\PortAdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+        return $this->hasManyThrough(PortAdsl::class, Port::class, 'device_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsFdb, $this>
+     */
     public function portsFdb(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
+        return $this->hasMany(PortsFdb::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsNac, $this>
+     */
     public function portsNac(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+        return $this->hasMany(PortsNac::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStack, $this>
+     */
     public function portsStack(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStack::class, 'device_id', 'device_id');
+        return $this->hasMany(PortStack::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStp, $this>
+     */
     public function portsStp(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+        return $this->hasMany(PortStp::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortVdsl, \App\Models\Port, $this>
+     */
     public function portsVdsl(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+        return $this->hasManyThrough(PortVdsl::class, Port::class, 'device_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortVlan, $this>
+     */
     public function portsVlan(): HasMany
     {
-        return $this->hasMany(\App\Models\PortVlan::class, 'device_id', 'device_id');
+        return $this->hasMany(PortVlan::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Process, $this>
+     */
     public function processes(): HasMany
     {
-        return $this->hasMany(\App\Models\Process::class, 'device_id');
+        return $this->hasMany(Process::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Processor, $this>
+     */
     public function processors(): HasMany
     {
-        return $this->hasMany(\App\Models\Processor::class, 'device_id');
+        return $this->hasMany(Processor::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     */
     public function routes(): HasMany
     {
         return $this->hasMany(Route::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertRule, $this>
+     */
     public function rules(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
+        return $this->belongsToMany(AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Sensor, $this>
+     */
     public function sensors(): HasMany
     {
-        return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+        return $this->hasMany(Sensor::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\ServiceTemplate, $this>
+     */
     public function serviceTemplates(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
+        return $this->belongsToMany(ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Service, $this>
+     */
     public function services(): HasMany
     {
-        return $this->hasMany(\App\Models\Service::class, 'device_id');
+        return $this->hasMany(Service::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Storage, $this>
+     */
     public function storage(): HasMany
     {
-        return $this->hasMany(\App\Models\Storage::class, 'device_id');
+        return $this->hasMany(Storage::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Stp, $this>
+     */
     public function stpInstances(): HasMany
     {
         return $this->hasMany(Stp::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStp, $this>
+     */
     public function stpPorts(): HasMany
     {
-        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
+        return $this->hasMany(PortStp::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Mempool, $this>
+     */
     public function mempools(): HasMany
     {
-        return $this->hasMany(\App\Models\Mempool::class, 'device_id');
+        return $this->hasMany(Mempool::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLsp, $this>
+     */
     public function mplsLsps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsLsp::class, 'device_id');
+        return $this->hasMany(MplsLsp::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLspPath, $this>
+     */
     public function mplsLspPaths(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsLspPath::class, 'device_id');
+        return $this->hasMany(MplsLspPath::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdp, $this>
+     */
     public function mplsSdps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdp::class, 'device_id');
+        return $this->hasMany(MplsSdp::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsService, $this>
+     */
     public function mplsServices(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsService::class, 'device_id');
+        return $this->hasMany(MplsService::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSap, $this>
+     */
     public function mplsSaps(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSap::class, 'device_id');
+        return $this->hasMany(MplsSap::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdpBind, $this>
+     */
     public function mplsSdpBinds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'device_id');
+        return $this->hasMany(MplsSdpBind::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsTunnelArHop, $this>
+     */
     public function mplsTunnelArHops(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsTunnelArHop::class, 'device_id');
+        return $this->hasMany(MplsTunnelArHop::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsTunnelCHop, $this>
+     */
     public function mplsTunnelCHops(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+        return $this->hasMany(MplsTunnelCHop::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\DeviceOutage, $this>
+     */
     public function outages(): HasMany
     {
         return $this->hasMany(DeviceOutage::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PrinterSupply, $this>
+     */
     public function printerSupplies(): HasMany
     {
         return $this->hasMany(PrinterSupply::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
+     */
     public function pseudowires(): HasMany
     {
         return $this->hasMany(Pseudowire::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\LoadbalancerRserver, $this>
+     */
     public function rServers(): HasMany
     {
         return $this->hasMany(LoadbalancerRserver::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Qos, $this>
+     */
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Sla, $this>
+     */
     public function slas(): HasMany
     {
         return $this->hasMany(Sla::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Syslog, $this>
+     */
     public function syslogs(): HasMany
     {
-        return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
+        return $this->hasMany(Syslog::class, 'device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\TnmsneInfo, $this>
+     */
     public function tnmsNeInfo(): HasMany
     {
         return $this->hasMany(TnmsneInfo::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Transceiver, $this>
+     */
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     */
     public function users(): BelongsToMany
     {
         // FIXME does not include global read
-        return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
+        return $this->belongsToMany(User::class, 'devices_perms', 'device_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vminfo, $this>
+     */
     public function vminfo(): HasMany
     {
-        return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
+        return $this->hasMany(Vminfo::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vlan, $this>
+     */
     public function vlans(): HasMany
     {
-        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
+        return $this->hasMany(Vlan::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\VrfLite, $this>
+     */
     public function vrfLites(): HasMany
     {
-        return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
+        return $this->hasMany(VrfLite::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Vrf, $this>
+     */
     public function vrfs(): HasMany
     {
-        return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+        return $this->hasMany(Vrf::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\LoadbalancerVserver, $this>
+     */
     public function vServers(): HasMany
     {
         return $this->hasMany(LoadbalancerVserver::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\WirelessSensor, $this>
+     */
     public function wirelessSensors(): HasMany
     {
-        return $this->hasMany(\App\Models\WirelessSensor::class, 'device_id');
+        return $this->hasMany(WirelessSensor::class, 'device_id');
     }
 }

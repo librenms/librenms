@@ -16,7 +16,7 @@ foreach ($oids as $freq_id => $data) {
     $type = 'xups';
     $index = '3.1.' . $freq_id;
 
-    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 // XUPS-MIB::xupsOutputFrequency.0 = INTEGER: 500
@@ -32,7 +32,7 @@ foreach ($oids as $freq_id => $data) {
     $current = $data['xupsOutputFrequency'] / $divisor;
     $type = 'xups';
     $index = '4.2.' . $freq_id;
-    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 // XUPS-MIB::xupsBypassFrequency.0 = INTEGER: 500
@@ -52,6 +52,6 @@ foreach ($oids as $freq_id => $data) {
         $type = 'xups';
         $index = '5.1.' . $freq_id;
 
-        discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 }

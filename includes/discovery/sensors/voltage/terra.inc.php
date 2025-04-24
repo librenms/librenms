@@ -10,7 +10,7 @@ if ($device['os'] === 'terra') {
         if (strpos($device['sysDescr'], $row[0]) !== false) {
             $c = snmp_get($device, $row[1], '-Oqv') / 10;
             if (is_numeric($c)) {
-                discover_sensor($valid['sensor'], 'voltage', $device, $row[1], 0, $row[0], 'Supply voltage', 10, 1, null, null, null, null, $c);
+                discover_sensor(null, 'voltage', $device, $row[1], 0, $row[0], 'Supply voltage', 10, 1, null, null, null, null, $c);
             }
         }
     }

@@ -54,6 +54,10 @@
             "default": "#f0ad4e",
             "type": "color"
         },
+        "alert_colour.changed": {
+            "default": "#FFD700",
+            "type": "color"
+        },
         "alert.default_copy": {
             "default": true,
             "group": "alerting",
@@ -383,6 +387,10 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.oslv_monitor.seen_age": {
+            "default": 604800,
+            "type": "integer"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
@@ -400,6 +408,41 @@
             "order": 24,
             "type": "boolean",
             "default": false
+        },
+        "auth_ad_debug": {
+            "group": "auth",
+            "section": "ad",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_global_read": {
+            "group": "auth",
+            "section": "ad",
+            "order": 3,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_group": {
+            "group": "auth",
+            "section": "ad",
+            "order": 4,
+            "type": "text",
+            "default": null
+        },
+        "auth_ad_require_groupmembership": {
+            "group": "auth",
+            "section": "ad",
+            "order": 5,
+            "type": "boolean",
+            "default": true
+        },
+        "auth_ad_timeout": {
+            "group": "auth",
+            "section": "ad",
+            "order": 6,
+            "type": "integer",
+            "default": 5
         },
         "auth.socialite.redirect": {
             "group": "auth",
@@ -478,13 +521,6 @@
             "order": 5,
             "type": "boolean"
         },
-        "auth_ad_debug": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 20,
-            "type": "boolean"
-        },
         "auth_ad_domain": {
             "group": "auth",
             "section": "ad",
@@ -545,15 +581,8 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"]
             }
-        },
-        "auth_ad_require_groupmembership": {
-            "default": false,
-            "group": "auth",
-            "section": "ad",
-            "order": 8,
-            "type": "boolean"
         },
         "auth_ad_starttls": {
             "default": "disabled",
@@ -678,7 +707,7 @@
             }
         },
         "auth_ldap_port": {
-            "default": 389,
+            "default": null,
             "group": "auth",
             "section": "ldap",
             "order": 1,
@@ -746,6 +775,12 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_userlist_filter": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 30,
+            "type": "text"
+        },
         "auth_ldap_wildcard_ou": {
             "default": false,
             "group": "auth",
@@ -799,17 +834,24 @@
         },
         "autodiscovery.bgp": {
             "default": true,
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 12,
             "type": "boolean"
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
             "type": "array",
-            "default": [
-                "/^Cisco IP Phone/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 7,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "autodiscovery.nets-exclude": {
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 2,
             "type": "array",
             "default": [
@@ -821,22 +863,45 @@
             ]
         },
         "autodiscovery.ospf": {
+            "type": "boolean",
             "default": true,
-            "type": "boolean"
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 13
         },
-        "autodiscovery.snmpscan": {
+        "autodiscovery.ospfv3": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 14
         },
         "autodiscovery.xdp": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 4
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
-            "default": [
-                "/-K9W8/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 6,
+            "validate": {
+                "value.*": "is_regex"
+            }
+        },
+        "autodiscovery.xdp_exclude.sysname_regexp": {
+            "type": "array",
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 5,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_entity_sensor_regex": {
             "default": null,
@@ -853,7 +918,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 0,
+            "order": 1,
             "default": [
                 "voip-null",
                 "virtual-",
@@ -883,7 +948,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 1,
+            "order": 2,
             "default": [
                 "/^ng[0-9]+$/",
                 "/^sl[0-9]/"
@@ -932,6 +997,14 @@
             "default": 1000,
             "type": "integer"
         },
+        "branding": {
+            "default": null,
+            "type": "text"
+        },
+        "branding.default": {
+            "default": null,
+            "type": "text"
+        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
@@ -947,6 +1020,10 @@
         "collectd_dir": {
             "default": null,
             "type": "directory"
+        },
+        "collectd_sock": {
+            "default": null,
+            "type": "text"
         },
         "core_descr": {
             "default": ["core"],
@@ -1045,6 +1122,19 @@
                 "value": "map"
             }
         },
+        "custom_map.edge_font_align": {
+            "default": "horizontal",
+            "type": "select",
+            "options": {
+                "horizontal": "Horizontal",
+                "top": "top",
+                "middle": "Middle",
+                "bottom": "Bottom"
+            },
+            "group": "webui",
+            "section": "custom-map",
+            "order": 54
+        },
         "custom_map.edge_font_color": {
             "default": "#343434",
             "type": "color",
@@ -1074,11 +1164,19 @@
             "order": 22
         },
         "custom_map.height": {
-            "default": "1800px",
+            "default": "800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
             "order": 2
+        },
+        "custom_map.legend_colours": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
         },
         "custom_map.node_align": {
             "default": 10,
@@ -1161,7 +1259,7 @@
             "order": 23
         },
         "custom_map.width": {
-            "default": "800px",
+            "default": "1800px",
             "type": "text",
             "group": "webui",
             "section": "custom-map",
@@ -1206,7 +1304,7 @@
             "default": 0,
             "type": "select-dynamic",
             "group": "discovery",
-            "section": "networks",
+            "section": "ports",
             "order": 0,
             "options": {
                 "target": "port-group"
@@ -1221,6 +1319,25 @@
             "section": "device",
             "default": false,
             "type": "boolean"
+        },
+        "device_location_map_show_devices": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
+        "device_location_map_show_device_dependencies": {
+            "order": 4,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean",
+            "when": {
+                "setting": "device_location_map_show_devices",
+                "operator": "equals",
+                "value": true
+            }
         },
         "default_port_association_mode": {
             "default": "ifIndex",
@@ -1454,6 +1571,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.ospfv3": {
+            "order": 235,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.cisco-cef": {
             "order": 50,
             "group": "discovery",
@@ -1463,13 +1587,6 @@
         },
         "discovery_modules.slas": {
             "order": 80,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "discovery_modules.cisco-cbqos": {
-            "order": 40,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
@@ -1503,11 +1620,25 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.qos": {
+            "order": 260,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.route": {
             "order": 270,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "discovery_modules.transceivers": {
+            "order": 322,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.sensors": {
@@ -1737,6 +1868,48 @@
                 "value": "smtp"
             }
         },
+        "email_smtp_verifypeer": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 11,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
+        "email_smtp_allowselfsigned": {
+            "default": false,
+            "group": "alerting",
+            "section": "email",
+            "order": 12,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
         "email_attach_graphs": {
             "default": true,
             "group": "alerting",
@@ -1899,6 +2072,10 @@
             "order": 1,
             "type": "text"
         },
+        "empty_ifdescr": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_billing": {
             "default": false,
             "type": "boolean"
@@ -1923,6 +2100,10 @@
             "default": false,
             "type": "boolean"
         },
+        "enable_proxmox": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
@@ -1935,11 +2116,19 @@
             "default": false,
             "type": "boolean"
         },
+        "enable_proxmox": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_pseudowires": {
             "default": true,
             "type": "boolean"
         },
         "enable_syslog": {
+            "default": false,
+            "type": "boolean"
+        },
+        "enable_syslog_hooks": {
             "default": false,
             "type": "boolean"
         },
@@ -1950,6 +2139,10 @@
         "enable_vrfs": {
             "default": true,
             "type": "boolean"
+        },
+        "error_font": {
+            "default": null,
+            "type": "text"
         },
         "eventlog_purge": {
             "default": 30,
@@ -2019,6 +2212,14 @@
             "default": 10,
             "type": "integer"
         },
+        "gateone.server": {
+            "default": null,
+            "type": "text"
+        },
+        "gateone.use_librenms_user": {
+            "default": false,
+            "type": "boolean"
+        },
         "geoloc.api_key": {
             "default": "",
             "group": "external",
@@ -2037,7 +2238,7 @@
             }
         },
         "geoloc.dns": {
-            "order": 3,
+            "order": 5,
             "group": "webui",
             "section": "device",
             "default": true,
@@ -2751,14 +2952,6 @@
                 "section": "voice",
                 "order": 0,
                 "descr": "Transcoder Utilisation"
-            },
-            "type": "graph"
-        },
-        "graph_types.device.cisco-voice-ip": {
-            "default": {
-                "section": "voice",
-                "order": 0,
-                "descr": "IP Real Time Calls"
             },
             "type": "graph"
         },
@@ -4062,7 +4255,7 @@
         "html.device.primary_link": {
             "group": "webui",
             "section": "device",
-            "order": 3,
+            "order": 6,
             "type": "select",
             "default": "edit",
             "options": {
@@ -4081,15 +4274,21 @@
                 "custom8": "Custom 8"
             }
         },
+        "html_dir": {
+            "type": "directory"
+        },
         "http_auth_header": {
             "default": "REMOTE_USER",
             "group": "auth",
-            "section": "general",
-            "order": 4,
+            "section": "http",
+            "order": 0,
             "type": "text"
         },
-        "html_dir": {
-            "type": "directory"
+        "http_auth_guest": {
+            "group": "auth",
+            "section": "http",
+            "order": 1,
+            "type": "text"
         },
         "http_proxy": {
             "group": "system",
@@ -4119,6 +4318,22 @@
             "default": true,
             "type": "boolean"
         },
+        "ignore_bsd_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 6,
+            "default": [
+            ],
+            "type": "array"
+        },
+        "ignore_junos_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 7,
+            "default": [
+            ],
+            "type": "array"
+        },
         "ignore_mount": {
             "group": "discovery",
             "section": "storage",
@@ -4129,23 +4344,21 @@
                 "/proc",
                 "/dev",
                 "/compat/linux/proc",
-                "/compat/linux/sys"
+                "/compat/linux/sys",
+                "/sys/fs/cgroup"
             ],
             "type": "array"
         },
-        "ignore_mount_network": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 0,
-            "default": true,
-            "type": "boolean"
-        },
-        "ignore_mount_optical": {
+        "ignore_mount_type": {
             "group": "discovery",
             "section": "storage",
             "order": 1,
-            "default": true,
-            "type": "boolean"
+            "default": [
+                "hrStorageRemovableDisk",
+                "hrStorageNetworkDisk",
+                "hrStorageCompactDisc"
+            ],
+            "type": "array"
         },
         "ignore_mount_regexp": {
             "group": "discovery",
@@ -4162,19 +4375,13 @@
                 "/^\\/dev\\/md0/",
                 "/^\\/var\\/dhcpd\\/dev/",
                 "/UMA/",
-                "/^\\/Volumes\\/OS X Base System/"
+                "/^\\/Volumes\\/OS X Base System/",
+                "/^\\/run\\/user\\//"
             ],
             "type": "array",
             "validate": {
                 "value.*": "is_regex"
             }
-        },
-        "ignore_mount_removable": {
-            "group": "discovery",
-            "section": "storage",
-            "order": 2,
-            "default": true,
-            "type": "boolean"
         },
         "ignore_mount_string": {
             "group": "discovery",
@@ -4333,13 +4540,47 @@
             "section": "influxdbv2",
             "order": 8
         },
+        "influxdbv2.log_file": {
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 9
+        },
         "influxdbv2.groups-exclude": {
             "group": "poller",
             "section": "influxdbv2",
-            "order": 9,
+            "order": 10,
             "type": "array",
             "default": [
             ]
+        },
+        "influxdbv2.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 11
+        },
+        "influxdbv2.verify": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 12
+        },
+        "influxdbv2.batch_size": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 13
+        },
+        "influxdbv2.max_retry": {
+            "default": 3,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 14
         },
         "install_dir": {
             "type": "directory"
@@ -4591,8 +4832,12 @@
             "type": "array",
             "default": [],
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 1
+        },
+        "network_map_dependencymap_vis_options": {
+            "default": null,
+            "type": "text"
         },
         "network_map_items": {
             "default": [
@@ -4634,6 +4879,11 @@
                     "edge": "#ff777788",
                     "node": "#ffdddd"
                 },
+                "wn": {
+                    "border": "#ff6644",
+                    "edge": "#ff7755",
+                    "node": "#ffeecc"
+                },
                 "highlight": {
                     "border": "#ee4000",
                     "borderWidth": 3
@@ -4651,6 +4901,29 @@
         "network_map_vis_options": {
             "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}",
             "type": "text"
+        },
+        "network_map_worldmap_link_type": {
+            "default": "xdp",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 3,
+            "type": "select",
+            "options": {
+                "xdp": "CDP/LLDP Neighbours",
+                "depends": "Parent Dependencies"
+            },
+            "when": {
+                "setting": "network_map_show_on_worldmap",
+                "operator": "equals",
+                "value": true
+            }
+        },
+        "network_map_worldmap_show_disabled_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 2
         },
         "nfdump": {
             "default": "/usr/bin/nfdump",
@@ -4672,14 +4945,14 @@
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 1,
+            "order": 2,
             "type": "array"
         },
         "nfsen_subdirlayout": {
             "default": 1,
             "group": "external",
             "section": "nfsen",
-            "order": 2,
+            "order": 3,
             "type": "select",
             "options": {
                 "0": "0. flat layout",
@@ -4697,7 +4970,7 @@
             "default": 153600,
             "group": "external",
             "section": "nfsen",
-            "order": 3,
+            "order": 4,
             "type": "integer",
             "units": "seconds"
         },
@@ -4705,7 +4978,7 @@
             "default": 500,
             "group": "external",
             "section": "nfsen",
-            "order": 4,
+            "order": 5,
             "type": "integer"
         },
         "nfsen_top_N": {
@@ -4719,39 +4992,42 @@
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 5,
+            "order": 6,
             "type": "array"
         },
         "nfsen_top_default": {
             "default": 20,
             "group": "external",
             "section": "nfsen",
-            "order": 6,
+            "order": 7,
             "type": "integer"
         },
-        "nfsen_stat_default": {
+        "nfsen_stats_default": {
             "default": "srcip",
             "group": "external",
             "section": "nfsen",
-            "order": 7,
+            "order": 8,
             "type": "text"
         },
         "nfsen_order_default": {
             "default": "packets",
             "group": "external",
             "section": "nfsen",
-            "order": 8,
+            "order": 9,
             "type": "text"
         },
         "nfsen_last_default": {
             "default": 900,
             "group": "external",
             "section": "nfsen",
-            "order": 9,
+            "order": 10,
             "type": "integer",
             "units": "seconds"
         },
         "nfsen_lasts": {
+            "group": "external",
+            "section": "nfsen",
+            "order": 11,
             "default": {
                 "300": "5 minutes",
                 "600": "10 minutes",
@@ -4776,13 +5052,13 @@
         "nfsen_split_char": {
             "group": "external",
             "section": "nfsen",
-            "order": 11,
+            "order": 12,
             "type": "text"
         },
         "nfsen_suffix": {
             "group": "external",
             "section": "nfsen",
-            "order": 12,
+            "order": 13,
             "type": "text"
         },
         "nmap": {
@@ -4799,6 +5075,10 @@
             "order": 2,
             "type": "text"
         },
+        "norrd": {
+            "default": false,
+            "type": "boolean"
+        },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
@@ -4810,6 +5090,13 @@
         "old_graphs": {
             "default": true,
             "type": "boolean"
+        },
+        "opentsdb.co": {
+            "default": null,
+            "type": "boolean",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 3
         },
         "opentsdb.enable": {
             "default": false,
@@ -4847,10 +5134,6 @@
                 }
             ],
             "type": "array"
-        },
-        "os_def_cache_time": {
-            "default": 86400,
-            "type": "integer"
         },
         "os_group.unix.over": {
             "default": [
@@ -4991,6 +5274,34 @@
                 "value": "url"
             }
         },
+        "radius.default_level": {
+            "default": 1,
+            "type": "integer"
+        },
+        "radius.hostname": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.port": {
+            "default": null,
+            "type": "integer"
+        },
+        "radius.users_purge": {
+            "default": null,
+            "type": "boolean"
+        },
+        "radius.secret": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.suffix": {
+            "default": null,
+            "type": "text"
+        },
+        "rrd.enable": {
+            "default": true,
+            "type": "boolean"
+        },
         "snmptraps.eventlog": {
             "default": "unhandled",
             "group": "external",
@@ -5120,6 +5431,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.qos": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.sensors": {
             "order": 360,
             "group": "poller",
@@ -5230,13 +5548,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.wifi": {
-            "order": 430,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.wireless": {
             "order": 440,
             "group": "poller",
@@ -5246,6 +5557,13 @@
         },
         "poller_modules.ospf": {
             "order": 330,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.ospfv3": {
+            "order": 331,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -5314,27 +5632,6 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.cisco-asa-firewall": {
-            "order": 60,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-voice": {
-            "order": 150,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.cisco-cbqos": {
-            "order": 70,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.cisco-otv": {
             "order": 110,
             "group": "poller",
@@ -5379,6 +5676,13 @@
         },
         "poller_modules.entity-physical": {
             "order": 170,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.transceivers": {
+            "order": 322,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -5590,7 +5894,7 @@
             "type": "boolean"
         },
         "reporting.throttle": {
-            "default": 300,
+            "default": 30,
             "type": "integer",
             "units": "seconds",
             "group": "system",
@@ -5710,21 +6014,88 @@
             "order": 12,
             "type": "text"
         },
+        "schedule_type.alerting": {
+            "default": "legacy",
+            "type": "select",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 1,
+            "options": {
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
+            }
+        },
+        "schedule_type.billing": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 2,
+            "type": "select",
+            "options": {
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
+            }
+        },
+        "schedule_type.discovery": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 3,
+            "type": "select",
+            "options": {
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
+            }
+        },
+        "schedule_type.ping": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 4,
+            "type": "select",
+            "options": {
+                "legacy": "legacy",
+                "disabled": "disabled",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
+            }
+        },
+        "schedule_type.poller": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 5,
+            "type": "select",
+            "options": {
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher",
+                "scheduler": "scheduler"
+            }
+        },
+        "schedule_type.services": {
+            "default": "legacy",
+            "group": "system",
+            "section": "scheduledtasks",
+            "order": 6,
+            "type": "select",
+            "options": {
+                "legacy": "legacy",
+                "cron": "cron",
+                "dispatcher": "dispatcher"
+            }
+        },
         "sensors.guess_limits": {
             "default": true,
-            "type": "boolean"
-        },
-        "service_poller_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 5,
             "type": "boolean"
         },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 6,
             "type": "integer",
             "units": "Workers"
@@ -5732,7 +6103,7 @@
         "service_poller_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 7,
             "type": "integer",
             "units": "Seconds"
@@ -5740,22 +6111,15 @@
         "service_poller_down_retry": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 8,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_discovery_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 9,
-            "type": "boolean"
-        },
         "service_discovery_workers": {
             "default": 16,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 10,
             "type": "integer",
             "units": "Workers"
@@ -5763,22 +6127,15 @@
         "service_discovery_frequency": {
             "default": 21600,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 11,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_services_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 12,
-            "type": "boolean"
-        },
         "service_services_workers": {
             "default": 8,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 13,
             "type": "integer",
             "units": "Workers"
@@ -5786,22 +6143,15 @@
         "service_services_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 14,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_billing_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 15,
-            "type": "boolean"
-        },
         "service_billing_frequency": {
             "default": 300,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 16,
             "type": "integer",
             "units": "Seconds"
@@ -5809,37 +6159,23 @@
         "service_billing_calculate_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 17,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_alerting_enabled": {
-            "default": true,
-            "group": "poller",
-            "section": "distributed",
-            "order": 18,
-            "type": "boolean"
-        },
         "service_alerting_frequency": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 19,
             "type": "integer",
             "units": "Seconds"
         },
-        "service_ping_enabled": {
-            "default": false,
-            "group": "poller",
-            "section": "distributed",
-            "order": 20,
-            "type": "boolean"
-        },
         "ping_rrd_step": {
             "default": 60,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 21,
             "type": "integer",
             "units": "Seconds"
@@ -5847,14 +6183,14 @@
         "service_update_enabled": {
             "default": true,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 22,
             "type": "boolean"
         },
         "service_update_frequency": {
             "default": 86400,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 23,
             "type": "integer",
             "units": "Seconds"
@@ -5862,7 +6198,7 @@
         "service_loglevel": {
             "default": "INFO",
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 24,
             "type": "select",
             "options": {
@@ -5876,15 +6212,22 @@
         "service_master_timeout": {
             "default": 20,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 25,
             "type": "integer",
             "units": "seconds"
         },
+        "service_health_file": {
+            "default": "",
+            "group": "poller",
+            "section": "distributed",
+            "order": 29,
+            "type": "string"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
-            "section": "distributed",
+            "section": "dispatcherservice",
             "order": 26,
             "type": "boolean"
         },
@@ -6130,6 +6473,9 @@
             "order": 1,
             "type": "integer"
         },
+        "syslog_xlate": {
+            "type": "array"
+        },
         "temp_dir": {
             "type": "directory"
         },
@@ -6224,8 +6570,8 @@
         },
         "uptime_warning": {
             "group": "webui",
-            "section": "dashboard",
-            "order": 2,
+            "section": "device",
+            "order": 7,
             "default": 86400,
             "type": "integer",
             "validate": {

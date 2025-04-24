@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -27,7 +28,7 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
         if (is_numeric($current)) {
-            discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'current', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }

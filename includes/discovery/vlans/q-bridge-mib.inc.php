@@ -1,4 +1,5 @@
 <?php
+
 /**
  * q-bridge-mib.inc.php
  *

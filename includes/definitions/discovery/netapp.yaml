@@ -1,6 +1,16 @@
 modules:
-  os:
-    serial: NETAPP-MIB::productSerialNum.0
-    hardware: NETAPP-MIB::productModel.0
-    version: NETAPP-MIB::productVersion.0
-    version_regex: '/NetApp Release (?<version>.*?):/'
+    os:
+        serial: NETAPP-MIB::productSerialNum.0
+        hardware: NETAPP-MIB::productModel.0
+        version: NETAPP-MIB::productVersion.0
+        version_regex: '/NetApp Release (?<version>.*?):/'
+    storage:
+        data:
+            -
+                oid: NETAPP-MIB::dfTable
+                type: NETAPP-MIB::dfType
+                descr: NETAPP-MIB::dfFileSys
+                units: 1024
+                size: NETAPP-MIB::df64TotalKBytes
+                used: NETAPP-MIB::df64UsedKBytes
+                used_num_oid: '.1.3.6.1.4.1.789.1.5.4.1.30.{{ $index }}'

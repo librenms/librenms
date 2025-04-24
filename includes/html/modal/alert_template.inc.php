@@ -201,7 +201,9 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rul
                         }
                     });
                 } else {
-                    var newrow = [{id: output.newid, templatename: name, alert_rules: JSON.stringify(row_rules)}];
+
+                    var escaped_name = new Option(name).innerHTML;
+                    var newrow = [{id: output.newid, templatename: escaped_name, alert_rules: JSON.stringify(row_rules)}];
                     $('#templatetable').bootgrid("append", newrow);
                 }
             } else {

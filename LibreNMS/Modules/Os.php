@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OS.php
  *
@@ -77,7 +78,7 @@ class Os implements Module
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
     {
-        $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
+        $deviceModel = $os->getDevice(); /** @var Device $deviceModel */
         if ($os instanceof OSPolling) {
             $os->pollOS($datastore);
         } else {
@@ -109,18 +110,23 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        // no cleanup needed
+        return false; // data part of device
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function cleanup(Device $device): int
+    {
+        return 0; // no cleanup needed
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device, string $type): ?array
     {
         // get data fresh from the database
         return [

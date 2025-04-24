@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to Graph Cisco IPSLA ICMP Jitter metrics
  *

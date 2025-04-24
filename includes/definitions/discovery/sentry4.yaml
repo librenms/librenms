@@ -56,6 +56,14 @@ modules:
                     index: 'st4PhaseVoltage.{{ $index }}'
                     descr: Phase, {{ $st4PhaseLabel }}, Voltage
                     divisor: 10
+        percent:
+            data:
+                -
+                    oid: st4InputCordOutOfBalance
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.12.{{ $index }}'
+                    index: 'st4InputCord.{{ $index }}'
+                    descr: Cord, {{ $st4InputCordName }}, Balance
+                    divisor: 10
         state:
             data:
                 -

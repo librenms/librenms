@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS - ADVA device support - Temperature Sensors
  *
@@ -95,7 +96,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
 
             d_echo($pre_cache['adva_fsp150']);
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,
@@ -128,7 +129,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex_measured = 'ports';
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetNetPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetNetPortIfIndex']);
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,
@@ -157,7 +158,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex_measured = 'ports';
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetAccPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetAccPortIfIndex']);
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,
@@ -186,7 +187,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $entPhysicalIndex_measured = 'ports';
             $descr = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']);
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'temperature',
                 $device,
                 $oid,

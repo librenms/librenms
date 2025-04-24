@@ -1,0 +1,15 @@
+modules:
+    os:
+        hardware:
+          - .1.3.6.1.2.1.1.5.0
+          - .1.3.6.1.2.1.47.1.1.1.1.8.67108992
+        hardware_template: '{{ .1.3.6.1.2.1.1.5.0 }} {{ .1.3.6.1.2.1.47.1.1.1.1.8.67108992 }}'
+        serial: .1.3.6.1.2.1.47.1.1.1.1.11.67108992
+        version: .1.3.6.1.2.1.47.1.1.1.1.10.67108992
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: GRANDSTREAM-GWN-PRODUCTS-SWITCH-MIB::gwnSystemTemper
+                    num_oid: '.1.3.6.1.4.1.42397.1.4.12.1.1.{{ $index }}'
+                    descr: 'switch-temperature-{{ $index }}'

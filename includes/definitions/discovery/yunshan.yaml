@@ -409,7 +409,7 @@ modules:
                     oid: hwPwrStatusTable
                     value: hwEntityPwrVoltage
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.8.{{ $index }}'
-                    descr: 'PWR{{ $hwEntityPwrSlot }}'
+                    descr: 'PWR{{ $index }}'
                     index: '{{ $index }}'
                     divisor: 1000
                 -
@@ -470,7 +470,7 @@ modules:
                     oid: hwPwrStatusTable
                     value: hwEntityPwrCurrent
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.7.{{ $index }}'
-                    descr: 'PWR{{ $hwEntityPwrSlot }}'
+                    descr: 'PWR{{ $index }}'
                     index: '{{ $index }}'
                     divisor: 1000
         power:
@@ -672,3 +672,15 @@ modules:
                         - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
                         - { descr: 'Major', graph: 1, value: 3, generic: 2 }
                         - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: hwPwrStatusTable
+                    value: hwEntityPwrState
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.{{ $index }}'
+                    group: 'Power Supply'
+                    descr: 'PWR{{ $index }}'
+                    states:
+                        - { descr: 'Supply', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Not Supply', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Sleep', graph: 1, value: 3, generic: 1 }
+                        - { descr: 'Unknown', graph: 1, value: 4, generic: 3 }

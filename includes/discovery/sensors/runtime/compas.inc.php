@@ -1,4 +1,5 @@
 <?php
+
 /**
  * compas.inc.php
  *
@@ -29,5 +30,5 @@ $index = 0;
 if (is_numeric($batteryAutonomy)) {
     $sensorType = 'compas';
     $descr = 'Runtime';
-    discover_sensor($valid['sensor'], 'runtime', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryAutonomy);
+    discover_sensor(null, 'runtime', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryAutonomy);
 }

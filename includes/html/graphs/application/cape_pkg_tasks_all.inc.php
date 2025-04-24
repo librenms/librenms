@@ -28,7 +28,7 @@ foreach ($packages as $index => $package) {
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg___-___', $vars['package']]);
 
-if (sizeof($rrd_list)) {
+if (count($rrd_list)) {
     d_echo('No relevant package RRDs found');
 }
 

@@ -1,0 +1,74 @@
+mib: ESPHOME-ESP8266-SNMP-MIB:HOST-RESOURCES-MIB:SNMPv2-MIB
+modules:
+    os:
+        hardware:
+            - ESPHOME-ESP8266-SNMP-MIB::chipModel.0
+            - ESPHOME-ESP8266-SNMP-MIB::chipRevision.0
+        hardware_template: 'Model: {{ $ESPHOME-ESP8266-SNMP-MIB::chipModel.0 }} Revision: {{ $ESPHOME-ESP8266-SNMP-MIB::chipRevision.0 }}'
+        version: SNMPv2-MIB::sysDescr.0
+        version_regex: '/version (?<version>[^ ]+)/'
+    mempools:
+        data:
+            - # Heap ESP32 only
+                oid: ESPHOME-ESP32-SNMP-MIB::heap
+                total: ESPHOME-ESP32-SNMP-MIB::heapSize
+                free: ESPHOME-ESP32-SNMP-MIB::freeHeap
+                precision: 1
+                descr: 'Heap'
+                class: Heap
+            - # SPI RAM If Attached
+                oid: HOST-RESOURCES-MIB::hrStorage
+                total: HOST-RESOURCES-MIB::hrStorageSize
+                used: HOST-RESOURCES-MIB::hrStorageUsed
+                precision: 1
+                descr: '{{ $HOST-RESOURCES-MIB::hrStorageDescr }}'
+                class: '{{ $HOST-RESOURCES-MIB::hrStorageDescr }}'
+                index: '{{ $index }}'
+                skip_values:
+                    - #Skip flash as the storage module should load that
+                        oid: HOST-RESOURCES-MIB::hrStorageDescr
+                        op: '='
+                        value: 'FLASH'
+    sensors:
+        dbm:
+            data:
+                - # RSSI
+                    oid: ESPHOME-ESP8266-SNMP-MIB::wifi
+                    descr: 'BSSID: {{ $ESPHOME-ESP8266-SNMP-MIB::bssi }}'
+                    group: 'RSSI of SSID: {{ $ESPHOME-ESP8266-SNMP-MIB::ssid }}'
+                    value: ESPHOME-ESP8266-SNMP-MIB::rssi
+                    num_oid: .1.3.9999.4.{{ $index }}
+        state:
+            data:
+                - # Chip Type
+                    oid: ESPHOME-ESP8266-SNMP-MIB::chipType
+                    descr: 'Chip Type'
+                    num_oid: .1.3.9999.2.1
+                    states:
+                        - { value: 32, generic: 0, graph: 0, descr: 'ESP32' }
+                        - { value: 8266, generic: 0, graph: 0, descr: 'ESP8266' }
+        frequency:
+            data:
+                - # Chip Frequency
+                    oid: ESPHOME-ESP8266-SNMP-MIB::cpuClock
+                    descr: 'Chip Frequency'
+                    num_oid: .1.3.9999.2.2.0
+                    multiplier: 1000000
+        count:
+            data:
+                - # Total RAM
+                    oid: HOST-RESOURCES-MIB::hrMemorySize
+                    descr: 'Total RAM'
+                    num_oid: .1.3.6.1.2.1.25.2.2.0
+                    multiplier: 1000
+                - # Core Count
+                    oid: ESPHOME-ESP8266-SNMP-MIB::numCores
+                    descr: 'Core Count'
+                    num_oid: .1.3.9999.2.4.0
+        percent:
+            data:
+                - # ESP8266 only Heap Fragmentation In percents
+                    oid: ESPHOME-ESP8266-SNMP-MIB::heapFragmentation
+                    descr: 'Heap Fragmentation In percents'
+                    num_oid: .1.3.9999.8266.2.0
+

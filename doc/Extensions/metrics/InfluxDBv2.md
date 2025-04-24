@@ -38,9 +38,14 @@ continue to function as normal.
     lnms config:set influxdbv2.bucket 'librenms'
     lnms config:set influxdbv2.token 'admin'
     lnms config:set influxdbv2.allow_redirect true
-    lmns config:set influxdbv2.organization 'librenms'
-    lmns config:set influxdbv2.debug false
-    lmns config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
+    lnms config:set influxdbv2.organization 'librenms'
+    lnms config:set influxdbv2.debug false
+    lnms config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
+    lnms config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
+    lnms config:set influxdbv2.timeout 5
+    lnms config:set influxdbv2.verify false
+    lnms config:set influxdbv2.batch_size 1000
+    lnms config:set influxdbv2.max_retry 2
     ```
 
 The same data stored within rrd will be sent to InfluxDB and

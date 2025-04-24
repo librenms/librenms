@@ -4741,5 +4741,26 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 10,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 11,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

@@ -15,7 +15,7 @@ By default Hostname will be used for polling data. If you want
 to get polling Device data via a specific IP-Address (e.g. Management IP)
 fill out the optional field `Overwrite IP` with it's IP-Address.
 
-![Add device](/img/webui_add_device.png)
+![Add device](../img/webui_add_device.png)
 
 ## Via CLI
 
@@ -52,7 +52,7 @@ added into LibreNMS as Ping Only Device and will show ICMP Response Graph.
 
 Via CLI this is done with `./lnms device:add [-P|--ping-only] yourhostname`
 
-![Ping Only](/img/add-ping-only.png)
+![Ping Only](../img/add-ping-only.png)
 
 A How-to video can be found here: [How to add ping only devices](https://youtu.be/cjuByubg-uk)
 

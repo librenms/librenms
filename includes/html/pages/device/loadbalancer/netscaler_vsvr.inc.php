@@ -42,8 +42,8 @@ if (is_numeric($vars['vsvr'])) {
         echo '<td>' . $vsvr['vsvr_ip'] . ':' . $vsvr['vsvr_port'] . '</td>';
         echo "<td><span class='label label-" . $vsvr_label . "'>" . $vsvr['vsvr_state'] . '</span></td>';
         echo '<td><span class="label label-default">' . $vsvr['vsvr_type'] . '</span></td>';
-        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_in'] * 8, 2, 3, '') . 'bps</a></td>';
-        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_out'] * 8, 2, 3, '') . 'bps</a></td>';
+        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_in'] * 8, 2, 0, '') . 'bps</a></td>';
+        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_out'] * 8, 2, 0, '') . 'bps</a></td>';
         echo '</tr>';
 
         foreach ($graph_types as $graph_type => $graph_text) {
@@ -166,8 +166,8 @@ if (is_numeric($vars['vsvr'])) {
         echo '<td>' . $vsvr['vsvr_ip'] . ':' . $vsvr['vsvr_port'] . '</td>';
         echo "<td><span class='label label-" . $vsvr_label . "'>" . $vsvr['vsvr_state'] . '</span></td>';
         echo '<td><span class="label label-default">' . $vsvr['vsvr_type'] . '</span></td>';
-        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_in'] * 8, 2, 3, '') . 'bps</a></td>';
-        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_out'] * 8, 2, 3, '') . 'bps</a></td>';
+        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_in'] * 8, 2, 0, '') . 'bps</a></td>';
+        echo '<td>' . \LibreNMS\Util\Number::formatSi($vsvr['vsvr_bps_out'] * 8, 2, 0, '') . 'bps</a></td>';
         echo '</tr>';
         if ($vars['view'] == 'graphs') {
             echo '<tr class="list-bold" bgcolor="' . $bg_colour . '">';

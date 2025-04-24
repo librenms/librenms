@@ -1,12 +1,11 @@
 <?php
+
 /*
  *
  * @link       https://www.librenms.org
  *
  * @author     peca.nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
-use LibreNMS\Util\Oid;
 
 echo 'RFC1628 ';
 
@@ -27,7 +26,7 @@ if (is_numeric($state)) {
 
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
@@ -44,9 +43,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 // Output Source (Value : 1 other, 2 none, 3 normal, 4 bypass, 5 battery, 6 booster, 7 reducer)
@@ -69,7 +65,7 @@ if (is_numeric($state)) {
 
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
@@ -86,9 +82,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 // UPS battery test status
@@ -109,12 +102,11 @@ if (is_numeric($state)) {
     );
 
     $sensor_index = 0;
-    $oid = oid::toNumeric('UPS-MIB::upsTestResultsSummary.0');
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
-        $oid,
+        '.1.3.6.1.2.1.33.1.7.3.0',
         $sensor_index,
         $state_name,
         'UPS Test',
@@ -128,7 +120,4 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

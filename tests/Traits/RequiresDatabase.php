@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RequiresDatabase.php
  *

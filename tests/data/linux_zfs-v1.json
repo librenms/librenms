@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"l2_errors\":null}",
+                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"version\":1,\"l2_errors\":null,\"status_info\":[]}",
                     "deleted_at": null
                 }
             ],

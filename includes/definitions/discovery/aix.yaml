@@ -12,3 +12,12 @@ modules:
     version_replace:
       - '/(?<=^|\.)0+(?=[^.])/' # standard snmp daemon
       - ['/(\d+) (\d+)/', '$2.$1'] # net-snmp daemon
+  storage:
+      data:
+          -
+              oid: IBM-AIX-MIB::aixFsTable
+              type: IBM-AIX-MIB::aixFsType
+              descr: IBM-AIX-MIB::aixFsMountPoint
+              size: IBM-AIX-MIB::aixFsSize
+              free: IBM-AIX-MIB::aixFsFree
+              units: 1048576

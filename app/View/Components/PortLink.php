@@ -11,7 +11,7 @@ use LibreNMS\Util\Url;
 class PortLink extends Component
 {
     /**
-     * @var \App\Models\Port
+     * @var Port
      */
     public $port;
     /**
@@ -41,11 +41,11 @@ class PortLink extends Component
      *
      * @return void
      */
-    public function __construct(Port $port, ?array $graphs = null, bool $basic = false)
+    public function __construct(Port $port, ?array $graphs = null, bool $basic = false, array $vars = [])
     {
         $this->basic = $basic;
         $this->port = $port;
-        $this->link = Url::portUrl($port);
+        $this->link = Url::portUrl($port, $vars);
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
         $this->status = $this->status();

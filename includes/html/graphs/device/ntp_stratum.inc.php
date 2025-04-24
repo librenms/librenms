@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display captured NTP statistics
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Php.php
  *
@@ -25,14 +26,15 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Config;
 use LibreNMS\Validator;
 
 class Php extends BaseValidation
 {
-    const PHP_MIN_VERSION = '8.1';
-    const PHP_MIN_VERSION_DATE = 'September, 2022';
-    const PHP_RECOMMENDED_VERSION = '8.1';
+    const PHP_MIN_VERSION = '8.2';
+    const PHP_MIN_VERSION_DATE = 'October, 2024';
+    const PHP_RECOMMENDED_VERSION = '8.3';
 
     /**
      * Validate this module.
@@ -51,7 +53,7 @@ class Php extends BaseValidation
     private function checkVersion(Validator $validator)
     {
         // if update is not set to false and version is min or newer
-        if (Config::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
+        if (LibrenmsConfig::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
             $validator->warn('PHP version ' . self::PHP_MIN_VERSION . ' is the minimum supported version as of ' . self::PHP_MIN_VERSION_DATE . '. We recommend you update PHP to a supported version (' . self::PHP_RECOMMENDED_VERSION . ' suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
         }
 
@@ -66,7 +68,7 @@ class Php extends BaseValidation
     {
         $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
-        if (Config::get('distributed_poller') && env('CACHE_DRIVER') == 'memcached') {
+        if (LibrenmsConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached') {
             $required_modules[] = 'memcached';
         }
 

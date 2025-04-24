@@ -18,6 +18,6 @@ foreach (explode("\n", $oids) as $data) {
         $oid = '.1.3.6.1.4.1.40297.1.2.1.2.2.' . $index;
         $temperature = hytera_h2f(str_replace('"', '', snmp_get($device, $oid, '-Oqv')), 2);
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', 0, 0, 70, 75, $temperature);
+        discover_sensor(null, 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', 0, 0, 70, 75, $temperature);
     }
 }

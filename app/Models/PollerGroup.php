@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PollerGroup.php
  *
@@ -53,8 +54,11 @@ class PollerGroup extends Model
         return self::query()->pluck('group_name', 'id')->prepend(__('General'), 0);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     */
     public function devices(): HasMany
     {
-        return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
+        return $this->hasMany(Device::class, 'poller_group', 'id');
     }
 }

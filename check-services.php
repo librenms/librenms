@@ -13,6 +13,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
@@ -47,6 +48,14 @@ if (isset($options['h'])) {
             $params[] = $options['h'];
         }
     }
+} else {
+    $scheduler = Config::get('schedule_type.services');
+    if ($scheduler != 'legacy' && $scheduler != 'cron') {
+        if (Debug::isEnabled()) {
+            echo "Services are not enabled for cron scheduling\n";
+        }
+        exit(0);
+    }
 }
 
 $sql = 'SELECT D.*,S.*,attrib_value  FROM `devices` AS D'
@@ -58,7 +67,7 @@ foreach (dbFetchRows($sql, $params) as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
-        $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
+        $service['attrib_value'] === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip'])))) {
         poll_service($service);
         $polled_services++;

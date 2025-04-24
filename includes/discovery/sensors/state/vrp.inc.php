@@ -1,4 +1,5 @@
 <?php
+
 /**
  * vrp.inc.php
  *
@@ -48,6 +49,5 @@ foreach ($pre_cache['hwStackPortTable'] as $index => $data) {
 
     create_state_index($state_name, $states);
 
-    discover_sensor($valid['sensor'], 'state', $device, $state_oid, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state, 'snmp', null, null, null, 'Stack');
-    create_sensor_to_state_index($device, $state_name, $state_index);
+    discover_sensor(null, 'state', $device, $state_oid, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state, 'snmp', null, null, null, 'Stack');
 }

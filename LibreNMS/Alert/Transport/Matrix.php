@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2020 Raphael Dannecker <rdannecker@gmail.com>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +45,7 @@ class Matrix extends Transport
 
         $message = SimpleTemplate::parse($message, $alert_data);
 
-        $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => 'm.text', 'format' => 'org.matrix.custom.html'];
+        $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => 'm.notice', 'format' => 'org.matrix.custom.html'];
 
         $res = Http::client()
             ->withToken($authtoken)

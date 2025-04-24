@@ -21637,8 +21637,8 @@
                     "ifName": "ve55",
                     "portName": null,
                     "ifIndex": 16777271,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -21737,8 +21737,8 @@
                     "ifName": "ve66",
                     "portName": null,
                     "ifIndex": 16777282,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -21837,8 +21837,8 @@
                     "ifName": "loopback1",
                     "portName": null,
                     "ifIndex": 33554433,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -23311,10 +23311,10 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 1,
                     "bgpLocalAddr": "172.31.31.20",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -23334,10 +23334,10 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "connect",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 1,
                     "bgpLocalAddr": "192.0.2.5",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -23357,7 +23357,7 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
@@ -23380,10 +23380,10 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "connect",
                     "bgpPeerAdminStatus": "start",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 1,
                     "bgpLocalAddr": "192.0.2.5",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -23403,7 +23403,7 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
-                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
                     "bgpPeerIface": null,
@@ -24614,5 +24614,92 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2001:0db8:0000:0000:0000:0000:0000:0001",
+                    "ipv6_compressed": "2001:db8::1",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 33554433
+                },
+                {
+                    "ipv6_address": "2001:0db8:0000:0000:0000:0000:0000:0004",
+                    "ipv6_compressed": "2001:db8::4",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "2001:0db8:0000:0000:0000:0000:0000:0005",
+                    "ipv6_compressed": "2001:db8::5",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "2001:0db8:0055:0000:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:db8:55::",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 16777271
+                },
+                {
+                    "ipv6_address": "2001:0db8:0055:0000:0000:0000:0000:0002",
+                    "ipv6_compressed": "2001:db8:55::2",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 16777271
+                },
+                {
+                    "ipv6_address": "2001:0db8:0066:0000:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:db8:66::",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 16777282
+                },
+                {
+                    "ipv6_address": "2001:0db8:0066:0000:0000:0000:0000:0002",
+                    "ipv6_compressed": "2001:db8:66::2",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 16777282
+                },
+                {
+                    "ipv6_address": "2001:0db8:2601:0000:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:db8:2601::",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "2001:0db8:2601:0000:0000:0000:0000:0020",
+                    "ipv6_compressed": "2001:db8:2601::20",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsController.php
  *
@@ -94,6 +95,7 @@ class PortsController implements DeviceTab
         $this->detail = $tab == 'detail';
         $data = match ($tab) {
             'links' => $this->linksData($device),
+            'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
@@ -118,6 +120,7 @@ class PortsController implements DeviceTab
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
         if ($this->detail) {
             $relationships[] = 'links';
+            $relationships[] = 'transceivers';
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
@@ -249,6 +252,15 @@ class PortsController implements DeviceTab
         ];
     }
 
+    private function transceiversData(Device $device): array
+    {
+        $device->load(['transceivers.port']);
+
+        return [
+            'transceivers' => $device->transceivers,
+        ];
+    }
+
     private function xdslData(Device $device): array
     {
         $device->portsAdsl->load('port');
@@ -278,8 +290,16 @@ class PortsController implements DeviceTab
             $tabs[] = ['name' => __('port.tabs.arp'), 'url' => 'arp'];
         }
 
+        if ($device->nd()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.nd'), 'url' => 'nd'];
+        }
+
         if ($device->portsFdb()->exists()) {
             $tabs[] = ['name' => __('port.tabs.fdb'), 'url' => 'fdb'];
+        }
+
+        if ($device->transceivers()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.transceivers'), 'url' => 'transceivers'];
         }
 
         if ($device->links()->exists()) {

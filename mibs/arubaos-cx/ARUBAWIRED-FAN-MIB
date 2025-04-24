@@ -160,7 +160,8 @@ arubaWiredFanRPM OBJECT-TYPE
       UNITS       "RPM"
       MAX-ACCESS  read-only
       STATUS      current
-      DESCRIPTION "Current RPM read for the fan."
+      DESCRIPTION "Current RPM read for the fan. RPM of -1 indicates
+                   fan does not have RPM readback capability."
       ::= { arubaWiredFanEntry 8 }
 
 arubaWiredFanAirflowDirection OBJECT-TYPE

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
-use App\Providers\RouteServiceProvider;
+use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
@@ -29,7 +29,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = AppServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -52,7 +52,7 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         // Check if we want to redirect users to the socialite provider directly
-        if (! $request->has('redirect') && Config::get('auth.socialite.redirect') && array_key_first(Config::get('auth.socialite.configs', []))) {
+        if (! $request->has('redirect') && ! $request->session()->has('block_auto_redirect') && Config::get('auth.socialite.redirect') && array_key_first(Config::get('auth.socialite.configs', []))) {
             return (new SocialiteController)->redirect($request, array_key_first(Config::get('auth.socialite.configs', [])));
         }
 

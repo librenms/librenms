@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mac.php
  *
@@ -66,6 +67,28 @@ class Mac
     public static function parse(?string $mac): static
     {
         return new static($mac ?? '');
+    }
+
+    public static function parsePartial(string $vendor): static
+    {
+        $parts = preg_split('/[-:.]/', $vendor);
+
+        // no delimiters, just pad to 12
+        if (! $parts || count($parts) == 1) {
+            return new static(str_pad($vendor, 12, '0'));
+        }
+
+        // try to parse into the correct bits
+        $words = [];
+        foreach ($parts as $part) {
+            $bits = strlen($part) > 2 ? str_split($part, 2) : [$part];
+
+            foreach ($bits as $bit) {
+                $words[] = str_pad($bit, 2, '0', STR_PAD_LEFT);
+            }
+        }
+
+        return new static(implode(':', array_pad($words, 6, '00')));
     }
 
     /**

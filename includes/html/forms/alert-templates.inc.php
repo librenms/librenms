@@ -1,4 +1,5 @@
 <?php
+
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,6 +92,6 @@ try {
     $message .= $e->getMessage();
 }
 
-$response = ['status' => $status, 'message' => $message, 'newid' => $template_newid];
+$response = ['status' => htmlentities($status), 'message' => htmlentities($message), 'newid' => $template_newid];
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

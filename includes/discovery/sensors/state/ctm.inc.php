@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ctm.inc.php
  *
@@ -73,7 +74,7 @@ foreach ($octetSetup as $entry) {
         foreach ($onStates as $index => $value) {
             $port_number = $index + 1;
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'state',
                 $device,
                 $entry['num_oid'],
@@ -90,7 +91,6 @@ foreach ($octetSetup as $entry) {
                 'snmp',
                 $port_number
             );
-            create_sensor_to_state_index($device, $entry['state_name'], $port_number);
         }
     }
     unset($octetString, $states, $octetSetup, $port_number);

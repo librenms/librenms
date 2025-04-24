@@ -32,7 +32,7 @@
         </div>
         <div class="panel-body">
             <vue-tabs direction="vertical" type="pills">
-                <v-tab :title="poller.poller_name" v-for="(poller, id) in pollers" :key="id">
+                <v-tab :title="poller.poller_name" v-for="(poller, id) in pollers" :key="id" class="tw:ml-3">
                     <div class="setting-container clearfix"
                          v-for="setting in settings[id]"
                          v-if="!setting.advanced || advanced"

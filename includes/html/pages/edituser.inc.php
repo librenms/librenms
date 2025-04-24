@@ -1,11 +1,8 @@
 <?php
 
-use App\Models\DeviceGroup;
 use App\Models\User;
 
 $no_refresh = true;
-
-require 'includes/html/javascript-interfacepicker.inc.php';
 
 echo "<div style='margin: 10px;'>";
 
@@ -80,7 +77,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
         $device_perms = dbFetchRows('SELECT * from devices_perms as P, devices as D WHERE `user_id` = ? AND D.device_id = P.device_id', [$user_data['user_id']]);
         foreach ($device_perms as $device_perm) {
-            echo '<tr><td><strong>' . format_hostname($device_perm) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $vars['user_id'] . '/device_id=' . $device_perm['device_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            echo '<tr><td><strong>' . htmlentities(format_hostname($device_perm)) . "</td><td> <a href='edituser/action=deldevperm/user_id=" . $vars['user_id'] . '/device_id=' . $device_perm['device_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
             $access_list[] = $device_perm['device_id'];
             $permdone = 'yes';
         }
@@ -101,23 +98,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
             <input type='hidden' value='adddevperm' name='action'>
             <div class='form-group'>
               <label class='sr-only' for='device_id'>Device</label>
-              <select name='device_id' id='device_id' class='form-control'>";
-
-        $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-        foreach ($devices as $device) {
-            unset($done);
-            foreach ($access_list as $ac) {
-                if ($ac == $device['device_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (! $done) {
-                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device) . '</option>';
-            }
-        }
-
-        echo "</select>
+              <select name='device_id' id='device_id' class='form-control'>
+              </select>
            </div>
            <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
 
@@ -159,21 +141,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             <input type='hidden' value='adddevgroupperm' name='action'>
             <div class='form-group'>
               <label class='sr-only' for='device_group_id'>Device</label>
-              <select name='device_group_id' id='device_group_id' class='form-control'>";
-
-        $device_groups = DeviceGroup::query()
-            ->whereNotIn('id', $user->deviceGroups->pluck('id'))
-            ->when(! $allow_dynamic, function ($query) {
-                return $query->where('type', 'static');
-            })
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
-        foreach ($device_groups as $group) {
-            echo '<option value="' . $group->id . '">' . $group->name . '</option>';
-        }
-
-        echo "</select>
+              <select name='device_group_id' id='device_group_id' class='form-control'></select>
            </div>
            <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
 
@@ -221,30 +189,13 @@ if (! Auth::user()->hasGlobalAdmin()) {
         <div class='form-group'>
           <label for='device' class='col-sm-2 control-label'>Device: </label>
           <div class='col-sm-10'>
-            <select id='device' class='form-control' name='device' onchange='getInterfaceList(this)'>
-          <option value=''>Select a device</option>";
-
-        foreach ($devices as $device) {
-            unset($done);
-            foreach ($access_list as $ac) {
-                if ($ac == $device['device_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (! $done) {
-                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device) . '</option>';
-            }
-        }
-
-        echo "</select>
+            <select id='device' class='form-control' name='device' onchange='window.port_device_id = this.value; $(\"#port_id\").empty().trigger(\"change\");'></select>
           </div>
           </div>
           <div class='form-group'>
             <label for='port_id' class='col-sm-2 control-label'>Interface: </label>
             <div class='col-sm-10'>
-              <select class='form-control' id='port_id' name='port_id'>
-              </select>
+              <select class='form-control' id='port_id' name='port_id'></select>
             </div>
          </div>
          <div class='form-group'>
@@ -270,7 +221,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>' . $bill_perm['bill_name'] . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
+                <strong>' . htmlentities($bill_perm['bill_name']) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];
@@ -294,26 +245,24 @@ if (! Auth::user()->hasGlobalAdmin()) {
             <input type='hidden' value='addbillperm' name='action'>
             <div class='form-group'>
               <label class='sr-only' for='bill_id'>Bill</label>
-              <select name='bill_id' class='form-control' id='bill_id'>";
-
-        $bills = dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_name`');
-        foreach ($bills as $bill) {
-            unset($done);
-            foreach ($bill_access_list as $ac) {
-                if ($ac == $bill['bill_id']) {
-                    $done = 1;
-                }
-            }
-
-            if (! $done) {
-                echo "<option value='" . $bill['bill_id'] . "'>" . $bill['bill_name'] . '</option>';
-            }
-        }
-
-        echo "</select>
+              <select name='bill_id' class='form-control' id='bill_id'></select>
           </div>
           <button type='submit' class='btn btn-default' name='Submit' value='Add'>Add</button>
         </form>
+        <script>
+          init_select2('#device_id', 'device', {'user': " . $user->user_id . ", 'access': 'inverted'}, null, 'Select Device');
+          init_select2('#device', 'device', {'user': " . $user->user_id . "}, null, 'Select Device');
+          window.port_device_id = null;
+          init_select2('#port_id', 'port', function(params) {
+                return {
+                    term: params.term,
+                    page: params.page || 1,
+                    device: window.port_device_id
+                };
+            });
+          init_select2('#device_group_id', 'device-group', {" . ($allow_dynamic ? '' : '"type": "static"') . "}, null, 'Select Group');
+          init_select2('#bill_id', 'bill', {}, null, 'Select Bill');
+        </script>
         </div>";
     } else {
         echo '<script>window.location.replace("' . url('users') . '");</script>';

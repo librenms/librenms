@@ -10,16 +10,29 @@
  */
 
 use LibreNMS\Billing;
+use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('r');
+$options = getopt('frd');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
     DB::table('bill_history')->truncate();
+}
+
+Debug::set(isset($options['d']));
+
+$scheduler = Config::get('schedule_type.billing');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Billing is not enabled for cron scheduling.  Add the -f command ar
+gument if you want to force this command to run.\n";
+    }
+    exit(0);
 }
 
 foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
@@ -54,8 +67,8 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $type = 'CDR';
                 $allowed = $bill['bill_cdr'];
                 $used = $rate_data['rate_95th'];
-                $allowed_text = Number::formatSi($allowed, 2, 3, 'bps');
-                $used_text = Number::formatSi($used, 2, 3, 'bps');
+                $allowed_text = Number::formatSi($allowed, 2, 0, 'bps');
+                $used_text = Number::formatSi($used, 2, 0, 'bps');
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);

@@ -30,7 +30,7 @@ You can create static groups (and convert dynamic groups to static) to
 put specific devices in a group. Just select static as the type and
 select the devices you want in the group.
 
-![Device Groups](/img/device_groups.png)
+![Device Groups](../img/device_groups.png)
 
 You can now select this group from the Devices -> All Devices link in
 the navigation at the top. You can also use the group to map alert

@@ -2,7 +2,7 @@
 --
 -- SCHLEIFENBAUER-DATABUS-MIB.txt: Schleifenbauer MIB for databus devices
 --
--- Copyright (c) 2016, 2020 by Schleifenbauer Holding BV
+-- Copyright (c) 2021 by Schleifenbauer Holding BV
 -- All rights reserved.
 --
 -------------------------------------------------------------------------------
@@ -28,69 +28,42 @@ IMPORTS
 
 schleifenbauerDatabusMIB MODULE-IDENTITY
     LAST-UPDATED
-        "202004280000Z" -- April 28th, 2020
+        "202302070000Z" -- February 7th, 2023
     ORGANIZATION
         "Schleifenbauer Engineering"
     CONTACT-INFO
         "Schleifenbauer Engineering
-         Alain Schuermans
-         Chief Technology Officer
          Rietwaard 15
          5236 WC 's-Hertogenbosch
          The Netherlands
-         t +31 (0)73 52 30256
-         f +31 (0)73 521 23 83
-         alain@schleifenbauer.eu
+         t +31 (0)73 5230256
+         support@schleifenbauer.eu
          www.schleifenbauer.eu"
     DESCRIPTION
         "This MIB describes the SNMP functions of network enabled databus
          devices.
 
-         Copyright (c) 2016, 2020 by Schleifenbauer Holding BV
+         Copyright (c) 2021 by Schleifenbauer Holding BV
         "
     REVISION
-        "202004280000Z" --  April 28th, 2020
+        "202302070000Z" -- February 7th, 2023
     DESCRIPTION
-        "1. Added performance monitoring registers
-         2. Added sdbDevStUsbMode register
-         3. Added sdbDevIdDeviceType register
-         4. Added sdbDevIdLocateUnit"
+        "1. Added sdbDevStOutletUnlockOverride
+         2. Added sdbDevCfTempSensors
+         3. Added sdbDevCfTotals
+         4. Added sdbDevTotalsResidualMaxAmps"
     REVISION
-        "201703060000Z" -- March 3rd, 2017
+        "202106160000Z" -- June 16th, 2021
     DESCRIPTION
-        "Renamed Deci prefix of custom TEXTUAL-CONVENTIONs to Centi"
+        "1. Removed sdbDevTotals with registers for table entries
+         2. Added sdbDevCfNeutral with registers for table entries
+         3. Added sdbDevIdConfigType with registers for table entries"
     REVISION
-        "201610210000Z" -- October 21th, 2016
+        "202009170000Z" --  September 17th, 2020
     DESCRIPTION
-        "1. Added sdbDevSsOutletVoltageDropAlert object.
-         2. Added sdbDevStAutoResetAlerts object.
-         3. Added sdbDevStExtendedNames object.
-         4. Added sdbDevSsOutletVoltageDropAlertDetected object."
-    REVISION
-        "201606160000Z" -- June 16th, 2016
-    DESCRIPTION
-        "1. Fixed incorrect range of sdbDevIdIndex."
-    REVISION
-        "201605100000Z" -- May 10th, 2016
-    DESCRIPTION
-        "1. Added sdbDevOutMtPowerVoltAmpere object.
-         2. Added sdbDevOutMtPowerWatt object."
-    REVISION
-        "201603240000Z" -- March 24th, 2016
-    DESCRIPTION
-        "1. Added sdbMgmtStsRingState object.
-         2. Added sdbMgmtStsBreachIndex object.
-         3. Added sdbMgmtStsRingStateChanged notification."
-    REVISION
-        "201602190000Z" -- February 19th, 2016
-    DESCRIPTION
-        "1. Fixed incorrect description of sdbDevIdIndex.
-         2. Fixed description of sdbDevSsSensorChangeAlertDetected. Removed
-            sdbDevSnsType from description."
-    REVISION
-        "201510230000Z" -- October 23th, 2015
-    DESCRIPTION
-        "The initial revision of this MIB module"
+        "1. Added sdbDevCfBranches register
+         2. Added sdbDevBranchTable with registers for table entries
+         3. Added sdbDevTotals with registers for table entries"
     ::= { schleifenbauerMgmt 1 }
 
 CentiValue ::= TEXTUAL-CONVENTION
@@ -183,6 +156,8 @@ sdbDevInput            OBJECT IDENTIFIER ::= { sdbDevice 6 }
 sdbDevOutlet           OBJECT IDENTIFIER ::= { sdbDevice 7 }
 sdbDevSensor           OBJECT IDENTIFIER ::= { sdbDevice 8 }
 sdbDevPerformance      OBJECT IDENTIFIER ::= { sdbDevice 9 }
+sdbDevBranches         OBJECT IDENTIFIER ::= { sdbDevice 10 }
+sdbDevTotals           OBJECT IDENTIFIER ::= { sdbDevice 11 }
 
 sdbMIBCompliances      OBJECT IDENTIFIER ::= { sdbMIBConformance 1 }
 sdbMIBGroups           OBJECT IDENTIFIER ::= { sdbMIBConformance 2 }
@@ -218,7 +193,7 @@ sdbMgmtStsDuplicateDevices OBJECT-TYPE
     DESCRIPTION
         "The number of duplicate devices on the databus."
     ::= { sdbMgmtStatus 4 }
-    
+
 sdbMgmtStsRingState OBJECT-TYPE
     SYNTAX      INTEGER {
                             open(0),
@@ -230,7 +205,7 @@ sdbMgmtStsRingState OBJECT-TYPE
         "If the device is in a bridge-like mode, this will indicate the actual
          state of the databus."
     ::= { sdbMgmtStatus 5 }
-    
+
 sdbMgmtStsRingBreachIndex OBJECT-TYPE
     SYNTAX      Integer32 (0..65535)
     MAX-ACCESS  read-only
@@ -239,7 +214,7 @@ sdbMgmtStsRingBreachIndex OBJECT-TYPE
         "Indicates the breach index if the current state of the data bus is
          open. If the data bus is closed this has no meaning."
     ::= { sdbMgmtStatus 6 }
-    
+
 sdbMgmtCtrlScan OBJECT-TYPE
     SYNTAX      INTEGER {
                             idle(0),
@@ -394,7 +369,8 @@ SdbDevIdEntry ::=
         sdbDevIdVanityTag           DisplayString,
         sdbDevIdIndex               Integer32,
         sdbDevIdDeviceType          Integer32,
-        sdbDevIdLocateUnit          Integer32
+        sdbDevIdLocateUnit          Integer32,
+        sdbDevIdConfigType          Integer32
     }
 
 sdbDevIdSPDMVersion OBJECT-TYPE
@@ -522,7 +498,7 @@ sdbDevIdDeviceType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "A unique value for each device group. 
+        "A unique value for each device group.
          Its value represents the device type of the device.
          Refer to manual for more information."
     ::= { sdbDevIdEntry 14 }
@@ -537,6 +513,14 @@ sdbDevIdLocateUnit OBJECT-TYPE
     DESCRIPTION
         "The LCD-backlight flashes in a heartbeat rhythm to locate the unit."
     ::= { sdbDevIdEntry 15 }
+
+sdbDevIdConfigType OBJECT-TYPE
+    SYNTAX      Integer32 (0..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wiring configuration type used."
+    ::= { sdbDevIdEntry 16 }
 
 sdbDevCfTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevCfEntry
@@ -566,7 +550,11 @@ SdbDevCfEntry ::=
         sdbDevCfOutletsSwitched Integer32,
         sdbDevCfOutletsMetered  Integer32,
         sdbDevCfSensors         Integer32,
-        sdbDevCfMaximumLoad     Integer32
+        sdbDevCfMaximumLoad     Integer32,
+        sdbDevCfBranches        Integer32,
+        sdbDevCfNeutral         Integer32,
+        sdbDevCfTempSensors     Integer32,
+        sdbDevCfTotals          Integer32
     }
 
 sdbDevCfPhases OBJECT-TYPE
@@ -578,7 +566,7 @@ sdbDevCfPhases OBJECT-TYPE
     ::= { sdbDevCfEntry 1 }
 
 sdbDevCfOutletsTotal OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -587,7 +575,7 @@ sdbDevCfOutletsTotal OBJECT-TYPE
     ::= { sdbDevCfEntry 2 }
 
 sdbDevCfOutletsSwitched OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -596,7 +584,7 @@ sdbDevCfOutletsSwitched OBJECT-TYPE
     ::= { sdbDevCfEntry 3 }
 
 sdbDevCfOutletsMetered OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -620,6 +608,38 @@ sdbDevCfMaximumLoad OBJECT-TYPE
     DESCRIPTION
         "Maximum rated load of device per phase"
     ::= { sdbDevCfEntry 6 }
+
+sdbDevCfBranches OBJECT-TYPE
+    SYNTAX      Integer32 (0..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of branches for input metering."
+    ::= { sdbDevCfEntry 7 }
+
+sdbDevCfNeutral OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nuetral current measurement."
+    ::= { sdbDevCfEntry 8 }
+
+sdbDevCfTempSensors OBJECT-TYPE
+    SYNTAX      Integer32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of temperature sensors present in the system."
+    ::= { sdbDevCfEntry 9 }
+
+sdbDevCfTotals OBJECT-TYPE
+    SYNTAX      Integer32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of totals rows for the configuration."
+    ::= { sdbDevCfEntry 10 }
 
 sdbDevSsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevSsEntry
@@ -652,7 +672,12 @@ SdbDevSsEntry ::=
         sdbDevSsOutletCurrentDropAlert  Integer32,
         sdbDevSsInputCurrentDropAlert   Integer32,
         sdbDevSsSensorChangeAlert       Integer32,
-        sdbDevSsOutletVoltageDropAlert  Integer32
+        sdbDevSsOutletVoltageDropAlert  Integer32,
+        sdbDevSsBranchCurrentAlert      Integer32,
+        sdbDevSsBranchVoltageAlert      Integer32,
+        sdbDevSsNeutralCurrentAlert     Integer32,
+        sdbDevSsResidualCurrentAlert    Integer32,
+        sdbDevSsHardwareAlert           Integer32
     }
 
 sdbDevSsDeviceStatusCode OBJECT-TYPE
@@ -697,7 +722,7 @@ sdbDevSsInputCurrentAlert OBJECT-TYPE
     ::= { sdbDevSsEntry 3 }
 
 sdbDevSsOutletCurrentAlert OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -715,7 +740,7 @@ sdbDevSsInputVoltageAlert OBJECT-TYPE
     ::= { sdbDevSsEntry 5 }
 
 sdbDevSsOutletCurrentDropAlert OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -744,7 +769,7 @@ sdbDevSsSensorChangeAlert OBJECT-TYPE
     ::= { sdbDevSsEntry 8 }
 
 sdbDevSsOutletVoltageDropAlert OBJECT-TYPE
-    SYNTAX      Integer32 (0..48)
+    SYNTAX      Integer32 (0..54)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -752,6 +777,52 @@ sdbDevSsOutletVoltageDropAlert OBJECT-TYPE
          The value indicates the first failed outlet."
     ::= { sdbDevSsEntry 9 }
 
+sdbDevSsBranchCurrentAlert OBJECT-TYPE
+    SYNTAX      Integer32 (0..18)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An alert has been raised due to current exceeding treshhold.
+         The value indicates the exceeding branch. 0 = no alert."
+    ::= { sdbDevSsEntry 10 }
+
+sdbDevSsBranchVoltageAlert OBJECT-TYPE
+    SYNTAX      Integer32 (0..18)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An alert has been raised due to a voltage dip.
+         The value indicates the dipped branch. 0 = no alert."
+    ::= { sdbDevSsEntry 11 }
+
+sdbDevSsNeutralCurrentAlert OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An alert has been raised due to current exceeding treshhold.
+         0 = no alert
+         1 = current alert"
+    ::= { sdbDevSsEntry 12 }
+
+sdbDevSsResidualCurrentAlert OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A residual current alert has been raised.
+         0 = no alert
+         1 = current exceeding treshhold alert
+		 2 = sensor error"
+    ::= { sdbDevSsEntry 13 }
+
+sdbDevSsHardwareAlert OBJECT-TYPE
+    SYNTAX      Integer32 (0..9)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "0 = no alarm >0 = or slave number for alert"
+    ::= { sdbDevSsEntry 14 }
 
 sdbDevRsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevRsEntry
@@ -876,7 +947,9 @@ SdbDevStEntry ::=
         sdbDevStDisplayOrientation      Integer32,
         sdbDevStLocalAlertReset         Integer32,
         sdbDevStCurrentDropDetection    Integer32,
-        sdbDevStUsbMode                 Integer32
+        sdbDevStUsbMode                 Integer32,
+        sdbDevStSensorChangeAlertMode   Integer32,
+        sdbDevStOutletUnlockOverride    Integer32
     }
 
 sdbDevStAutoResetAlerts OBJECT-TYPE
@@ -886,7 +959,7 @@ sdbDevStAutoResetAlerts OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Auto reset alerts configuration.
-         If set to 0 the auto reset alerts feature is disabled. If set to a 
+         If set to 0 the auto reset alerts feature is disabled. If set to a
          value greater then 0, the auto reset alerts feature is enabled and
          alerts will get cleared after the configured amount of seconds since
          the last alert condition have passed."
@@ -1013,6 +1086,30 @@ sdbDevStUsbMode OBJECT-TYPE
         "Allow the USB port to be used for specific tasks"
     ::= { sdbDevStEntry 13 }
 
+sdbDevStSensorChangeAlertMode OBJECT-TYPE
+    SYNTAX
+        INTEGER {
+            disabled(0),
+            enabled(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable sensoe change alerts"
+    ::= { sdbDevStEntry 14 }
+
+sdbDevStOutletUnlockOverride OBJECT-TYPE
+    SYNTAX
+        INTEGER {
+            disabled(0),
+            enabled(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Overrides the timeout. If this is set to 1 then the timeout will be ignored, otherwise the timeout will be taken into account."
+    ::= { sdbDevStEntry 15 }
+
 sdbDevInTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevInEntry
     MAX-ACCESS  not-accessible
@@ -1057,7 +1154,7 @@ SdbDevInEntry ::=
     }
 
 sdbDevInIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..48)
+    SYNTAX      Integer32 (1..54)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1222,7 +1319,7 @@ SdbDevOutEntry ::=
     }
 
 sdbDevOutIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..48)
+    SYNTAX      Integer32 (1..54)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1279,7 +1376,7 @@ SdbDevOutMtEntry ::=
     }
 
 sdbDevOutMtIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..48)
+    SYNTAX      Integer32 (1..54)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1363,7 +1460,7 @@ sdbDevOutMtCTRatio OBJECT-TYPE
     DESCRIPTION
         "The multiplier to use for the outlet CTs."
     ::= { sdbDevOutMtEntry 9 }
-    
+
 sdbDevOutMtPowerVoltAmpere OBJECT-TYPE
     SYNTAX      Integer32 (0..327680)
     UNITS       "VA"
@@ -1418,7 +1515,7 @@ SdbDevOutSwEntry ::=
     }
 
 sdbDevOutSwIndex OBJECT-TYPE
-    SYNTAX      Integer32 (1..48)
+    SYNTAX      Integer32 (1..54)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -1510,7 +1607,10 @@ SdbDevMeasuresEntry ::=
         sdbDevMsIntTemperature      CentiCelsius,
         sdbDevMsExtTemperature      CentiCelsius,
         sdbDevMsIntTemperaturePeak  CentiCelsius,
-        sdbDevMsExtTemperaturePeak  CentiCelsius
+        sdbDevMsExtTemperaturePeak  CentiCelsius,
+        sdbDevMsResidualCurrent     CentiAmpere,
+        sdbDevMsResidualPeak        CentiAmpere
+
     }
 
 sdbDevMsIntTemperature OBJECT-TYPE
@@ -1548,6 +1648,24 @@ sdbDevMsExtTemperaturePeak OBJECT-TYPE
     DESCRIPTION
         "Peak external device temperature since last reset of alerts."
     ::= { sdbDevMeasuresEntry 4 }
+
+sdbDevMsResidualCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Residual current."
+    ::= { sdbDevMeasuresEntry 5 }
+
+sdbDevMsResidualPeak OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak residual current."
+    ::= { sdbDevMeasuresEntry 6 }
 
 sdbDevSnsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdbDevSnsEntry
@@ -1611,7 +1729,7 @@ sdbDevSnsValue OBJECT-TYPE
     ::= { sdbDevSnsEntry 3 }
 
 sdbDevSnsName OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..6))
+    SYNTAX      DisplayString (SIZE(0..18))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1736,6 +1854,337 @@ sdbDevResetUptime OBJECT-TYPE
 
 -- ---------------------------------------------------------------------------------------------
 
+sdbDevBranchTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdbDevBranchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information of inputs of devices connected to the
+         databus."
+    ::= { sdbDevBranches 1 }
+
+
+sdbDevBranchEntry OBJECT-TYPE
+    SYNTAX      SdbDevBranchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Inputs entry containing objects of an input of a particular databus
+         device.
+         Note that this table has two indexes. sdbDevIdIndex to identify a
+         particular device and sdbDevBranchIndex to identify a particular input
+         of the device identified by sdbDevIdIndex."
+    INDEX {
+        sdbDevIdIndex,
+        sdbDevBranchIndex
+    }
+    ::= { sdbDevBranchTable 1 }
+
+SdbDevBranchEntry ::=
+    SEQUENCE {
+        sdbDevBranchIndex           Integer32,
+        sdbDevBranchKWhTotal        KiloWattHour,
+        sdbDevBranchKWhSubtotal     KiloWattHour,
+        sdbDevBranchPowerFactor     CentiPercent,
+        sdbDevBranchActualCurrent   CentiAmpere,
+        sdbDevBranchPeakCurrent     CentiAmpere,
+        sdbDevBranchActualVoltage   CentiVolt,
+        sdbDevBranchMinVoltage      CentiVolt,
+        sdbDevBranchPowerVoltAmpere Integer32,
+        sdbDevBranchPowerWatt       Integer32,
+        sdbDevBranchMaxAmps         CentiAmpere,
+        sdbDevBranchCTRatio         Integer32,
+        sdbDevBranchName            DisplayString,
+        sdbDevBranchZeroKWhSubtotal Integer32
+    }
+
+sdbDevBranchIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..54)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each input. Its value ranges between 1 and the
+         value of sdbDevCfPhases."
+    ::= { sdbDevBranchEntry 1 }
+
+sdbDevBranchKWhTotal OBJECT-TYPE
+    SYNTAX      KiloWattHour
+    UNITS       "kWh"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total kWh value of an input. This value can not be reset."
+    ::= { sdbDevBranchEntry 2 }
+
+sdbDevBranchKWhSubtotal OBJECT-TYPE
+    SYNTAX      KiloWattHour
+    UNITS       "kWh"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subtotal kWh value of an input. This value can be reset."
+    ::= { sdbDevBranchEntry 3 }
+
+sdbDevBranchPowerFactor OBJECT-TYPE
+    SYNTAX      CentiPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power factor of input.
+         The power factor of an AC power system is defined as the ratio of the
+         real or active power to the apparent power and is a number between 0
+         and 1. This value is expressed as a percentage between 0% and 100%."
+    ::= { sdbDevBranchEntry 4 }
+
+sdbDevBranchActualCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual apparent, RMS current."
+    ::= { sdbDevBranchEntry 5 }
+
+sdbDevBranchPeakCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak apparent, RMS current.
+         Highest value since last reset of the alerts."
+    ::= { sdbDevBranchEntry 6 }
+
+sdbDevBranchActualVoltage OBJECT-TYPE
+    SYNTAX      CentiVolt
+    UNITS       "V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual voltage."
+    ::= { sdbDevBranchEntry 7 }
+
+sdbDevBranchMinVoltage OBJECT-TYPE
+    SYNTAX      CentiVolt
+    UNITS       "V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RMS voltage dip.
+         Lowest value since reset of alerts."
+    ::= { sdbDevBranchEntry 8 }
+
+sdbDevBranchPowerVoltAmpere OBJECT-TYPE
+    SYNTAX      Integer32 (0..327680)
+    UNITS       "VA"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Calculated apparent power."
+    ::= { sdbDevBranchEntry 9 }
+
+sdbDevBranchPowerWatt OBJECT-TYPE
+    SYNTAX      Integer32 (0..327680)
+    UNITS       "W"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Calculated real power."
+    ::= { sdbDevBranchEntry 10 }
+
+sdbDevBranchMaxAmps OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum current per input phase.
+         Should last at least sdbDevStPeakDuration ms before triggering an
+         alert."
+    ::= { sdbDevBranchEntry 11 }
+
+sdbDevBranchCTRatio OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The multiplier to use for the input CTs."
+    ::= { sdbDevBranchEntry 12 }
+
+sdbDevBranchName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable naming of branches."
+    ::= { sdbDevBranchEntry 13 }
+
+sdbDevBranchZeroKWhSubtotal OBJECT-TYPE
+    SYNTAX
+        INTEGER {
+            idle(0),
+            zero(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset input kWh subtotal counter of a single input to zero."
+    ::= { sdbDevBranchEntry 14 }
+
+-- ---------------------------------------------------------------------------------------------
+
+sdbDevTotalsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdbDevTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information of inputs of devices connected to the
+         databus."
+    ::= { sdbDevTotals 1 }
+
+
+sdbDevTotalsEntry OBJECT-TYPE
+    SYNTAX      SdbDevTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Inputs entry containing objects of an input of a particular databus
+         device.
+         Note that this table has two indexes. sdbDevIdIndex to identify a
+         particular device and sdbDevTotalsIndex to identify a particular input
+         of the device identified by sdbDevIdIndex."
+    INDEX {
+        sdbDevIdIndex,
+        sdbDevTotalsIndex
+    }
+    ::= { sdbDevTotalsTable 1 }
+
+SdbDevTotalsEntry ::=
+    SEQUENCE {
+        sdbDevTotalsIndex           Integer32,
+        sdbDevTotalsKWhTotal        KiloWattHour,
+        sdbDevTotalsPowerFactor     CentiPercent,
+        sdbDevTotalsActualCurrent   CentiAmpere,
+        sdbDevTotalsPeakCurrent     CentiAmpere,
+        sdbDevTotalsPowerVoltAmpere Integer32,
+        sdbDevTotalsPowerWatt       Integer32,
+        sdbDevTotalsNeutralCurrent  CentiAmpere,
+        sdbDevTotalsNeutralPeak     CentiAmpere,
+        sdbDevTotalsNeutralMaxAmps  CentiAmpere,
+        sdbDevTotalsResidualMaxAmps CentiAmpere
+    }
+
+sdbDevTotalsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..54)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each input. Its value ranges between 1 and the
+         value of sdbDevCfPhases."
+    ::= { sdbDevTotalsEntry 1 }
+
+sdbDevTotalsKWhTotal OBJECT-TYPE
+    SYNTAX      KiloWattHour
+    UNITS       "kWh"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total kWh value of an input. This value can not be reset."
+    ::= { sdbDevTotalsEntry 2 }
+
+sdbDevTotalsPowerFactor OBJECT-TYPE
+    SYNTAX      CentiPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power factor of input.
+         The power factor of an AC power system is defined as the ratio of the
+         real or active power to the apparent power and is a number between 0
+         and 1. This value is expressed as a percentage between 0% and 100%."
+    ::= { sdbDevTotalsEntry 3 }
+
+sdbDevTotalsActualCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Actual apparent, RMS current."
+    ::= { sdbDevTotalsEntry 4 }
+
+sdbDevTotalsPeakCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak apparent, RMS current.
+         Highest value since last reset of the alerts."
+    ::= { sdbDevTotalsEntry 5 }
+
+sdbDevTotalsPowerVoltAmpere OBJECT-TYPE
+    SYNTAX      Integer32 (0..327680)
+    UNITS       "VA"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Calculated apparent power."
+    ::= { sdbDevTotalsEntry 6 }
+
+sdbDevTotalsPowerWatt OBJECT-TYPE
+    SYNTAX      Integer32 (0..327680)
+    UNITS       "W"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Calculated real power."
+    ::= { sdbDevTotalsEntry 7 }
+
+sdbDevTotalsNeutralCurrent OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Neutral current of phases."
+    ::= { sdbDevTotalsEntry 8 }
+
+sdbDevTotalsNeutralPeak OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peak neutral current of phases."
+    ::= { sdbDevTotalsEntry 9 }
+
+sdbDevTotalsNeutralMaxAmps OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum neutral current.
+         Should last at least sdbDevStPeakDuration ms before triggering an
+         alert."
+    ::= { sdbDevTotalsEntry 10 }
+
+sdbDevTotalsResidualMaxAmps OBJECT-TYPE
+    SYNTAX      CentiAmpere
+    UNITS       "A"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum residual current.
+         Should last at least sdbDevStPeakDuration ms before triggering an
+         alert."
+    ::= { sdbDevTotalsEntry 11 }
+
+-- ---------------------------------------------------------------------------------------------
+
+
 sdbDevSsDeviceStatusCodeChanged NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
@@ -1836,18 +2285,18 @@ sdbDevSsSensorChangeAlertDetected NOTIFICATION-TYPE
              sdbDevSsSensorChangeAlert
          }"
     ::= { sdbMIBNotifications 8 }
-    
+
 sdbMgmtStsRingStateChanged NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
         "Ring state changed.
-         
+
          Ring state changded to open:
          OBJECTS {
             sdbMgmtStsRingState,
             sdbMgmtStsRingBreachIndex
          }
-         
+
          Ring state changded to closed:
          OBJECTS {
             sdbMgmtStsRingState
@@ -1864,6 +2313,61 @@ sdbDevSsOutletVoltageDropAlertDetected NOTIFICATION-TYPE
              sdbDevOutMtActualVoltage
          }"
     ::= { sdbMIBNotifications 10 }
+
+sdbDevSsBranchCurrentAlertDetected NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Branch current alert detected.
+
+         OBJECTS {
+             sdbDevSsBranchCurrentAlert,
+             sdbDevBranchActualCurrent
+         }"
+    ::= { sdbMIBNotifications 11 }
+
+sdbDevSsBranchVoltageAlertDetected NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Branch current alert detected.
+
+         OBJECTS {
+             sdbDevSsBranchVoltageAlert,
+             sdbDevBranchActualVoltage
+         }"
+    ::= { sdbMIBNotifications 12 }
+
+sdbDevSsNeutralCurrentAlertDetected NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Input current alert detected.
+
+         OBJECTS {
+             sdbDevSsNeutralCurrentAlert,
+             sdbDevTotalsNeutralCurrent
+         }"
+    ::= { sdbMIBNotifications 13 }
+
+sdbDevSsResidualCurrentAlertDetected NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Residual current alert detected.
+
+         OBJECTS {
+             sdbDevSsResidualCurrentAlert,
+             sdbDevMsResidualCurrent,
+			 sdbDevMsResidualPeak
+         }"
+    ::= { sdbMIBNotifications 14 }
+
+sdbDevSsHardwareAlertDetected NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Hardware alert detected.
+
+         OBJECTS {
+             sdbDevSsHardwareAlert
+         }"
+    ::= { sdbMIBNotifications 15 }
 
 
 sdbMIBCompliance MODULE-COMPLIANCE
@@ -1926,7 +2430,12 @@ sdbMIBNotificationGroup NOTIFICATION-GROUP
         sdbDevSsInputCurrentDropAlertDetected,
         sdbDevSsSensorChangeAlertDetected,
         sdbMgmtStsRingStateChanged,
-        sdbDevSsOutletVoltageDropAlertDetected
+        sdbDevSsOutletVoltageDropAlertDetected,
+        sdbDevSsBranchCurrentAlertDetected,
+        sdbDevSsBranchVoltageAlertDetected,
+        sdbDevSsNeutralCurrentAlertDetected,
+        sdbDevSsResidualCurrentAlertDetected,
+        sdbDevSsHardwareAlertDetected
     }
     STATUS current
     DESCRIPTION
@@ -1948,7 +2457,8 @@ sdbMIBDevIdGroup OBJECT-GROUP
         sdbDevIdMacAddress,
         sdbDevIdBuildNumber,
         sdbDevIdDeviceType,
-        sdbDevIdLocateUnit
+        sdbDevIdLocateUnit,
+		sdbDevIdConfigType
     }
     STATUS      current
     DESCRIPTION
@@ -1963,7 +2473,11 @@ sdbMIBDevCfGroup OBJECT-GROUP
         sdbDevCfOutletsSwitched,
         sdbDevCfOutletsMetered,
         sdbDevCfMaximumLoad,
-        sdbDevCfSensors
+        sdbDevCfSensors,
+        sdbDevCfBranches,
+        sdbDevCfNeutral,
+        sdbDevCfTempSensors,
+        sdbDevCfTotals
     }
     STATUS      current
     DESCRIPTION
@@ -1981,7 +2495,12 @@ sdbMIBDevSsGroup OBJECT-GROUP
         sdbDevSsOutletCurrentDropAlert,
         sdbDevSsInputCurrentDropAlert,
         sdbDevSsSensorChangeAlert,
-        sdbDevSsOutletVoltageDropAlert
+        sdbDevSsOutletVoltageDropAlert,
+        sdbDevSsBranchCurrentAlert,
+        sdbDevSsBranchVoltageAlert,
+        sdbDevSsNeutralCurrentAlert,
+        sdbDevSsResidualCurrentAlert,
+        sdbDevSsHardwareAlert
     }
     STATUS      current
     DESCRIPTION
@@ -2014,7 +2533,9 @@ sdbMIBDevStGroup OBJECT-GROUP
         sdbDevStMaximumTemperature,
         sdbDevStDisplayOrientation,
         sdbDevStCurrentDropDetection,
-        sdbDevStUsbMode
+        sdbDevStUsbMode,
+        sdbDevStSensorChangeAlertMode,
+        sdbDevStOutletUnlockOverride
     }
     STATUS      current
     DESCRIPTION
@@ -2095,7 +2616,9 @@ sdbMIBDevSensorGroup OBJECT-GROUP
         sdbDevMsIntTemperature,
         sdbDevMsExtTemperature,
         sdbDevMsIntTemperaturePeak,
-        sdbDevMsExtTemperaturePeak
+        sdbDevMsExtTemperaturePeak,
+        sdbDevMsResidualCurrent,
+        sdbDevMsResidualPeak
     }
     STATUS      current
     DESCRIPTION

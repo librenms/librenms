@@ -2,10 +2,11 @@
 
 use App\Models\BgpPeer;
 use Carbon\Carbon;
+use LibreNMS\Util\Oid;
 
 $name = 'bird2';
 
-$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 // make sure we actually get something back
 if (empty($birdOutput)) {
@@ -172,8 +173,8 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received']);
     $bgpPeer->bgpPeerOutTotalMessages = intval($protocol['route_change_stats']['export_updates']['received']);
 
-    $bgpPeer->bgpPeerFsmEstablishedTime = Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now());
-    $bgpPeer->bgpPeerInUpdateElapsedTime = Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now());
+    $bgpPeer->bgpPeerFsmEstablishedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
+    $bgpPeer->bgpPeerInUpdateElapsedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
     $bgpPeer->save();
 
     echo PHP_EOL . $name . ': Processed peer AS' . $bgpPeer->bgpPeerRemoteAs . ' (' . $bgpPeer->astext . ')';

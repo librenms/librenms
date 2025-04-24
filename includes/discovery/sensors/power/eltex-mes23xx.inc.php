@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES23xx PoE power
  *
@@ -38,7 +39,7 @@ if ($pre_cache['eltex-mes23xx-poe']) {
                 $descr = $tmp['ifName'];
                 $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $unit . '.' . $ifIndex;
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'power',
                     $device,
                     $oid,

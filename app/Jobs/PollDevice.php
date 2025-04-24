@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
@@ -30,7 +31,7 @@ class PollDevice implements ShouldQueue
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
-     * @var \LibreNMS\OS|\LibreNMS\OS\Generic
+     * @var OS|OS\Generic
      */
     private $os;
 
@@ -47,7 +48,7 @@ class PollDevice implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->initDevice();
         PollingDevice::dispatch($this->device);
@@ -229,11 +230,21 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
 
     private function getModules(): array
     {
-        if (! empty($this->module_overrides)) {
-            return $this->module_overrides;
+        $default_modules = LibrenmsConfig::get('poller_modules', []);
+
+        if (empty($this->module_overrides)) {
+            return $default_modules;
         }
 
-        return \LibreNMS\Config::get('poller_modules', []);
+        // ensure order of modules, preserve submodules
+        $ordered_modules = [];
+        foreach ($default_modules as $module => $enabled) {
+            if (isset($this->module_overrides[$module])) {
+                $ordered_modules[$module] = $this->module_overrides[$module];
+            }
+        }
+
+        return $ordered_modules;
     }
 
     private function isModuleManuallyEnabled(string $module): ?bool

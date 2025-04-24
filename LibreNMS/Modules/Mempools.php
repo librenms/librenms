@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Mempools.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Mempool;
-use App\Observers\MempoolObserver;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -62,18 +63,26 @@ class Mempools implements Module
             if ($mempool->isValid()) {
                 return true;
             }
-            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
+
+            $reason = 'Not enough data';
+            if ($mempool->mempool_total <= 0) {
+                $reason = "Invalid total value $mempool->mempool_total";
+            }
+
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
+            Log::info('x');
 
             return false;
         });
+
+        // check if linux or similar and calculate available ram
         $this->calculateAvailable($mempools);
 
-        MempoolObserver::observe(\App\Models\Mempool::class);
+        ModuleModelObserver::observe(Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
-        $mempools->each(function ($mempool) {
-            $this->printMempool($mempool);
-        });
+        Log::info('');
+        $mempools->each($this->printMempool(...));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -125,9 +134,9 @@ class Mempools implements Module
     }
 
     /**
-     * @param  \LibreNMS\OS  $os
-     * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection
+     * @param  OS  $os
+     * @param  Collection  $mempools
+     * @return Collection
      */
     private function defaultPolling($os, $mempools)
     {
@@ -148,15 +157,20 @@ class Mempools implements Module
         return $mempools;
     }
 
-    public function cleanup(Device $device): void
+    public function dataExists(Device $device): bool
     {
-        $device->mempools()->delete();
+        return $device->mempools()->exists();
+    }
+
+    public function cleanup(Device $device): int
+    {
+        return $device->mempools()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
@@ -167,10 +181,10 @@ class Mempools implements Module
     /**
      * Calculate available memory.  This is free + buffers + cached.
      *
-     * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection
+     * @param  Collection  $mempools
+     * @return Collection
      */
-    private function calculateAvailable(Collection $mempools)
+    private function calculateAvailable(Collection $mempools): Collection
     {
         if ($mempools->count() > 2) { // optimization
             $system = null;
@@ -205,9 +219,12 @@ class Mempools implements Module
 
             if ($system !== null) {
                 $old = Number::formatBi($system->mempool_free);
-                $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
-                $new = Number::formatBi($system->mempool_free);
-                Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
+                $available_used = $system->mempool_used - $buffers - $cached;
+                if ($available_used >= 0) {
+                    $system->fillUsage($available_used, $system->mempool_total, multiplier: 1);
+                    $new = Number::formatBi($system->mempool_free);
+                    Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
+                }
             }
         }
 
@@ -216,11 +233,11 @@ class Mempools implements Module
 
     private function printMempool(Mempool $mempool): void
     {
-        $status = "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
+        $status = "$mempool->mempool_descr ($mempool->mempool_class): $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
             $used = Number::formatBi($mempool->mempool_used);
             $total = Number::formatBi($mempool->mempool_total);
-            $status .= "  {$used} / {$total}";
+            $status .= "  $used / $total";
         }
         Log::info($status);
     }

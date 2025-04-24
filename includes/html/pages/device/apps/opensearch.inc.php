@@ -8,7 +8,7 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo '<b>Cluster Name:</b> ' . $app->data['cluster'] . '<br>';
+echo '<b>Cluster Name:</b> ' . htmlspecialchars($app->data['cluster']) . '<br>';
 echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set'] = 'translog';

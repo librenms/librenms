@@ -15,6 +15,6 @@ if ($emd_installed == 'eMD-HT') {
         $current_oid = '.1.3.6.1.4.1.2468.1.4.2.1.5.1.1.3.0';
         $descr = trim(str_replace('"', '', $descr));
 
-        discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, '1', 'ipoman', $descr, '10', '1', $low_limit, null, null, $high_limit, $current);
+        discover_sensor(null, 'humidity', $device, $current_oid, '1', 'ipoman', $descr, '10', '1', $low_limit, null, null, $high_limit, $current);
     }
 }

@@ -1,0 +1,408 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-PM-MIB.mib
+--*
+--* (c) Copyright 2024 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-PM-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-PM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+            FROM SNMPv2-SMI
+        TruthValue, DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID
+        InterfaceIndex
+            FROM IF-MIB;
+
+    arubaWiredPmMIB   MODULE-IDENTITY
+        LAST-UPDATED "202401060000Z" -- January 06, 2024
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes management objects
+                      that manage pluggable modules."
+
+        REVISION     "202401060000Z" -- January 06, 2024
+        DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 27 }
+
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+
+
+-- *************************************************************
+-- Start of MIB Objects
+-- *************************************************************
+
+arubaWiredPmNotificatons    OBJECT IDENTIFIER
+                                ::= { arubaWiredPmMIB 0 }
+arubaWiredPmObjects         OBJECT IDENTIFIER
+                                ::= { arubaWiredPmMIB 1 }
+arubaWiredPmConformance     OBJECT IDENTIFIER
+                                ::= { arubaWiredPmMIB 2 }
+
+-- ************************************************************
+--  Pluggable module transceiver information
+-- ************************************************************
+arubaWiredPmXcvrInfo         OBJECT IDENTIFIER
+                                ::= { arubaWiredPmObjects 1 }
+
+    arubaWiredPmXcvrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredPmXcvrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Details of the Transceivers plugged in the ports."
+        ::= { arubaWiredPmXcvrInfo 1 }
+
+    arubaWiredPmXcvrEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredPmXcvrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Pluggable module transceiver information."
+        INDEX       {
+                      arubaWiredPmXcvrPortIfIndex
+                    }
+        ::= { arubaWiredPmXcvrTable 1 }
+
+    ArubaWiredPmXcvrEntry ::= SEQUENCE {
+            arubaWiredPmXcvrPortIfIndex            InterfaceIndex,
+            arubaWiredPmXcvrPortDesc               DisplayString,
+            arubaWiredPmXcvrDescription            DisplayString,
+            arubaWiredPmXcvrProductNum             DisplayString,
+            arubaWiredPmXcvrSerialNum              DisplayString,
+            arubaWiredPmXcvrPartNum                DisplayString,
+            arubaWiredPmXcvrType                   DisplayString,
+            arubaWiredPmXcvrConnectorType          DisplayString,
+            arubaWiredPmXcvrConnectorStatus        INTEGER,
+            arubaWiredPmXcvrConnectorStatusReason  DisplayString,
+            arubaWiredPmXcvrCableType              DisplayString,
+            arubaWiredPmXcvrWavelength             Unsigned32,
+            arubaWiredPmXcvrSmfTxDist              Unsigned32,
+            arubaWiredPmXcvrMmfOm1TxDist           Unsigned32,
+            arubaWiredPmXcvrMmfOm2TxDist           Unsigned32,
+            arubaWiredPmXcvrMmfOm3TxDist           Unsigned32,
+            arubaWiredPmXcvrMmfOm4TxDist           Unsigned32,
+            arubaWiredPmXcvrMmfOm5TxDist           Unsigned32,
+            arubaWiredPmXcvrCableLength            Unsigned32,
+            arubaWiredPmXcvrMaxSpeed               Unsigned32,
+            arubaWiredPmXcvrMaxPower               Unsigned32,
+            arubaWiredPmXcvrAdapterType            DisplayString,
+            arubaWiredPmXcvrAdapterStatus          INTEGER,
+            arubaWiredPmXcvrAdapterStatusReason    DisplayString,
+            arubaWiredPmXcvrAdapterProductNum      DisplayString,
+            arubaWiredPmXcvrAdapterSerialNum       DisplayString,
+            arubaWiredPmXcvrThermalClass           DisplayString,
+            arubaWiredPmXcvrDiagnostics            TruthValue
+
+        }
+
+    arubaWiredPmXcvrPortIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "IfIndex of the port in which transceiver is plugged in."
+        ::= { arubaWiredPmXcvrEntry 1 }
+
+    arubaWiredPmXcvrPortDesc OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface port description in which transceiver is
+             plugged in."
+        ::= { arubaWiredPmXcvrEntry 2 }
+
+    arubaWiredPmXcvrDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Description of transceiver plugged into the port."
+        ::= { arubaWiredPmXcvrEntry 3 }
+
+    arubaWiredPmXcvrProductNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The product number of transceiver module."
+        ::= { arubaWiredPmXcvrEntry 4 }
+
+    arubaWiredPmXcvrSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The serial number of transceiver module."
+        ::= { arubaWiredPmXcvrEntry 5 }
+
+    arubaWiredPmXcvrPartNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The part number of transceiver module."
+        ::= { arubaWiredPmXcvrEntry 6 }
+
+    arubaWiredPmXcvrType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The type of transceiver plugged into the port."
+        ::= { arubaWiredPmXcvrEntry 7 }
+
+    arubaWiredPmXcvrConnectorType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The current transceiver module type for this interface.
+                     For transceiver modules that support multiple
+                     applications, this is the module type of the currently
+                     selected application."
+        ::= { arubaWiredPmXcvrEntry 8 }
+
+   arubaWiredPmXcvrConnectorStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                      incompatible        (0),
+                      supported           (1),
+                      unrecognized        (2),
+                      unsupported         (3),
+                      unsupportedAllowed  (4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The status of the connector to indicate whether it is
+                     supported by the hardware"
+        ::= { arubaWiredPmXcvrEntry 9 }
+
+    arubaWiredPmXcvrConnectorStatusReason OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A text description of the reason causing the current
+                     status of the transceiver."
+        ::= { arubaWiredPmXcvrEntry 10 }
+
+    arubaWiredPmXcvrCableType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the type of external connector (i.e. cable)
+                     the pluggable module uses."
+        ::= { arubaWiredPmXcvrEntry 11 }
+
+    arubaWiredPmXcvrWavelength OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "nm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The wavelength for optical transceiver in nm."
+        ::= { arubaWiredPmXcvrEntry 12 }
+
+    arubaWiredPmXcvrSmfTxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "km"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for SMF cables in km."
+        ::= { arubaWiredPmXcvrEntry 13 }
+
+    arubaWiredPmXcvrMmfOm1TxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for OM1 cables in meters."
+        ::= { arubaWiredPmXcvrEntry 14 }
+
+    arubaWiredPmXcvrMmfOm2TxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for OM2 cables in meters."
+        ::= { arubaWiredPmXcvrEntry 15 }
+
+    arubaWiredPmXcvrMmfOm3TxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for OM3 cables in meters."
+        ::= { arubaWiredPmXcvrEntry 16 }
+
+    arubaWiredPmXcvrMmfOm4TxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for OM4 cables in meters."
+        ::= { arubaWiredPmXcvrEntry 17 }
+
+    arubaWiredPmXcvrMmfOm5TxDist OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The transfer distance for OM5 cables in meters."
+        ::= { arubaWiredPmXcvrEntry 18 }
+
+    arubaWiredPmXcvrCableLength OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..100000)
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The length in meters of the installed cable, if known.
+                     This is only applicable to transceivers such as DACs
+                     where the cable is fixed and the length is known."
+        ::= { arubaWiredPmXcvrEntry 19 }
+
+    arubaWiredPmXcvrMaxSpeed OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..1000000)
+        UNITS       "Mbps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The maximum speed supported by the transceiver, in
+                     units of megabits per second."
+        ::= { arubaWiredPmXcvrEntry 20 }
+
+    arubaWiredPmXcvrMaxPower OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65536)
+        UNITS       "mW"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The maximum power allowed to the transceiver, in units
+                     of milliwatts."
+        ::= { arubaWiredPmXcvrEntry 21 }
+
+    arubaWiredPmXcvrAdapterType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The type of adapter detected in the interface. If
+                     adapter is not plugged in, the value of this OID 
+                     is 'absent' "
+        ::= { arubaWiredPmXcvrEntry 22 }
+
+    arubaWiredPmXcvrAdapterStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                      incompatible        (0),
+                      supported           (1),
+                      unrecognized        (2),
+                      unsupported         (3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The status of the transceiver adapter to indicate
+                     whether it is supported by the hardware. If adapter
+                     is not plugged in, the value of this OID is
+                     unrecognized (2)."
+        ::= { arubaWiredPmXcvrEntry 23 }
+
+    arubaWiredPmXcvrAdapterStatusReason OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A text description of the reason causing the current
+                     status of the adapter."
+        ::= { arubaWiredPmXcvrEntry 24 }
+
+    arubaWiredPmXcvrAdapterProductNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The product number of transceiver adapter."
+        ::= { arubaWiredPmXcvrEntry 25 }
+
+    arubaWiredPmXcvrAdapterSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The serial number of transceiver adapter."
+        ::= { arubaWiredPmXcvrEntry 26 }
+
+    arubaWiredPmXcvrThermalClass OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Thermal classification of the transceiver module."
+        ::= { arubaWiredPmXcvrEntry 27 }
+
+    arubaWiredPmXcvrDiagnostics OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate if DOM is supported on the transceiver."
+        ::= { arubaWiredPmXcvrEntry 28 }
+
+
+-- **********************************************************************
+-- PM Conformance information
+-- **********************************************************************
+
+    arubaWiredPmGroups        OBJECT IDENTIFIER
+                               ::= { arubaWiredPmConformance 1 }
+
+    arubaWiredPmCompliances   OBJECT IDENTIFIER
+                               ::= { arubaWiredPmConformance 2 }
+
+    arubaWiredPmXcvrInfoGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredPmXcvrPortDesc,
+                      arubaWiredPmXcvrDescription,
+                      arubaWiredPmXcvrProductNum,
+                      arubaWiredPmXcvrSerialNum,
+                      arubaWiredPmXcvrPartNum,
+                      arubaWiredPmXcvrType,
+                      arubaWiredPmXcvrConnectorType,
+                      arubaWiredPmXcvrConnectorStatus,
+                      arubaWiredPmXcvrConnectorStatusReason,
+                      arubaWiredPmXcvrCableType,
+                      arubaWiredPmXcvrWavelength,
+                      arubaWiredPmXcvrSmfTxDist,
+                      arubaWiredPmXcvrMmfOm1TxDist,
+                      arubaWiredPmXcvrMmfOm2TxDist,
+                      arubaWiredPmXcvrMmfOm3TxDist,
+                      arubaWiredPmXcvrMmfOm4TxDist,
+                      arubaWiredPmXcvrMmfOm5TxDist,
+                      arubaWiredPmXcvrCableLength,
+                      arubaWiredPmXcvrMaxSpeed,
+                      arubaWiredPmXcvrMaxPower,
+                      arubaWiredPmXcvrAdapterType,
+                      arubaWiredPmXcvrAdapterStatus,
+                      arubaWiredPmXcvrAdapterStatusReason,
+                      arubaWiredPmXcvrAdapterProductNum,
+                      arubaWiredPmXcvrAdapterSerialNum,
+                      arubaWiredPmXcvrThermalClass,
+                      arubaWiredPmXcvrDiagnostics
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing information about
+                     transceiver plugged into switch port."
+
+        ::= {arubaWiredPmGroups 1 }
+
+    arubaWiredPmCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired Pluggable module objects."
+
+        MODULE
+            MANDATORY-GROUPS { arubaWiredPmXcvrInfoGroup }
+
+        ::= { arubaWiredPmCompliances 1 }
+
+END

@@ -555,3 +555,153 @@ The included templates apart from the default template are:
 }
 ```
 
+### Microsoft Teams - AdaptiveCard JSON
+
+```
+@php
+    $state_color = match ($alert->state) {
+        0 => 'Good',
+        1 => 'Warning',
+        2 => 'Attention',
+        default => 'Default'
+    };
+    $severity_color = match ($alert->severity) {
+        'Ok' => 'Good',
+        'Warning' => 'Warning',
+        'Critical' => 'Attention',
+        default => 'Default'
+    };
+@endphp
+{
+    "type": "LibreNMS AdaptiveCard Alert",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "content": {
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.4",
+                "type": "AdaptiveCard",
+                "body": [
+                    {
+                        "type":  "TextBlock",
+                        "size":  "Large",
+                        "weight":  "Bolder",
+                        "color":  "{{ $state_color }}",
+                        "text":  "🚨 **LibreNMS Alert @if ($alert->state == 0) - Resolved @endif**",
+                        "horizontalAlignment":  "Center",
+                        "spacing":  "Small"
+                    },
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**🔔** {{ $alert->title }}",
+                        "wrap":  true,
+                        "color": "Accent",
+                        "weight":  "Bolder",
+                        "spacing":  "Small"
+                    },
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**📌 State:** @switch ($alert->state)
+                            @case (0) OK ✅ @break
+                            @case (1) Warning ⚠️ @break
+                            @case (2) Critical ❌ @break
+                            @default Unknown @endswitch",
+                        "wrap":  true,
+                        "color":  "{{ $state_color }}",
+                        "spacing":  "Small"
+                    },
+                    @if ($alert->state == 0) {
+                        "type":  "TextBlock",
+                        "text":  "**🕒 Elapsed:** {{ $alert->elapsed }}",
+                        "wrap":  true,
+                        "spacing":  "Small"
+                    }, @endif
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**📅 Timestamp:** {{ $alert->timestamp }}",
+                        "wrap":  true,
+                        "spacing":  "Small"
+                    },
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**🆔 Unique-ID:** {{ $alert->uid }}",
+                        "wrap":  true,
+                        "spacing":  "Small"
+                    },
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**⚠️ Severity:**  {{ $alert->severity }}",
+                        "wrap":  true,
+                        "color":  "{{ $severity_color }}",
+                        "spacing":  "Small"
+                    },
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**📜 Rule:**  @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif",
+                        "wrap":  true,
+                        "color":  "Accent",
+                        "spacing":  "Small"
+                    },
+                    @if ($alert->faults and count($alert->faults) > 0)
+                    {
+                        "type":  "TextBlock",
+                        "text":  "**🔍 Fault Details:**",
+                        "wrap":  true,
+                        "size":  "Medium",
+                        "weight":  "Bolder",
+                        "spacing":  "Small"
+                    },
+                    @foreach ($alert->faults as $fault_key => $fault_details)
+                    {
+                        "type": "ActionSet",
+                        "actions": [
+                            {
+                                "type": "Action.ShowCard",
+                                "title": "Fault {{ $fault_key }} ",
+                                "card": {
+                                    "type": "AdaptiveCard",
+                                    "body": [
+                                        {
+                                            "type":  "FactSet",
+                                            "separator":  true,
+                                            "facts":  [
+                                                @foreach ($fault_details as $key => $value)
+                                                @if ($key == 'string')
+                                                    {{--
+                                                        the 'string' key is a redundant amalgam of all 
+                                                        other keys in the assoc array, skip it
+                                                    --}}
+                                                    @continue    
+                                                @endif
+                                                {
+                                                    "title":  "{{ $key }}",
+                                                    "value":  "{{ str_replace(array("\r\n", "\n", "\r"), "", $value) }}"
+                                                },
+                                                @endforeach
+                                                {"title": "", "value": ""}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    @endforeach
+                    {"type": "TextBlock", "text": ""}
+                    @else
+                    {"type": "TextBlock", "text": "No fault data in this alert"}
+                    @endif
+                ],
+                "actions":  [
+                    {
+                        "type":  "Action.OpenUrl",
+                        "title":  "View Alert",
+                        "style": "positive",
+                        "url":  "https://librenms.server.utsc.utoronto.ca/device/{{ $alert->device_id }}/alerts"
+                    }
+                ]
+                }
+        }
+    ]
+}
+```

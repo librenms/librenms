@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
@@ -60,7 +61,7 @@ if (! function_exists('systemd_data_update_helper')) {
             'rrd_def' => $rrd_def,
             'rrd_name' => $rrd_name,
         ];
-        data_update($device, $polling_type, $tags, $fields);
+        app('Datastore')->put($device, $polling_type, $tags, $fields);
 
         return $metrics;
     }
@@ -123,7 +124,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
                 $state_status .
                 ' state status: ' .
                 $field_value;
-            log_event($log_message, $device, 'application');
+            Eventlog::log($log_message, $device['device_id'], 'application');
             continue;
         }
 

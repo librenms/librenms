@@ -59,31 +59,31 @@ if ($updated && $update_message) {
   <div class="form-group">
     <label for="ipmi_hostname" class="col-sm-2 control-label">IPMI/BMC Hostname</label>
     <div class="col-sm-6">
-      <input id="ipmi_hostname" name="ipmi_hostname" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_hostname'); ?>" />
+      <input id="ipmi_hostname" name="ipmi_hostname" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_hostname')); ?>" />
     </div>
   </div>
   <div class="form-group">
     <label for="ipmi_port" class="col-sm-2 control-label">IPMI/BMC Port</label>
     <div class="col-sm-6">
-      <input id="ipmi_port" name="ipmi_port" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_port'); ?>" placeholder="623" />
+      <input id="ipmi_port" name="ipmi_port" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_port')); ?>" placeholder="623" />
     </div>
   </div>
   <div class="form-group">
     <label for="ipmi_username" class="col-sm-2 control-label">IPMI/BMC Username</label>
     <div class="col-sm-6">
-      <input id="ipmi_username" name="ipmi_username" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_username'); ?>" />
+      <input id="ipmi_username" name="ipmi_username" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_username')); ?>" />
     </div>
   </div>
   <div class="form-group">
     <label for="impi_password" class="col-sm-2 control-label">IPMI/BMC Password</label>
     <div class="col-sm-6">
-      <input id="ipmi_password" name="ipmi_password" type="password" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_password'); ?>" />
+      <input id="ipmi_password" name="ipmi_password" type="password" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_password')); ?>" />
     </div>
   </div>
   <div class="form-group">
     <label for="ipmi_kg_key" class="col-sm-2 control-label">IPMIv2 Kg key</label>
     <div class="col-sm-6">
-      <input id="ipmi_kg_key" name="ipmi_kg_key" type="password" class="form-control" value="<?php echo get_dev_attrib($device, 'ipmi_kg_key'); ?>" placeholder="A0FE1A760B304... (Leave blank if none)" />
+      <input id="ipmi_kg_key" name="ipmi_kg_key" type="password" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_kg_key')); ?>" placeholder="A0FE1A760B304... (Leave blank if none)" />
     </div>
   </div>
   <div class="row">

@@ -14,7 +14,7 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
             $limit = ($port['sfpDiagRSSIRxPowerAlmHigh'] / $divisor) ?: -3;
             $warn_limit = ($port['sfpDiagRSSIRxPowerWarnHigh'] / $divisor) ?: -5;
             $value = $port['sfpDiagRxPower'] / $divisor;
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, $portName . '-rx', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'dbm', $device, $oid, $portName . '-rx', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
         if (is_numeric($port['sfpDiagTxPower'])) {
             $oid = '.1.3.6.1.4.1.637.61.1.56.5.1.6.' . $slotId . '.' . $portId;
@@ -24,7 +24,7 @@ foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
             $limit = ($port['sfpDiagRSSITxPowerAlmHigh'] / $divisor) ?: -3;
             $warn_limit = ($port['sfpDiagRSSITxPowerWarnHigh'] / $divisor) ?: -4;
             $value = $port['sfpDiagTxPower'] / $divisor;
-            discover_sensor($valid['sensor'], 'dbm', $device, $oid, $portName . '-tx', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, 'dbm', $device, $oid, $portName . '-tx', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }

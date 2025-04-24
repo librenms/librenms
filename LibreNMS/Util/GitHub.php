@@ -45,6 +45,7 @@ class GitHub
         'webui' => [],
         'alerting' => [],
         'graphs' => [],
+        'maps' => [],
         'snmp traps' => [],
         'applications' => [],
         'billing' => [],

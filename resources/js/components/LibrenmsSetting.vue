@@ -43,7 +43,7 @@
             <span class="form-control-feedback"></span>
         </div>
         <div>
-            <button :style="{'opacity': showResetToDefault()?1:0}" @click="resetToDefault" class="btn btn-default" :class="{'disable-events': ! showResetToDefault()}" type="button" v-tooltip="{ content: $t('Reset to default') }"><i class="fa fa-refresh"></i></button>
+            <button :style="{'opacity': showResetToDefault()?1:0}" @click="resetToDefault" class="btn btn-danger" :class="{'disable-events': ! showResetToDefault()}" type="button" v-tooltip="{ content: $t('Reset to default') }"><i class="fa-solid fa-clock-rotate-left"></i></button>
             <button :style="{'opacity': showUndo()?1:0}" @click="resetToInitial" class="btn btn-primary" :class="{'disable-events': ! showUndo()}" type="button" v-tooltip="{ content: $t('Undo') }"><i class="fa fa-undo"></i></button>
             <div v-if="hasHelp()" v-tooltip="{content: getHelp(), trigger: 'hover click'}" class="fa fa-fw fa-lg fa-question-circle"></div>
         </div>
@@ -51,7 +51,9 @@
 </template>
 
 <script>
-    export default {
+import _ from 'lodash';
+
+export default {
         name: "LibrenmsSetting",
         props: {
             'setting': {type: Object, required: true},
@@ -161,7 +163,7 @@
                 const component = 'Setting' +  this.setting.type.toString()
                     .replace(/(-[a-z]|^[a-z])/g, (group) => group.toUpperCase().replace('-', ''));
 
-                return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
+                return typeof this.$options.components[component] !== 'undefined' ? component : SettingNull;
             }
         }
     }

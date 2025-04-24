@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eventlog.php
  *
@@ -36,9 +37,16 @@ class Eventlog extends DeviceRelatedModel
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
-    protected $casts = [
-        'severity' => Severity::class,
-    ];
+
+    /**
+     * @return array{severity: 'LibreNMS\Enum\Severity'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'severity' => Severity::class,
+        ];
+    }
 
     // ---- Helper Functions ----
     /**
@@ -52,7 +60,7 @@ class Eventlog extends DeviceRelatedModel
      * @param  Severity  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
      */
-    public static function log($text, $device = null, $type = null, Severity $severity = Severity::Info, $reference = null): void
+    public static function log(string $text, Device|int|null $device = null, ?string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
         $model = app()->make(Eventlog::class);
         $model->_log($text, $device, $type, $severity, $reference);
@@ -60,14 +68,8 @@ class Eventlog extends DeviceRelatedModel
 
     /**
      * Log events to the event table
-     *
-     * @param  string  $text
-     * @param  Device|int|null  $device
-     * @param  string  $type
-     * @param  Severity  $severity
-     * @param  int|string|null  $reference
      */
-    public function _log($text, $device = null, $type = null, Severity $severity = Severity::Info, $reference = null): void
+    public function _log(string $text, Device|int|null $device = null, ?string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
         $log = new static([
             'reference' => $reference,

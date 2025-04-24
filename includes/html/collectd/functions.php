@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2009  Bruno Prémont <bonbons AT linux-vserver.org>
  *

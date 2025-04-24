@@ -27,7 +27,7 @@ if ($apc_env_data) {
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor(null, 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 } else {
@@ -47,7 +47,7 @@ if ($apc_env_data) {
 
         if ($current > 0) {
             // Humidity = 0 -> Sensor not available
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor(null, 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 }
@@ -66,7 +66,7 @@ foreach (array_keys($apc_env_data) as $index) {
         $high_limit = $apc_env_data[$index]['emsProbeStatusProbeMaxHumidityThresh'];
 
         if ($current > 0) {
-            discover_sensor($valid['sensor'], 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor(null, 'humidity', $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 }
@@ -78,6 +78,6 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $multiplier = 1;
     $value = $data['memSensorsHumidity'];
     if (is_numeric($value)) {
-        discover_sensor($valid['sensor'], 'humidity', $device, $cur_oid, 'memSensorsHumidity.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
+        discover_sensor(null, 'humidity', $device, $cur_oid, 'memSensorsHumidity.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value);
     }
 }

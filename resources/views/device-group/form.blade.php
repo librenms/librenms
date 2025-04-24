@@ -71,7 +71,8 @@
         }
     }).queryBuilder({
         plugins: [
-            'bt-tooltip-errors'
+            'bt-tooltip-errors',
+            'sortable'
             // 'not-group'
         ],
 

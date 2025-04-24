@@ -1,0 +1,4005 @@
+-- *****************************************************************
+-- Copyright (c) 2012-2014 Viptela, Inc
+-- Copyright (c) 2017-2020 by cisco Systems, Inc.
+-- All rights reserved.
+-- ********************************************
+-- Namespace: http://viptela.com/omp
+
+VIPTELA-OMP DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-omp MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for OMP management"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 5 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+IpPrefix ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:ipPrefix"
+    SYNTAX      OCTET STRING (SIZE (5|17))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+Groups1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+ReceivedPrunes ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+AttributeTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {original(0),installed(1)}
+
+Groups ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+AdvertisedPrunes ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Route1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Route ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+ReceivedPrunes1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+AdvertisedPrunes1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+AfTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {tloc-ipv4(0),tloc-ipv6(1),service(2),route-ipv4(3),route-ipv6(4),mcast-ipv4(5),mcast-ipv6(6)}
+
+BfdStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {up(0),down(1),inactive(2)}
+
+PathStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {chosen(0),backup(1)}
+
+RibInStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      BITS {c(0),i(1),red(2),rej(3),l(4),r(5),s(6),ext(7),inv(8),u(9),stg(10),ia(11)}
+
+AddrFamilyEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {ipv4(0),ipv6(1)}
+
+LossReasonEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Best-path loss reason"
+    SYNTAX      INTEGER {none(0),invalid(1),personality(2),distance(3),preference(4),tloc-preference(5),origin-protocol(6),origin-protocol-subtype(7),origin-metric(8),peer-id(9),tloc-id(10),stale-entry(11),site-id(12),omp-version(13),tloc-gen-id(14),tloc-spi(15),ultimate-tloc-id(16),tloc-action(17)}
+
+McastRouteEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Multicast route type"
+    SYNTAX      INTEGER {starGroup(0),sourceGroup(1),sourceActive(2)}
+
+-- OMP information
+-- tagpath /omp
+omp OBJECT IDENTIFIER ::= { viptela-omp 1 }
+
+-- Display OMP summary
+-- tagpath /omp/summary
+ompSummaryTable OBJECT IDENTIFIER ::= { viptela-omp 2 }
+
+-- Display OMP summary
+-- tagpath /omp/summary
+ompSummary OBJECT IDENTIFIER ::= { ompSummaryTable 1 }
+
+-- tagpath /omp/summary/operstate
+ompSummaryOperstate OBJECT-TYPE
+    SYNTAX      INTEGER {dOWN(1),uP(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational state"
+    ::= { ompSummary 1 }
+
+-- tagpath /omp/summary/adminstate
+ompSummaryAdminstate OBJECT-TYPE
+    SYNTAX      INTEGER {dOWN(1),uP(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Administration state"
+    ::= { ompSummary 2 }
+
+-- tagpath /omp/summary/devicetype
+ompSummaryDevicetype OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),vedge(1),vhub(2),vsmart(3),vbond(4),vmanage(5),ztp(6),vcontainer(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device personality"
+    ::= { ompSummary 3 }
+
+-- tagpath /omp/summary/ompuptime
+ompSummaryOmpuptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OMP uptime"
+    ::= { ompSummary 4 }
+
+-- tagpath /omp/summary/ompdowntime
+ompSummaryOmpdowntime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OMP downtime"
+    ::= { ompSummary 5 }
+
+-- tagpath /omp/summary/routes-received
+ompSummaryRoutesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes received"
+    ::= { ompSummary 6 }
+
+-- tagpath /omp/summary/routes-installed
+ompSummaryRoutesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes installed"
+    ::= { ompSummary 7 }
+
+-- tagpath /omp/summary/routes-sent
+ompSummaryRoutesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes sent"
+    ::= { ompSummary 8 }
+
+-- tagpath /omp/summary/tlocs-received
+ompSummaryTlocsReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs received"
+    ::= { ompSummary 9 }
+
+-- tagpath /omp/summary/tlocs-installed
+ompSummaryTlocsInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs installed"
+    ::= { ompSummary 10 }
+
+-- tagpath /omp/summary/tlocs-sent
+ompSummaryTlocsSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs sent"
+    ::= { ompSummary 11 }
+
+-- tagpath /omp/summary/services-received
+ompSummaryServicesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services received"
+    ::= { ompSummary 12 }
+
+-- tagpath /omp/summary/services-installed
+ompSummaryServicesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services installed"
+    ::= { ompSummary 13 }
+
+-- tagpath /omp/summary/services-sent
+ompSummaryServicesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services sent"
+    ::= { ompSummary 14 }
+
+-- tagpath /omp/summary/mcast-routes-received
+ompSummaryMcastRoutesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes received"
+    ::= { ompSummary 15 }
+
+-- tagpath /omp/summary/mcast-routes-installed
+ompSummaryMcastRoutesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes installed"
+    ::= { ompSummary 16 }
+
+-- tagpath /omp/summary/mcast-routes-sent
+ompSummaryMcastRoutesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes sent"
+    ::= { ompSummary 17 }
+
+-- tagpath /omp/summary/hello-received
+ompSummaryHelloReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets received"
+    ::= { ompSummary 18 }
+
+-- tagpath /omp/summary/hello-sent
+ompSummaryHelloSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets sent"
+    ::= { ompSummary 19 }
+
+-- tagpath /omp/summary/handshake-received
+ompSummaryHandshakeReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Handshake packets received"
+    ::= { ompSummary 20 }
+
+-- tagpath /omp/summary/handshake-sent
+ompSummaryHandshakeSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Handshake packets sent"
+    ::= { ompSummary 21 }
+
+-- tagpath /omp/summary/alert-received
+ompSummaryAlertReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alert packets received"
+    ::= { ompSummary 22 }
+
+-- tagpath /omp/summary/alert-sent
+ompSummaryAlertSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alert packets sent"
+    ::= { ompSummary 23 }
+
+-- tagpath /omp/summary/inform-received
+ompSummaryInformReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inform packets received"
+    ::= { ompSummary 24 }
+
+-- tagpath /omp/summary/inform-sent
+ompSummaryInformSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inform packets sent"
+    ::= { ompSummary 25 }
+
+-- tagpath /omp/summary/update-received
+ompSummaryUpdateReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update packets received"
+    ::= { ompSummary 26 }
+
+-- tagpath /omp/summary/update-sent
+ompSummaryUpdateSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update packets sent"
+    ::= { ompSummary 27 }
+
+-- tagpath /omp/summary/policy-received
+ompSummaryPolicyReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy packets received"
+    ::= { ompSummary 28 }
+
+-- tagpath /omp/summary/policy-sent
+ompSummaryPolicySent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy packets sent"
+    ::= { ompSummary 29 }
+
+-- tagpath /omp/summary/packets-received
+ompSummaryPacketsReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OMP packets received"
+    ::= { ompSummary 30 }
+
+-- tagpath /omp/summary/packets-sent
+ompSummaryPacketsSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OMP packets sent"
+    ::= { ompSummary 31 }
+
+-- tagpath /omp/summary/vsmart-peers
+ompSummaryVsmartPeers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of vSmart peers in up state"
+    ::= { ompSummary 32 }
+
+-- tagpath /omp/summary/vedge-peers
+ompSummaryVedgePeers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of vEdge peers in up state"
+    ::= { ompSummary 33 }
+
+-- tagpath /omp/summary/policy-queue
+ompSummaryPolicyQueue OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy queue statistics"
+    ::= { ompSummary 34 }
+
+-- Display routes
+-- tagpath /omp/routes-table
+ompRoutesTable OBJECT IDENTIFIER ::= { viptela-omp 3 }
+
+-- Display best-match route
+-- tagpath /omp/best-match-route
+ompBestMatchRoute OBJECT IDENTIFIER ::= { viptela-omp 4 }
+
+-- Display TLOC Paths
+-- tagpath /omp/tloc-paths
+ompTlocPaths OBJECT IDENTIFIER ::= { viptela-omp 5 }
+
+-- Display TLOCs
+-- tagpath /omp/omp-tlocs
+ompTlocs OBJECT IDENTIFIER ::= { viptela-omp 6 }
+
+-- Display services
+-- tagpath /omp/services
+ompServices OBJECT IDENTIFIER ::= { viptela-omp 7 }
+
+-- Display Auto-discovered Multicast Routes
+-- tagpath /omp/multicast-auto-discover
+ompMulticastAutoDiscover OBJECT IDENTIFIER ::= { viptela-omp 8 }
+
+-- Display Multicast Joins
+-- tagpath /omp/multicast-routes
+ompMulticastRoutes OBJECT IDENTIFIER ::= { viptela-omp 9 }
+
+-- Display cloudexpress gateway applications Routes
+-- tagpath /omp/cloudexpress
+ompCloudexpressRoutes OBJECT IDENTIFIER ::= { viptela-omp 10 }
+
+-- tagpath /omp/summary/peers
+ompSummaryPeersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpSummaryPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display OMP peers"
+    ::= { ompSummaryTable 2 }
+
+-- tagpath /omp/summary/peers
+ompSummaryPeersEntry OBJECT-TYPE
+    SYNTAX      OmpSummaryPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompSummaryPeersPeer }
+        ::= { ompSummaryPeersTable 1 }
+
+OmpSummaryPeersEntry ::=
+    SEQUENCE {
+        ompSummaryPeersPeer InetAddressIP,
+        ompSummaryPeersType INTEGER,
+        ompSummaryPeersDomainId Unsigned32,
+        ompSummaryPeersSiteId Unsigned32,
+        ompSummaryPeersState INTEGER,
+        ompSummaryPeersVersion UnsignedByte,
+        ompSummaryPeersLegit INTEGER,
+        ompSummaryPeersUpcount Unsigned32,
+        ompSummaryPeersDowncount Unsigned32,
+        ompSummaryPeersLastuptime DateAndTime,
+        ompSummaryPeersLastdowntime DateAndTime,
+        ompSummaryPeersUpTime String,
+        ompSummaryPeersDownTime String,
+        ompSummaryPeersHoldtime Unsigned32,
+        ompSummaryPeersSitepolicy String,
+        ompSummaryPeersPolicyin String,
+        ompSummaryPeersPolicyout String,
+        ompSummaryPeersGracefulRestart INTEGER,
+        ompSummaryPeersGracefulRestartInterval Unsigned32,
+        ompSummaryPeersHelloReceived Unsigned32,
+        ompSummaryPeersHelloSent Unsigned32,
+        ompSummaryPeersHandshakeReceived Unsigned32,
+        ompSummaryPeersHandshakeSent Unsigned32,
+        ompSummaryPeersAlertReceived Unsigned32,
+        ompSummaryPeersAlertSent Unsigned32,
+        ompSummaryPeersInformReceived Unsigned32,
+        ompSummaryPeersInformSent Unsigned32,
+        ompSummaryPeersUpdateReceived Unsigned32,
+        ompSummaryPeersUpdateSent Unsigned32,
+        ompSummaryPeersPolicyReceived Unsigned32,
+        ompSummaryPeersPolicySent Unsigned32,
+        ompSummaryPeersPacketsReceived Unsigned32,
+        ompSummaryPeersPacketsSent Unsigned32,
+        ompSummaryPeersRoutesReceived Unsigned32,
+        ompSummaryPeersRoutesInstalled Unsigned32,
+        ompSummaryPeersRoutesSent Unsigned32,
+        ompSummaryPeersTlocsReceived Unsigned32,
+        ompSummaryPeersTlocsInstalled Unsigned32,
+        ompSummaryPeersTlocsSent Unsigned32,
+        ompSummaryPeersServicesReceived Unsigned32,
+        ompSummaryPeersServicesInstalled Unsigned32,
+        ompSummaryPeersServicesSent Unsigned32,
+        ompSummaryPeersMcastRoutesReceived Unsigned32,
+        ompSummaryPeersMcastRoutesInstalled Unsigned32,
+        ompSummaryPeersMcastRoutesSent Unsigned32,
+        ompSummaryPeersControlUp INTEGER,
+        ompSummaryPeersStaging INTEGER,
+        ompSummaryPeersRefresh INTEGER,
+        ompSummaryPeersOverlayId Unsigned32,
+        ompSummaryPeersRoutesReceivedIPv6 Unsigned32,
+        ompSummaryPeersRoutesInstalledIPv6 Unsigned32,
+        ompSummaryPeersRoutesSentIPv6 Unsigned32,
+        ompSummaryPeersRoutesReceivedTotal Unsigned32,
+        ompSummaryPeersRoutesInstalledTotal Unsigned32,
+        ompSummaryPeersRoutesSentTotal Unsigned32,
+        ompSummaryPeersServicesReceivedIPv6 Unsigned32,
+        ompSummaryPeersServicesInstalledIPv6 Unsigned32,
+        ompSummaryPeersServicesSentIPv6 Unsigned32
+    }
+
+-- tagpath /omp/summary/peers/peer
+ompSummaryPeersPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Peer address"
+    ::= { ompSummaryPeersEntry 1 }
+
+-- tagpath /omp/summary/peers/type
+ompSummaryPeersType OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),vedge(1),vhub(2),vsmart(3),vbond(4),vmanage(5),ztp(6),vcontainer(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer personality"
+    ::= { ompSummaryPeersEntry 2 }
+
+-- tagpath /omp/summary/peers/domain-id
+ompSummaryPeersDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Domain ID"
+    ::= { ompSummaryPeersEntry 3 }
+
+-- tagpath /omp/summary/peers/site-id
+ompSummaryPeersSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Site ID"
+    ::= { ompSummaryPeersEntry 4 }
+
+-- tagpath /omp/summary/peers/state
+ompSummaryPeersState OBJECT-TYPE
+    SYNTAX      INTEGER {invalid(0),init(1),handshake(2),up(3),down(4),init-in-gr(5),down-in-gr(6),handshake-in-gr(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State"
+    ::= { ompSummaryPeersEntry 5 }
+
+-- tagpath /omp/summary/peers/version
+ompSummaryPeersVersion OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompSummaryPeersEntry 6 }
+
+-- tagpath /omp/summary/peers/legit
+ompSummaryPeersLegit OBJECT-TYPE
+    SYNTAX      INTEGER {no(0),yes(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Legitimate"
+    ::= { ompSummaryPeersEntry 7 }
+
+-- tagpath /omp/summary/peers/upcount
+ompSummaryPeersUpcount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Up count"
+    ::= { ompSummaryPeersEntry 8 }
+
+-- tagpath /omp/summary/peers/downcount
+ompSummaryPeersDowncount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Down count"
+    ::= { ompSummaryPeersEntry 9 }
+
+-- tagpath /omp/summary/peers/lastuptime
+ompSummaryPeersLastuptime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last uptime"
+    ::= { ompSummaryPeersEntry 10 }
+
+-- tagpath /omp/summary/peers/lastdowntime
+ompSummaryPeersLastdowntime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last downtime"
+    ::= { ompSummaryPeersEntry 11 }
+
+-- tagpath /omp/summary/peers/up-time
+ompSummaryPeersUpTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uptime"
+    ::= { ompSummaryPeersEntry 12 }
+
+-- tagpath /omp/summary/peers/down-time
+ompSummaryPeersDownTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Downtime"
+    ::= { ompSummaryPeersEntry 13 }
+
+-- tagpath /omp/summary/peers/holdtime
+ompSummaryPeersHoldtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Negotiated holdtime"
+    ::= { ompSummaryPeersEntry 14 }
+
+-- tagpath /omp/summary/peers/sitepolicy
+ompSummaryPeersSitepolicy OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Site policy"
+    ::= { ompSummaryPeersEntry 15 }
+
+-- tagpath /omp/summary/peers/policyin
+ompSummaryPeersPolicyin OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound policy"
+    ::= { ompSummaryPeersEntry 16 }
+
+-- tagpath /omp/summary/peers/policyout
+ompSummaryPeersPolicyout OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound policy"
+    ::= { ompSummaryPeersEntry 17 }
+
+-- tagpath /omp/summary/peers/graceful-restart
+ompSummaryPeersGracefulRestart OBJECT-TYPE
+    SYNTAX      INTEGER {supported(0),not-supported(1),in-progress(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Graceful restart status"
+    ::= { ompSummaryPeersEntry 18 }
+
+-- tagpath /omp/summary/peers/graceful-restart-interval
+ompSummaryPeersGracefulRestartInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Graceful restart interval"
+    ::= { ompSummaryPeersEntry 19 }
+
+-- tagpath /omp/summary/peers/hello-received
+ompSummaryPeersHelloReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets received"
+    ::= { ompSummaryPeersEntry 20 }
+
+-- tagpath /omp/summary/peers/hello-sent
+ompSummaryPeersHelloSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets sent"
+    ::= { ompSummaryPeersEntry 21 }
+
+-- tagpath /omp/summary/peers/handshake-received
+ompSummaryPeersHandshakeReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Handshake packets received"
+    ::= { ompSummaryPeersEntry 22 }
+
+-- tagpath /omp/summary/peers/handshake-sent
+ompSummaryPeersHandshakeSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Handshake packets sent"
+    ::= { ompSummaryPeersEntry 23 }
+
+-- tagpath /omp/summary/peers/alert-received
+ompSummaryPeersAlertReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alert packets received"
+    ::= { ompSummaryPeersEntry 24 }
+
+-- tagpath /omp/summary/peers/alert-sent
+ompSummaryPeersAlertSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alert packets sent"
+    ::= { ompSummaryPeersEntry 25 }
+
+-- tagpath /omp/summary/peers/inform-received
+ompSummaryPeersInformReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inform packets received"
+    ::= { ompSummaryPeersEntry 26 }
+
+-- tagpath /omp/summary/peers/inform-sent
+ompSummaryPeersInformSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inform packets sent"
+    ::= { ompSummaryPeersEntry 27 }
+
+-- tagpath /omp/summary/peers/update-received
+ompSummaryPeersUpdateReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update packets received"
+    ::= { ompSummaryPeersEntry 28 }
+
+-- tagpath /omp/summary/peers/update-sent
+ompSummaryPeersUpdateSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update packets sent"
+    ::= { ompSummaryPeersEntry 29 }
+
+-- tagpath /omp/summary/peers/policy-received
+ompSummaryPeersPolicyReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy packets received"
+    ::= { ompSummaryPeersEntry 30 }
+
+-- tagpath /omp/summary/peers/policy-sent
+ompSummaryPeersPolicySent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy packets sent"
+    ::= { ompSummaryPeersEntry 31 }
+
+-- tagpath /omp/summary/peers/packets-received
+ompSummaryPeersPacketsReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OMP packets received"
+    ::= { ompSummaryPeersEntry 32 }
+
+-- tagpath /omp/summary/peers/packets-sent
+ompSummaryPeersPacketsSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OMP packets sent"
+    ::= { ompSummaryPeersEntry 33 }
+
+-- tagpath /omp/summary/peers/routes-received
+ompSummaryPeersRoutesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes received"
+    ::= { ompSummaryPeersEntry 34 }
+
+-- tagpath /omp/summary/peers/routes-installed
+ompSummaryPeersRoutesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes installed"
+    ::= { ompSummaryPeersEntry 35 }
+
+-- tagpath /omp/summary/peers/routes-sent
+ompSummaryPeersRoutesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes sent"
+    ::= { ompSummaryPeersEntry 36 }
+
+-- tagpath /omp/summary/peers/tlocs-received
+ompSummaryPeersTlocsReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs received"
+    ::= { ompSummaryPeersEntry 37 }
+
+-- tagpath /omp/summary/peers/tlocs-installed
+ompSummaryPeersTlocsInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs installed"
+    ::= { ompSummaryPeersEntry 38 }
+
+-- tagpath /omp/summary/peers/tlocs-sent
+ompSummaryPeersTlocsSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TLOCs sent"
+    ::= { ompSummaryPeersEntry 39 }
+
+-- tagpath /omp/summary/peers/services-received
+ompSummaryPeersServicesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services received"
+    ::= { ompSummaryPeersEntry 40 }
+
+-- tagpath /omp/summary/peers/services-installed
+ompSummaryPeersServicesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services installed"
+    ::= { ompSummaryPeersEntry 41 }
+
+-- tagpath /omp/summary/peers/services-sent
+ompSummaryPeersServicesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services sent"
+    ::= { ompSummaryPeersEntry 42 }
+
+-- tagpath /omp/summary/peers/mcast-routes-received
+ompSummaryPeersMcastRoutesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes received"
+    ::= { ompSummaryPeersEntry 43 }
+
+-- tagpath /omp/summary/peers/mcast-routes-installed
+ompSummaryPeersMcastRoutesInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes installed"
+    ::= { ompSummaryPeersEntry 44 }
+
+-- tagpath /omp/summary/peers/mcast-routes-sent
+ompSummaryPeersMcastRoutesSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast routes sent"
+    ::= { ompSummaryPeersEntry 45 }
+
+-- tagpath /omp/summary/peers/control-up
+ompSummaryPeersControlUp OBJECT-TYPE
+    SYNTAX      INTEGER {no(0),yes(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Control Up"
+    ::= { ompSummaryPeersEntry 46 }
+
+-- tagpath /omp/summary/peers/staging
+ompSummaryPeersStaging OBJECT-TYPE
+    SYNTAX      INTEGER {no(0),yes(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device under staging"
+    ::= { ompSummaryPeersEntry 47 }
+
+-- tagpath /omp/summary/peers/refresh
+ompSummaryPeersRefresh OBJECT-TYPE
+    SYNTAX      INTEGER {supported(0),not-supported(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Refresh status"
+    ::= { ompSummaryPeersEntry 48 }
+
+-- tagpath /omp/summary/peers/overlay-id
+ompSummaryPeersOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Overlay ID"
+    ::= { ompSummaryPeersEntry 49 }
+
+-- tagpath /omp/summary/peers/routes-received-ipv6
+ompSummaryPeersRoutesReceivedIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes received for IPv6"
+    ::= { ompSummaryPeersEntry 50 }
+
+-- tagpath /omp/summary/peers/routes-installed-ipv6
+ompSummaryPeersRoutesInstalledIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes installed for IPv6"
+    ::= { ompSummaryPeersEntry 51 }
+
+-- tagpath /omp/summary/peers/routes-sent-ipv6
+ompSummaryPeersRoutesSentIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes sent for IPv6"
+    ::= { ompSummaryPeersEntry 52 }
+
+-- tagpath /omp/summary/peers/routes-received-total
+ompSummaryPeersRoutesReceivedTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes received total"
+    ::= { ompSummaryPeersEntry 53 }
+
+-- tagpath /omp/summary/peers/routes-installed-total
+ompSummaryPeersRoutesInstalledTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes installed total"
+    ::= { ompSummaryPeersEntry 54 }
+
+-- tagpath /omp/summary/peers/routes-sent-total
+ompSummaryPeersRoutesSentTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routes sent total"
+    ::= { ompSummaryPeersEntry 55 }
+
+-- tagpath /omp/summary/peers/services-received-ipv6
+ompSummaryPeersServicesReceivedIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services IPv6 received"
+    ::= { ompSummaryPeersEntry 56 }
+
+-- tagpath /omp/summary/peers/services-installed-ipv6
+ompSummaryPeersServicesInstalledIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services IPv6 installed"
+    ::= { ompSummaryPeersEntry 57 }
+
+-- tagpath /omp/summary/peers/services-sent-ipv6
+ompSummaryPeersServicesSentIPv6 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Services IPv6 sent"
+    ::= { ompSummaryPeersEntry 58 }
+
+-- tagpath /omp/routes-table/family
+ompRoutesTableFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 1 }
+
+-- tagpath /omp/routes-table/family
+ompRoutesTableFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily }
+        ::= { ompRoutesTableFamilyTable 1 }
+
+OmpRoutesTableFamilyEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/routes-table/family/address-family
+ompRoutesTableFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries
+ompRoutesTableFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 2 }
+
+-- tagpath /omp/routes-table/family/entries
+ompRoutesTableFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix }
+        ::= { ompRoutesTableFamilyEntriesTable 1 }
+
+OmpRoutesTableFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesVpnId Unsigned32,
+        ompRoutesTableFamilyEntriesPrefix IpPrefix
+    }
+
+-- tagpath /omp/routes-table/family/entries/vpn-id
+ompRoutesTableFamilyEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/prefix
+ompRoutesTableFamilyEntriesPrefix OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesEntry 2 }
+
+-- tagpath /omp/routes-table/family/entries/received
+ompRoutesTableFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 3 }
+
+-- tagpath /omp/routes-table/family/entries/received
+ompRoutesTableFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix, ompRoutesTableFamilyEntriesReceivedFromPeer, ompRoutesTableFamilyEntriesReceivedPathId }
+        ::= { ompRoutesTableFamilyEntriesReceivedTable 1 }
+
+OmpRoutesTableFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompRoutesTableFamilyEntriesReceivedPathId Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedLabel Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedStatus RibInStatusType,
+        ompRoutesTableFamilyEntriesReceivedLossReason LossReasonEnum,
+        ompRoutesTableFamilyEntriesReceivedLostToPeer InetAddressIP,
+        ompRoutesTableFamilyEntriesReceivedLostToPathId Unsigned32
+    }
+
+-- tagpath /omp/routes-table/family/entries/received/from-peer
+ompRoutesTableFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/received/path-id
+ompRoutesTableFamilyEntriesReceivedPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/routes-table/family/entries/received/label
+ompRoutesTableFamilyEntriesReceivedLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/routes-table/family/entries/received/status
+ompRoutesTableFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 4 }
+
+-- tagpath /omp/routes-table/family/entries/received/loss-reason
+ompRoutesTableFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 5 }
+
+-- tagpath /omp/routes-table/family/entries/received/lost-to-peer
+ompRoutesTableFamilyEntriesReceivedLostToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 6 }
+
+-- tagpath /omp/routes-table/family/entries/received/lost-to-path-id
+ompRoutesTableFamilyEntriesReceivedLostToPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedEntry 7 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes
+ompRoutesTableFamilyEntriesReceivedAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 4 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes
+ompRoutesTableFamilyEntriesReceivedAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix, ompRoutesTableFamilyEntriesReceivedFromPeer, ompRoutesTableFamilyEntriesReceivedPathId, ompRoutesTableFamilyEntriesReceivedAttributesAttributeType }
+        ::= { ompRoutesTableFamilyEntriesReceivedAttributesTable 1 }
+
+OmpRoutesTableFamilyEntriesReceivedAttributesEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesReceivedAttributesAttributeType AttributeTypeEnum,
+        ompRoutesTableFamilyEntriesReceivedAttributesTlocIp InetAddressIP,
+        ompRoutesTableFamilyEntriesReceivedAttributesTlocColor INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesTlocEncap INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesOriginProtocol INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesOriginMetric Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesDomainId Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesSiteId Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesPreference Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesTag Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesUnknownAttributeLen UnsignedShort,
+        ompRoutesTableFamilyEntriesReceivedAttributesOriginator IpAddress,
+        ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocIp InetAddressIP,
+        ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocColor INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocEncap INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocAction INTEGER,
+        ompRoutesTableFamilyEntriesReceivedAttributesOverlayId Unsigned32,
+        ompRoutesTableFamilyEntriesReceivedAttributesAsPath String,
+        ompRoutesTableFamilyEntriesReceivedAttributesCommunity String
+
+    }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/attribute-type
+ompRoutesTableFamilyEntriesReceivedAttributesAttributeType OBJECT-TYPE
+    SYNTAX      AttributeTypeEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/tloc/ip
+ompRoutesTableFamilyEntriesReceivedAttributesTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 2 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/tloc/color
+ompRoutesTableFamilyEntriesReceivedAttributesTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 3 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/tloc/encap
+ompRoutesTableFamilyEntriesReceivedAttributesTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 4 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/origin/protocol
+ompRoutesTableFamilyEntriesReceivedAttributesOriginProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {proto-invalid(0),static(1),connected(2),eBGP(3),iBGP(4),oSPF-intra-area(5),oSPF-inter-area(6),oSPF-external-1(7),oSPF-external-2(8),aggregate(9),natpoolInside(10),eigrp-sum(11),eigrp-int(12),eigrp-ext(13),lisp(14),isis(15)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin protocol"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 5 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/origin/metric
+ompRoutesTableFamilyEntriesReceivedAttributesOriginMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin metric"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 6 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/domain-id
+ompRoutesTableFamilyEntriesReceivedAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 7 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/site-id
+ompRoutesTableFamilyEntriesReceivedAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 8 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/preference
+ompRoutesTableFamilyEntriesReceivedAttributesPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 9 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/tag
+ompRoutesTableFamilyEntriesReceivedAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 10 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/unknown-attribute-len
+ompRoutesTableFamilyEntriesReceivedAttributesUnknownAttributeLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 11 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/originator
+ompRoutesTableFamilyEntriesReceivedAttributesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 12 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/ultimate-tloc/ip
+ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 13 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/ultimate-tloc/color
+ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 14 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/ultimate-tloc/encap
+ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 15 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/ultimate-tloc-action
+ompRoutesTableFamilyEntriesReceivedAttributesUltimateTlocAction OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),strict(1),primary(2),ecmp(3),backup(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ultimate TLOC action to indicate if packets should be forwarded only via intermediate TLOC or fallback to ultimate TLOC"
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 16 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/overlay-id
+ompRoutesTableFamilyEntriesReceivedAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 17 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/as-path
+ompRoutesTableFamilyEntriesReceivedAttributesAsPath OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 18 }
+
+-- tagpath /omp/routes-table/family/entries/received/attributes/community
+ompRoutesTableFamilyEntriesReceivedAttributesCommunity OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesReceivedAttributesEntry 19 }
+
+-- tagpath /omp/routes-table/family/entries/advertised
+ompRoutesTableFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 5 }
+
+-- tagpath /omp/routes-table/family/entries/advertised
+ompRoutesTableFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix, ompRoutesTableFamilyEntriesAdvertisedToPeer }
+        ::= { ompRoutesTableFamilyEntriesAdvertisedTable 1 }
+
+OmpRoutesTableFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesAdvertisedToPeer InetAddressIP
+    }
+
+-- tagpath /omp/routes-table/family/entries/advertised/to-peer
+ompRoutesTableFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths
+ompRoutesTableFamilyEntriesAdvertisedPathsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesAdvertisedPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 6 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths
+ompRoutesTableFamilyEntriesAdvertisedPathsEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesAdvertisedPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix, ompRoutesTableFamilyEntriesAdvertisedToPeer, ompRoutesTableFamilyEntriesAdvertisedPathsAdvertiseId }
+        ::= { ompRoutesTableFamilyEntriesAdvertisedPathsTable 1 }
+
+OmpRoutesTableFamilyEntriesAdvertisedPathsEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesAdvertisedPathsAdvertiseId Unsigned32
+    }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/advertise-id
+ompRoutesTableFamilyEntriesAdvertisedPathsAdvertiseId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTable 7 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompRoutesTableFamilyAddressFamily, ompRoutesTableFamilyEntriesVpnId, ompRoutesTableFamilyEntriesPrefix, ompRoutesTableFamilyEntriesAdvertisedToPeer, ompRoutesTableFamilyEntriesAdvertisedPathsAdvertiseId, ompRoutesTableFamilyEntriesAdvertisedPathsAttributesPathId }
+        ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTable 1 }
+
+OmpRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry ::=
+    SEQUENCE {
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesPathId Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesLabel Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocIp InetAddressIP,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocColor INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocEncap INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrbOrgProto INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOriginMetric Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesDomainId Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesSiteId Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesPreference Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTag Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrbUnkAttrbLen UnsignedShort,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOriginator IpAddress,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocIp InetAddressIP,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocColor INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocEncap INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocAction INTEGER,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOverlayId Unsigned32,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesAsPath String,
+        ompRoutesTableFamilyEntriesAdvertisedPathsAttributesCommunity String
+    }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/path-id
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 1 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/label
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 2 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/tloc/ip
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 3 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/tloc/color
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 4 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/tloc/encap
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 5 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/origin/protocol
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrbOrgProto OBJECT-TYPE
+    SYNTAX      INTEGER {proto-invalid(0),static(1),connected(2),eBGP(3),iBGP(4),oSPF-intra-area(5),oSPF-inter-area(6),oSPF-external-1(7),oSPF-external-2(8),aggregate(9),natpoolInside(10),eigrp-sum(11),eigrp-int(12),eigrp-ext(13),lisp(14),isis(15)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin protocol"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 6 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/origin/metric
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOriginMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin metric"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 7 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/domain-id
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 8 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/site-id
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 9 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/preference
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 10 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/tag
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 11 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/unknown-attribute-len
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrbUnkAttrbLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 12 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/originator
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 13 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/ultimate-tloc/ip
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 14 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/ultimate-tloc/color
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 15 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/ultimate-tloc/encap
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 16 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/ultimate-tloc-action
+ompRoutesTableFamilyEntriesAdvertisedPathsAttrUltTlocAction OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),strict(1),primary(2),ecmp(3),backup(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ultimate TLOC action to indicate if packets should be forwarded only via intermediate TLOC or fallback to ultimate TLOC"
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 17 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/overlay-id
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 18 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/as-path
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesAsPath OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 19 }
+
+-- tagpath /omp/routes-table/family/entries/advertised/paths/attributes/community
+ompRoutesTableFamilyEntriesAdvertisedPathsAttributesCommunity OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompRoutesTableFamilyEntriesAdvertisedPathsAttributesEntry 20 }
+
+
+-- tagpath /omp/best-match-route/family
+ompBestMatchRouteFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 1 }
+
+-- tagpath /omp/best-match-route/family
+ompBestMatchRouteFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily }
+        ::= { ompBestMatchRouteFamilyTable 1 }
+
+OmpBestMatchRouteFamilyEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/best-match-route/family/address-family
+ompBestMatchRouteFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries
+ompBestMatchRouteFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 2 }
+
+-- tagpath /omp/best-match-route/family/entries
+ompBestMatchRouteFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr }
+        ::= { ompBestMatchRouteFamilyEntriesTable 1 }
+
+OmpBestMatchRouteFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesVpnId Unsigned32,
+        ompBestMatchRouteFamilyEntriesRouteAddr InetAddressIP,
+        ompBestMatchRouteFamilyEntriesPrefix IpPrefix
+    }
+
+-- tagpath /omp/best-match-route/family/entries/vpn-id
+ompBestMatchRouteFamilyEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/route-addr
+ompBestMatchRouteFamilyEntriesRouteAddr OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesEntry 2 }
+
+-- tagpath /omp/best-match-route/family/entries/prefix
+ompBestMatchRouteFamilyEntriesPrefix OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesEntry 3 }
+
+-- tagpath /omp/best-match-route/family/entries/received
+ompBestMatchRouteFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 3 }
+
+-- tagpath /omp/best-match-route/family/entries/received
+ompBestMatchRouteFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr, ompBestMatchRouteFamilyEntriesReceivedFromPeer, ompBestMatchRouteFamilyEntriesReceivedPathId }
+        ::= { ompBestMatchRouteFamilyEntriesReceivedTable 1 }
+
+OmpBestMatchRouteFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompBestMatchRouteFamilyEntriesReceivedPathId Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedLabel Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedStatus RibInStatusType,
+        ompBestMatchRouteFamilyEntriesReceivedLossReason LossReasonEnum,
+        ompBestMatchRouteFamilyEntriesReceivedLostToPeer InetAddressIP,
+        ompBestMatchRouteFamilyEntriesReceivedLostToPathId Unsigned32
+    }
+
+-- tagpath /omp/best-match-route/family/entries/received/from-peer
+ompBestMatchRouteFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/received/path-id
+ompBestMatchRouteFamilyEntriesReceivedPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/best-match-route/family/entries/received/label
+ompBestMatchRouteFamilyEntriesReceivedLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/best-match-route/family/entries/received/status
+ompBestMatchRouteFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 4 }
+
+-- tagpath /omp/best-match-route/family/entries/received/loss-reason
+ompBestMatchRouteFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 5 }
+
+-- tagpath /omp/best-match-route/family/entries/received/lost-to-peer
+ompBestMatchRouteFamilyEntriesReceivedLostToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 6 }
+
+-- tagpath /omp/best-match-route/family/entries/received/lost-to-path-id
+ompBestMatchRouteFamilyEntriesReceivedLostToPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedEntry 7 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes
+ompBestMatchRouteFamilyEntriesReceivedAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 4 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes
+ompBestMatchRouteFamilyEntriesReceivedAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr, ompBestMatchRouteFamilyEntriesReceivedFromPeer, ompBestMatchRouteFamilyEntriesReceivedPathId, ompBestMatchRouteFamilyEntriesReceivedAttributesPseudoKey }
+        ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesTable 1 }
+
+OmpBestMatchRouteFamilyEntriesReceivedAttributesEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesReceivedAttributesPseudoKey Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesAttributeType AttributeTypeEnum,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesTlocIp InetAddressIP,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesTlocColor INTEGER,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesTlocEncap INTEGER,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesOriginProtocol INTEGER,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesOriginMetric Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesDomainId Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesSiteId Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesPreference Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesTag Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttrbUnkAttrbLen UnsignedShort,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesOriginator IpAddress,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesOverlayId Unsigned32,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesAsPath String,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesCommunity String,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocIp InetAddressIP,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocColor INTEGER,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocEncap INTEGER,
+        ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocAction INTEGER
+    }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/pseudo-key
+ompBestMatchRouteFamilyEntriesReceivedAttributesPseudoKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/attribute-type
+ompBestMatchRouteFamilyEntriesReceivedAttributesAttributeType OBJECT-TYPE
+    SYNTAX      AttributeTypeEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 2 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/tloc/ip
+ompBestMatchRouteFamilyEntriesReceivedAttributesTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 3 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/tloc/color
+ompBestMatchRouteFamilyEntriesReceivedAttributesTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 4 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/tloc/encap
+ompBestMatchRouteFamilyEntriesReceivedAttributesTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 5 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/origin/protocol
+ompBestMatchRouteFamilyEntriesReceivedAttributesOriginProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {proto-invalid(0),static(1),connected(2),eBGP(3),iBGP(4),oSPF-intra-area(5),oSPF-inter-area(6),oSPF-external-1(7),oSPF-external-2(8),aggregate(9),natpoolInside(10),eigrp-sum(11),eigrp-int(12),eigrp-ext(13),lisp(14),isis(15)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin protocol"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 6 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/origin/metric
+ompBestMatchRouteFamilyEntriesReceivedAttributesOriginMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin metric"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 7 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/domain-id
+ompBestMatchRouteFamilyEntriesReceivedAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 8 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/site-id
+ompBestMatchRouteFamilyEntriesReceivedAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 9 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/preference
+ompBestMatchRouteFamilyEntriesReceivedAttributesPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 10 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/tag
+ompBestMatchRouteFamilyEntriesReceivedAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 11 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/unknown-attribute-len
+ompBestMatchRouteFamilyEntriesReceivedAttrbUnkAttrbLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 12 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/originator
+ompBestMatchRouteFamilyEntriesReceivedAttributesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 13 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/overlay-id
+ompBestMatchRouteFamilyEntriesReceivedAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 14 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/as-path
+ompBestMatchRouteFamilyEntriesReceivedAttributesAsPath OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 15 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/community
+ompBestMatchRouteFamilyEntriesReceivedAttributesCommunity OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 16 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/ultimate-tloc/ip
+ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocIp OBJECT-TYPE
+
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 17 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/ultimate-tloc/color
+ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 18 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/ultimate-tloc/encap
+ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 19 }
+
+-- tagpath /omp/best-match-route/family/entries/received/attributes/ultimate-tloc-action
+ompBestMatchRouteFamilyEntriesReceivedAttributesUltimateTlocAction OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),strict(1),primary(2),ecmp(3),backup(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ultimate TLOC action to indicate if packets should be forwarded only via intermediate TLOC or fallback to ultimate TLOC"
+    ::= { ompBestMatchRouteFamilyEntriesReceivedAttributesEntry 20 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised
+ompBestMatchRouteFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 5 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised
+ompBestMatchRouteFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr, ompBestMatchRouteFamilyEntriesAdvertisedToPeer }
+        ::= { ompBestMatchRouteFamilyEntriesAdvertisedTable 1 }
+
+OmpBestMatchRouteFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesAdvertisedToPeer InetAddressIP
+    }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/to-peer
+ompBestMatchRouteFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths
+ompBestMatchRouteFamilyEntriesAdvertisedPathsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesAdvertisedPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 6 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths
+ompBestMatchRouteFamilyEntriesAdvertisedPathsEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesAdvertisedPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr, ompBestMatchRouteFamilyEntriesAdvertisedToPeer, ompBestMatchRouteFamilyEntriesAdvertisedPathsAdvertiseId }
+        ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsTable 1 }
+
+OmpBestMatchRouteFamilyEntriesAdvertisedPathsEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAdvertiseId Unsigned32
+    }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/advertise-id
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAdvertiseId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRoute 7 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompBestMatchRouteFamilyAddressFamily, ompBestMatchRouteFamilyEntriesVpnId, ompBestMatchRouteFamilyEntriesRouteAddr, ompBestMatchRouteFamilyEntriesAdvertisedToPeer, ompBestMatchRouteFamilyEntriesAdvertisedPathsAdvertiseId, ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesPathId }
+        ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTable 1 }
+
+OmpBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry ::=
+    SEQUENCE {
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesPathId Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesLabel Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocIp InetAddressIP,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocColor INTEGER,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocEncap INTEGER,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOrgProto INTEGER,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOrgMet Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesDomainId Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesSiteId Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbPref Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTag Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbUnkAttrbLen UnsignedShort,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOriginator IpAddress,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesOverlayId Unsigned32,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesAsPath String,
+        ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesCommunity String
+    }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/path-id
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 1 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/label
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 2 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/tloc/ip
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 3 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/tloc/color
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 4 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/tloc/encap
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 5 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/origin/protocol
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOrgProto  OBJECT-TYPE
+    SYNTAX      INTEGER {proto-invalid(0),static(1),connected(2),eBGP(3),iBGP(4),oSPF-intra-area(5),oSPF-inter-area(6),oSPF-external-1(7),oSPF-external-2(8),aggregate(9),natpoolInside(10),eigrp-sum(11),eigrp-int(12),eigrp-ext(13),lisp(14),isis(15)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin protocol"
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 6 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/origin/metric
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOrgMet  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin metric"
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 7 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/domain-id
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 8 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/site-id
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 9 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/preference
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbPref OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 10 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/tag
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 11 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/unknown-attribute-len
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbUnkAttrbLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 12 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/originator
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttrbOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 13 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/overlay-id
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 14 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/as-path
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesAsPath OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 15 }
+
+-- tagpath /omp/best-match-route/family/entries/advertised/paths/attributes/community
+ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesCommunity OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompBestMatchRouteFamilyEntriesAdvertisedPathsAttributesEntry 16 }
+
+-- tagpath /omp/tloc-paths/entries
+ompTlocPathsEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocPathsEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPaths 1 }
+
+-- tagpath /omp/tloc-paths/entries
+ompTlocPathsEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpTlocPathsEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocPathsEntriesIp, ompTlocPathsEntriesColor, ompTlocPathsEntriesEncap }
+        ::= { ompTlocPathsEntriesTable 1 }
+
+OmpTlocPathsEntriesEntry ::=
+    SEQUENCE {
+        ompTlocPathsEntriesIp InetAddressIP,
+        ompTlocPathsEntriesColor INTEGER,
+        ompTlocPathsEntriesEncap INTEGER
+    }
+
+-- tagpath /omp/tloc-paths/entries/ip
+ompTlocPathsEntriesIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocPathsEntriesEntry 1 }
+
+-- tagpath /omp/tloc-paths/entries/color
+ompTlocPathsEntriesColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompTlocPathsEntriesEntry 2 }
+
+-- tagpath /omp/tloc-paths/entries/encap
+ompTlocPathsEntriesEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompTlocPathsEntriesEntry 3 }
+
+-- tagpath /omp/tloc-paths/entries/paths
+ompTlocPathsEntriesPathsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocPathsEntriesPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPaths 2 }
+
+-- tagpath /omp/tloc-paths/entries/paths
+ompTlocPathsEntriesPathsEntry OBJECT-TYPE
+    SYNTAX      OmpTlocPathsEntriesPathsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocPathsEntriesIp, ompTlocPathsEntriesColor, ompTlocPathsEntriesEncap, ompTlocPathsEntriesPathsIndex }
+        ::= { ompTlocPathsEntriesPathsTable 1 }
+
+OmpTlocPathsEntriesPathsEntry ::=
+    SEQUENCE {
+        ompTlocPathsEntriesPathsIndex Unsigned32,
+        ompTlocPathsEntriesPathsPreference Unsigned32,
+        ompTlocPathsEntriesPathsMtu Unsigned32,
+        ompTlocPathsEntriesPathsBfdStatus BfdStatusEnum,
+        ompTlocPathsEntriesPathsStatus PathStatusEnum,
+        ompTlocPathsEntriesPathsStale TruthValue
+    }
+
+-- tagpath /omp/tloc-paths/entries/paths/index
+ompTlocPathsEntriesPathsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 1 }
+
+-- tagpath /omp/tloc-paths/entries/paths/preference
+ompTlocPathsEntriesPathsPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 2 }
+
+-- tagpath /omp/tloc-paths/entries/paths/mtu
+ompTlocPathsEntriesPathsMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 3 }
+
+-- tagpath /omp/tloc-paths/entries/paths/bfd-status
+ompTlocPathsEntriesPathsBfdStatus OBJECT-TYPE
+    SYNTAX      BfdStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 4 }
+
+-- tagpath /omp/tloc-paths/entries/paths/path-status
+ompTlocPathsEntriesPathsStatus OBJECT-TYPE
+    SYNTAX      PathStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 6 }
+
+-- tagpath /omp/tloc-paths/entries/paths/stale
+ompTlocPathsEntriesPathsStale OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsEntry 7 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links
+ompTlocPathsEntriesPathsLinksTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocPathsEntriesPathsLinksEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPaths 3 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links
+ompTlocPathsEntriesPathsLinksEntry OBJECT-TYPE
+    SYNTAX      OmpTlocPathsEntriesPathsLinksEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocPathsEntriesIp, ompTlocPathsEntriesColor, ompTlocPathsEntriesEncap, ompTlocPathsEntriesPathsIndex, ompTlocPathsEntriesPathsLinksLinkIndex }
+        ::= { ompTlocPathsEntriesPathsLinksTable 1 }
+
+OmpTlocPathsEntriesPathsLinksEntry ::=
+    SEQUENCE {
+        ompTlocPathsEntriesPathsLinksLinkIndex Unsigned32,
+        ompTlocPathsEntriesPathsLinksFromTlocIp InetAddressIP,
+        ompTlocPathsEntriesPathsLinksFromTlocColor INTEGER,
+        ompTlocPathsEntriesPathsLinksFromTlocEncap INTEGER,
+        ompTlocPathsEntriesPathsLinksToTlocIp InetAddressIP,
+        ompTlocPathsEntriesPathsLinksToTlocColor INTEGER,
+        ompTlocPathsEntriesPathsLinksToTlocEncap INTEGER,
+        ompTlocPathsEntriesPathsLinksLabel Unsigned32
+    }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/link-index
+ompTlocPathsEntriesPathsLinksLinkIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsLinksEntry 1 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/from-tloc/ip
+ompTlocPathsEntriesPathsLinksFromTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 2 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/from-tloc/color
+ompTlocPathsEntriesPathsLinksFromTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 3 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/from-tloc/encap
+ompTlocPathsEntriesPathsLinksFromTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 4 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/to-tloc/ip
+ompTlocPathsEntriesPathsLinksToTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 5 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/to-tloc/color
+ompTlocPathsEntriesPathsLinksToTlocColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 6 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/to-tloc/encap
+ompTlocPathsEntriesPathsLinksToTlocEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompTlocPathsEntriesPathsLinksEntry 7 }
+
+-- tagpath /omp/tloc-paths/entries/paths/links/label
+ompTlocPathsEntriesPathsLinksLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocPathsEntriesPathsLinksEntry 8 }
+
+-- tagpath /omp/omp-tlocs/family
+ompTlocsFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 1 }
+
+-- tagpath /omp/omp-tlocs/family
+ompTlocsFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily }
+        ::= { ompTlocsFamilyTable 1 }
+
+OmpTlocsFamilyEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/omp-tlocs/family/address-family
+ompTlocsFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries
+ompTlocsFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 2 }
+
+-- tagpath /omp/omp-tlocs/family/entries
+ompTlocsFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily, ompTlocsFamilyEntriesIp, ompTlocsFamilyEntriesColor, ompTlocsFamilyEntriesEncap }
+        ::= { ompTlocsFamilyEntriesTable 1 }
+
+OmpTlocsFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyEntriesIp InetAddressIP,
+        ompTlocsFamilyEntriesColor INTEGER,
+        ompTlocsFamilyEntriesEncap INTEGER
+    }
+
+-- tagpath /omp/omp-tlocs/family/entries/ip
+ompTlocsFamilyEntriesIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries/color
+ompTlocsFamilyEntriesColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ompTlocsFamilyEntriesEntry 2 }
+
+-- tagpath /omp/omp-tlocs/family/entries/encap
+ompTlocsFamilyEntriesEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { ompTlocsFamilyEntriesEntry 3 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received
+ompTlocsFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 5 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received
+ompTlocsFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily, ompTlocsFamilyEntriesIp, ompTlocsFamilyEntriesColor, ompTlocsFamilyEntriesEncap, ompTlocsFamilyEntriesReceivedFromPeer }
+        ::= { ompTlocsFamilyEntriesReceivedTable 1 }
+
+OmpTlocsFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompTlocsFamilyEntriesReceivedStatus RibInStatusType,
+        ompTlocsFamilyEntriesReceivedLossReason LossReasonEnum,
+        ompTlocsFamilyEntriesReceivedLostToPeer InetAddressIP,
+        ompTlocsFamilyEntriesReceivedLostToPathId Unsigned32
+    }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/from-peer
+ompTlocsFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/status
+ompTlocsFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompTlocsFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/loss-reason
+ompTlocsFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/lost-to-peer
+ompTlocsFamilyEntriesReceivedLostToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedEntry 4 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/lost-to-path-id
+ompTlocsFamilyEntriesReceivedLostToPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedEntry 5 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes
+ompTlocsFamilyEntriesReceivedAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 6 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes
+ompTlocsFamilyEntriesReceivedAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntriesReceivedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily, ompTlocsFamilyEntriesIp, ompTlocsFamilyEntriesColor, ompTlocsFamilyEntriesEncap, ompTlocsFamilyEntriesReceivedFromPeer, ompTlocsFamilyEntriesReceivedAttributesPseudoKey }
+        ::= { ompTlocsFamilyEntriesReceivedAttributesTable 1 }
+
+OmpTlocsFamilyEntriesReceivedAttributesEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyEntriesReceivedAttributesPseudoKey Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesAttributeType AttributeTypeEnum,
+        ompTlocsFamilyEntriesReceivedAttributesTlocEncapKey Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesTlocEncapProto Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesTlocEncapSpi Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesTlocEncapAuthType BITS,
+        ompTlocsFamilyEntriesReceivedAttributesTlocEncapEncryptType BITS,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapPublicIp InetAddressIP,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapPublicPort UnsignedShort,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapPrivateIp InetAddressIP,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapPrivatePort UnsignedShort,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PublicIp InetAddressIP,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PublicPort UnsignedShort,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PrivateIp InetAddressIP,
+        ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PrivatePort UnsignedShort,
+        ompTlocsFamilyEntriesReceivedAttributesBfdStatus BfdStatusEnum,
+        ompTlocsFamilyEntriesReceivedAttributesDomainId Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesSiteId Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesPreference Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesTag Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesStale UnsignedByte,
+        ompTlocsFamilyEntriesReceivedAttributesCarrier INTEGER,
+        ompTlocsFamilyEntriesReceivedAttributesGroups Groups1,
+        ompTlocsFamilyEntriesReceivedAttributesUnknownAttributeLen UnsignedShort,
+        ompTlocsFamilyEntriesReceivedAttributesWeight Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesGenId Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesVersion Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesOriginator IpAddress,
+        ompTlocsFamilyEntriesReceivedAttributesRestrict UnsignedByte,
+        ompTlocsFamilyEntriesReceivedAttributesOverlayId Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesBandwidth Unsigned32,
+        ompTlocsFamilyEntriesReceivedAttributesQosGroup String,
+        ompTlocsFamilyEntriesReceivedAttributesOnDemand UnsignedByte
+    }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/pseudo-key
+ompTlocsFamilyEntriesReceivedAttributesPseudoKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/attribute-type
+ompTlocsFamilyEntriesReceivedAttributesAttributeType OBJECT-TYPE
+    SYNTAX      AttributeTypeEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 2 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-encap/key
+ompTlocsFamilyEntriesReceivedAttributesTlocEncapKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GRE key"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 3 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-encap/proto
+ompTlocsFamilyEntriesReceivedAttributesTlocEncapProto OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Protocol"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 4 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-encap/spi
+ompTlocsFamilyEntriesReceivedAttributesTlocEncapSpi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPI"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 5 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-encap/auth-type
+ompTlocsFamilyEntriesReceivedAttributesTlocEncapAuthType OBJECT-TYPE
+    SYNTAX      BITS {none(0),md5(1),sha1Hmac(2),ahSha1Hmac(3),aesXcbc(4),sha256(5),sha384(6),sha512(7),ghash8(8),ghash12(9),ghash16(10)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 6 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-encap/encrypt-type
+ompTlocsFamilyEntriesReceivedAttributesTlocEncapEncryptType OBJECT-TYPE
+    SYNTAX      BITS {null(0),des(1),des3(2),aes128(3),aes192(4),aes256(5),aes128Ctr(6),aes192Ctr(7),aes256Ctr(8),aes128Gmac(9),aes192Gmac(10),aes256Gmac(11)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encryption"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 7 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-public/ip
+ompTlocsFamilyEntriesReceivedAttributesTlocMapPublicIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 8 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-public/port
+ompTlocsFamilyEntriesReceivedAttributesTlocMapPublicPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 9 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-private/ip
+ompTlocsFamilyEntriesReceivedAttributesTlocMapPrivateIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 10 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-private/port
+ompTlocsFamilyEntriesReceivedAttributesTlocMapPrivatePort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 11 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-v6-public/ip
+ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PublicIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 12 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-v6-public/port
+ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PublicPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 13 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-v6-private/ip
+ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PrivateIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 14 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tloc-map-v6-private/port
+ompTlocsFamilyEntriesReceivedAttributesTlocMapV6PrivatePort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 15 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/bfd-status
+ompTlocsFamilyEntriesReceivedAttributesBfdStatus OBJECT-TYPE
+    SYNTAX      BfdStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 16 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/domain-id
+ompTlocsFamilyEntriesReceivedAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 17 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/site-id
+ompTlocsFamilyEntriesReceivedAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 18 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/preference
+ompTlocsFamilyEntriesReceivedAttributesPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 19 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/tag
+ompTlocsFamilyEntriesReceivedAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 20 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/stale
+ompTlocsFamilyEntriesReceivedAttributesStale OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 21 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/carrier
+ompTlocsFamilyEntriesReceivedAttributesCarrier OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),carrier1(2),carrier2(3),carrier3(4),carrier4(5),carrier5(6),carrier6(7),carrier7(8),carrier8(9)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 22 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/groups
+ompTlocsFamilyEntriesReceivedAttributesGroups OBJECT-TYPE
+    SYNTAX      Groups1
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 23 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/unknown-attribute-len
+ompTlocsFamilyEntriesReceivedAttributesUnknownAttributeLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 24 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/weight
+ompTlocsFamilyEntriesReceivedAttributesWeight OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 25 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/gen-id
+ompTlocsFamilyEntriesReceivedAttributesGenId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 26 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/version
+ompTlocsFamilyEntriesReceivedAttributesVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 27 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/originator
+ompTlocsFamilyEntriesReceivedAttributesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 28 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/restrict
+ompTlocsFamilyEntriesReceivedAttributesRestrict OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 29 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/overlay-id
+ompTlocsFamilyEntriesReceivedAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 30 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/bandwidth
+ompTlocsFamilyEntriesReceivedAttributesBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 31 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/qos-group
+ompTlocsFamilyEntriesReceivedAttributesQosGroup OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 32 }
+
+-- tagpath /omp/omp-tlocs/family/entries/received/attributes/on-demand
+ompTlocsFamilyEntriesReceivedAttributesOnDemand OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesReceivedAttributesEntry 33 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised
+ompTlocsFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 7 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised
+ompTlocsFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily, ompTlocsFamilyEntriesIp, ompTlocsFamilyEntriesColor, ompTlocsFamilyEntriesEncap, ompTlocsFamilyEntriesAdvertisedToPeer }
+        ::= { ompTlocsFamilyEntriesAdvertisedTable 1 }
+
+OmpTlocsFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyEntriesAdvertisedToPeer InetAddressIP
+    }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/to-peer
+ompTlocsFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes
+ompTlocsFamilyEntriesAdvertisedAttributesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpTlocsFamilyEntriesAdvertisedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocs 8 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes
+ompTlocsFamilyEntriesAdvertisedAttributesEntry OBJECT-TYPE
+    SYNTAX      OmpTlocsFamilyEntriesAdvertisedAttributesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompTlocsFamilyAddressFamily, ompTlocsFamilyEntriesIp, ompTlocsFamilyEntriesColor, ompTlocsFamilyEntriesEncap, ompTlocsFamilyEntriesAdvertisedToPeer, ompTlocsFamilyEntriesAdvertisedAttributesAttributeId }
+        ::= { ompTlocsFamilyEntriesAdvertisedAttributesTable 1 }
+
+OmpTlocsFamilyEntriesAdvertisedAttributesEntry ::=
+    SEQUENCE {
+        ompTlocsFamilyEntriesAdvertisedAttributesAttributeId Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapKey Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapProto Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapSpi Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapAuthType BITS,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapEncryptType BITS,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPublicIp InetAddressIP,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPublicPort UnsignedShort,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPrivateIp InetAddressIP,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPrivatePort UnsignedShort,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PublicIp InetAddressIP,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PublicPort UnsignedShort,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PrivateIp InetAddressIP,
+        ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PrivatePort UnsignedShort,
+        ompTlocsFamilyEntriesAdvertisedAttributesDomainId Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesSiteId Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesPreference Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesTag Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesStale UnsignedByte,
+        ompTlocsFamilyEntriesAdvertisedAttributesCarrier INTEGER,
+        ompTlocsFamilyEntriesAdvertisedAttributesGroups Groups1,
+        ompTlocsFamilyEntriesAdvertisedAttributesUnknownAttributeLen UnsignedShort,
+        ompTlocsFamilyEntriesAdvertisedAttributesWeight Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesGenId Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesVersion Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesOriginator IpAddress,
+        ompTlocsFamilyEntriesAdvertisedAttributesRestrict UnsignedByte,
+        ompTlocsFamilyEntriesAdvertisedAttributesOverlayId Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesBandwidth Unsigned32,
+        ompTlocsFamilyEntriesAdvertisedAttributesQosGroup String,
+        ompTlocsFamilyEntriesAdvertisedAttributesOnDemand UnsignedByte
+    }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/attribute-id
+ompTlocsFamilyEntriesAdvertisedAttributesAttributeId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 1 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-encap/key
+ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GRE key"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 2 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-encap/proto
+ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapProto OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Protocol"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 3 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-encap/spi
+ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapSpi OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPI"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 4 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-encap/auth-type
+ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapAuthType OBJECT-TYPE
+    SYNTAX      BITS {none(0),md5(1),sha1Hmac(2),ahSha1Hmac(3),aesXcbc(4),sha256(5),sha384(6),sha512(7),ghash8(8),ghash12(9),ghash16(10)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 5 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-encap/encrypt-type
+ompTlocsFamilyEntriesAdvertisedAttributesTlocEncapEncryptType OBJECT-TYPE
+    SYNTAX      BITS {null(0),des(1),des3(2),aes128(3),aes192(4),aes256(5),aes128Ctr(6),aes192Ctr(7),aes256Ctr(8),aes128Gmac(9),aes192Gmac(10),aes256Gmac(11)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encryption"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 6 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-public/ip
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPublicIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 7 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-public/port
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPublicPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 8 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-private/ip
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPrivateIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 9 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-private/port
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapPrivatePort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 10 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-v6-public/ip
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PublicIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 11 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-v6-public/port
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PublicPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 12 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-v6-private/ip
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PrivateIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 13 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tloc-map-v6-private/port
+ompTlocsFamilyEntriesAdvertisedAttributesTlocMapV6PrivatePort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 14 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/domain-id
+ompTlocsFamilyEntriesAdvertisedAttributesDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 15 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/site-id
+ompTlocsFamilyEntriesAdvertisedAttributesSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 16 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/preference
+ompTlocsFamilyEntriesAdvertisedAttributesPreference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 17 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/tag
+ompTlocsFamilyEntriesAdvertisedAttributesTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 18 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/stale
+ompTlocsFamilyEntriesAdvertisedAttributesStale OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 19 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/carrier
+ompTlocsFamilyEntriesAdvertisedAttributesCarrier OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),carrier1(2),carrier2(3),carrier3(4),carrier4(5),carrier5(6),carrier6(7),carrier7(8),carrier8(9)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 20 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/groups
+ompTlocsFamilyEntriesAdvertisedAttributesGroups OBJECT-TYPE
+    SYNTAX      Groups1
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 21 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/unknown-attribute-len
+ompTlocsFamilyEntriesAdvertisedAttributesUnknownAttributeLen OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 22 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/weight
+ompTlocsFamilyEntriesAdvertisedAttributesWeight OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 23 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/gen-id
+ompTlocsFamilyEntriesAdvertisedAttributesGenId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 24 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/version
+ompTlocsFamilyEntriesAdvertisedAttributesVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 25 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/originator
+ompTlocsFamilyEntriesAdvertisedAttributesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 26 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/restrict
+ompTlocsFamilyEntriesAdvertisedAttributesRestrict OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 27 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/overlay-id
+ompTlocsFamilyEntriesAdvertisedAttributesOverlayId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 28 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/bandwidth
+ompTlocsFamilyEntriesAdvertisedAttributesBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 29 }
+
+-- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/qos-group
+ompTlocsFamilyEntriesAdvertisedAttributesQosGroup OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 30 }
+
+ -- tagpath /omp/omp-tlocs/family/entries/advertised/attributes/on-demand
+ompTlocsFamilyEntriesAdvertisedAttributesOnDemand OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompTlocsFamilyEntriesAdvertisedAttributesEntry 31 }
+
+-- tagpath /omp/services/family
+ompServicesFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpServicesFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServices 1 }
+
+-- tagpath /omp/services/family
+ompServicesFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpServicesFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompServicesFamilyAddressFamily }
+        ::= { ompServicesFamilyTable 1 }
+
+OmpServicesFamilyEntry ::=
+    SEQUENCE {
+        ompServicesFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/services/family/address-family
+ompServicesFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntry 1 }
+
+-- tagpath /omp/services/family/entries/
+ompServicesFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpServicesFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServices 2 }
+
+-- tagpath /omp/services/family/entries/
+ompServicesFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpServicesFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompServicesFamilyAddressFamily, ompServicesFamilyEntriesVpnId, ompServicesFamilyEntriesService, ompServicesFamilyEntriesOriginator }
+        ::= { ompServicesFamilyEntriesTable 1 }
+
+OmpServicesFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompServicesFamilyEntriesVpnId Unsigned32,
+        ompServicesFamilyEntriesService INTEGER,
+        ompServicesFamilyEntriesOriginator InetAddressIP
+}
+
+-- tagpath /omp/services/family/entries/vpn-id
+ompServicesFamilyEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ompServicesFamilyEntriesEntry 1 }
+
+-- tagpath /omp/services/family/entries/service
+ompServicesFamilyEntriesService OBJECT-TYPE
+    SYNTAX      INTEGER {vPN(0),fW(1),iDS(2),iDP(3),netsvc1(4),netsvc2(5),netsvc3(6),netsvc4(7),tE(8),sig(9)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Service type"
+    ::= { ompServicesFamilyEntriesEntry 2 }
+
+-- tagpath /omp/services/family/entries/originator
+ompServicesFamilyEntriesOriginator OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Originator IP address"
+    ::= { ompServicesFamilyEntriesEntry 3 }
+
+-- tagpath /omp/services/family/entries/received
+ompServicesFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpServicesFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServices 3 }
+
+-- tagpath /omp/services/family/entries/received
+ompServicesFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpServicesFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompServicesFamilyAddressFamily, ompServicesFamilyEntriesVpnId, ompServicesFamilyEntriesService, ompServicesFamilyEntriesOriginator, ompServicesFamilyEntriesReceivedFromPeer, ompServicesFamilyEntriesReceivedPathId }
+        ::= { ompServicesFamilyEntriesReceivedTable 1 }
+
+OmpServicesFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompServicesFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompServicesFamilyEntriesReceivedPathId Unsigned32,
+        ompServicesFamilyEntriesReceivedLabel Unsigned32,
+        ompServicesFamilyEntriesReceivedStatus RibInStatusType,
+        ompServicesFamilyEntriesReceivedLossReason LossReasonEnum,
+        ompServicesFamilyEntriesReceivedLostToPeer InetAddressIP,
+        ompServicesFamilyEntriesReceivedLostToPathId Unsigned32
+    }
+
+-- tagpath /omp/services/family/entries/received/from-peer
+ompServicesFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/services/family/entries/received/path-id
+ompServicesFamilyEntriesReceivedPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/services/family/entries/received/label
+ompServicesFamilyEntriesReceivedLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/services/family/entries/received/status
+ompServicesFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompServicesFamilyEntriesReceivedEntry 4 }
+
+-- tagpath /omp/services/family/entries/received/loss-reason
+ompServicesFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 5 }
+
+-- tagpath /omp/services/family/entries/received/lost-to-peer
+ompServicesFamilyEntriesReceivedLostToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 6 }
+
+-- tagpath /omp/services/family/entries/received/lost-to-path-id
+ompServicesFamilyEntriesReceivedLostToPathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesReceivedEntry 7 }
+
+-- tagpath /omp/services/family/entries/advertised
+ompServicesFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpServicesFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServices 4 }
+
+-- tagpath /omp/services/family/entries/advertised
+ompServicesFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpServicesFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompServicesFamilyAddressFamily, ompServicesFamilyEntriesVpnId, ompServicesFamilyEntriesService, ompServicesFamilyEntriesOriginator, ompServicesFamilyEntriesAdvertisedToPeer }
+        ::= { ompServicesFamilyEntriesAdvertisedTable 1 }
+
+OmpServicesFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompServicesFamilyEntriesAdvertisedToPeer InetAddressIP
+    }
+
+-- tagpath /omp/services/family/entries/advertised/to-peer
+ompServicesFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompServicesFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/multicast-auto-discover/family
+ompMulticastAutoDiscoverFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastAutoDiscoverFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscover 1 }
+
+-- tagpath /omp/multicast-auto-discover/family
+ompMulticastAutoDiscoverFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastAutoDiscoverFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastAutoDiscoverFamilyAddressFamily }
+        ::= { ompMulticastAutoDiscoverFamilyTable 1 }
+
+OmpMulticastAutoDiscoverFamilyEntry ::=
+    SEQUENCE {
+        ompMulticastAutoDiscoverFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/multicast-auto-discover/family/address-family
+ompMulticastAutoDiscoverFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntry 1 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries
+ompMulticastAutoDiscoverFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastAutoDiscoverFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscover 2 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries
+ompMulticastAutoDiscoverFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastAutoDiscoverFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastAutoDiscoverFamilyAddressFamily, ompMulticastAutoDiscoverFamilyEntriesVpnId, ompMulticastAutoDiscoverFamilyEntriesSourceOriginator }
+        ::= { ompMulticastAutoDiscoverFamilyEntriesTable 1 }
+
+OmpMulticastAutoDiscoverFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompMulticastAutoDiscoverFamilyEntriesVpnId Unsigned32,
+        ompMulticastAutoDiscoverFamilyEntriesSourceOriginator IpAddress
+    }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/vpn-id
+ompMulticastAutoDiscoverFamilyEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntriesEntry 1 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/source-originator
+ompMulticastAutoDiscoverFamilyEntriesSourceOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntriesEntry 2 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/received
+ompMulticastAutoDiscoverFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastAutoDiscoverFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscover 3 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/received
+ompMulticastAutoDiscoverFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastAutoDiscoverFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastAutoDiscoverFamilyAddressFamily, ompMulticastAutoDiscoverFamilyEntriesVpnId, ompMulticastAutoDiscoverFamilyEntriesSourceOriginator, ompMulticastAutoDiscoverFamilyEntriesReceivedFromPeer }
+        ::= { ompMulticastAutoDiscoverFamilyEntriesReceivedTable 1 }
+
+OmpMulticastAutoDiscoverFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompMulticastAutoDiscoverFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompMulticastAutoDiscoverFamilyEntriesReceivedStatus RibInStatusType,
+        ompMulticastAutoDiscoverFamilyEntriesReceivedLossReason LossReasonEnum
+    }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/received/from-peer
+ompMulticastAutoDiscoverFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/received/status
+ompMulticastAutoDiscoverFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompMulticastAutoDiscoverFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/received/loss-reason
+ompMulticastAutoDiscoverFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/advertised
+ompMulticastAutoDiscoverFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastAutoDiscoverFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscover 4 }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/advertised
+ompMulticastAutoDiscoverFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastAutoDiscoverFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastAutoDiscoverFamilyAddressFamily, ompMulticastAutoDiscoverFamilyEntriesVpnId, ompMulticastAutoDiscoverFamilyEntriesSourceOriginator, ompMulticastAutoDiscoverFamilyEntriesAdvertisedToPeer }
+        ::= { ompMulticastAutoDiscoverFamilyEntriesAdvertisedTable 1 }
+
+OmpMulticastAutoDiscoverFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompMulticastAutoDiscoverFamilyEntriesAdvertisedToPeer InetAddressIP
+    }
+
+-- tagpath /omp/multicast-auto-discover/family/entries/advertised/to-peer
+ompMulticastAutoDiscoverFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastAutoDiscoverFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/multicast-routes/family
+ompMulticastRoutesFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastRoutesFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutes 1 }
+
+-- tagpath /omp/multicast-routes/family
+ompMulticastRoutesFamilyEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastRoutesFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastRoutesFamilyAddressFamily }
+        ::= { ompMulticastRoutesFamilyTable 1 }
+
+OmpMulticastRoutesFamilyEntry ::=
+    SEQUENCE {
+        ompMulticastRoutesFamilyAddressFamily AddrFamilyEnum
+    }
+
+-- tagpath /omp/multicast-routes/family/address-family
+ompMulticastRoutesFamilyAddressFamily OBJECT-TYPE
+    SYNTAX      AddrFamilyEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntry 1 }
+
+-- tagpath /omp/multicast-routes/family/entries
+ompMulticastRoutesFamilyEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastRoutesFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutes 2 }
+
+-- tagpath /omp/multicast-routes/family/entries
+ompMulticastRoutesFamilyEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastRoutesFamilyEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastRoutesFamilyAddressFamily, ompMulticastRoutesFamilyEntriesType, ompMulticastRoutesFamilyEntriesVpnId, ompMulticastRoutesFamilyEntriesSourceOriginator, ompMulticastRoutesFamilyEntriesDestination, ompMulticastRoutesFamilyEntriesGroup, ompMulticastRoutesFamilyEntriesSource }
+        ::= { ompMulticastRoutesFamilyEntriesTable 1 }
+
+OmpMulticastRoutesFamilyEntriesEntry ::=
+    SEQUENCE {
+        ompMulticastRoutesFamilyEntriesType McastRouteEnum,
+        ompMulticastRoutesFamilyEntriesVpnId Unsigned32,
+        ompMulticastRoutesFamilyEntriesSourceOriginator IpAddress,
+        ompMulticastRoutesFamilyEntriesDestination IpAddress,
+        ompMulticastRoutesFamilyEntriesGroup IpAddress,
+        ompMulticastRoutesFamilyEntriesSource IpAddress
+    }
+
+-- tagpath /omp/multicast-routes/family/entries/type
+ompMulticastRoutesFamilyEntriesType OBJECT-TYPE
+    SYNTAX      McastRouteEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 1 }
+
+-- tagpath /omp/multicast-routes/family/entries/vpn-id
+ompMulticastRoutesFamilyEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 2 }
+
+-- tagpath /omp/multicast-routes/family/entries/source-originator
+ompMulticastRoutesFamilyEntriesSourceOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 3 }
+
+-- tagpath /omp/multicast-routes/family/entries/destination
+ompMulticastRoutesFamilyEntriesDestination OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 4 }
+
+-- tagpath /omp/multicast-routes/family/entries/group
+ompMulticastRoutesFamilyEntriesGroup OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 5 }
+
+-- tagpath /omp/multicast-routes/family/entries/source
+ompMulticastRoutesFamilyEntriesSource OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesEntry 6 }
+
+-- tagpath /omp/multicast-routes/family/entries/received
+ompMulticastRoutesFamilyEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastRoutesFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutes 3 }
+
+-- tagpath /omp/multicast-routes/family/entries/received
+ompMulticastRoutesFamilyEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastRoutesFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastRoutesFamilyAddressFamily, ompMulticastRoutesFamilyEntriesType, ompMulticastRoutesFamilyEntriesVpnId, ompMulticastRoutesFamilyEntriesSourceOriginator, ompMulticastRoutesFamilyEntriesDestination, ompMulticastRoutesFamilyEntriesGroup, ompMulticastRoutesFamilyEntriesSource, ompMulticastRoutesFamilyEntriesReceivedFromPeer }
+        ::= { ompMulticastRoutesFamilyEntriesReceivedTable 1 }
+
+OmpMulticastRoutesFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompMulticastRoutesFamilyEntriesReceivedFromPeer InetAddressIP,
+        ompMulticastRoutesFamilyEntriesReceivedRp IpAddress,
+        ompMulticastRoutesFamilyEntriesReceivedReceivedPrunes ReceivedPrunes1,
+        ompMulticastRoutesFamilyEntriesReceivedStatus RibInStatusType,
+        ompMulticastRoutesFamilyEntriesReceivedLossReason LossReasonEnum
+    }
+
+-- tagpath /omp/multicast-routes/family/entries/received/from-peer
+ompMulticastRoutesFamilyEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesReceivedEntry 1 }
+
+-- tagpath /omp/multicast-routes/family/entries/received/rp
+ompMulticastRoutesFamilyEntriesReceivedRp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesReceivedEntry 2 }
+
+-- tagpath /omp/multicast-routes/family/entries/received/received-prunes
+ompMulticastRoutesFamilyEntriesReceivedReceivedPrunes OBJECT-TYPE
+    SYNTAX      ReceivedPrunes1
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesReceivedEntry 3 }
+
+-- tagpath /omp/multicast-routes/family/entries/received/status
+ompMulticastRoutesFamilyEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompMulticastRoutesFamilyEntriesReceivedEntry 4 }
+
+-- tagpath /omp/multicast-routes/family/entries/received/loss-reason
+ompMulticastRoutesFamilyEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesReceivedEntry 5 }
+
+-- tagpath /omp/multicast-routes/family/entries/advertised
+ompMulticastRoutesFamilyEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpMulticastRoutesFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutes 4 }
+
+-- tagpath /omp/multicast-routes/family/entries/advertised
+ompMulticastRoutesFamilyEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpMulticastRoutesFamilyEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompMulticastRoutesFamilyAddressFamily, ompMulticastRoutesFamilyEntriesType, ompMulticastRoutesFamilyEntriesVpnId, ompMulticastRoutesFamilyEntriesSourceOriginator, ompMulticastRoutesFamilyEntriesDestination, ompMulticastRoutesFamilyEntriesGroup, ompMulticastRoutesFamilyEntriesSource, ompMulticastRoutesFamilyEntriesAdvertisedToPeer }
+        ::= { ompMulticastRoutesFamilyEntriesAdvertisedTable 1 }
+
+OmpMulticastRoutesFamilyEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompMulticastRoutesFamilyEntriesAdvertisedToPeer InetAddressIP,
+        ompMulticastRoutesFamilyEntriesAdvertisedRp IpAddress,
+        ompMulticastRoutesFamilyEntriesAdvertisedAdvertisedPrunes AdvertisedPrunes1
+    }
+
+-- tagpath /omp/multicast-routes/family/entries/advertised/to-peer
+ompMulticastRoutesFamilyEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/multicast-routes/family/entries/advertised/rp
+ompMulticastRoutesFamilyEntriesAdvertisedRp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesAdvertisedEntry 2 }
+
+-- tagpath /omp/multicast-routes/family/entries/advertised/advertised-prunes
+ompMulticastRoutesFamilyEntriesAdvertisedAdvertisedPrunes OBJECT-TYPE
+    SYNTAX      AdvertisedPrunes1
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompMulticastRoutesFamilyEntriesAdvertisedEntry 3 }
+
+-- tagpath /omp/cloudexpress/entries
+ompCloudexpressEntriesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpCloudexpressEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressRoutes 1 }
+
+-- tagpath /omp/cloudexpress/entries
+ompCloudexpressEntriesEntry OBJECT-TYPE
+    SYNTAX      OmpCloudexpressEntriesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompCloudexpressEntriesVpnId, ompCloudexpressEntriesOriginator, ompCloudexpressEntriesAppid}
+        ::= { ompCloudexpressEntriesTable 1 }
+
+OmpCloudexpressEntriesEntry ::=
+    SEQUENCE {
+        ompCloudexpressEntriesVpnId Unsigned32,
+        ompCloudexpressEntriesOriginator IpAddress,
+        ompCloudexpressEntriesAppid Unsigned32,
+        ompCloudexpressEntriesAppname String
+    }
+
+-- tagpath /omp/cloudexpress/entries/vpn-id
+ompCloudexpressEntriesVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesEntry 1 }
+
+-- tagpath /omp/cloudexpress/entries/originator
+ompCloudexpressEntriesOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesEntry 2 }
+
+-- tagpath /omp/cloudexpress/entries/appid
+ompCloudexpressEntriesAppid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesEntry 3 }
+
+-- tagpath /omp/cloudexpress/entries/appname
+ompCloudexpressEntriesAppname OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesEntry 4 }
+
+-- tagpath /omp/cloudexpress/entries/received
+ompCloudexpressEntriesReceivedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpCloudexpressFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressRoutes 2 }
+
+-- tagpath /omp/cloudexpress/entries/received
+ompCloudexpressEntriesReceivedEntry OBJECT-TYPE
+    SYNTAX      OmpCloudexpressFamilyEntriesReceivedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompCloudexpressEntriesVpnId, ompCloudexpressEntriesOriginator, ompCloudexpressEntriesAppid, ompCloudexpressEntriesReceivedFromPeer }
+        ::= { ompCloudexpressEntriesReceivedTable 1 }
+
+OmpCloudexpressFamilyEntriesReceivedEntry ::=
+    SEQUENCE {
+        ompCloudexpressEntriesReceivedFromPeer InetAddressIP,
+        ompCloudexpressEntriesReceivedStatus RibInStatusType,
+        ompCloudexpressEntriesReceivedLossReason LossReasonEnum,
+        ompCloudexpressEntriesReceivedLatency Unsigned32,
+        ompCloudexpressEntriesReceivedLoss Unsigned32
+    }
+
+-- tagpath /omp/cloudexpress/entries/received/from-peer
+ompCloudexpressEntriesReceivedFromPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesReceivedEntry 1 }
+
+-- tagpath /omp/cloudexpress/entries/received/status
+ompCloudexpressEntriesReceivedStatus OBJECT-TYPE
+    SYNTAX      RibInStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB-in status"
+    ::= { ompCloudexpressEntriesReceivedEntry 2 }
+
+-- tagpath /omp/cloudexpress/entries/received/loss-reason
+ompCloudexpressEntriesReceivedLossReason OBJECT-TYPE
+    SYNTAX      LossReasonEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesReceivedEntry 3 }
+
+-- tagpath /omp/cloudexpress/entries/received/latency
+ompCloudexpressEntriesReceivedLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesReceivedEntry 4 }
+
+-- tagpath /omp/cloudexpress/entries/received/loss
+ompCloudexpressEntriesReceivedLoss OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesReceivedEntry 5 }
+
+-- tagpath /omp/cloudexpress/entries/advertised
+ompCloudexpressEntriesAdvertisedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OmpCloudexpressEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressRoutes 3 }
+
+-- tagpath /omp/cloudexpress/entries/advertised
+ompCloudexpressEntriesAdvertisedEntry OBJECT-TYPE
+    SYNTAX      OmpCloudexpressEntriesAdvertisedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ompCloudexpressEntriesVpnId, ompCloudexpressEntriesOriginator, ompCloudexpressEntriesAppid, ompCloudexpressEntriesAdvertisedToPeer }
+        ::= { ompCloudexpressEntriesAdvertisedTable 1 }
+
+OmpCloudexpressEntriesAdvertisedEntry ::=
+    SEQUENCE {
+        ompCloudexpressEntriesAdvertisedToPeer InetAddressIP,
+        ompCloudexpressEntriesAdvertisedLatency Unsigned32,
+        ompCloudexpressEntriesAdvertisedLoss Unsigned32
+    }
+
+-- tagpath /omp/cloudexpress/entries/advertised/to-peer
+ompCloudexpressEntriesAdvertisedToPeer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesAdvertisedEntry 1 }
+
+-- tagpath /omp/cloudexpress/entries/advertised/latency
+ompCloudexpressEntriesAdvertisedLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesAdvertisedEntry 2 }
+
+-- tagpath /omp/cloudexpress/entries/advertised/loss
+ompCloudexpressEntriesAdvertisedLoss OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ompCloudexpressEntriesAdvertisedEntry 3 }
+
+END

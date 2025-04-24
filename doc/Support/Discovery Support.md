@@ -82,7 +82,6 @@ Modules.
     lnms config:set discovery_modules.vrf false
     lnms config:set discovery_modules.cisco-cef false
     lnms config:set discovery_modules.slas false
-    lnms config:set discovery_modules.cisco-cbqos false
     lnms config:set discovery_modules.cisco-otv false
     lnms config:set discovery_modules.ipv4-addresses true
     lnms config:set discovery_modules.ipv6-addresses true
@@ -159,7 +158,7 @@ configured to be ignored by config options.
 
 `hr-device`: Processor and Memory support via HOST-RESOURCES-MIB.
 
-`discovery-protocols`: Auto discovery module for xDP, OSPF and BGP.
+`discovery-protocols`: Auto discovery module for xDP, OSPF, OSPFv3 and BGP.
 
 `arp-table`: Detection of the ARP table for the device.
 

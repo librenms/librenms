@@ -22,7 +22,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $type = 'mge-ups';
     $divisor = 10;
     $index = $i;
-    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
 $oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.6.1', '-OsqnU'));
@@ -46,5 +46,5 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $type = 'mge-ups';
     $divisor = 10;
     $index = (100 + $i);
-    discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

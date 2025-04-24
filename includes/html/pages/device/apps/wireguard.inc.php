@@ -12,6 +12,13 @@ $link_array = [
     'app' => 'wireguard',
 ];
 
+if (isset($vars['interface'])) {
+    $vars['interface'] = htmlspecialchars($vars['interface']);
+}
+if (isset($vars['client'])) {
+    $vars['client'] = htmlspecialchars($vars['client']);
+}
+
 $interface_client_map = $app->data['mappings'] ?? [];
 $returned_data = $app->data['data'] ?? [];
 
@@ -38,6 +45,8 @@ echo ' | Interfaces: ';
 // generate interface links on the host application page
 $i = 0;
 foreach ($interface_client_map as $interface => $client_list) {
+    $interface = htmlspecialchars($interface);
+
     $label =
         ($vars['interface'] == $interface && ! isset($vars['wg_page']))
             ? '<span class="pagemenu-selected">' . $interface . '</span>'
@@ -78,6 +87,8 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
     $i = 0;
     echo '<br>Peers: ';
     foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+        $peer = htmlspecialchars($peer);
+
         $label =
             $vars['client'] == $peer
             ? '<span class="pagemenu-selected">' . $peer . '</span>'

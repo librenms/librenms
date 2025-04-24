@@ -21,8 +21,9 @@ discovery_modules:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.8072.3.2.8
-            - .1.3.6.1.4.1.50536.3
+            - .1.3.6.1.4.1.8072.3.2.8  #freebsd
+            - .1.3.6.1.4.1.50536.3     #truenas
         sysDescr_regex:
             - '/freenas/i'
-            - '/truenas/i'
+            - '/^(TrueNAS)(?!.*-SCALE).*$/i'
+            

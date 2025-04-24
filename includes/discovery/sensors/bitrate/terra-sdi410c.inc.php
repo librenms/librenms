@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Terra-sdi410c bitrates
  *
@@ -40,7 +41,7 @@ if (is_array($pre_cache['sdi410cstatus'])) {
             $value = $br * $multiplier;
             $group = 'Streams';
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'bitrate',
                 $device,
                 $oid,

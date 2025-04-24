@@ -13,5 +13,5 @@ $oid = '.1.3.6.1.4.1.1916.1.1.1.8.0'; // extremeCurrentTemperature
 $value = snmp_get($device, $oid, '-Oqv', 'EXTREME-SYSTEM-MIB');
 
 if (is_numeric($value)) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, 1, 'extreme-temp', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+    discover_sensor(null, 'temperature', $device, $oid, 1, 'extreme-temp', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
 }

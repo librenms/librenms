@@ -19,7 +19,7 @@ foreach (explode("\n", $inlet_oids) as $inlet_data) {
         $inlet_frequency = snmp_get($device, "measurementsInletSensorValue.$inlet_index.frequency", '-Ovq', 'PDU2-MIB');
         if (is_numeric($inlet_frequency)) {
             $inlet_frequency = ($inlet_frequency / $inlet_divisor);
-            discover_sensor($valid['sensor'], 'frequency', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, 1, null, null, null, null, $inlet_frequency);
+            discover_sensor(null, 'frequency', $device, $inlet_oid, $inlet_index, 'raritan', $inlet_descr, $inlet_divisor, 1, null, null, null, null, $inlet_frequency);
         }
     }
 }

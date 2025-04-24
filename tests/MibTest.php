@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MibTest.php
  *
@@ -28,6 +29,8 @@ namespace LibreNMS\Tests;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -40,12 +43,10 @@ class MibTest extends TestCase
     /**
      * Test mib file in a directory for errors
      *
-     * @group mibs
-     *
-     * @dataProvider mibDirs
-     *
      * @param  string  $dir
      */
+    #[Group('mibs')]
+    #[DataProvider('mibDirs')]
     public function testMibDirectory($dir): void
     {
         $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
@@ -57,14 +58,12 @@ class MibTest extends TestCase
     /**
      * Test that each mib only exists once.
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testDuplicateMibs($path, $file, $mib_name): void
     {
         global $console_color;
@@ -89,14 +88,12 @@ class MibTest extends TestCase
     /**
      * Test that the file name matches the mib name
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testMibNameMatches($path, $file, $mib_name): void
     {
         global $console_color;
@@ -109,14 +106,12 @@ class MibTest extends TestCase
     /**
      * Test each mib file for errors
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testMibContents($path, $file, $mib_name): void
     {
         global $console_color;
@@ -135,7 +130,7 @@ class MibTest extends TestCase
      *
      * @return array path, filename, mib_name
      */
-    public function mibFiles()
+    public static function mibFiles(): array
     {
         $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
@@ -147,7 +142,7 @@ class MibTest extends TestCase
             $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
-                $this->extractMibName($file->getPathname()),
+                self::extractMibName($file->getPathname()),
             ];
         }
 
@@ -159,7 +154,7 @@ class MibTest extends TestCase
      *
      * @return array
      */
-    public function mibDirs()
+    public static function mibDirs(): array
     {
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
@@ -176,12 +171,9 @@ class MibTest extends TestCase
     /**
      * Extract the mib name from a file
      *
-     * @param  string  $file
-     * @return mixed
-     *
      * @throws Exception
      */
-    private function extractMibName($file)
+    private static function extractMibName(string $file): string
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;

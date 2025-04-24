@@ -3,13 +3,14 @@ modules:
     os:
         hardware: UI-AF60-MIB::af60DevModel.1
         version: UI-AF60-MIB::af60FirmwareVersion.1
+        version_regex: '/(?<version>v[0-9]+\.[0-9]+\.[0-9]+[-RC]*)/'
         lat: UI-AF60-MIB::af60GpsLat.1
         long: UI-AF60-MIB::af60GpsLon.1
     processors:
         data:
             -
                 oid: af60CpuUsage
-                num_oid: '.1.3.6.1.4.1.41112.1.11.2.6'
+                num_oid: '.1.3.6.1.4.1.41112.1.11.1.2.6.1'
     sensors:
         state:
             data:

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * AlertNotification.php
  *
@@ -32,7 +33,7 @@ use NotificationChannels\WebPush\WebPushMessage;
 class AlertNotification extends Notification
 {
     /**
-     * @var \NotificationChannels\WebPush\WebPushMessage
+     * @var WebPushMessage
      */
     public $message;
 
@@ -41,7 +42,7 @@ class AlertNotification extends Notification
         $this->message = (new WebPushMessage)
             ->title($title)
             ->icon(asset('/images/mstile-144x144.png'))
-            ->body($body)
+            ->body(substr($body, 0, 3500))
             ->action('Acknowledge', 'alert.acknowledge')
             ->action('View', 'alert.view')
             ->options(['TTL' => 2000])
@@ -67,8 +68,8 @@ class AlertNotification extends Notification
 
     /**
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \NotificationChannels\WebPush\WebPushMessage
+     * @param  Notification  $notification
+     * @return WebPushMessage
      */
     public function toWebPush($notifiable, Notification $notification): WebPushMessage
     {

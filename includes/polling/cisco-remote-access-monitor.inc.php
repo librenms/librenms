@@ -67,7 +67,7 @@ if ($device['os_group'] == 'cisco') {
         ];
 
         $tags = compact('rrd_def');
-        data_update($device, 'cras_sessions', $tags, $fields);
+        app('Datastore')->put($device, 'cras_sessions', $tags, $fields);
 
         $os->enableGraph('cras_sessions');
     }

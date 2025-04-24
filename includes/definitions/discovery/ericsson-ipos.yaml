@@ -17,6 +17,15 @@ modules:
                 value: eriRouterCpuMeterFiveMinutePeak
                 num_oid: '.1.3.6.1.4.1.193.218.2.6.1.6.{{ $index }}'
                 descr: '5 minute peak'
+    storage:
+        data:
+            -
+                oid: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageTable
+                descr: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageDescr
+                type: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageMedia
+                size: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageSize
+                percent_used: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageUtilization
+                units: 1024
     sensors:
         pre-cache:
             data:

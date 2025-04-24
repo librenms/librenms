@@ -15,7 +15,7 @@ foreach ($output_power as $index => $data) {
     }
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'power',
         $device,
         $pwr_oid,
@@ -45,7 +45,7 @@ foreach ($input_power as $index => $data) {
     }
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'power',
         $device,
         $pwr_oid,
@@ -75,7 +75,7 @@ foreach ($bypass_power as $index => $data) {
     }
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'power',
         $device,
         $pwr_oid,

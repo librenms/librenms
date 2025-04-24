@@ -1,4 +1,5 @@
 <?php
+
 /**
  * compas.inc.php
  *
@@ -28,5 +29,5 @@ $index = 0;
 if (is_numeric($batteryTemp)) {
     $sensorType = 'compas';
     $descr = 'Battery Temperature';
-    discover_sensor($valid['sensor'], 'temperature', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryTemp);
+    discover_sensor(null, 'temperature', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $batteryTemp);
 }

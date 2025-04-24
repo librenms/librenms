@@ -1,22 +1,19 @@
 <?php
 
-$multiplier = 1;
+use LibreNMS\Util\Rewrite;
+
 $divisor = 1000000;
-$divisor_alarm = 1000000;
-foreach ($pre_cache['procurve_hpicfXcvrInfoTable'] as $index => $entry) {
-    if (is_numeric($entry['hpicfXcvrBias']) && $entry['hpicfXcvrBias'] != 0) {
+foreach (SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->table(1) as $index => $entry) {
+    if (is_numeric($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBias']) && $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBias'] != 0) {
         $oid = '.1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.13.' . $index;
-        $dbquery = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$index, $device['device_id']]);
-        $limit_low = $entry['hpicfXcvrBiasLoAlarm'] / $divisor_alarm;
-        $warn_limit_low = $entry['hpicfXcvrBiasLoWarn'] / $divisor_alarm;
-        $limit = $entry['hpicfXcvrBiasHiAlarm'] / $divisor_alarm;
-        $warn_limit = $entry['hpicfXcvrBiasHiWarn'] / $divisor_alarm;
-        $current = $entry['hpicfXcvrBias'] / $divisor;
+        $limit_low = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBiasLoAlarm'] / $divisor;
+        $warn_limit_low = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBiasLoWarn'] / $divisor;
+        $limit = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBiasHiAlarm'] / $divisor;
+        $warn_limit = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBiasHiWarn'] / $divisor;
+        $current = $entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrBias'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        foreach ($dbquery as $dbindex => $dbresult) {
-            $descr = makeshortif($dbresult['ifDescr']) . ' Port Bias Current';
-            discover_sensor($valid['sensor'], 'current', $device, $oid, 'hpicfXcvrBias.' . $index, 'procurve', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
-        }
+        $descr = Rewrite::shortenIfName($entry['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrPortDesc']) . ' Bias Current';
+        discover_sensor(null, 'current', $device, $oid, 'hpicfXcvrBias.' . $index, 'procurve', $descr, $divisor, 1, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

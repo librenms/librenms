@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mpls.php
  *
@@ -59,7 +60,7 @@ class Mpls implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -108,7 +109,7 @@ class Mpls implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -165,26 +166,40 @@ class Mpls implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->mplsLsps()->exists()
+         || $device->mplsLspPaths()->exists()
+         || $device->mplsSdps()->exists()
+         || $device->mplsServices()->exists()
+         || $device->mplsSaps()->exists()
+         || $device->mplsSdpBinds()->exists()
+         || $device->mplsTunnelArHops()->exists()
+         || $device->mplsTunnelCHops()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->mplsLsps()->delete();
-        $device->mplsLspPaths()->delete();
-        $device->mplsSdps()->delete();
-        $device->mplsServices()->delete();
-        $device->mplsSaps()->delete();
-        $device->mplsSdpBinds()->delete();
-        $device->mplsTunnelArHops()->delete();
-        $device->mplsTunnelCHops()->delete();
+        $deleted = $device->mplsLsps()->delete();
+        $deleted += $device->mplsLspPaths()->delete();
+        $deleted += $device->mplsSdps()->delete();
+        $deleted += $device->mplsServices()->delete();
+        $deleted += $device->mplsSaps()->delete();
+        $deleted += $device->mplsSdpBinds()->delete();
+        $deleted += $device->mplsTunnelArHops()->delete();
+        $deleted += $device->mplsTunnelCHops()->delete();
+
+        return $deleted;
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'mpls_lsps' => $device->mplsLsps()->orderBy('vrf_oid')->orderBy('lsp_oid')

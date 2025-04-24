@@ -31,6 +31,7 @@ discovery:
             - .1.3.6.1.4.1.9.1.3053 # { ciscoProducts 3053 } -- Cisco Secure Firewall 3110 Security Appliance
             - .1.3.6.1.4.1.9.1.3054 # { ciscoProducts 3054 } -- Cisco Secure Firewall 3120 Security Appliance
             - .1.3.6.1.4.1.9.1.3055 # { ciscoProducts 3055 } -- Cisco Secure Firewall 3130 Security Appliance
+            - .1.3.6.1.4.1.9.1.3056 # { ciscoProducts 3056 } -- Cisco Secure Firewall 3140 Security Appliance
             - .1.3.6.1.4.1.9.1.3057 # { ciscoProducts 3057 } -- Cisco Secure Firewall 3105 Security Appliance
 
 discovery_modules:

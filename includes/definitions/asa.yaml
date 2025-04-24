@@ -12,7 +12,6 @@ poller_modules:
     applications: false
     bgp-peers: false
     cipsec-tunnels: true
-    cisco-asa-firewall: true
     cisco-ipsec-flow-monitor: true
     cisco-remote-access-monitor: true
     hr-mib: false
@@ -34,4 +33,4 @@ discovery_modules:
 discovery:
     -
         sysDescr_regex:
-            - '/^Cisco Adaptive Security Appliance/'
+            - '/^Cisco (Adaptive|Industrial) Security Appliance/'

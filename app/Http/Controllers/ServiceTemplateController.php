@@ -57,7 +57,7 @@ class ServiceTemplateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function store(Request $request, ToastInterface $toast)
@@ -113,7 +113,7 @@ class ServiceTemplateController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(ServiceTemplate $template)
@@ -124,7 +124,7 @@ class ServiceTemplateController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(ServiceTemplate $template)
@@ -142,8 +142,8 @@ class ServiceTemplateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  Request  $request
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
@@ -202,18 +202,18 @@ class ServiceTemplateController extends Controller
             }, $updated)) > 0;
         } elseif ($template->type == 'dynamic') {
             $template->rules = json_decode($request->rules);
-        } elseif ($template->type == 'groups') {
-            // sync device_group_ids from input
-            $updated = $template->groups()->sync($request->get('groups', []));
-            // check for attached/detached/updated
-            $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
-                return count($device_group_ids);
-            }, $updated)) > 0;
         }
 
-        if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
+        // sync device_group_ids from input
+        $updated = $template->groups()->sync($request->get('groups', []));
+        // check for attached/detached/updated
+        $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
+            return count($device_group_ids);
+        }, $updated)) > 0;
+
+        if ($template->isDirty() || $devices_updated || $device_groups_updated) {
             try {
-                if ($template->save() || $devices_updated || isset($device_groups_updated)) {
+                if ($template->save() || $devices_updated || $device_groups_updated) {
                     $toast->success(__('Service Template :name updated', ['name' => $template->name]));
                 } else {
                     $toast->error(__('Failed to save'));
@@ -235,7 +235,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template to Device Groups.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function applyDeviceGroups(ServiceTemplate $template)
@@ -267,7 +267,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template to Devices.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function applyDevices(ServiceTemplate $template)
@@ -327,7 +327,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function apply(ServiceTemplate $template)
@@ -350,7 +350,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template to a device.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @param  int  $device_id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
@@ -410,7 +410,7 @@ class ServiceTemplateController extends Controller
     /**
      * Remove specified Service Template.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function remove(ServiceTemplate $template)
@@ -425,7 +425,7 @@ class ServiceTemplateController extends Controller
     /**
      * Destroy the specified resource from storage.
      *
-     * @param  \App\Models\ServiceTemplate  $template
+     * @param  ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function destroy(ServiceTemplate $template)

@@ -19,7 +19,7 @@ class LegacyQueryListener
     /**
      * set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
      *
-     * @param  \Illuminate\Database\Events\StatementPrepared  $event
+     * @param  StatementPrepared  $event
      * @return void
      */
     public function handle(StatementPrepared $event): void

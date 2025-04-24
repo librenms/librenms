@@ -4,7 +4,7 @@
 
 This is currently well documented within the doc folder of the installation files.
 
-Please see the following [doc](/Installation/Install-LibreNMS.md)
+Please see the following [doc](../Installation/Install-LibreNMS.md)
 
 ### <a name="faq2"> How do I add a device?</a>
 
@@ -375,7 +375,7 @@ tell you in there.
 You can change the Device Type by going to the device you would like
 to change, then click on the Gear Icon -> Edit. If you would like to
 define custom types, we suggest using [Device
-Groups](/Extensions/Device-Groups/). They will be listed in the
+Groups](../Extensions/Device-Groups.md). They will be listed in the
 menu similarly to device types.
 
 ### <a name="faq34"> Editing large device groups gives error messages</a>

@@ -167,7 +167,7 @@ def get_config_data(base_dir):
         )
         logger.debug("Traceback:", exc_info=True)
 
-    config_cmd = ["/usr/bin/env", "php", "%s/config_to_json.php" % base_dir]
+    config_cmd = ["/usr/bin/env", "php", "%s/lnms" % base_dir, "config:get", "--dump"]
     try:
         exit_code, output = command_runner(config_cmd, timeout=300, stderr=False)
         if exit_code != 0:
@@ -423,8 +423,17 @@ class RedisLock(Lock):
     def __init__(self, namespace="lock", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
+        from redis.retry import Retry
+        from redis.exceptions import TimeoutError, ConnectionError
+        from redis.backoff import ConstantBackoff
 
         redis_kwargs["decode_responses"] = True
+        redis_kwargs["retry"] = Retry(ConstantBackoff(backoff=2), 5)
+        redis_kwargs["retry_on_error"] = [
+            ConnectionError,
+            ConnectionRefusedError,
+            TimeoutError,
+        ]
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
             sentinels = [
                 tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
@@ -434,7 +443,15 @@ class RedisLock(Lock):
                 k: v
                 for k, v in redis_kwargs.items()
                 if k
-                in ["decode_responses", "username", "password", "db", "socket_timeout"]
+                in [
+                    "decode_responses",
+                    "username",
+                    "password",
+                    "db",
+                    "socket_timeout",
+                    "retry",
+                    "retry_on_error",
+                ]
             }
             self._redis = Sentinel(
                 sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs
@@ -533,8 +550,17 @@ class RedisUniqueQueue(object):
     def __init__(self, name, namespace="queue", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
+        from redis.retry import Retry
+        from redis.exceptions import TimeoutError, ConnectionError
+        from redis.backoff import ConstantBackoff
 
         redis_kwargs["decode_responses"] = True
+        redis_kwargs["retry"] = Retry(ConstantBackoff(backoff=2), 5)
+        redis_kwargs["retry_on_error"] = [
+            ConnectionError,
+            ConnectionRefusedError,
+            TimeoutError,
+        ]
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
             sentinels = [
                 tuple(l.split(":")) for l in redis_kwargs.pop("sentinel").split(",")
@@ -544,7 +570,15 @@ class RedisUniqueQueue(object):
                 k: v
                 for k, v in redis_kwargs.items()
                 if k
-                in ["decode_responses", "username", "password", "db", "socket_timeout"]
+                in [
+                    "decode_responses",
+                    "username",
+                    "password",
+                    "db",
+                    "socket_timeout",
+                    "retry",
+                    "retry_on_error",
+                ]
             }
             self._redis = Sentinel(
                 sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs

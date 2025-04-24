@@ -9,6 +9,10 @@ $link_array = [
     'app' => 'poudriere',
 ];
 
+if (isset($vars['poudriere_set'])) {
+    $vars['poudriere_set'] = htmlspecialchars($vars['poudriere_set']);
+}
+
 $app_data = $app->data;
 
 print_optionbar_start();
@@ -29,6 +33,7 @@ echo ' | Sets: ';
 
 $index_int = 0;
 foreach ($app_data['sets'] as $index => $set_name) {
+    $set_name = htmlspecialchars($set_name);
     $label = (! isset($vars['poudriere_set']) || $vars['poudriere_set'] != $set_name)
         ? $set_name
         : '<span class="pagemenu-selected">' . $set_name . '</span>';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS - ADVA device support - Voltage Sensors
  *
@@ -95,7 +96,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
             $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
 
             discover_sensor(
-                $valid['sensor'],
+                null,
                 'voltage',
                 $device,
                 $oid,

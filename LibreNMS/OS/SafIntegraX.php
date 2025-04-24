@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Saf-IntegraX.php
  *

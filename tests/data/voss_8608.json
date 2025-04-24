@@ -20357,7 +20357,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19602,
@@ -20376,7 +20376,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19603,
@@ -20395,7 +20395,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19604,
@@ -20414,7 +20414,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19605,
@@ -20433,7 +20433,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19606,
@@ -20452,7 +20452,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19607,
@@ -20471,7 +20471,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19608,
@@ -20490,7 +20490,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19609,
@@ -20509,7 +20509,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19610,
@@ -20528,7 +20528,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19611,
@@ -20547,7 +20547,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19612,
@@ -20566,7 +20566,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19613,
@@ -20585,7 +20585,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 19614,
@@ -20604,7 +20604,7 @@
                     "entPhysicalContainedIn": 196,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 196
                 },
                 {
                     "entPhysicalIndex": 25601,
@@ -20623,7 +20623,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25602,
@@ -20642,7 +20642,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25603,
@@ -20661,7 +20661,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25604,
@@ -20680,7 +20680,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25605,
@@ -20699,7 +20699,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25606,
@@ -20718,7 +20718,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25607,
@@ -20737,7 +20737,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25608,
@@ -20756,7 +20756,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25609,
@@ -20775,7 +20775,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25610,
@@ -20794,7 +20794,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25611,
@@ -20813,7 +20813,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25612,
@@ -20832,7 +20832,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25613,
@@ -20851,7 +20851,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 25614,
@@ -20870,7 +20870,7 @@
                     "entPhysicalContainedIn": 256,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 256
                 },
                 {
                     "entPhysicalIndex": 26001,
@@ -20889,7 +20889,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26002,
@@ -20908,7 +20908,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26003,
@@ -20927,7 +20927,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26004,
@@ -20946,7 +20946,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26005,
@@ -20965,7 +20965,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26006,
@@ -20984,7 +20984,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26007,
@@ -21003,7 +21003,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26008,
@@ -21022,7 +21022,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26009,
@@ -21041,7 +21041,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26010,
@@ -21060,7 +21060,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26011,
@@ -21079,7 +21079,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26012,
@@ -21098,7 +21098,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26013,
@@ -21117,7 +21117,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 26014,
@@ -21136,7 +21136,7 @@
                     "entPhysicalContainedIn": 260,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 260
                 },
                 {
                     "entPhysicalIndex": 32001,
@@ -21155,7 +21155,7 @@
                     "entPhysicalContainedIn": 320,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 320
                 },
                 {
                     "entPhysicalIndex": 32002,
@@ -21174,7 +21174,7 @@
                     "entPhysicalContainedIn": 320,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 320
                 },
                 {
                     "entPhysicalIndex": 32003,
@@ -21193,7 +21193,7 @@
                     "entPhysicalContainedIn": 320,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 320
                 },
                 {
                     "entPhysicalIndex": 32004,
@@ -21212,7 +21212,7 @@
                     "entPhysicalContainedIn": 320,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 320
                 },
                 {
                     "entPhysicalIndex": 32005,
@@ -21231,7 +21231,7 @@
                     "entPhysicalContainedIn": 320,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 320
                 },
                 {
                     "entPhysicalIndex": 32101,
@@ -21250,7 +21250,7 @@
                     "entPhysicalContainedIn": 321,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 321
                 },
                 {
                     "entPhysicalIndex": 32102,
@@ -21269,7 +21269,7 @@
                     "entPhysicalContainedIn": 321,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 321
                 },
                 {
                     "entPhysicalIndex": 32103,
@@ -21288,7 +21288,7 @@
                     "entPhysicalContainedIn": 321,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 321
                 },
                 {
                     "entPhysicalIndex": 32104,
@@ -21307,7 +21307,7 @@
                     "entPhysicalContainedIn": 321,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 321
                 },
                 {
                     "entPhysicalIndex": 32105,
@@ -21326,7 +21326,7 @@
                     "entPhysicalContainedIn": 321,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 321
                 },
                 {
                     "entPhysicalIndex": 32201,
@@ -21345,7 +21345,7 @@
                     "entPhysicalContainedIn": 322,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 322
                 },
                 {
                     "entPhysicalIndex": 32202,
@@ -21364,7 +21364,7 @@
                     "entPhysicalContainedIn": 322,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 322
                 },
                 {
                     "entPhysicalIndex": 32203,
@@ -21383,7 +21383,7 @@
                     "entPhysicalContainedIn": 322,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 322
                 },
                 {
                     "entPhysicalIndex": 32204,
@@ -21402,7 +21402,7 @@
                     "entPhysicalContainedIn": 322,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 322
                 },
                 {
                     "entPhysicalIndex": 32205,
@@ -21421,7 +21421,7 @@
                     "entPhysicalContainedIn": 322,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 322
                 },
                 {
                     "entPhysicalIndex": 32401,
@@ -21440,7 +21440,7 @@
                     "entPhysicalContainedIn": 324,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 324
                 },
                 {
                     "entPhysicalIndex": 32402,
@@ -21459,7 +21459,7 @@
                     "entPhysicalContainedIn": 324,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 324
                 },
                 {
                     "entPhysicalIndex": 32403,
@@ -21478,7 +21478,7 @@
                     "entPhysicalContainedIn": 324,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 324
                 },
                 {
                     "entPhysicalIndex": 32404,
@@ -21497,7 +21497,7 @@
                     "entPhysicalContainedIn": 324,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 324
                 },
                 {
                     "entPhysicalIndex": 32405,
@@ -21516,7 +21516,7 @@
                     "entPhysicalContainedIn": 324,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 324
                 },
                 {
                     "entPhysicalIndex": 32501,
@@ -21535,7 +21535,7 @@
                     "entPhysicalContainedIn": 325,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 325
                 },
                 {
                     "entPhysicalIndex": 32502,
@@ -21554,7 +21554,7 @@
                     "entPhysicalContainedIn": 325,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 325
                 },
                 {
                     "entPhysicalIndex": 32503,
@@ -21573,7 +21573,7 @@
                     "entPhysicalContainedIn": 325,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 325
                 },
                 {
                     "entPhysicalIndex": 32504,
@@ -21592,7 +21592,7 @@
                     "entPhysicalContainedIn": 325,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 325
                 },
                 {
                     "entPhysicalIndex": 32505,
@@ -21611,7 +21611,7 @@
                     "entPhysicalContainedIn": 325,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 325
                 },
                 {
                     "entPhysicalIndex": 34001,
@@ -21630,7 +21630,7 @@
                     "entPhysicalContainedIn": 340,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 340
                 },
                 {
                     "entPhysicalIndex": 34002,
@@ -21649,7 +21649,7 @@
                     "entPhysicalContainedIn": 340,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 340
                 },
                 {
                     "entPhysicalIndex": 34003,
@@ -21668,7 +21668,7 @@
                     "entPhysicalContainedIn": 340,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 340
                 },
                 {
                     "entPhysicalIndex": 34004,
@@ -21687,7 +21687,7 @@
                     "entPhysicalContainedIn": 340,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 340
                 },
                 {
                     "entPhysicalIndex": 34005,
@@ -21706,7 +21706,7 @@
                     "entPhysicalContainedIn": 340,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 340
                 },
                 {
                     "entPhysicalIndex": 34101,
@@ -21725,7 +21725,7 @@
                     "entPhysicalContainedIn": 341,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 341
                 },
                 {
                     "entPhysicalIndex": 34102,
@@ -21744,7 +21744,7 @@
                     "entPhysicalContainedIn": 341,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 341
                 },
                 {
                     "entPhysicalIndex": 34103,
@@ -21763,7 +21763,7 @@
                     "entPhysicalContainedIn": 341,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 341
                 },
                 {
                     "entPhysicalIndex": 34104,
@@ -21782,7 +21782,7 @@
                     "entPhysicalContainedIn": 341,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 341
                 },
                 {
                     "entPhysicalIndex": 34105,
@@ -21801,7 +21801,7 @@
                     "entPhysicalContainedIn": 341,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 341
                 },
                 {
                     "entPhysicalIndex": 34201,
@@ -21820,7 +21820,7 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 342
                 },
                 {
                     "entPhysicalIndex": 34202,
@@ -21839,7 +21839,7 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 342
                 },
                 {
                     "entPhysicalIndex": 34203,
@@ -21858,7 +21858,7 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 342
                 },
                 {
                     "entPhysicalIndex": 34204,
@@ -21877,7 +21877,7 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 342
                 },
                 {
                     "entPhysicalIndex": 34205,
@@ -21896,7 +21896,7 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 342
                 },
                 {
                     "entPhysicalIndex": 34301,
@@ -21915,7 +21915,7 @@
                     "entPhysicalContainedIn": 343,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 343
                 },
                 {
                     "entPhysicalIndex": 34302,
@@ -21934,7 +21934,7 @@
                     "entPhysicalContainedIn": 343,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 343
                 },
                 {
                     "entPhysicalIndex": 34303,
@@ -21953,7 +21953,7 @@
                     "entPhysicalContainedIn": 343,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 343
                 },
                 {
                     "entPhysicalIndex": 34304,
@@ -21972,7 +21972,7 @@
                     "entPhysicalContainedIn": 343,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 343
                 },
                 {
                     "entPhysicalIndex": 34305,
@@ -21991,7 +21991,7 @@
                     "entPhysicalContainedIn": 343,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 343
                 },
                 {
                     "entPhysicalIndex": 38401,
@@ -22010,7 +22010,7 @@
                     "entPhysicalContainedIn": 384,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 384
                 },
                 {
                     "entPhysicalIndex": 38402,
@@ -22029,7 +22029,7 @@
                     "entPhysicalContainedIn": 384,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 384
                 },
                 {
                     "entPhysicalIndex": 38403,
@@ -22048,7 +22048,7 @@
                     "entPhysicalContainedIn": 384,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 384
                 },
                 {
                     "entPhysicalIndex": 38404,
@@ -22067,7 +22067,7 @@
                     "entPhysicalContainedIn": 384,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 384
                 },
                 {
                     "entPhysicalIndex": 38405,
@@ -22086,7 +22086,7 @@
                     "entPhysicalContainedIn": 384,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 384
                 },
                 {
                     "entPhysicalIndex": 38501,
@@ -22105,7 +22105,7 @@
                     "entPhysicalContainedIn": 385,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 385
                 },
                 {
                     "entPhysicalIndex": 38502,
@@ -22124,7 +22124,7 @@
                     "entPhysicalContainedIn": 385,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 385
                 },
                 {
                     "entPhysicalIndex": 38503,
@@ -22143,7 +22143,7 @@
                     "entPhysicalContainedIn": 385,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 385
                 },
                 {
                     "entPhysicalIndex": 38504,
@@ -22162,7 +22162,7 @@
                     "entPhysicalContainedIn": 385,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 385
                 },
                 {
                     "entPhysicalIndex": 38505,
@@ -22181,7 +22181,7 @@
                     "entPhysicalContainedIn": 385,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 385
                 },
                 {
                     "entPhysicalIndex": 38601,
@@ -22200,7 +22200,7 @@
                     "entPhysicalContainedIn": 386,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 386
                 },
                 {
                     "entPhysicalIndex": 38602,
@@ -22219,7 +22219,7 @@
                     "entPhysicalContainedIn": 386,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 386
                 },
                 {
                     "entPhysicalIndex": 38603,
@@ -22238,7 +22238,7 @@
                     "entPhysicalContainedIn": 386,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 386
                 },
                 {
                     "entPhysicalIndex": 38604,
@@ -22257,7 +22257,7 @@
                     "entPhysicalContainedIn": 386,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 386
                 },
                 {
                     "entPhysicalIndex": 38605,
@@ -22276,7 +22276,7 @@
                     "entPhysicalContainedIn": 386,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 386
                 },
                 {
                     "entPhysicalIndex": 38701,
@@ -22295,7 +22295,7 @@
                     "entPhysicalContainedIn": 387,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 387
                 },
                 {
                     "entPhysicalIndex": 38702,
@@ -22314,7 +22314,7 @@
                     "entPhysicalContainedIn": 387,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 387
                 },
                 {
                     "entPhysicalIndex": 38703,
@@ -22333,7 +22333,7 @@
                     "entPhysicalContainedIn": 387,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 387
                 },
                 {
                     "entPhysicalIndex": 38704,
@@ -22352,7 +22352,7 @@
                     "entPhysicalContainedIn": 387,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 387
                 },
                 {
                     "entPhysicalIndex": 38705,
@@ -22371,7 +22371,7 @@
                     "entPhysicalContainedIn": 387,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 387
                 },
                 {
                     "entPhysicalIndex": 38801,
@@ -22390,7 +22390,7 @@
                     "entPhysicalContainedIn": 388,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 388
                 },
                 {
                     "entPhysicalIndex": 38802,
@@ -22409,7 +22409,7 @@
                     "entPhysicalContainedIn": 388,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 388
                 },
                 {
                     "entPhysicalIndex": 38803,
@@ -22428,7 +22428,7 @@
                     "entPhysicalContainedIn": 388,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 388
                 },
                 {
                     "entPhysicalIndex": 38804,
@@ -22447,7 +22447,7 @@
                     "entPhysicalContainedIn": 388,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 388
                 },
                 {
                     "entPhysicalIndex": 38805,
@@ -22466,7 +22466,7 @@
                     "entPhysicalContainedIn": 388,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 388
                 },
                 {
                     "entPhysicalIndex": 51201,
@@ -22485,7 +22485,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51202,
@@ -22504,7 +22504,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51203,
@@ -22523,7 +22523,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51204,
@@ -22542,7 +22542,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51205,
@@ -22561,7 +22561,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51206,
@@ -22580,7 +22580,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51207,
@@ -22599,7 +22599,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51208,
@@ -22618,7 +22618,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51209,
@@ -22637,7 +22637,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51210,
@@ -22656,7 +22656,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51211,
@@ -22675,7 +22675,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51212,
@@ -22694,7 +22694,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51213,
@@ -22713,7 +22713,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51214,
@@ -22732,7 +22732,7 @@
                     "entPhysicalContainedIn": 512,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 512
                 },
                 {
                     "entPhysicalIndex": 51601,
@@ -22751,7 +22751,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51602,
@@ -22770,7 +22770,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51603,
@@ -22789,7 +22789,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51604,
@@ -22808,7 +22808,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51605,
@@ -22827,7 +22827,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51606,
@@ -22846,7 +22846,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51607,
@@ -22865,7 +22865,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51608,
@@ -22884,7 +22884,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51609,
@@ -22903,7 +22903,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51610,
@@ -22922,7 +22922,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51611,
@@ -22941,7 +22941,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51612,
@@ -22960,7 +22960,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51613,
@@ -22979,7 +22979,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 },
                 {
                     "entPhysicalIndex": 51614,
@@ -22998,7 +22998,7 @@
                     "entPhysicalContainedIn": 516,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme",
-                    "ifIndex": null
+                    "ifIndex": 516
                 }
             ]
         },

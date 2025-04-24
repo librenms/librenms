@@ -14,11 +14,17 @@ class Eurostor extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $info = snmp_getnext_multi($this->getDeviceArray(), ['siVendor', 'siModel', 'siSerial', 'siFirmVer'], '-OQUs', 'proware-SNMP-MIB');
-        $device->version = trim($info['siFirmVer'], '"');
-        $device->hardware = trim($info['siModel'], '"');
-        $device->features = trim($info['siVendor'], '"');
-        $device->serial = trim($info['siSerial'], '"');
+        $info = SnmpQuery::get([
+            'proware-SNMP-MIB::siVendor.0',
+            'proware-SNMP-MIB::siModel.0',
+            'proware-SNMP-MIB::siSerial.0',
+            'proware-SNMP-MIB::siFirmVer.0',
+        ])->values();
+
+        $device->version = $info['proware-SNMP-MIB::siFirmVer.0'] ?? null;
+        $device->hardware = $info['proware-SNMP-MIB::siModel.0'] ?? null;
+        $device->features = $info['proware-SNMP-MIB::siVendor.0'] ?? null;
+        $device->serial = $info['proware-SNMP-MIB::siSerial.0'] ?? null;
 
         if (preg_match('/^ES/', $device->hardware)) {
             $device->hardware = 'EUROstore [' . $device->hardware . ']';

@@ -1,0 +1,151 @@
+mib: TRUENAS-MIB        # Used for TrueNAS-SCALE only
+modules:
+    os:
+        sysDescr_regex: '/(?:TrueNAS-SCALE-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\. Software.*/'
+    storage:
+        data:
+            -
+                oid: TRUENAS-MIB::zvolTable
+                poller_type: truenas-scale-zv
+                type: zvol
+                descr: TRUENAS-MIB::zvolDescr
+                free: TRUENAS-MIB::zvolAvailableBytes
+                free_num_oid: '.1.3.6.1.4.1.50536.1.2.1.1.4.{{ $index }}'
+                used: TRUENAS-MIB::zvolUsedBytes
+                used_num_oid: '.1.3.6.1.4.1.50536.1.2.1.1.3.{{ $index }}'
+    sensors:
+        count:
+            data:
+                -
+                    oid: zfsArcSize
+                    value: zfsArcSize
+                    num_oid: .1.3.6.1.4.1.50536.1.3.1.{{ $index }}
+                    descr: 'ARC Size'
+                    index: zfsArcSize.{{ $index }}
+                -
+                    oid: zfsArcMeta
+                    value: zfsArcMeta
+                    num_oid: .1.3.6.1.4.1.50536.1.3.2.{{ $index }}
+                    descr: 'ARC Metadata'
+                    index: zfsArcMeta.{{ $index }}
+                -
+                    oid: zfsArcData
+                    value: zfsArcData
+                    num_oid: .1.3.6.1.4.1.50536.1.3.3.{{ $index }}
+                    descr: 'ARC Data'
+                    index: zfsArcData.{{ $index }}
+                -
+                    oid: zfsArcHits
+                    value: zfsArcHits
+                    num_oid: .1.3.6.1.4.1.50536.1.3.4.{{ $index }}
+                    descr: 'ARC Hits'
+                    index: zfsArcHits_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsArcMisses
+                    value: zfsArcMisses
+                    num_oid: .1.3.6.1.4.1.50536.1.3.5.{{ $index }}
+                    descr: 'ARC Misses'
+                    index: zfsArcMisses_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsArcC
+                    value: zfsArcC
+                    num_oid: .1.3.6.1.4.1.50536.1.3.6.{{ $index }}
+                    descr: 'ARC Target Size (C)'
+                    index: zfsArcC.{{ $index }}
+                -
+                    oid: zfsArcMissPercent
+                    value: zfsArcMissPercent
+                    num_oid: .1.3.6.1.4.1.50536.1.3.8.{{ $index }}
+                    descr: 'ARC Miss Percent'
+                    index: zfsArcMissPercent.{{ $index }}
+                -
+                    oid: zfsArcCacheHitRatio
+                    value: zfsArcCacheHitRatio
+                    num_oid: .1.3.6.1.4.1.50536.1.3.9.{{ $index }}
+                    descr: 'Arc Cache Hit Ratio Percentage'
+                    index: zfsArcHitRatio.{{ $index }}
+                -
+                    oid: zfsArcCacheMissRatio
+                    value: zfsArcCacheMissRatio
+                    num_oid: .1.3.6.1.4.1.50536.1.3.10.{{ $index }}
+                    descr: 'Arc Cache Miss Ratio Percentage'
+                    index: zfsArcMissRatio.{{ $index }}
+                -
+                    oid: zfsL2ArcHits
+                    value: zfsL2ArcHits
+                    num_oid: .1.3.6.1.4.1.50536.1.4.1.{{ $index }}
+                    descr: 'L2ARC Hits'
+                    index: zfsL2ArcHits_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsL2ArcMisses
+                    value: zfsL2ArcMisses
+                    num_oid: .1.3.6.1.4.1.50536.1.4.2.{{ $index }}
+                    descr: 'L2ARC Misses'
+                    index: zfsL2ArcMisses_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsL2ArcRead
+                    value: zfsL2ArcRead
+                    num_oid: .1.3.6.1.4.1.50536.1.4.3.{{ $index }}
+                    descr: 'L2ARC Reads'
+                    index: zfsL2ArcRead_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsL2ArcWrite
+                    value: zfsL2ArcWrite
+                    num_oid: .1.3.6.1.4.1.50536.1.4.4.{{ $index }}
+                    descr: 'L2ARC Writes'
+                    index: zfsL2ArcWrite_rate.{{ $index }}
+                    rrd_type: COUNTER
+                -
+                    oid: zfsL2ArcSize
+                    value: zfsL2ArcSize
+                    num_oid: .1.3.6.1.4.1.50536.1.4.5.{{ $index }}
+                    descr: 'L2ARC Size'
+                    index: zfsL2ArcSize.{{ $index }}
+                -
+                    oid: zfsZilstatOps1sec
+                    value: zfsZilstatOps1sec
+                    num_oid: .1.3.6.1.4.1.50536.1.5.1.{{ $index }}
+                    descr: 'ZIL Operations last second'
+                    index: zfsZilstatOps1sec.{{ $index }}
+                -
+                    oid: zfsZilstatOps5sec
+                    value: zfsZilstatOps5sec
+                    num_oid: .1.3.6.1.4.1.50536.1.5.2.{{ $index }}
+                    descr: 'ZIL Operations last 5 seconds'
+                    index: zfsZilstatOps5sec.{{ $index }}
+                -
+                    oid: zfsZilstatOps10sec
+                    value: zfsZilstatOps10sec
+                    num_oid: .1.3.6.1.4.1.50536.1.5.3.{{ $index }}
+                    descr: 'ZIL Operations last 10 seconds'
+                    index: zfsZilstatOps10sec.{{ $index }}
+        temperature:
+            data:
+                -
+                    oid: hddTempTable
+                    value: hddTempValue
+                    num_oid: .1.3.6.1.4.1.50536.3.1.3.{{ $index }}
+                    divisor: 1000
+                    descr: '{{ $hddTempDevice }}'
+                    index: hddTempValue.'{{ $index }}'
+                    group: 'hdd temperature'
+        state:
+            data:
+                -
+                    oid: zpoolTable
+                    value: zpoolHealth
+                    num_oid: .1.3.6.1.4.1.50536.1.1.1.1.3.{{ $index }}
+                    descr: 'ZPool: {{ $zpoolName }}'
+                    index: zpoolHealth.{{ $index }}
+                    states:
+                        - { value: 0, descr: ONLINE, graph: 1, generic: 0 }
+                        - { value: 1, descr: DEGRADED, graph: 1, generic: 1 }
+                        - { value: 2, descr: FAULTED, graph: 1, generic: 2 }
+                        - { value: 3, descr: OFFLINE, graph: 1, generic: 2 }
+                        - { value: 4, descr: UNAVAIL, graph: 1, generic: 2 }
+                        - { value: 5, descr: REMOVED, graph: 1, generic: 2 }

@@ -1,0 +1,1728 @@
+	Argus-MIB DEFINITIONS ::= BEGIN
+
+	--==========================================================================
+	-- ARGUS.MIB Rev B
+	--
+	-- NOTE: Refer to RFC2578 for the formal definition of the SNMPv2-SMI MIB.
+	--
+	-- Changes:
+	--
+	-- November 3, 2008
+	--       
+	-- The following new definitions were added:
+	-- 		Resync 
+	-- 		Alarm Trigger
+	-- 		Time stamp
+	--
+	-- Subtyping removed from sequence definitions.
+	--==========================================================================
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises
+			FROM SNMPv2-SMI
+		DisplayString
+			FROM SNMPv2-TC;
+
+	argus MODULE-IDENTITY
+		LAST-UPDATED "200811030000Z"
+		ORGANIZATION "Argus Technologies"
+		CONTACT-INFO
+		  "        Randy Dahlgren
+
+		   Postal: Argus Technologies
+				   5700 Sidley Street
+				   Vancouver, BC V5J 5E5
+				   Canada
+
+			  Tel: 1-604-436-5900
+			  Fax: 1-604-436-1233
+
+		   E-mail: rdahlgren@argus.ca"
+		DESCRIPTION
+		  "This MIB defines the information block(s) available in system controllers 
+		   as defined by the following list: 
+				- dcPwrSysDevice: the SM-series of controllers"
+	::= { enterprises 7309 }
+	
+	dcpower	    	    	OBJECT IDENTIFIER ::= { argus 4 }
+	dcPwrSysDevice			OBJECT IDENTIFIER ::= { dcpower 1 }
+	dcPwrSysVariable		OBJECT IDENTIFIER ::= { dcPwrSysDevice 1 }
+	dcPwrSysString			OBJECT IDENTIFIER ::= { dcPwrSysDevice 2 }
+	dcPwrSysTraps			OBJECT IDENTIFIER ::= { dcPwrSysDevice 3 }    
+
+	dcPwrSysOutputsTbl		OBJECT IDENTIFIER ::= { dcPwrSysDevice 4 }
+	dcPwrSysRelayTbl 		OBJECT IDENTIFIER ::= { dcPwrSysOutputsTbl 1 } 
+	dcPwrSysAnalogOpTbl		OBJECT IDENTIFIER ::= { dcPwrSysOutputsTbl 2 } 
+
+	dcPwrSysAlrmsTbl		OBJECT IDENTIFIER ::= { dcPwrSysDevice 5 }
+	dcPwrSysRectAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 1 } 
+	dcPwrSysDigAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 2 } 
+	dcPwrSysCurrAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 3 } 
+	dcPwrSysVoltAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 4 } 
+	dcPwrSysBattAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 5 } 
+	dcPwrSysTempAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 6 } 
+	dcPwrSysCustomAlrmTbl 	OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 7 } 
+	dcPwrSysMiscAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 8 } 
+	dcPwrSysCtrlAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 9 } 
+	dcPwrSysAdioAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 10 } 
+	dcPwrSysConvAlrmTbl		OBJECT IDENTIFIER ::= { dcPwrSysAlrmsTbl 11 } 
+
+	dcPwrSysInputsTbl		OBJECT IDENTIFIER ::= { dcPwrSysDevice 6 }
+	dcPwrSysDigIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 1 }
+	dcPwrSysCntrlrIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 2 }
+	dcPwrSysRectIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 3 }
+	dcPwrSysCustomIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 4 }
+	dcPwrSysConvIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 5 }
+	dcPwrSysTimerIpTbl		OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 6 }
+	dcPwrSysCounterIpTbl	OBJECT IDENTIFIER ::= { dcPwrSysInputsTbl 7 }
+
+	dcPwrExternalControls	OBJECT IDENTIFIER ::= { dcPwrSysDevice 8 }
+	dcPwrVarbindNameReference	OBJECT IDENTIFIER ::= { dcPwrSysDevice 9 }
+
+
+	--==========================================================================
+	-- Start of variables
+	--==========================================================================
+
+	dcPwrSysChargeVolts OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Battery Charge Voltage. The integer value represent a two digit fix decimal (Value = real voltage * 100) in Volt"
+	::= { dcPwrSysVariable 1 }
+
+	dcPwrSysDischargeVolts OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Battery Discharge Voltage. The integer value represent a two digit fix decimal (Value = real voltage * 100) in Volt"
+	::= { dcPwrSysVariable  2 }
+
+	dcPwrSysChargeAmps OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Battery Charge Current. The integer value represent a two digit fix decimal (Value = real current * 100) in Amp"
+	::= { dcPwrSysVariable  3 }
+
+	dcPwrSysDischargeAmps OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Battery Discharge Current. The integer value represent a two digit fix decimal (Value = real current * 100) in Amp"
+	::= { dcPwrSysVariable  4 }
+
+	dcPwrSysMajorAlarm OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Major Alarm"
+	::= { dcPwrSysVariable  5 }
+
+	dcPwrSysMinorAlarm OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Minor Alarm"
+	::= { dcPwrSysVariable  6 }
+
+	--==========================================================================
+	-- Start of Strings
+	--==========================================================================
+
+	dcPwrSysSiteName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Site Name"
+	::= { dcPwrSysString 1 }
+
+	dcPwrSysSiteCity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Site City"
+	::= { dcPwrSysString 2 }
+
+	dcPwrSysSiteRegion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Site Region"
+	::= { dcPwrSysString 3 }
+
+	dcPwrSysSiteCountry OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Site Country"
+	::= { dcPwrSysString 4 }
+
+	dcPwrSysContactName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Contact Name"
+	::= { dcPwrSysString 5 }
+
+	dcPwrSysPhoneNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Phone Number"
+	::= { dcPwrSysString 6 }
+
+	dcPwrSysSiteNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Site Number"
+	::= { dcPwrSysString 7 }
+
+	dcPwrSysSystemType OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The type of system being monitored by the agent"
+	::= { dcPwrSysString 8 }
+
+	dcPwrSysSystemSerial OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The serial number of the monitored system"
+	::= { dcPwrSysString 9 }
+
+	dcPwrSysSystemNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The number of the monitored system"
+	::= { dcPwrSysString 10 }
+
+	dcPwrSysSoftwareVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The version of software running on the monitored system"
+	::= { dcPwrSysString 11 }
+
+	dcPwrSysSoftwareTimestamp OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The time stamp of the software running on the monitored system"
+	::= { dcPwrSysString 12 }
+
+	--==========================================================================
+	-- Start of Tables Information
+	--==========================================================================
+	--=================
+	-- Output table
+	--=================
+	--========================
+	-- Relay output	sub table
+	--=========================
+	dcPwrSysRelayCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of relay variables in system controller relay table"
+	::= { dcPwrSysRelayTbl 1 }
+
+	dcPwrSysRelayTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysRelayEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller rectifier relay output variables"
+	::= { dcPwrSysRelayTbl 2 }
+
+	dcPwrSysRelayEntry OBJECT-TYPE
+		SYNTAX DcPwrSysRelayEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller relay output group"
+		INDEX { dcPwrSysRelayIndex }
+		::= { dcPwrSysRelayTable 1 }
+
+	DcPwrSysRelayEntry
+	::= SEQUENCE {
+		dcPwrSysRelayIndex 			INTEGER,
+		dcPwrSysRelayName 			DisplayString,
+		dcPwrSysRelayIntegerValue 	INTEGER,
+		dcPwrSysRelayStringValue 	DisplayString,
+		dcPwrSysRelaySeverity		INTEGER
+	}
+
+	dcPwrSysRelayIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the relay variable in the power system controller relay output group"
+	::= { dcPwrSysRelayEntry 1 }
+
+	dcPwrSysRelayName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the relay variable as reported by the DC power system controller relay output group"
+	::= { dcPwrSysRelayEntry 2 }
+
+	dcPwrSysRelayIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the relay variable as reported by the DC power system controller relay output group"
+	::= { dcPwrSysRelayEntry 3 }
+
+	dcPwrSysRelayStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the relay variable as reported by the DC power system controller relay output group"
+	::= { dcPwrSysRelayEntry 4 }
+
+	dcPwrSysRelaySeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of relay severity level of the extra variable as reported by the DC power system controller relay output group"
+	::= { dcPwrSysRelayEntry 5 }
+
+	--========================
+	-- Analog output sub table
+	--=========================
+	dcPwrSysAnalogOpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of analog output variables in system controller analog output table"
+	::= { dcPwrSysAnalogOpTbl 1 }
+
+	dcPwrSysAnalogOpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysAnalogOpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller analog output variables"
+	::= { dcPwrSysAnalogOpTbl 2 }
+
+	dcPwrSysAnalogOpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysAnalogOpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller analog output group"
+		INDEX { dcPwrSysAnalogOpIndex }
+		::= { dcPwrSysAnalogOpTable 1 }
+
+	DcPwrSysAnalogOpEntry
+	::= SEQUENCE {
+		dcPwrSysAnalogOpIndex 			INTEGER,
+		dcPwrSysAnalogOpName 			DisplayString,
+		dcPwrSysAnalogOpIntegerValue 	INTEGER,
+		dcPwrSysAnalogOpStringValue 	DisplayString,
+		dcPwrSysAnalogOpSeverity 		INTEGER
+	}
+
+	dcPwrSysAnalogOpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the analog variable in the power system controller analog output group"
+	::= { dcPwrSysAnalogOpEntry 1 }
+
+	dcPwrSysAnalogOpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the analog variable as reported by the DC power system controller analog output group"
+	::= { dcPwrSysAnalogOpEntry 2 }
+
+	dcPwrSysAnalogOpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the analog variable as reported by the DC power system controller analog output group"
+	::= { dcPwrSysAnalogOpEntry 3 }
+
+	dcPwrSysAnalogOpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the analog variable as reported by the DC power system controller analog output group"
+	::= { dcPwrSysAnalogOpEntry 4 }
+
+	dcPwrSysAnalogOpSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of analog severity level of the extra variable as reported by the DC power system controller analog output group"
+	::= { dcPwrSysAnalogOpEntry 5 }
+
+	--=================
+	-- Alarm table
+	--=================
+	--============================
+	--  Rectifier alarm group
+	--============================
+	dcPwrSysRectAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of rectifier alarm variables in system controller alarm table"
+	::= { dcPwrSysRectAlrmTbl 1 }
+
+	dcPwrSysRectAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysRectAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller rectifier alarm variables"
+	::= { dcPwrSysRectAlrmTbl 2 }
+
+	dcPwrSysRectAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysRectAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller rectifier alarm group"
+		INDEX { dcPwrSysRectAlrmIndex }
+		::= { dcPwrSysRectAlrmTable 1 }
+
+	DcPwrSysRectAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysRectAlrmIndex 			INTEGER,
+		dcPwrSysRectAlrmName 			DisplayString,
+		dcPwrSysRectAlrmIntegerValue 	INTEGER,
+		dcPwrSysRectAlrmStringValue 	DisplayString,
+		dcPwrSysRectAlrmSeverity		INTEGER
+	}
+
+	dcPwrSysRectAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table rectifier alarm group"
+	::= { dcPwrSysRectAlrmEntry 1 }
+
+	dcPwrSysRectAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller rectifier alarm group"
+	::= { dcPwrSysRectAlrmEntry 2 }
+
+	dcPwrSysRectAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller rectifier alarm group"
+	::= { dcPwrSysRectAlrmEntry 3 }
+
+	dcPwrSysRectAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller rectifier alarm group"
+	::= { dcPwrSysRectAlrmEntry 4 }
+
+	dcPwrSysRectAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller rectifier alarm group"
+	::= { dcPwrSysRectAlrmEntry 5 }
+
+	--============================
+	--  Digital alarm group
+	--============================
+	dcPwrSysDigAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of digital alarm variables in system controller alarm table"
+	::= { dcPwrSysDigAlrmTbl 1 }
+
+	dcPwrSysDigAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysDigAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller digital alarm variables"
+	::= { dcPwrSysDigAlrmTbl 2 }
+
+	dcPwrSysDigAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysDigAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller digital alarm group"
+		INDEX { dcPwrSysDigAlrmIndex }
+		::= { dcPwrSysDigAlrmTable 1 }
+
+	DcPwrSysDigAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysDigAlrmIndex 			INTEGER,
+		dcPwrSysDigAlrmName 			DisplayString,
+		dcPwrSysDigAlrmIntegerValue 	INTEGER,
+		dcPwrSysDigAlrmStringValue 		DisplayString,
+		dcPwrSysDigAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysDigAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table digital alarm group"
+	::= { dcPwrSysDigAlrmEntry 1 }
+
+	dcPwrSysDigAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller digital alarm group"
+	::= { dcPwrSysDigAlrmEntry 2 }
+
+	dcPwrSysDigAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller digital alarm group"
+	::= { dcPwrSysDigAlrmEntry 3 }
+
+	dcPwrSysDigAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller digital alarm group"
+	::= { dcPwrSysDigAlrmEntry 4 }
+
+	dcPwrSysDigAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller digital alarm group"
+	::= { dcPwrSysDigAlrmEntry 5 }
+
+	--============================
+	--  Current alarm group
+	--============================
+	dcPwrSysCurrAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of current alarm variables in system controller alarm table"
+	::= { dcPwrSysCurrAlrmTbl 1 }
+
+	dcPwrSysCurrAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCurrAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller current alarm variables"
+	::= { dcPwrSysCurrAlrmTbl 2 }
+
+	dcPwrSysCurrAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCurrAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller current alarm group"
+		INDEX { dcPwrSysCurrAlrmIndex }
+		::= { dcPwrSysCurrAlrmTable 1 }
+
+	DcPwrSysCurrAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysCurrAlrmIndex 			INTEGER,
+		dcPwrSysCurrAlrmName 			DisplayString,
+		dcPwrSysCurrAlrmIntegerValue 	INTEGER,
+		dcPwrSysCurrAlrmStringValue 	DisplayString,
+		dcPwrSysCurrAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysCurrAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table current alarm group"
+	::= { dcPwrSysCurrAlrmEntry 1 }
+
+	dcPwrSysCurrAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller current alarm group"
+	::= { dcPwrSysCurrAlrmEntry 2 }
+
+	dcPwrSysCurrAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller current alarm group"
+	::= { dcPwrSysCurrAlrmEntry 3 }
+
+	dcPwrSysCurrAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller current alarm group"
+	::= { dcPwrSysCurrAlrmEntry 4 }
+
+	dcPwrSysCurrAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller current alarm group"
+	::= { dcPwrSysCurrAlrmEntry 5 }
+
+	--============================
+	--  Voltage alarm group
+	--============================
+	dcPwrSysVoltAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of voltage alarm variables in system controller alarm table"
+	::= { dcPwrSysVoltAlrmTbl 1 }
+
+	dcPwrSysVoltAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysVoltAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller voltage alarm variables"
+	::= { dcPwrSysVoltAlrmTbl 2 }
+
+	dcPwrSysVoltAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysVoltAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller voltage alarm group"
+		INDEX { dcPwrSysVoltAlrmIndex }
+		::= { dcPwrSysVoltAlrmTable 1 }
+
+	DcPwrSysVoltAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysVoltAlrmIndex 			INTEGER,
+		dcPwrSysVoltAlrmName 			DisplayString,
+		dcPwrSysVoltAlrmIntegerValue 	INTEGER,
+		dcPwrSysVoltAlrmStringValue 	DisplayString,
+		dcPwrSysVoltAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysVoltAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table voltage alarm group"
+	::= { dcPwrSysVoltAlrmEntry 1 }
+
+	dcPwrSysVoltAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller voltage alarm group"
+	::= { dcPwrSysVoltAlrmEntry 2 }
+
+	dcPwrSysVoltAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller voltage alarm group"
+	::= { dcPwrSysVoltAlrmEntry 3 }
+
+	dcPwrSysVoltAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller voltage alarm group"
+	::= { dcPwrSysVoltAlrmEntry 4 }
+
+	dcPwrSysVoltAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller voltage alarm group"
+	::= { dcPwrSysVoltAlrmEntry 5 }
+
+	--============================
+	--  Battery alarm group
+	--============================
+	dcPwrSysBattAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of battery alarm variables in system controller alarm table"
+	::= { dcPwrSysBattAlrmTbl 1 }
+
+	dcPwrSysBattAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysBattAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller battery alarm variables"
+	::= { dcPwrSysBattAlrmTbl 2 }
+
+	dcPwrSysBattAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysBattAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller battery alarm group"
+		INDEX { dcPwrSysBattAlrmIndex }
+		::= { dcPwrSysBattAlrmTable 1 }
+
+	DcPwrSysBattAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysBattAlrmIndex 			INTEGER,
+		dcPwrSysBattAlrmName 			DisplayString,
+		dcPwrSysBattAlrmIntegerValue 	INTEGER,
+		dcPwrSysBattAlrmStringValue 	DisplayString,
+		dcPwrSysBattAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysBattAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table battery alarm group"
+	::= { dcPwrSysBattAlrmEntry 1 }
+
+	dcPwrSysBattAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller battery alarm group"
+	::= { dcPwrSysBattAlrmEntry 2 }
+
+	dcPwrSysBattAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller battery alarm group"
+	::= { dcPwrSysBattAlrmEntry 3 }
+
+	dcPwrSysBattAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller battery alarm group"
+	::= { dcPwrSysBattAlrmEntry 4 }
+
+	dcPwrSysBattAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller battery alarm group"
+	::= { dcPwrSysBattAlrmEntry 5 }
+
+	--============================
+	--  Temperature alarm group
+	--============================
+	dcPwrSysTempAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of temperature alarm variables in system controller alarm table"
+	::= { dcPwrSysTempAlrmTbl 1 }
+
+	dcPwrSysTempAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysTempAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller temperature alarm variables"
+	::= { dcPwrSysTempAlrmTbl 2 }
+
+	dcPwrSysTempAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysTempAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller temperature alarm group"
+		INDEX { dcPwrSysTempAlrmIndex }
+		::= { dcPwrSysTempAlrmTable 1 }
+
+	DcPwrSysTempAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysTempAlrmIndex 			INTEGER,
+		dcPwrSysTempAlrmName 			DisplayString,
+		dcPwrSysTempAlrmIntegerValue 	INTEGER,
+		dcPwrSysTempAlrmStringValue 	DisplayString,
+		dcPwrSysTempAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysTempAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table temperature alarm group"
+	::= { dcPwrSysTempAlrmEntry 1 }
+
+	dcPwrSysTempAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller temperature alarm group"
+	::= { dcPwrSysTempAlrmEntry 2 }
+
+	dcPwrSysTempAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller temperature alarm group"
+	::= { dcPwrSysTempAlrmEntry 3 }
+
+	dcPwrSysTempAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller temperature alarm group"
+	::= { dcPwrSysTempAlrmEntry 4 }
+
+	dcPwrSysTempAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller temperature alarm group"
+	::= { dcPwrSysTempAlrmEntry 5 }
+
+	--============================
+	--  Custom alarm group
+	--============================
+	dcPwrSysCustomAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of custom alarm variables in system controller alarm table"
+	::= { dcPwrSysCustomAlrmTbl 1 }
+
+	dcPwrSysCustomAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCustomAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller custom alarm variables"
+	::= { dcPwrSysCustomAlrmTbl 2 }
+
+	dcPwrSysCustomAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCustomAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller custom alarm group"
+		INDEX { dcPwrSysCustomAlrmIndex }
+		::= { dcPwrSysCustomAlrmTable 1 }
+
+	DcPwrSysCustomAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysCustomAlrmIndex 	 	INTEGER,
+		dcPwrSysCustomAlrmName 			DisplayString,
+		dcPwrSysCustomAlrmIntegerValue 	INTEGER,
+		dcPwrSysCustomAlrmStringValue 	DisplayString,
+		dcPwrSysCustomAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysCustomAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table custom alarm group"
+	::= { dcPwrSysCustomAlrmEntry 1 }
+
+	dcPwrSysCustomAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller custom alarm group"
+	::= { dcPwrSysCustomAlrmEntry 2 }
+
+	dcPwrSysCustomAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller custom alarm group"
+	::= { dcPwrSysCustomAlrmEntry 3 }
+
+	dcPwrSysCustomAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller custom alarm group"
+	::= { dcPwrSysCustomAlrmEntry 4 }
+
+	dcPwrSysCustomAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller custom alarm group"
+	::= { dcPwrSysCustomAlrmEntry 5 }
+
+	--============================
+	--  Misc alarm group
+	--============================
+	dcPwrSysMiscAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of misc alarm variables in system controller alarm table"
+	::= { dcPwrSysMiscAlrmTbl 1 }
+
+	dcPwrSysMiscAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysMiscAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller misc alarm variables"
+	::= { dcPwrSysMiscAlrmTbl 2 }
+
+	dcPwrSysMiscAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysMiscAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller misc alarm group"
+		INDEX { dcPwrSysMiscAlrmIndex }
+		::= { dcPwrSysMiscAlrmTable 1 }
+
+	DcPwrSysMiscAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysMiscAlrmIndex 			INTEGER,
+		dcPwrSysMiscAlrmName 			DisplayString,
+		dcPwrSysMiscAlrmIntegerValue 	INTEGER,
+		dcPwrSysMiscAlrmStringValue 	DisplayString,
+		dcPwrSysMiscAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysMiscAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table misc alarm group"
+	::= { dcPwrSysMiscAlrmEntry 1 }
+
+	dcPwrSysMiscAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller misc alarm group"
+	::= { dcPwrSysMiscAlrmEntry 2 }
+
+	dcPwrSysMiscAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller misc alarm group"
+	::= { dcPwrSysMiscAlrmEntry 3 }
+
+	dcPwrSysMiscAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller misc alarm group"
+	::= { dcPwrSysMiscAlrmEntry 4 }
+
+	dcPwrSysMiscAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller misc alarm group"
+	::= { dcPwrSysMiscAlrmEntry 5 }
+
+	--============================
+	--  Control alarm group
+	--============================
+	dcPwrSysCtrlAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of control alarm variables in system controller alarm table"
+	::= { dcPwrSysCtrlAlrmTbl 1 }
+
+	dcPwrSysCtrlAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCtrlAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller control alarm variables"
+	::= { dcPwrSysCtrlAlrmTbl 2 }
+
+	dcPwrSysCtrlAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCtrlAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller control alarm group"
+		INDEX { dcPwrSysCtrlAlrmIndex }
+		::= { dcPwrSysCtrlAlrmTable 1 }
+
+	DcPwrSysCtrlAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysCtrlAlrmIndex 			INTEGER,
+		dcPwrSysCtrlAlrmName 			DisplayString,
+		dcPwrSysCtrlAlrmIntegerValue 	INTEGER,
+		dcPwrSysCtrlAlrmStringValue 	DisplayString,
+		dcPwrSysCtrlAlrmSeverity 		INTEGER 
+	}
+
+	dcPwrSysCtrlAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table control alarm group"
+	::= { dcPwrSysCtrlAlrmEntry 1 }
+
+	dcPwrSysCtrlAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller control alarm group"
+	::= { dcPwrSysCtrlAlrmEntry 2 }
+
+	dcPwrSysCtrlAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller control alarm group"
+	::= { dcPwrSysCtrlAlrmEntry 3 }
+
+	dcPwrSysCtrlAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller control alarm group"
+	::= { dcPwrSysCtrlAlrmEntry 4 }
+
+	dcPwrSysCtrlAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller control alarm group"
+	::= { dcPwrSysCtrlAlrmEntry 5 }
+
+
+	--============================
+	--  ADIO alarm group
+	--============================
+
+	dcPwrSysAdioAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of control alarm variables in Adio alarm table"
+	::= { dcPwrSysAdioAlrmTbl 1 }
+
+	dcPwrSysAdioAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysAdioAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller Adio alarm variables"
+	::= { dcPwrSysAdioAlrmTbl 2 }
+
+	dcPwrSysAdioAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysAdioAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller Adio alarm group"
+		INDEX { dcPwrSysAdioAlrmIndex }
+		::= { dcPwrSysAdioAlrmTable 1 }
+
+	DcPwrSysAdioAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysAdioAlrmIndex 			INTEGER,
+		dcPwrSysAdioAlrmName 			DisplayString,
+		dcPwrSysAdioAlrmIntegerValue 	INTEGER,
+		dcPwrSysAdioAlrmStringValue 	DisplayString,
+		dcPwrSysAdioAlrmSeverity 		INTEGER
+	}
+
+	dcPwrSysAdioAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table Adio alarm group"
+	::= { dcPwrSysAdioAlrmEntry 1 }
+
+	dcPwrSysAdioAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller Adio alarm group"
+	::= { dcPwrSysAdioAlrmEntry 2 }
+
+	dcPwrSysAdioAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller Adio alarm group"
+	::= { dcPwrSysAdioAlrmEntry 3 }
+
+	dcPwrSysAdioAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller Adio alarm group"
+	::= { dcPwrSysAdioAlrmEntry 4 }
+
+	dcPwrSysAdioAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC Adio system controller control alarm group"
+	::= { dcPwrSysAdioAlrmEntry 5 }
+
+
+
+                                             
+                                               
+	--============================
+	--  Converter alarm group
+	--============================
+	dcPwrSysConvAlrmCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of Converter alarm variables in system controller alarm table"
+	::= { dcPwrSysConvAlrmTbl 1 }
+
+	dcPwrSysConvAlrmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysConvAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller Converter alarm variables"
+	::= { dcPwrSysConvAlrmTbl 2 }
+
+	dcPwrSysConvAlrmEntry OBJECT-TYPE
+		SYNTAX DcPwrSysConvAlrmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller Converter alarm group"
+		INDEX { dcPwrSysConvAlrmIndex }
+		::= { dcPwrSysConvAlrmTable 1 }
+
+	DcPwrSysConvAlrmEntry
+	::= SEQUENCE {
+		dcPwrSysConvAlrmIndex 			INTEGER,
+		dcPwrSysConvAlrmName 			DisplayString,
+		dcPwrSysConvAlrmIntegerValue 	INTEGER,
+		dcPwrSysConvAlrmStringValue 	DisplayString,
+		dcPwrSysConvAlrmSeverity		INTEGER
+	}
+
+	dcPwrSysConvAlrmIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the alarm variable in the DC power system controller table Converter alarm group"
+	::= { dcPwrSysConvAlrmEntry 1 }
+
+	dcPwrSysConvAlrmName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the alarm variable as reported by the DC power system controller Converter alarm group"
+	::= { dcPwrSysConvAlrmEntry 2 }
+
+	dcPwrSysConvAlrmIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the alarm variable as reported by the DC power system controller Converter alarm group"
+	::= { dcPwrSysConvAlrmEntry 3 }
+
+	dcPwrSysConvAlrmStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the alarm variable as reported by the DC power system controller Converter alarm group"
+	::= { dcPwrSysConvAlrmEntry 4 }
+
+	dcPwrSysConvAlrmSeverity OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The integer value of alarm severity level of the extra variable as reported by the DC power system controller Converter alarm group"
+	::= { dcPwrSysConvAlrmEntry 5 }
+
+                                               
+                                               
+                      
+
+	
+
+	--============
+	-- Input table
+	--============
+	--=====================
+	-- Digital input group
+	--=====================
+	dcPwrSysDigIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of digital input variables in system controller digital input table"
+	::= { dcPwrSysDigIpTbl 1 }
+
+	dcPwrSysDigIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysDigIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller digital input variables"
+	::= { dcPwrSysDigIpTbl 2 }
+
+	dcPwrSysDigIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysDigIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller digital input group"
+		INDEX { dcPwrSysDigIpIndex }
+		::= { dcPwrSysDigIpTable 1 }
+
+	DcPwrSysDigIpEntry
+	::= SEQUENCE {
+		dcPwrSysDigIpIndex 			INTEGER,
+		dcPwrSysDigIpName 			DisplayString,
+		dcPwrSysDigIpIntegerValue 	INTEGER,
+		dcPwrSysDigIpStringValue 	DisplayString
+	}
+
+	dcPwrSysDigIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the digital input variable in the DC power system controller table digital input group"
+	::= { dcPwrSysDigIpEntry 1 }
+
+	dcPwrSysDigIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the digital input variable as reported by the DC power system controller digital input group"
+	::= { dcPwrSysDigIpEntry 2 }
+
+	dcPwrSysDigIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the digital input variable as reported by the DC power system controller digital input group"
+	::= { dcPwrSysDigIpEntry 3 }
+
+	dcPwrSysDigIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the digital input variable as reported by the DC power system controller digital input group"
+	::= { dcPwrSysDigIpEntry 4 }
+
+	--=========================
+	-- Controller input group
+	--=========================
+	dcPwrSysCntrlrIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of controller input variables in system controller controller input table"
+	::= { dcPwrSysCntrlrIpTbl 1 }
+
+	dcPwrSysCntrlrIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCntrlrIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller controller input variables"
+	::= { dcPwrSysCntrlrIpTbl 2 }
+
+	dcPwrSysCntrlrIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCntrlrIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller controller input group"
+		INDEX { dcPwrSysCntrlrIpIndex }
+		::= { dcPwrSysCntrlrIpTable 1 }
+
+	DcPwrSysCntrlrIpEntry
+	::= SEQUENCE {
+		dcPwrSysCntrlrIpIndex 			INTEGER,
+		dcPwrSysCntrlrIpName 			DisplayString,
+		dcPwrSysCntrlrIpIntegerValue 	INTEGER,
+		dcPwrSysCntrlrIpStringValue 	DisplayString
+	}
+
+	dcPwrSysCntrlrIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the controller input variable in the DC power system controller table controller input group"
+	::= { dcPwrSysCntrlrIpEntry 1 }
+
+	dcPwrSysCntrlrIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the controller input variable as reported by the DC power system controller controller input group"
+	::= { dcPwrSysCntrlrIpEntry 2 }
+
+	dcPwrSysCntrlrIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the controller input variable as reported by the DC power system controller controller input group"
+	::= { dcPwrSysCntrlrIpEntry 3 }
+
+	dcPwrSysCntrlrIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the controller input variable as reported by the DC power system controller controller input group"
+	::= { dcPwrSysCntrlrIpEntry 4 }
+
+	--========================
+	-- Rectifier input group
+	--========================
+	dcPwrSysRectIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of rectifier input variables in system controller rectifier input table"
+	::= { dcPwrSysRectIpTbl 1 }
+
+	dcPwrSysRectIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysRectIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller rectifier input variables"
+	::= { dcPwrSysRectIpTbl 2 }
+
+	dcPwrSysRectIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysRectIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller rectifier input group"
+		INDEX { dcPwrSysRectIpIndex }
+		::= { dcPwrSysRectIpTable 1 }
+
+	DcPwrSysRectIpEntry
+	::= SEQUENCE {
+		dcPwrSysRectIpIndex 	  	INTEGER,
+		dcPwrSysRectIpName 			DisplayString,
+		dcPwrSysRectIpIntegerValue 	INTEGER,
+		dcPwrSysRectIpStringValue 	DisplayString
+	}
+
+	dcPwrSysRectIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the rectifier input variable in the DC power system controller table rectifier input group"
+	::= { dcPwrSysRectIpEntry 1 }
+
+	dcPwrSysRectIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the rectifier input variable as reported by the DC power system controller rectifier input group"
+	::= { dcPwrSysRectIpEntry 2 }
+
+	dcPwrSysRectIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the rectifier input variable as reported by the DC power system controller rectifier input group"
+	::= { dcPwrSysRectIpEntry 3 }
+
+	dcPwrSysRectIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the rectifier input variable as reported by the DC power system controller rectifier input group"
+	::= { dcPwrSysRectIpEntry 4 }
+
+	--======================
+	-- Custom input group
+	--======================
+	dcPwrSysCustomIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of custom input variables in system controller custom input table"
+	::= { dcPwrSysCustomIpTbl 1 }
+
+	dcPwrSysCustomIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCustomIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller digital custom variables"
+	::= { dcPwrSysCustomIpTbl 2 }
+
+	dcPwrSysCustomIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCustomIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller custom input group"
+		INDEX { dcPwrSysCustomIpIndex }
+		::= { dcPwrSysCustomIpTable 1 }
+
+	DcPwrSysCustomIpEntry
+	::= SEQUENCE {
+		dcPwrSysCustomIpIndex 			INTEGER,
+		dcPwrSysCustomIpName 			DisplayString,
+		dcPwrSysgCustomIpIntegerValue 	INTEGER,
+		dcPwrSysCustomIpStringValue 	DisplayString
+	}
+
+	dcPwrSysCustomIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the custom input variable in the DC power system controller table custom input group"
+	::= { dcPwrSysCustomIpEntry 1 }
+
+	dcPwrSysCustomIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the custom input variable as reported by the DC power system controller custom input group"
+	::= { dcPwrSysCustomIpEntry 2 }
+
+	dcPwrSysgCustomIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the custom input variable as reported by the DC power system controller custom input group"
+	::= { dcPwrSysCustomIpEntry 3 }
+
+	dcPwrSysCustomIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the custom input variable as reported by the DC power system controller custom input group"
+	::= { dcPwrSysCustomIpEntry 4 }
+                          
+                          
+                          
+	--========================
+	-- Converter input group
+	--========================
+	dcPwrSysConvIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of Converter input variables in system controller Converter input table"
+	::= { dcPwrSysConvIpTbl 1 }
+
+	dcPwrSysConvIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysConvIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller Converter input variables"
+	::= { dcPwrSysConvIpTbl 2 }
+
+	dcPwrSysConvIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysConvIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller Converter input group"
+		INDEX { dcPwrSysConvIpIndex }
+		::= { dcPwrSysConvIpTable 1 }
+
+	DcPwrSysConvIpEntry
+	::= SEQUENCE {
+		dcPwrSysConvIpIndex 	  	INTEGER,
+		dcPwrSysConvIpName 			DisplayString,
+		dcPwrSysConvIpIntegerValue 	INTEGER,
+		dcPwrSysConvIpStringValue 	DisplayString
+	}
+
+	dcPwrSysConvIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the Converter input variable in the DC power system controller table Converter input group"
+	::= { dcPwrSysConvIpEntry 1 }
+
+	dcPwrSysConvIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the Converter input variable as reported by the DC power system controller Converter input group"
+	::= { dcPwrSysConvIpEntry 2 }
+
+	dcPwrSysConvIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the Converter input variable as reported by the DC power system controller Converter input group"
+	::= { dcPwrSysConvIpEntry 3 }
+
+	dcPwrSysConvIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the Converter input variable as reported by the DC power system controller Converter input group"
+	::= { dcPwrSysConvIpEntry 4 }
+                          
+	--========================
+	-- Timer input group
+	--========================
+	dcPwrSysTimerIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of Timererter input variables in system controller Timererter input table"
+	::= { dcPwrSysTimerIpTbl 1 }
+
+	dcPwrSysTimerIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysTimerIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller Timererter input variables"
+	::= { dcPwrSysTimerIpTbl 2 }
+
+	dcPwrSysTimerIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysTimerIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller Timererter input group"
+		INDEX { dcPwrSysTimerIpIndex }
+		::= { dcPwrSysTimerIpTable 1 }
+
+	DcPwrSysTimerIpEntry
+	::= SEQUENCE {
+		dcPwrSysTimerIpIndex 	  		INTEGER,
+		dcPwrSysTimerIpName 			DisplayString,
+		dcPwrSysTimerIpIntegerValue 	INTEGER,
+		dcPwrSysTimerIpStringValue 		DisplayString
+	}
+
+	dcPwrSysTimerIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the Timererter input variable in the DC power system controller table Timererter input group"
+	::= { dcPwrSysTimerIpEntry 1 }
+
+	dcPwrSysTimerIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the Timererter input variable as reported by the DC power system controller Timererter input group"
+	::= { dcPwrSysTimerIpEntry 2 }
+
+	dcPwrSysTimerIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the Timererter input variable as reported by the DC power system controller Timererter input group"
+	::= { dcPwrSysTimerIpEntry 3 }
+
+	dcPwrSysTimerIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the Timererter input variable as reported by the DC power system controller Timererter input group"
+	::= { dcPwrSysTimerIpEntry 4 }
+                          
+
+	--========================
+	-- Counter input group
+	--========================
+	dcPwrSysCounterIpCount OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"Number of Countererter input variables in system controller Countererter input table"
+	::= { dcPwrSysCounterIpTbl 1 }
+
+	dcPwrSysCounterIpTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DcPwrSysCounterIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"A table of DC power system controller Countererter input variables"
+	::= { dcPwrSysCounterIpTbl 2 }
+
+	dcPwrSysCounterIpEntry OBJECT-TYPE
+		SYNTAX DcPwrSysCounterIpEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION	"An entry into the DC power system controller Countererter input group"
+		INDEX { dcPwrSysCounterIpIndex }
+		::= { dcPwrSysCounterIpTable 1 }
+
+	DcPwrSysCounterIpEntry
+	::= SEQUENCE {
+		dcPwrSysCounterIpIndex 	  		INTEGER,
+		dcPwrSysCounterIpName 			DisplayString,
+		dcPwrSysCounterIpIntegerValue 	INTEGER,
+		dcPwrSysCounterIpStringValue 	DisplayString
+	}
+
+	dcPwrSysCounterIpIndex OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The index of the Countererter input variable in the DC power system controller table Countererter input group"
+	::= { dcPwrSysCounterIpEntry 1 }
+
+	dcPwrSysCounterIpName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..30))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The description of the Countererter input variable as reported by the DC power system controller Countererter input group"
+	::= { dcPwrSysCounterIpEntry 2 }
+
+	dcPwrSysCounterIpIntegerValue OBJECT-TYPE
+		SYNTAX INTEGER (-1000000000..1000000000)
+		MAX-ACCESS read-only	
+		STATUS current
+		DESCRIPTION	"The integer value of the Countererter input variable as reported by the DC power system controller Countererter input group"
+	::= { dcPwrSysCounterIpEntry 3 }
+
+	dcPwrSysCounterIpStringValue OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	"The string value of the Countererter input variable as reported by the DC power system controller Countererter input group"
+	::= { dcPwrSysCounterIpEntry 4 }
+                                             
+                          
+
+ 	--==========================================================================
+	-- The OBJECT IDENTIFIERs for the traps must be defined in this manner to
+	-- satisfy the NetSight MIB compiler; in particular, nodes cannot be defined 
+	-- concatenated in a single line, but must be defined explicitly node by node
+	-- (hence, the dcPwrSysDevice.dcPwrSysTraps.dcPwrSysTrap definition)
+	-- In addition, forward references to extra system variables are needed for 
+	-- dcPwrSysTrap by CastleRock SNMPc for event filter and match features.
+	--==========================================================================
+	dcPwrSysTrap		OBJECT IDENTIFIER ::= { dcPwrSysTraps 0 }
+
+	--==========================================================================
+	-- Start of Traps
+	--==========================================================================
+
+	dcPwrSysAlarmActiveTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName,
+			dcPwrSysAlarmTriggerValue
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued when one of the alarms on the DC power system controller became active"
+	::= { dcPwrSysTrap 1 }
+
+	dcPwrSysAlarmClearedTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName,
+			dcPwrSysAlarmTriggerValue
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued when one of the active alarms on the DC power system controller is cleared"
+	::= { dcPwrSysTrap 2 }
+
+	dcPwrSysRelayTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRelayIntegerValue,
+			dcPwrSysRelayStringValue,
+			dcPwrSysRelayIndex,
+			dcPwrSysRelaySeverity,
+			dcPwrSysSiteName
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued from a change in state in one of the relays on the DC power system controller"
+	::= { dcPwrSysTrap 3 }
+
+	dcPwrSysComOKTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysSiteName
+		}
+		STATUS  current
+		DESCRIPTION "A trap to indicate that communications with a DC power system controller has been established."
+	::= { dcPwrSysTrap 4 }
+
+	dcPwrSysComErrTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysSiteName
+		}
+		STATUS  current
+		DESCRIPTION "A trap to indicate that communications with a DC power system controller has been lost."
+	::= { dcPwrSysTrap 5 }
+
+	dcPwrSysAgentStartupTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysSiteName
+		}
+		STATUS  current
+		DESCRIPTION "A trap to indicate that the agent software has started up."
+	::= { dcPwrSysTrap 6 }
+
+	dcPwrSysAgentShutdownTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysSiteName
+		}
+		STATUS  current
+		DESCRIPTION "A trap to indicate that the agent software has shutdown."
+	::= { dcPwrSysTrap 7 }
+
+	dcPwrSysMajorAlarmActiveTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued as a summary of DC power system status.  It is sent when the system goes into in Major Alarm"
+	::= { dcPwrSysTrap 8 }
+
+	dcPwrSysMajorAlarmClearedTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued as a summary of DC power system status.  It is sent when the system comes out of Major Alarm"
+	::= { dcPwrSysTrap 9 }
+    
+	dcPwrSysMinorAlarmActiveTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued as a summary of DC power system status.  It is sent when the system goes into in Minor Alarm"
+	::= { dcPwrSysTrap 10 }
+
+	dcPwrSysMinorAlarmClearedTrap NOTIFICATION-TYPE
+		OBJECTS {
+			dcPwrSysRectAlrmStringValue,
+			dcPwrSysRectAlrmIndex,
+			dcPwrSysRectAlrmSeverity,
+			dcPwrSysSiteName
+		}
+    	STATUS  current
+    	DESCRIPTION "A trap issued as a summary of DC power system status.  It is sent when the system comes out of Minor Alarm"
+	::= { dcPwrSysTrap 11 }
+      
+      
+	--==========================================================================
+	-- Start of External Controls
+	--==========================================================================
+
+	dcPwrSysResyncAlarms OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION	"Send/Resend all active alarms that were previously sent through SNMP notification."
+	::= { dcPwrExternalControls  1 }
+      
+	--==========================================================================
+	-- Alarm Trigger
+	--==========================================================================
+	dcPwrSysAlarmTriggerValue OBJECT-TYPE
+		SYNTAX INTEGER (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	""
+	::= { dcPwrVarbindNameReference  1 }
+
+	--==========================================================================
+	-- Time stamp
+	--==========================================================================
+	dcPwrSysTimeStamp OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255)) 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	""
+	::= { dcPwrVarbindNameReference  2 }
+      
+END

@@ -14,6 +14,14 @@ modules:
                 index: 1
                 precision: 1048576
                 descr: 'Paging Memory'
+    storage:
+        data:
+            -
+                oid: CPQHOST-MIB::cpqHoFileSysTable
+                descr: CPQHOST-MIB::cpqHoFileSysDesc
+                size: CPQHOST-MIB::cpqHoFileSysSpaceTotal
+                used: CPQHOST-MIB::cpqHoFileSysSpaceUsed
+                units: 1048576
 
     os:
         sysDescr_regex: '/Integrated Lights-Out \d (?<version>[\d.]+)/'
