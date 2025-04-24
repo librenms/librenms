@@ -26,9 +26,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -37,6 +34,8 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;

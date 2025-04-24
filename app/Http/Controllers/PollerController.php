@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -10,6 +9,7 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Config;
 
 class PollerController extends Controller

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
@@ -71,21 +71,21 @@ class ServiceTemplateController extends Controller implements HasMiddleware
     public function store(Request $request, ToastInterface $toast)
     {
         $request->validate([
-                'name' => 'required|string|unique:service_templates',
-                'groups' => 'array',
-                'groups.*' => 'integer',
-                'devices' => 'array',
-                'devices.*' => 'integer',
-                'check' => 'required|string',
-                'type' => 'required|in:dynamic,static',
-                'rules' => 'json|required_if:type,dynamic',
-                'param' => 'nullable|string',
-                'ip' => 'nullable|string',
-                'desc' => 'nullable|string',
-                'changed' => 'integer',
-                'disabled' => 'integer',
-                'ignore' => 'integer',
-            ]);
+            'name' => 'required|string|unique:service_templates',
+            'groups' => 'array',
+            'groups.*' => 'integer',
+            'devices' => 'array',
+            'devices.*' => 'integer',
+            'check' => 'required|string',
+            'type' => 'required|in:dynamic,static',
+            'rules' => 'json|required_if:type,dynamic',
+            'param' => 'nullable|string',
+            'ip' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
+        ]);
 
         $template = ServiceTemplate::make(
             $request->only(
@@ -155,29 +155,29 @@ class ServiceTemplateController extends Controller implements HasMiddleware
     public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
     {
         $request->validate([
-                'name' => [
-                    'required',
-                    'string',
-                    Rule::unique('service_templates')->where(
-                        function ($query) use ($template) {
-                            $query->where('id', '!=', $template->id);
-                        }
-                    ),
-                ],
-                'type' => 'required|in:dynamic,static',
-                'rules' => 'json|required_if:type,dynamic',
-                'devices' => 'array',
-                'devices.*' => 'integer',
-                'groups' => 'array',
-                'groups.*' => 'integer',
-                'check' => 'string',
-                'param' => 'nullable|string',
-                'ip' => 'nullable|string',
-                'desc' => 'nullable|string',
-                'changed' => 'integer',
-                'disabled' => 'integer',
-                'ignore' => 'integer',
-            ]);
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('service_templates')->where(
+                    function ($query) use ($template) {
+                        $query->where('id', '!=', $template->id);
+                    }
+                ),
+            ],
+            'type' => 'required|in:dynamic,static',
+            'rules' => 'json|required_if:type,dynamic',
+            'devices' => 'array',
+            'devices.*' => 'integer',
+            'groups' => 'array',
+            'groups.*' => 'integer',
+            'check' => 'string',
+            'param' => 'nullable|string',
+            'ip' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
+        ]);
 
         $template->fill(
             $request->only(

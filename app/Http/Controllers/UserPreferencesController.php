@@ -26,12 +26,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;

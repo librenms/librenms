@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Maps;
 
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMapNodeImage;
 use enshrined\svgSanitize\Sanitizer;
@@ -35,6 +34,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class CustomMapNodeImageController extends Controller
 {

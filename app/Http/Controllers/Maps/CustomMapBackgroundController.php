@@ -26,13 +26,13 @@
 
 namespace App\Http\Controllers\Maps;
 
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapBackground;
 use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class CustomMapBackgroundController extends Controller
 {
