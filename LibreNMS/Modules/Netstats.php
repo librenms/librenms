@@ -147,6 +147,8 @@ class Netstats implements Module
             'TCP-MIB::tcpOutRsts.0',
         ],
         'udp' => [
+            'UDP-MIB::udpHCInDatagrams.0',
+            'UDP-MIB::udpHCOutDatagrams.0',
             'UDP-MIB::udpInDatagrams.0',
             'UDP-MIB::udpOutDatagrams.0',
             'UDP-MIB::udpInErrors.0',
@@ -212,6 +214,14 @@ class Netstats implements Module
                     $rrd_def = new RrdDefinition();
                     $fields = [];
                     foreach ($this->oids[$type] as $oid) {
+                        // if a high capacity (HC) oid exists, override the non-HC value so we preserve the field name
+                        if (preg_match("/(.+::.+)HC(.+\.[0-9]+)/", $oid, $matches)
+                         && array_key_exists($data[$matches[1] . $matches[2]])
+                        ) {
+                            $data[$matches[1] . $matches[2]] = $data[$oid] ?? $data[$matches[1] . $matches[2]];
+                            continue;
+                        }
+
                         $stat = $this->statName($oid);
                         $rrd_def->addDataset($stat, 'COUNTER', null, 100000000000);
                         $fields[$stat] = $data[$oid] ?? null;
