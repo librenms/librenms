@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use LibreNMS\Config;
 
 class LoginController extends Controller implements HasMiddleware

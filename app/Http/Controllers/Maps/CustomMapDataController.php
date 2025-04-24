@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Maps;
 
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapEdge;
@@ -35,6 +34,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Number;

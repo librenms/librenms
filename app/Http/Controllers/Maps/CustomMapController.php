@@ -26,8 +26,6 @@
 
 namespace App\Http\Controllers\Maps;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
@@ -36,6 +34,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;

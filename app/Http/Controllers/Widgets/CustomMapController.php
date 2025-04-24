@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use App\Models\CustomMap;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use LibreNMS\Config;
 
 class CustomMapController extends WidgetController implements HasMiddleware

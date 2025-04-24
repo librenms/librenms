@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 

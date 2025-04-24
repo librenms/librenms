@@ -26,14 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use Illuminate\Support\Facades\Gate;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NotesController implements DeviceTab
 {
-
     public function visible(Device $device): bool
     {
         return true;

@@ -26,9 +26,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
 use App\Models\PollerCluster;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PollerSettingsController extends Controller
 {
