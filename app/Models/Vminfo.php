@@ -62,9 +62,12 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         return $query->whereIn('vmwVmDisplayName', $where);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Device, $this>
+     */
     public function parentDevice(): HasOne
     {
-        return $this->hasOne(\App\Models\Device::class, 'hostname', 'vmwVmDisplayName');
+        return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');
     }
 
     public function getCompositeKey()

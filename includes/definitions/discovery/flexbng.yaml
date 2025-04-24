@@ -112,3 +112,10 @@ modules:
                     descr: 'IPv6 delegation pool allocated %'
                     index: 'prefixAllocatePercent.{{ $index }}'
                     group: 'IP Pool'
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOL::groupTable
+                    value: NETELASTIC-FLEXBNG-IPPOOL::groupAllocatePercent
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.1.1.5.{{ $str_index_as_numeric }}'
+                    descr: '{{ NETELASTIC-FLEXBNG-IPPOOL::groupName }} DHCP Pool Used %'
+                    index: 'groupTable.{{ $index }}'
+                    group: 'IP Pool'

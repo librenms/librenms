@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Terra-sdi480 inputs SNR
  *

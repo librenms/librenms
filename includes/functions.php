@@ -719,7 +719,7 @@ function is_disk_valid($disk, $device)
 {
     foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
         if (preg_match($bir . 'i', $disk['diskIODevice'])) {
-            Log::debug("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)");
+            Log::debug('Ignored Disk: ' . $disk['diskIODevice'] . ' (matched: ' . $bir . ')');
 
             return false;
         }

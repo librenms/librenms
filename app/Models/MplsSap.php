@@ -38,14 +38,19 @@ class MplsSap extends DeviceRelatedModel implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsSdpBind, $this>
+     */
     public function binds(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsSdpBind::class, 'svc_id');
+        return $this->hasMany(MplsSdpBind::class, 'svc_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsService, $this>
+     */
     public function services(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsService::class, 'svc_id');
+        return $this->hasMany(MplsService::class, 'svc_id');
     }
 }

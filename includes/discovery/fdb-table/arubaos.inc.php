@@ -1,4 +1,5 @@
 <?php
+
 /**
  * arubaos.inc.php
  *

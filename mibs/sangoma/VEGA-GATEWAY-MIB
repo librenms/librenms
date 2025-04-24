@@ -1,0 +1,1035 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+-- File         : vega.mib
+-- Description  : Vega Sangoma MIB 
+-- $Revision: 1.12.1 $  
+-- $Date: 2016/06/10 17:30:29BST $ $Author: ecasas   $ $State: dev $ *
+--
+-- Copyright (c) 2016 Sangoma Technologies.  All Rights Reserved.
+--
+--
+------------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Vega-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE										FROM RFC-1212
+		TimeTicks, enterprises, Counter32, Integer32	FROM SNMPv2-SMI
+		enterprises, Counter							FROM RFC1155-SMI
+		TRAP-TYPE										FROM RFC-1215	    
+		DisplayString, sysDescr							FROM RFC1213-MIB;
+		
+
+	--  Vega MIB for vega gateway products 
+
+
+	-- vega (Sangoma Technologies) Enterprise MIB Extensions
+	vega OBJECT IDENTIFIER ::= { enterprises 4686 }
+
+	-- Vega platform
+	vsplatform OBJECT IDENTIFIER ::= { vega 11 }
+
+ 	-- vega Call Statistics
+	callStats OBJECT IDENTIFIER ::= { vsplatform 1 }
+    	
+	-- Interfaces
+	interfaces OBJECT IDENTIFIER ::= { vsplatform 2 }  
+
+	-- vega Call Statistics Objects are defined below
+
+	-- System up time
+
+	noCircuits	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of circuits on all interfaces"
+		::=  { callStats 1 } 	
+
+	upTime		OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total up time of all interfaces"
+		::=  { callStats 2 } 
+
+	downTime 	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total down time of all interfaces"
+		::=  { callStats 3 }
+
+	startTime	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Start time of the last interface"
+		::=  { callStats 4 }
+
+	endTime	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" End time of the last interface"
+		::=  { callStats 5 } 
+
+	inboundCalls	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of inbound calls"
+		::=  { callStats 6 }
+
+	inboundAnswered	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of inbound calls answered"
+		::=  { callStats 7 }
+
+	inboundBusy	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of inbound calls that were busy "
+		::=  { callStats 8 }
+
+	inboundNoAnswer	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of inbound calls not answered"
+		::=  { callStats 9 }
+
+	inboundTermReject OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of inbound calls rejected by terminal"
+		::=  { callStats 10 }     
+
+	outboundCalls	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of outbound calls"
+		::=  { callStats 11 }
+
+	outboundAnswered OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of outbound calls answered"
+		::=  { callStats 12 }
+
+	outboundBusy	OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of outbound calls that were busy"
+		::=  { callStats 13 }
+
+	outboundNoAnswer OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of outbound calls not answered"
+		::=  { callStats 14 }
+
+	outboundTermReject OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Total number of outbound calls rejected by terminal"
+		::=  { callStats 15 }  
+
+	inboundCurrUse OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Current number of inbound calls "
+		::=  { callStats 16 }
+
+	outboundCurrUse OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Current number of outbound calls "
+		::=  { callStats 17 }
+
+	inboundMaxUse OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum Number of inbound calls "
+		::=  { callStats 18 } 
+
+	outboundMaxUse OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum Number of outbound calls "
+		::=  { callStats 19 }                 
+
+	allMaxUse OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum Number of inbound & outbound calls "
+		::=  { callStats 20 }
+
+	inboundAvAnswer OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average answer time for inbound calls "
+		::=  { callStats 21 }
+
+	outboundAvAnswer OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average answer time for outbound calls "
+		::=  { callStats 22 }
+
+	inboundAvCall OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average call time for inbound calls "
+		::=  { callStats 23 }
+
+	inboundMaxCall OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum call time for an inbound call "
+		::=  { callStats 24 }
+
+	outboundAvCall OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average call time for outbound calls "
+		::=  { callStats 25 }
+
+	outboundMaxCall OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum call time for an outbound call "
+		::=  { callStats 26 }
+
+	inboundAvDialSucc OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average dial to answer time for inbound calls "
+		::=  { callStats 27 }
+
+	outboundAvDialSucc OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average dial to answer time for outbound calls "
+		::=  { callStats 28 }          
+
+	inboundAvDialFail OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average dial to fail time for inbound calls "
+		::=  { callStats 29 }	
+
+	outboundAvDialFail OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average dial to fail time for outbound calls "
+		::=  { callStats 30 }
+	
+	averageJitter OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average jitter across interfaces "
+		::=  { callStats 31 }
+
+	maximumJitter OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum jitter across interfaces "
+		::=  { callStats 32 }
+
+	averageLoss OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Average loss across interfaces "
+		::=  { callStats 33 }
+
+	maximumLoss OBJECT-TYPE
+		SYNTAX  Integer32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Maximum loss across interfaces "
+		::=  { callStats 34 }
+
+	ifFanState OBJECT-TYPE
+		SYNTAX  OCTET STRING
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Fan State "
+		::=  { callStats 35 }
+
+	ifPowerStatus OBJECT-TYPE
+		SYNTAX  OCTET STRING
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION  	" Power Status "
+		::=  { callStats 36 }
+
+	-- vega interfaces
+
+	ifNumber	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of network interfaces (regardless of their
+            	current state) present on this system."
+    		::= { interfaces 1 }
+
+	InterfaceIndex ::= TEXTUAL-CONVENTION
+    		DISPLAY-HINT "d"
+    		STATUS       current
+    		DESCRIPTION
+            	"A unique value, greater than zero, for each interface or
+            	interface sub-layer in the managed system.  It is
+            	recommended that values are assigned contiguously starting
+            	from 1.  The value for each interface sub-layer must remain
+            	constant at least from one re-initialization of the entity's
+            	network management system to the next re-initialization."
+    		SYNTAX       Integer32 (1..2147483647)
+
+	-- the Interfaces table
+	-- The Interfaces table contains information on the entity's
+	-- interfaces.  Each sub-layer below the internetwork-layer
+	-- of a network interface is considered to be an interface.
+	ifTable OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF IfEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            	"A list of interface entries.  The number of entries is
+            	given by the value of ifNumber."
+    		::= { interfaces 2 }
+
+	ifEntry OBJECT-TYPE
+    		SYNTAX      IfEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            	"An entry containing management information applicable to a
+           	 particular interface."
+    		INDEX   { ifIndex }
+    		::= { ifTable 1 }
+
+	IfEntry ::= SEQUENCE {
+		ifIndex 			InterfaceIndex,
+		ifType				Integer32,
+		ifNoCircuits		Integer32,
+		ifUpTime			Integer32,
+		ifDownTime			Integer32,
+		ifStartTime			Integer32,
+		ifEndTime			Integer32,
+		ifInboundCalls		Counter,
+		ifInboundAnswered 	Counter,
+		ifInboundBusy  		Counter,
+		ifInboundNoAnswer 	Counter,
+		ifInboundTermReject	Counter,
+		ifOutboundCalls	 	Counter,
+		ifOutboundAnswered 	Counter,
+		ifOutboundBusy	 	Counter,
+		ifOutboundNoAnswer 	Counter,
+		ifOutboundTermReject 	Counter,
+		ifInboundCurrUse  	Counter,
+		ifOutboundCurrUse  	Counter,
+		ifInboundMaxUse 		Counter,
+		ifOutboundMaxUse 		Counter,
+		ifAllMaxUse 		Counter,
+		ifInboundAvAnswer  	Integer32,
+		ifOutboundAvAnswer 	Integer32,
+		ifInboundAvCall  		Integer32,
+		ifInboundMaxCall  	Integer32,
+		ifOutboundAvCall  	Integer32,
+		ifOutboundMaxCall  	Integer32,
+		ifInboundAvDialSucc 	Integer32,
+ 		ifOutboundAvDialSucc 	Integer32,
+		ifInboundAvDialFail 	Integer32,
+		ifOutboundAvDialFail 	Integer32,
+		ifAverageJitter  		Integer32,
+		ifMaximumJitter  		Integer32,
+		ifAverageLoss  		Integer32,
+		ifMaximumLoss   		InterfaceIndex,
+		ifFanState          OCTET STRING,
+		ifPowerStatus       OCTET STRING
+    		}
+
+	ifIndex OBJECT-TYPE
+    		SYNTAX      InterfaceIndex
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"A unique value, greater than zero, for each interface.  It
+            	is recommended that values are assigned contiguously
+            	starting from 1.  The value for each interface sub-layer
+            	must remain constant at least from one re-initialization of
+            	the entity's network management system to the next re-
+            	initialization."
+    		::= { ifEntry 1 }
+
+	ifType	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The type of the interface"
+    		::= { ifEntry 2 }
+
+	ifNoCircuits	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of circuits on the interface"
+    		::= { ifEntry 3 }
+
+	ifUpTime	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The up time of the Interface in seconds"
+    		::= { ifEntry 4 }
+
+	ifDownTime	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The down time of the Interface in seconds"
+    		::= { ifEntry 5 }
+
+	ifStartTime	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The Start time of the Interface in seconds"
+    		::= { ifEntry 6 }
+
+	ifEndTime	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The End time of the Interface in seconds"
+    		::= { ifEntry 7 }
+
+	ifInboundCalls	OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of inbound calls for the Interface"
+    		::= { ifEntry 8 }
+	
+	ifInboundAnswered OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of inbound calls answered for the Interface"
+    		::= { ifEntry 9 }
+
+	ifInboundBusy OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of inbound calls busy for the Interface"
+    		::= { ifEntry 10 }
+
+	ifInboundNoAnswer OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of inbound calls not answered for the Interface"
+    		::= { ifEntry 11 }
+
+	ifInboundTermReject OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of inbound calls rejected on the terminal for the Interface"
+    		::= { ifEntry 12 }
+
+	ifOutboundCalls	OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of outbound calls for the Interface"
+    		::= { ifEntry 13 }
+
+	ifOutboundAnswered	OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of outbound calls answered for the Interface"
+    		::= { ifEntry 14 }
+
+	ifOutboundBusy	OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of outbound calls busy for the Interface"
+    		::= { ifEntry 15 }
+
+	ifOutboundNoAnswer	OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of outbound calls not answered for the Interface"
+    		::= { ifEntry 16 }
+
+	ifOutboundTermReject OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The number of outbound calls rejected on the terminal for the Interface"
+    		::= { ifEntry 17 }
+
+	ifInboundCurrUse OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The current number of inbound calls for the Interface"
+    		::= { ifEntry 18 }
+
+	ifOutboundCurrUse OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The current number of outbound calls for the Interface"
+    		::= { ifEntry 19 }
+
+	ifInboundMaxUse OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum number of inbound calls for the Interface"
+    		::= { ifEntry 20 }
+
+	ifOutboundMaxUse OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum number of outbound calls for the Interface"
+    		::= { ifEntry 21 }
+
+	ifAllMaxUse OBJECT-TYPE
+    		SYNTAX      Counter
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum number of inbound & outbound calls for the Interface"
+    		::= { ifEntry 22 }
+
+	ifInboundAvAnswer OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average answer time of inbound calls for the Interface"
+    		::= { ifEntry 23 } 
+
+	ifOutboundAvAnswer OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average answer time of outbound calls for the Interface"
+    		::= { ifEntry 24 } 
+
+	ifInboundAvCall OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average call time of inbound calls for the Interface"
+    		::= { ifEntry 25 } 
+
+	ifInboundMaxCall OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum call time of an inbound call for the Interface"
+    		::= { ifEntry 26 }
+
+	ifOutboundAvCall OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average call time of outbound calls for the Interface"
+    		::= { ifEntry 27 } 
+
+	ifOutboundMaxCall OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum call time of an outbound call for the Interface"
+    		::= { ifEntry 28 }
+
+	ifInboundAvDialSucc OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average dial to answer time of inbound calls for the Interface"
+    		::= { ifEntry 29 }
+ 
+ 	ifOutboundAvDialSucc OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average dial to answer time of outbound call for the Interface"
+    		::= { ifEntry 30 }  
+
+	ifInboundAvDialFail OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average dial to fail time of inbound calls for the Interface"
+    		::= { ifEntry 31 } 
+
+	ifOutboundAvDialFail OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average dial to fail time of outbound calls for the Interface"
+    		::= { ifEntry 32 } 
+
+	ifAverageJitter OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average jitter of incoming packets for the Interface"
+    		::= { ifEntry 33 }
+
+	ifMaximumJitter OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum jitter of incoming packets for the Interface"
+    		::= { ifEntry 34 }
+
+	ifAverageLoss OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The average loss of incoming packets for the Interface"
+    		::= { ifEntry 35 } 
+
+
+	ifMaximumLoss OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The maximum loss of incoming packets for the Interface"
+    		::= { ifEntry 36 }    
+
+	-- vega sip users
+
+	SipUsrIndex ::= TEXTUAL-CONVENTION
+    		DISPLAY-HINT "d"
+    		STATUS       current
+    		DESCRIPTION
+            	"A unique value, greater than zero, for each sip user in
+            	in the managed system.  It is recommended that values are
+            	assigned contiguously starting from 1. The value of each
+            	sip user sub-layer must remain constant at lease from one
+            	re-initialization of the entity's network management
+		to the next re-initialization."
+    		SYNTAX       Integer32 (1..2147483647)
+
+	-- The Sip User table contains all information with respect to all
+	-- configuied sip Users.  Each sub-layer below the internetwork-layer
+	-- of a network interface is considered to be an interface.
+	sipUsrTable OBJECT-TYPE
+   		SYNTAX      SEQUENCE OF SipUsrEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            	"A list of SIP Users.  The number of entries is
+            	given by the value of ifNumber."
+    		::= { interfaces 3 }
+
+	sipUsrEntry OBJECT-TYPE
+    		SYNTAX      SipUsrEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            	"An entry containing management information applicable to a
+           	 particular sip user."
+    		INDEX   { sipIndex }
+    		::= { sipUsrTable 1 }
+
+	SipUsrEntry ::= SEQUENCE {
+		sipIndex 	      SipUsrIndex,
+		sipRegisterUser       Integer32,
+		sipRegisterStatus     OCTET STRING,
+		sipRegisterAddress    OCTET STRING,
+		sipRegisterRegistrar  OCTET STRING,
+		sipRegisterContact    OCTET STRING,
+		sipRegisterSipProfile Integer32,
+		sipRegisterTTL        Integer32
+	}
+
+	sipIndex OBJECT-TYPE
+    		SYNTAX      SipUsrIndex
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"A unique value, greater than zero, for each sip User.  It
+            	is recommended that values are assigned contiguously
+            	starting from 1.  The value for each sip user sub-layer
+            	must remain constant at least from one re-initialization of
+            	the entity's network management system to the next re-
+            	initialization."
+    		::= { sipUsrEntry 1 }
+
+	sipRegisterUser	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The auth name of sip User"
+    		::= { sipUsrEntry 2 }
+
+
+	sipRegisterStatus OBJECT-TYPE
+    		SYNTAX      OCTET STRING
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The registration status of sip user"
+    		::= { sipUsrEntry 3 }
+
+	sipRegisterAddress OBJECT-TYPE
+    		SYNTAX      OCTET STRING
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The register address of the sip user"
+    		::= { sipUsrEntry 4 }
+
+	sipRegisterRegistrar OBJECT-TYPE
+    		SYNTAX      OCTET STRING
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The registrar information where sip user is registered"
+    		::= { sipUsrEntry 5 }
+
+	sipRegisterContact OBJECT-TYPE
+    		SYNTAX      OCTET STRING
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The contact used by sip user for registration"
+    		::= { sipUsrEntry 6 }
+
+	sipRegisterSipProfile	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The sip profile on which sip user is register"
+    		::= { sipUsrEntry 7 }
+
+	sipRegisterTTL	OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            	"The registration time out of the sip user"
+    		::= { sipUsrEntry 8 }
+
+
+	-- vega traps are defined below
+	
+	
+	-- Autoexec load Error status
+	
+	fileServerOrFileNotFound  TRAP-TYPE
+		ENTERPRISE    	vsplatform
+		DESCRIPTION  	" Some File server for autoexec not found.
+		TFTP/FTP/HTTP/HTTPS - it might not be
+		running or cannot be reached"
+		::= 1
+
+	scriptFileTooBig  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Autoexec script file is too big; there is a 512 byte 
+		limit on the script file "
+		::= 2
+
+	fileServerUnknownError  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" FileServer (TFTP/FTP/HTTP/HTTPS) unknown error reported "
+		::= 3
+
+	fileDoesNotExist  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" File does not exist on FileServer or invalid filename "
+		::= 4
+
+	recurFileServerGetError  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Recursive FileServer (TFTP/FTP/HTTP/HTTPS) get error -
+		only allowed one TFTP/FTP/HTTP/HTTPS get at a time "
+		::= 5
+
+	fileServerGetMemoryError  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Get memory error - the system hasn't 
+		enough memory to perform a TFTP/FTP/HTTP/HTTPS get "
+		::= 6
+
+	lanInterfaceNotActive  TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Lan Interface Entity not active "
+		::= 7
+
+	ftpNotConfigured  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" FTP not configured - FTP IP address is set to 0.0.0.0 0 "
+		::= 8
+
+	invalidUserParams  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Invalid user parameters e.g. incorrect filename"
+		::= 9
+
+	serverUnavailable  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" FTP/TFTP/HTTP/HTTPS Server Unavailable "
+		::= 10
+
+	systemNotReady  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" System not ready - unable to action AUTOEXEC "
+		::= 11
+
+	tftpNotConfigured	TRAP-TYPE
+		ENTERPRISE 		vsplatform
+		DESCRIPTION  	" TFTP not configured - TFTP IP address is set to 0.0.0.0 "
+		::= 12
+
+	httpNotConfigured	TRAP-TYPE
+		ENTERPRISE 		vsplatform
+		DESCRIPTION  	" HTTP not configured - HTTP IP address is set to 0.0.0.0 "
+		::= 13
+
+	httpsNotConfigured	TRAP-TYPE
+		ENTERPRISE 		vsplatform
+		DESCRIPTION  	" HTTPS not configured - HTTPS IP address is set to 0.0.0.0 "
+		::= 14
+
+	-- Autoexec load Non-error status
+
+	configNotLoaded  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Configuration not loaded tget used with ifdiff option but remote configuration file is not different "
+		::= 21
+
+	firmwareNotLoaded  		TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Firmware not loaded, 1.ifnew / remote firmware not newer 2.ifdiff / remote firmware not different"
+		::= 22
+
+	configLoaded  		TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Configuration loaded- loaded remote configuration "
+		::= 23
+
+	firmwareLoaded  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Firmware loaded - loaded remote firmware "
+		::= 24
+
+
+	-- 8 FXS + 2 FXO - Fallback relay state
+	
+	bypassRelayActivated  	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Ongoing Emergency Call on port 1 or 2 POTS bypass relay activated "
+		::= 25	
+
+	-- QOS statistics
+
+	pktLossThresholdExceed	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Gateway packet loss threshold has been exceeded "
+		::= 30
+
+	playoutThresholdExceed	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Gateway play-out delay threshold has been exceeded "
+		::= 31
+
+	jitterThresholdExceed	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Average jitter threshold has been exceeded "
+		::= 32
+
+	-- Thermal Control traps
+
+	sysFanFailed  		TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" All System Fans Failed "
+		::= 40
+
+	sysFanOK  		TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" System Fan OK "
+		::= 41
+
+	sysOverTempIndication	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Over Temperature Indication "
+		::= 42
+
+	sysOverTempOK	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Over Temperature OK "
+		::= 43
+
+	sysOverPower	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Excessive Power Consumption "
+		::= 44
+
+	sysOverPowerOK	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	" Power Usage OK "
+		::= 45
+
+	fxsPortShutDown 	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		DESCRIPTION  	"FXS Port Shut down due to thermal heating"
+		::= 46
+
+
+	-- Sip Registration traps
+
+	sipRegistrationSuccess	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" Sip Registration Success Indication "
+		::=  50 
+
+	sipRegistrationFailure	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" Sip Registration Failure Indication "
+		::= 51 
+
+	sipUnRegistered 	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" Sip Unregistered Indication "
+		::= 52 
+
+	-- ISDN Link Status traps	
+
+	iSDNLinkUp	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" ISDN Link up "
+		::=  60 
+
+	iSDNLinkDown	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" ISDN Link down "
+		::=  61    
+
+
+	-- LAN Link Status traps	         
+
+	lANLinkUp	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" LAN Link up "
+		::=  62 
+
+	lANLinkDown	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" LAN Link down "
+		::=  63
+
+	-- COLDSTART and WARMSTART Status traps	         
+
+	cOLDSTART	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" COLDSTART "
+		::=  64 
+
+	wARMSTART	TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" WARMSTART "
+		::=  65
+		
+	-- DSP Traps
+	
+	dspFatalError   TRAP-TYPE
+		ENTERPRISE   	vsplatform
+		VARIABLES { sysDescr }
+		DESCRIPTION  	" DSP Fatal ERROR Vega Reboot"
+		::=  66
+
+	-- End of Vega - MIB
+END
+

@@ -23,6 +23,7 @@ class Route extends DeviceRelatedModel
         'ciscoIgrp',
         'bbnSpfIgp',
         'ospf',
+        'ospfv3',
         'bgp',
         'idpr',
         'ciscoEigrp',
@@ -41,8 +42,11 @@ class Route extends DeviceRelatedModel
     public $timestamps = true;
 
     // ---- Define Relationships ----
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
     public function port(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
+        return $this->belongsTo(Port::class, 'port_id', 'port_id');
     }
 }

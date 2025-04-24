@@ -1,4 +1,5 @@
 <?php
+
 /*
  * voltages for raspberry pi
  * requires snmp extend agent script from librenms-agent

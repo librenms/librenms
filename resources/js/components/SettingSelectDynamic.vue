@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import BaseSetting from "./BaseSetting";
+import BaseSetting from "./BaseSetting.vue";
 import LibrenmsSelect from "./LibrenmsSelect.vue";
 
 export default {

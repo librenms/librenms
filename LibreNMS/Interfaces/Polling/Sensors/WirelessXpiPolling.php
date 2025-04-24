@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessXpiPolling.php
  *

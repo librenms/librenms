@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS FortiGate count sensors
  *

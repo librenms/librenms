@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org

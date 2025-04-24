@@ -4,11 +4,11 @@
             <div>
             {{-- div to allow color to override boostrap title link color --}}
             <x-port-link basic :port="$port">
-                <span class="tw-text-3xl tw-font-bold">
+                <span class="tw:text-3xl tw:font-bold">
                     <i class="fa fa-tag" aria-hidden='true'></i>
                     {{ $port->getLabel() }}
                     @if($port->getLabel() !== $port->getDescription())
-                        <span class="tw-text-xl tw-font-normal">{{ $port->getDescription() }}</span>
+                        <span class="tw:text-xl tw:font-normal">{{ $port->getDescription() }}</span>
                     @endif
                 </span>
             </x-port-link>

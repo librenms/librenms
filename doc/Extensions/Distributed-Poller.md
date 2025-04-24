@@ -70,13 +70,35 @@ time.
 ### Using REDIS
 
 In your `.env` file you will need to specify a redis server, port and
-the driver.
+the driver. You can choose to either configure redis OR redis + sentinel for distributed polling.
+
+#### Standalone Redis
+
+A single Redis server, this is the simplest setup.
 
 ```
 REDIS_HOST=HOSTNAME or IP
 REDIS_PORT=6379
-CACHE_DRIVER=redis
+CACHE_STORE=redis
 ```
+
+#### Redis Sentinel
+
+Redis sentinel provides high availability for Redis. This is more complex, but recommended for production environments.
+
+See [Redis Sentinel](Redis-Sentinel.md) for more information.
+
+```
+REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
+REDIS_SENTINEL_SERVICE=mymaster
+
+# If requirepass is set in sentinel, set everything above as well as: (recommended)
+REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
+
+# If ACL's are in use, set everything above as well as: (highly recommended)
+REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
+```
+
 ### Using Memcached
 
 Preferably you should set the memcached server settings via the web UI.
@@ -84,7 +106,7 @@ Under Settings > Global Settings > Distributed poller, you fill out the
 memcached host and port, and then in your `.env` file you will need to add:
 
 ```
-CACHE_DRIVER=memcached
+CACHE_STORE=memcached
 ```
 If you want to use memcached, you will also need to install an additional
 Python 3 python-memcached package.

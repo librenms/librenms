@@ -16,7 +16,7 @@ class DeviceObserver
     /**
      * Handle the device "created" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function created(Device $device): void
@@ -28,7 +28,7 @@ class DeviceObserver
     /**
      * Handle the device "updated" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function updated(Device $device): void
@@ -78,7 +78,7 @@ class DeviceObserver
     /**
      * Handle the device "deleting" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function deleting(Device $device): void
@@ -100,7 +100,6 @@ class DeviceObserver
         $device->bgppeers()->delete();
         \DB::table('bgpPeers_cbgp')->where('device_id', $device->device_id)->delete();
         $device->cefSwitching()->delete();
-        \DB::table('ciscoASA')->where('device_id', $device->device_id)->delete();
         $device->components()->delete();
         \DB::table('customoids')->where('device_id', $device->device_id)->delete();
         \DB::table('devices_perms')->where('device_id', $device->device_id)->delete();
@@ -135,6 +134,10 @@ class DeviceObserver
         $device->ospfInstances()->delete();
         $device->ospfNbrs()->delete();
         $device->ospfPorts()->delete();
+        $device->ospfv3Areas()->delete();
+        $device->ospfv3Instances()->delete();
+        $device->ospfv3Nbrs()->delete();
+        $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
         $device->portsFdb()->delete();
@@ -177,7 +180,7 @@ class DeviceObserver
     /**
      * Handle the device "Pivot Attached" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @param  string  $relationName  parents or children
      * @param  array  $pivotIds  list of pivot ids
      * @param  array  $pivotIdsAttributes  additional pivot attributes

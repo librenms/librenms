@@ -48,7 +48,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $new_slugs = [];
 $seen_slugs = [];
@@ -67,7 +67,7 @@ foreach ($data['slugs'] as $slug => $slug_data) {
     ];
     $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     if (! isset($app_data['slugs'][$slug])) {
         array_push($new_slugs, $slug);
     }
@@ -94,7 +94,7 @@ foreach ($app_data['slugs'] as $slug => $slug_data) {
         ];
         $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
         if (! isset($app_data['slugs'][$slug])) {
             array_push($new_slugs, $slug);
         }

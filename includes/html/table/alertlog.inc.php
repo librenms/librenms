@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -102,11 +103,11 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         if ($last_active_state) {
             $alert_log_id = $last_active_state[0]['id'];
             [$fault_detail, $max_row_length] = alert_details($last_active_state[0]['details']);
-        // It's a rule created log
+            // It's a rule created log
         } else {
             $fault_detail = 'Rule created, no faults found';
         }
-    // We will display the details of the log in question
+        // We will display the details of the log in question
     } else {
         $alert_log_id = $alertlog['alert_log_id'];
         [$fault_detail, $max_row_length] = alert_details($alertlog['alert_log_details']);
@@ -130,7 +131,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $rulei . '" data-parent="#alerts"></a>',
-        'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
+        'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . $rulei . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",

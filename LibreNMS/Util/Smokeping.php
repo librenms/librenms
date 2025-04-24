@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smokeping.php
  *

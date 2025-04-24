@@ -1,7 +1,9 @@
 <?php
 
+use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Symfony\Component\Process\Process;
 
 /*
@@ -19,7 +21,7 @@ Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}
     {new hostname : ' . __('The new hostname or IP') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     (new Process([
         base_path('renamehost.php'),
         $this->argument('old hostname'),
@@ -30,7 +32,7 @@ Artisan::command('device:rename
 Artisan::command('device:remove
     {device spec : ' . __('Hostname, IP, or device id to remove') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     (new Process([
         base_path('delhost.php'),
         $this->argument('device spec'),
@@ -90,7 +92,7 @@ Artisan::command('poller:alerts', function () {
 Artisan::command('poller:billing
     {bill id? : ' . __('The bill id to poll') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     $command = [base_path('poll-billing.php')];
     if ($this->argument('bill id')) {
         $command[] = '-b';
@@ -110,7 +112,7 @@ Artisan::command('poller:services
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, all') . '}
     {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     $command = [base_path('check-services.php')];
     if ($this->option('no-data')) {
         array_push($command, '-r', '-f', '-p');
@@ -132,7 +134,7 @@ Artisan::command('poller:services
 Artisan::command('poller:billing-calculate
     {--c|clear-history : ' . __('Delete all billing history') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     $command = [base_path('billing-calculate.php')];
     if ($this->option('clear-history')) {
         $command[] = '-r';
@@ -148,10 +150,10 @@ Artisan::command('scan
     {--t|threads=32 : ' . __('How many IPs to scan at a time, more will increase the scan speed, but could overload your system') . '}
     {--l|legend : ' . __('Print the legend') . '}
 ', function () {
-    /** @var \Illuminate\Console\Command $this */
+    /** @var Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && ! \LibreNMS\Config::has('nets')) {
+    if (empty($this->argument('network')) && ! LibreNMS\Config::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
@@ -198,3 +200,15 @@ Artisan::command('scan
 
     return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
+
+// mark schedule working
+Schedule::call(function () {
+    Cache::put('scheduler_working', now(), now()->addMinutes(6));
+})->everyFiveMinutes();
+
+// schedule maintenance, should be after all others
+$maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
+Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
+    ->weeklyOn(0, '1:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);

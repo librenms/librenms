@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TopErrorsController.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SelectController.php
  *
@@ -50,7 +51,7 @@ abstract class SelectController extends PaginatedAjaxController
     /**
      * The default method called by the route handler
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request)

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * raritan-pdu.inc.php
  *

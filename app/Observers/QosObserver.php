@@ -9,7 +9,7 @@ class QosObserver
     /**
      * Handle the Qos "updating" event.
      *
-     * @param  \App\Models\Qos  $qos
+     * @param  Qos  $qos
      * @return void
      */
     public function updating(Qos $qos)
@@ -33,7 +33,7 @@ class QosObserver
         }
     }
 
-    private function calcRate(int|null $val, int|null $lastval, int $interval): int|null
+    private function calcRate(?int $val, ?int $lastval, int $interval): ?int
     {
         if (is_null($val)) {
             return null;
@@ -50,7 +50,7 @@ class QosObserver
         return intval(($val - $lastval) / $interval);
     }
 
-    private function calcPct(int|null $dividend, int|null $divisor, int $precision): float|null
+    private function calcPct(?int $dividend, ?int $divisor, int $precision): ?float
     {
         if (is_null($dividend) || is_null($divisor)) {
             return null;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ModuleTester.php
  *
@@ -155,7 +156,7 @@ class ModuleTestHelper
                     $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
-                if (isset($data) && $data->isValid()) {
+                if (isset($data) && $data->getExitCode() === 0) {
                     $snmprec_data[] = $this->convertSnmpToSnmprec($data);
                 }
             }
@@ -239,7 +240,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], string $os_filter = null)
+    public static function findOsWithData($modules = [], ?string $os_filter = null)
     {
         $os_list = [];
 
@@ -362,7 +363,7 @@ class ModuleTestHelper
     private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->raw) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->getRawWithoutBadLines()) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -536,22 +537,18 @@ class ModuleTestHelper
      * Run discovery and polling against snmpsim data and create a database dump
      * Save the dumped data to tests/data/<os>.json
      *
-     * @param  Snmpsim  $snmpsim
-     * @param  bool  $no_save
-     * @return array|null
-     *
      * @throws FileNotFoundException
      */
-    public function generateTestData(Snmpsim $snmpsim, $no_save = false)
+    public function generateTestData(string $snmpSimIp, int $snmpSimPort, bool $noSave = false): ?array
     {
         global $device;
         Config::set('rrd.enable', false); // disable rrd
         Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
-        app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
+        app()->bind(AutonomousSystem::class, function ($app, $parameters) {
             $asn = $parameters['asn'] ?? '?';
-            $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
+            $mock = \Mockery::mock(AutonomousSystem::class);
             $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
                 return "AS$asn-MOCK-TEXT";
             });
@@ -564,17 +561,17 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
+        if (($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
             $new_device = new Device([
-                'hostname' => $snmpsim->ip,
+                'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
                 'community' => $this->file_name,
-                'port' => $snmpsim->port,
+                'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
@@ -650,12 +647,12 @@ class ModuleTestHelper
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
-        if ($device['hostname'] == $snmpsim->ip) {
+        if ($device['hostname'] == $snmpSimIp) {
             Debug::set(false);
             delete_device($device_id);
         }
 
-        if (! $no_save) {
+        if (! $noSave) {
             d_echo($data);
 
             // Save the data to the default test data location (or elsewhere if specified)

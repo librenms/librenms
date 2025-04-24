@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-transports.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * entity-state.inc.php
  *

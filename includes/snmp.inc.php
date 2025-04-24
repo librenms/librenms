@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS - SNMP Functions
  *
@@ -21,6 +22,9 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Oid;
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function prep_snmp_setting($device, $setting)
 {
     if (isset($device[$setting]) && is_numeric($device[$setting]) && $device[$setting] > 0) {
@@ -33,6 +37,8 @@ function prep_snmp_setting($device, $setting)
 /**
  * @param  array  $device
  * @return array will contain a list of mib dirs
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function get_mib_dir($device)
 {
@@ -71,6 +77,8 @@ function get_mib_dir($device)
  * @param  string  $mibdir  should be the name of the directory within \LibreNMS\Config::get('mib_dir')
  * @param  array|null  $device
  * @return string The option string starting with -M
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function mibdir($mibdir = null, $device = null)
 {
@@ -99,6 +107,8 @@ function mibdir($mibdir = null, $device = null)
  * @param  string  $mib  an additional mib to add to this command
  * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
@@ -116,6 +126,8 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  * @param  string  $mib  an additional mib to add to this command
  * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
@@ -152,6 +164,8 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
  * @param  string  $mib  an additional mib to add to this command
  * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null)
 {
@@ -183,6 +197,9 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
     return $cmd;
 } // end gen_snmp_cmd()
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
 {
     $measure = Measurement::start('snmpget');
@@ -225,6 +242,9 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     return $array;
 }//end snmp_get_multi()
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
     $measure = Measurement::start('snmpget');
@@ -277,6 +297,8 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
  * @param  string  $mib
  * @param  string  $mibdir
  * @return bool|string
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -314,6 +336,8 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  * @param  string  $mib  The MIB to use
  * @param  string  $mibdir  Optional mib directory to search
  * @return string|false the output or false if the data could not be fetched
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
@@ -333,6 +357,9 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
     return false;
 }
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
     $measure = Measurement::start('snmpwalk');
@@ -360,6 +387,9 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     return $data;
 }//end snmp_walk()
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
@@ -401,12 +431,17 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
  * @param  string  $mib
  * @param  string  $mibdir
  * @return bool|array
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmpwalk_cache_oid_num($device, $oid, $array = [], $mib = null, $mibdir = null)
 {
     return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
 }//end snmpwalk_cache_oid_num()
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
     global $cache;
@@ -466,6 +501,8 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
  * @param  string  $mibdir  custom mib dir to search for mib
  * @param  mixed  $snmpFlags  flags to use for the snmp command
  * @return array grouped array of data
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $snmpFlags = '-OQUsetX')
 {
@@ -507,6 +544,9 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
     return $array;
 }
 
+/**
+ * @deprecated Please use SnmpQuery instead
+ */
 function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
@@ -545,6 +585,8 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdi
  * @param  array  $device
  * @param  array  $cmd
  * @return array
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmp_gen_auth(&$device, $cmd = [])
 {
@@ -591,6 +633,8 @@ function snmp_gen_auth(&$device, $cmd = [])
  * @param  array|string  $options  Options to pass to snmptranslate
  * @param  array|null  $device
  * @return string
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
@@ -644,6 +688,8 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
  * @internal param $string
  *
  * @return bool|array
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function snmpwalk_array_num($device, $oid, $indexes = 1)
 {
@@ -693,6 +739,8 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
 /**
  * @param  $device
  * @return bool
+ *
+ * @deprecated Please use SnmpQuery instead
  */
 function get_device_max_repeaters($device)
 {

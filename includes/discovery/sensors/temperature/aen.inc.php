@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Accedian MetroNID Temperature Sensor Discovery module
  *

@@ -524,7 +524,7 @@ return [
         'nfsen_top_default' => [
             'description' => '默认 Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => '默认统计',
         ],
         'nfsen_order_default' => [

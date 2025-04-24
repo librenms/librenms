@@ -25,7 +25,7 @@ to choose a System OID and a Enterprise OID. This is a little tricky but based o
 information we defined a "standard" for all implementation of Carel
 products with LibreNMS.
 
-![pCOweb](/img/carelpcowebsystemoid.png)
+![pCOweb](../../img/carelpcowebsystemoid.png)
 
 The base Carel OID is 1.3.6.1.4.1.9839. To this OID we will add the
 final manufacturer Enterprise OID. You can find all enterprise OID
@@ -57,5 +57,5 @@ to configure your pCOweb card with the accorded System OID and Enterprise OID:
 
 ## Unsupported devices
 After constructing the correct System OID for your SNMP card, you can
-start the LibreNMS [new OS implementation](/Developing/Support-New-OS.md)
+start the LibreNMS [new OS implementation](../../Developing/Support-New-OS.md)
 and use this new OID as sysObjectID for the YAML definition file.

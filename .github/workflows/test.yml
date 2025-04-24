@@ -28,11 +28,6 @@ jobs:
             name: Unit
             skip-web-check: 1
             database: mysql:8.0
-          -
-            php-version: 8.2
-            name: Web
-            skip-unit-check: 1
-            database: mariadb:10.11
     services:
       database:
         image: ${{ matrix.database }}
@@ -133,11 +128,6 @@ jobs:
         run: |
           php lnms dev:simulate --setup-venv
       -
-        name: Start ChromeDriver
-        if: matrix.skip-web-check != '1'
-        run: |
-          $CHROMEWEBDRIVER/chromedriver --port=9515 &
-      -
         name: Copy seeded config
         run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
       -
@@ -163,13 +153,10 @@ jobs:
         name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
       -
-        name: Artisan serve
-        if: matrix.skip-web-check != '1'
-        run: |
-          php artisan serve --env=dusk.testing >/tmp/artisan-serve.log 2>&1 &
-          sleep 5
+        name: Migrate Database
+        run: php artisan migrate
       -
-        name: Start SNMP
+        name: Start SNMPSIM
         if: matrix.skip-unit-check != '1'
         run: |
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
@@ -184,11 +171,6 @@ jobs:
         name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
-      -
-        name: Dump serve logs
-        if: always() && matrix.skip-web-check != '1'
-        run: |
-          cat /tmp/artisan-serve.log || true
       -
         name: Dump snmp logs
         if: failure() && matrix.skip-unit-check != '1'

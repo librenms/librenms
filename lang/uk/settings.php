@@ -906,7 +906,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [
@@ -1072,6 +1072,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1098,9 +1101,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Cisco ACE Serverfarms',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Cisco ASA Firewall',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',

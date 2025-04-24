@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timos.php
  *
@@ -227,7 +228,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpLastStatusChange' => round(($value['sdpLastStatusChange'] ?? 0) / 100),
                 'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
                 'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'], true),
+                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
             ]);
         });
     }
@@ -520,7 +521,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
                 'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
                 'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'], true),
+                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
             ]);
         });
     }
@@ -922,10 +923,14 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         return $inventory;
     }
 
-    private function parseIpField(array $data, string $ngField): string|null
+    private function parseIpField(array $data, string $ngField): ?string
     {
         if (isset($data[$ngField])) {
             try {
+                if (is_string($data[$ngField]) && preg_match('/^([0-9A-Fa-f]{2} ?)+$/', $data[$ngField])) {
+                    return IP::fromHexString($data[$ngField])->uncompressed();
+                }
+
                 return IP::parse($data[$ngField])->uncompressed();
             } catch (InvalidIpException $e) {
                 return null;

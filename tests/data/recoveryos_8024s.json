@@ -1935,5 +1935,38 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:ae1f:6bff:fe05:7c50",
+                    "ipv6_compressed": "fe80::ae1f:6bff:fe05:7c50",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:ec36:ebff:fe97:4008",
+                    "ipv6_compressed": "fe80::ec36:ebff:fe97:4008",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 6
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:faf2:1eff:fe40:7bcc",
+                    "ipv6_compressed": "fe80::faf2:1eff:fe40:7bcc",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

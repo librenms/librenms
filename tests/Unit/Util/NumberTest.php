@@ -73,7 +73,7 @@ class NumberTest extends TestCase
         $this->assertEquals(29394.26, Number::calculatePercent(12639.53, 43));
     }
 
-    public function testFillMissingRatio()
+    public function testFillMissingRatio(): void
     {
         $this->assertEquals([20, 10, 10, 50], Number::fillMissingRatio(total: 20, used: 10));
         $this->assertEquals([23, 9, 14, 39.13], Number::fillMissingRatio(total: 23, available: 14));

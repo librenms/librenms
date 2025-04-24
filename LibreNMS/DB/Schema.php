@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schema.php
  *

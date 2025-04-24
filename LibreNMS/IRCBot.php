@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2014  <singh@devilcode.org>
  * Modified and Relicensed by <f0o@devilcode.org> under the expressed

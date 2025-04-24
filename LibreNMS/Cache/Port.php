@@ -60,6 +60,15 @@ class Port
     }
 
     /**
+     * Get a port from an IP address.
+     * Must be constrained to a device, when $device is null, use primary device
+     */
+    public function getByIp(string|IP $ip, ?string $context_name = null, \App\Models\Device|int|null $device = null): ?\App\Models\Port
+    {
+        return $this->get($this->getIdFromIp($ip, $context_name, $device));
+    }
+
+    /**
      * Get a port_id from an ifIndex.
      * Must be constrained to a device, when $device is null, use primary device
      */
@@ -161,6 +170,7 @@ class Port
         $primaryDevice = \DeviceCache::getPrimary();
         if ($primaryDevice->relationLoaded('ports')) {
             $port = $primaryDevice->ports->firstWhere('port_id', $port_id);
+
             if ($port !== null) {
                 $this->ports[$port_id] = $port; // cache the port here
 

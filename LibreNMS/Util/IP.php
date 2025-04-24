@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IP.php
  *
@@ -197,6 +198,14 @@ abstract class IP
     }
 
     /**
+     * @return bool
+     */
+    public function isLinkLocal()
+    {
+        return false; // IPv4 has no concept of link local, overridden for IPv6
+    }
+
+    /**
      * Check if this IP is in the reserved range.
      *
      * @return bool
@@ -251,10 +260,10 @@ abstract class IP
     public function __toString()
     {
         if ($this->cidr == $this->host_bits) {
-            return (string) $this->ip;
+            return $this->compressed();
         }
 
-        return $this->ip . "/{$this->cidr}";
+        return $this->compressed() . "/{$this->cidr}";
     }
 
     /**

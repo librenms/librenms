@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Quanta LB6M Fan Speed information
  *
