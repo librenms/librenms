@@ -63,18 +63,18 @@ if (Auth::user()->hasGlobalAdmin()) {
 }
 
 echo '</div><div>';
-echo '<div class="col-sm-2"><strong>Name</strong></div>';
-echo '<div class="col-sm-1"><strong>Check Type</strong></div>';
-echo '<div class="col-sm-4"><strong>Message</strong></div>';
-echo '<div class="col-sm-2"><strong>Description</strong></div>';
-echo '<div class="col-sm-2"><strong>Last Changed</strong></div>';
-echo '<div class="col-sm-1"></div>';
 
 if (count($services) > '0') {
     // Loop over each service, pulling out the details.
 
     echo '<table class="table table-hover table-condensed">';
-
+    echo '<td class="col-sm-2"><strong>Name</strong></td>';
+    echo '<td class="col-sm-1"><strong>Check Type</strong></td>';
+    echo '<td class="col-sm-1">Remote Host</td>';
+    echo '<td class="col-sm-4"><strong>Message</strong></td>';
+    echo '<td class="col-sm-2"><strong>Description</strong></td>';
+    echo '<td class="col-sm-1"><strong>Last Changed</strong></td>';
+    echo '<td class="col-sm-1"></td>';
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
         if ($service['service_status'] == '2') {
@@ -88,20 +88,19 @@ if (count($services) > '0') {
         }
 
         echo '<tr id="row_' . $service['service_id'] . '">';
-        echo '<td class="col-sm-12">';
-        echo '<div class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities($service['service_name']) . '</span></span></div>';
-        echo '<div class="col-sm-1 text-muted">' . htmlentities($service['service_type']) . '</div>';
-        echo '<div class="col-sm-4">' . nl2br(htmlentities(trim($service['service_message']))) . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
-        echo '<div class="col-sm-1">';
-        echo '<div class="pull-right">';
+        echo '<td class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities($service['service_name']) . '</span></span></td>';
+        echo '<td class="col-sm-1 text-muted">' . htmlentities($service['service_type']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities($service['service_ip'])) . '</td>';
+        echo '<td class="col-sm-4">' . nl2br(htmlentities(trim($service['service_message']))) . '</td>';
+        echo '<td class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-1">';
         if (Auth::user()->hasGlobalAdmin()) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
         <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
         }
-        echo '</div>';
-        echo '</div>';
+        echo '</td>';
+        echo '</tr>';
 
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
@@ -124,11 +123,11 @@ if (count($services) > '0') {
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="5"><div class="col-sm-12">';
+                echo '<td class="col-sm-12"">';
 
                 include 'includes/html/print-graphrow.inc.php';
 
-                echo '</div></td>';
+                echo '</td>';
                 echo '</tr>';
             }
         }
