@@ -50,12 +50,12 @@ combination of two or three of these.
   devices details you will pass the hostname of the device in the route: `/api/v0/devices/:hostname`.
 - Passing parameters via the query string. For example you can list
   all devices on your install but limit the output to devices that are
-  currently down: `/api/v0/devices?type=down`
+  currently down: `/api/v0/devices/list_devices?type=down`
 - Passing data in via JSON, this will mainly be used when adding or
   updating information via the API, for instance adding a new device:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/list_devices
 ```
 
 ## Output
