@@ -63,6 +63,12 @@ if (Auth::user()->hasGlobalAdmin()) {
 }
 
 echo '</div><div>';
+echo '<div class="col-sm-2"><strong>Name</strong></div>';
+echo '<div class="col-sm-1"><strong>Check Type</strong></div>';
+echo '<div class="col-sm-4"><strong>Message</strong></div>';
+echo '<div class="col-sm-2"><strong>Description</strong></div>';
+echo '<div class="col-sm-2"><strong>Last Changed</strong></div>';
+echo '<div class="col-sm-1"></div>';
 
 if (count($services) > '0') {
     // Loop over each service, pulling out the details.
@@ -72,22 +78,23 @@ if (count($services) > '0') {
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
         if ($service['service_status'] == '2') {
-            $status = '<span class="alert-status label-danger"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-danger';
         } elseif ($service['service_status'] == '1') {
-            $status = '<span class="alert-status label-warning"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-warning';
         } elseif ($service['service_status'] == '0') {
-            $status = '<span class="alert-status label-success"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-success';
         } else {
-            $status = '<span class="alert-status label-info"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-info';
         }
 
         echo '<tr id="row_' . $service['service_id'] . '">';
         echo '<td class="col-sm-12">';
-        echo '<div class="col-sm-1">' . $status . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
+        echo '<div class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities($service['service_name']) . '</span></span></div>';
+        echo '<div class="col-sm-1 text-muted">' . htmlentities($service['service_type']) . '</div>';
+        echo '<div class="col-sm-4">' . nl2br(htmlentities(trim($service['service_message']))) . '</div>';
         echo '<div class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</div>';
-        echo '<div class="col-sm-5">' . nl2br(htmlentities(trim($service['service_message']))) . '</div>';
-        echo '<div class="col-sm-2">';
+        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
+        echo '<div class="col-sm-1">';
         echo '<div class="pull-right">';
         if (Auth::user()->hasGlobalAdmin()) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
