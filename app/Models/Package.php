@@ -26,7 +26,6 @@
 
 namespace App\Models;
 
-use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use LibreNMS\Interfaces\Models\Keyable;
 

@@ -26,7 +26,6 @@
 
 namespace App\Models;
 
-use App\Observers\WirelessSensorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\Models\Keyable;

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Observers\StpObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use LibreNMS\Interfaces\Models\Keyable;
 

@@ -163,7 +163,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootObservers()
     {
-
     }
 
     private function bootCustomValidators()

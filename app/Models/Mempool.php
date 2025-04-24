@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Observers\MempoolObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;

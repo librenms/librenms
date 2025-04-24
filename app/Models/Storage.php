@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Observers\StorageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InsufficientDataException;
