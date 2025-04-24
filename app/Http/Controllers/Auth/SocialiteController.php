@@ -23,6 +23,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Config;
@@ -33,7 +34,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
-use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -61,7 +61,7 @@ class SocialiteController extends Controller
 
         // https://laravel.com/docs/10.x/socialite#access-scopes
         if ($driver instanceof \Laravel\Socialite\Two\AbstractProvider) {
-            $scopes = LibreNMSConfig::get('auth.socialite.scopes');
+            $scopes = LibrenmsConfig::get('auth.socialite.scopes');
             if (! empty($scopes) && is_array($scopes)) {
                 return $driver
                     ->scopes($scopes)
@@ -133,7 +133,7 @@ class SocialiteController extends Controller
 
     private function register(string $provider): void
     {
-        if (! LibreNMSConfig::get('auth.socialite.register', false)) {
+        if (! LibrenmsConfig::get('auth.socialite.register', false)) {
             return;
         }
 
@@ -152,7 +152,7 @@ class SocialiteController extends Controller
 
         $user->save();
 
-        $default_role = LibreNMSConfig::get('auth.socialite.default_role');
+        $default_role = LibrenmsConfig::get('auth.socialite.default_role');
         if ($default_role !== null && $default_role != 'none') {
             $user->syncRoles([$default_role]);
         }
@@ -279,7 +279,7 @@ class SocialiteController extends Controller
      */
     private function injectConfig(): void
     {
-        foreach (LibreNMSConfig::get('auth.socialite.configs', []) as $provider => $config) {
+        foreach (LibrenmsConfig::get('auth.socialite.configs', []) as $provider => $config) {
             Config::set("services.$provider", $config);
 
             // Inject redirect URL automatically if not set
