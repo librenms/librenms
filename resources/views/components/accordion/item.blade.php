@@ -1,15 +1,21 @@
 @aware(['accordionId'])
-@props(['id', 'title'])
+@props(['id', 'title', 'open' => false])
 
-<div class="accordion-item">
-    <h3 class="accordion-header">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$id}}" aria-expanded="true" aria-controls="collapse{{$id}}">
-            {{ $title }}
-        </button>
-    </h3>
-    <div class="accordion-collapse collapse" id="collapse{{$id}}" data-bs-parent="#accordion{{$accordionId}}">
-        <div class="accordion-body">
-            {{ $slot }}
-        </div>
-    </div>
+<div class="accordion-header">
+    <button class="accordion-toggle" type="button" data-toggle="collapse" data-target="#collapse{{$id}}" onClick="$('#accordionPM{{$id}}').toggleClass('fa-minus').toggleClass('fa-plus');">
+        @if($open)
+        <span id="accordionPM{{$id}}" class="fa fa-minus"></span>{!! $title !!}
+        @else
+        <span id="accordionPM{{$id}}" class="fa fa-plus"></span>{!! $title !!}
+        @endif
+    </button>
 </div>
+@if($open)
+<div class="accordion-body collapse in" id="collapse{{$id}}" aria-expanded="true">
+    {{ $slot }}
+</div>
+@else
+<div class="accordion-body collapse" id="collapse{{$id}}">
+    {{ $slot }}
+</div>
+@endif
