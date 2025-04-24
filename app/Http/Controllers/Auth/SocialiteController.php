@@ -36,7 +36,7 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Exceptions\AuthenticationException;
 use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+use Monolog\Level;
 
 class SocialiteController extends Controller
 {
@@ -168,7 +168,7 @@ class SocialiteController extends Controller
         try {
             if ($is_debug) {
                 $monolog = Log::getLogger();
-                $debugHandler = new StreamHandler(base_path('logs/auth.log'), Logger::DEBUG);
+                $debugHandler = new StreamHandler(base_path('logs/auth.log'), Level::Debug);
                 $debugHandler->setFormatter(new \App\Logging\LogFileFormatter());
                 $monolog->pushHandler($debugHandler);
                 Log::debug('setRolesFromClaim() starts : ' . $user->username . PHP_EOL .
