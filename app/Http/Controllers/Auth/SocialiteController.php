@@ -30,11 +30,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
-use Illuminate\Support\Facades\Log;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -166,14 +166,14 @@ class SocialiteController extends Controller
         $monolog = null;
 
         try {
-            if( $is_debug ){
+            if ($is_debug) {
                 $monolog = Log::getLogger();
                 $debugHandler = new StreamHandler(base_path('logs/auth.log'), Logger::DEBUG);
                 $debugHandler->setFormatter(new \App\Logging\LogFileFormatter());
                 $monolog->pushHandler($debugHandler);
-                Log::debug( 'setRolesFromClaim() starts : ' . $user->username . PHP_EOL .
+                Log::debug('setRolesFromClaim() starts : ' . $user->username . PHP_EOL .
                     '  Provider: ' . $provider . PHP_EOL .
-                    '  User: ' . json_encode( $user ) . PHP_EOL .
+                    '  User: ' . json_encode($user) . PHP_EOL .
                     '  Scopes: ' . json_encode($scopes) . PHP_EOL .
                     '  Claims: ' . json_encode($claims) . PHP_EOL .
                     '  socialite_user class: ' . get_class($this->socialite_user) . PHP_EOL
@@ -187,9 +187,9 @@ class SocialiteController extends Controller
                 $roles = [];
                 $attributes = $this->socialite_user->getRaw();
 
-                if( $is_debug ){
+                if ($is_debug) {
                     $type = is_object($attributes) ? get_class($attributes) : gettype($attributes);
-                    Log::debug( 'setRolesFromClaim() socialite_user->getRaw() : ' . $user->username . PHP_EOL .
+                    Log::debug('setRolesFromClaim() socialite_user->getRaw() : ' . $user->username . PHP_EOL .
                         '  Data Type: ' . $type . PHP_EOL .
                         '  Dump of Data: ' . PHP_EOL .
                         '  ' . print_r($attributes, true) . PHP_EOL
@@ -218,19 +218,19 @@ class SocialiteController extends Controller
 
                 if (count($roles) > 0) {
                     $user->syncRoles(array_unique($roles));
-                    if( $is_debug ){
-                        Log::debug( 'setRolesFromClaim() returned data : ' . $user->username . PHP_EOL .
-                            ' Roles: ' . json_encode( $roles ) . PHP_EOL
+                    if ($is_debug) {
+                        Log::debug('setRolesFromClaim() returned data : ' . $user->username . PHP_EOL .
+                            ' Roles: ' . json_encode($roles) . PHP_EOL
                         );
                     }
+
                     return true;
                 }
             }
 
             return false;
-
         } finally {
-            if( $monolog ){
+            if ($monolog) {
                 $monolog->popHandler();
             }
         }
