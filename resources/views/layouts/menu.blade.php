@@ -260,7 +260,7 @@
                                 </li>
                                 @endforeach
                             @else
-                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
+                            <li class="dropdown-submenu"><a href="{{ route('maps.custom.list') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
                                 <ul class="dropdown-menu scrollable-menu">
                                     @foreach($custommaps as $map_group => $group_maps)
                                         <li><a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
