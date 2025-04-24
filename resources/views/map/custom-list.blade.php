@@ -21,7 +21,7 @@
                         <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">
                             <div>
                                 <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
+                                <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{!! $map->name !!}</a>
                             </div>
                         </div>
                     </div>
