@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -15,7 +16,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     protected static $AUTH_IS_EXTERNAL = true;
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected $ldap_connection;
+    protected ?Connection $ldap_connection = null;
 
     public function __construct()
     {
@@ -78,6 +79,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             ['samaccountname']
         );
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -151,6 +155,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->userFilter($username),
             $attributes
         );
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         if ($entries['count']) {
@@ -162,7 +169,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return $user_id;
     }
 
-    protected function getConnection()
+    protected function getConnection(): ?Connection
     {
         return $this->ldap_connection;
     }

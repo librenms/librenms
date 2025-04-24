@@ -10,7 +10,7 @@ if ($device['os'] === 'terra') {
         if (strpos($device['sysDescr'], $row[0]) !== false) {
             $temperature = snmp_get($device, $row[1], '-Oqv');
             if (is_numeric($temperature)) {
-                discover_sensor($valid['sensor'], 'temperature', $device, $row[1], '0', $row[0], 'Internal Temperature', 1, 1, null, null, null, null, $temperature);
+                discover_sensor(null, 'temperature', $device, $row[1], '0', $row[0], 'Internal Temperature', 1, 1, null, null, null, null, $temperature);
             }
         }
     }

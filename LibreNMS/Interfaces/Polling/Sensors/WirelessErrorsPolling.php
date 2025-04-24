@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessErrorsPolling.php
  *

@@ -16,7 +16,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
     echo '<div style="clear: both;">';
     echo $index > 0 ? '<hr />' : '';
     $index++;
-    echo '<h4>' . generate_link($groupedApps->first()->displayName(), ['page' => 'apps', 'app' => $type]) . '</h4>';
+    echo '<h4>' . generate_link(htmlentities($groupedApps->first()->displayName()), ['page' => 'apps', 'app' => $type]) . '</h4>';
     /** @var \Illuminate\Support\Collection $groupedApps */
     $groupedApps = $groupedApps->sortBy(function ($app) {
         return $app->device->hostname;
@@ -35,7 +35,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
 
-        $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">' . $app_state_info . optional($app->device)->shortDisplayName() . '</span>';
+        $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">' . $app_state_info . htmlentities($app->device?->shortDisplayName() ?? '') . '</span>';
         if (! empty($app->app_instance)) {
             $overlib_link .= '<span style="float:right; margin-right: 10px; font-weight: bold;">' . $app->app_instance . '</span>';
             $content_add = '(' . $app->app_instance . ')';
@@ -43,7 +43,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
 
         $overlib_link .= '<br/>';
         $overlib_link .= \LibreNMS\Util\Url::graphTag($graph_array);
-        $overlib_content = generate_overlib_content($graph_array, optional($app->device)->displayName() . ' - ' . $app->displayName() . $content_add);
+        $overlib_content = generate_overlib_content($graph_array, htmlentities($app->device?->shortDisplayName() ?? '') . ' - ' . htmlentities($app->displayName()) . $content_add);
 
         echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-width: " . $width_div . 'px; max-width:' . $width_div . "px; min-height:165px; max-height:165px;
                       text-align: center; float: left;'>";

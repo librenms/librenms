@@ -8,6 +8,7 @@ modules:
                     value: exhaust-air-temperature
                     num_oid: '.1.3.6.1.4.1.9839.1.2.15.{{ $index }}'
                     descr: 'Exhaust air temperature'
+                    index: "exhaust.{{ $index }}"
                     divisor: 10
 
                 -
@@ -15,6 +16,7 @@ modules:
                     value: supply-air-temperature
                     num_oid: '.1.3.6.1.4.1.9839.1.2.16.{{ $index }}'
                     descr: 'Supply air temperature'
+                    index: "supply.{{ $index }}"
                     divisor: 10
 
                 -
@@ -22,6 +24,7 @@ modules:
                     value: outside-air-temperature
                     num_oid: '.1.3.6.1.4.1.9839.1.2.17.{{ $index }}'
                     descr: 'Outside air temperature'
+                    index: "outside.{{ $index }}"
                     divisor: 10
 
                 -
@@ -29,6 +32,7 @@ modules:
                     value: room-temperature
                     num_oid: '.1.3.6.1.4.1.9839.1.2.18.{{ $index }}'
                     descr: 'Room temperature'
+                    index: "room.{{ $index }}"
                     divisor: 10
 
         humidity:

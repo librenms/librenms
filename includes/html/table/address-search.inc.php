@@ -82,7 +82,7 @@ if ($rowCount != -1) {
 $sql = "SELECT *,`I`.`ifDescr` AS `interface` $sql";
 
 foreach (dbFetchRows($sql, $param) as $interface) {
-    $speed = \LibreNMS\Util\Number::formatSi($interface['ifSpeed'], 2, 3, 'bps');
+    $speed = \LibreNMS\Util\Number::formatSi($interface['ifSpeed'], 2, 0, 'bps');
     $type = \LibreNMS\Util\Rewrite::normalizeIfType($interface['ifType']);
 
     if ($vars['search_type'] == 'ipv6') {

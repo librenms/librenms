@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UserController.php
  *
@@ -36,6 +37,7 @@ use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -57,7 +59,7 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::with('preferences')->orderBy('username')->get(),
+            'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
         ]);
     }
@@ -99,7 +101,7 @@ class UserController extends Controller
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
-        $user->setRoles($request->get('roles', []));
+        $user->syncRoles($request->get('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
         $this->updateTimezone($user, $request->get('timezone'));
@@ -186,8 +188,8 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->has('roles')) {
-            $user->setRoles($request->get('roles', []));
+        if ($request->user()->can('manage', Role::class)) {
+            $user->syncRoles($request->get('roles', []));
         }
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {

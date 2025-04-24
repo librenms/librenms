@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PluginMenuEntry.php
  *
@@ -29,7 +30,7 @@ use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
-abstract class MenuEntryHook
+abstract class MenuEntryHook implements \LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook
 {
     public string $view = 'resources.views.menu';
 

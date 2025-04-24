@@ -1,4 +1,5 @@
 <?php
+
 /**
  * delete-cluster-poller.inc.php
  *

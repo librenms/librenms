@@ -1,0 +1,1969 @@
+TN-LAG-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Unsigned32, Integer32, Gauge32
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, RowStatus, TruthValue,
+    TimeStamp
+        FROM SNMPv2-TC
+
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+
+    tnSRMIBModules, tnSRObjs, tnSRNotifyPrefix
+        FROM TROPIC-GLOBAL-REG
+    tnPortPortID
+        FROM TN-PORT-MIB
+    TNamedItemOrEmpty, TItemLongDescription, TmnxPortID
+        FROM TN-TC-MIB
+    dot3adAggPortEntry
+        FROM IEEE8023-LAG-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    tnSysSwitchId FROM TROPIC-SYSTEM-MIB;
+
+tnLagMIBModule   MODULE-IDENTITY
+        LAST-UPDATED    "202302030000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision
+         the IEEE 802.3ad Link Aggregation Group operation on Nokia
+         7x50 systems.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive
+         license to use and distribute an unmodified copy of this
+         Specification in connection with management of Nokia
+         products, and without fee, provided this copyright notice and
+         license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "202302030000Z"
+        DESCRIPTION     "Added the following to tnLagOperationTable:
+                         tnLagLACPOperVersionNumber."
+
+        REVISION        "202212230000Z"
+        DESCRIPTION     "1) Added the following TEXTUAL-CONVENTION:
+                            LagPsfdMappingConnProfId.
+                         2) Added the following to tnLagPsfdMappingLinkIdListBasedInfoTable:
+                            tnLagPsfdMappingConnProfId.
+                         3) Modified DESCRIPTION for the following:
+                            tnLagPsfdMappingLinkIdListBasedInfoTable
+                            LagPsfdMappingVlanRanges."
+
+        REVISION        "202207080000Z"
+        DESCRIPTION     "1) Added the following TEXTUAL-CONVENTION:
+                            LagPsfdMappingLinkId.
+                         2) Modified DESCRIPTION for the following table:
+                            tnLagPsfdMappingConfigTable.
+                         3) Marked the following tables as obsolete:
+                            tnLagPsfdMappingVlanRangeIndexTable
+                            tnLagPsfdMappingPortIndexTable
+                            tnLagPsfdMappingLinkIndexTable.
+                         4) Added the following tables:
+                            tnLagPsfdMappingLinkIdListBasedInfoTable
+                            tnLagPsfdMappingPortIdBasedInfoTable
+                            tnLagPsfdMappingLinkIdBasedInfoTable
+                            tnLagPsfdMappingVlanIdBasedInfoTable."
+
+        REVISION        "202201140000Z"
+        DESCRIPTION     "Added the following to tnLagConfigTable:
+                         tnLagLACPVersionNumber."
+
+        REVISION        "202112170000Z"
+        DESCRIPTION     "1) Added the following TEXTUAL-CONVENTION:
+                            LagFDMode
+                            LagPsfdMappingVlanRanges
+                            LagPsfdMappingLinkIdList
+                            LagPsfdMappingPortIdList.
+                         2) Added the following to tnLagConfigTable:
+                            tnLagFDMode.
+                         3) Added the following to tnLagPortTable:
+                            tnLagPortLinkId.
+                         4) Added the following tables:
+                            tnLagPsfdMappingConfigTable
+                            tnLagPsfdMappingVlanRangeIndexTable
+                            tnLagPsfdMappingPortIndexTable
+                            tnLagPsfdMappingLinkIndexTable."
+
+        REVISION        "202002140000Z"
+        DESCRIPTION     "Changed SYNTAX of the following from Integer32 (0..7)
+                         to Integer32 (0..23):
+                         tnLagPortThreshold."
+
+        REVISION        "201909130000Z"
+        DESCRIPTION     "Added the following to tnLagConfigTable:
+                         tnLagAlmProfName."
+
+        REVISION        "201903010000Z"
+        DESCRIPTION     "Changed range of LAGInterfaceNumber from
+                         INTEGER (1..127)
+                         to
+                         INTEGER (1..240)."
+
+        REVISION        "201411250000Z"
+        DESCRIPTION     "Added tnSysSwitchId to the index list of tnLagMemberTable."
+
+        REVISION        "201212130000Z"
+        DESCRIPTION     "Added the following to tnLagCommandTable:
+                         tnLagCommandAllMc
+                         tnLagCommandMcPeerIpType
+                         tnLagCommandMcPeerIpAddr."
+
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "201204270000Z"
+        DESCRIPTION     "Changed range of LAGInterfaceNumber from
+                         INTEGER (1..200)
+                         to
+                         INTEGER (1..127)."
+
+        REVISION        "201202210000Z"
+        DESCRIPTION     "Added tnLagConfigXTable."
+
+        REVISION        "200902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200807010000Z"
+        DESCRIPTION     "Rev 6.1                01 Jul 2008 00:00
+                         6.1 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200603150000Z"
+        DESCRIPTION     "Rev 4.0                15 Mar 2006 00:00
+                         4.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200508310000Z"
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                        1.0 Release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200102090000Z"
+        DESCRIPTION     "Rev 0.1                09 Feb 2001 00:00
+                        Initial version of the TIMETRA-LAG-MIB."
+
+        ::= { tnSRMIBModules 15 }
+
+tnLagObjects                 OBJECT IDENTIFIER ::= { tnSRObjs 15 }
+tnLagNotifyPrefix      OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 15 }
+    tnLagNotifications    OBJECT IDENTIFIER ::= { tnLagNotifyPrefix 0 }
+-- tmnxLagConformance          OBJECT IDENTIFIER ::= { tnSRConfs 15 }
+
+-- tnLagNotificationObjects     OBJECT IDENTIFIER ::= { tnLagObjects 4 }
+
+--
+-- textual conventions
+--
+LAGInterfaceNumber ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The unique number identifying a LAG interface.
+
+                  There are maximum 64 LAG interfaces, when the value of
+                  TIMETRA-CHASSIS-MIB::tmnxChassisType is '5' (ESS-1/SR-1)."
+    SYNTAX       Integer32 (1..240)
+
+LAGSubgroup ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This type specifies a LAG subgroup.
+                  The value -2 denotes 'auto-iom', whereby the  subgroup
+                  is defined based on the IOM (i.e. all ports
+                  of the same IOM are assigned to the same subgroup).
+                  The value -1 denotes 'auto-mda', whereby the subgroup is
+                  defined based on the MDA."
+    SYNTAX       Integer32 (-2|-1|1..8)
+
+LagFDMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "LagFDMode data type is an enumerated integer that
+                  describes the values used to identify the lag Frame Distribution
+                  mode."
+    SYNTAX       INTEGER {
+                   hardwareHashing(0),
+                   psfd(1)
+                 }
+
+LagPsfdMappingConnProfId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A number used to identify a connection profile in lag PSFD mapping where
+         a vlan range belongs to the connection profile. The value 0 is used to
+         identify for a vlan range not belonging to any connection profile."
+    SYNTAX      Unsigned32 (0|1..1000)
+
+LagPsfdMappingVlanRanges ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "LagPsfdMappingVlanRanges is a string that represents a list of vlan ranges
+         for a lag PSFD mapping configuration.
+
+         Each vlan range is either a single vlan id or a vlan range specified as
+         two vlan ids separated by '-'."
+    SYNTAX      DisplayString (SIZE(0..512))
+
+LagPsfdMappingPortIdList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Each group of 4 octets in this string specifies
+                     a 32-bit Port ID. The Port IDs are stored in
+                     network byte order; i.e. octet N corresponds
+                     to the most significant 8 bits of the Port ID,
+                     and octet N+3 correspond to the least significant
+                     8 bits. The list is terminated by the null Port ID.
+                     The Port IDs in this list are not required to be sorted
+                     in any specific order. The list is large enough to hold
+                     up to 16 Port IDs (the maximum number of Lag member ports)
+                     plus the null terminator."
+    SYNTAX          OCTET STRING (SIZE (0..68))
+
+LagPsfdMappingLinkIdList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "Each group of 2 octets in this string specifies
+                     a 16-bit link ID. The link IDs are stored in
+                     network byte order; i.e. octet N corresponds
+                     to the most significant 8 bits of the link ID,
+                     and octet N+1 correspond to the least significant
+                     8 bits. The list is terminated by the null link ID (0x0000).
+                     The link IDs in this list are not required to be sorted
+                     in any specific order. The list is large enough to hold
+                     up to 16 link IDs (the maximum number of Lag member ports)
+                     plus the null terminator."
+    SYNTAX          OCTET STRING (SIZE (0..34))
+
+LagPsfdMappingLinkId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "The linkId is only applicable when Lag PSFD is configured.
+                     It associates a Lag member port to a physical link. This
+                     parameter is only applicable to a LAG in packetswitch.  0
+                     represents an invalid linkId."
+    SYNTAX          Integer32 (0..65535)
+
+--
+-- mib objects
+--
+
+tnLagConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Configuration information about each Link Aggregation Group."
+    ::= { tnLagObjects 2 }
+
+tnLagConfigEntry OBJECT-TYPE
+    SYNTAX     TnLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the tnLagConfigTable.
+        Each entry represents a Link Aggregation Group.
+        Create or destroy rows to add or remove Link Aggregation Groups (LAG).
+
+        After tnLagRowStatus is set to active(1), a corresponding
+        entry is created in IEEE8023-LAG-MIB dot3adAggTable.
+
+        The corresponding entry in IEEE8023-LAG-MIB dot3adAggTable is
+        removed when tnLagRowStatus is set to destroy(6).
+
+        Use ifAdminStatus to set interface up and down for this LAG entry.
+
+        Use ifAlias for the interface description.
+        "
+    INDEX      { tnSysSwitchId, tnLagIndex }
+    ::= { tnLagConfigTable 1 }
+
+TnLagConfigEntry ::= SEQUENCE {
+    tnLagIndex                     LAGInterfaceNumber,
+    tnLagRowStatus                 RowStatus,
+    tnLagPortThreshold             Integer32,
+    tnLagPortThresholdAction       INTEGER,
+    tnLagEnableMarkerGenerator     TruthValue,
+    tnLagEnableLACP                TruthValue,
+    tnLagDescription               TItemLongDescription,
+    tnLagDynamicCosting            TruthValue,
+    tnLagLACPMode                  INTEGER,
+    tnLagLACPAdminKeyAutogen       TruthValue,
+    tnLagLACPTransmitInterval      INTEGER,
+    tnLagAccessAdaptQos            INTEGER,
+    tnLagLACPXmitStdby             TruthValue,
+    tnLagLACPSelCrit               INTEGER,
+    tnLagLACPSelCritSlaveToPartner TruthValue,
+    tnLagLACPNbrOfSubGroups        Unsigned32,
+    tnLagholdTimeDown              Unsigned32,
+    tnLagPortType                  INTEGER,
+    tnLagPerFpIngQueuing           TruthValue,
+    tnLagAlmProfName               OCTET STRING,
+    tnLagFDMode                    LagFDMode,
+    tnLagLACPVersionNumber         INTEGER
+}
+
+tnLagIndex OBJECT-TYPE
+    SYNTAX       LAGInterfaceNumber
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "the number of the Link Aggregation Group."
+    ::= { tnLagConfigEntry 1 }
+
+tnLagRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "RowStatus for this entry."
+    ::= { tnLagConfigEntry 2 }
+
+tnLagPortThreshold OBJECT-TYPE
+    SYNTAX       Integer32 (0..23)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnLagPortThreshold is a threshold for tnLagPortThresholdAction.
+
+        When a physical port link state changes and the number of
+        operational physical ports is less than or equal to
+        tnLagPortThreshold, tnLagPortThresholdAction is invoked:
+        either the LAG is set operationally down, or
+        the protocols operating on the LAG interface are adjusted.
+
+        When the number of operational physical ports becomes greater
+        than tnLagPortThreshold, tnLagPortThresholdAction is revoked:
+        either the LAG is set operationally up, or the protocols
+        operating on the LAG interface are adjusted.
+
+        The value zero means tnLagPortThresholdAction is never invoked.
+
+        To invoke dynamicCost at every physical port state change,
+        set tnLagPortThreshold to the total number of physical ports
+        configured to be in the Link Aggregation Group.
+        "
+    DEFVAL { 0 }
+    ::= { tnLagConfigEntry 3 }
+
+tnLagPortThresholdAction OBJECT-TYPE
+    SYNTAX       INTEGER {
+                   down(1),
+                   dynamicCost(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Port Threshold Action is action to take when the number of
+         operational (link up) physical ports is less than tnLagPortThreshold.
+
+         When a physical port ifOperStatus changes and the number of
+         operational physical ports is less than or equal to tnLagPortThreshold:
+
+         - when set to down(1), the ifOperStatus for the Link Aggregation Group
+         (tnLagIfIndex) goes to down(2).
+
+         - when set to dynamicCost(2), the ifOperStatus stays up(2), but
+         dependent protocols such as OSPF are signaled and will adjust their
+         operation (cost) to match the number of physical ports remaining
+         in the Link Aggregation Group.  a tnLagDynamicCostOn notification
+         is generated.
+
+
+         When a physical port ifOperStatus changes and the number of
+         operational physical ports is greater than tnLagPortThreshold:
+
+         - when set to down(1), the ifOperStatus for the Link Aggregation Group
+         (tnLagIfIndex) goes to up(1).
+
+         - when set to dynamicCost(2), the ifOperStatus stays up(2), but
+         dependent protocols such as OSPF are signaled and will adjust their
+         operation (cost) to be the value as configured.    a tnLagDynamicCostOff
+         notification is generated.
+
+
+         Regardless of the setting of this object, when the number of
+         operational physical ports goes to zero, the Link Aggregation Group's
+         ifOperStatus goes to down.
+         "
+--    REFERENCE
+--        ""
+    DEFVAL { down }
+    ::= { tnLagConfigEntry 4 }
+
+tnLagEnableMarkerGenerator OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "enables (true(1)) or disables (false(2)) the Marker Generator
+        protocol."
+    REFERENCE
+        "IEEE 802.3ad 43.5"
+    DEFVAL { false }
+    ::= { tnLagConfigEntry 5 }
+
+tnLagEnableLACP OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "enables (true(1)) or disables (false(2)) the Link Aggregation Control
+        Protocol (LACP)."
+    REFERENCE
+        "IEEE 802.3ad 43.4"
+    DEFVAL { false }
+    ::= { tnLagConfigEntry 6 }
+
+tnLagDescription OBJECT-TYPE
+    SYNTAX      TItemLongDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "discription text for the Link Aggregation Group port."
+    DEFVAL { ''H }
+    ::= { tnLagConfigEntry 7 }
+
+tnLagDynamicCosting OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When dynamic cost and OSPF autocost are both configured then costing
+        is applied based on the total number of links configured and the cost
+        is advertised inversely proportional to the number of links
+        available at the time, providing the number of links that are up
+        exceeds the configured LAG threshold value at which time the
+        configured threshold action determines if and at what cost this
+        LAG will be advertised."
+    DEFVAL { false }
+    ::= { tnLagConfigEntry 8 }
+
+tnLagLACPMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  passive(1),
+                  active(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnLagLACPMode represents the mode in which LACP will operate.
+         If the value is set to 'passive', LACP places all member ports of a
+         lag into a passive negotiating state. When this is the case member
+         ports of the lag respond to LACP packets they receive but do not
+         initiate LACP packet negotiation.
+         If the value is set to 'active', LACP places all member ports of a lag
+         in to an active negotiation state. When this occurs the port will
+         initiate LACP negotiation immediately once the port achieves link up
+         state. At least one of the peer lag ports must be configured as
+         active to initiate LACP.
+         The default mode is passive."
+    DEFVAL      { passive }
+    ::= { tnLagConfigEntry 9 }
+
+tnLagLACPAdminKeyAutogen OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnLagLACPAdminKeyAutogen is set to 'true' if the lag administrative key
+         in the dot3adAggActorAdminKey object was auto generated.
+         tnLagLACPAdminKeyAutogen is set to 'false', if the lag administrative
+         key was manually configured."
+    DEFVAL { true }
+    ::= { tnLagConfigEntry 10 }
+
+tnLagLACPTransmitInterval OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  slow (1),
+                  fast (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnLagLACPTransmitInterval configures the timer interval for
+         periodic transmission of LACP packets. If set to 'slow', LACP packets
+         are transmitted every 30 seconds. If set to 'fast', LACP packets
+         are transmitted every second."
+    DEFVAL { fast }
+    ::= { tnLagConfigEntry 11 }
+
+tnLagAccessAdaptQos OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  link       (1),
+                  distribute (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagAccessAdaptQos specifies how the LAG SAP queue and
+         virtual scheduler buffering and rate parameters are adapted over
+         multiple active MDAs.
+         link           (1) - The LAG will create the SAP queues and virtual
+                              schedulers with the actual parameters on each MDA.
+         distribute     (2) - Each MDA will receive a fraction of the SAP and
+                              scheduler parameters."
+    DEFVAL { distribute }
+    ::= { tnLagConfigEntry 12 }
+
+tnLagLACPXmitStdby OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagLACPXmitStdby specifies whether or not LACP messages
+         are transmitted on standby-links."
+    DEFVAL { true }
+    ::= { tnLagConfigEntry 13 }
+
+tnLagLACPSelCrit OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  highest-count  (1),
+                  highest-weight (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagLACPSelCrit specifies which selection criteria
+         should be used to select the active sub-group."
+    DEFVAL { highest-count }
+    ::= { tnLagConfigEntry 14 }
+
+tnLagLACPSelCritSlaveToPartner OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagLACPSelCritSlaveToPartner specifies together with
+         tnLagLACPSelCrit  selection criteria  should be used to select the
+         active sub-group.
+         The term 'eligible member' refers to a lag-member link which can
+         potentially become active. This means it is oper up, and not disabled
+         for use by the remote side. The object tnLagLACPSelCritSlaveToPartner
+         can be used to control whether ornot this latter condition is taken
+         into account."
+    DEFVAL { false }
+    ::= { tnLagConfigEntry 15 }
+
+tnLagLACPNbrOfSubGroups OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagLACPNbrOfSubGroups indicates the number of subgroups
+         configured in this LAG."
+    ::= { tnLagConfigEntry 16 }
+
+tnLagholdTimeDown OBJECT-TYPE
+    SYNTAX      Unsigned32(0..2000)
+    UNITS       "100s of milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagholdTimeDown specifies the timer in  0.1 second
+         units which controls the delay between detecting that a LAG is down
+         (all active ports are down) and reporting it to the higher levels.
+         The default value for this timer is 0, i.e. the higher levels are
+         informed directly.
+         A non zero value may be configured e.g. when active/standby
+         signalling is used in a 1:1 fashion to avoid that the higher levels
+         are informed during the small time interval between detecting that
+         the LAG is down and the time needed to activate the standby system."
+    DEFVAL { 0 }
+    ::= { tnLagConfigEntry 17 }
+
+tnLagPortType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  standard (1),
+                  hsmda (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagPortType specifies the type of ports allowed in
+         this LAG.
+
+         A value of 'standard (1)' allows all non-HSMDA type ports to be added
+         to this LAG.  A value of 'hsmda (2)' limits the LAG members to be HSMDA
+         ports only."
+    DEFVAL { standard }
+    ::= { tnLagConfigEntry 18 }
+
+tnLagPerFpIngQueuing OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagPerFpIngQueuing specifies whether a more efficient
+         method of queue allocation for LAG SAPs should be utilized.
+
+         An 'inconsistentValue' error is returned if this object is set to
+         a different value when there are existing port members in the LAG."
+    DEFVAL { false }
+    ::= { tnLagConfigEntry 19 }
+
+tnLagAlmProfName OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1..40))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "."
+    ::= { tnLagConfigEntry 20 }
+
+tnLagFDMode OBJECT-TYPE
+    SYNTAX         LagFDMode
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The value of tnLagFDMode specifies the
+                    lag Frame Distribution selection mode."
+    DEFVAL { hardwareHashing }
+    ::= { tnLagConfigEntry 21 }
+
+tnLagLACPVersionNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  v1(1),
+                  v2(2)
+                }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The value of tnLagLACPVersionNumber specifies the
+                    LACP version number."
+    DEFVAL { v1 }
+    ::= { tnLagConfigEntry 22 }
+
+--
+-- tnLagOperationTable
+--
+
+tnLagOperationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagOperationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Operational information about each Link Aggregation Group."
+    ::= { tnLagObjects 3 }
+
+tnLagOperationEntry OBJECT-TYPE
+    SYNTAX     TnLagOperationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the tnLagOperationTable.
+         Each entry represents an active Link Aggregation Group.
+        "
+    AUGMENTS       { tnLagConfigEntry }
+    ::= { tnLagOperationTable 1 }
+
+TnLagOperationEntry ::= SEQUENCE {
+    tnLagIfIndex                  InterfaceIndexOrZero,
+    tnLagConfigLastChange         TimeStamp,
+    tnLagPortThresholdFalling     Counter32,
+    tnLagPortThresholdRising      Counter32,
+--    tnLagLACPPrimaryPort          TmnxPortID,
+--    tnLagPortReasonDownFlags      BITS
+    tnLagLACPOperVersionNumber    INTEGER
+}
+
+tnLagIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "ifIndex for the Link Aggregation Group.
+        This value is zero when tnLagRowStatus is not active(1).
+        "
+    REFERENCE
+        "."
+    ::= { tnLagOperationEntry 1 }
+
+tnLagConfigLastChange OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "last change timestamp records when any object in tnLagConfigTable was set."
+    ::= { tnLagOperationEntry 2 }
+
+tnLagPortThresholdFalling OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "counts the number of linkDown or dynamicCost events for the
+        Link Aggregation Group caused by the number of physical ports being
+        less than or equal to tnLagPortThreshold value."
+    ::= { tnLagOperationEntry 3 }
+
+tnLagPortThresholdRising OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "counts the number of linkUp or dynamicCost events for the
+        Link Aggregation Group caused by the number of physical ports
+        being greater than tnLagPortThreshold value."
+    ::= { tnLagOperationEntry 4 }
+
+-- tnLagLACPPrimaryPort OBJECT-TYPE
+--     SYNTAX       TmnxPortID
+--     MAX-ACCESS   read-only
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "tnLagLACPPrimaryPort contains the primary port of the LACP.
+--          The following two conditions have to be met for the port
+--          to become eligible for becoming the primary port:
+--          a) Port has to be in either link up or oper up.
+--          b) The port must have received at least one LACP PDU.
+--
+--          Once the above two conditions have been met, port with a highest
+--          priority is chosen as the primary port.
+--          If there is a tie, the smallest TmnxPortID will be the primary port."
+--     ::= { tnLagOperationEntry 5 }
+--
+-- tnLagPortReasonDownFlags OBJECT-TYPE
+--     SYNTAX      BITS {
+--                    unknown     (0),
+--                    linklossFwd (1)
+--                 }
+--     MAX-ACCESS  read-only
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The tnLagPortReasonDownFlags indicates why a lag port may be in the
+--          operationally 'down' state. The following reasons are detected
+--          through this object:
+--                 unknown(0)     - Unspecified (or unknown)
+--                 linklossFwd(1) - A sap using this port has the object
+--                                  'sapEthernetLLFOperStatus' set to 'fault'"
+--     ::= { tnLagOperationEntry 6 }
+
+tnLagLACPOperVersionNumber OBJECT-TYPE
+    SYNTAX       INTEGER {
+                   unknown (0),
+                   v1      (1),
+                   v2      (2)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagLACPOperVersionNumber specifies the
+         operational LACP version number of LAG."
+    DEFVAL { unknown }
+    ::= { tnLagOperationEntry 7 }
+
+--
+-- Dummy Scalar
+--
+tnLagScalar1 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A dummy scalar that satisfies a SNMP get request
+                     quickly when there is no 11QPE24 card provisioned.
+                     Otherwise, it has to traverse the remaining 11QPE24
+                     MIB to get to the next applicable item."
+    ::= { tnLagObjects 4 }
+
+--
+-- tnLagMemberTable
+--
+
+tnLagMemberTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tnLagMemberTable has an entry for each Port that is part
+         of a LAG."
+    ::= { tnLagObjects 5 }
+
+tnLagMemberEntry OBJECT-TYPE
+    SYNTAX     TnLagMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each row entry represents a particular port in a LAG. Entries are
+         automatically created when a Port is provisioned as part of a LAG,
+         i.e. when tnPortLagId from TIMETRA-PORT-MIB.mib is changed from
+         its default value of '0'."
+    INDEX { tnSysSwitchId, tnLagIndex, tnPortPortID }
+    ::= { tnLagMemberTable 1 }
+
+TnLagMemberEntry ::= SEQUENCE {
+    tnLagMemberPortName                  TNamedItemOrEmpty,
+    tnLagMemberPortIsPrimary             TruthValue
+}
+
+tnLagMemberPortName OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagMemberPortName indicates the name of the port
+         that is a member of the LAG used to index into tnLagMemberTable.
+         This is a read-only object that is the same as tnPortName from
+         TIMETRA-PORT-MIB.mib."
+    ::= { tnLagMemberEntry 1 }
+
+tnLagMemberPortIsPrimary OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnLagMemberPortIsPrimary indicates whether the port used to
+         index into tnLagMemberTable is the primary port of the LAG
+         used to index into tnLagMemberTable."
+    ::= { tnLagMemberEntry 2 }
+
+--
+-- tnLagPortTable
+--
+
+tnLagPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tnLagPortTable extends the IEEE8023-LAG-MIB::dot3adAggPortTable
+         with 7x50 specific features."
+    ::= { tnLagObjects 6 }
+
+tnLagPortEntry OBJECT-TYPE
+    SYNTAX     TnLagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Link Aggregation Control configuration
+         parameters for each Aggregation Port on this device.
+         The tnLagPortTable extends the IEEE8023-LAG-MIB::dot3adAggPortTable
+         with 7x50 specific features."
+    AUGMENTS { dot3adAggPortEntry }
+    ::= { tnLagPortTable 1 }
+
+TnLagPortEntry ::= SEQUENCE {
+    tnLagPortSubgroup     LAGSubgroup,
+    tnLagPortActiveStdby  INTEGER,
+    tnLagPortLinkId       INTEGER
+}
+
+tnLagPortSubgroup OBJECT-TYPE
+    SYNTAX       LAGSubgroup
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagPortSubgroup specifies the subgroup to which the
+         port in this LAG is assigned."
+    DEFVAL { 1 }
+    ::= { tnLagPortEntry 1 }
+
+tnLagPortActiveStdby OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  active    (1),
+                  stand-by  (2)
+                }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagPortActiveStdby indicates active standby state of this
+         port in the LAG."
+    ::= { tnLagPortEntry 2 }
+
+tnLagPortLinkId OBJECT-TYPE
+    SYNTAX       INTEGER (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagPortLinkId specifies the Link ID to which the
+         port in this LAG is assigned."
+    DEFVAL { 0 }
+    ::= { tnLagPortEntry 3 }
+
+--
+--tnLagConfigXTable
+--
+tnLagConfigXTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagConfigXEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Extension information about each Link Aggregation Group."
+    ::= { tnLagObjects 7 }
+
+tnLagConfigXEntry OBJECT-TYPE
+    SYNTAX     TnLagConfigXEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the tnLagConfigXTable.
+         Each entry represents an active Link Aggregation Group.
+        "
+    AUGMENTS       { tnLagConfigEntry }
+    ::= { tnLagConfigXTable 1 }
+
+TnLagConfigXEntry ::= SEQUENCE {
+    tnLagConfigXIngressAvailBandwidth      Unsigned32,
+    tnLagConfigXEgressAvailBandwidth       Unsigned32,
+    tnLagConfigXMaxPortSize                Integer32,
+    tnLagConfigXNumSelectedPorts           Unsigned32,
+    tnLagConfigXNumAttachedPorts           Unsigned32,
+    tnLagConfigXPrimaryPort                InterfaceIndex,
+    tnLagAdminState                        INTEGER,
+    tnLagLPTConsequenceAction              INTEGER,
+    tnLagLosProp                           INTEGER,
+    tnLagTPID                              INTEGER,
+    tnLagMtu                               Integer32,
+    tnLagSpeed                             Gauge32
+}
+
+tnLagConfigXIngressAvailBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the remaining Ingress Bandwidth of the LAG."
+    ::= { tnLagConfigXEntry 1 }
+
+tnLagConfigXEgressAvailBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate the remaining Egress Bandwidth of the LAG."
+    ::= { tnLagConfigXEntry 2 }
+
+tnLagConfigXMaxPortSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicate the number of aggregated port.Allow to set the size of the LAG."
+    DEFVAL { 4 }
+    ::= { tnLagConfigXEntry 3 }
+
+tnLagConfigXNumSelectedPorts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "indicate the number of selected ports for the LAG."
+    ::= { tnLagConfigXEntry 4 }
+
+tnLagConfigXNumAttachedPorts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "indicate the number of attached ports for the LAG."
+    ::= { tnLagConfigXEntry 5 }
+
+tnLagConfigXPrimaryPort OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Specify the primary port for the LAG group."
+    ::= { tnLagConfigXEntry 6 }
+
+tnLagAdminState OBJECT-TYPE
+    SYNTAX  INTEGER {
+              up(1),       -- ready to pass packets
+              down(2),
+              testing(3)   -- in some test mode
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "."
+    DEFVAL { down }
+    ::= { tnLagConfigXEntry 7 }
+
+tnLagLPTConsequenceAction    OBJECT-TYPE
+    SYNTAX   INTEGER {
+               noAction(1),
+               oneShutDown(2),
+               allShutDown(3)
+             }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "Indicates the Lag LPT ConsequenceAction."
+    DEFVAL { noAction }
+    ::= { tnLagConfigXEntry 8 }
+
+tnLagLosProp OBJECT-TYPE
+    SYNTAX    INTEGER {
+                laserOn(1),
+                laserOff(2)
+              }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The LOS propagation."
+    DEFVAL { laserOn }
+    ::= { tnLagConfigXEntry 9 }
+
+tnLagTPID OBJECT-TYPE
+    SYNTAX    INTEGER {
+                qinqtpid1(1),
+                qinqtpid2(2),
+                qinqtpid3(3),
+                qinqtpid4(4)
+              }
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The TPID for the LagGroup."
+    DEFVAL { qinqtpid1 }
+    ::= { tnLagConfigXEntry 10 }
+
+tnLagMtu OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The size of the largest packet which can be sent/received
+            on the interface, specified in octets.  For interfaces that
+            are used for transmitting network datagrams, this is the
+            size of the largest network datagram that can be sent on the
+            interface."
+    DEFVAL { 9600 }
+    ::= { tnLagConfigXEntry 11 }
+
+tnLagSpeed OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "."
+    ::= { tnLagConfigXEntry 12 }
+
+--
+--tnLagPsfdMappingConfigTable
+--
+tnLagPsfdMappingConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPsfdMappingConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table allows the user to specify a Lag PSFD mapping
+         between a set of vlan ids and a link priority list of lag member ports.
+
+         The table can be created regardless what value tnLagFDMode has in order to reduce
+         service interruption time when tnLagFDMode switches from 'hardwareHashing' to 'psfd'.
+         The psfd mappings created via the table is only used when tnLagFDMode has value 'psfd'.
+         The table takes the user input and has only one entry at any time."
+    ::= { tnLagObjects 8 }
+
+tnLagPsfdMappingConfigEntry OBJECT-TYPE
+    SYNTAX     TnLagPsfdMappingConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry of tnLagPsfdMappingConfigTable."
+    INDEX      { tnSysSwitchId, tnLagIndex }
+    ::= { tnLagPsfdMappingConfigTable 1 }
+
+TnLagPsfdMappingConfigEntry ::= SEQUENCE {
+    tnLagPsfdMappingRowStatus          RowStatus,
+    tnLagPsfdMappingVlanIdRanges       LagPsfdMappingVlanRanges,
+    tnLagPsfdMappingLinkIdList         LagPsfdMappingLinkIdList
+}
+
+tnLagPsfdMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus for this entry."
+    ::= { tnLagPsfdMappingConfigEntry 1 }
+
+tnLagPsfdMappingVlanIdRanges OBJECT-TYPE
+    SYNTAX      LagPsfdMappingVlanRanges
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Vlan id ranges for a lag PSFD mapping."
+    ::= { tnLagPsfdMappingConfigEntry 2 }
+
+tnLagPsfdMappingLinkIdList OBJECT-TYPE
+    SYNTAX      LagPsfdMappingLinkIdList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Priority list of link ids of lag member ports for a lag PSFD mapping.
+         Note that the first link id in the list has the highest priority and
+         the last link id has the lowest priority."
+    ::= { tnLagPsfdMappingConfigEntry 3 }
+
+--    obsolete
+--    tnLagPsfdMappingVlanRangeIndexTable OBJECT-TYPE ::= { tnLagObjects 9 }
+--    tnLagPsfdMappingPortIndexTable      OBJECT-TYPE ::= { tnLagObjects 10 }
+--    tnLagPsfdMappingLinkIndexTable      OBJECT-TYPE ::= { tnLagObjects 11 }
+
+--
+--tnLagPsfdMappingLinkIdListBasedInfoTable
+--
+tnLagPsfdMappingLinkIdListBasedInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPsfdMappingLinkIdListBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is a read only table that stores lag's PSFD mappings sorted by link id priority list of lag member ports.
+         User can display all PSFD mappings for the lag, such as:
+
+         Link Priority List   Port Priority List             Vlans
+         ----------------------------------------------------------------------------
+         1                    1/3/1                          4, 5, 6
+         1, 4                 1/3/1, 1/4/1                   cp-3
+         4, 1                 1/4/1, 1/3/1                   0, 30
+
+         where cp-3 (connection profile id 3) has vlan ranges: 10-15 20
+
+         Note that the table contains following entries for the example above:
+
+         xxLinkIdListIndex  xxLowVlanIndex  xxHighVlanIndex  xxPortIdList     xxConnProfId
+         ------------------------------------------------------------------------------
+         1                  4               4                1/3/1            0
+         1                  5               5                1/3/1            0
+         1                  6               6                1/3/1            0
+         1, 4               10              15               1/3/1, 1/4/1     3
+         1, 4               20              20               1/3/1, 1/4/1     3
+         4, 1               0               0                1/4/1, 1/3/1     0
+        "
+    ::= { tnLagObjects 12 }
+
+tnLagPsfdMappingLinkIdListBasedInfoEntry OBJECT-TYPE
+    SYNTAX     TnLagPsfdMappingLinkIdListBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents a PSFD mapping between a vlan range or single vlan and a link id priority list"
+    INDEX    {
+               tnSysSwitchId,
+               tnLagIndex,
+               tnLagPsfdMappingLinkIdListIndex,
+               tnLagPsfdMappingLowVlanIndex,
+               tnLagPsfdMappingHighVlanIndex
+             }
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoTable 1 }
+
+TnLagPsfdMappingLinkIdListBasedInfoEntry ::= SEQUENCE {
+    tnLagPsfdMappingLinkIdListIndex                  LagPsfdMappingLinkIdList,
+    tnLagPsfdMappingLowVlanIndex                     Integer32,
+    tnLagPsfdMappingHighVlanIndex                    Integer32,
+    tnLagPsfdMappingLinkIdListBasedInfoPortIdList    LagPsfdMappingPortIdList,
+    tnLagPsfdMappingConnProfId                       LagPsfdMappingConnProfId
+}
+
+tnLagPsfdMappingLinkIdListIndex OBJECT-TYPE
+    SYNTAX      LagPsfdMappingLinkIdList
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A lag PSFD link id priority list, used as MIB index"
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoEntry 1 }
+
+tnLagPsfdMappingLowVlanIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used as MIB index, low vlan of a vlan range or single vlan with PSFD mapping to
+         the link id priority list (ie tnLagPsfdMappingLinkIdListIndex).
+         For the single vlan case, low vlan and high vlan have the same value"
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoEntry 2 }
+
+tnLagPsfdMappingHighVlanIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used as MIB index, high vlan of a vlan range or single vlan with PSFD mapping to
+        the link id priority list (ie tnLagPsfdMappingLinkIdListIndex).
+        For the single vlan case, low vlan and high vlan have the same value"
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoEntry 3 }
+
+tnLagPsfdMappingLinkIdListBasedInfoPortIdList OBJECT-TYPE
+    SYNTAX      LagPsfdMappingPortIdList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port id priority list for the link id priority list (ie tnLagPsfdMappingLinkIdListIndex)"
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoEntry 4 }
+
+tnLagPsfdMappingConnProfId OBJECT-TYPE
+    SYNTAX      LagPsfdMappingConnProfId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Id of the connection profile to which the vlan range in an entry of this mib table belongs.
+         Note that connection profile id 0 is used for vlan range that don't belong to any connection profile."
+    ::= { tnLagPsfdMappingLinkIdListBasedInfoEntry 5 }
+
+--
+--tnLagPsfdMappingPortIdBasedInfoTable
+--
+tnLagPsfdMappingPortIdBasedInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPsfdMappingPortIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is a read only table that stores lag's PSFD mappings sorted by port ids of lag member ports.
+         The table allows the user to display PSFD mappings based on port id. For example:
+
+         Port-id   Link-id   VLANs
+         ---------------------------------------------
+         1/3/1     1         4, 5, 6, 10-15, 20, 0, 30
+
+         Note that the table contains following entries for the example above:
+
+         tnPortPortID  xxLinkIdListIndex  xxLowVlanIndex  xxHighVlanIndex  xxLinkId
+         --------------------------------------------------------------------------
+         1/3/1         1                  4               4                1
+         1/3/1         1                  5               5                1
+         1/3/1         1                  6               6                1
+         1/3/1         1, 4               10              15               1
+         1/3/1         1, 4               20              20               1
+         1/3/1         4, 1               0               0                1
+         1/3/1         4, 1               30              30               1
+        "
+    ::= { tnLagObjects 13 }
+
+tnLagPsfdMappingPortIdBasedInfoEntry OBJECT-TYPE
+    SYNTAX     TnLagPsfdMappingPortIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents all PSFD mappings involving the lag member port indexed by port id (ie tnPortPortID)"
+    INDEX    {
+               tnSysSwitchId,
+               tnLagIndex,
+               tnPortPortID,
+               tnLagPsfdMappingLinkIdListIndex,
+               tnLagPsfdMappingLowVlanIndex,
+               tnLagPsfdMappingHighVlanIndex
+             }
+    ::= { tnLagPsfdMappingPortIdBasedInfoTable 1 }
+
+TnLagPsfdMappingPortIdBasedInfoEntry ::= SEQUENCE {
+    tnLagPsfdMappingPortIdBasedInfoLinkId         LagPsfdMappingLinkId
+}
+
+tnLagPsfdMappingPortIdBasedInfoLinkId OBJECT-TYPE
+    SYNTAX      LagPsfdMappingLinkId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link id for the lag member port (ie tnPortPortID)"
+    ::= { tnLagPsfdMappingPortIdBasedInfoEntry 1 }
+
+--
+--tnLagPsfdMappingLinkIdBasedInfoTable
+--
+tnLagPsfdMappingLinkIdBasedInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPsfdMappingLinkIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is a read only table that stores lag's PSFD mappings sorted by link id of lag member ports.
+         The table allows the user to display PSFD mappings based on link id. For example:
+
+         Link-id  Port-id   VLANs
+         ----------------------------------------------------------------------------
+         1        1/3/1     4, 5, 6, 10-15, 20, 0, 30
+
+         Note that the table contains following entries for the example above:
+
+         xxLinkIdIndex  xxLinkIdListIndex  xxLowVlanIndex  xxHighVlanIndex  xxPortId
+         ---------------------------------------------------------------------------
+         1              1                  4               4                1/3/1
+         1              1                  5               5                1/3/1
+         1              1                  6               6                1/3/1
+         1              1, 4               10              15               1/3/1
+         1              1, 4               20              20               1/3/1
+         1              4, 1               0               0                1/3/1
+         1              4, 1               30              30               1/3/1
+        "
+    ::= { tnLagObjects 14 }
+
+tnLagPsfdMappingLinkIdBasedInfoEntry OBJECT-TYPE
+    SYNTAX     TnLagPsfdMappingLinkIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents all PSFD mappings involving the lag member port indexed by link id (ie tnLagPsfdMappingLinkIdIndex)"
+    INDEX    {
+               tnSysSwitchId,
+               tnLagIndex,
+               tnLagPsfdMappingLinkIdIndex,
+               tnLagPsfdMappingLinkIdListIndex,
+               tnLagPsfdMappingLowVlanIndex,
+               tnLagPsfdMappingHighVlanIndex
+             }
+    ::= { tnLagPsfdMappingLinkIdBasedInfoTable 1 }
+
+TnLagPsfdMappingLinkIdBasedInfoEntry ::= SEQUENCE {
+    tnLagPsfdMappingLinkIdIndex                   LagPsfdMappingLinkId,
+    tnLagPsfdMappingLinkIdBasedInfoPortId         TmnxPortID
+}
+
+tnLagPsfdMappingLinkIdIndex OBJECT-TYPE
+    SYNTAX      LagPsfdMappingLinkId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Link Id of a lag member port, used as MIB index"
+    ::= { tnLagPsfdMappingLinkIdBasedInfoEntry 1 }
+
+tnLagPsfdMappingLinkIdBasedInfoPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Id for lag member port whose link id is tnLagPsfdMappingLinkIdIndex"
+    ::= { tnLagPsfdMappingLinkIdBasedInfoEntry 2 }
+
+--
+--tnLagPsfdMappingVlanIdBasedInfoTable
+--
+tnLagPsfdMappingVlanIdBasedInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagPsfdMappingVlanIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This is a read only table that stores lag's PSFD mappings sorted by vlan id.
+         The table allows the user to display PSFD mappings based on vlan id. For example:
+
+         Vlan    VlanRange    Link Priority List    Port Priority List
+         -------------------------------------------------------------
+         4       4            1                     1/3/1
+         10      10-15        1, 4                  1/3/1, 1/4/1
+         12      10-12        1, 4                  1/3/1, 1/4/1
+
+         Note that the table contains following entries for the example above:
+
+         xxVlanIndex  xxLinkIdList  xxPortIdList   xxLowVlan  xxHighVlan
+         --------------------------------------------------------------
+         4            1             1/3/1          4          4
+         10           1, 4          1/3/1, 1/4/1   10         15
+         12           1, 4          1/3/1, 1/4/1   10         15
+        "
+    ::= { tnLagObjects 15 }
+
+tnLagPsfdMappingVlanIdBasedInfoEntry OBJECT-TYPE
+    SYNTAX     TnLagPsfdMappingVlanIdBasedInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents the PSFD mapping involving the vlan id (ie tnLagPsfdMappingVlanIndex)"
+    INDEX    {
+               tnSysSwitchId,
+               tnLagIndex,
+               tnLagPsfdMappingVlanIndex
+             }
+    ::= { tnLagPsfdMappingVlanIdBasedInfoTable 1 }
+
+TnLagPsfdMappingVlanIdBasedInfoEntry ::= SEQUENCE {
+    tnLagPsfdMappingVlanIndex                     Integer32,
+    tnLagPsfdMappingVlanIdBasedInfoLinkIdList     LagPsfdMappingLinkIdList,
+    tnLagPsfdMappingVlanIdBasedInfoPortIdList     LagPsfdMappingPortIdList,
+    tnLagPsfdMappingVlanIdBasedInfoLowVlan        Integer32,
+    tnLagPsfdMappingVlanIdBasedInfoHighVlan       Integer32
+}
+
+tnLagPsfdMappingVlanIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "vlan id, used as MIB index"
+    ::= { tnLagPsfdMappingVlanIdBasedInfoEntry 1 }
+
+tnLagPsfdMappingVlanIdBasedInfoLinkIdList OBJECT-TYPE
+    SYNTAX      LagPsfdMappingLinkIdList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link Id list of the PSFD mapping involving the vlan id."
+    ::= { tnLagPsfdMappingVlanIdBasedInfoEntry 2 }
+
+tnLagPsfdMappingVlanIdBasedInfoPortIdList OBJECT-TYPE
+    SYNTAX      LagPsfdMappingPortIdList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port id priority list for the link id priority list of the PSFD mapping involving the vlan id."
+    ::= { tnLagPsfdMappingVlanIdBasedInfoEntry 3 }
+
+tnLagPsfdMappingVlanIdBasedInfoLowVlan OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Low vlan of a vlan range or single vlan involving the vlan id.
+         The vlan range or single vlan maps to the link id priority list
+         in lag's PSFD mapping.
+
+         For the single vlan case, low vlan and high vlan have same value"
+    ::= { tnLagPsfdMappingVlanIdBasedInfoEntry 4 }
+
+tnLagPsfdMappingVlanIdBasedInfoHighVlan OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "High vlan of a vlan range or single vlan involving the vlan id.
+         The vlan range or single vlan maps to the link id priority list
+         in lag's PSFD mapping.
+
+         For the single vlan case, low vlan and high vlan have same value"
+    ::= { tnLagPsfdMappingVlanIdBasedInfoEntry 5 }
+
+--
+-- tnLagCommandTable
+--
+
+tnLagCommandTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnLagCommandEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tnLagCommandTable consists of one-shot action commands that force
+         or clear active standby state on LAG subgroups."
+    ::= { tnLagObjects 20 }
+
+tnLagCommandEntry OBJECT-TYPE
+    SYNTAX     TnLagCommandEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tnLagCommandEntry contains the commands available to execute on an
+         existing LAG.
+         Rows in this table are created and destroyed by the system"
+    INDEX      { tnSysSwitchId, tnLagIndex, tnLagSubgroup }
+    ::= { tnLagCommandTable 1 }
+
+TnLagCommandEntry ::= SEQUENCE {
+    tnLagSubgroup            LAGSubgroup,
+    tnLagCommand             INTEGER,
+    tnLagCommandActiveStdby  INTEGER,
+    tnLagCommandAllMc        TruthValue,
+    tnLagCommandMcPeerIpType InetAddressType,
+    tnLagCommandMcPeerIpAddr InetAddress
+}
+
+tnLagSubgroup OBJECT-TYPE
+    SYNTAX       LAGSubgroup
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagSubgroup specifies the subgroup on which the
+         command is executed."
+    ::= { tnLagCommandEntry 1 }
+
+tnLagCommand OBJECT-TYPE
+    SYNTAX       INTEGER {
+                   noCmd       (0),
+                   clearForce  (1),
+                   force       (2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagCommand specifies the command."
+    DEFVAL { 1 }
+    ::= { tnLagCommandEntry 2 }
+
+tnLagCommandActiveStdby OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  active    (1),
+                  standby  (2)
+                }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagCommandActiveStdby indicates active standby state the
+         subgroup is forced to be.
+         This parameter is not required for clearForce command."
+    DEFVAL { active }
+    ::= { tnLagCommandEntry 3 }
+
+tnLagCommandAllMc OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "If tnLagCommandAllMc is 'true', all MC-LAGs are forced to switch or clear."
+    DEFVAL { false }
+    ::= { tnLagCommandEntry 4 }
+
+tnLagCommandMcPeerIpType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagCommandMcPeerIpType specifies the address type
+         of tnLagCommandMcPeerIpAddr."
+    DEFVAL { ipv4 }
+    ::= { tnLagCommandEntry 5 }
+
+tnLagCommandMcPeerIpAddr OBJECT-TYPE
+    SYNTAX       InetAddress (SIZE (0|4))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tnLagCommandMcPeerIpAddr specifies the address of
+         the MC-LAG peer that is forced to switch or clear."
+    DEFVAL { "" }
+    ::= { tnLagCommandEntry 6 }
+
+--
+-- Dummy Scalars
+--
+tnLagScalar2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A dummy scalar that satisfies a SNMP get request
+                     quickly when there is no 11QPE24 card provisioned.
+                     Otherwise, it has to traverse the remaining 11QPE24
+                     MIB to get to the next applicable item."
+    ::= { tnLagObjects 101 }
+
+tnLagScalar3 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "."
+    ::= { tnLagObjects 102 }
+
+--
+-- Notification Information
+--
+-- tnLagNotifyPortAddFailReason OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                   unknown (0),
+--                   adminkey-mismatch (1),
+--                   sysid-mismatch (2),
+--                   lacp-passive-both-ends (3),
+--                   link-down (4)
+--                 }
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS  current
+--     DESCRIPTION
+--         "tnLagNotifyPortAddFailReason is used by the tnLagPortAddFailed
+--          notification to indicate the reason why a port could not be added
+--          to a lag."
+--     ::= { tnLagNotificationObjects 1 }
+--
+-- tnLagNotifySubGroupSelected OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLagNotifySubGroupSelected is a printable character
+--          string which contains information about the result of the selection
+--          algorithm."
+--     ::= { tnLagNotificationObjects 2 }
+
+tnLagDynamicCostOn NOTIFICATION-TYPE
+    OBJECTS { tnLagPortThreshold }
+    STATUS current
+    DESCRIPTION
+        "the number of phyical ports in the Link Aggregation Group
+        is less than or equal to tnLagPortThreshold value.
+        "
+    REFERENCE
+        "."
+  ::= { tnLagNotifications 1 }
+
+tnLagDynamicCostOff NOTIFICATION-TYPE
+    OBJECTS { tnLagPortThreshold }
+    STATUS current
+    DESCRIPTION
+        "the number of phyical ports in the Link Aggregation Group
+        is greater than tnLagPortThreshold value.
+        "
+    REFERENCE
+        "."
+  ::= { tnLagNotifications 2 }
+--
+-- tnLagPortAddFailed NOTIFICATION-TYPE
+--     OBJECTS {
+--             tnLagRowStatus,
+--             tnPortLagId,
+--             tnLagNotifyPortAddFailReason
+--     }
+--     STATUS current
+--     DESCRIPTION
+--         "tnLagPortAddFailed notification is generated when a port could
+--          not be added to the lag.
+--          tnLagNotifyPortAddFailReason contains the reason for failure."
+--   ::= { tnLagNotifications 3 }
+
+-- tnLagSubGroupSelected NOTIFICATION-TYPE
+--     OBJECTS { tnLagNotifySubGroupSelected }
+--     STATUS current
+--     DESCRIPTION
+--         "The tnLagSubGroupSelected notification is sent when the selection
+--          algorithm selects a different sub-group."
+--   ::= { tnLagNotifications 4 }
+
+-- tnLagPortAddFailureCleared NOTIFICATION-TYPE
+--     OBJECTS {
+--             tnLagRowStatus,
+--             tnPortLagId,
+--             tnLagNotifyPortAddFailReason
+--     }
+--     STATUS current
+--     DESCRIPTION
+--         "tnLagPortAddFailureCleared notification is generated when
+--          the failure, reported by tnLagPortAddFailed, has been resolved."
+--   ::= { tnLagNotifications 5 }
+
+--
+-- Conformance Information
+--
+
+-- tmnxLagCompliances OBJECT IDENTIFIER ::= { tmnxLagConformance 1 }
+-- tmnxLagGroups      OBJECT IDENTIFIER ::= { tmnxLagConformance 2 }
+
+
+-- compliance statements
+
+-- tmnxLagCompliance   MODULE-COMPLIANCE
+--    ::= { tmnxLagCompliances 1 }
+
+-- tmnxLagV3v0Compliance   MODULE-COMPLIANCE
+--    ::= { tmnxLagCompliances 2 }
+
+-- tmnxLagV4v0Compliance   MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for management of extended LAG
+--             capabilities on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tmnxLagInstanceV4v0Group,
+--            tmnxLagNotifyObjsGroup,
+--            tmnxLagNotificationsGroup
+--        }
+--    ::= { tmnxLagCompliances 3 }
+
+-- tmnxLagV5v0Compliance   MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for management of extended LAG
+--             capabilities on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tmnxLagInstanceV5v0Group,
+--            tmnxLagV5v0NotifGroup
+--        }
+--    ::= { tmnxLagCompliances 4 }
+
+-- tmnxLagV6v0Compliance   MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for management of extended LAG
+--             capabilities on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tmnxLagInstanceV6v0Group,
+--            tmnxLagV6v0NotifGroup
+--        }
+--    ::= { tmnxLagCompliances 5 }
+
+-- tmnxLagV6v1Compliance   MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for management of extended LAG
+--             capabilities on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tmnxLagInstanceV6v0Group,
+--            tmnxLagV6v0NotifGroup,
+--            tmnxLagHsmdaV6v0Group
+--        }
+--    ::= { tmnxLagCompliances 6 }
+
+-- tmnxLagV7v0Compliance   MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--            "The compliance statement for management of extended LAG
+--             capabilities on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tmnxLagInstanceV7v0Group,
+--            tmnxLagV6v0NotifGroup,
+--            tmnxLagHsmdaV6v0Group,
+--            tmnxLagV7v0Group
+--        }
+--    ::= { tmnxLagCompliances 7 }
+
+-- units of conformance
+
+-- tmnxLagInstanceGroup OBJECT-GROUP
+--    ::= { tmnxLagGroups 1 }
+
+-- tmnxLagNotifyObjsGroup   OBJECT-GROUP
+--    OBJECTS {   tnLagNotifyPortAddFailReason
+--            }
+--    STATUS        obsolete
+--    DESCRIPTION
+--        "The group of objects supporting Cflowd notifications
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 2 }
+
+-- tmnxLagNotificationsGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS   {   tnLagDynamicCostOn,
+--                        tnLagDynamicCostOff,
+--                        tnLagPortAddFailed
+--                    }
+--    STATUS obsolete
+--    DESCRIPTION
+--        "the group of notifications providing for management of Link
+--        Aggregation Group operation."
+--    ::= { tmnxLagGroups 3 }
+
+-- tmnxLagInstanceV3v0Group OBJECT-GROUP
+--    ::= { tmnxLagGroups 4 }
+
+-- tmnxLagInstanceV4v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagRowStatus,
+--                tnLagPortThreshold,
+--                tnLagPortThresholdAction,
+--                tnLagEnableMarkerGenerator,
+--                tnLagEnableLACP,
+--                tnLagDescription,
+--                tnLagDynamicCosting,
+--                tnLagLACPMode,
+--                tnLagLACPAdminKeyAutogen,
+--                tnLagLACPTransmitInterval,
+--                tnLagAccessAdaptQos,
+--                tnLagLACPXmitStdby,
+--                tnLagLACPSelCrit,
+--                tnLagLACPSelCritSlaveToPartner,
+--                tnLagLACPNbrOfSubGroups,
+--                tnLagholdTimeDown,
+--                tnLagIfIndex,
+--                tnLagConfigLastChange,
+--                tnLagPortThresholdFalling,
+--                tnLagPortThresholdRising,
+--                tnLagMemberPortName,
+--                tnLagMemberPortIsPrimary,
+--                tnLagPortSubgroup,
+--                tnLagPortActiveStdby
+--            }
+--    STATUS    obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 5 }
+
+-- tmnxObsoletedObjectsV4v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagLACPPrimaryPort
+--            }
+--    STATUS    current
+--    DESCRIPTION
+--        "The group of objects that have been obsoleted in release 4.0
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 6 }
+
+-- tmnxLagInstanceV5v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagRowStatus,
+--                tnLagPortThreshold,
+--                tnLagPortThresholdAction,
+--                tnLagEnableMarkerGenerator,
+--                tnLagEnableLACP,
+--                tnLagDescription,
+--                tnLagDynamicCosting,
+--                tnLagLACPMode,
+--                tnLagLACPAdminKeyAutogen,
+--                tnLagLACPTransmitInterval,
+--                tnLagAccessAdaptQos,
+--                tnLagLACPXmitStdby,
+--                tnLagLACPSelCrit,
+--                tnLagLACPSelCritSlaveToPartner,
+--                tnLagLACPNbrOfSubGroups,
+--                tnLagholdTimeDown,
+--                tnLagIfIndex,
+--                tnLagConfigLastChange,
+--                tnLagPortThresholdFalling,
+--                tnLagPortThresholdRising,
+--                tnLagMemberPortName,
+--                tnLagMemberPortIsPrimary,
+--                tnLagPortSubgroup,
+--                tnLagPortActiveStdby
+--            }
+--    STATUS   obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 7 }
+
+-- tmnxLagV5v0NotifGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS   {   tnLagDynamicCostOn,
+--                        tnLagDynamicCostOff,
+--                        tnLagPortAddFailed,
+--                        tnLagSubGroupSelected
+--                    }
+--    STATUS   obsolete
+--    DESCRIPTION
+--        "the group of notifications providing for management of Link
+--        Aggregation Group operation in version 5.0 of the Nokia 7xxx series
+--        systems."
+--    ::= { tmnxLagGroups 8 }
+
+-- tmnxLagNotifyObjsV5v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagNotifyPortAddFailReason,
+--                tnLagNotifySubGroupSelected
+--            }
+--    STATUS        current
+--    DESCRIPTION
+--        "The group of objects supporting Cflowd notifications
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 9 }
+
+-- tmnxLagHsmdaV6v0Group OBJECT-GROUP
+--    OBJECTS {
+--                tnLagPortType
+--            }
+--    STATUS current
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         with the HSMDA MDA on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 10 }
+
+-- tmnxLagInstanceV6v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagRowStatus,
+--                tnLagPortThreshold,
+--                tnLagPortThresholdAction,
+--                tnLagEnableMarkerGenerator,
+--                tnLagEnableLACP,
+--                tnLagDescription,
+--                tnLagDynamicCosting,
+--                tnLagLACPMode,
+--                tnLagLACPAdminKeyAutogen,
+--                tnLagLACPTransmitInterval,
+--                tnLagAccessAdaptQos,
+--                tnLagLACPXmitStdby,
+--                tnLagLACPSelCrit,
+--                tnLagLACPSelCritSlaveToPartner,
+--                tnLagLACPNbrOfSubGroups,
+--                tnLagholdTimeDown,
+--                tnLagIfIndex,
+--                tnLagConfigLastChange,
+--                tnLagPortThresholdFalling,
+--                tnLagPortThresholdRising,
+--                tnLagMemberPortName,
+--                tnLagMemberPortIsPrimary,
+--                tnLagPortSubgroup,
+--                tnLagPortActiveStdby,
+--                tnLagPortReasonDownFlags
+--            }
+--    STATUS    obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 11 }
+
+-- tmnxLagV6v0NotifGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS   {
+--                tnLagDynamicCostOn,
+--                tnLagDynamicCostOff,
+--                tnLagPortAddFailed,
+--                tnLagSubGroupSelected,
+--                tnLagPortAddFailureCleared
+--                    }
+--    STATUS    current
+--    DESCRIPTION
+--        "the group of notifications providing for management of Link
+--         Aggregation Group operation in version 6.0 of the Nokia 7xxx series
+--         systems."
+--    ::= { tmnxLagGroups 12 }
+
+-- tmnxLagV7v0Group OBJECT-GROUP
+--    OBJECTS {
+--                tnLagPerFpIngQueuing
+--            }
+--    STATUS current
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         on Nokia 7x50 SR series systems in 7.0 release."
+--    ::= { tmnxLagGroups 13 }
+
+-- tmnxObsoletedObjectsV7v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagPortReasonDownFlags
+--            }
+--    STATUS    current
+--    DESCRIPTION
+--        "The group of objects that have been obsoleted in release 7.0
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 14 }
+
+-- tmnxLagInstanceV7v0Group OBJECT-GROUP
+--    OBJECTS {   tnLagRowStatus,
+--                tnLagPortThreshold,
+--                tnLagPortThresholdAction,
+--                tnLagEnableMarkerGenerator,
+--                tnLagEnableLACP,
+--                tnLagDescription,
+--                tnLagDynamicCosting,
+--                tnLagLACPMode,
+--                tnLagLACPAdminKeyAutogen,
+--                tnLagLACPTransmitInterval,
+--                tnLagAccessAdaptQos,
+--                tnLagLACPXmitStdby,
+--                tnLagLACPSelCrit,
+--                tnLagLACPSelCritSlaveToPartner,
+--                tnLagLACPNbrOfSubGroups,
+--                tnLagholdTimeDown,
+--                tnLagIfIndex,
+--                tnLagConfigLastChange,
+--                tnLagPortThresholdFalling,
+--                tnLagPortThresholdRising,
+--                tnLagMemberPortName,
+--                tnLagMemberPortIsPrimary,
+--                tnLagPortSubgroup,
+--                tnLagPortActiveStdby
+--            }
+--    STATUS    current
+--    DESCRIPTION
+--        "The group of objects supporting management of Link Aggregation (LAG)
+--         on Nokia 7x50 SR series systems."
+--    ::= { tmnxLagGroups 15 }
+END

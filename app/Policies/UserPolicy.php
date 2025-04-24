@@ -41,7 +41,7 @@ class UserPolicy
      * @param  User  $user
      * @param  User  $target
      */
-    public function update(User $user, User $target = null): ?bool
+    public function update(User $user, ?User $target = null): ?bool
     {
         if ($target == null) {
             return null;

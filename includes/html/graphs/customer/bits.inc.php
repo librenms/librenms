@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
@@ -18,7 +19,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
             'filename' => $rrd_filename,
             'descr' => $port['hostname'] . '-' . $port['ifDescr'],
             'descr_in' => shorthost($port['hostname']),
-            'descr_out' => makeshortif($port['ifDescr']),
+            'descr_out' => Rewrite::shortenIfName($port['ifDescr']),
         ];
     }
 }

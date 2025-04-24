@@ -109,7 +109,7 @@ if ($data) {
         }
 
         $tags = compact('af', 'rrd_name', 'rrd_def');
-        data_update($device, 'ipSystemStats', $tags, $fields);
+        app('Datastore')->put($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
         $os->enableGraph("ipsystemstats_$af");

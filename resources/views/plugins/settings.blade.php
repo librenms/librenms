@@ -3,5 +3,5 @@
 @section('title', $title)
 
 @section('content')
-    @include($settings_view, $settings)
+    @include($content_view, $settings)
 @endsection

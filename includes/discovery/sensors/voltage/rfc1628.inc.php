@@ -10,7 +10,7 @@ if (is_numeric($battery_volts)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'voltage',
         $device,
         $volt_oid,
@@ -45,7 +45,7 @@ foreach ($output_volts as $index => $data) {
     $upsOutputVoltage_value = Number::cast($upsOutputVoltage_value);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'voltage',
         $device,
         $volt_oid,
@@ -80,7 +80,7 @@ foreach ($input_volts as $index => $data) {
     $upsInputVoltage_value = Number::cast($upsInputVoltage_value);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'voltage',
         $device,
         $volt_oid,
@@ -112,7 +112,7 @@ foreach ($bypass_volts as $index => $data) {
     $data['upsBypassVoltage'] = Number::cast($data['upsBypassVoltage']);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'voltage',
         $device,
         $volt_oid,

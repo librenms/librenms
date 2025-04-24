@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ict-pdu.inc.php
  *
@@ -34,5 +35,5 @@ if (! empty($systemVoltage)) {
     $type = 'ict-pdu';
     $current_value = $systemVoltage / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
+    discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current_value);
 }

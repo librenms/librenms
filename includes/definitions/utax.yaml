@@ -1,0 +1,16 @@
+os: utax
+group: printer
+text: 'UTAX Printer'
+over:
+    - { graph: device_toner, text: Toner }
+ifname: true
+type: printer
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1347.41
+    - sysDescr:
+            - 'TA_UTAX Printing System'
+discovery_modules:
+    printer-supplies:   true
+poller_modules:
+    printer-supplies:   true

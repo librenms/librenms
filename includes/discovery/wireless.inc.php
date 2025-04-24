@@ -1,4 +1,5 @@
 <?php
+
 /**
  * wireless.inc.php
  *
@@ -23,6 +24,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Device\WirelessSensor;
+use LibreNMS\OS;
 
-WirelessSensor::runDiscovery($os);
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
+
+(new \LibreNMS\Modules\Wireless())->discover($os);

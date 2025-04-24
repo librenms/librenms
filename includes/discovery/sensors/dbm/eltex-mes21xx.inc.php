@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES21xx SFP Dbm
  *
@@ -41,7 +42,7 @@ if ($oids) {
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
                 discover_sensor(
-                    $valid['sensor'], 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    null, 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
             }
 
@@ -51,7 +52,7 @@ if ($oids) {
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
                 discover_sensor(
-                    $valid['sensor'], 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    null, 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
             }
         }

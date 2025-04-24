@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plugin;
-use App\Plugins\Hooks\PageHook;
-use App\Plugins\PluginManager;
 use Illuminate\Http\Request;
+use LibreNMS\Interfaces\Plugins\Hooks\SinglePageHook;
+use LibreNMS\Interfaces\Plugins\PluginManagerInterface;
 
 class PluginPageController extends Controller
 {
-    public function __invoke(PluginManager $manager, Plugin $plugin): \Illuminate\Contracts\View\View
+    public function __invoke(PluginManagerInterface $manager, Plugin $plugin): \Illuminate\Contracts\View\View
     {
         if (! $manager->pluginEnabled($plugin->plugin_name)) {
             abort(404, trans('plugins.errors.disabled', ['plugin' => $plugin->plugin_name]));
@@ -20,10 +20,10 @@ class PluginPageController extends Controller
             'title' => trans('plugins.settings_page', ['plugin' => $plugin->plugin_name]),
             'plugin_name' => $plugin->plugin_name,
             'plugin_id' => Plugin::where('plugin_name', $plugin->plugin_name)->value('plugin_id'),
-            'settings_view' => 'plugins.missing',
+            'content_view' => 'plugins.missing',
             'settings' => [],
         ],
-            (array) $manager->call(PageHook::class, [], $plugin->plugin_name)->first()
+            $manager->call(SinglePageHook::class, [], $plugin->plugin_name)[0] ?? []
         );
 
         return view('plugins.settings', $data);

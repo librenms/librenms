@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Chassis MIB
--- 
--- Copyright (c) 1998-2008, Juniper Networks, Inc.
+--
+-- Copyright (c) 1998-2015, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -16,27 +16,24 @@ IMPORTS
         FROM SNMPv2-SMI
     DisplayString, TimeStamp, TimeInterval, TEXTUAL-CONVENTION, DateAndTime
         FROM SNMPv2-TC
-    jnxMibs, jnxChassisTraps, jnxChassisOKTraps
+    jnxMibs, jnxChassisTraps, jnxChassisOKTraps, jnxAsicExtMemTraps, jnxAsicExtMemOKTraps
         FROM JUNIPER-SMI;
 
 jnxBoxAnatomy MODULE-IDENTITY
 
-    LAST-UPDATED "201010220000Z" -- Fri Oct 22 00:00:00 2008 UTC
+    LAST-UPDATED "202012090000Z"    -- Oct 22, 2023
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
 
     DESCRIPTION
             "The MIB modules representing Juniper Networks'
-	    implementation of enterprise specific MIBs 
+	    implementation of enterprise specific MIBs
 	    supported by a single SNMP agent."
-    REVISION      "201010220000Z"
-    DESCRIPTION
-               "Added load average variables"
     REVISION      "200403230000Z"
     DESCRIPTION
                "Added chassis identification objects."
@@ -68,14 +65,172 @@ jnxBoxAnatomy MODULE-IDENTITY
                "Added new fru type PSD to jnxFruType enumeration and
                 added jcsX chassis IDs to JnxChassisId enumeration."
     REVISION     "200812310000Z"    -- Dec 31, 2008
-    DESCRIPTION "Added nodeX chassis IDs to JnxChassisId enumeration."
+    DESCRIPTION
+               "Added nodeX chassis IDs to JnxChassisId enumeration."
     REVISION     "200901090000Z"    -- Jan 09, 2009
-    DESCRIPTION 
+    DESCRIPTION
                "Added sfcX and lcc4-lcc15 chassis IDs to JnxChassisId
                 enumeration."
+    REVISION     "201010220000Z"    -- Oct 22, 2010
+    DESCRIPTION
+               "Added load average variables"
+    REVISION     "201109090000Z"    -- Sep 09, 2011
+    DESCRIPTION
+               "Added jnxBoxPersonality for MidRangius Boxes
+                namely MX40/MX10/MX5"
+    REVISION     "201202150000Z"    -- Feb 02, 2012
+    DESCRIPTION
+               "Added new offline reason builtinPicBounce to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201202210000Z"    -- Feb 21, 2012
+    DESCRIPTION
+               "Added new jnxFruType: PDU and PSM,
+                and new traps: jnxFmLinkErr and jnxFmCellDropErr."
+    REVISION     "201208240000Z"    -- Aug 24, 2012
+    DESCRIPTION
+               "Added new offline reason fruTypeConfigMismatch to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201208240000Z"    -- Aug 24, 2012
+    DESCRIPTION
+               "Added new offline reason fruTypeConfigMismatch to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201210120000Z"    -- Oct 12, 2012
+    DESCRIPTION
+               "Added new offline reason fruPICOfflineOnEccErrors to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201211070000Z"    -- Nov 07, 2012
+    DESCRIPTION
+               "Added new offline reasons fruFpcIncompatible and
+                fruFpcFanTrayPEMIncompatible to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201301070000Z"    -- Jan 07, 2013
+    DESCRIPTION
+               "Added new offline reason openflowConfigChange to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201302280000Z"    -- Feb 28, 2013
+    DESCRIPTION
+               "Added new offline reasons fruFpcScbIncompatible to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201303220000Z"    -- Mar 22, 2013
+    DESCRIPTION
+               "Added new offline reason hwError
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201305220000Z"    -- May 22, 2013
+    DESCRIPTION
+               "Added new offline reasons fruReUnresponsive to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201307170000Z"    -- Jul 17, 2013
+    DESCRIPTION
+               "Added new Fabric plane offline/online/check traps
+                to trap fabric plane offline/online/fault events."
+    REVISION     "201309240000Z"    -- Sep 24, 2013
+    DESCRIPTION
+               "Added new offline reason hwError
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201310150000Z"    -- Oct 15, 2013
+    DESCRIPTION
+               "Added new offline reason fruIncompatibleWithPEM,
+                fruIncompatibleWithSIB, and sibIncompatibleWithOtherSIB
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201311190000Z"    -- Nov 19, 2013
+    DESCRIPTION
+               "Added new offline reason fruPfeErrors to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201212100000Z"    -- Dec 10, 2012
+    DESCRIPTION
+               "Added new OIDs to get control plane memory
+                allocation (jnxOperatingMemoryCP)
+                and utilization(jnxOperatingBufferCP) in RE."
+
+    REVISION     "201404080000Z"    -- Apr 08, 2014
+    DESCRIPTION
+               "Added new offline reason vpnLocalizationRoleChange to
+                jnxFruOfflineReason enumeration."
+
+    REVISION     "201405200000Z"    -- May 20, 2014
+    DESCRIPTION
+               "Added MIBs for 1, 5 and 15 min average CPU util"
+
+    REVISION     "201407300000Z"    -- Jul 30, 2014
+    DESCRIPTION
+               "Added new offline reasons fruFpcFanTrayIncompatible &
+                fruFpcPEMIncompatible to jnxFruOfflineReason enumeration."
+
+    REVISION     "201501140000Z"    -- Jan 14, 2015
+    DESCRIPTION
+               "Added new color types for jnxLEDState and jnxLEDStateOrdered."
+
+    REVISION     "201412040000Z"    -- Dec 04, 2014
+    DESCRIPTION
+               "Added new trap: jnxFmAsicErr."
+
+    REVISION     "201504010000Z"    -- Apr 1, 2015
+    DESCRIPTION
+              "Added new FRU Power consumption variable."
+
+    REVISION     "201504280000Z"    -- Apr 28, 2015
+    DESCRIPTION
+              "Added new MIB jnxContentsModel."
+
+    REVISION     "201602020000Z"    -- Feb 02, 2016
+    DESCRIPTION
+               "Added new offline reason fruFpcHFanTrayIncompatible and
+                missing entries mixedSwitchFabric, unsupportedFabric,
+                jamConfigError."
+
+    REVISION     "201605160000Z"    -- May 16, 2016
+    DESCRIPTION
+               "Added new trap: jnxFmHealthChkErr."
+
+    REVISION     "201906100000Z"    -- Jun 10, 2019
+    DESCRIPTION
+               "Added new FRU type Fan Tray Controller."
 
 
+    REVISION     "201908100000Z"    -- Aug 10, 2019
+    DESCRIPTION
+               "Added new Added new OIDs to get memory utilization
+                which doesn't include inactive memory as free memory"
 
+    REVISION     "201911150000Z"    -- Nov 15, 2019
+    DESCRIPTION
+               "Added new offline reasons fruInvalidConfig,
+                katsPostError and katsRuntimeError"
+
+    REVISION     "201911300000Z"    -- Nov 30, 2019
+    DESCRIPTION
+               "Added new offline reasons gnfInitRestart and
+                gnfOverlapMac"
+    REVISION     "201912030000Z"    -- Dec 03, 2019
+    DESCRIPTION
+               "Added new offline reasons fpcUnsupportedMode"
+
+    REVISION     "201911140000Z"    -- Dev 16, 2019
+    DESCRIPTION
+               "Added new offline reason fruOfflinedonFipsConstraints"
+
+    REVISION     "201912090000Z"    -- Dec 09, 2019
+    DESCRIPTION
+               "Added new offline reasons fpcFtrayNotVerified,
+                fpcPemNotVerified and fabricAsicFault"
+
+    REVISION     "202001230000Z"    -- Jan 23, 2020
+    DESCRIPTION
+              "Added new Trap: jnxAlarmPortInput."
+
+    REVISION     "202012090000Z"    -- Dec 09, 2020
+    DESCRIPTION
+               "Added new offline reasons fruFpcSlcMisconfig,
+                fruSfbFanTrayIncompatible and fruSfbPEMIncompatible"
+
+    REVISION     "202206200000Z"    -- Jun 20, 2022
+    DESCRIPTION
+               "Added new FRU type Timing Interface Board."
+
+    REVISION     "202310020000Z"    -- Oct 22, 2023
+    DESCRIPTION
+               "Added new offline reasons fpcDeprecated and
+                fabricDeprecated"
     ::= { jnxMibs 1 }
 
 --
@@ -123,7 +278,21 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      member4       (35),
                      member5       (36),
                      member6       (37),
-                     member7       (38)
+                     member7       (38),
+                     nodeDevice    (39),
+                     interconnectDevice (40),
+                     controlPlaneDevice (41),
+                     directorDevice (42),
+                     gnf1          (43),
+                     gnf2          (44),
+                     gnf3          (45),
+                     gnf4          (46),
+                     gnf5          (47),
+                     gnf6          (48),
+                     gnf7          (49),
+                     gnf8          (50),
+                     gnf9          (51),
+                     gnf10         (52)
                  }
 
 
@@ -133,7 +302,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 
 -- Top level objects
 
-    jnxBoxClass OBJECT-TYPE 
+    jnxBoxClass OBJECT-TYPE
 	SYNTAX		OBJECT IDENTIFIER
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -157,7 +326,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The serial number of this subject, blank if unknown 
+		"The serial number of this subject, blank if unknown
 		or unavailable."
 	::= { jnxBoxAnatomy 3 }
 
@@ -176,7 +345,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"The value of sysUpTime when the subject was last
-		installed, up-and-running.  Zero if unknown or 
+		installed, up-and-running.  Zero if unknown or
 		already up-and-running when the agent was up."
 	::= { jnxBoxAnatomy 5 }
 
@@ -233,7 +402,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 
 		The value is a bit map represented as a sum.
 		If multiple bits are set, the specified
-		container(s) are located and accessible from 
+		container(s) are located and accessible from
 		that set of views.
 
 		The various values representing the bit positions
@@ -245,12 +414,12 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		   16   leftHandSide
 		   32   rightHandSide
 
-		Note 1: 
+		Note 1:
 		LefHandSide and rightHandSide are referred
 		to based on the view from the front.
 
-		Note 2: 
-		If the specified containers are scattered 
+		Note 2:
+		If the specified containers are scattered
 		around various views, the numbering is according
 		to the following sequence:
 		    front -> rear -> top -> bottom
@@ -258,10 +427,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		For each view plane, the numbering sequence is
 		first from left to right, and then from up to down.
 
-		Note 3: 
-		Even though the value in chassis hardware (e.g. 
+		Note 3:
+		Even though the value in chassis hardware (e.g.
 		slot number) may be labelled from 0, 1, 2, and up,
-		all the indices in MIB start with 1 (not 0) 
+		all the indices in MIB start with 1 (not 0)
 		according to network management convention."
 	::= { jnxContainersEntry 2 }
 
@@ -271,10 +440,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"The abstraction level of the box or chassis.
-		It is enumerated from the outside to the inside, 
+		It is enumerated from the outside to the inside,
 		from the outer layer to the inner layer.
-		For example, top level (i.e. level 0) refers to 
-		chassis frame, level 1 FPC slot within chassis 
+		For example, top level (i.e. level 0) refers to
+		chassis frame, level 1 FPC slot within chassis
 		frame, level 2 PIC space within FPC slot."
 	::= { jnxContainersEntry 3 }
 
@@ -283,9 +452,9 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The index of its next higher level container 
-		housing	this entry.  The associated 
-		jnxContainersIndex in the jnxContainersTable 
+		"The index of its next higher level container
+		housing	this entry.  The associated
+		jnxContainersIndex in the jnxContainersTable
 		represents its next higher level container."
 	::= { jnxContainersEntry 4 }
 
@@ -312,8 +481,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"The maximum number of containers of this level
-		per container of the next higher level.  
-		e.g. if there are six level 2 containers in 
+		per container of the next higher level.
+		e.g. if there are six level 2 containers in
 		level 1 container, then jnxContainersCount for
 		level 2 is six."
 	::= { jnxContainersEntry 7 }
@@ -327,8 +496,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when the box contents 
-		table last changed.  Zero if unknown or already 
+		"The value of sysUpTime when the box contents
+		table last changed.  Zero if unknown or already
 		existing when the agent was up."
 	::= { jnxBoxAnatomy 7 }
 
@@ -346,7 +515,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"An entry of contents table."
-	INDEX	{ jnxContentsContainerIndex, 
+	INDEX	{ jnxContentsContainerIndex,
 		  jnxContentsL1Index,
 		  jnxContentsL2Index,
 		  jnxContentsL3Index }
@@ -362,10 +531,11 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	    jnxContentsSerialNo		DisplayString,
 	    jnxContentsRevision		DisplayString,
 	    jnxContentsInstalled	TimeStamp,
-            jnxContentsPartNo           DisplayString,
-            jnxContentsChassisId        JnxChassisId,
-            jnxContentsChassisDescr     DisplayString,
-            jnxContentsChassisCleiCode  DisplayString
+        jnxContentsPartNo           DisplayString,
+        jnxContentsChassisId        JnxChassisId,
+        jnxContentsChassisDescr     DisplayString,
+        jnxContentsChassisCleiCode  DisplayString,
+        jnxContentsModel            DisplayString
     }
 
     jnxContentsContainerIndex OBJECT-TYPE
@@ -373,10 +543,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The associated jnxContainersIndex in the 
+		"The associated jnxContainersIndex in the
 		jnxContainersTable."
 	::= { jnxContentsEntry 1 }
-	
+
     jnxContentsL1Index OBJECT-TYPE
 	SYNTAX		Integer32 (0..'7fffffff'h)
 	MAX-ACCESS	read-only
@@ -430,7 +600,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The serial number of this subject, blank if 
+		"The serial number of this subject, blank if
 		unknown or unavailable."
 	::= { jnxContentsEntry 7 }
 
@@ -439,7 +609,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The revision of this subject, blank if unknown 
+		"The revision of this subject, blank if unknown
 		or unavailable."
 	::= { jnxContentsEntry 8 }
 
@@ -448,7 +618,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when the subject was last 
+		"The value of sysUpTime when the subject was last
 		installed, up-and-running.  Zero if unknown
 		or already up-and-running when the agent was up."
 	::= { jnxContentsEntry 9 }
@@ -458,7 +628,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The part number of this subject, blank if unknown 
+		"The part number of this subject, blank if unknown
 		or unavailable."
 	::= { jnxContentsEntry 10 }
 
@@ -509,6 +679,17 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                  telecommunications industry."
         ::= { jnxContentsEntry 13 }
 
+    jnxContentsModel OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The FRU model name of this subject, blank if unknown
+                 or unavailable."
+        ::= { jnxContentsEntry 14 }
+
+
+
 --
 -- Box LED Indicators Table
 --
@@ -518,8 +699,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		deprecated
 	DESCRIPTION
-		"The value of sysUpTime when the box LED table 
-		last changed.  Zero if unknown or already at 
+		"The value of sysUpTime when the box LED table
+		last changed.  Zero if unknown or already at
 		that state when the agent was up."
 	::= { jnxBoxAnatomy 9 }
 
@@ -565,7 +746,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		deprecated
 	DESCRIPTION
-		"The associated table that this entry is 
+		"The associated table that this entry is
 		related."
 	::= { jnxLEDEntry 1 }
 
@@ -584,7 +765,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		deprecated
 	DESCRIPTION
 		"The level one index of the associated
-		table that this entry is related.  Zero 
+		table that this entry is related.  Zero
 		if unavailable or inapplicable."
 	::= { jnxLEDEntry 3 }
 
@@ -594,7 +775,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		deprecated
 	DESCRIPTION
 		"The level two index of the associated
-		table that this entry is related.  Zero 
+		table that this entry is related.  Zero
 		if unavailable or inapplicable."
 	::= { jnxLEDEntry 4 }
 
@@ -633,7 +814,13 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		yellow(3),    -- alarm, warning, marginally working
 		red(4),	      -- alert, failed, not working
 		blue(5),      -- ok, on-line as an active primary
-		amber(6)      -- alarm, off-line, not running
+		amber(6),     -- alarm, off-line, not running
+		off(7),            -- off-line, not running
+		blinkingGreen(8),  -- entering state of ok, good, normally working
+		blinkingYellow(9), -- entering state of alarm, warning, marginally working
+		blinkingRed(10),   -- entering state of alert, failed, not working
+		blinkingBlue(11),  -- entering state of ok, on-line as an active primary
+		blinkingAmber(12)  -- entering state of alarm, off-line, not running
 	}
 	MAX-ACCESS	read-only
 	STATUS		deprecated
@@ -650,7 +837,13 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		amber(3),     -- alarm, off-line, not running
 		yellow(4),    -- alarm, warning, marginally working
 		red(5),	      -- alert, failed, not working
-		other(6)      -- unknown or unavailable
+		other(6),     -- unknown or unavailable
+		off(7),             -- off-line, not running
+		blinkingBlue(8),    -- entering state of ok, on-line as an active primary
+		blinkingGreen(9),   -- entering state of ok, good, normally working
+		blinkingAmber(10),  -- entering state of alarm, off-line, not running
+		blinkingYellow(11), -- entering state of alarm, warning, marginally working
+		blinkingRed(12)     -- entering state of alert, failed, not working
 	}
 	MAX-ACCESS	read-only
 	STATUS		deprecated
@@ -662,7 +855,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 --
 -- Box Filled Status Table
 --
--- This table show the empty/filled status of the container in the 
+-- This table show the empty/filled status of the container in the
 -- box containers table.
 --
 
@@ -671,11 +864,11 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when the box filled 
+		"The value of sysUpTime when the box filled
 		status table last changed.  Zero if unknown or
 		already at that state when the agent was up."
 	::= { jnxBoxAnatomy 11 }
-	
+
     jnxFilledTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF JnxFilledEntry
 	MAX-ACCESS	not-accessible
@@ -712,10 +905,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The associated jnxContainersIndex in the 
+		"The associated jnxContainersIndex in the
 		jnxContainersTable."
 	::= { jnxFilledEntry 1 }
-	
+
     jnxFilledL1Index OBJECT-TYPE
 	SYNTAX		Integer32 (0..'7fffffff'h)
 	MAX-ACCESS	read-only
@@ -789,7 +982,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 --
 -- Box Operating Status Table
 --
--- This table reveals the operating status of some subjects 
+-- This table reveals the operating status of some subjects
 -- of interest in the box contents table.
 --
 
@@ -829,13 +1022,21 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	    jnxOperatingUpTime          TimeInterval,
 	    jnxOperatingLastRestart     TimeStamp,
 	    jnxOperatingMemory          Integer32,
-            jnxOperatingStateOrdered    INTEGER,
-            jnxOperatingChassisId       JnxChassisId,
-            jnxOperatingChassisDescr    DisplayString,
-            jnxOperatingRestartTime     DateAndTime,
-            jnxOperating1MinLoadAvg     Gauge32,
-            jnxOperating5MinLoadAvg     Gauge32,
-            jnxOperating15MinLoadAvg     Gauge32
+        jnxOperatingStateOrdered    INTEGER,
+        jnxOperatingChassisId       JnxChassisId,
+        jnxOperatingChassisDescr    DisplayString,
+        jnxOperatingRestartTime     DateAndTime,
+        jnxOperating1MinLoadAvg     Gauge32,
+        jnxOperating5MinLoadAvg     Gauge32,
+        jnxOperating15MinLoadAvg    Gauge32,
+        jnxOperating1MinAvgCPU      Gauge32,
+        jnxOperating5MinAvgCPU      Gauge32,
+        jnxOperating15MinAvgCPU     Gauge32,
+        jnxOperatingFRUPower        Gauge32,
+             jnxOperatingBufferCP        Gauge32,
+             jnxOperatingMemoryCP        Integer32,
+        jnxOperatingBufferExt      Gauge32,
+        jnxOperatingTemperature    Integer32
     }
 
     jnxOperatingContentsIndex OBJECT-TYPE
@@ -843,10 +1044,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The associated jnxContentsContainerIndex in the 
+		"The associated jnxContentsContainerIndex in the
 		jnxContentsTable."
 	::= { jnxOperatingEntry 1 }
-	
+
     jnxOperatingL1Index OBJECT-TYPE
 	SYNTAX		Integer32 (0..'7fffffff'h)
 	MAX-ACCESS	read-only
@@ -861,7 +1062,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The level two index associated with this 
+		"The level two index associated with this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 3 }
 
@@ -889,7 +1090,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			      -- as a active primary
 		ready(3),     -- ready to run, not running yet
 		reset(4),     -- held in reset, not ready yet
-	        runningAtFullSpeed(5),  
+	        runningAtFullSpeed(5),
 			      -- valid for fans only
 	        down(6),      -- down or off, for power supply
 		standby(7)    -- running as a standby backup
@@ -905,7 +1106,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The temperature in Celsius (degrees C) of this 
+		"The temperature in Celsius (degrees C) of this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 7 }
 
@@ -914,10 +1115,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The CPU utilization in percentage of this 
+		"The CPU utilization in percentage of this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 8 }
-	
+
     jnxOperatingISR OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
@@ -927,7 +1128,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		spending in interrupt service routine (ISR).
 		Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 9 }
-	
+
     jnxOperatingDRAMSize OBJECT-TYPE
 	SYNTAX		Integer32
 	MAX-ACCESS	read-only
@@ -936,24 +1137,24 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		"The DRAM size in bytes of this subject.
 		Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 10 }
-	
+
     jnxOperatingBuffer OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
 		"The buffer pool utilization in percentage
-		of this subject.  Zero if unavailable or 
+		of this subject.  Zero if unavailable or
 		inapplicable."
 	::= { jnxOperatingEntry 11 }
-	
+
     jnxOperatingHeap OBJECT-TYPE
 	SYNTAX		Gauge32
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The heap utilization in percentage of 
-		this subject.  Zero if unavailable or 
+		"The heap utilization in percentage of
+		this subject.  Zero if unavailable or
 		inapplicable."
 	::= { jnxOperatingEntry 12 }
 
@@ -963,7 +1164,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
         STATUS          deprecated
 	DESCRIPTION
 		"The time interval in 10-millisecond period
-		that this subject has been up and running.  
+		that this subject has been up and running.
 		Zero if unavailable or inapplicable."
 	::= { jnxOperatingEntry 13 }
 
@@ -972,8 +1173,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when this subject 
-		last restarted.  Zero if unavailable or 
+		"The value of sysUpTime when this subject
+		last restarted.  Zero if unavailable or
 		inapplicable."
 	::= { jnxOperatingEntry 14 }
 
@@ -982,7 +1183,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The installed memory size in Megabytes 
+		"The installed memory size in Megabytes
 		of this subject.  Zero if unavailable or
 		inapplicable."
 	::= { jnxOperatingEntry 15 }
@@ -993,7 +1194,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			      -- as a active primary
 		standby(2),   -- running as a standby backup
 		ready(3),     -- ready to run, not running yet
-	        runningAtFullSpeed(4),  
+	        runningAtFullSpeed(4),
 			      -- valid for fans only
 		reset(5),     -- held in reset, not ready yet
 	        down(6),      -- down or off, for power supply
@@ -1064,10 +1265,90 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      Zero if unavailable or inapplicable."
             ::= { jnxOperatingEntry 22 }
 
+    jnxOperating1MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 1 minutes. Zero if
+             unavailable or inapplicable."
+        ::= { jnxOperatingEntry 23 }
+
+    jnxOperating5MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 5 minutes.  Zero if
+             unavailable or inapplicable."
+        ::= { jnxOperatingEntry 24 }
+
+    jnxOperating15MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 15 minutes.  Zero
+             if unavailable or inapplicable."
+        ::= { jnxOperatingEntry 25 }
+
+        jnxOperatingFRUPower    OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                    "The present power of each FRU. Here it will
+                     be shown in terms of voltage. Zero if unavailable
+                     or inapplicable"
+            ::= { jnxOperatingEntry 26 }
+
+    	jnxOperatingBufferCP OBJECT-TYPE
+	    SYNTAX		Gauge32
+	    MAX-ACCESS		read-only
+	    STATUS		current
+	    DESCRIPTION
+	    	    "The buffer pool utilization in percentage
+	    	    of this subject in control plane.  Zero if
+                    unavailable or inapplicable."
+	    ::= { jnxOperatingEntry 27 }
+
+    	jnxOperatingMemoryCP OBJECT-TYPE
+	    SYNTAX	    	Integer32
+	    MAX-ACCESS		read-only
+	    STATUS		current
+	    DESCRIPTION
+		        "The Allocated memory size for control plane
+                        in Megabytes. Zero if unavailable or
+	        	inapplicable."
+	    ::= { jnxOperatingEntry 28 }
+
+        jnxOperatingBufferExt OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                        "The buffer pool utilization in percentage
+                         of this subject.  Zero if unavailable or
+                         inapplicable. does not include inactive memory
+                         as free memory."
+            ::= { jnxOperatingEntry 29 }
+
+    jnxOperatingTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The temperature in Celsius (degrees C) of this
+                subject.  Zero if unavailable or inapplicable."
+        ::= { jnxOperatingEntry 30 }
+
 --
 -- Box Redundancy Information Table
 --
--- This table shows the internal configuration setting for the 
+-- This table shows the internal configuration setting for the
 -- available redundant subsystems or components in the box.
 --
 
@@ -1115,10 +1396,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The associated jnxContentsContainerIndex in the 
+		"The associated jnxContentsContainerIndex in the
 		jnxContentsTable."
 	::= { jnxRedundancyEntry 1 }
- 	
+
     jnxRedundancyL1Index OBJECT-TYPE
 	SYNTAX		Integer32 (0..'7fffffff'h)
 	MAX-ACCESS	read-only
@@ -1133,7 +1414,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The level two index associated with this 
+		"The level two index associated with this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxRedundancyEntry 3 }
 
@@ -1239,9 +1520,9 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The timeout period in seconds, by the keepalive 
-		watchdog timer, before initiating a switch over to 
-		the backup subsystem.  Zero if unavailable or 
+		"The timeout period in seconds, by the keepalive
+		watchdog timer, before initiating a switch over to
+		the backup subsystem.  Zero if unavailable or
 		inapplicable."
 	::= { jnxRedundancyEntry 12 }
 
@@ -1250,7 +1531,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The elapsed time in seconds by this subject since 
+		"The elapsed time in seconds by this subject since
 		receiving the last keepalive message from the other
 		subsystems.  Zero if unavailable or inapplicable."
 	::= { jnxRedundancyEntry 13 }
@@ -1260,9 +1541,9 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The total number of losses on keepalive messages 
+		"The total number of losses on keepalive messages
 		between the master and backup subsystems as perceived
-		by this subject since the system is up and running.  
+		by this subject since the system is up and running.
 		Zero if unavailable or inapplicable."
 	::= { jnxRedundancyEntry 14 }
 
@@ -1284,7 +1565,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 contents of this row exists."
         ::= { jnxRedundancyEntry 16 }
 
-	
+
 --
 -- FRU (Field Replaceable Unit) Status Table
 --
@@ -1335,10 +1616,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The associated jnxContentsContainerIndex in the 
+		"The associated jnxContentsContainerIndex in the
 		jnxContentsTable."
 	::= { jnxFruEntry 1 }
- 	
+
     jnxFruL1Index OBJECT-TYPE
 	SYNTAX		Integer32 (0..'7fffffff'h)
 	MAX-ACCESS	read-only
@@ -1353,7 +1634,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The level two index associated with this 
+		"The level two index associated with this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxFruEntry 3 }
 
@@ -1391,7 +1672,13 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		fan(13),                                -- fan
 		lineCardChassis(14),                    -- LCC
                 forwardingEngineBoard(15),              -- FEB
-                protectedSystemDomain(16)               -- PSD
+                protectedSystemDomain(16),              -- PSD
+		powerDistributionUnit(17),              -- PDU
+		powerSupplyModule(18),                  -- PSM
+		switchFabricBoard(19),                  -- SFB
+		adapterCard(20),                        -- ADC
+	        ftc(21),                                -- FTC
+	        tib(22)                                 -- TIB
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1405,7 +1692,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
 		"The slot number of this subject.  This is equivalent
-		to jnxFruL1Index in meaning.  Zero if unavailable or 
+		to jnxFruL1Index in meaning.  Zero if unavailable or
 		inapplicable."
 	::= { jnxFruEntry 7 }
 
@@ -1433,16 +1720,16 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The temperature in Celsius (degrees C) of this 
+		"The temperature in Celsius (degrees C) of this
 		subject.  Zero if unavailable or inapplicable."
 	::= { jnxFruEntry 9 }
 
     jnxFruOfflineReason OBJECT-TYPE
 	SYNTAX		INTEGER {
 		unknown(1),	                -- unknown or other
-		none(2),	                -- none	
-		error(3),      	                -- error 
-		noPower(4),	                -- no power  
+		none(2),	                -- none
+		error(3),      	                -- error
+		noPower(4),	                -- no power
 		configPowerOff(5),              -- configured to power off
 		configHoldInReset(6),           -- configured to hold in reset
 		cliCommand(7),                  -- offlined by cli command
@@ -1512,7 +1799,57 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 psdVersionMismatch(71),          -- PSD version mismatch
                 fruResetThresholdExceeded(72),   -- FRU Reset Threshold Exceeded
                 picBounce(73),                   -- PIC Bounce
-                badVoltage(74)                   -- bad voltage
+                badVoltage(74),                  -- bad voltage
+                fruFPCReducedFabricBW(75),       -- FPC offlined due to Reduced Fabric Bandwidth
+                fruAutoheal(76),                 -- FRU offlined due to software autoheal action
+                builtinPicBounce(77),            -- Builtin PIC Bounce
+                fruFabricDegraded(78),           -- Fabric running in degraded state
+                fruFPCFabricDegradedOffline(79), -- FPC offlined due to degraded fabric action
+                fruUnsupportedSlot(80),          -- FRU unsupported in the current slot
+                fruRouteLocalizationMisCfg(81),  -- Route Localization - FPC Misconfiguration
+                fruTypeConfigMismatch(82),       -- FRU Type configuration mismatch
+                lccModeChanged(83),              -- LCC mode changed on the SFC
+                hwFault(84),                     -- Hardware fault
+                fruPICOfflineOnEccErrors(85),    -- PIC offlined on ecc errors cross ceratins limit.
+                fruFpcIncompatible(86),          -- FPC imcompatible with other FPCs
+                fruFpcFanTrayPEMIncompatible(87),-- FPC incompatible with FAN-TRAYs ,PEMs
+                fruUnsupportedFirmware(88),      -- Firmware on this FRU not supported
+                openflowConfigChange(89),        -- Openflow config change offlines FPC
+                fruFpcScbIncompatible(90),       -- FPC incompatible with SCB
+                fruReUnresponsive(91),           -- Corresponding slot RE unresponsive
+                hwError(92),                     -- Hardware error
+                fruErrorManagerReqFPCReset(93),  -- Error manager requested FPC reset.
+                fruIncompatibleWithPEM(94),      -- FRU incompatible with power supply
+                fruIncompatibleWithSIB(95),      -- FRU incompatible with SIB
+                sibIncompatibleWithOtherSIB(96), -- FRU incompatible with other SIB
+                fruPfeErrors(97),                -- PIC offlined on PFE Errors cross limit.
+                vpnLocalizationRoleChange(98),   -- VPN localization core-facing-FPC role change
+                fruFpcFanTrayIncompatible(99),   -- FPC incompatible with FAN-TRAYs
+                fruFpcPEMIncompatible(100),      -- FPC incompatible with PEMs
+                mixedSwitchFabric(101),          -- Mixed Switch Fabric error
+                unsupportedFabric(102),          -- unsupported Fabric error
+                jamConfigError(103),             -- JAM configuration error
+                fruFpcHFanTrayIncompatible(104), -- FPC incompatible with Horizontal FAN-TRAYs
+                gnfIsOffline(105),               -- GNF is Offline
+                gnfdisconnected(106),            -- GNF disconnected
+                fruIncompatibleWithVersion(107), -- Incompatibile with BSYS
+		fruInvalidConfig(108),           -- FRU invalid configuration
+		katsPostError(109),              -- KATS post error
+		katsRuntimeError(110),           -- KATS run time error
+		gnfInitRestart(111),             -- GNF has initiated FPC restart
+		gnfOverlapMac(112),              -- MAC address overlap detected between GNFs
+                fruOfflinedonFipsConstraints(113), -- FRU offlined due to FIPS constraints
+                fpcUnsupportedMode(114),         -- FPC Unsupported Mode
+                fpcFtrayNotVerified(115),        -- FPC Ftray not verified
+                fpcPemNotVerified(116),          -- FPC PEM not verified
+                fabricAsicFault(117),            -- Fabric ASIC Fault
+                flowdCoreStart(118),             -- Flowd core start
+                fruFpcSlcMisconfig(119),         -- FPC SLC misconfig
+                fruSfbFanTrayIncompatible(120),  -- SFB incompatible with Fan-Tray
+                fruSfbPEMIncompatible(121),       -- SFB incompatible with PEM
+                fpcDeprecated(124),              -- FPC is Deprecated
+                fabricDeprecated(125)            -- Fabric is Deprecated
+
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1525,7 +1862,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when this subject was last 
+		"The value of sysUpTime when this subject was last
 		powered off.  Zero if unavailable or inapplicable."
 	::= { jnxFruEntry 11 }
 
@@ -1534,7 +1871,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
-		"The value of sysUpTime when this subject was last 
+		"The value of sysUpTime when this subject was last
 		powered on.  Zero if unavailable or inapplicable."
 	::= { jnxFruEntry 12 }
 
@@ -1545,7 +1882,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	DESCRIPTION
 		"The time interval in 10-millisecond period
 		that this subject has been up and running
-		since the last power on time.  Zero if 
+		since the last power on time.  Zero if
 		unavailable or inapplicable."
 	::= { jnxFruEntry 13 }
 
@@ -1609,9 +1946,23 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 
 
 --
+-- Applicable only for MidRangius Systems (MX5/10/40)
+--
+    jnxBoxPersonality OBJECT-TYPE
+	SYNTAX          OBJECT IDENTIFIER
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+	        "The personality of the box, indicating which product line it is currently acting as
+		 for example, 'MX40'."
+	::= { jnxBoxAnatomy 18 }
+
+
+
+--
 -- definition of chassis related traps
 --
-    -- Traps for chassis alarm conditions   
+    -- Traps for chassis alarm conditions
 
     jnxPowerSupplyFailure NOTIFICATION-TYPE
 	OBJECTS		{ jnxContentsContainerIndex,
@@ -1625,7 +1976,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		"A jnxPowerSupplyFailure trap signifies that
 		the SNMP entity, acting in an agent role, has
 		detected that the specified power supply in the
-		chassis has been in the failure (bad DC output) 
+		chassis has been in the failure (bad DC output)
 		condition."
 	::= { jnxChassisTraps 1 }
 
@@ -1640,8 +1991,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	DESCRIPTION
 		"A jnxFanFailure trap signifies that the SNMP
 		entity, acting in an agent role, has detected
-		that the specified cooling fan or impeller in 
-		the chassis has been in the failure (not spinning) 
+		that the specified cooling fan or impeller in
+		the chassis has been in the failure (not spinning)
 		condition."
 	::= { jnxChassisTraps 2 }
 
@@ -1651,11 +2002,12 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxContentsL2Index,
 			  jnxContentsL3Index,
 			  jnxContentsDescr,
-			  jnxOperatingTemp }
+			  jnxOperatingTemp,
+                          jnxOperatingTemperature }
 	STATUS		current
 	DESCRIPTION
-		"A jnxOverTemperature trap signifies that the 
-		SNMP entity, acting in an agent role, has 
+		"A jnxOverTemperature trap signifies that the
+		SNMP entity, acting in an agent role, has
 		detected that the specified hardware component
 		in the chassis has experienced over temperature
 		condition."
@@ -1674,10 +2026,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxRedundancySwitchoverReason }
 	STATUS		current
 	DESCRIPTION
-		"A jnxRedundancySwitchover trap signifies that 
-		the SNMP entity, acting in an agent role, has 
+		"A jnxRedundancySwitchover trap signifies that
+		the SNMP entity, acting in an agent role, has
 		detected that the specified hardware component
-		in the chassis has experienced a redundancy 
+		in the chassis has experienced a redundancy
 		switchover event defined as a change in state
 		of jnxRedundancyState from master to backup or
 		vice versa."
@@ -1693,8 +2045,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxFruSlot }
 	STATUS		current
 	DESCRIPTION
-		"A jnxFruRemoval trap signifies that the SNMP 
-		entity, acting in an agent role, has detected 
+		"A jnxFruRemoval trap signifies that the SNMP
+		entity, acting in an agent role, has detected
 		that the specified FRU (Field Replaceable Unit)
 		has been removed from the chassis."
 	::= { jnxChassisTraps 5 }
@@ -1709,9 +2061,9 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxFruSlot }
 	STATUS		current
 	DESCRIPTION
-		"A jnxFruInsertion trap signifies that the SNMP 
+		"A jnxFruInsertion trap signifies that the SNMP
 		entity,	acting in an agent role, has detected that
-		the specified FRU (Field Replaceable Unit) has been 
+		the specified FRU (Field Replaceable Unit) has been
 		inserted into the chassis."
 	::= { jnxChassisTraps 6 }
 
@@ -1728,8 +2080,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxFruLastPowerOn }
 	STATUS		current
 	DESCRIPTION
-		"A jnxFruPowerOff trap signifies that the SNMP 
-		entity, acting in an agent role, has detected 
+		"A jnxFruPowerOff trap signifies that the SNMP
+		entity, acting in an agent role, has detected
 		that the specified FRU (Field Replaceable Unit)
 		has been powered off in the chassis."
 	::= { jnxChassisTraps 7 }
@@ -1747,9 +2099,9 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxFruLastPowerOn }
 	STATUS		current
 	DESCRIPTION
-		"A jnxFruPowerOn trap signifies that the SNMP 
+		"A jnxFruPowerOn trap signifies that the SNMP
 		entity,	acting in an agent role, has detected that
-		the specified FRU (Field Replaceable Unit) has been 
+		the specified FRU (Field Replaceable Unit) has been
 		powered on in the chassis."
 	::= { jnxChassisTraps 8 }
 
@@ -1819,7 +2171,7 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 the specified FRU (Field Replaceable Unit) has
                 encountered some operational errors and gone into
                 check state in the chassis."
-        ::= { jnxChassisTraps 12 }   
+        ::= { jnxChassisTraps 12 }
 
     jnxFEBSwitchover NOTIFICATION-TYPE
         OBJECTS         { jnxFruContentsIndex,
@@ -1836,7 +2188,6 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 the specified FEB (Forwarding Engine Board) has
                 switched over."
         ::= { jnxChassisTraps 13 }
-
 
     jnxHardDiskFailed NOTIFICATION-TYPE
         OBJECTS         { jnxFruContentsIndex,
@@ -1885,8 +2236,210 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                  entity, acting in an agent role, has detected that
                  the specified  routing-engine/member has booted from
                  the back up root partition"
-         ::= { jnxChassisTraps 16 }     
+         ::= { jnxChassisTraps 16 }
 
+    jnxFmLinkErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A LinkErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                link errors."
+        ::= { jnxChassisTraps 17 }
+
+    jnxFmCellDropErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A CellDropErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                cell drop errors."
+        ::= { jnxChassisTraps 18 }
+
+    jnxExtSrcLockLost NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A ExtSrcLockLost trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                a lock for an external clock source has been lost."
+        ::= { jnxChassisTraps 19 }
+    jnxPlaneOffline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot,
+                          jnxFruOfflineReason,
+                          jnxFruLastPowerOff,
+                          jnxFruLastPowerOn }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneOffline trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                that the specified Fabric plane
+                has gone offline in the chassis."
+        ::= { jnxChassisTraps 20 }
+
+    jnxPlaneOnline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneOnline trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric Plane has
+                gone online in the chassis."
+        ::= { jnxChassisTraps 21 }
+
+    jnxPlaneCheck NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneCheck trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric plane has
+                encountered some operational errors and gone into
+                check state in the chassis."
+        ::= { jnxChassisTraps 22 }
+
+    jnxPlaneFault NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneCheck trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric plane has
+                encountered some operational errors and gone into
+                fault state in the chassis."
+        ::= { jnxChassisTraps 23 }
+
+    jnxPowerSupplyInputFailure NOTIFICATION-TYPE
+        OBJECTS         { jnxContentsContainerIndex,
+                          jnxContentsL1Index,
+                          jnxContentsL2Index,
+                          jnxContentsL3Index,
+                          jnxContentsDescr,
+                          jnxOperatingState }
+        STATUS          current
+        DESCRIPTION
+            "A jnxPowerSupplyInputFailure trap signifies that
+            the SNMP entity, acting in an agent role, has
+            detected that the specified power supply's input feed
+            in the chassis has been in the failure condition."
+        ::= { jnxChassisTraps 24 }
+
+    jnxFmAsicErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFmAsicErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                errors in a switching device within the fabric."
+        ::= { jnxChassisTraps 25 }
+
+    jnxMountVarOffHardDiskFailed NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxMountVarOffHardDiskFailed signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                mount of /var failed off harddisk, emergency /var created."
+        ::= { jnxChassisTraps 26 }
+
+    jnxFmHealthChkErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A HealthChkErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                health check errors."
+        ::= { jnxChassisTraps 27 }
+
+    jnxAlarmPortInput NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A AlarmPortInput trap signifies that the SNMP
+                entity, acting in an agent role, has detected input alarm port
+                errors."
+        ::= { jnxChassisTraps 28 }
+
+    jnxUnsupportedFru NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxUnsupportedFru trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the Unsupported Fru has been inserted in the chassis"
+        ::= { jnxChassisTraps 29 }
 
     -- Traps for chassis alarm cleared conditions
 
@@ -1899,10 +2452,10 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxOperatingState }
 	STATUS		current
 	DESCRIPTION
-		"A jnxPowerSupplyOK trap signifies that the 
+		"A jnxPowerSupplyOK trap signifies that the
 		SNMP entity, acting in an agent role, has
 		detected that the specified power supply in the
-		chassis has recovered from the failure (bad DC output) 
+		chassis has recovered from the failure (bad DC output)
 		condition."
 	::= { jnxChassisOKTraps 1 }
 
@@ -1927,14 +2480,15 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 			  jnxContentsL2Index,
 			  jnxContentsL3Index,
 			  jnxContentsDescr,
-			  jnxOperatingTemp }
+			  jnxOperatingTemp,
+                          jnxOperatingTemperature }
 	STATUS		current
 	DESCRIPTION
-		"A jnxTemperatureOK trap signifies that the 
-		SNMP entity, acting in an agent role, has 
+		"A jnxTemperatureOK trap signifies that the
+		SNMP entity, acting in an agent role, has
 		detected that the specified hardware component
 		in the chassis has recovered from over temperature
-		condition." 
+		condition."
 	::= { jnxChassisOKTraps 3 }
 
     jnxFruOK NOTIFICATION-TYPE
@@ -1953,6 +2507,90 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 recovered from previous operational errors and it
                 is in ok state in the chassis."
         ::= { jnxChassisOKTraps 4 }
+
+    jnxExtSrcLockAcquired NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A ExtSrcLockAcquired trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                a lock for an external clock source has been acquired."
+        ::= { jnxChassisOKTraps 5 }
+
+    jnxHardDiskOK NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHardDiskOK trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the Disk in the specified Routing Engine has
+                recovered from the failure condition."
+        ::= { jnxChassisOKTraps 6 }
+
+    jnxPowerSupplyInputOK NOTIFICATION-TYPE
+        OBJECTS     { jnxContentsContainerIndex,
+                      jnxContentsL1Index,
+                      jnxContentsL2Index,
+                      jnxContentsL3Index,
+                      jnxContentsDescr,
+                      jnxOperatingState }
+        STATUS      current
+        DESCRIPTION
+            "A jnxPowerSupplyInputOK trap signifies that the
+            SNMP entity, acting in an agent role, has detected
+            that the specified power supply's input feed in the
+            chassis has recovered from the failure condition."
+        ::= { jnxChassisOKTraps 7 }
+
+--
+-- definition of jnx asic ext mem related traps
+--
+
+    -- Traps for alarm conditions
+
+    jnxHmcFatal NOTIFICATION-TYPE
+        OBJECTS         { jnxContentsContainerIndex,
+                          jnxContentsL1Index,
+                          jnxContentsL2Index,
+                          jnxContentsL3Index,
+                          jnxContentsDescr,
+                          jnxOperatingState }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHmcFatal trap signifies that
+                the SNMP entity, acting in an agent role, has
+                detected that the specified HMC on a specific
+                FPC has been in the failure condition."
+        ::= { jnxAsicExtMemTraps 1 }
+
+    -- Traps for alarm cleared conditions
+
+    jnxHmcOK NOTIFICATION-TYPE
+        OBJECTS         { jnxContentsContainerIndex,
+                          jnxContentsL1Index,
+                          jnxContentsL2Index,
+                          jnxContentsL3Index,
+                          jnxContentsDescr,
+                          jnxOperatingState }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHmcOK trap signifies that
+                the SNMP entity, acting in an agent role, has
+                detected that the specified HMC on a specific FPC
+                has recovered from the failure (Fatal error) condition."
+        ::= { jnxAsicExtMemOKTraps 1 }
 
 
 END

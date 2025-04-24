@@ -1,0 +1,80 @@
+-- *****************************************************************
+-- NMS-POWER-MIB: NMS POWER MIB
+--
+-- AUG 2010
+-- Edit by LIUQIANG
+-- Copyright (c) 2010 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,INTEGER,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                          FROM SNMPv2-CONF
+    nmsEPONGroup,nmsMgmt                                 FROM NMS-SMI;
+
+
+               power         OBJECT IDENTIFIER ::= { nmsMgmt 189 }
+               
+              
+-- Notifications
+          powerStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 1 }
+          
+          powerOldStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status before change, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 2 }
+          
+          powerNewStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          power-A-normal(1), 
+                          power-B-normal(2),     
+                          power-A-B-normal(3),
+                          other(4)
+                          }
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Power status after change, power-A-normal(1), power-B-normal(2), power-A-B-normal(3), other(4)."
+              ::= { power 3 }
+          
+          
+
+	powerNotifications OBJECT IDENTIFIER
+                                ::= { power 4 }
+
+
+	powerNotification NOTIFICATION-TYPE
+    		OBJECTS {
+                       powerOldStatus,
+                       powerNewStatus
+                        }
+    		STATUS      current
+    		DESCRIPTION
+        	"The agent generates this notification when power status changes."
+    		::= { powerNotifications 1 }
+
+              
+END

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rssi.inc.php
  *

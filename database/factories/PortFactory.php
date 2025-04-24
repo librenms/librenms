@@ -2,16 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Port> */
+/** @extends Factory<\App\Models\Port> */
 class PortFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {

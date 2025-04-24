@@ -1,3 +1,4 @@
+mib: SIAE-UNIT-MIB:SIAE-POWER-SUPPLY-MIB:SIAE-SFP-MIB
 modules:
     os:
         hardware:
@@ -6,3 +7,139 @@ modules:
         hardware_template: '{{ SIAE-UNIT-MIB::unitLabel.1 }} ({{ SIAE-UNIT-MIB::unitPartNumber.1 }})'
         serial: SIAE-UNIT-MIB::unitParentSerialNumber.1
         version: SIAE-SOFT-MIB::softwareEquipmentReleaseBench1.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - SIAE-SFP-MIB::sfpLabel
+        state:
+            data:
+                -
+                    oid: SIAE-POWER-SUPPLY-MIB::pwrSupplyTable
+                    value: SIAE-POWER-SUPPLY-MIB::pwrSupplyRowStatus
+                    num_oid: '.1.3.6.1.4.1.3373.1103.89.2.1.4.{{ $index }}'
+                    descr: SIAE-POWER-SUPPLY-MIB::pwrSupplyLabel
+                    index: 'pwrSupplyRowStatus.{{ $index }}'
+                    state_name: pwrSupplyRowStatus
+                    states:
+                        - { descr: Active, graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Not in service', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'Not ready', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Create and go', graph: 1, value: 4, generic: 3 }
+                        - { descr: 'Create and wait', graph: 1, value: 5, generic: 3 }
+                        - { descr: 'Destroy', graph: 1, value: 6, generic: 3 }
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpLOSPinOut
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.2.{{ $index }}'
+                    descr: '{{ $SIAE-SFP-MIB::sfpLabel }} LOS'
+                    index: 'sfpLOSPinOut.{{ $index }}'
+                    state_name: sfpLOSPinOut
+                    states:
+                        - { descr: 'LOS Detected', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'LOS OK', graph: 1, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpTxFaultPinOut
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.3.{{ $index }}'
+                    descr: '{{ $SIAE-SFP-MIB::sfpLabel }} Tx Status'
+                    index: 'sfpTxFaultPinOut.{{ $index }}'
+                    state_name: sfpTxFaultPinOut
+                    states:
+                        - { descr: 'Fault', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'OK', graph: 1, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+        temperature:
+            data:
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpTemperature
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.6.{{ $index }}'
+                    descr: SIAE-SFP-MIB::sfpLabel
+                    index: 'sfpTemperature.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+        voltage:
+            data:
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpVoltage
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.7.{{ $index }}'
+                    descr: SIAE-SFP-MIB::sfpLabel
+                    index: 'sfpVoltage.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+        current:
+            data:
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpTxBias
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.8.{{ $index }}'
+                    descr: SIAE-SFP-MIB::sfpLabel
+                    index: 'sfpTxBias.{{ $index }}'
+                    divisor: 1000000
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+                        -
+                            oid: SIAE-SFP-MIB::sfpTxBias
+                            op: '='
+                            value: 0
+        power:
+            data:
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpTxPower
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.9.{{ $index }}'
+                    descr: SIAE-SFP-MIB::sfpLabel
+                    index: 'sfpTxPower.{{ $index }}'
+                    divisor: 1000000
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+                        -
+                            oid: SIAE-SFP-MIB::sfpTxPower
+                            op: '='
+                            value: 0
+                -
+                    oid: SIAE-SFP-MIB::sfpDiagnosticTable
+                    value: SIAE-SFP-MIB::sfpRxPower
+                    num_oid: '.1.3.6.1.4.1.3373.1103.74.7.1.10.{{ $index }}'
+                    descr: SIAE-SFP-MIB::sfpLabel
+                    index: 'sfpRxPower.{{ $index }}'
+                    divisor: 1000000
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: SIAE-SFP-MIB::sfpDiagnosticValid
+                            op: '='
+                            value: 2
+                        -
+                            oid: SIAE-SFP-MIB::sfpRxPower
+                            op: '='
+                            value: 0

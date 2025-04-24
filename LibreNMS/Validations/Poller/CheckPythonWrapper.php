@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckPythonWrapper.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\Validations\Poller;
 use App\Models\Poller;
 use App\Models\PollerCluster;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
@@ -70,7 +72,7 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
      */
     public function enabled(): bool
     {
-        return true;
+        return Eloquent::isConnected();
     }
 
     private function checkPythonWrapper(): ValidationResult

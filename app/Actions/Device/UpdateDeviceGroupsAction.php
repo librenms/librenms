@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UpdateDeviceGroupsAction.php
  *
@@ -32,7 +33,7 @@ use Log;
 class UpdateDeviceGroupsAction
 {
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     private $device;
 

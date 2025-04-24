@@ -1,4 +1,5 @@
 <?php
+
 /*
  * VminfoVmware.php
  *
@@ -27,13 +28,14 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PowerState;
 
 trait VminfoVmware
 {
     public function discoverVmInfo(): Collection
     {
-        echo 'VMware VM: ';
+        Log::info('VMware VM: ');
 
         /*
          * Fetch the Virtual Machine information.

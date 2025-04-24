@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SnmpCapabilities.php
  *

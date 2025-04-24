@@ -75,7 +75,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
         $group = $value['group'];
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             $class,
             $device,
             $oid,

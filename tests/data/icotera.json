@@ -1229,5 +1229,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "ICOTERA_i6400",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "i6400",
+                    "entPhysicalHardwareRev": "0.0.1",
+                    "entPhysicalFirmwareRev": "2.5.0",
+                    "entPhysicalSoftwareRev": "2.5.0",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "0",
+                    "entPhysicalModelName": "i6405-51",
+                    "entPhysicalVendorType": "enterprises.29865.11",
+                    "entPhysicalSerialNum": "6405513318001608",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 0,
+                    "entPhysicalMfgName": "ICOTERA",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

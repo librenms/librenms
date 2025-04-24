@@ -4172,5 +4172,31 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "................\n00 00 00 00",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "................\n00 00 00 00",
+                    "entPhysicalHardwareRev": "AB",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LBB_240",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "S1730007920093079",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

@@ -45,7 +45,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(format_hostname($device)); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">
@@ -150,7 +150,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class='col-sm-9 col-md-10'>
                                         <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
                                     </div>
-                                </div>                                
+                                </div>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
@@ -182,6 +182,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
+    <script src="js/interact.min.js"></script>
     <script>
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {
@@ -197,7 +198,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }).queryBuilder({
             plugins: [
-                'bt-tooltip-errors'
+                'bt-tooltip-errors',
+                'sortable'
                 // 'not-group'
             ],
 

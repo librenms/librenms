@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rewrite.php
  *
@@ -210,6 +211,18 @@ class Rewrite
         return $location;
     }
 
+    public static function dslLineType(string $lineType): string
+    {
+        return match ($lineType) {
+            'noChannel' => 'No Channel',
+            'fastOnly' => 'Fastpath',
+            'interleavedOnly' => 'Interleaved',
+            'fastOrInterleaved' => 'Fast/Interleaved',
+            'fastAndInterleaved' => 'Fast+Interleaved',
+            default => $lineType,
+        };
+    }
+
     public static function vmwareGuest($guest_id)
     {
         $guests = [
@@ -379,11 +392,6 @@ class Rewrite
         return $guests[$guest_id] ?? $guest_id;
     }
 
-    public static function zeropad($num, $length = 2)
-    {
-        return str_pad($num, $length, '0', STR_PAD_LEFT);
-    }
-
     /**
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
@@ -393,5 +401,10 @@ class Rewrite
     public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
+
+    public static function celsiusToFahrenheit(float $celsius): float
+    {
+        return round($celsius * 1.8 + 32, 2);
     }
 }

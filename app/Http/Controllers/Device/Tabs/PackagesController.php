@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PackagesController.php
  *
@@ -26,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PackagesController implements DeviceTab
@@ -50,7 +52,7 @@ class PackagesController implements DeviceTab
         return __('Pkgs');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

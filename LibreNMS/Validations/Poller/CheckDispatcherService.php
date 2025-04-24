@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckDispatcherService.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\Validations\Poller;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 
 class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
@@ -49,7 +51,7 @@ class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
      */
     public function enabled(): bool
     {
-        return Device::exists();
+        return Eloquent::isConnected() && Device::exists();
     }
 
     private function checkDispatchService(): ValidationResult

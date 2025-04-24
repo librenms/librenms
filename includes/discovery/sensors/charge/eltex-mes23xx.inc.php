@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES23xx Battery charge
  *
@@ -40,7 +41,7 @@ if ($oids) {
                 $lowwarnlimit = 10;
                 $descr = 'Battery Charge';
 
-                discover_sensor($valid['sensor'], 'charge', $device, $oid, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value);
+                discover_sensor(null, 'charge', $device, $oid, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value);
             }
         }
     }

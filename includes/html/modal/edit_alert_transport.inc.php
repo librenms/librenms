@@ -44,7 +44,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 // Create list of transport
     $transports_list = Transport::list();
     foreach ($transports_list as $transport => $name) {
-        echo '<option value="' . $transport . '-form">' . $name . '</option>';
+        echo '<option value="' . htmlentities($transport) . '-form">' . htmlentities($name) . '</option>';
     } ?>
                                 </select>
                             </div>
@@ -67,19 +67,19 @@ if (Auth::user()->hasGlobalAdmin()) {
             continue;
         }
 
-        echo '<form method="post" role="form" id="' . $transport . '-form" class="form-horizontal transport">';
+        echo '<form method="post" role="form" id="' . htmlentities($transport) . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" value="' . $transport . '">';
+        echo '<input type="hidden" name="transport-type" value="' . htmlentities($transport) . '">';
 
         $tmp = call_user_func($class . '::configTemplate');
 
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
-                echo '<div class="form-group" title="' . $item['descr'] . '">';
-                echo '<label for="' . $item['name'] . '" class="col-sm-3 col-md-2 control-label">' . $item['title'] . ': </label>';
+                echo '<div class="form-group" title="' . htmlentities($item['descr']) . '">';
+                echo '<label for="' . htmlentities($item['name']) . '" class="col-sm-3 col-md-2 control-label">' . htmlentities($item['title']) . ': </label>';
                 if ($item['type'] == 'text' || $item['type'] == 'password') {
                     echo '<div class="col-sm-9 col-md-10">';
-                    echo '<input type="' . $item['type'] . '" id="' . $item['name'] . '" name="' . $item['name'] . '" class="form-control" ';
+                    echo '<input type="' . htmlentities($item['type']) . '" id="' . htmlentities($item['name']) . '" name="' . htmlentities($item['name']) . '" class="form-control" ';
                     if ($item['required']) {
                         echo 'required>';
                     } else {
@@ -88,33 +88,33 @@ if (Auth::user()->hasGlobalAdmin()) {
                     echo '</div>';
                 } elseif ($item['type'] == 'checkbox') {
                     echo '<div class="col-sm-2">';
-                    echo '<input type="checkbox" name="' . $item['name'] . '" id="' . $item['name'] . '">';
+                    echo '<input type="checkbox" name="' . htmlentities($item['name']) . '" id="' . htmlentities($item['name']) . '">';
                     echo '</div>';
-                    $switches[$item['name']] = $item['default'];
+                    $switches[$item['name']] = htmlentities($item['default']);
                 } elseif ($item['type'] == 'select') {
                     echo '<div class="col-sm-3">';
-                    echo '<select name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control">';
+                    echo '<select name="' . htmlentities($item['name']) . '" id="' . htmlentities($item['name']) . '" class="form-control">';
                     foreach ($item['options'] as $descr => $opt) {
-                        echo '<option value="' . $opt . '">' . $descr . '</option>';
+                        echo '<option value="' . htmlentities($opt) . '">' . htmlentities($descr). '</option>';
                     }
                     echo '</select>';
                     echo '</div>';
                 } elseif ($item['type'] === 'textarea') {
                     echo '<div class="col-sm-9 col-md-10">';
-                    echo '<textarea name="' . $item['name'] . '" id="' . $item['name'] . '" class="form-control" placeholder="' . $item['descr'] . '">';
+                    echo '<textarea name="' . htmlentities($item['name']) . '" id="' . htmlentities($item['name']) . '" class="form-control" placeholder="' . htmlentities($item['descr']) . '">';
                     echo '</textarea>';
                     echo '</div>';
                 } elseif ($item['type'] === 'oauth') {
-                    $class = isset($item['class']) ? $item['class'] : 'btn-success';
+                    $class = $item['class'] ?? 'btn-success';
                     $callback = urlencode(url()->current() . '/?oauthtransport=' . $transport);
                     $url = $item['url'] . $callback;
 
-                    echo '<a class="btn btn-oauth ' . $class . '"';
-                    echo '" href="' . $url . '" data-base-url="' . $url . '">';
+                    echo '<a class="btn btn-oauth ' . htmlentities($class) . '"';
+                    echo '" href="' . htmlentities($url) . '" data-base-url="' . htmlentities($url) . '">';
                     if (isset($item['icon'])) {
                         echo '<img src="' . asset('images/transports/' . $item['icon']) . '"  width="24" height="24"> ';
                     }
-                    echo $item['descr'];
+                    echo htmlentities($item['descr']);
                     echo '</a>';
                 }
                 echo '</div>';

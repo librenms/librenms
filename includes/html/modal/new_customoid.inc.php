@@ -16,7 +16,7 @@ if (! (Auth::user()->hasGlobalAdmin())) {
             <div class="modal-body">
                 <form method="post" role="form" id="coids" class="form-horizontal coid_form">
                     <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
-                    <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
+                    <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(format_hostname($device)); ?>">
                     <input type="hidden" name="ccustomoid_id" id="ccustomoid_id" value="">
                     <input type="hidden" name="type" id="type" value="customoid">
                     <input type="hidden" name="action" id="action" value="">

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nac.php
  *
@@ -54,7 +55,7 @@ class Nac implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  Os  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -71,7 +72,7 @@ class Nac implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -81,11 +82,9 @@ class Nac implements Module
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
             //filter out historical entries
-            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address')->filter(function ($value, $key) {
-                if ($value['historical'] == 0) {
-                    return $value;
-                }
-            });
+            $existing_entries = $os->getDevice()->portsNac()
+                ->where('historical', 0)
+                ->get()->keyBy('mac_address');
 
             // update existing models
             foreach ($nac_entries as $nac_entry) {
@@ -115,20 +114,29 @@ class Nac implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->portsNac()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->portsNac()->delete();
+        return $device->portsNac()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
+        if ($type == 'discovery') {
+            return null;
+        }
+
         return [
             'ports_nac' => $device->portsNac()->orderBy('ports.ifIndex')->orderBy('mac_address')
                 ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')

@@ -3,15 +3,12 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Silber\Bouncer\BouncerFacade as Bouncer;
 
 /** @extends Factory<\App\Models\User> */
 class UserFactory extends Factory
 {
     /**
      * Define the model's default state.
-     *
-     * @return array
      */
     public function definition(): array
     {
@@ -24,20 +21,17 @@ class UserFactory extends Factory
         ];
     }
 
-    public function admin()
+    public function admin(): UserFactory
     {
         return $this->afterCreating(function ($user) {
-            Bouncer::allow('admin')->everything();
-            $user->assign('admin');
+            $user->assignRole('admin');
         });
     }
 
-    public function read()
+    public function read(): UserFactory
     {
         return $this->afterCreating(function ($user) {
-            Bouncer::allow(Bouncer::role()->firstOrCreate(['name' => 'global-read'], ['title' => 'Global Read']))
-                ->to('viewAny', '*', []);
-            $user->assign('global-read');
+            $user->assignRole('global-read');
         });
     }
 }

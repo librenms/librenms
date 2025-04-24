@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES24xx SFP OpticalPower
  *
@@ -21,6 +22,7 @@
  * @copyright  2024 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
@@ -45,28 +47,27 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1');
-            discover_sensor(
-                $valid['sensor'],
-                'dbm',
-                $device,
-                $oid,
-                'SfpTxDbm' . $ifIndex,
-                'ELTEX-PHY-MIB',
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                'Transceiver TX'
-            );
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1')->toNumeric();
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'dbm',
+                'sensor_oid' => $oid,
+                'sensor_index' => 'SfpTxDbm' . $ifIndex,
+                'sensor_type' => 'ELTEX-PHY-MIB',
+                'sensor_descr' => 'SfpTxDbm-' . $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $low_limit,
+                'sensor_limit_low_warn' => $low_warn_limit,
+                'sensor_limit_warn' => $high_warn_limit,
+                'sensor_limit' => $high_limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'port',
+                'user_func' => null,
+                'group' => 'transceiver',
+            ]));
         }
     }
 }
@@ -80,28 +81,27 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['rxOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1');
-            discover_sensor(
-                $valid['sensor'],
-                'dbm',
-                $device,
-                $oid,
-                'SfpRxDbm' . $ifIndex,
-                'ELTEX-PHY-MIB',
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                'Transceiver RX'
-            );
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1')->toNumeric();
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'dbm',
+                'sensor_oid' => $oid,
+                'sensor_index' => 'SfpRxDbm' . $ifIndex,
+                'sensor_type' => 'ELTEX-PHY-MIB',
+                'sensor_descr' => 'SfpRxDbm-' . $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $low_limit,
+                'sensor_limit_low_warn' => $low_warn_limit,
+                'sensor_limit_warn' => $high_warn_limit,
+                'sensor_limit' => $high_limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'port',
+                'user_func' => null,
+                'group' => 'transceiver',
+            ]));
         }
     }
 }

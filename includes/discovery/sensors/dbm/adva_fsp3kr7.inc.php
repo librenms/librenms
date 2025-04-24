@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS - ADVA device support - Pre-Cache for Sensors
  *
@@ -29,7 +30,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
         $descr = $entry['entityFacilityAidString'] . ' RX';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'dbm',
             $device,
             $oidRX,
@@ -52,7 +53,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
         $currentTX = $entry['pmSnapshotCurrentOutputPower'] / $divisor;
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'dbm',
             $device,
             $oidTX,

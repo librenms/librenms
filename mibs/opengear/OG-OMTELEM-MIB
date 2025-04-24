@@ -1,0 +1,1112 @@
+-- =====================================================================
+-- == OG-OMSTATUS-MIB:                                                ==
+-- == Opengear Operation Manager Status Management Information Base   ==
+-- ==                                                                 ==
+-- == (c) Copyright 2020 Opengear Inc.                                ==
+-- =====================================================================
+
+OG-OMTELEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ogMgmt
+        FROM OG-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC;
+
+ogOmTelem MODULE-IDENTITY
+    LAST-UPDATED "202311130934Z"
+    ORGANIZATION
+        "Opengear Inc."
+    CONTACT-INFO
+        "Opengear Inc.
+        630 West 9560 South, Suite A,
+        Sandy, UT 84070
+        support@opengear.com"
+    DESCRIPTION
+        "Opengear Operation Manager Telemetry MIB"
+    REVISION "202311130934Z"
+    DESCRIPTION
+        "Update Opengear Telemetry MIB for version 23.12.0.
+        - Add lteNr5g and nr5g enum values to accessTechnology leaf."
+    REVISION "202103121454Z"
+    DESCRIPTION
+        "added lastActiveTime to cell-uim submodule"
+    REVISION "202008041454Z"
+    DESCRIPTION
+        "Initial revision"
+    ::= { ogMgmt 19 }
+
+
+ogOmSystem OBJECT IDENTIFIER ::= { ogOmTelem 1 }
+
+ogOmSystemHostName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current host name (if applicable)."
+    ::= { ogOmSystem 1 }
+
+ogOmSystemSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current serial number (if applicable)."
+    ::= { ogOmSystem 2 }
+
+ogOmSystemFirmwareVersion OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current device firmware."
+    ::= { ogOmSystem 3 }
+
+ogOmSystemVendor OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device vendor."
+    ::= { ogOmSystem 4 }
+
+ogOmSystemModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The device model."
+    ::= { ogOmSystem 5 }
+
+ogOmSerialPort OBJECT IDENTIFIER ::= { ogOmTelem 2 }
+
+ogOmSerialPortCount OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of serial ports"
+    ::= { ogOmSerialPort 1 }
+
+ogOmSerialPortTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF SerialPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Serial Port table structure."
+    ::= { ogOmSerialPort 2 }
+
+ogOmSerialPortEntry OBJECT-TYPE
+    SYNTAX SerialPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A serial port status table entry."
+    INDEX { ogOmSerialPortIndex }
+    ::= { ogOmSerialPortTable 1 }
+
+SerialPortEntry ::= SEQUENCE  {
+    ogOmSerialPortIndex    Integer32,
+    ogOmSerialPortLabel    DisplayString,
+    ogOmSerialPortSpeed    Integer32,
+    ogOmSerialPortDataBits    Integer32,
+    ogOmSerialPortParity    INTEGER,
+    ogOmSerialPortStopBits    INTEGER,
+    ogOmSerialPortFlowControl    INTEGER,
+    ogOmSerialPortMode    INTEGER,
+    ogOmSerialPortPinout    INTEGER,
+    ogOmSerialPortLogLevel    INTEGER,
+    ogOmSerialPortRxBytes    Counter64,
+    ogOmSerialPortTxBytes    Counter64,
+    ogOmSerialPortFramingErrors    Counter64,
+    ogOmSerialPortParityErrors    Counter64,
+    ogOmSerialPortOverrunErrors    Counter64,
+    ogOmSerialPortBreaks    Counter64,
+    ogOmSerialPortDCD    INTEGER,
+    ogOmSerialPortDTR    INTEGER,
+    ogOmSerialPortDSR    INTEGER,
+    ogOmSerialPortCTS    INTEGER,
+    ogOmSerialPortRTS    INTEGER
+}
+
+ogOmSerialPortIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index within the serial port table of this status"
+    ::= { ogOmSerialPortEntry 1 }
+
+ogOmSerialPortLabel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port descriptive name"
+    ::= { ogOmSerialPortEntry 2 }
+
+ogOmSerialPortSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port speed in bits per second"
+    ::= { ogOmSerialPortEntry 3 }
+
+ogOmSerialPortDataBits OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port character size"
+    ::= { ogOmSerialPortEntry 4 }
+
+ogOmSerialPortParity OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        odd(2),
+        even(3),
+        mark(4),
+        space(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port parity"
+    ::= { ogOmSerialPortEntry 5 }
+
+ogOmSerialPortStopBits OBJECT-TYPE
+    SYNTAX INTEGER {
+        one(1),
+        two(2),
+        oneAndAHalf(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port number of stop bits"
+    ::= { ogOmSerialPortEntry 6 }
+
+ogOmSerialPortFlowControl OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        hardware(2),
+        software(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port flow control type"
+    ::= { ogOmSerialPortEntry 7 }
+
+ogOmSerialPortMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(1),
+        localConsole(2),
+        consoleServer(3),
+        bridge(4),
+        terminalServer(5),
+        reserved(6),
+        pduDevice(7),
+        unknown(8)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port operational mode type"
+    ::= { ogOmSerialPortEntry 8 }
+
+ogOmSerialPortPinout OBJECT-TYPE
+    SYNTAX INTEGER {
+        x1(1),
+        x2(2),
+        usb(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port pinout type"
+    ::= { ogOmSerialPortEntry 9 }
+
+ogOmSerialPortLogLevel OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(1),
+        connect(2),
+        inputAndOutput(3),
+        inputOnly(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port logging level"
+    ::= { ogOmSerialPortEntry 10 }
+
+ogOmSerialPortRxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port bytes received"
+    ::= { ogOmSerialPortEntry 11 }
+
+ogOmSerialPortTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port bytes transmitted"
+    ::= { ogOmSerialPortEntry 12 }
+
+ogOmSerialPortFramingErrors OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port framing error total."
+    ::= { ogOmSerialPortEntry 13 }
+
+ogOmSerialPortParityErrors OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port parity error total."
+    ::= { ogOmSerialPortEntry 14 }
+
+ogOmSerialPortOverrunErrors OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port Overrun Error total."
+    ::= { ogOmSerialPortEntry 15 }
+
+ogOmSerialPortBreaks OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port break total"
+    ::= { ogOmSerialPortEntry 16 }
+
+ogOmSerialPortDCD OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the DCD signal."
+    ::= { ogOmSerialPortEntry 17 }
+
+ogOmSerialPortDTR OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the DTR signal."
+    ::= { ogOmSerialPortEntry 18 }
+
+ogOmSerialPortDSR OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the DSR signal."
+    ::= { ogOmSerialPortEntry 19 }
+
+ogOmSerialPortCTS OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the CTS signal."
+    ::= { ogOmSerialPortEntry 20 }
+
+ogOmSerialPortRTS OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        on(1),
+        off(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the RTS signal."
+    ::= { ogOmSerialPortEntry 21 }
+
+ogOmSerialUser OBJECT IDENTIFIER ::= { ogOmTelem 3 }
+
+ogOmSerialUserTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF SerialUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Serial Console User table entry structure."
+    ::= { ogOmSerialUser 1 }
+
+ogOmSerialUserEntry OBJECT-TYPE
+    SYNTAX SerialUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A user logged in on the serial port"
+    INDEX { ogOmSerialUserIndex }
+    ::= { ogOmSerialUserTable 1 }
+
+SerialUserEntry ::= SEQUENCE  {
+    ogOmSerialUserIndex    Integer32,
+    ogOmSerialUserStartTime    DateAndTime,
+    ogOmSerialUserPortNumber    Integer32,
+    ogOmSerialUserPortLabel    DisplayString,
+    ogOmSerialUserName    DisplayString
+}
+
+ogOmSerialUserIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index within the serial port active users table"
+    ::= { ogOmSerialUserEntry 1 }
+
+ogOmSerialUserStartTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time and date the user session started."
+    ::= { ogOmSerialUserEntry 2 }
+
+ogOmSerialUserPortNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial port number"
+    ::= { ogOmSerialUserEntry 3 }
+
+ogOmSerialUserPortLabel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The readable label for the serial port."
+    ::= { ogOmSerialUserEntry 4 }
+
+ogOmSerialUserName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the user logged in on the port."
+    ::= { ogOmSerialUserEntry 5 }
+
+ogOmWebUser OBJECT IDENTIFIER ::= { ogOmTelem 4 }
+
+ogOmWebUserTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF WebUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Web UI User table structure."
+    ::= { ogOmWebUser 1 }
+
+ogOmWebUserEntry OBJECT-TYPE
+    SYNTAX WebUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A user logged in to the Web Interface"
+    INDEX { ogOmWebUserIndex }
+    ::= { ogOmWebUserTable 1 }
+
+WebUserEntry ::= SEQUENCE  {
+    ogOmWebUserIndex    Integer32,
+    ogOmWebUserStartTime    DateAndTime,
+    ogOmWebUserName    DisplayString,
+    ogOmWebUserSourceAddress    DisplayString,
+    ogOmWebUserSourcePort    Integer32
+}
+
+ogOmWebUserIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index within the Web Interface users table"
+    ::= { ogOmWebUserEntry 1 }
+
+ogOmWebUserStartTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The web users session start date and time."
+    ::= { ogOmWebUserEntry 2 }
+
+ogOmWebUserName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The web users active username."
+    ::= { ogOmWebUserEntry 3 }
+
+ogOmWebUserSourceAddress OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The web users source address."
+    ::= { ogOmWebUserEntry 4 }
+
+ogOmWebUserSourcePort OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The web users source tcp port."
+    ::= { ogOmWebUserEntry 5 }
+
+ogOmCellular OBJECT IDENTIFIER ::= { ogOmTelem 5 }
+
+ogOmCellularTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF CellularEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Cellular modem table structure."
+    ::= { ogOmCellular 1 }
+
+ogOmCellularEntry OBJECT-TYPE
+    SYNTAX CellularEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A cellular modem status entry."
+    INDEX { ogOmCellularIndex }
+    ::= { ogOmCellularTable 1 }
+
+CellularEntry ::= SEQUENCE  {
+    ogOmCellularIndex    Integer32,
+    ogOmCellularVendor    DisplayString,
+    ogOmCellularModel    DisplayString,
+    ogOmCellularEquipmentId    DisplayString,
+    ogOmCellularFirmware    DisplayString,
+    ogOmCellularState    INTEGER,
+    ogOmCellularAccessTechnology    INTEGER,
+    ogOmCellularActiveUim    Counter32,
+    ogOmCellularUimFailoverState    INTEGER
+}
+
+ogOmCellularIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the cellular modem status entry."
+    ::= { ogOmCellularEntry 1 }
+
+ogOmCellularVendor OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Manufacturer ID of Cellular Modem."
+    ::= { ogOmCellularEntry 2 }
+
+ogOmCellularModel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Cellular Modem model name."
+    ::= { ogOmCellularEntry 3 }
+
+ogOmCellularEquipmentId OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Cellular Modem Equipment Identifier (IMEI)."
+    ::= { ogOmCellularEntry 4 }
+
+ogOmCellularFirmware OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current Cellular Modem firmware revision."
+    ::= { ogOmCellularEntry 5 }
+
+ogOmCellularState OBJECT-TYPE
+    SYNTAX INTEGER {
+        failed(1),
+        unknown(2),
+        initializing(3),
+        locked(4),
+        disabled(5),
+        disabling(6),
+        enabling(7),
+        enabled(8),
+        searching(9),
+        registered(10),
+        disconnecting(11),
+        connecting(12),
+        connected(13)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The overall current state of the modem."
+    ::= { ogOmCellularEntry 6 }
+
+ogOmCellularAccessTechnology OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        cdma(2),
+        evdo(3),
+        gsm(4),
+        umts(5),
+        lte(6),
+        gsmUmts(7),
+        gsmUmtsLte(8),
+        cdmaEvdo(9),
+        cdmaEvdoLte(10),
+        lteNr5g(11),
+        nr5g(12)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current Radio Access Technology being used"
+    ::= { ogOmCellularEntry 7 }
+
+ogOmCellularActiveUim OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The physical UIM card slot number that is currently active."
+    ::= { ogOmCellularEntry 8 }
+
+ogOmCellularUimFailoverState OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        disabled(2),
+        enabled(3),
+        failingOver(4),
+        failedOver(5),
+        failingBack(6)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current UIM failover state"
+    ::= { ogOmCellularEntry 9 }
+
+ogOmCellUim OBJECT IDENTIFIER ::= { ogOmTelem 6 }
+
+ogOmCellUimTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF CellUimEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Cellular modem UIM table structure."
+    ::= { ogOmCellUim 1 }
+
+ogOmCellUimEntry OBJECT-TYPE
+    SYNTAX CellUimEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A cellular modem UIM status entry."
+    INDEX { ogOmCellUimIndex }
+    ::= { ogOmCellUimTable 1 }
+
+CellUimEntry ::= SEQUENCE  {
+    ogOmCellUimIndex    Integer32,
+    ogOmCellUimPhysicalSlot    Counter32,
+    ogOmCellUimSlotState    INTEGER,
+    ogOmCellUimCardState    INTEGER,
+    ogOmCellUimIccid    DisplayString,
+    ogOmCellUimImsi    DisplayString,
+    ogOmCellUimOperatorName    DisplayString,
+    ogOmCellUimApn    DisplayString,
+    ogOmCellUimSignalQuality    Integer32,
+    ogOmCellUimRssi    Integer32,
+    ogOmCellUimConnectivityHealth    INTEGER,
+    ogOmCellUimSignalHealth    INTEGER,
+    ogOmCellUimLastUpdateTime    DateAndTime,
+    ogOmCellUimLastActiveTime    DateAndTime,
+    ogOmCellUimRoamingOperatorName    DisplayString
+}
+
+ogOmCellUimIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the cellular modem UIM card."
+    ::= { ogOmCellUimEntry 1 }
+
+ogOmCellUimPhysicalSlot OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The physical UIM card slot number."
+    ::= { ogOmCellUimEntry 2 }
+
+ogOmCellUimSlotState OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        inactive(2),
+        active(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current state of the Cellular Modem signal quality."
+    ::= { ogOmCellUimEntry 3 }
+
+ogOmCellUimCardState OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        absent(2),
+        present(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current UIM Card presence state."
+    ::= { ogOmCellUimEntry 4 }
+
+ogOmCellUimIccid OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ICCID of the UIM card currently in use by this modem."
+    ::= { ogOmCellUimEntry 5 }
+
+ogOmCellUimImsi OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IMSI of the UIM card currently in use by this modem."
+    ::= { ogOmCellUimEntry 6 }
+
+ogOmCellUimOperatorName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the home network operator for this UIM card."
+    ::= { ogOmCellUimEntry 7 }
+
+ogOmCellUimApn OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The APN configured for this cellular modem UIM card."
+    ::= { ogOmCellUimEntry 8 }
+
+ogOmCellUimSignalQuality OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Signal quality as a percent of the dominant access technology the device is using to communicate with the network."
+    ::= { ogOmCellUimEntry 9 }
+
+ogOmCellUimRssi OBJECT-TYPE
+    SYNTAX Integer32 (-99..99)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Received Signal Strength Indicator (RSSI) for the current Radio Access Technology if applicable."
+    ::= { ogOmCellUimEntry 10 }
+
+ogOmCellUimConnectivityHealth OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        bad(2),
+        good(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current state of the Cellular Modem connectivity testing."
+    ::= { ogOmCellUimEntry 11 }
+
+ogOmCellUimSignalHealth OBJECT-TYPE
+    SYNTAX INTEGER {
+        unavailable(1),
+        bad(2),
+        moderate(3),
+        good(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current state of the Cellular Modem signal quality."
+    ::= { ogOmCellUimEntry 12 }
+
+ogOmCellUimLastUpdateTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The date and time of the last UIM card status check."
+    ::= { ogOmCellUimEntry 13 }
+
+ogOmCellUimLastActiveTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The date and time of the last UIM card activation."
+    ::= { ogOmCellUimEntry 14 }
+
+ogOmCellUimRoamingOperatorName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the roaming network operator for this UIM card."
+    ::= { ogOmCellUimEntry 15 }
+
+ogOmEnrollment OBJECT IDENTIFIER ::= { ogOmTelem 7 }
+
+ogOmEnrollmentTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF EnrollmentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Lighthouse Enrollment table structure."
+    ::= { ogOmEnrollment 1 }
+
+ogOmEnrollmentEntry OBJECT-TYPE
+    SYNTAX EnrollmentEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A Lighthouse Enrollment status entry."
+    INDEX { ogOmEnrollmentIndex }
+    ::= { ogOmEnrollmentTable 1 }
+
+EnrollmentEntry ::= SEQUENCE  {
+    ogOmEnrollmentIndex    Integer32,
+    ogOmEnrollmentAddress    DisplayString,
+    ogOmEnrollmentPort    Integer32,
+    ogOmEnrollmentBundle    DisplayString,
+    ogOmEnrollmentStatus    INTEGER
+}
+
+ogOmEnrollmentIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the Lighthouse Enrollment status entry."
+    ::= { ogOmEnrollmentEntry 1 }
+
+ogOmEnrollmentAddress OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Lighthouse Enrollment address."
+    ::= { ogOmEnrollmentEntry 2 }
+
+ogOmEnrollmentPort OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Lighthouse Enrollment TCP port."
+    ::= { ogOmEnrollmentEntry 3 }
+
+ogOmEnrollmentBundle OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Lighthouse Enrollment bundle."
+    ::= { ogOmEnrollmentEntry 4 }
+
+ogOmEnrollmentStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        enrolling(2),
+        connected(3),
+        disconnected(4),
+        registered(5),
+        failed(6)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current Lighthouse Enrollment status."
+    ::= { ogOmEnrollmentEntry 5 }
+
+ogOmPowerSupply OBJECT IDENTIFIER ::= { ogOmTelem 8 }
+
+ogOmPowerSupplyTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF PowerSupplyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Power Supply table structure."
+    ::= { ogOmPowerSupply 1 }
+
+ogOmPowerSupplyEntry OBJECT-TYPE
+    SYNTAX PowerSupplyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A Power Supply status entry."
+    INDEX { ogOmPowerSupplyIndex }
+    ::= { ogOmPowerSupplyTable 1 }
+
+PowerSupplyEntry ::= SEQUENCE  {
+    ogOmPowerSupplyIndex    Integer32,
+    ogOmPowerSupplyName    DisplayString,
+    ogOmPowerSupplyDevice    DisplayString,
+    ogOmPowerSupplyInputVoltage    Integer32,
+    ogOmPowerSupplyOutputCurrent    Integer32,
+    ogOmPowerSupplyOutputPower    Integer32
+}
+
+ogOmPowerSupplyIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the power supply status entry."
+    ::= { ogOmPowerSupplyEntry 1 }
+
+ogOmPowerSupplyName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Power Supply name."
+    ::= { ogOmPowerSupplyEntry 2 }
+
+ogOmPowerSupplyDevice OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Power Supply device."
+    ::= { ogOmPowerSupplyEntry 3 }
+
+ogOmPowerSupplyInputVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "0.001 volts"
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Power Supply input voltage."
+    ::= { ogOmPowerSupplyEntry 4 }
+
+ogOmPowerSupplyOutputCurrent OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "0.001 Amps"
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Power Supply output current."
+    ::= { ogOmPowerSupplyEntry 5 }
+
+ogOmPowerSupplyOutputPower OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "Watts"
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Power Supply output power."
+    ::= { ogOmPowerSupplyEntry 6 }
+
+ogOmTempSensor OBJECT IDENTIFIER ::= { ogOmTelem 9 }
+
+ogOmTempSensorTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF TempSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Operations Manager Temperature Sensor table structure."
+    ::= { ogOmTempSensor 1 }
+
+ogOmTempSensorEntry OBJECT-TYPE
+    SYNTAX TempSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A Temperature Sensor status entry."
+    INDEX { ogOmTempSensorIndex }
+    ::= { ogOmTempSensorTable 1 }
+
+TempSensorEntry ::= SEQUENCE  {
+    ogOmTempSensorIndex    Integer32,
+    ogOmTempSensorName    DisplayString,
+    ogOmTempSensorDevice    DisplayString,
+    ogOmTempSensorValue    Integer32
+}
+
+ogOmTempSensorIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the Temperature Sensor status entry."
+    ::= { ogOmTempSensorEntry 1 }
+
+ogOmTempSensorName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Temperature Sensor name."
+    ::= { ogOmTempSensorEntry 2 }
+
+ogOmTempSensorDevice OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Temperature Sensor device."
+    ::= { ogOmTempSensorEntry 3 }
+
+ogOmTempSensorValue OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "millidegrees Celsius"
+
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Temperature Sensor value."
+    ::= { ogOmTempSensorEntry 4 }
+
+-- Conformance Information
+ogOmConformance OBJECT IDENTIFIER ::= { ogOmTelem 65535 }
+ogOmCompliances OBJECT IDENTIFIER ::= { ogOmConformance 1 }
+ogOmGroups OBJECT IDENTIFIER ::= { ogOmConformance 2 }
+
+-- Compliance Statements
+ogOmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for the ogOm MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+        ogOmBasicGroup
+    }
+
+::= { ogOmCompliances 1 }
+
+-- Units of Conformance
+ogOmBasicGroup OBJECT-GROUP
+    OBJECTS {
+        ogOmSystemHostName,
+        ogOmSystemSerialNumber,
+        ogOmSystemFirmwareVersion,
+        ogOmSystemVendor,
+        ogOmSystemModel,
+        ogOmSerialPortCount,
+        ogOmSerialPortLabel,
+        ogOmSerialPortSpeed,
+        ogOmSerialPortDataBits,
+        ogOmSerialPortParity,
+        ogOmSerialPortStopBits,
+        ogOmSerialPortFlowControl,
+        ogOmSerialPortMode,
+        ogOmSerialPortPinout,
+        ogOmSerialPortLogLevel,
+        ogOmSerialPortRxBytes,
+        ogOmSerialPortTxBytes,
+        ogOmSerialPortFramingErrors,
+        ogOmSerialPortParityErrors,
+        ogOmSerialPortOverrunErrors,
+        ogOmSerialPortBreaks,
+        ogOmSerialPortDCD,
+        ogOmSerialPortDTR,
+        ogOmSerialPortDSR,
+        ogOmSerialPortCTS,
+        ogOmSerialPortRTS,
+        ogOmSerialUserStartTime,
+        ogOmSerialUserPortNumber,
+        ogOmSerialUserPortLabel,
+        ogOmSerialUserName,
+        ogOmWebUserStartTime,
+        ogOmWebUserName,
+        ogOmWebUserSourceAddress,
+        ogOmWebUserSourcePort,
+        ogOmCellularVendor,
+        ogOmCellularModel,
+        ogOmCellularEquipmentId,
+        ogOmCellularFirmware,
+        ogOmCellularState,
+        ogOmCellularAccessTechnology,
+        ogOmCellularActiveUim,
+        ogOmCellularUimFailoverState,
+        ogOmCellUimPhysicalSlot,
+        ogOmCellUimSlotState,
+        ogOmCellUimCardState,
+        ogOmCellUimIccid,
+        ogOmCellUimImsi,
+        ogOmCellUimOperatorName,
+        ogOmCellUimApn,
+        ogOmCellUimSignalQuality,
+        ogOmCellUimRssi,
+        ogOmCellUimConnectivityHealth,
+        ogOmCellUimSignalHealth,
+        ogOmCellUimLastUpdateTime,
+        ogOmCellUimLastActiveTime,
+        ogOmCellUimRoamingOperatorName,
+        ogOmEnrollmentAddress,
+        ogOmEnrollmentPort,
+        ogOmEnrollmentBundle,
+        ogOmEnrollmentStatus,
+        ogOmPowerSupplyName,
+        ogOmPowerSupplyDevice,
+        ogOmPowerSupplyInputVoltage,
+        ogOmPowerSupplyOutputCurrent,
+        ogOmPowerSupplyOutputPower,
+        ogOmTempSensorName,
+        ogOmTempSensorDevice,
+        ogOmTempSensorValue
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of ogOm related objects."
+    ::= { ogOmGroups 1 }
+
+END

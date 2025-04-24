@@ -37,7 +37,7 @@ modules:
                     oid: aiRadioStatus
                     num_oid: '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.20.{{ $index }}'
                     snmp_flags: '-OteQUsb'
-                    descr: '{{ $aiAPName:0-6 }} ({{ $aiAPSerialNum:0-6 }}) Radio {{ $subindex6 }}'
+                    descr: '{{ $aiAPName:0-5 }} ({{ $aiAPSerialNum:0-5 }}) Radio {{ $subindex6 }}'
                     group: 'Cluster Radios'
                     state_name: aiRadioStatus
                     states:

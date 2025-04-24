@@ -1,3 +1,9 @@
+# FS-MIB entries are for the S3900 (non -R) series
+# They are most likely manufactured by Accton.
+# The MIB FS-MIB file is very simmilar to the edgecos MIB files (with fiberstore using their own enterprise ID)
+#
+# SWITCH MIB entries are for centec based switches where Fiberstore forgot to change the enterprise IDs
+# e.g. the S5800-8TF12S before version 5.3.11.r3
 mib: FS-MIB
 modules:
     mempools:
@@ -8,6 +14,12 @@ modules:
                 used: SWITCH::memTotalUsed
                 precision: 1024
                 descr: 'Chassis Memory'
+            -
+                total: FS-MIB::memoryTotal
+                free: FS-MIB::memoryFreed
+                used: FS-MIB::memoryAllocated
+                precision: 1024
+                descr: 'Memory'
     os:
         hardware:
             - SWITCH::lswSlotCurrentType.1.1
@@ -26,6 +38,13 @@ modules:
                 num_oid: '..1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
                 descr: 'Processor'
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                    - ifName
+                    - FS-MIB::portMediaInfoTable
+                    - FS-MIB::portTransceiverThresholdInfoTable
         temperature:
             data:
                 -
@@ -34,6 +53,82 @@ modules:
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.11.1.3.{{ $index }}'
                     index: 'temp1.{{ $index }}'
                     descr: 'Temperature Unit {{ $subindex0 }} sensor {{ $subindex1 }}'
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTemperature
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.2.{{ $index }}'
+                    descr: '{{ $ifName }} temperature'
+                    index: 'portOpticalMonitoringInfoTemperature.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    low_limit: FS-MIB::portTransceiverThresholdInfoTemperatureLowAlarm
+                    low_warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureLowWarn
+                    warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighWarn
+                    high_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
+        voltage:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoVcc
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.3.{{ $index }}'
+                    descr: '{{ $ifName }} voltage'
+                    index: 'portOpticalMonitoringInfoVcc.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    low_limit: FS-MIB::portTransceiverThresholdInfoVccLowAlarm
+                    low_warn_limit: FS-MIB::portTransceiverThresholdInfoVccLowWarn
+                    warn_limit: FS-MIB::portTransceiverThresholdInfoVccHighWarn
+                    high_limit: FS-MIB::portTransceiverThresholdInfoVccHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
+        current:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.4.{{ $index }}'
+                    descr: '{{ $ifName }} current'
+                    index: 'portOpticalMonitoringInfoTxBiasCurrent.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    low_limit: FS-MIB::portTransceiverThresholdInfoTxBiasCurrentLowAlarm
+                    low_warn_limit: FS-MIB::portTransceiverThresholdInfoTxBiasCurrentLowWarn
+                    warn_limit: FS-MIB::portTransceiverThresholdInfoTxBiasCurrentHighWarn
+                    high_limit: FS-MIB::portTransceiverThresholdInfoTxBiasCurrentHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValuesCurrent
+        dbm:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTxPower
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.5.{{ $index }}'
+                    descr: '{{ $ifName }} TxPower'
+                    index: 'portOpticalMonitoringInfoTxPower.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    low_limit: FS-MIB::portTransceiverThresholdInfoTxPowerLowAlarm
+                    low_warn_limit: FS-MIB::portTransceiverThresholdInfoTxPowerLowWarn
+                    warn_limit: FS-MIB::portTransceiverThresholdInfoTxPowerHighWarn
+                    high_limit: FS-MIB::portTransceiverThresholdInfoTxPowerHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoRxPower
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.6.{{ $index }}'
+                    descr: '{{ $ifName }} RxPower'
+                    index: 'portOpticalMonitoringInfoRxPower.{{ $index }}'
+                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    low_limit: FS-MIB::portTransceiverThresholdInfoRxPowerLowAlarm
+                    low_warn_limit: FS-MIB::portTransceiverThresholdInfoRxPowerLowWarn
+                    warn_limit: FS-MIB::portTransceiverThresholdInfoRxPowerHighWarn
+                    high_limit: FS-MIB::portTransceiverThresholdInfoRxPowerHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
         state:
             data:
                 -
@@ -48,3 +143,19 @@ modules:
                         - { value: 4, generic: 1, descr: noncritical, graph: 0 }
                         - { value: 5, generic: 2, descr: critical, graph: 0 }
                         - { value: 6, generic: 2, descr: unrecoverable, graph: 0 }
+                -
+                    oid: swPowerStatus
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.3.1.8.1'
+                    descr: 'Power status'
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: internalPower }
+                        - { value: 2, generic: 0, graph: 1, descr: redundantPower }
+                        - { value: 3, generic: 0, graph: 1, descr: internalAndRedundantPower }
+                -
+                    oid: swIndivPowerStatus
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.6.1.3.{{ $index }}'
+                    descr: 'Power Unit {{ $subindex0 }} ({{ $subindex1 }}) status'
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: notPresent }
+                        - { value: 2, generic: 0, graph: 1, descr: green }
+                        - { value: 3, generic: 2, graph: 1, descr: red }

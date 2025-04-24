@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@
 namespace LibreNMS\Authentication;
 
 use App\Models\User;
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -34,7 +36,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 {
     use LdapSessionCache;
 
-    protected $ldap_connection;
+    protected ?Connection $ldap_connection = null;
     protected static $AUTH_IS_EXTERNAL = true;
 
     public function __construct()
@@ -46,7 +48,15 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         /**
          * Set up connection to LDAP server
          */
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port'));
+        $port = Config::get('auth_ldap_port');
+        $uri = Config::get('auth_ldap_server');
+        if ($port && ! str_contains($uri, '://')) {
+            $scheme = $port == 636 ? 'ldaps://' : 'ldap://';
+            $uri = $scheme . $uri . ':' . $port;
+        }
+
+        $this->ldap_connection = @ldap_connect($uri);
+
         if (! $this->ldap_connection) {
             throw new AuthenticationException('Fatal error while connecting to LDAP server, uri not valid: ' . Config::get('auth_ldap_server') . ':' . Config::get('auth_ldap_port'));
         }
@@ -95,6 +105,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
 
         $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
         if ($entries['count']) {
             /*
@@ -125,6 +138,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         // Find all defined groups $username is in
         $filter = '(&(|(cn=' . implode(')(cn=', array_keys(Config::get('auth_ldap_groups'))) . '))(' . Config::get('auth_ldap_groupmemberattr') . '=' . $this->getMembername($username) . '))';
         $search = ldap_search($this->ldap_connection, Config::get('auth_ldap_groupbase'), $filter);
+        if ($search === false) {
+            throw new AuthenticationException('Role search failed: ' . ldap_error($this->ldap_connection));
+        }
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
         $authLdapGroups = Config::get('auth_ldap_groups');

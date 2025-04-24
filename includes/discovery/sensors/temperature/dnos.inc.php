@@ -13,7 +13,7 @@ if (! empty($temps)) {
         if (substr($oid, -1) == '1') {
             // This code will only pull CPU temp for each stack member, but there is no reason why the additional values couldn't be graphed
             $counter = $counter + 1;
-            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
+            discover_sensor(null, 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
         }
     }
 }
@@ -31,6 +31,6 @@ if (is_array($oids)) {
         $descr = 'Unit ' . $index . ' ' . $entry['chStackUnitSysType'];
         $oid = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.' . $index;
         $current = $entry['chStackUnitTemp'];
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }
 }

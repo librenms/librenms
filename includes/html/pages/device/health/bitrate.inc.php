@@ -1,4 +1,5 @@
 <?php
+
 /**
  * bitrate.inc.php
  *

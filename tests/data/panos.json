@@ -3737,8 +3737,8 @@
                     "ifName": "ethernet1/1.1",
                     "portName": null,
                     "ifIndex": 101011101,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3837,8 +3837,8 @@
                     "ifName": "ethernet1/1.2",
                     "portName": null,
                     "ifIndex": 101011104,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3937,8 +3937,8 @@
                     "ifName": "ethernet1/1.3",
                     "portName": null,
                     "ifIndex": 101011105,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4037,8 +4037,8 @@
                     "ifName": "ethernet1/1.4",
                     "portName": null,
                     "ifIndex": 101011300,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4137,8 +4137,8 @@
                     "ifName": "ethernet1/1.5",
                     "portName": null,
                     "ifIndex": 101011301,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4237,8 +4237,8 @@
                     "ifName": "ethernet1/1.6",
                     "portName": null,
                     "ifIndex": 101011310,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4337,8 +4337,8 @@
                     "ifName": "ethernet1/1.7",
                     "portName": null,
                     "ifIndex": 101011400,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4437,8 +4437,8 @@
                     "ifName": "vlan",
                     "portName": null,
                     "ifIndex": 200000000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4537,8 +4537,8 @@
                     "ifName": "loopback",
                     "portName": null,
                     "ifIndex": 300000000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4637,8 +4637,8 @@
                     "ifName": "loopback.1",
                     "portName": null,
                     "ifIndex": 300000001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4737,8 +4737,8 @@
                     "ifName": "loopback.2",
                     "portName": null,
                     "ifIndex": 300000002,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4837,8 +4837,8 @@
                     "ifName": "tunnel",
                     "portName": null,
                     "ifIndex": 400000000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4937,8 +4937,8 @@
                     "ifName": "tunnel.1",
                     "portName": null,
                     "ifIndex": 400000001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5153,6 +5153,31 @@
                     "sensor_deleted": 0,
                     "sensor_class": "count",
                     "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.5.1.3.0",
+                    "sensor_index": "panGPGWUtilizationActiveTunnels.0",
+                    "sensor_type": "panos",
+                    "sensor_descr": "GlobalProtect VPN Active Sessions",
+                    "group": "VPN",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": 0,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.25461.2.3.30.1.1.0",
                     "sensor_index": "panLcLogRate.0",
                     "sensor_type": "panos",
@@ -5360,7 +5385,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2,
+                    "sensor_current": 4,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -5385,7 +5410,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 1,
+                    "sensor_current": 5,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -5417,50 +5442,159 @@
                 },
                 {
                     "state_name": "panSysHAPeerState",
-                    "state_descr": "active",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "panSysHAPeerState",
-                    "state_descr": "passive",
-                    "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAPeerState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "panSysHAState",
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
                     "state_descr": "active",
                     "state_draw_graph": 1,
-                    "state_value": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "panSysHAState",
-                    "state_descr": "passive",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
+                    "state_generic_value": 0
                 }
             ]
         },
         "poller": {
             "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.25461.2.1.2.5.1.3.0",
+                    "sensor_index": "panGPGWUtilizationActiveTunnels.0",
+                    "sensor_type": "panos",
+                    "sensor_descr": "GlobalProtect VPN Active Sessions",
+                    "group": "VPN",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": 0,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "count",
@@ -5672,7 +5806,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 2,
+                    "sensor_current": 4,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -5697,7 +5831,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 1,
+                    "sensor_current": 5,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -5729,45 +5863,129 @@
                 },
                 {
                     "state_name": "panSysHAPeerState",
-                    "state_descr": "active",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "panSysHAPeerState",
-                    "state_descr": "passive",
-                    "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAPeerState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "panSysHAState",
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
                     "state_descr": "active",
                     "state_draw_graph": 1,
-                    "state_value": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAPeerState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "panSysHAState",
-                    "state_descr": "passive",
+                    "state_descr": "unknown",
                     "state_draw_graph": 1,
-                    "state_value": 2,
-                    "state_generic_value": 3
+                    "state_value": 0,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "panSysHAState",
                     "state_descr": "suspended",
                     "state_draw_graph": 1,
-                    "state_value": 3,
+                    "state_value": 1,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "non-functional",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "initial",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "passive",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "tentative",
+                    "state_draw_graph": 1,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-secondary",
+                    "state_draw_graph": 1,
+                    "state_value": 11,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "panSysHAState",
+                    "state_descr": "active-primary",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
+                    "state_generic_value": 0
                 }
             ]
         }
@@ -5776,86 +5994,135 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1040",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Config Partition",
                     "storage_size": 8522227712,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3710603264,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1040",
+                    "storage_free": 4811624448,
+                    "storage_free_oid": null,
+                    "storage_perc": 44,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1041",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Log Partition",
                     "storage_size": 5326372864,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3974123520,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1041",
+                    "storage_free": 1352249344,
+                    "storage_free_oid": null,
+                    "storage_perc": 75,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1042",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "Slot-1 Management Root Partition",
                     "storage_size": 7456874496,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 3548856320,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1042",
+                    "storage_free": 3908018176,
+                    "storage_free_oid": null,
+                    "storage_perc": 48,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1040",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Config Partition",
-                    "storage_size": 8522227712,
-                    "storage_units": 1024,
-                    "storage_used": 3710603264,
-                    "storage_free": 4811624448,
-                    "storage_perc": 44,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "PA-VM",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "PA-VM",
+                    "entPhysicalHardwareRev": "1.0",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "9.0.7",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "PA-VM",
+                    "entPhysicalVendorType": "enterprises.25461.2.3.29",
+                    "entPhysicalSerialNum": "015351000009999",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Palo Alto Networks",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011101,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1041",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Log Partition",
-                    "storage_size": 5326372864,
-                    "storage_units": 1024,
-                    "storage_used": 3974123520,
-                    "storage_free": 1352249344,
-                    "storage_perc": 75,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011104,
+                    "ifStackStatus": "active"
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1042",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "Slot-1 Management Root Partition",
-                    "storage_size": 7456874496,
-                    "storage_units": 1024,
-                    "storage_used": 3548856320,
-                    "storage_free": 3908018176,
-                    "storage_perc": 48,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011105,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011300,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011310,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 101011400,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 300000000,
+                    "low_ifIndex": 300000002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 400000000,
+                    "low_ifIndex": 400000001,
+                    "ifStackStatus": "active"
                 }
             ]
         }

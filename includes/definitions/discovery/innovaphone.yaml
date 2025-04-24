@@ -36,7 +36,7 @@ modules:
                         - { descr: up,   graph: 0, value: 2, generic: 0 }
                 -
                     oid: l3Table
-                    value: l3Label
+                    value: l3Protocol
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.2.{{ $index }}'
                     descr: 'ISDN signaling protocol {{ $l3Label }}'
                     state_name: l3Label
@@ -53,13 +53,16 @@ modules:
                     value: l3NumBchanActive
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.4.{{ $index }}'
                     descr: 'Active calls {{ $l3Label }}'
+                    index: 'l3NumBchanActive.{{ $index }}'
                 -
                     oid: l3Table
                     value: l3CallsBoot
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.5.{{ $index }}'
                     descr: "Calls since boot {{ $l3Label }}"
+                    index: 'l3CallsBoot.{{ $index }}'
                 -
                     oid: l3Table
                     value: l3NumBchan
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.3.{{ $index }}'
                     descr: 'Available Channels {{ $l3Label }}'
+                    index: 'l3NumBchan.{{ $index }}'

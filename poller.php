@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * poller.php
  *
@@ -29,6 +30,11 @@ require __DIR__ . '/includes/init.php';
 $options = getopt('h:rfpdvm:q');
 
 c_echo('%RWarning: poller.php is deprecated!%n Use %9lnms device:poll%n instead.' . PHP_EOL . PHP_EOL);
+
+$scheduler = \LibreNMS\Config::get('schedule_type.poller');
+if ($scheduler != 'legacy' && $scheduler != 'cron') {
+    exit(0); // message above is sufficient
+}
 
 if (empty($options['h'])) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";

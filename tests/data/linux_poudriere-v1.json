@@ -1,0 +1,952 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "poudriere",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "poudriere",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"status\":\"test2\",\"build_info\":\"test\",\"history\":null,\"sets\":[\"13relengAMD64-default\",\"13relengI386-default\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "jps___13relengAMD64-default___build",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___build-depends",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___BUILT",
+                    "value": 619,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___check-sanity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___checksum",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___configure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___copy-on-write-faults",
+                    "value": 1279,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___cpu-time",
+                    "value": 18.43,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___data-size",
+                    "value": 11664,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___elapsed-times",
+                    "value": 20231,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___extract",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___extract-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___FAIL",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___FETCH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___fetch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___IGNORE",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___involuntary-context-switches",
+                    "value": 1013,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___job-control-count",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___lib-depends",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___log_size_done",
+                    "value": 85340321,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___log_size_latest",
+                    "value": 2688695871,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___log_size_per_package",
+                    "value": 4148883673,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___major-faults",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___minor-faults",
+                    "value": 67178,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___package",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___package_size_all",
+                    "value": 13389068464,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___package_size_building",
+                    "value": 3682385,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___package_size_latest",
+                    "value": 19989984,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___patch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___patch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___percent-cpu",
+                    "value": 0.1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___percent-memory",
+                    "value": 0.1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___pkg-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___QUEUE",
+                    "value": 648,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___read-blocks",
+                    "value": 1458,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___received-messages",
+                    "value": 23403,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___REMAIN",
+                    "value": 22,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___rss",
+                    "value": 296128,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___run-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___sent-messages",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___SKIP",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___stack-size",
+                    "value": 1792,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___stage",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___swaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___system-time",
+                    "value": 1.13,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___text-size",
+                    "value": 33080,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___threads",
+                    "value": 14,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___TIME",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___user-time",
+                    "value": 17.31,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___voluntary-context-switches",
+                    "value": 46413,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengAMD64-default___written-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___build",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___build-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___BUILT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___check-sanity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___checksum",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___configure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___copy-on-write-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___cpu-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___data-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___elapsed-times",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___extract",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___extract-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___FAIL",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___FETCH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___fetch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___IGNORE",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___involuntary-context-switches",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___job-control-count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___lib-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___log_size_done",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___log_size_latest",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___log_size_per_package",
+                    "value": 179070691,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___major-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___minor-faults",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___package",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___package_size_all",
+                    "value": 772420452,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___package_size_building",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___package_size_latest",
+                    "value": 19816680,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___patch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___patch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___percent-cpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___percent-memory",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___pkg-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___QUEUE",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___read-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___received-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___REMAIN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___run-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___sent-messages",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___SKIP",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___stack-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___stage",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___swaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___system-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___text-size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___threads",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___TIME",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___user-time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___voluntary-context-switches",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "jps___13relengI386-default___written-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_build",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_build-depends",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_BUILT",
+                    "value": 619,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_check-sanity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_checksum",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_configure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_copy-on-write-faults",
+                    "value": 1279,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_cpu-time",
+                    "value": 18.43,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_data-size",
+                    "value": 11664,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_elapsed-times",
+                    "value": 20231,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_extract",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_extract-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_FAIL",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_FETCH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_fetch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_IGNORE",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_involuntary-context-switches",
+                    "value": 1013,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_job-control-count",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_lib-depends",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_log_size_done",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_log_size_latest",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_log_size_per_package",
+                    "value": 179070691,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_major-faults",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_minor-faults",
+                    "value": 67178,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_package",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_package_size_all",
+                    "value": 772420452,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_package_size_building",
+                    "value": 3682385,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_package_size_latest",
+                    "value": 19816680,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_patch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_patch-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_percent-cpu",
+                    "value": 0.1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_percent-memory",
+                    "value": 0.1,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_pkg-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_QUEUE",
+                    "value": 648,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_read-blocks",
+                    "value": 1458,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_received-messages",
+                    "value": 23403,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_REMAIN",
+                    "value": 22,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_rss",
+                    "value": 296128,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_run-depends",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_sent-messages",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_SKIP",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_stack-size",
+                    "value": 1792,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_stage",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_swaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_system-time",
+                    "value": 1.13,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_text-size",
+                    "value": 33080,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_threads",
+                    "value": 14,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_TIME",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_user-time",
+                    "value": 17.31,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_voluntary-context-switches",
+                    "value": 46413,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                },
+                {
+                    "metric": "totals_written-blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "poudriere"
+                }
+            ]
+        }
+    }
+}

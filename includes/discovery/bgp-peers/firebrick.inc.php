@@ -1,4 +1,5 @@
 <?php
+
 /**
  * firebrick.inc.php
  *

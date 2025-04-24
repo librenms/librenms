@@ -1,4 +1,5 @@
 <?php
+
 /*
  * VminfoLibvirt.php
  *
@@ -35,14 +36,15 @@ trait VminfoLibvirt
 {
     public function discoverVminfo(): Collection
     {
-        echo 'LibVirt VM: ';
+        Log::info('LibVirt VM: ');
 
         if (! Config::get('enable_libvirt')) {
-            echo 'not configured';
+            Log::info('not configured');
 
             return new Collection;
         }
 
+        /** @var Collection<\App\Models\Vminfo> $vms */
         $vms = new Collection;
 
         $ssh_ok = 0;

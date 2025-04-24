@@ -6337,8 +6337,8 @@
                     "ifName": "User Defined Port 1",
                     "portName": null,
                     "ifIndex": 8000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6437,8 +6437,8 @@
                     "ifName": "stack-port",
                     "portName": null,
                     "ifIndex": 9000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6537,8 +6537,8 @@
                     "ifName": "Logical-int 1",
                     "portName": null,
                     "ifIndex": 20000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6637,8 +6637,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6737,8 +6737,8 @@
                     "ifName": "10",
                     "portName": null,
                     "ifIndex": 100009,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7245,5 +7245,1081 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 67109120,
+                    "entPhysicalDescr": "CBS350-24P-4G 24-Port Gigabit PoE Managed Switch",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "CBS350-24P-4G",
+                    "entPhysicalHardwareRev": "V01",
+                    "entPhysicalFirmwareRev": "3.0.0.23",
+                    "entPhysicalSoftwareRev": "3.0.0.61",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "CBS350-24P-4G",
+                    "entPhysicalVendorType": "cevChassis",
+                    "entPhysicalSerialNum": "FOC2433L650",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Cisco",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 67109505,
+                    "entPhysicalDescr": "PowerSupply",
+                    "entPhysicalClass": "powerSupply",
+                    "entPhysicalName": "Main PowerSupply",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 31,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68158464,
+                    "entPhysicalDescr": "Slot",
+                    "entPhysicalClass": "container",
+                    "entPhysicalName": "Slot",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68421120,
+                    "entPhysicalDescr": "motherboard",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68421377,
+                    "entPhysicalDescr": "Thermal Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "Thermal Sensor 1",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevSensorModuleDeviceTemp",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 21,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68421378,
+                    "entPhysicalDescr": "Thermal Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "Thermal Sensor 2",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevSensorModuleDeviceTemp",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 22,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68421379,
+                    "entPhysicalDescr": "Thermal Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "Thermal Sensor 3",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevSensorModuleDeviceTemp",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 23,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68421380,
+                    "entPhysicalDescr": "Thermal Sensor",
+                    "entPhysicalClass": "sensor",
+                    "entPhysicalName": "Thermal Sensor 4",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevSensorModuleDeviceTemp",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 24,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68425728,
+                    "entPhysicalDescr": "switch processor",
+                    "entPhysicalClass": "other",
+                    "entPhysicalName": "",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 68425857,
+                    "entPhysicalDescr": "GigabitEthernet2",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi2",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortMCIEther",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 2
+                },
+                {
+                    "entPhysicalIndex": 68425858,
+                    "entPhysicalDescr": "GigabitEthernet1",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi1",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortUnknown",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 1
+                },
+                {
+                    "entPhysicalIndex": 68425859,
+                    "entPhysicalDescr": "GigabitEthernet4",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi4",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortCBusSerial",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 4
+                },
+                {
+                    "entPhysicalIndex": 68425860,
+                    "entPhysicalDescr": "GigabitEthernet3",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi3",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortMCISerial",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 4,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 3
+                },
+                {
+                    "entPhysicalIndex": 68425861,
+                    "entPhysicalDescr": "GigabitEthernet6",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi6",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortFddit",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 5,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 6
+                },
+                {
+                    "entPhysicalIndex": 68425862,
+                    "entPhysicalDescr": "GigabitEthernet5",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi5",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortFddi",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 6,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 5
+                },
+                {
+                    "entPhysicalIndex": 68425863,
+                    "entPhysicalDescr": "GigabitEthernet8",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi8",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortAsync",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 7,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 8
+                },
+                {
+                    "entPhysicalIndex": 68425864,
+                    "entPhysicalDescr": "GigabitEthernet7",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi7",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortCBusTR",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 8,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 7
+                },
+                {
+                    "entPhysicalIndex": 68425865,
+                    "entPhysicalDescr": "GigabitEthernet10",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi10",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortT1",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 9,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 10
+                },
+                {
+                    "entPhysicalIndex": 68425866,
+                    "entPhysicalDescr": "GigabitEthernet9",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi9",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortHSSI",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 10,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 9
+                },
+                {
+                    "entPhysicalIndex": 68425867,
+                    "entPhysicalDescr": "GigabitEthernet12",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi12",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortBRI",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 11,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 12
+                },
+                {
+                    "entPhysicalIndex": 68425868,
+                    "entPhysicalDescr": "GigabitEthernet11",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi11",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortE1",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 12,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 11
+                },
+                {
+                    "entPhysicalIndex": 68425869,
+                    "entPhysicalDescr": "GigabitEthernet14",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi14",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortCIP",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 13,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 14
+                },
+                {
+                    "entPhysicalIndex": 68425870,
+                    "entPhysicalDescr": "GigabitEthernet13",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi13",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortAIP",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 14,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 13
+                },
+                {
+                    "entPhysicalIndex": 68425871,
+                    "entPhysicalDescr": "GigabitEthernet16",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi16",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortFEIP",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 15,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 16
+                },
+                {
+                    "entPhysicalIndex": 68425872,
+                    "entPhysicalDescr": "GigabitEthernet15",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi15",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortVtyAsync",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 16,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 15
+                },
+                {
+                    "entPhysicalIndex": 68425873,
+                    "entPhysicalDescr": "GigabitEthernet18",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi18",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortVTemplate",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 17,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 18
+                },
+                {
+                    "entPhysicalIndex": 68425874,
+                    "entPhysicalDescr": "GigabitEthernet17",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi17",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortAsyncGroup",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 18,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 17
+                },
+                {
+                    "entPhysicalIndex": 68425875,
+                    "entPhysicalDescr": "GigabitEthernet20",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi20",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortT3",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 19,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 20
+                },
+                {
+                    "entPhysicalIndex": 68425876,
+                    "entPhysicalDescr": "GigabitEthernet19",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi19",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortVAccess",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 20,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 19
+                },
+                {
+                    "entPhysicalIndex": 68425877,
+                    "entPhysicalDescr": "GigabitEthernet22",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi22",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortLance",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 21,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 22
+                },
+                {
+                    "entPhysicalIndex": 68425878,
+                    "entPhysicalDescr": "GigabitEthernet21",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi21",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortVGAnyLAN",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 22,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 21
+                },
+                {
+                    "entPhysicalIndex": 68425879,
+                    "entPhysicalDescr": "GigabitEthernet24",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi24",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortSALI25",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 23,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 24
+                },
+                {
+                    "entPhysicalIndex": 68425880,
+                    "entPhysicalDescr": "GigabitEthernet23",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi23",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortATMS2000",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 24,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 23
+                },
+                {
+                    "entPhysicalIndex": 68425881,
+                    "entPhysicalDescr": "GigabitEthernet25",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi25",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortSonicT",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 25,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 25
+                },
+                {
+                    "entPhysicalIndex": 68425882,
+                    "entPhysicalDescr": "GigabitEthernet26",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi26",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortOC3SUNI",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 26,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 26
+                },
+                {
+                    "entPhysicalIndex": 68425883,
+                    "entPhysicalDescr": "GigabitEthernet27",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi27",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortOC12SUNI",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 27,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 27
+                },
+                {
+                    "entPhysicalIndex": 68425884,
+                    "entPhysicalDescr": "GigabitEthernet28",
+                    "entPhysicalClass": "port",
+                    "entPhysicalName": "gi28",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "false",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "cevPortDS3SUNI",
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": 28,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": 28
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100009,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

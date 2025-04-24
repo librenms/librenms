@@ -1,0 +1,1300 @@
+TERACOM-TCW242-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, IpAddress, Integer32, Unsigned32, Counter32, snmpModules 		
+															FROM SNMPv2-SMI
+	DateAndTime, MacAddress, DisplayString					FROM SNMPv2-TC
+	TEXTUAL-CONVENTION										FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP , NOTIFICATION-GROUP            						
+															FROM SNMPv2-CONF;
+	
+snmpMIB MODULE-IDENTITY
+        LAST-UPDATED "202302070000Z"
+	ORGANIZATION "TERACOM"
+	CONTACT-INFO
+			"EMail:	info@teracomsystems.com"
+	DESCRIPTION
+			"The MIB module for TCW242 SNMP entities."
+	REVISION            "202302070000Z"
+	DESCRIPTION
+			"TCW242v1.4"
+	::= { snmpModules 1 }
+
+teracom								OBJECT IDENTIFIER ::=    { enterprises 38783 }
+tcw242								OBJECT IDENTIFIER ::=    { teracom 8 }
+trapNotifications					OBJECT IDENTIFIER ::=    { tcw242 0 }
+product								OBJECT IDENTIFIER ::=    { tcw242 1 }
+setup								OBJECT IDENTIFIER ::=    { tcw242 2 }
+monitorNcontrol                     OBJECT IDENTIFIER ::=    { tcw242 3 }
+
+tcw242MIBConformance				OBJECT IDENTIFIER ::=    { tcw242 4 }
+
+tcw242MIBCompliances               OBJECT IDENTIFIER ::= { tcw242MIBConformance 1 }
+tcw242MIBGroups    				OBJECT IDENTIFIER ::= { tcw242MIBConformance 2 }
+	      
+-- ======================================================
+-- TEXTUAL-CONVENTIONS
+-- ======================================================
+
+RealValue ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d-3"
+      STATUS    		current
+      DESCRIPTION    "Real value x1000 in Integer format"
+      SYNTAX        	Integer32
+	      
+      
+DigitalValue ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d"
+      STATUS    		current
+      DESCRIPTION    "Digital value in Integer format"
+      SYNTAX        	Unsigned32
+			
+AlarmLevel ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Alarm Level"
+      SYNTAX              INTEGER 
+		{undefined(0), normal(1), indeterminate(2), warning(3), minor(4), major(5), critical(6)}
+	
+AlarmType ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Alarm Type"
+      SYNTAX              INTEGER 
+		{warning(3), minor(4), major(5), critical(6)}
+		
+AnalogMode ::=    TEXTUAL-CONVENTION
+      STATUS    		current
+      DESCRIPTION    "Analog input mode"
+      SYNTAX        	INTEGER
+		{volt0to10(0),ma0to20(1)}
+			
+DigitalMode ::=    TEXTUAL-CONVENTION
+      STATUS    		current
+      DESCRIPTION    "Digital input mode"
+      SYNTAX        	INTEGER
+		{openclosed(0), risingEdge(1), fallingEdge(2), bothEdges(3)}
+				
+ChannelParameter1 ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Channel parameter"
+      SYNTAX              INTEGER 
+		{none(0), s01(3), s02(4), s03(5), s04(6), s05(7), s06(8), s07(9), s08(10),
+		 s09(11), s10(12), s11(13), s12(14), s13(15), s14(16), s15(17), s16(18), 
+		 s17(19), s18(20), s19(21), s20(22), s21(23), s22(24), s23(25), s24(26),
+		 a01(27), a02(28), a03(29), a04(30),
+		 d01(31), d02(32), d03(33), d04(34)
+		}
+					
+ChannelParameter2 ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Channel parameter"
+      SYNTAX              INTEGER 
+		{none(0), one(1), null(2), s01(3), s02(4), s03(5), s04(6), s05(7), s06(8), s07(9), s08(10),
+		 s09(11), s10(12), s11(13), s12(14), s13(15), s14(16), s15(17), s16(18), 
+		 s17(19), s18(20), s19(21), s20(22), s21(23), s22(24), s23(25), s24(26),
+		 a01(27), a02(28), a03(29), a04(30), a05(31), a06(32),
+		 d01(33), d02(34), d03(35), d04(36)
+		}
+		
+ChannelOperand ::=    TEXTUAL-CONVENTION
+      STATUS    		current
+      DESCRIPTION    "Channel operand"
+      SYNTAX        	INTEGER
+		{none(0), multiplication(1), division(2), sum(3), subtract(4)}
+		
+AlarmCondOperand ::=    TEXTUAL-CONVENTION
+      STATUS    		current
+      DESCRIPTION    "Alarm condition operand"
+      SYNTAX        	INTEGER
+		{larger(1), less(2)}
+		
+AlarmChannel ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Alarm Channel"
+      SYNTAX              INTEGER 
+		{none(0), v01(1), v02(2), v03(3), v04(4), v05(5), v06(6), v07(7), v08(8),
+		 v09(9), v10(10), v11(11), v12(12), v13(13), v14(14), v15(15), v16(16),
+		 v17(17), v18(18), v19(19), v20(20), v21(21), v22(22), v23(23), v24(24)
+		}
+		
+AlarmCondLogic ::=    TEXTUAL-CONVENTION
+      STATUS    		current
+      DESCRIPTION    "Alarm condition logic"
+      SYNTAX        	INTEGER
+		{none(0), and(1), or(2)}
+		
+AlarmActionDelay ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d"
+      STATUS    		current
+      DESCRIPTION    "Action delay in Integer format"
+      SYNTAX        	Integer32
+	      
+AlarmActionOnReturn ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Alarm action on return"
+      SYNTAX              INTEGER 
+		{no(0), yes(1)}
+	      
+AlarmAction ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Alarm action"
+      SYNTAX              INTEGER 
+		{none(0), trapcond1(1), trapcond2(2), trapcond1and2(3), postiostate(4), mail(5)}
+		
+DigInputDelay ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d"
+      STATUS    		current
+      DESCRIPTION    "Digital input delay in Integer format"
+      SYNTAX        	Integer32(0..60000)
+	    		
+RELAYPULSEWIDTH ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d"
+      STATUS    		current
+      DESCRIPTION    "Relay Pulse x100ms"
+      SYNTAX        	Integer32
+	  
+RELAYACTIVATION ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Relay activation logic"
+    SYNTAX    INTEGER
+ 		{ webHttpApi(0), al01(1), al02(2), al03(3), al04(4), al05(5), al06(6), al07(7), 
+		al08(8), al09(9), al10(10), al11(11),  al12(12),  al13(13), al14(14), al15(15),
+		al16(16), al17(17), al18(18), al19(19), al20(20), al21(21), al22(22), al23(23), al24(24),
+		anyAlarm(25), schedule1(26), schedule2(27), schedule3(28), schedule4(29),
+		func1(30), func2(31), func3(32), func4(33)}
+		
+RELAYACTION ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "Relay action on alarm"
+   SYNTAX       INTEGER 
+		{on(0), pulse(2)}   
+		
+RELAYSTATUS::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "Relay status"
+   SYNTAX       INTEGER 
+		{off(0), on(1)}
+
+RELAYPULSES::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "Relay pulse"
+   SYNTAX       INTEGER 
+		{off(0), on(1)} 	
+		
+FUNCSTATUS ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Function status"
+       SYNTAX    INTEGER
+ 			{false(0), true(1)}	
+
+FUNCALARMSTATUS ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "function alarm status"
+       SYNTAX    INTEGER
+ 			{normal(0), alarm(1)}				
+
+RelayStateAfterRestart::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "Relay state after restart"
+   SYNTAX       INTEGER 
+		{off(0), on(1), laststate(2)}   		
+	      
+ChannelType ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Channel type"
+      SYNTAX              INTEGER 
+		{general(0), discrete(2), counter(3)}
+      
+DiscreteAlarmState ::= TEXTUAL-CONVENTION
+      STATUS              current
+      DESCRIPTION    "Discrete Alarm state"
+      SYNTAX              INTEGER 
+		{open(0), closed(1)}
+		
+MbSenTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+      DESCRIPTION   "Index of modbus rtu table"
+      SYNTAX		Integer32 (1..24)
+		
+AnalogInpTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of analog inputs table"
+      SYNTAX		Integer32 (1..6)
+		
+
+DigInpTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of digital inputs table"
+      SYNTAX		Integer32 (1..4)
+	  
+RelayTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of relays table"
+      SYNTAX		Integer32 (1..4)
+		
+ChTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of channels table"
+      SYNTAX		Integer32 (1..24)
+		
+AlTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of alarms table"
+      SYNTAX		Integer32 (1..24)
+	  
+FuncTableIndex ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT	"d"
+      STATUS        current
+	  DESCRIPTION   "Index of function table"
+      SYNTAX		Integer32 (1..4)
+
+-- ======================================================
+-- Device settings
+-- ======================================================
+
+name        OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "Name of product"
+      ::= { product 1 }
+      
+version        OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "Version string"
+      ::= { product 2 }
+      
+dateTime        OBJECT-TYPE
+      SYNTAX DateAndTime
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+            "Date and time"
+      ::= { product 3 }
+
+-- ======================================================
+-- Network settings
+-- ======================================================
+
+network                                                          	OBJECT IDENTIFIER ::=    { setup 1 }
+
+deviceID OBJECT-TYPE
+        SYNTAX    MacAddress
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+                "Device ID is Default MAC Address"
+        ::= { network 1 }
+	
+hostName    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..38))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Host Name"
+        ::= { network 2 }
+	
+deviceIP OBJECT-TYPE
+        SYNTAX    IpAddress
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+                "Device IP Address"
+        ::= { network 3 }
+	
+-- ======================================================
+-- Parameters
+-- ======================================================
+
+parameters                                                    OBJECT IDENTIFIER ::=    { setup 2 }
+
+-- ======================================================
+-- Modbus rtu sensors
+-- ======================================================
+
+mbSensors                                            			OBJECT IDENTIFIER ::=    { parameters 1 }
+
+mbSensorsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MbSensorsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing modbus rtu parameters."
+          ::= { mbSensors 1 }
+
+mbSensorsEntry OBJECT-TYPE
+        SYNTAX MbSensorsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing modbus rtu parameters."
+        INDEX { mbSenIndex }
+          ::= { mbSensorsTable 1 }
+
+MbSensorsEntry ::=
+        SEQUENCE {
+		mbSenIndex
+			MbSenTableIndex,
+		mbSenDescription
+			DisplayString,
+		mbSenMult
+			RealValue,
+		mbSenOffset
+			RealValue,
+		mbSenVal
+			RealValue,
+		mbSenCounter
+			Counter32
+        }
+
+mbSenIndex    OBJECT-TYPE
+        SYNTAX MbSenTableIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Index of modbus rtu table"
+        ::= { mbSensorsEntry 1 }
+	
+mbSenDescription    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Sensor description"
+        ::= { mbSensorsEntry 2 }
+	
+mbSenMult OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Sensor multiplier x1000 in Integer format"
+	::= { mbSensorsEntry 3 }
+		
+mbSenOffset OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Sensor offset x1000 in Integer format"
+	::= { mbSensorsEntry 4 }
+		
+mbSenVal OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Sensor value x1000 in Integer format"
+	::= { mbSensorsEntry 5 }
+	
+mbSenCounter OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Sensor as 32 bit Counter"
+	::= { mbSensorsEntry 6 }
+
+-- ======================================================
+-- Analog inputs
+-- ======================================================
+
+analogInputs                                        OBJECT IDENTIFIER ::=    { parameters 2 }
+
+analogInpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AnalogInpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing analog inputs parameters."
+          ::= { analogInputs 1 }
+
+analogInpEntry OBJECT-TYPE
+        SYNTAX AnalogInpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing analog inputs parameters."
+        INDEX { analogInpIndex }
+          ::= { analogInpTable 1 }
+
+AnalogInpEntry ::=
+        SEQUENCE {
+		analogInpIndex
+			AnalogInpTableIndex,
+		analogInpDescription
+			DisplayString,
+		analogInpMult
+			RealValue,
+		analogInpOffset
+			RealValue,
+		analogInpMode
+			AnalogMode,
+		analogInpValue
+			RealValue
+        }
+
+analogInpIndex    OBJECT-TYPE
+        SYNTAX AnalogInpTableIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Index of analog inputs table"
+        ::= { analogInpEntry 1 }
+
+analogInpDescription    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Analog input description"
+        ::= { analogInpEntry 2 }
+	
+analogInpMult OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Analog input multiplier x1000 in Integer format"
+	::= { analogInpEntry 3 }
+	
+analogInpOffset OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Analog input offset x1000 in Integer format"
+	::= { analogInpEntry 4 }
+	
+analogInpMode OBJECT-TYPE
+        SYNTAX AnalogMode
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Analog input mode - 0-10V or 4-20mA"
+        ::= { analogInpEntry 5 }
+	
+analogInpValue OBJECT-TYPE
+	SYNTAX RealValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Analog input value x1000 in Integer format"
+	::= { analogInpEntry 6 }
+
+-- ======================================================
+-- Digital inputs
+-- ======================================================
+
+digitalInputs                                      OBJECT IDENTIFIER ::=    { parameters 3 }
+
+digitalInpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DigitalInpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing digital inputs parameters."
+          ::= { digitalInputs 1 }
+
+digitalInpEntry OBJECT-TYPE
+        SYNTAX DigitalInpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing digital inputs parameters."
+        INDEX { digInpIndex }
+          ::= { digitalInpTable 1 }
+
+DigitalInpEntry ::=
+        SEQUENCE {
+		digInpIndex
+			DigInpTableIndex,
+		digInpDescription
+			DisplayString,
+		digInplowLevel
+			DisplayString,
+		digInphighLevel
+			DisplayString,
+		digInpMode
+			DigitalMode,
+		digInpCloseToOpenDelay
+			DigInputDelay,
+		digInpOpenToCloseDelay
+			DigInputDelay,
+		digInpCounterInitValue
+			Unsigned32,
+		digInpValue
+			DigitalValue
+        }
+
+digInpIndex    OBJECT-TYPE
+        SYNTAX DigInpTableIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Index of digital inputs table"
+        ::= { digitalInpEntry 1 }
+
+digInpDescription    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Digital Input description"
+        ::= { digitalInpEntry 2 }
+	
+digInplowLevel    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Digital Input closed state"
+        ::= { digitalInpEntry 3 }
+	
+digInphighLevel    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Digital Input open state"
+        ::= { digitalInpEntry 4 }
+	
+digInpMode OBJECT-TYPE
+        SYNTAX DigitalMode
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Digital Input mode - Discrete or Counter"
+        ::= { digitalInpEntry 5 }
+	
+digInpCloseToOpenDelay OBJECT-TYPE
+	SYNTAX DigInputDelay
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Close To Open delay"
+	::= { digitalInpEntry 6 }
+	
+digInpOpenToCloseDelay OBJECT-TYPE
+	SYNTAX DigInputDelay
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Open To Close delay"
+	::= { digitalInpEntry 7 }
+	
+digInpCounterInitValue OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Counter initial value"
+	::= { digitalInpEntry 8 }
+	
+digInpValue OBJECT-TYPE
+	SYNTAX DigitalValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Digital input value"
+	::= { digitalInpEntry 9 }
+
+-- ======================================================
+-- Relay Setup
+-- ======================================================
+relaySetup                                      OBJECT IDENTIFIER ::=    { parameters 4 }
+
+relOutSetupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RelOutSetupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing relay setup parameters."
+          ::= { relaySetup 1 }
+
+relOutSetupEntry OBJECT-TYPE
+        SYNTAX RelOutSetupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing relay setup parameters."
+        INDEX { relOutSetupIndex }
+          ::= { relOutSetupTable 1 }
+
+RelOutSetupEntry ::=
+        SEQUENCE {
+		relOutSetupIndex
+			RelayTableIndex,
+		relOutDescription
+			DisplayString,
+		relOutPulseWidth
+			RELAYPULSEWIDTH,
+		relOutActivation
+			RELAYACTIVATION,
+		relOutAction
+			RELAYACTION
+        }
+	
+relOutSetupIndex    OBJECT-TYPE
+    SYNTAX RelayTableIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Index of relay table"
+    ::= { relOutSetupEntry 1 }
+	
+relOutDescription  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay description"
+    ::= { relOutSetupEntry 2 }
+	
+relOutPulseWidth  OBJECT-TYPE
+    SYNTAX  RELAYPULSEWIDTH
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay Pulse x100ms"
+    ::= { relOutSetupEntry 3 }	
+	
+relOutActivation  OBJECT-TYPE
+    SYNTAX  RELAYACTIVATION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay activated from"
+    ::= { relOutSetupEntry 4 }
+	
+relOutAction  OBJECT-TYPE
+    SYNTAX  RELAYACTION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay action on alarm condition"
+    ::= { relOutSetupEntry 5 }	
+	
+relOutAfterRst    OBJECT-TYPE
+    SYNTAX RelayStateAfterRestart
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+            "Relay state after restart"
+    ::= { relaySetup 2 }
+
+-- ======================================================
+-- Channels
+-- ======================================================
+
+channels	OBJECT IDENTIFIER ::=    { monitorNcontrol 1 }
+
+chanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing channels parameters."
+          ::= { channels 1 }
+
+chanEntry OBJECT-TYPE
+        SYNTAX ChanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing channels parameters."
+        INDEX { chIndex }
+          ::= { chanTable 1 }
+
+ChanEntry ::=
+        SEQUENCE {
+		chIndex
+			ChTableIndex,
+		chType
+			ChannelType,
+		chDescription
+			DisplayString,
+		chParam1
+			ChannelParameter1,
+		chOP1
+			ChannelOperand,
+		chParam2
+			ChannelParameter2,
+		chOP2
+			ChannelOperand,
+		chCoef1
+			RealValue,
+		chOP3
+			ChannelOperand,
+		chCoef2
+			RealValue,
+		chUnit
+			DisplayString,
+		chValue
+			RealValue,
+		chCounter
+			Counter32,
+		chAlarmStatus
+			AlarmLevel
+        }
+
+chIndex    OBJECT-TYPE
+        SYNTAX ChTableIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Index of channels table"
+        ::= { chanEntry 1 }
+
+
+chType OBJECT-TYPE
+        SYNTAX ChannelType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel 1 type"
+        ::= { chanEntry 2 }
+	
+chDescription    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Channel description"
+        ::= { chanEntry 3 }
+	
+chParam1 OBJECT-TYPE
+        SYNTAX ChannelParameter1
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel parameter 1"
+        ::= { chanEntry 4 }
+	
+chOP1 OBJECT-TYPE
+        SYNTAX ChannelOperand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel operand 1"
+        ::= { chanEntry 5 }
+	
+chParam2 OBJECT-TYPE
+        SYNTAX ChannelParameter2
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel parameter 2"
+        ::= { chanEntry 6 }
+	
+chOP2 OBJECT-TYPE
+        SYNTAX ChannelOperand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel operand 2"
+        ::= { chanEntry 7 }
+	
+chCoef1 OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel coefficient 1 x1000 in Integer format"
+        ::= { chanEntry 8 }
+	
+chOP3 OBJECT-TYPE
+        SYNTAX ChannelOperand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel operand 3"
+        ::= { chanEntry 9 }
+	
+chCoef2 OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Channel coefficient 2 x1000 in Integer format"
+        ::= { chanEntry 10 }
+	
+chUnit    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Channel 1 unit"
+        ::= { chanEntry 11 }
+	
+chValue OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                "Channel value x1000 in Integer format"
+        ::= { chanEntry 13 }
+	
+chCounter OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                "Channel as 32 bit counter"
+        ::= { chanEntry 14 }
+	
+chAlarmStatus OBJECT-TYPE
+        SYNTAX AlarmLevel
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                "Channel alarm status"
+        ::= { chanEntry 15 }
+		
+-- ======================================================
+-- Relays
+-- ======================================================
+relays                                      OBJECT IDENTIFIER ::=    { monitorNcontrol 2 }
+
+relOutTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RelOutEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing monitor and control relays."
+          ::= { relays 1 }
+
+relOutEntry OBJECT-TYPE
+        SYNTAX RelOutEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing monitor and control relays."
+        INDEX { relayIndex }
+          ::= { relOutTable 1 }
+
+RelOutEntry ::=
+        SEQUENCE {
+		relayIndex
+			RelayTableIndex,
+		relayState
+			RELAYSTATUS,
+		relayPulse	
+			RELAYPULSES
+        }
+	
+relayIndex    OBJECT-TYPE
+    SYNTAX RelayTableIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Index of relay table"
+    ::= { relOutEntry 1 }		
+	
+relayState OBJECT-TYPE
+	SYNTAX RELAYSTATUS
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay state"
+	::= { relOutEntry 2 }
+		
+relayPulse OBJECT-TYPE
+	SYNTAX RELAYPULSES
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay pulse"
+	::= { relOutEntry 3 }
+		
+-- ======================================================
+-- Alarms
+-- ======================================================
+
+alarms	OBJECT IDENTIFIER ::=    { monitorNcontrol 3 }
+
+alarmsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlarmsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing alarms parameters."
+          ::= { alarms 1 }
+
+alarmsEntry OBJECT-TYPE
+        SYNTAX AlarmsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing alarms parameters."
+        INDEX { alIndex }
+          ::= { alarmsTable 1 }
+
+AlarmsEntry ::=
+        SEQUENCE {
+		alIndex
+			AlTableIndex,
+		alDescription
+			DisplayString,
+		alCond1Channel
+			AlarmChannel,
+		alCond1Operand
+			AlarmCondOperand,
+		alCond1Limit
+			RealValue,
+		alCond1Hys
+			RealValue,
+		alCond1AlarmState
+			DiscreteAlarmState,
+		alCondLogic
+			AlarmCondLogic,
+		alCond2Channel
+			AlarmChannel,
+		alCond2Operand
+			AlarmCondOperand,
+		alCond2Limit
+			RealValue,
+		alCond2Hys
+			RealValue,
+		alCond2AlarmState
+			DiscreteAlarmState,
+		alType
+			AlarmType,
+		alAssigned
+			AlarmChannel,
+		alActionDelay
+			AlarmActionDelay,
+		alActionOnReturn
+			AlarmActionOnReturn,
+		alAction1
+			AlarmAction,
+		alAction2
+			AlarmAction,
+		alAction3
+			AlarmAction,
+		alStatus
+			AlarmLevel
+        }
+
+alIndex    OBJECT-TYPE
+        SYNTAX AlTableIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Index of alarms table"
+        ::= { alarmsEntry 1 }
+
+alDescription    OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE (0..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Alarm 1 description"
+        ::= { alarmsEntry 2 }
+
+alCond1Channel OBJECT-TYPE
+        SYNTAX AlarmChannel
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 1 channel"
+        ::= { alarmsEntry 3 }	
+
+alCond1Operand OBJECT-TYPE
+        SYNTAX AlarmCondOperand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 1 operand"
+        ::= { alarmsEntry 4 }
+		
+alCond1Limit OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 1 limit x1000 in Integer format"
+        ::= { alarmsEntry 5 }
+		
+alCond1Hys OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 1 hysteresis x1000 in Integer format"
+        ::= { alarmsEntry 6 }
+
+alCond1AlarmState OBJECT-TYPE
+        SYNTAX DiscreteAlarmState
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 1 discrete alarm state"
+        ::= { alarmsEntry 7 }	
+		
+alCondLogic OBJECT-TYPE
+        SYNTAX AlarmCondLogic
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 conditions logic"
+        ::= { alarmsEntry 8 }
+		
+alCond2Channel OBJECT-TYPE
+        SYNTAX AlarmChannel
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 2 channel"
+        ::= { alarmsEntry 9 }	
+		
+alCond2Operand OBJECT-TYPE
+        SYNTAX AlarmCondOperand
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 2 operand"
+        ::= { alarmsEntry 10 }
+		
+alCond2Limit OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 2 limit x1000 in Integer format"
+        ::= { alarmsEntry 11 }
+		
+alCond2Hys OBJECT-TYPE
+        SYNTAX RealValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 2 hysteresis x1000 in Integer format"
+        ::= { alarmsEntry 12 }
+
+alCond2AlarmState OBJECT-TYPE
+        SYNTAX DiscreteAlarmState
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 condition 2 discrete alarm state"
+        ::= { alarmsEntry 13 }	
+	
+alType OBJECT-TYPE
+        SYNTAX AlarmType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 type"
+        ::= { alarmsEntry 14 }
+	
+alAssigned OBJECT-TYPE
+        SYNTAX AlarmChannel
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 assigned to"
+        ::= { alarmsEntry 15 }
+	
+alActionDelay OBJECT-TYPE
+        SYNTAX AlarmActionDelay
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 action delay x1000 in Integer format"
+        ::= { alarmsEntry 16 }
+	
+alActionOnReturn OBJECT-TYPE
+        SYNTAX AlarmActionOnReturn
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 action on return"
+        ::= { alarmsEntry 17 }
+	
+alAction1 OBJECT-TYPE
+        SYNTAX AlarmAction
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 action 1"
+        ::= { alarmsEntry 18 }
+	
+alAction2 OBJECT-TYPE
+        SYNTAX AlarmAction
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 action 2"
+        ::= { alarmsEntry 19 }
+	
+alAction3 OBJECT-TYPE
+        SYNTAX AlarmAction
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 action 3"
+        ::= { alarmsEntry 20 }
+	
+alStatus OBJECT-TYPE
+        SYNTAX AlarmLevel
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION 
+                "Alarm 1 status"
+        ::= { alarmsEntry 21 }
+
+
+	
+--- configurationSaved
+configurationSaved OBJECT-TYPE
+	SYNTAX INTEGER { unsaved(0), saved(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Configuration save status SAVED/UNSAVED"
+	::= { monitorNcontrol 4 }
+
+restartDevice OBJECT-TYPE
+	SYNTAX INTEGER {    cancel(0), restart(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Restart Device"
+	::= { monitorNcontrol 5}
+	
+hardwareErr OBJECT-TYPE
+	SYNTAX INTEGER {    noErr(0), hwErr(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Hardware Error"
+	::= { monitorNcontrol 6}
+	
+-- ======================================================
+-- Functions
+-- ======================================================
+functions	OBJECT IDENTIFIER ::=    { monitorNcontrol 7 }
+
+funcTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FuncEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Table containing functions."
+          ::= { functions 1 }
+
+funcEntry OBJECT-TYPE
+        SYNTAX FuncEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entry containing monitor and control relays."
+        INDEX { funcIndex }
+          ::= { funcTable 1 }
+
+FuncEntry ::=
+        SEQUENCE {
+		funcIndex
+			FuncTableIndex,
+		funcState
+			FUNCSTATUS,
+		funcAl	
+			FUNCALARMSTATUS
+        }
+	
+funcIndex    OBJECT-TYPE
+    SYNTAX FuncTableIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+            "Index of function table"
+    ::= { funcEntry 1 }		
+	
+funcState OBJECT-TYPE
+	SYNTAX FUNCSTATUS
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Function state"
+	::= { funcEntry 2 }
+		
+funcAl OBJECT-TYPE
+	SYNTAX FUNCALARMSTATUS
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Function alarm"
+	::= { funcEntry 3 }
+
+snmp-trap-notification NOTIFICATION-TYPE
+	OBJECTS { chValue, chCounter, restartDevice, deviceIP, funcState, funcAl }
+	STATUS current
+	DESCRIPTION 
+		"SMIV2 Trap notification information for the SNMP Manager."
+	::= {trapNotifications 1}
+	
+tcw242MIBCompliances1 MODULE-COMPLIANCE
+        STATUS    current
+	DESCRIPTION
+                        "This group is for SNMP applications."
+        MODULE    -- this module
+                MANDATORY-GROUPS { tcw242ProductGroup, tcw242SetupGroup, tcw242MonitorGroup, tcw242TrapGroup}
+
+        ::= { tcw242MIBCompliances 1 }
+	
+tcw242ProductGroup OBJECT-GROUP
+        OBJECTS {name, version, dateTime}
+	STATUS    current
+        DESCRIPTION
+                        "A collection of objects providing basic product info."
+        ::= { tcw242MIBGroups 1 }	
+	
+tcw242SetupGroup OBJECT-GROUP
+        OBJECTS {	deviceID, hostName, deviceIP,
+				mbSenDescription, mbSenMult, mbSenOffset, mbSenVal, mbSenCounter,
+				analogInpDescription, analogInpMult, analogInpOffset, analogInpMode, analogInpValue,
+				digInpDescription, digInplowLevel, digInphighLevel, digInpMode, digInpCloseToOpenDelay, digInpOpenToCloseDelay, digInpCounterInitValue, digInpValue,
+				relOutDescription, relOutPulseWidth, relOutActivation, relOutAction, relOutAfterRst
+			}
+        STATUS    current
+        DESCRIPTION
+                        "A collection of objects providing basic setup."
+        ::= { tcw242MIBGroups 2 }	
+	
+tcw242MonitorGroup OBJECT-GROUP
+        OBJECTS {	chType, chDescription, chParam1, chOP1, chParam2, chOP2, chCoef1, chOP3, chCoef2, chUnit, chValue, chCounter, chAlarmStatus,
+					alDescription, alCond1Channel, alCond1Operand, alCond1Limit, alCond1Hys, alCond1AlarmState, alCondLogic, alCond2Channel, alCond2Operand,
+					alCond2Limit,alCond2Hys, alCond2AlarmState, alType, alAssigned, alActionDelay, alActionOnReturn, alAction1, alAction2, alAction3, alStatus, 
+					relayState, relayPulse,
+					configurationSaved,restartDevice,hardwareErr,
+					funcState, funcAl
+			}
+        STATUS    current
+        DESCRIPTION
+                        "A collection of objects providing basic monitoring
+                        and control of a product."
+        ::= { tcw242MIBGroups 3 }	
+	
+tcw242TrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS    {snmp-trap-notification}
+        STATUS    current
+        DESCRIPTION
+                        "SNMP Trap Notification object."
+        ::= { tcw242MIBGroups 4 }	
+
+	
+END
+

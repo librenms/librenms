@@ -13,7 +13,7 @@ modules:
                 total: LUM-SYSINFO-MIB::sysinfoBoardMemoryTotalMem
                 free: LUM-SYSINFO-MIB::sysinfoBoardMemoryFreeMem
                 percent_used: LUM-SYSINFO-MIB::sysinfoBoardMemoryUsageMemPercent
-                descr: '{{ LUM-SYSINFO-MIB::sysinfoBoardMemoryName }}'   
+                descr: '{{ LUM-SYSINFO-MIB::sysinfoBoardMemoryName }}'
 
     processors:
         data:
@@ -70,12 +70,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }     
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: equipmentBoardAdminStatus
                             op: '='
-                            value: 1                                 
+                            value: 1
                 -
                     oid: equipmentBoardTable
                     value: equipmentBoardTempHighExceeded
@@ -86,7 +86,7 @@ modules:
                     state_name: BoardTempHighExceeded
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }  
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: equipmentPowerTable
@@ -98,7 +98,7 @@ modules:
                     state_name: PSUOperStatus
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }                
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid:  equipmentFanTable
@@ -110,7 +110,7 @@ modules:
                     state_name: FanOperStatus
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }      
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: oaIfTable
@@ -123,12 +123,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }     
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1  
+                            value: 1
 
                 -
                     oid: oaIfTable
@@ -140,12 +140,12 @@ modules:
                     state_name: AmpSaturationFault
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }  
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                          
+                            value: 1
                 -
                     oid: oaIfTable
                     value: oaIfLaserTempOutOfRange
@@ -156,12 +156,12 @@ modules:
                     state_name: AmpTempExceeded
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }   
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                              
+                            value: 1
 
                 -
                     oid: oaIfTable
@@ -173,13 +173,13 @@ modules:
                     state_name: AmpLoS
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }   
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                          
-                                                                                                                                                        
+                            value: 1
+
                 -
                     oid: oaIfTable
                     value: oaIfTxSignalStatus
@@ -191,12 +191,12 @@ modules:
                     states:
                         - { descr: down, graph: 0, value: 1, generic: 2 }
                         - { descr: degraded, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 3, generic: 0 }   
+                        - { descr: ok, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                          
+                            value: 1
 
                 -
                     oid: oaIfTable
@@ -209,12 +209,12 @@ modules:
                     states:
                         - { descr: down, graph: 0, value: 1, generic: 2 }
                         - { descr: degraded, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 3, generic: 0 }  
+                        - { descr: ok, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                           
+                            value: 1
 
                 -
                     oid: oaIfTable
@@ -226,12 +226,12 @@ modules:
                     state_name: AmpLoS
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 } 
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: oaIfAdminStatus
                             op: '='
-                            value: 1                              
+                            value: 1
 
                 -
                     oid: oaVoaClientIfTable
@@ -243,12 +243,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }  
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: oaVoaClientIfAdminStatus
                             op: '='
-                            value: 1                
+                            value: 1
 
                 -
                     oid: oaVoaLineIfTable
@@ -260,12 +260,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }  
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: oaVoaLineIfAdminStatus
                             op: '='
-                            value: 1                                                                       
+                            value: 1
 
                 -
                     oid: ocmIfTable
@@ -278,12 +278,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }  
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: ocmIfAdminStatus
                             op: '='
-                            value: 1                            
+                            value: 1
 
                 -
                     oid: ocmIfTable
@@ -295,7 +295,7 @@ modules:
                     state_name: OCMSwitch
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }       
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ocmIfTable
@@ -307,7 +307,7 @@ modules:
                     state_name: OCMModule
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }      
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnOtuTable
@@ -319,7 +319,7 @@ modules:
                     state_name: OTNLoF
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }      
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnOtuTable
@@ -331,7 +331,7 @@ modules:
                     state_name: OTNLoMF
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }                                                                                         
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnOtuTable
@@ -343,7 +343,7 @@ modules:
                     state_name: OTNIndicationSignal
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }   
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnMonSmTable
@@ -355,7 +355,7 @@ modules:
                     state_name: OTNBDIState
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }         
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnMonSmTable
@@ -367,7 +367,7 @@ modules:
                     state_name: OTNIAEState
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }      
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: ifOtnMonSmTable
@@ -379,7 +379,7 @@ modules:
                     state_name: OTNBIAEState
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }                                                                
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
                     oid: wdmCtrlChannelTable
@@ -411,12 +411,12 @@ modules:
                     state_name: WDMChannelLoSStatus
                     states:
                         - { descr: alarm, graph: 0, value: 2, generic: 2 }
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }  
+                        - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
                             oid: wdmCtrlChannelAdminStatus
                             op: '='
-                            value: 1   
+                            value: 1
 
                 -
                     oid: ifBasicAdminTable
@@ -429,12 +429,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }  
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: ifBasicAdminAdminStatus
                             op: '='
-                            value: 1      
+                            value: 1
 
                 -
                     oid: dcnIfTable
@@ -446,12 +446,12 @@ modules:
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 0 }
                         - { descr: down, graph: 0, value: 2, generic: 2 }
-                        - { descr: up, graph: 0, value: 3, generic: 0 }  
+                        - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
                             oid: dcnIfAdminStatus
                             op: '='
-                            value: 1                                                
+                            value: 1
 
 
         temperature:
@@ -466,7 +466,7 @@ modules:
                     entPhysicalIndex: 'sr-{{ $index }}'
                     high_limit:  equipmentSubrackTempThreshold
                     low_limit: 3
-                    
+
                 -
                     oid: equipmentBoardTable
                     value: equipmentBoardTemp
@@ -475,8 +475,8 @@ modules:
                     descr: 'Temperature {{ $equipmentBoardSubrack }}:{{ $equipmentBoardName }}'
                     group: Board Temperature
                     entPhysicalIndex: 'board-{{ $index }}'
-                    high_limit: equipmentBoardTempThreshold  
-                    low_limit: equipmentBoardTempLowThreshold              
+                    high_limit: equipmentBoardTempThreshold
+                    low_limit: equipmentBoardTempLowThreshold
 
                 -
                     oid: oaIfTable
@@ -484,20 +484,20 @@ modules:
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.43.{{ $index }}'
                     descr: 'Temperature {{ $oaIfSubrack }}:{{ $oaIfName }}'
-                    group: Amplifier Laser Temperature     
+                    group: Amplifier Laser Temperature
                     entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
                     oid:  ifPhysicalTrxTable
                     value: ifPhysicalTrxLaserTemp
-                    divisor: 10   
+                    divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.47.2.2.1.1.5.{{ $index }}'
                     descr: 'Laser Temperature {{ $ifPhysicalTrxName }}'
                     group: Laser Temperature
-                    entPhysicalIndex: 'laser-{{ $index }}' 
-                    skip_values: [2147483646, 2147483647, -2147483648]        
+                    entPhysicalIndex: 'laser-{{ $index }}'
+                    skip_values: [2147483646, 2147483647, -2147483648]
 
-                                
+
 
 
         dbm:
@@ -505,95 +505,86 @@ modules:
                 skip_values: 0
             data:
                 -
-                    oid: oaIfTable 
+                    oid: oaIfTable
                     value: oaIfRxPowerLevel
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.20.{{ $index }}'
                     descr: 'Amplifier Rx {{ $oaIfSubrack }}:{{ $oaIfName }}'
-                    group: Amplifier Laser dBm  
-                    index: oa-rx-dbm.{{ $index }}     
-                    entPhysicalIndex: 'oa-{{ $index }}'                   
+                    group: Amplifier Laser dBm
+                    index: oa-rx-dbm.{{ $index }}
+                    entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
-                    oid: oaIfTable 
+                    oid: oaIfTable
                     value: oaIfTxPowerLevel
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.19.{{ $index }}'
                     descr: 'Amplifier Tx {{ $oaIfSubrack }}:{{ $oaIfName }}'
-                    group: Amplifier Laser dBm   
-                    index: oa-tx-dbm.{{ $index }}   
-                    entPhysicalIndex: 'oa-{{ $index }}'              
+                    group: Amplifier Laser dBm
+                    index: oa-tx-dbm.{{ $index }}
+                    entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
-                    oid: oaIfTable 
+                    oid: oaIfTable
                     value: oaIfActualGain
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.51.{{ $index }}'
                     descr: 'Amplifier Gain {{ $oaIfSubrack }}:{{ $oaIfName }}'
-                    group: Amplifier Laser Gain dBm   
-                    index: oa-gain-dbm.{{ $index }}    
-                    entPhysicalIndex: 'oa-{{ $index }}'    
+                    group: Amplifier Laser Gain dBm
+                    index: oa-gain-dbm.{{ $index }}
+                    entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
-                    oid: ifPerfL0Table 
+                    oid: ifPerfL0Table
                     value: ifPerfL0RxPower
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.4.{{ $index }}'
                     descr: 'Laser Rx {{ $ifPerfL0Name }}'
-                    group: Laser dBm   
-                    index: laser-rx-dbm.{{ $index }}    
-                    entPhysicalIndex: 'laser-{{ $index }}' 
-                    skip_values: [2147483646, -2147483648]    
+                    group: Laser dBm
+                    index: laser-rx-dbm.{{ $index }}
+                    entPhysicalIndex: 'laser-{{ $index }}'
+                    skip_values: [2147483646, -2147483648]
 
                 -
-                    oid: ifPerfL0Table 
+                    oid: ifPerfL0Table
                     value: ifPerfL0TxPower
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.5.{{ $index }}'
                     descr: 'Laser Tx {{ $ifPerfL0Name }}'
-                    group: Laser dBm   
-                    index: laser-tx-dbm.{{ $index }}    
+                    group: Laser dBm
+                    index: laser-tx-dbm.{{ $index }}
                     entPhysicalIndex: 'laser-{{ $index }}'
-                    skip_values: [2147483646, -2147483648]                                                 
+                    skip_values: [2147483646, -2147483648]
 
         current:
             data:
                 -
                     oid: oaIfTable
                     value: oaIfLaserBias
-                    divisor: 10000   
+                    divisor: 10000
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.22.{{ $index }}'
                     descr: 'Amplifier current {{ $oaIfSubrack }}:{{ $oaIfName }}'
                     group: Amplifier Laser Current
                     entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
-                    oid: oaIfTable
-                    value: oaIfLaserBias
-                    divisor: 10000   
-                    num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.22.{{ $index }}'
-                    descr: 'Amplifier current {{ $oaIfSubrack }}:{{ $oaIfName }}'
-                    group: Amplifier Laser Current
-                    entPhysicalIndex: 'oa-{{ $index }}'                    
-
-                -
                     oid:  ifPhysicalTrxTable
                     value: ifPhysicalTrxLaserBias
-                    divisor: 10000   
+                    divisor: 10000
                     num_oid: '.1.3.6.1.4.1.8708.2.47.2.2.1.1.4.{{ $index }}'
                     descr: 'Laser current {{ $ifPhysicalTrxName }}'
                     group: Laser Current
-                    entPhysicalIndex: 'laser-{{ $index }}' 
-                    skip_values: [2147483646, 2147483647, -2147483648, 4294967293, 4294967294, 2147483648]    
+                    entPhysicalIndex: 'laser-{{ $index }}'
+                    skip_values: [2147483646, 2147483647, -2147483648, 4294967293, 4294967294, 2147483648]
 
         chromatic_dispersion:
             data:
                 -
-                    oid: ifPerfL0Table 
+                    oid: ifPerfL0Table
                     value: ifPerfL0ChromaticDispersion
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.7.{{ $index }}'
                     descr: 'Laser CD {{ $ifPerfL0Name }}'
-                    group: Laser Chromatic Dispersion   
-                    index: laser-cd.{{ $index }}    
+                    group: Laser Chromatic Dispersion
+                    index: laser-cd.{{ $index }}
                     entPhysicalIndex: 'laser-{{ $index }}'
-                    skip_values: [2147483646, 2147483647, -2147483648]                      
+                    skip_values: [2147483646, 2147483647, -2147483648]

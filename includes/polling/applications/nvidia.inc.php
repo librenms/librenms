@@ -33,7 +33,7 @@ $metrics = [];
 foreach ($gpuArray as $index => $gpu) {
     $stats = explode(',', $gpu);
     $stats_count = count($stats);
-    if ($stats_count == 22) {
+    if ($stats_count == 22 || $stats_count == 23) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $jpg, $ofa,
             $mclk, $pclk, $pviol, $tviol, $fb, $bar1, $ccpm, $sbecc, $dbecc,
             $pci, $rxpci, $txpci] = $stats;
@@ -71,7 +71,7 @@ foreach ($gpuArray as $index => $gpu) {
     $metrics[$index] = $fields;
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 $sm_average = ($sm_total ? ($sm_total / count($gpuArray)) : 0);
 

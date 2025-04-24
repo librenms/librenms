@@ -49,7 +49,7 @@ We have two current mapping engines available:
 
 Example Settings:
 
-![Example World Map Settings](/img/world-map-widget-settings.png)
+![Example World Map Settings](../img/world-map-widget-settings.png)
 
 ### Device Overview World Map Settings
 
@@ -92,6 +92,12 @@ lnms config:set network_map_worldmap_link_type xdp/depends
 # Do not show devices that have notifications disabled
 lnms config:set network_map_worldmap_show_disabled_alerts false
 ```
+
+!!! note
+    If entering negative coordinates, use this format:
+    ```bash
+    lnms config:set leaflet.default_lng -- -5.350342
+    ```
 
 ## Geocode engine config
 

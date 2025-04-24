@@ -1,4 +1,5 @@
 <?php
+
 /**
  * init.php
  *
@@ -62,7 +63,6 @@ if (! function_exists('module_selected')) {
 // function only files
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
-require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
@@ -100,7 +100,7 @@ if (! module_selected('nodb', $init_modules)) {
             echo "Check the install docs for more info: https://docs.librenms.org/Installation/\n";
         }
 
-        exit;
+        exit(1);
     }
 }
 \LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
@@ -119,7 +119,6 @@ try {
 
 if (module_selected('web', $init_modules)) {
     require $install_dir . '/includes/html/vars.inc.php';
-    \LibreNMS\Util\OS::loadAllDefinitions(! module_selected('nodb', $init_modules), true);
 }
 
 $console_color = new Console_Color2();

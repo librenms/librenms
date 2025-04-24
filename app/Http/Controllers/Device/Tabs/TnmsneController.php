@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TnmsneController.php
  *
@@ -27,6 +28,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use App\Models\TnmsneInfo;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class TnmsneController implements DeviceTab
@@ -51,7 +53,7 @@ class TnmsneController implements DeviceTab
         return __('Hardware');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [];
     }

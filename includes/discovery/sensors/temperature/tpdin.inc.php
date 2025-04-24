@@ -1,4 +1,5 @@
 <?php
+
 /**
  * tpdin.inc.php
  *
@@ -39,7 +40,7 @@ $tpdin_oids = [
 
 foreach ($tpdin_oids as $data) {
     if ($data['current'] > 0) {
-        discover_sensor($valid['sensor'], 'temperature', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
+        discover_sensor(null, 'temperature', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
     }
 }
 

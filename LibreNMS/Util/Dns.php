@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Dns.php
  *
@@ -27,14 +28,15 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\Geocoder;
+use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
-    protected $resolver;
+    protected Net_DNS2_Resolver $resolver;
 
-    public function __construct()
+    public function __construct(Net_DNS2_Resolver $resolver)
     {
-        $this->resolver = new \Net_DNS2_Resolver();
+        $this->resolver = $resolver;
     }
 
     public static function lookupIp(Device $device): ?string

@@ -8,10 +8,8 @@ over:
     - { graph: device_voltage, text: 'Power Voltage' }
     - { graph: device_current, text: 'Power Current' }
 poller_modules:
-    cisco-cbqos: true
     cisco-cef: true
     cisco-mac-accounting: true
-    cisco-voice: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true

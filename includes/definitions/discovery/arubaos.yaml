@@ -18,3 +18,11 @@ modules:
                 value: WLSX-SYSTEMEXT-MIB::sysExtProcessorLoad
                 num_oid: '.1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.{{ $index }}'
                 descr: WLSX-SYSTEMEXT-MIB::sysExtProcessorDescr
+    sensors:
+        count:
+            data:
+                -
+                    oid: WLSX-USER-MIB::wlsxNumOfUsersVPN
+                    num_oid: '.1.3.6.1.4.1.14823.2.2.1.4.1.4.2.{{ $index }}'
+                    descr: 'Active VPN sessions'
+                    index: 'vpnsessions{{ $index }}'

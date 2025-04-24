@@ -180,7 +180,7 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 
 ### Nginx Configuration - RHEL, CentOS and alike
 This section assumes you have configured LibreNMS with Nginx as
-specified in [Configure Nginx](../Installation/Installation-CentOS-7-Nginx).
+specified in [Configure Nginx](../Installation/Install-LibreNMS.md#__tabbed_5_1).
 
 Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
 ```

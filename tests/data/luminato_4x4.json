@@ -3494,36 +3494,106 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1",
                     "storage_type": "hrStorageFlashMemory",
                     "storage_descr": "user partition",
                     "storage_size": 6951215104,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 32567296,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "storage_free": 6918647808,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1",
-                    "storage_type": "hrStorageFlashMemory",
-                    "storage_descr": "user partition",
-                    "storage_size": 6951215104,
-                    "storage_units": 1024,
-                    "storage_used": 32567296,
-                    "storage_free": 6918647808,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot1",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00362035",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 2,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot2",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00552112",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 2,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 3,
+                    "entPhysicalDescr": "LDM-C",
+                    "entPhysicalClass": "module",
+                    "entPhysicalName": "Slot3",
+                    "entPhysicalHardwareRev": "C10",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": "",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LDM-C",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK00332035",
+                    "entPhysicalContainedIn": 10,
+                    "entPhysicalParentRelPos": 3,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 10,
+                    "entPhysicalDescr": "LMC-A",
+                    "entPhysicalClass": "chassis",
+                    "entPhysicalName": "Chassis",
+                    "entPhysicalHardwareRev": "B13",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "20.8.23",
+                    "entPhysicalAlias": "H1-Izbiste",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "LMC-A",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "HK01672034",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "Teleste",
+                    "ifIndex": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

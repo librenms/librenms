@@ -7,7 +7,7 @@
 #$config['user'] = 'librenms';
 
 ### This should *only* be set if you want to *force* a particular hostname/port
-### It will prevent the web interface being usable form any other hostname
+### It will prevent the web interface being usable from any other hostname
 #$config['base_url']        = "/";
 
 ### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir

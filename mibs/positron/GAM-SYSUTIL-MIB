@@ -1,0 +1,790 @@
+-- *****************************************************************
+-- SYSUTIL-MIB:  Positron's GAM private MIB
+-- *****************************************************************
+
+GAM-SYSUTIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-GROUP, MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    gamMgmt FROM POSITRON-SMI
+    GAMDisplayString FROM GAM-TC
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    ;
+
+gamSysutilMib MODULE-IDENTITY
+    LAST-UPDATED "201602170000Z"
+    ORGANIZATION
+        "Positron Access Solutions Corp."
+    CONTACT-INFO
+        "Customer Service <info@positronaccess.com>"
+    DESCRIPTION
+        "This is a private version of SysUtil"
+    REVISION    "201602170000Z"
+    DESCRIPTION
+        "Add system temperature monitor"
+    REVISION    "201602150000Z"
+    DESCRIPTION
+        "Add board serial and type to board info"
+    REVISION    "201511020000Z"
+    DESCRIPTION
+        "Add system time config"
+    REVISION    "201510300000Z"
+    DESCRIPTION
+        "Add board info"
+    REVISION    "201510200000Z"
+    DESCRIPTION
+        "Add system config info"
+    REVISION    "201510150000Z"
+    DESCRIPTION
+        "Add system uptime status"
+    REVISION    "201411110000Z"
+    DESCRIPTION
+        "Add system LED status"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { gamMgmt 24 }
+
+
+GAMSysutilPowerSupplyStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of power supply state."
+    SYNTAX      INTEGER { active(0), standby(1), notPresent(2) }
+
+GAMSysutilRebootType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of reboot."
+    SYNTAX      INTEGER { noReboot(0), coldReboot(1), warmReboot(2) }
+
+GAMSysutilTemperatureMonitorSensorType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of temperature sensors."
+    SYNTAX      INTEGER { board(0), junction(1) }
+
+gamSysutilMibObjects OBJECT IDENTIFIER
+    ::= { gamSysutilMib 1 }
+
+gamSysutilCapabilities OBJECT IDENTIFIER
+    ::= { gamSysutilMibObjects 1 }
+
+gamSysutilCapabilitiesWarmRebootSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if warm restart is supported or not. true means it is
+         supported. false means it is not supported."
+    ::= { gamSysutilCapabilities 1 }
+
+gamSysutilCapabilitiesPostSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if POST(Power On Self Test) is supported or not. true(1) means
+         it is supported. false(2) means it is not supported."
+    ::= { gamSysutilCapabilities 2 }
+
+gamSysutilCapabilitiesZtpSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if ZTP(Zero Touch Provisioning) is supported or not. true(1)
+         means it is supported. false(2) means it is not supported."
+    ::= { gamSysutilCapabilities 3 }
+
+gamSysutilCapabilitiesStackFwChkSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if stack firmware version check is supported or not. true(1)
+         means it is supported. false(2) means it is not supported."
+    ::= { gamSysutilCapabilities 4 }
+
+gamSysutilConfig OBJECT IDENTIFIER
+    ::= { gamSysutilMibObjects 2 }
+
+gamSysutilConfigSystemInfo OBJECT IDENTIFIER
+    ::= { gamSysutilConfig 1 }
+
+gamSysutilConfigSystemInfoHostname OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hostname"
+    ::= { gamSysutilConfigSystemInfo 1 }
+
+gamSysutilConfigSystemInfoContact OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Contact name."
+    ::= { gamSysutilConfigSystemInfo 2 }
+
+gamSysutilConfigSystemInfoLocation OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Location."
+    ::= { gamSysutilConfigSystemInfo 3 }
+
+gamSysutilConfigSystemTime OBJECT IDENTIFIER
+    ::= { gamSysutilConfig 2 }
+
+gamSysutilConfigSystemTimeSystemCurTime OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Current system time"
+    ::= { gamSysutilConfigSystemTime 1 }
+
+gamSysutilConfigSystemTimeSystemCurTimeFormat OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Format for setting up current system time"
+    ::= { gamSysutilConfigSystemTime 2 }
+
+gamSysutilConfigTemperatureMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilConfigTemperatureMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of temperature monitor config."
+    ::= { gamSysutilConfig 3 }
+
+gamSysutilConfigTemperatureMonitorEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilConfigTemperatureMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row set the sensor config."
+    INDEX       { gamSysutilConfigTemperatureMonitorSensorId }
+    ::= { gamSysutilConfigTemperatureMonitorTable 1 }
+
+GAMSysutilConfigTemperatureMonitorEntry ::= SEQUENCE {
+    gamSysutilConfigTemperatureMonitorSensorId           GAMSysutilTemperatureMonitorSensorType,
+    gamSysutilConfigTemperatureMonitorLowThreshold       Integer32,
+    gamSysutilConfigTemperatureMonitorHighThreshold      Integer32,
+    gamSysutilConfigTemperatureMonitorCriticalThreshold  Integer32,
+    gamSysutilConfigTemperatureMonitorHysteresis         Integer32
+}
+
+gamSysutilConfigTemperatureMonitorSensorId OBJECT-TYPE
+    SYNTAX      GAMSysutilTemperatureMonitorSensorType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of sensor for tempeature monitor."
+    ::= { gamSysutilConfigTemperatureMonitorEntry 1 }
+
+gamSysutilConfigTemperatureMonitorLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..125)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low threshold of temperature monior."
+    ::= { gamSysutilConfigTemperatureMonitorEntry 2 }
+
+gamSysutilConfigTemperatureMonitorHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-40..125)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high threshold of temperature monior."
+    ::= { gamSysutilConfigTemperatureMonitorEntry 3 }
+
+gamSysutilConfigTemperatureMonitorCriticalThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (90..150)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The critical threshold of temperature monior."
+    ::= { gamSysutilConfigTemperatureMonitorEntry 4 }
+
+gamSysutilConfigTemperatureMonitorHysteresis OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of hysteresis for temperature check."
+    ::= { gamSysutilConfigTemperatureMonitorEntry 5 }
+
+gamSysutilStatus OBJECT IDENTIFIER
+    ::= { gamSysutilMibObjects 3 }
+
+gamSysutilStatusCpuLoad OBJECT IDENTIFIER
+    ::= { gamSysutilStatus 1 }
+
+gamSysutilStatusCpuLoadAverage100msec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 100 milli-seconds."
+    ::= { gamSysutilStatusCpuLoad 1 }
+
+gamSysutilStatusCpuLoadAverage1sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 1 second."
+    ::= { gamSysutilStatusCpuLoad 2 }
+
+gamSysutilStatusCpuLoadAverage10sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 10 seconds."
+    ::= { gamSysutilStatusCpuLoad 3 }
+
+gamSysutilStatusPowerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilStatusPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of power supply status."
+    ::= { gamSysutilStatus 2 }
+
+gamSysutilStatusPowerSupplyEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilStatusPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the power supply status."
+    INDEX       { gamSysutilStatusPowerSupplySwitchId,
+                  gamSysutilStatusPowerSupplyPsuId }
+    ::= { gamSysutilStatusPowerSupplyTable 1 }
+
+GAMSysutilStatusPowerSupplyEntry ::= SEQUENCE {
+    gamSysutilStatusPowerSupplySwitchId     Integer32,
+    gamSysutilStatusPowerSupplyPsuId        Integer32,
+    gamSysutilStatusPowerSupplyState        GAMSysutilPowerSupplyStateType,
+    gamSysutilStatusPowerSupplyDescription  GAMDisplayString
+}
+
+gamSysutilStatusPowerSupplySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch."
+    ::= { gamSysutilStatusPowerSupplyEntry 1 }
+
+gamSysutilStatusPowerSupplyPsuId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of power supply."
+    ::= { gamSysutilStatusPowerSupplyEntry 2 }
+
+gamSysutilStatusPowerSupplyState OBJECT-TYPE
+    SYNTAX      GAMSysutilPowerSupplyStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of power supply."
+    ::= { gamSysutilStatusPowerSupplyEntry 3 }
+
+gamSysutilStatusPowerSupplyDescription OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of power supply."
+    ::= { gamSysutilStatusPowerSupplyEntry 4 }
+
+gamSysutilStatusSystemLedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilStatusSystemLedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of system LED status."
+    ::= { gamSysutilStatus 3 }
+
+gamSysutilStatusSystemLedEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilStatusSystemLedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the system LED status."
+    INDEX       { gamSysutilStatusSystemLedSwitchId }
+    ::= { gamSysutilStatusSystemLedTable 1 }
+
+GAMSysutilStatusSystemLedEntry ::= SEQUENCE {
+    gamSysutilStatusSystemLedSwitchId     Integer32,
+    gamSysutilStatusSystemLedDescription  GAMDisplayString
+}
+
+gamSysutilStatusSystemLedSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch."
+    ::= { gamSysutilStatusSystemLedEntry 1 }
+
+gamSysutilStatusSystemLedDescription OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of system LED status."
+    ::= { gamSysutilStatusSystemLedEntry 2 }
+
+gamSysutilStatusSystemUptime OBJECT IDENTIFIER
+    ::= { gamSysutilStatus 4 }
+
+gamSysutilStatusSystemUptimeSystemUptime OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time since the DUT is Up."
+    ::= { gamSysutilStatusSystemUptime 1 }
+
+gamSysutilStatusBoardInfo OBJECT IDENTIFIER
+    ::= { gamSysutilStatus 5 }
+
+gamSysutilStatusBoardInfoBoardMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board Mac Address"
+    ::= { gamSysutilStatusBoardInfo 1 }
+
+gamSysutilStatusBoardInfoBoardID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board ID"
+    ::= { gamSysutilStatusBoardInfo 2 }
+
+gamSysutilStatusBoardInfoBoardSerial OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board Serial Number"
+    ::= { gamSysutilStatusBoardInfo 3 }
+
+gamSysutilStatusBoardInfoBoardType OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board ID"
+    ::= { gamSysutilStatusBoardInfo 4 }
+
+gamSysutilStatusBoardInfoBoardHwVersion OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board Hardware Version"
+    ::= { gamSysutilStatusBoardInfo 5 }
+
+gamSysutilStatusBoardInfoBoardFPGA1Version OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board FPGA #1 version (-1 if unavailable)"
+    ::= { gamSysutilStatusBoardInfo 6 }
+
+gamSysutilStatusBoardInfoBoardFPGA2Version OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board FPGA #1 version (-1 if unavailable)"
+    ::= { gamSysutilStatusBoardInfo 7 }
+
+gamSysutilStatusBoardInfoBoardNorFlashModel OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board NOR flash model"
+    ::= { gamSysutilStatusBoardInfo 8 }
+
+gamSysutilStatusBoardInfoBoardMgmtPhyModel OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board MGMT PHY model"
+    ::= { gamSysutilStatusBoardInfo 9 }
+
+gamSysutilStatusTemperatureMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilStatusTemperatureMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of temperature monitor status."
+    ::= { gamSysutilStatus 6 }
+
+gamSysutilStatusTemperatureMonitorEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilStatusTemperatureMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the sensor status."
+    INDEX       { gamSysutilStatusTemperatureMonitorSensorId }
+    ::= { gamSysutilStatusTemperatureMonitorTable 1 }
+
+GAMSysutilStatusTemperatureMonitorEntry ::= SEQUENCE {
+    gamSysutilStatusTemperatureMonitorSensorId       GAMSysutilTemperatureMonitorSensorType,
+    gamSysutilStatusTemperatureMonitorLowAlarm       TruthValue,
+    gamSysutilStatusTemperatureMonitorHighAlarm      TruthValue,
+    gamSysutilStatusTemperatureMonitorCriticalAlarm  TruthValue,
+    gamSysutilStatusTemperatureMonitorTemperature    Integer32
+}
+
+gamSysutilStatusTemperatureMonitorSensorId OBJECT-TYPE
+    SYNTAX      GAMSysutilTemperatureMonitorSensorType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of sensor for tempeature monitor."
+    ::= { gamSysutilStatusTemperatureMonitorEntry 1 }
+
+gamSysutilStatusTemperatureMonitorLowAlarm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm flag of temperature low status."
+    ::= { gamSysutilStatusTemperatureMonitorEntry 2 }
+
+gamSysutilStatusTemperatureMonitorHighAlarm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm flag of temperature high status."
+    ::= { gamSysutilStatusTemperatureMonitorEntry 3 }
+
+gamSysutilStatusTemperatureMonitorCriticalAlarm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm flag of temperature critical status."
+    ::= { gamSysutilStatusTemperatureMonitorEntry 4 }
+
+gamSysutilStatusTemperatureMonitorTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current temperature."
+    ::= { gamSysutilStatusTemperatureMonitorEntry 5 }
+
+gamSysutilStatusTemperatureSensorsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilStatusTemperatureSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of temperature sensors status."
+    ::= { gamSysutilStatus 7 }
+
+gamSysutilStatusTemperatureSensorsEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilStatusTemperatureSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the sensor status."
+    INDEX       { gamSysutilStatusTemperatureSensorsSensorId }
+    ::= { gamSysutilStatusTemperatureSensorsTable 1 }
+
+GAMSysutilStatusTemperatureSensorsEntry ::= SEQUENCE {
+    gamSysutilStatusTemperatureSensorsSensorId        Unsigned32,
+    gamSysutilStatusTemperatureSensorsName            GAMDisplayString,
+    gamSysutilStatusTemperatureSensorsTemperatureX10  Integer32
+}
+
+gamSysutilStatusTemperatureSensorsSensorId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The tempeature sensor number."
+    ::= { gamSysutilStatusTemperatureSensorsEntry 1 }
+
+gamSysutilStatusTemperatureSensorsName OBJECT-TYPE
+    SYNTAX      GAMDisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature sensor descriptive name."
+    ::= { gamSysutilStatusTemperatureSensorsEntry 2 }
+
+gamSysutilStatusTemperatureSensorsTemperatureX10 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current temperature, multiplied by 10, in Celsius."
+    ::= { gamSysutilStatusTemperatureSensorsEntry 3 }
+
+gamSysutilStatusFanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilStatusFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of fan status."
+    ::= { gamSysutilStatus 8 }
+
+gamSysutilStatusFanEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilStatusFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the status of one fan."
+    INDEX       { gamSysutilStatusFanFanId }
+    ::= { gamSysutilStatusFanTable 1 }
+
+GAMSysutilStatusFanEntry ::= SEQUENCE {
+    gamSysutilStatusFanFanId  Unsigned32,
+    gamSysutilStatusFanRPM    Integer32
+}
+
+gamSysutilStatusFanFanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The fan index number."
+    ::= { gamSysutilStatusFanEntry 1 }
+
+gamSysutilStatusFanRPM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current fan speed (RPM)."
+    ::= { gamSysutilStatusFanEntry 2 }
+
+gamSysutilControl OBJECT IDENTIFIER
+    ::= { gamSysutilMibObjects 4 }
+
+gamSysutilControlRebootTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GAMSysutilControlRebootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to reboot a swicth"
+    ::= { gamSysutilControl 1 }
+
+gamSysutilControlRebootEntry OBJECT-TYPE
+    SYNTAX      GAMSysutilControlRebootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each switch has a set of parameters"
+    INDEX       { gamSysutilControlRebootSwitchId }
+    ::= { gamSysutilControlRebootTable 1 }
+
+GAMSysutilControlRebootEntry ::= SEQUENCE {
+    gamSysutilControlRebootSwitchId  Integer32,
+    gamSysutilControlRebootType      GAMSysutilRebootType
+}
+
+gamSysutilControlRebootSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch."
+    ::= { gamSysutilControlRebootEntry 1 }
+
+gamSysutilControlRebootType OBJECT-TYPE
+    SYNTAX      GAMSysutilRebootType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of reboot. noReboot(0) does not reboot. coldReboot(1) is to do
+         cold reboot. warmReboot(2) is to do warm reboot, but this is optional.
+         The OID of vtssSysutilCapabilitiesWarmRebootSupported tells if warm
+         reboot is supported or not."
+    ::= { gamSysutilControlRebootEntry 2 }
+
+gamSysutilMibConformance OBJECT IDENTIFIER
+    ::= { gamSysutilMib 2 }
+
+gamSysutilMibCompliances OBJECT IDENTIFIER
+    ::= { gamSysutilMibConformance 1 }
+
+gamSysutilMibGroups OBJECT IDENTIFIER
+    ::= { gamSysutilMibConformance 2 }
+
+gamSysutilCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilCapabilitiesWarmRebootSupported,
+                  gamSysutilCapabilitiesPostSupported,
+                  gamSysutilCapabilitiesZtpSupported,
+                  gamSysutilCapabilitiesStackFwChkSupported }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 1 }
+
+gamSysutilConfigSystemInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilConfigSystemInfoHostname,
+                  gamSysutilConfigSystemInfoContact,
+                  gamSysutilConfigSystemInfoLocation }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 2 }
+
+gamSysutilConfigSystemTimeInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilConfigSystemTimeSystemCurTime,
+                  gamSysutilConfigSystemTimeSystemCurTimeFormat }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 3 }
+
+gamSysutilConfigTemperatureMonitorInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilConfigTemperatureMonitorSensorId,
+                  gamSysutilConfigTemperatureMonitorLowThreshold,
+                  gamSysutilConfigTemperatureMonitorHighThreshold,
+                  gamSysutilConfigTemperatureMonitorCriticalThreshold,
+                  gamSysutilConfigTemperatureMonitorHysteresis }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 4 }
+
+gamSysutilStatusCpuLoadInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusCpuLoadAverage100msec,
+                  gamSysutilStatusCpuLoadAverage1sec,
+                  gamSysutilStatusCpuLoadAverage10sec }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 5 }
+
+gamSysutilStatusPowerSupplyInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusPowerSupplySwitchId,
+                  gamSysutilStatusPowerSupplyPsuId,
+                  gamSysutilStatusPowerSupplyState,
+                  gamSysutilStatusPowerSupplyDescription }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 6 }
+
+gamSysutilStatusSystemLedInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusSystemLedSwitchId,
+                  gamSysutilStatusSystemLedDescription }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 7 }
+
+gamSysutilStatusSystemUptimeInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusSystemUptimeSystemUptime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 8 }
+
+gamSysutilStatusBoardInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusBoardInfoBoardMacAddress,
+                  gamSysutilStatusBoardInfoBoardID,
+                  gamSysutilStatusBoardInfoBoardSerial,
+                  gamSysutilStatusBoardInfoBoardType,
+                  gamSysutilStatusBoardInfoBoardHwVersion,
+                  gamSysutilStatusBoardInfoBoardFPGA1Version,
+                  gamSysutilStatusBoardInfoBoardFPGA2Version,
+                  gamSysutilStatusBoardInfoBoardNorFlashModel,
+                  gamSysutilStatusBoardInfoBoardMgmtPhyModel }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 9 }
+
+gamSysutilStatusTemperatureMonitorInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusTemperatureMonitorSensorId,
+                  gamSysutilStatusTemperatureMonitorLowAlarm,
+                  gamSysutilStatusTemperatureMonitorHighAlarm,
+                  gamSysutilStatusTemperatureMonitorCriticalAlarm,
+                  gamSysutilStatusTemperatureMonitorTemperature }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 10 }
+
+gamSysutilStatusTemperatureSensorsInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusTemperatureSensorsSensorId,
+                  gamSysutilStatusTemperatureSensorsName,
+                  gamSysutilStatusTemperatureSensorsTemperatureX10 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 11 }
+
+gamSysutilStatusFanInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilStatusFanFanId, gamSysutilStatusFanRPM }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 12 }
+
+gamSysutilControlRebootInfoGroup OBJECT-GROUP
+    OBJECTS     { gamSysutilControlRebootSwitchId,
+                  gamSysutilControlRebootType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { gamSysutilMibGroups 13 }
+
+gamSysutilMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { gamSysutilCapabilitiesInfoGroup,
+                       gamSysutilConfigSystemInfoInfoGroup,
+                       gamSysutilConfigSystemTimeInfoGroup,
+                       gamSysutilConfigTemperatureMonitorInfoGroup,
+                       gamSysutilStatusCpuLoadInfoGroup,
+                       gamSysutilStatusPowerSupplyInfoGroup,
+                       gamSysutilStatusSystemLedInfoGroup,
+                       gamSysutilStatusSystemUptimeInfoGroup,
+                       gamSysutilStatusBoardInfoInfoGroup,
+                       gamSysutilStatusTemperatureMonitorInfoGroup,
+                       gamSysutilStatusTemperatureSensorsInfoGroup,
+                       gamSysutilStatusFanInfoGroup,
+                       gamSysutilControlRebootInfoGroup }
+
+    ::= { gamSysutilMibCompliances 1 }
+
+END

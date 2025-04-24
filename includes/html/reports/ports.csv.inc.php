@@ -166,10 +166,10 @@ $csv[] = [
 
 foreach ($ports as $port) {
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+        $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
         $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
-        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps');
-        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
+        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
         $port = cleanPort($port, $device);
         $csv[] = [
             format_hostname($port),

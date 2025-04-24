@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Dantel Webmon generic sensor
  *
@@ -42,7 +43,7 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
             if ($oid[$prefix . 'Units']) {
                 $descr .= '(' . $oid[$prefix . 'Units'] . ')';
             }
-            discover_sensor($valid['sensor'], 'count', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
+            discover_sensor(null, 'count', $device, $num_oid, $prefix . 'LiveRaw.' . $index, 'webmon', $descr, '1', '1', $lowLimit, $lowWarnLimit, $highWarnLimit, $highLimit, $value, 'snmp', null, null, null, $group);
         }
     }
 }

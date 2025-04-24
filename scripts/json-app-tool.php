@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-require realpath(__DIR__ . '/..') . '/includes/init.php';
-
 // Pulled from includes/polling/functions.inc.php
 function data_flatten($array, $prefix = '', $joiner = '_')
 {
@@ -149,7 +147,7 @@ if (! isset($options['S'])) {
 
 // Output snmprec data for snmpsim for use with testing.
 if (isset($options['s'])) {
-    $oid = \LibreNMS\Util\Oid::ofString($options['S']);
+    $oid = string_to_oid($options['S']);
     echo "1.3.6.1.2.1.1.1.0|4|Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64\n" .
         "1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10\n" .
         "1.3.6.1.2.1.1.3.0|67|77550514\n" .
@@ -176,6 +174,7 @@ if (isset($options['t'])) {
                     'app_status' => '',
                     'app_instance' => '',
                     'data' => null,
+                    'deleted_at' => null,
                 ]],
             ],
             'poller' => [
@@ -187,6 +186,7 @@ if (isset($options['t'])) {
                     'app_status' => '',
                     'app_instance' => '',
                     'data' => null,
+                    'deleted_at' => null,
                 ]],
                 'application_metrics' => [],
             ],

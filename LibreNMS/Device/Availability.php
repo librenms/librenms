@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Availability.php
  *
@@ -28,6 +29,7 @@ namespace LibreNMS\Device;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
 class Availability
@@ -115,16 +117,26 @@ class Availability
 
         // no recorded outages found, so use current status
         if ($found_outages->isEmpty()) {
-            return 100 * $device->status;
+            return $device->status ? 100 : 0;
         }
 
         // don't calculate for time when the device didn't exist
         if ($device->inserted) {
-            $duration = min($duration, $device->inserted->diffInSeconds());
+            $duration = min($duration, (int) $device->inserted->diffInSeconds(null, true));
         }
 
         $outage_summary = self::outageSummary($found_outages, $duration, $now);
 
-        return Number::calculatePercent($duration - $outage_summary, $duration, $precision);
+        $percent = Number::calculatePercent($duration - $outage_summary, $duration, $precision);
+        if ($percent < 0) {
+            Log::debug("Invalid availability calculation ($percent), normalizing to 0");
+            $percent = 0;
+        }
+        if ($percent > 100) {
+            Log::debug("Invalid availability calculation ($percent), normalizing to 100");
+            $percent = 100;
+        }
+
+        return $percent;
     }
 }

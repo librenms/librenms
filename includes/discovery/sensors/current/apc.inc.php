@@ -39,7 +39,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -86,7 +86,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -130,7 +130,7 @@ if (isset($oids) && $oids) {
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
             $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
             if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1) {
-                discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+                discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
             }
         }
     }
@@ -177,7 +177,7 @@ if (isset($oids) && $oids) {
             }
 
             $descr = 'Outlet ' . $index . ' - ' . snmp_get($device, $name_oid, '-Oqv', '');
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -209,7 +209,7 @@ if (isset($oids) && $oids) {
     $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
     // No / $precision here! Nice, APC!
     $descr = 'Output Feed';
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+    discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
 }
 unset($oids);
 
@@ -231,10 +231,10 @@ if (isset($in_oids)) {
         $in_index = '3.1.4.' . $index;
         if (substr($index, 0, 1) == 2 && $data['upsPhaseInputCurrent'] != -1) {
             $descr = 'Phase ' . substr($index, -1) . ' Bypass Input';
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         } elseif (substr($index, 0, 1) == 1) {
             $descr = 'Phase ' . substr($index, -1) . ' Input';
-            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         }
     }
 }
@@ -253,7 +253,7 @@ foreach ($oids as $index => $data) {
         $current = $data['upsPhaseOutputCurrent'] / $divisor;
     }
     if ($current >= -1) {
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }
 unset($index);

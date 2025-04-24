@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FinalizeController.php
  *
@@ -136,7 +137,7 @@ class FinalizeController extends InstallationController implements InstallerStep
     }
 
     /**
-     * @throws \LibreNMS\Exceptions\FileWriteFailedException
+     * @throws FileWriteFailedException
      */
     private function writeConfigFile()
     {

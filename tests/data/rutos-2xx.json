@@ -3517,141 +3517,76 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "31",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/rom",
                     "storage_size": 10747904,
+                    "storage_size_oid": null,
                     "storage_units": 262144,
                     "storage_used": 10747904,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.31",
                     "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_free_oid": null,
+                    "storage_perc": 100,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "32",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/overlay",
                     "storage_size": 4194304,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 409600,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.32",
+                    "storage_free": 3784704,
+                    "storage_free_oid": null,
+                    "storage_perc": 10,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "33",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 4194304,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 409600,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.33",
+                    "storage_free": 3784704,
+                    "storage_free_oid": null,
+                    "storage_perc": 10,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "34",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/mtdblock7",
                     "storage_size": 589824,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 253952,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.34",
+                    "storage_free": 335872,
+                    "storage_free_oid": null,
+                    "storage_perc": 43,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/rom",
-                    "storage_size": 10747904,
-                    "storage_units": 262144,
-                    "storage_used": 10747904,
-                    "storage_free": 0,
-                    "storage_perc": 100,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "32",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/overlay",
-                    "storage_size": 4194304,
-                    "storage_units": 4096,
-                    "storage_used": 409600,
-                    "storage_free": 3784704,
-                    "storage_perc": 10,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "33",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 4194304,
-                    "storage_units": 4096,
-                    "storage_used": 409600,
-                    "storage_free": 3784704,
-                    "storage_perc": 10,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "34",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/mnt/mtdblock7",
-                    "storage_size": 589824,
-                    "storage_units": 4096,
-                    "storage_used": 253952,
-                    "storage_free": 335872,
-                    "storage_perc": 43,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "wireless": {
         "discovery": {
             "wireless_sensors": [
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "snr",
-                    "sensor_index": "1",
-                    "sensor_type": "rutos-2xx",
-                    "sensor_descr": "SINR",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": -1,
-                    "sensor_aggregator": "sum",
-                    "sensor_current": -14.1,
-                    "sensor_prev": null,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.48690.2.22.0\"]",
-                    "rrd_type": "GAUGE"
-                },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rssi",
@@ -3673,11 +3608,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_oids": "[\".1.3.6.1.4.1.48690.2.23.0\"]",
                     "rrd_type": "GAUGE"
-                }
-            ]
-        },
-        "poller": {
-            "wireless_sensors": [
+                },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "snr",
@@ -3688,7 +3619,7 @@
                     "sensor_multiplier": -1,
                     "sensor_aggregator": "sum",
                     "sensor_current": -14.1,
-                    "sensor_prev": -14.1,
+                    "sensor_prev": null,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -3699,7 +3630,11 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_oids": "[\".1.3.6.1.4.1.48690.2.22.0\"]",
                     "rrd_type": "GAUGE"
-                },
+                }
+            ]
+        },
+        "poller": {
+            "wireless_sensors": [
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rssi",
@@ -3720,6 +3655,28 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_oids": "[\".1.3.6.1.4.1.48690.2.23.0\"]",
+                    "rrd_type": "GAUGE"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "snr",
+                    "sensor_index": "1",
+                    "sensor_type": "rutos-2xx",
+                    "sensor_descr": "SINR",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": -1,
+                    "sensor_aggregator": "sum",
+                    "sensor_current": -14.1,
+                    "sensor_prev": -14.1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_oids": "[\".1.3.6.1.4.1.48690.2.22.0\"]",
                     "rrd_type": "GAUGE"
                 }
             ]

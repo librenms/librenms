@@ -1,9 +1,9 @@
---===========================================================
--- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- ===========================================================
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:  Transceiver MIB
 -- Reference:  IF-MIB
--- Version:  V1.5
+-- Version:  V2.3
 -- History:
 -- V1.0 created by liuhongxu and zoudian.
 --   Initial version 2006-01-10
@@ -27,30 +27,100 @@
 --   Add hh3cTransceiverChannelTable to transceiver channel statistics.
 -- V1.5 2014-08-11 Updated by SongHao
 --   Add hh3cTransceiverVendorOUI and hh3cTransceiverRevisionNumber.
---=================================================================
+-- V1.6 2015-12-25 Updated by zhouliping
+--   Added hh3cTransceiverFrequency and hh3cTransceiverActiveITUChannel to hh3cTransceiverInfoTable.
+--   Added hh3cTransceiverITUChanTable for ITU channel information.
+-- V1.7 2016-03-09 Updated by zhouliping
+--   Added hh3cTransceiverCurWaveErr, hh3cTransceiverWaveErrHiAlarm, hh3cTransceiverWaveErrLoAlarm,
+--   hh3cTransceiverCurFreqErr, hh3cTransceiverFreqErrHiAlarm and hh3cTransceiverFreqErrLoAlarm
+--   to hh3cTransceiverInfoTable.
+--     2018-01-03 Updated by zhouliping
+--   Added hh3cTransceiverChannelBiasHiAm, hh3cTransceiverChannelBiasLoAm,
+--   hh3cTransceiverChannelTXPwrHiAm, hh3cTransceiverChannelTXPwrLoAm
+--   to hh3cTransceiverChannelTable.
+-- V1.8 2019-01-03 Updated by luozelei
+--   Added hh3cTransceiverPartNumber and hh3cTransceiverProductCode
+--   to hh3cTransceiverInfoTable.
+-- V1.9 2019-08-09 Updated by yuhaiyan
+--   Added hh3cTransceiverOriginalSN to hh3cTransceiverInfoTable.
+-- V2.0 2021-03-18 Updated by hezheng
+--   Add the objects of hh3cTransceiverPwrOutHiAlarmDbm, hh3cTransceiverPwrOutLoAlarmDbm,
+--   hh3cTransceiverPwrOutHiWarnDbm, hh3cTransceiverPwrOutLoWarnDbm, hh3cTransceiverRcvPwrHiAlarmDbm,
+--   hh3cTransceiverRcvPwrLoAlarmDbm, hh3cTransceiverRcvPwrHiWarnDbm, hh3cTransceiverRcvPwrLoWarnDbm.
+--   Added hh3cTransceiverChanTXPwrHiAmDbm, hh3cTransceiverChanTXPwrLoAmDbm
+--   to hh3cTransceiverChannelTable.
+-- V2.1 2021-12-02 Updated by fangliwen
+--   Added hh3cTransceiverExtrAlarmEnable and hh3cTransceiverMaybeFake.
+-- V2.2 2022-2-22 Updated by liziyi
+--   Add the hh3cTransceiverLaneTable.
+--   Added hh3cTransceiverLaneCurRxPower、hh3cTransceiverLaneCurTxPower and hh3cTransceiverLaneBiasCurrent
+--   to hh3cTransceiverLaneTable.
+-- V2.3 2022-05-12 Updated by fangliwen
+--   Add hh3cTransceiverRelySlotMfgName and hh3cTransceiverRelySlotMfgDate
+--   to hh3cTransceiverInfoTable.
+-- =================================================================
 HH3C-TRANSCEIVER-INFO-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    TruthValue
+    TruthValue, DateAndTime
         FROM SNMPv2-TC
-    ifIndex
+    ifIndex, ifName
         FROM IF-MIB
     hh3cCommon
         FROM HH3C-OID-MIB;
 
     hh3cTransceiver MODULE-IDENTITY
-        LAST-UPDATED "201408111050Z"
+        LAST-UPDATED "202205120000Z"
         ORGANIZATION
-            "Hangzhou H3C Technologies Co., Ltd."
+            "New H3C Technologies Co., Ltd."
         CONTACT-INFO
-            "Platform Team Hangzhou H3C Technologies Co., Ltd.
+            "Platform Team New H3C Technologies Co., Ltd.
             Hai-Dian District Beijing P.R. China
             http://www.h3c.com
             Zip:100085"
         DESCRIPTION
             "The objects in this MIB module are used to display the
             information of transceiver on interface."
+        REVISION "202205120000Z"
+        DESCRIPTION
+            "Add hh3cTransceiverRelySlotMfgName and hh3cTransceiverRelySlotMfgDate
+            to hh3cTransceiverInfoTable."
+        REVISION "202202220000Z"
+        DESCRIPTION
+            "Add the hh3cTransceiverLaneTable. Added hh3cTransceiverLaneCurRxPower,
+             hh3cTransceiverLaneCurTxPower and hh3cTransceiverLaneBiasCurrent to hh3cTransceiverLaneTable."
+        REVISION "202112020000Z"
+        DESCRIPTION
+            "Add the objects of hh3cTransceiverExtrAlarmEnable and hh3cTransceiverMaybeFake."
+        REVISION "202103180000Z"
+        DESCRIPTION
+            "Add the objects of hh3cTransceiverPwrOutHiAlarmDbm, hh3cTransceiverPwrOutLoAlarmDbm,
+            hh3cTransceiverPwrOutHiWarnDbm, hh3cTransceiverPwrOutLoWarnDbm, hh3cTransceiverRcvPwrHiAlarmDbm,
+            hh3cTransceiverRcvPwrLoAlarmDbm, hh3cTransceiverRcvPwrHiWarnDbm, hh3cTransceiverRcvPwrLoWarnDbm.
+            Added hh3cTransceiverChanTXPwrHiAmDbm, hh3cTransceiverChanTXPwrLoAmDbm
+            to hh3cTransceiverChannelTable."
+        REVISION "201908090000Z"
+        DESCRIPTION
+            "Added hh3cTransceiverOriginalSN to hh3cTransceiverInfoTable."
+        REVISION "201901030000Z"
+        DESCRIPTION
+            "Added hh3cTransceiverPartNumber and hh3cTransceiverProductCode
+            to hh3cTransceiverInfoTable."
+        REVISION "201801030000Z"
+        DESCRIPTION
+            "Added hh3cTransceiverChannelBiasHiAm, hh3cTransceiverChannelBiasLoAm,
+            hh3cTransceiverChannelTXPwrHiAm, hh3cTransceiverChannelTXPwrLoAm
+            to hh3cTransceiverChannelTable."
+        REVISION "201603090000Z"
+        DESCRIPTION
+            "Added hh3cTransceiverCurWaveErr, hh3cTransceiverWaveErrHiAlarm, hh3cTransceiverWaveErrLoAlarm,
+            hh3cTransceiverCurFreqErr, hh3cTransceiverFreqErrHiAlarm and hh3cTransceiverFreqErrLoAlarm
+            to hh3cTransceiverInfoTable."
+        REVISION "201512250000Z"
+        DESCRIPTION
+            "Added hh3cTransceiverFrequency and hh3cTransceiverActiveITUChannel to hh3cTransceiverInfoTable.
+            Added hh3cTransceiverITUChanTable for ITU channel information."
         REVISION "201408111050Z"
         DESCRIPTION
             "Add hh3cTransceiverVendorOUI and hh3cTransceiverRevisionNumber."
@@ -141,7 +211,28 @@ IMPORTS
             hh3cTransceiverRcvPwrLoWarn      Integer32,
             hh3cTransceiverErrors            BITS,
             hh3cTransceiverVendorOUI         OCTET STRING,
-            hh3cTransceiverRevisionNumber    OCTET STRING
+            hh3cTransceiverRevisionNumber    OCTET STRING,
+            hh3cTransceiverFrequency         Integer32,
+            hh3cTransceiverActiveITUChannel  Unsigned32,
+            hh3cTransceiverCurWaveErr        Integer32,
+            hh3cTransceiverWaveErrHiAlarm    Integer32,
+            hh3cTransceiverWaveErrLoAlarm    Integer32,
+            hh3cTransceiverCurFreqErr        Integer32,
+            hh3cTransceiverFreqErrHiAlarm    Integer32,
+            hh3cTransceiverFreqErrLoAlarm    Integer32,
+            hh3cTransceiverPartNumber        OCTET STRING,
+            hh3cTransceiverProductCode       OCTET STRING,
+            hh3cTransceiverOriginalSN        OCTET STRING,
+            hh3cTransceiverPwrOutHiAlarmDbm  Integer32,
+            hh3cTransceiverPwrOutLoAlarmDbm  Integer32,
+            hh3cTransceiverPwrOutHiWarnDbm   Integer32,
+            hh3cTransceiverPwrOutLoWarnDbm   Integer32,
+            hh3cTransceiverRcvPwrHiAlarmDbm  Integer32,
+            hh3cTransceiverRcvPwrLoAlarmDbm  Integer32,
+            hh3cTransceiverRcvPwrHiWarnDbm   Integer32,
+            hh3cTransceiverRcvPwrLoWarnDbm   Integer32,
+            hh3cTransceiverRelySlotMfgName   OCTET STRING,
+            hh3cTransceiverRelySlotMfgDate   DateAndTime
         }
 
     hh3cTransceiverHardwareType OBJECT-TYPE
@@ -165,7 +256,8 @@ IMPORTS
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "Wave length of the interface, measured in nanometer."
+            "Wave length of the interface, measured in nanometer.
+            The unit is nm."
         ::= { hh3cTransceiverInfoEntry 3 }
 
     hh3cTransceiverVendorName OBJECT-TYPE
@@ -226,7 +318,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the current transmitted power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 9 }
 
     hh3cTransceiverMaxTXPower OBJECT-TYPE
@@ -235,7 +327,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the maximum transmitted power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 10 }
 
     hh3cTransceiverMinTXPower OBJECT-TYPE
@@ -244,7 +336,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the minimum transmitted power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 11 }
 
     hh3cTransceiverCurRXPower OBJECT-TYPE
@@ -253,7 +345,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the current received power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 12 }
 
     hh3cTransceiverMaxRXPower OBJECT-TYPE
@@ -262,7 +354,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the maximum received power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 13 }
 
     hh3cTransceiverMinRXPower OBJECT-TYPE
@@ -271,7 +363,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the minimum received power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverInfoEntry 14 }
 
     hh3cTransceiverTemperature OBJECT-TYPE
@@ -307,7 +399,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver temperature high alarm threshold
-             limit in thousandths of degrees Celsius.
+             in thousandths of degrees Celsius.
              As an example: 49120 is 49.120 degrees Celsius."
         ::= { hh3cTransceiverInfoEntry 18 }
 
@@ -317,7 +409,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver temperature low alarm threshold
-             limit in thousandths of degrees Celsius.
+             in thousandths of degrees Celsius.
              As an example: 49120 is 49.120 degrees Celsius."
         ::= { hh3cTransceiverInfoEntry 19 }
 
@@ -327,7 +419,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver temperature high warning threshold
-             limit in thousandths of degrees Celsius.
+             in thousandths of degrees Celsius.
              As an example: 49120 is 49.120 degrees Celsius."
         ::= { hh3cTransceiverInfoEntry 20 }
 
@@ -337,7 +429,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver temperature low warning threshold
-             limit in thousandths of degrees Celsius.
+             in thousandths of degrees Celsius.
              As an example: 49120 is 49.120 degrees Celsius."
         ::= { hh3cTransceiverInfoEntry 21 }
 
@@ -347,7 +439,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver VCC high alarm threshold
-             limit in hundreds of microvolts.
+             in hundreds of microvolts.
              As an example: 32928 is 3.2928 volts.
              Returns zero if not supported on the transceiver."
         ::= { hh3cTransceiverInfoEntry 22 }
@@ -358,7 +450,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver VCC low alarm threshold
-             limit in hundreds of microvolts.
+             in hundreds of microvolts.
              As an example: 32928 is 3.2928 volts.
              Returns zero if not supported on the transceiver."
         ::= { hh3cTransceiverInfoEntry 23 }
@@ -369,7 +461,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver VCC high warning threshold
-             limit in hundreds of microvolts.
+             in hundreds of microvolts.
              As an example: 32928 is 3.2928 volts.
              Returns zero if not supported on the transceiver."
         ::= { hh3cTransceiverInfoEntry 24 }
@@ -380,7 +472,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver VCC low warning threshold
-             limit in hundreds of microvolts.
+             in hundreds of microvolts.
              As an example: 32928 is 3.2928 volts.
              Returns zero if not supported on the transceiver."
         ::= { hh3cTransceiverInfoEntry 25 }
@@ -390,7 +482,7 @@ IMPORTS
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Transceiver bias high alarm threshold limit in microamps."
+            "Transceiver bias high alarm threshold in microamps."
         ::= { hh3cTransceiverInfoEntry 26 }
 
     hh3cTransceiverBiasLoAlarm OBJECT-TYPE
@@ -398,7 +490,7 @@ IMPORTS
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Transceiver bias low alarm threshold limit in microamps."
+            "Transceiver bias low alarm threshold in microamps."
         ::= { hh3cTransceiverInfoEntry 27 }
 
     hh3cTransceiverBiasHiWarn OBJECT-TYPE
@@ -406,7 +498,7 @@ IMPORTS
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Transceiver bias high warning threshold limit in microamps."
+            "Transceiver bias high warning threshold in microamps."
         ::= { hh3cTransceiverInfoEntry 28 }
 
     hh3cTransceiverBiasLoWarn OBJECT-TYPE
@@ -414,7 +506,7 @@ IMPORTS
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Transceiver bias low warning threshold limit in microamps."
+            "Transceiver bias low warning threshold in microamps."
         ::= { hh3cTransceiverInfoEntry 29 }
 
     hh3cTransceiverPwrOutHiAlarm OBJECT-TYPE
@@ -423,7 +515,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver transmit power high alarm
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 30 }
 
@@ -433,7 +525,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver transmit power low alarm
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 31 }
 
@@ -443,7 +535,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver transmit power high warning
-             threshold limit in tenths of microwatts
+             threshold in tenths of microwatts
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 32 }
 
@@ -453,7 +545,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver transmit power low warning
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 33 }
 
@@ -463,7 +555,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver receive power high alarm
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 34 }
 
@@ -473,7 +565,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver receive power low alarm
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 35 }
 
@@ -483,7 +575,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver receive power high warning
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 36 }
 
@@ -493,7 +585,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Transceiver receive power low warning
-             threshold limit in tenths of microwatts.
+             threshold in tenths of microwatts.
              As an example: 10000 is 1 milliwatt."
         ::= { hh3cTransceiverInfoEntry 37 }
 
@@ -516,7 +608,10 @@ IMPORTS
                 pmapmdTransmitterLocalFault(13),
                 pcsTransmitLocalFault(14),
                 phyXSTransmitLocalFault(15),
-                rxLossOfSignal(16)
+                rxLossOfSignal(16),
+                tecError(17),
+                wavelengthUnlocked(18),
+                txIsNotReadyDueToTuning(19)
             }
         MAX-ACCESS  read-only
         STATUS      current
@@ -539,7 +634,10 @@ IMPORTS
              PCS transmit local fault(14)
              PHY XS Transmit Local Fault(15)
              RX loss of signal(16)
-             Unused(17-31)"
+             TEC error(17)
+             Wavelength unlocked(18)
+             Tx is not ready due to tuning(19)
+             Unused(20-31)"
         ::= { hh3cTransceiverInfoEntry 38 }
 
     hh3cTransceiverVendorOUI OBJECT-TYPE
@@ -558,6 +656,207 @@ IMPORTS
             "Revision number of the interface."
         ::= { hh3cTransceiverInfoEntry 40 }
 
+    hh3cTransceiverFrequency OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency of the current ITU channel on the connected transceiver.
+            The unit is hundredths of THz."
+        ::= { hh3cTransceiverInfoEntry 41 }
+
+    hh3cTransceiverActiveITUChannel OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The index of the current ITU channel on the connected transceiver.
+            The maximum index number for the ITU channel might vary by transceiver model.
+            The value of this node depends on the hh3cTransceiverITUChanIdx node of hh3cTransceiverITUChanTable.
+            The value of this node affects the frequency or wavelength."
+        ::= { hh3cTransceiverInfoEntry 42 }
+
+    hh3cTransceiverCurWaveErr OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current wavelength error of the current ITU channel
+            on the connected transceiver.
+            The unit is thousandths of nm."
+        ::= { hh3cTransceiverInfoEntry 43 }
+
+    hh3cTransceiverWaveErrHiAlarm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The high wavelength error alarm threshold of the
+            current ITU channel on the connected transceiver.
+            The unit is thousandths of nm."
+        ::= { hh3cTransceiverInfoEntry 44 }
+
+    hh3cTransceiverWaveErrLoAlarm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The low wavelength error alarm threshold of the
+            current ITU channel on the connected transceiver.
+            The unit is thousandths of nm."
+        ::= { hh3cTransceiverInfoEntry 45 }
+
+    hh3cTransceiverCurFreqErr OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current frequency error of the current ITU channel
+            on the connected transceiver.
+            The unit is tenths of GHz."
+        ::= { hh3cTransceiverInfoEntry 46 }
+
+    hh3cTransceiverFreqErrHiAlarm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The high frequency error alarm threshold of the current
+            ITU channel on the connected transceiver.
+            The unit is tenths of GHz."
+        ::= { hh3cTransceiverInfoEntry 47 }
+
+    hh3cTransceiverFreqErrLoAlarm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The low frequency error alarm threshold of the current
+            ITU channel on the connected transceiver.
+            The unit is tenths of GHz."
+        ::= { hh3cTransceiverInfoEntry 48 }
+
+    hh3cTransceiverPartNumber OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PartNumber of the interface.
+            As an example: 1110409083."
+        ::= { hh3cTransceiverInfoEntry 49 }
+
+    hh3cTransceiverProductCode OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Product Code of the interface.
+            As an example: MRC00CD."
+        ::= { hh3cTransceiverInfoEntry 50 }
+
+    hh3cTransceiverOriginalSN OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Orginal serial number of the interface."
+        ::= { hh3cTransceiverInfoEntry 51 }
+
+    hh3cTransceiverPwrOutHiAlarmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power high alarm
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 52 }
+
+    hh3cTransceiverPwrOutLoAlarmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power low alarm
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 53 }
+
+    hh3cTransceiverPwrOutHiWarnDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power high warning
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 54 }
+
+    hh3cTransceiverPwrOutLoWarnDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power low warning
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 55 }
+
+    hh3cTransceiverRcvPwrHiAlarmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver receive power high alarm
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 56 }
+
+    hh3cTransceiverRcvPwrLoAlarmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver receive power low alarm
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 57 }
+
+    hh3cTransceiverRcvPwrHiWarnDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver receive power high warning
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 58 }
+
+    hh3cTransceiverRcvPwrLoWarnDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver receive power low warning
+             threshold in hundredths of dBm.
+             As an example: 100 milliwatts is 20 dBms."
+        ::= { hh3cTransceiverInfoEntry 59 }
+
+    hh3cTransceiverRelySlotMfgName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Vendor name of the card on which the transceiver is installed."
+        ::= { hh3cTransceiverInfoEntry 60 }
+
+    hh3cTransceiverRelySlotMfgDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Manufacturing date of the card on which the transceiver is installed."
+        ::= { hh3cTransceiverInfoEntry 61 }
 
 -- Transceiver Channel Table
 
@@ -584,7 +883,13 @@ IMPORTS
             hh3cTransceiverChannelCurTXPower        Integer32,
             hh3cTransceiverChannelCurRXPower        Integer32,
             hh3cTransceiverChannelTemperature       Integer32,
-            hh3cTransceiverChannelBiasCurrent       Integer32
+            hh3cTransceiverChannelBiasCurrent       Integer32,
+            hh3cTransceiverChannelBiasHiAm          Integer32,
+            hh3cTransceiverChannelBiasLoAm          Integer32,
+            hh3cTransceiverChannelTXPwrHiAm         Integer32,
+            hh3cTransceiverChannelTXPwrLoAm         Integer32,
+            hh3cTransceiverChanTXPwrHiAmDbm         Integer32,
+            hh3cTransceiverChanTXPwrLoAmDbm         Integer32
         }
 
     hh3cTransceiverChannelIndex OBJECT-TYPE
@@ -602,7 +907,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the current transmission power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverChannelEntry 2 }
 
     hh3cTransceiverChannelCurRXPower OBJECT-TYPE
@@ -611,7 +916,7 @@ IMPORTS
         STATUS      current
         DESCRIPTION
             "Indicating the current received power.
-            The unit is in hundredths of dBM."
+            The unit is in hundredths of dBm."
         ::= { hh3cTransceiverChannelEntry 3 }
 
     hh3cTransceiverChannelTemperature OBJECT-TYPE
@@ -632,4 +937,182 @@ IMPORTS
             The unit is in hundredths of mA."
         ::= { hh3cTransceiverChannelEntry 5 }
 
+    hh3cTransceiverChannelBiasHiAm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver bias high alarm threshold in microamps."
+        ::= { hh3cTransceiverChannelEntry 6 }
+
+    hh3cTransceiverChannelBiasLoAm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver bias low alarm threshold in microamps."
+        ::= { hh3cTransceiverChannelEntry 7 }
+
+    hh3cTransceiverChannelTXPwrHiAm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power high alarm threshold in tenths of microwatts."
+        ::= { hh3cTransceiverChannelEntry 8 }
+
+    hh3cTransceiverChannelTXPwrLoAm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power low alarm threshold in tenths of microwatts."
+        ::= { hh3cTransceiverChannelEntry 9 }
+
+    hh3cTransceiverChanTXPwrHiAmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power high alarm threshold in hundredths of dBm."
+        ::= { hh3cTransceiverChannelEntry 10 }
+
+    hh3cTransceiverChanTXPwrLoAmDbm OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transceiver transmit power low alarm threshold in hundredths of dBm."
+        ::= { hh3cTransceiverChannelEntry 11 }
+
+-- Transceiver ITUChannel Table
+
+    hh3cTransceiverITUChanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cTransceiverITUChanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table provides information about ITU channels supported on the transceiver that is connected to this interface."
+        ::= { hh3cTransceiverInfoAdm 3 }
+
+    hh3cTransceiverITUChanEntry OBJECT-TYPE
+        SYNTAX Hh3cTransceiverITUChanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of the hh3cTransceiverITUChanTable."
+        INDEX { ifIndex, hh3cTransceiverITUChanIdx }
+        ::= { hh3cTransceiverITUChanTable 1 }
+
+    Hh3cTransceiverITUChanEntry ::=
+        SEQUENCE {
+            hh3cTransceiverITUChanIdx            Unsigned32,
+            hh3cTransceiverITUChanFreq          Integer32,
+            hh3cTransceiverITUChanWaveLth        Integer32
+        }
+
+    hh3cTransceiverITUChanIdx OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of the specified ITU channel on the transceiver that is connected to this interface."
+        ::= { hh3cTransceiverITUChanEntry 1 }
+
+    hh3cTransceiverITUChanFreq OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency of the specified ITU channel on the transceiver that is connected to this interface.
+            The unit is hundredths of THz."
+        ::= { hh3cTransceiverITUChanEntry 2 }
+
+    hh3cTransceiverITUChanWaveLth OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wave length of the specified ITU channel on the transceiver that is connected to this interface.
+            The unit is pm."
+        ::= { hh3cTransceiverITUChanEntry 3 }
+
+    hh3cTransceiverSystemPara OBJECT IDENTIFIER ::= {  hh3cTransceiver 2  }
+
+-- ==================================================================
+
+    hh3cTransceiverExtrAlarmEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable alarming upon detection of a third-party transceiver."
+        DEFVAL      { true }
+        ::= { hh3cTransceiverSystemPara 1 }
+
+    hh3cTransceiverTrap OBJECT IDENTIFIER ::= {  hh3cTransceiver 3  }
+
+    hh3cTransceiverTrapPrefix OBJECT IDENTIFIER ::= { hh3cTransceiverTrap 0 }
+
+  -- ==================================================================
+
+    hh3cTransceiverMaybeFake NOTIFICATION-TYPE
+      OBJECTS { ifName, hh3cTransceiverType, hh3cTransceiverSerialNumber }
+      STATUS  current
+      DESCRIPTION
+          "The transceiver is suspected to be a counterfeit/pirated/unauthorized transceiver."
+      ::= { hh3cTransceiverTrapPrefix 1 }
+
+  -- ==================================================================
+
+    hh3cTransceiverLaneTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cTransceiverLaneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table provides statistics about transceiver ."
+        ::= { hh3cTransceiverInfoAdm 4 }
+
+    hh3cTransceiverLaneEntry OBJECT-TYPE
+        SYNTAX Hh3cTransceiverLaneEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of the hh3cTransceiverLaneTable."
+        INDEX { ifIndex }
+        ::= { hh3cTransceiverLaneTable 1 }
+
+    Hh3cTransceiverLaneEntry ::=
+        SEQUENCE {
+            hh3cTransceiverLaneCurTxPower    OCTET STRING,
+            hh3cTransceiverLaneCurRxPower    OCTET STRING,
+            hh3cTransceiverLaneBiasCurrent   OCTET STRING
+        }
+
+    hh3cTransceiverLaneCurTxPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicating the current transmitted power.
+            The unit is in hundredths of dBm."
+        ::= { hh3cTransceiverLaneEntry 1 }
+
+    hh3cTransceiverLaneCurRxPower OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicating the current received power.
+            The unit is in hundredths of dBm."
+        ::= { hh3cTransceiverLaneEntry 2 }
+
+    hh3cTransceiverLaneBiasCurrent  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicating the current bias electric current.
+            The unit is in hundredths of mA."
+        ::= { hh3cTransceiverLaneEntry 3 }
 END

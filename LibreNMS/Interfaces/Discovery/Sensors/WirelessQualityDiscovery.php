@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessQualityDiscovery.php
  *

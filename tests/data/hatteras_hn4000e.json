@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "hatteras",
                     "type": "network",
                     "serial": null,
-                    "icon": "hatteras.svg",
-                    "location": "<private>"
+                    "icon": "hatteras.svg"
                 }
             ]
         },

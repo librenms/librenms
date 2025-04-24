@@ -1,4 +1,5 @@
 <?php
+
 /**
  * netagent2.inc.php
  *
@@ -75,7 +76,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Input';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $in_voltage_oid,
@@ -106,7 +107,7 @@ if ($in_phaseNum == '3') {
         $descr = 'In L1';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $in_voltage1_oid,
@@ -134,7 +135,7 @@ if ($in_phaseNum == '3') {
         $descr = 'In L2';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $in_voltage2_oid,
@@ -162,7 +163,7 @@ if ($in_phaseNum == '3') {
         $descr = 'In L3';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $in_voltage3_oid,
@@ -193,7 +194,7 @@ if ($in_phaseNum == '1') {
         $descr = 'Output';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $out_voltage_oid,
@@ -225,7 +226,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Out L1';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $out_voltage1_oid,
@@ -253,7 +254,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Out L2';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $out_voltage2_oid,
@@ -281,7 +282,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Out L3';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $out_voltage3_oid,
@@ -313,7 +314,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Bypass L1';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $bypass_voltage1_oid,
@@ -341,7 +342,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Bypass L2';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $bypass_voltage2_oid,
@@ -369,7 +370,7 @@ if ($out_phaseNum == '3') {
         $descr = 'Bypass L3';
 
         discover_sensor(
-            $valid['sensor'],
+            null,
             'voltage',
             $device,
             $bypass_voltage3_oid,
@@ -417,7 +418,7 @@ if (! empty($battery_voltage1) || $battery_voltage1 == 0) {
     $descr = 'Battery';
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'voltage',
         $device,
         $battery_voltage1_oid,

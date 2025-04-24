@@ -10,6 +10,8 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.4413
         sysDescr_regex_except:
+            - '/UISP Fiber OLT XGS/'
             - '/VxWorks/'
             - '/quanta/i'
             - '/FASTPATH (Switching|Routing)/'
+            - '/SONiC Software Version/'

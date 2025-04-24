@@ -105,7 +105,7 @@ modules:
                         - { value: 4096, generic: 2, graph: 0, descr: macSpoof }
                         - { value: 8192, generic: 2, graph: 0, descr: cpuHigh }
                         - { value: 16384, generic: 2, graph: 0, descr: memoryUsageHigh }
-                        - { value: 32768, generic: 2, graph: 0, descr: packetBufferUsageHigh }
+#                        - { value: 32768, generic: 2, graph: 0, descr: packetBufferUsageHigh }  # state value larger than smallint 32767
                 -
                     oid: ledAlarmStatus
                     value: ledAlarmStatus

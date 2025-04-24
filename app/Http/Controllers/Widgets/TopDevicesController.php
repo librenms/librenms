@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TopDevices.php
  *
@@ -35,9 +36,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Util\Html;
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Validate;
 
@@ -128,7 +129,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        /** @var Builder $query */
+        /** @var Builder<\App\Models\DeviceRelatedModel> $query */
         return $query->with(['device' => function ($query) {
             return $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
@@ -136,11 +137,8 @@ class TopDevicesController extends WidgetController
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                /** @var Builder<\App\Models\DeviceRelatedModel> $query */
-                $inDeviceGroup = $query->inDeviceGroup($settings['device_group']); /** @var Builder $inDeviceGroup */
-
-                return $inDeviceGroup;
+            ->when($settings['device_group'], function (Builder $query) use ($settings) {
+                return $query->inDeviceGroup($settings['device_group']);
             });
     }
 
@@ -320,7 +318,7 @@ class TopDevicesController extends WidgetController
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),
-                StringHelpers::shortenText($storage->storage_descr, 50),
+                Str::limit($storage->storage_descr, 50),
                 Url::overlibLink(
                     $link,
                     Html::percentageBar(150, 20, $storage->storage_perc, '', $storage->storage_perc . '%', $storage->storage_perc_warn),

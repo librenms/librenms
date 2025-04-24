@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OSModulesTest.php
  *
@@ -36,6 +37,8 @@ use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
@@ -65,11 +68,9 @@ class OSModulesTest extends DBTestCase
 
     /**
      * Test all modules for a particular OS
-     *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -83,14 +84,12 @@ class OSModulesTest extends DBTestCase
     /**
      * Test all modules for a particular OS
      *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
-     *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
@@ -106,7 +105,7 @@ class OSModulesTest extends DBTestCase
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
-            $results = $helper->generateTestData($this->getSnmpsim(), true);
+            $results = $helper->generateTestData($this->getSnmpsimIp(), $this->getSnmpsimPort(), true);
         } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
         }
@@ -118,9 +117,9 @@ class OSModulesTest extends DBTestCase
         // output all discovery and poller output if debug mode is enabled for phpunit
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
-        foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'] ?? [];
-            $actual = $results[$module]['discovery'] ?? [];
+        foreach ($modules as $module => $module_status) {
+            $expected = $expected_data[$module]['discovery'] ?? null;
+            $actual = $results[$module]['discovery'] ?? null;
             $this->checkTestData($expected, $actual, 'Discovered', $os, $module, $filename, $helper, $phpunit_debug);
 
             // modules without polling
@@ -128,20 +127,27 @@ class OSModulesTest extends DBTestCase
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? [];
+            if (isset($expected_data[$module]['poller'])) {
+                if ($expected_data[$module]['poller'] !== 'matches discovery') {
+                    $expected = $expected_data[$module]['poller']; // we have specific poller data, update expected
+                }
+                // pass through discovery expected data
+            } else {
+                $expected = null; // no poller data, clear discovery's expected
             }
-            $actual = $results[$module]['poller'] ?? [];
+
+            $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
 
+        /** @phpstan-ignore method.alreadyNarrowedType */
         $this->assertTrue(true, "Tested $os successfully"); // avoid no asserts error
 
         DeviceCache::flush(); // clear cached devices
         $this->travelBack();
     }
 
-    public function dumpedDataProvider()
+    public static function dumpedDataProvider(): array
     {
         $modules = [];
 
@@ -167,17 +173,20 @@ class OSModulesTest extends DBTestCase
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+            $mock = \Mockery::mock(Fping::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;
         });
     }
 
-    private function checkTestData(array $expected, array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
+    private function checkTestData(?array $expected, ?array $actual, string $type, string $os, mixed $module, string $filename, ModuleTestHelper $helper, bool $phpunit_debug): void
     {
         // try simple and fast comparison first, if that fails, do a costly/well formatted comparison
         if ($expected != $actual) {
+            $this->assertNotNull($actual, "OS $os: $type $module no data generated when it is expected");
+            $this->assertNotNull($expected, "OS $os: $type $module generates data when none is expected");
+
             $message = Color::colorize('bg-red', "OS $os: $type $module data does not match that found in $filename");
             $message .= PHP_EOL;
             $message .= ($type == 'Discovered'

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PrinterSupplies.php
  *
@@ -25,6 +26,7 @@ use App\Models\Eventlog;
 use App\Models\PrinterSupply;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\Severity;
@@ -56,7 +58,7 @@ class PrinterSupplies implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -80,7 +82,7 @@ class PrinterSupplies implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -94,11 +96,9 @@ class PrinterSupplies implements Module
         $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
 
         foreach ($toner_data as $toner) {
-            echo 'Checking toner ' . $toner['supply_descr'] . '... ';
-
             $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
             $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity'] ?? null);
-            echo $tonerperc . " %\n";
+            Log::info('Checking toner ' . $toner['supply_descr'] . "... $tonerperc %");
 
             $tags = [
                 'rrd_def' => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
@@ -136,19 +136,24 @@ class PrinterSupplies implements Module
         }
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->printerSupplies()->exists();
+    }
+
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      */
-    public function cleanup(Device $device): void
+    public function cleanup(Device $device): int
     {
-        $device->printerSupplies()->delete();
+        return $device->printerSupplies()->delete();
     }
 
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'printer_supplies' => $device->printerSupplies()->orderBy('supply_oid')->orderBy('supply_index')
@@ -227,7 +232,7 @@ class PrinterSupplies implements Module
 
     private function discoveryPapers($device): Collection
     {
-        echo 'Tray Paper Level: ';
+        Log::info('Tray Paper Level: ');
         $papers = new Collection();
 
         $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');

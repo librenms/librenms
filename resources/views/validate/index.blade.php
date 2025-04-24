@@ -14,7 +14,7 @@
                         response.text().then(console.log);
                     }
                 });">
-        <div class="tw-grid tw-place-items-center" style="height: 80vh" x-show="! results.length">
+        <div class="tw:grid tw:place-items-center" style="height: 80vh" x-show="! results.length">
             <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
             <div x-show="errorMessage" class="panel panel-danger">
                 <div class="panel-heading">
@@ -23,7 +23,7 @@
                 <div class="panel-body" x-text="errorMessage"></div>
             </div>
         </div>
-        <div x-show="results.length" class="tw-mx-10">
+        <div x-show="results.length" class="tw:mx-10">
             <template x-for="(group, index) in results">
                 <div class="panel-group" style="margin-bottom: 5px">
                     <div class="panel panel-default">
@@ -45,7 +45,7 @@
                                              x-text="result.statusText + ': ' + result.message"
                                         ></div>
                                         <div class="panel-body" x-show="result.fix.length || result.list.length || result.fixer">
-                                            <div x-show="result.fixer" class="tw-mb-2" x-data="fixerData(result.fixer)">
+                                            <div x-show="result.fixer" class="tw:mb-2" x-data="fixerData(result.fixer)">
                                                 <button class="btn btn-success" x-on:click="runFixer" x-bind:disabled="running" x-show="! fixed">
                                                     <i class="fa-solid" x-bind:class="running ? 'fa-spinner fa-spin' : 'fa-wrench'"></i> {{ __('validation.results.autofix') }}
                                                 </button>
@@ -55,7 +55,7 @@
                                                 {{ __('validation.results.fix') }}: <pre x-text='result.fix.join("\r\n")'>
                                                 </pre>
                                             </div>
-                                            <div x-show="result.list.length" class="tw-mt-5">
+                                            <div x-show="result.list.length" class="tw:mt-5">
                                                 <ul class='list-group' style='margin-bottom: -1px'>
                                                     <li class="list-group-item active" x-text="result.listDescription"></li>
                                                     <template x-for="shortList in result.list.slice(0, listItems)">

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Eltex-MES24xx SFP Voltage
  *
@@ -21,6 +22,7 @@
  * @copyright  2024 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
@@ -35,6 +37,7 @@ if (! empty($snmpData)) {
 
 $divisor = 1;
 $multiplier = 1;
+
 if (! empty($eltexPhyTransceiverDiagnosticTable['supplyVoltage'])) {
     foreach ($eltexPhyTransceiverDiagnosticTable['supplyVoltage'] as $ifIndex => $data) {
         $value = $data['eltexPhyTransceiverDiagnosticCurrentValue'] / $divisor;
@@ -44,28 +47,27 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['supplyVoltage'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / 1000;
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'] / 1000;
             $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
-            $oid = Oid::toNumeric('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.2.1');
-            discover_sensor(
-                $valid['sensor'],
-                'voltage',
-                $device,
-                $oid,
-                'SfpVolt' . $ifIndex,
-                'ELTEX-PHY-MIB',
-                $descr,
-                $divisor,
-                $multiplier,
-                $low_limit,
-                $low_warn_limit,
-                $high_warn_limit,
-                $high_limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                'Transceiver'
-            );
+            $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.2.1')->toNumeric();
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'voltage',
+                'sensor_oid' => $oid,
+                'sensor_index' => 'SfpVolt' . $ifIndex,
+                'sensor_type' => 'ELTEX-PHY-MIB',
+                'sensor_descr' => 'SfpVolt-' . $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $low_limit,
+                'sensor_limit_low_warn' => $low_warn_limit,
+                'sensor_limit_warn' => $high_warn_limit,
+                'sensor_limit' => $high_limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'port',
+                'user_func' => null,
+                'group' => 'transceiver',
+            ]));
         }
     }
 }

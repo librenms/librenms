@@ -3,16 +3,25 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Events\DevicePolled;
+use App\Facades\LibrenmsConfig;
+use App\Jobs\PollDevice;
+use App\Models\Device;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
-use LibreNMS\Poller;
+use LibreNMS\Polling\Result;
+use LibreNMS\Util\Module;
+use LibreNMS\Util\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class DevicePoll extends LnmsCommand
 {
     protected $name = 'device:poll';
+    private ?int $current_device_id = null;
 
     /**
      * Create a new command instance.
@@ -25,10 +34,15 @@ class DevicePoll extends LnmsCommand
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
+        $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
 
     public function handle(MeasurementManager $measurements): int
     {
+        if ($this->option('dispatch')) {
+            return $this->dispatchWork();
+        }
+
         $this->configureOutputOptions();
 
         if ($this->option('no-data')) {
@@ -40,9 +54,30 @@ class DevicePoll extends LnmsCommand
         }
 
         try {
-            /** @var \LibreNMS\Poller $poller */
-            $poller = app(Poller::class, ['device_spec' => $this->argument('device spec'), 'module_override' => explode(',', $this->option('modules') ?? '')]);
-            $result = $poller->poll();
+            if ($this->getOutput()->isVerbose()) {
+                Log::debug(Version::get()->header());
+                LibrenmsConfig::invalidateAndReload();
+            }
+
+            $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+            $this->printModules($module_overrides);
+
+            $result = new Result;
+
+            $this->line("Starting polling run:\n");
+
+            // listen for the device polled events to mark the device completed
+            Event::listen(function (DevicePolled $event) use ($result) {
+                if ($event->device->device_id == $this->current_device_id) {
+                    $result->markCompleted($event->device->status);
+                }
+            });
+
+            foreach (Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id') as $device_id) {
+                $this->current_device_id = $device_id;
+                $result->markAttempted();
+                PollDevice::dispatchSync($device_id, $module_overrides);
+            }
 
             if ($result->hasAnyCompleted()) {
                 if (! $this->output->isQuiet()) {
@@ -91,5 +126,36 @@ class DevicePoll extends LnmsCommand
         $this->error(trans('commands.device:poll.errors.none_polled'));
 
         return 1; // failed to poll
+    }
+
+    private function dispatchWork()
+    {
+        \Log::setDefaultDriver('stack');
+        $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+
+        if (\config('queue.default') == 'sync') {
+            $this->error('Queue driver is sync, work will run in process.');
+            sleep(1);
+        }
+
+        foreach ($devices as $device_id) {
+            PollDevice::dispatch($device_id, $module_overrides);
+        }
+
+        $this->line('Submitted work for ' . $devices->count() . ' devices');
+
+        return 0;
+    }
+
+    private function printModules(array $module_overrides): void
+    {
+        if (! empty($module_overrides)) {
+            $modules = array_map(function ($module, $status) {
+                return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
+            }, array_keys($module_overrides), array_values($module_overrides));
+
+            Log::debug('Override poller modules: ' . implode(', ', $modules));
+        }
     }
 }

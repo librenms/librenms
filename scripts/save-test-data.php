@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
@@ -20,7 +21,6 @@ $options = getopt(
         'no-save',
         'file:',
         'debug',
-        'snmpsim',
         'help',
     ]
 );
@@ -31,12 +31,6 @@ require $install_dir . '/includes/init.php';
 Debug::setVerbose(
     Debug::set(isset($options['d']) || isset($options['debug']))
 );
-
-if (isset($options['snmpsim'])) {
-    $snmpsim = new Snmpsim();
-    $snmpsim->run();
-    exit;
-}
 
 if (isset($options['h'])
     || isset($options['help'])
@@ -58,7 +52,6 @@ Parameters:
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
-      --snmpsim      Run snmpsimd.py using the collected data for manual testing.
 
 Examples:
   ./save-test-data.php -o ios -v 2960x
@@ -109,6 +102,12 @@ if (isset($os_name) && isset($variant)) {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
 
+if (empty($os_list)) {
+    echo "No matching snmprec(s) found.\n";
+
+    exit(1);
+}
+
 if (isset($options['f'])) {
     if (count($os_list) != 1) {
         echo "Failed to create test data, -f/--file option can be used with one os/variant combination.\n";
@@ -120,18 +119,17 @@ if (isset($options['f'])) {
 
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
-$snmpsim->fork();
-$snmpsim_ip = $snmpsim->getIp();
-$snmpsim_port = $snmpsim->getPort();
+$snmpsim->setupVenv(true);
+$snmpsim->start();
+echo "Waiting for snmpsim to initialize...\n";
+$snmpsim->waitForStartup();
 
 if (! $snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    echo $snmpsim->getErrorOutput();
     exit(1);
 }
 
-echo "Pausing 10 seconds to allow snmpsim to initialize...\n";
-sleep(10);
 echo "\n";
 
 try {
@@ -145,12 +143,12 @@ try {
         }
         echo PHP_EOL;
 
-        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
+        LibrenmsConfig::invalidateAndReload();
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }
-        $test_data = $tester->generateTestData($snmpsim, $no_save);
+        $test_data = $tester->generateTestData($snmpsim->ip, $snmpsim->port, $no_save);
 
         if ($no_save) {
             print_r($test_data);

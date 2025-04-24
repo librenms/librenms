@@ -1,0 +1,110 @@
+mib:  Argus-MIB
+modules:
+    sensors:
+        charge:
+            data:
+                -
+                    oid: dcPwrSysCntrlrIpTable
+                    value: dcPwrSysCntrlrIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.2.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysCntrlrIpStringValue }}'
+                    index: dcPwrSysCntrlrIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysCntrlrIpIndex
+                            op: '!='
+                            value: 8
+        count:
+            data:
+                -
+                    oid: dcPwrSysRectIpTable
+                    value: dcPwrSysRectIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.3.2.1.3.{{ $index }}'
+                    descr: '{{ $dcPwrSysRectIpStringValue }}'
+                    index: dcPwrSysRectIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysRectIpIndex
+                            op: 'not_in_array'
+                            value: [4,5]
+        current:
+            data:
+                -
+                    oid: dcPwrSysCntrlrIpTable
+                    value: dcPwrSysCntrlrIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.2.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysCntrlrIpStringValue }}'
+                    index: dcPwrSysCntrlrIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysCntrlrIpIndex
+                            op: 'not_in_array'
+                            value: [2,4]
+                -
+                    oid: dcPwrSysRectIpTable
+                    value: dcPwrSysRectIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.3.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysRectIpStringValue }}'
+                    index: dcPwrSysRectIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysRectIpIndex
+                            op: '!='
+                            value: 1
+        runtime:
+            data:
+                -
+                    oid: dcPwrSysCntrlrIpTable
+                    value: dcPwrSysCntrlrIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.2.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysCntrlrIpStringValue }}'
+                    index: dcPwrSysCntrlrIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysCntrlrIpIndex
+                            op: 'not_in_array'
+                            value: [7]
+        temperature:
+            data:
+                -
+                    oid: dcPwrSysCntrlrIpTable
+                    value: dcPwrSysCntrlrIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.2.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysCntrlrIpStringValue }}'
+                    index: dcPwrSysCntrlrIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysCntrlrIpIndex
+                            op: 'not_in_array'
+                            value: [6]
+        voltage:
+            data:
+                -
+                    oid: dcPwrSysCntrlrIpTable
+                    value: dcPwrSysCntrlrIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.2.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysCntrlrIpStringValue }}'
+                    index: dcPwrSysCntrlrIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysCntrlrIpIndex
+                            op: 'not_in_array'
+                            value: [1, 3, 5, 11]
+                -
+                    oid: dcPwrSysRectIpTable
+                    value: dcPwrSysRectIpIntegerValue
+                    num_oid: '.1.3.6.1.4.1.7309.4.1.6.3.2.1.3.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $dcPwrSysRectIpStringValue }}'
+                    index: dcPwrSysRectIpIndex.{{ $index }}
+                    skip_values:
+                        -
+                            oid: dcPwrSysRectIpIndex
+                            op: 'not_in_array'
+                            value: [2, 3]

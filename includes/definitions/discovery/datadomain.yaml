@@ -2,3 +2,19 @@ modules:
     os:
         sysDescr_regex: '/Data Domain OS (?<version>.*)/'
         hardware: DATA-DOMAIN-MIB::systemHardwareDevice
+    storage:
+        data:
+            -
+                oid: DATA-DOMAIN-MIB::fileSystemSpaceTable
+                descr: DATA-DOMAIN-MIB::fileSystemResourceName
+                type: DATA-DOMAIN-MIB::fileSystemResourceTier
+                size: DATA-DOMAIN-MIB::fileSystemSpaceSize
+                free: DATA-DOMAIN-MIB::fileSystemSpaceAvail
+                used: DATA-DOMAIN-MIB::fileSystemSpaceUsed
+                used_num_oid: '.1.3.6.1.4.1.19746.1.3.2.1.1.5.{{ $index }}'
+                units: 1073741824
+                skip_values:
+                    -
+                        oid: DATA-DOMAIN-MIB::fileSystemResourceName
+                        op: '!='
+                        value: '/data: post-comp'

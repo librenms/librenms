@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         // try to run index like this to hopefully allow mysql to optimize away the reindex
-        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+        if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             $this->renameIndex('access_points', 'deleted', 'access_points_deleted_index', ['deleted']);
             $this->renameIndex('access_points', 'deleted', 'access_points_deleted_index', ['deleted']);
             $this->renameIndex('alerts', 'device_id', 'alerts_device_id_index', ['device_id']);
@@ -59,10 +59,10 @@ return new class extends Migration
             $this->renameIndex('entPhysical', 'device_id', 'entphysical_device_id_index', ['device_id']);
             $this->renameIndex('eventlog', 'datetime', 'eventlog_datetime_index', ['datetime']);
             $this->renameIndex('eventlog', 'device_id', 'eventlog_device_id_index', ['device_id']);
-            if (! $this->indexExists('entityState', 'entitystate_device_id_index')) {
+            if (! Schema::hasIndex('entityState', 'entitystate_device_id_index')) {
                 Schema::table('entityState', function (Blueprint $table) {
                     // must be dropped and re-added because of case insensitivity
-                    if ($this->indexExists('entityState', 'entityState_device_id_index')) {
+                    if (Schema::hasIndex('entityState', 'entityState_device_id_index')) {
                         $table->dropIndex('entityState_device_id_index');
                     }
                     $table->index('device_id');
@@ -83,7 +83,7 @@ return new class extends Migration
             $this->renameIndex('loadbalancer_vservers', 'device_id', 'loadbalancer_vservers_device_id_index', ['device_id']);
             $this->renameIndex('locations', 'locations_location_uindex', 'locations_location_unique', ['location'], true);
             $this->renameIndex('mac_accounting', 'interface_id', 'mac_accounting_port_id_index', ['port_id']);
-            if ($this->indexExists('mac_accounting', 'interface_id_2')) {
+            if (Schema::hasIndex('mac_accounting', 'interface_id_2')) {
                 DB::statement('ALTER TABLE mac_accounting DROP INDEX interface_id_2;');
             }
             $this->renameIndex('mefinfo', 'device_id', 'mefinfo_device_id_index', ['device_id']);
@@ -114,7 +114,9 @@ return new class extends Migration
             $this->renameIndex('ports', 'if_2', 'ports_ifdescr_index', ['ifDescr']);
             $this->renameIndex('ports_adsl', 'interface_id', 'ports_adsl_port_id_unique', ['port_id'], true);
             $this->renameIndex('ports_fdb', 'mac_address', 'ports_fdb_mac_address_index', ['mac_address']);
-            $this->renameIndex('ports_stack', 'device_id', 'ports_stack_device_id_port_id_high_port_id_low_unique', ['device_id', 'port_id_high', 'port_id_low'], true);
+            if (Schema::hasColumn('ports_stack', 'port_id_high')) {
+                $this->renameIndex('ports_stack', 'device_id', 'ports_stack_device_id_port_id_high_port_id_low_unique', ['device_id', 'port_id_high', 'port_id_low'], true);
+            }
             $this->renameIndex('ports_stp', 'device_id', 'ports_stp_device_id_port_id_unique', ['device_id', 'port_id'], true);
             $this->renameIndex('ports_vlans', '`unique`', 'ports_vlans_device_id_port_id_vlan_unique', ['device_id', 'port_id', 'vlan'], true);
             $this->renameIndex('processes', 'device_id', 'processes_device_id_index', ['device_id']);
@@ -169,21 +171,14 @@ return new class extends Migration
         //
     }
 
-    private function indexExists($table, $name)
-    {
-        $indexes = Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table);
-
-        return array_key_exists($name, $indexes);
-    }
-
     private function renameIndex($table, $old, $new, array $fields, $unique = false)
     {
         // skip pre-existing new index
-        if (! $this->indexExists($table, $new)) {
+        if (! Schema::hasIndex($table, $new)) {
             $query = "ALTER TABLE $table ";
 
             // don't try to remove non-existent old index
-            if ($this->indexExists($table, $old)) {
+            if (Schema::hasIndex($table, $old)) {
                 $query .= "DROP INDEX $old, ";
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UserPref.php
  *
@@ -24,6 +25,8 @@
  */
 
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserPref extends BaseModel
 {
@@ -83,10 +86,12 @@ class UserPref extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-    public function user()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

@@ -268,7 +268,7 @@ return [
         ],
         'poller' => [
             'CheckActivePoller' => [
-                'fail' => '未检测到活动的轮询方法',
+                'fail' => '轮询器未运行。  过去 :interval 秒内没有运行任何轮询器。',
                 'both_fail' => '调度程序服务和Python包装器最近都处于活动状态，这可能导致双重轮询',
                 'ok' => '找到活动的轮询器',
             ],
@@ -292,7 +292,7 @@ return [
                 'not_detected' => 'Python包装器cron条目不存在',
             ],
             'CheckRedis' => [
-                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_DRIVER=redis',
+                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_STORE=redis',
                 'ok' => 'Redis功能正常',
                 'unavailable' => 'Redis不可用',
             ],

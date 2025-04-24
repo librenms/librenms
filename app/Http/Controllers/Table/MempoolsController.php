@@ -1,4 +1,5 @@
 <?php
+
 /*
  * MempoolsController.php
  *
@@ -28,6 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
@@ -54,7 +56,8 @@ class MempoolsController extends TableController
             return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
-        $query = Mempool::hasAccess($request->user())->with('device');
+        $query = Mempool::hasAccess($request->user())
+            ->with(['device', 'device.location']);
 
         // join devices table to sort by hostname or search
         if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
@@ -72,7 +75,7 @@ class MempoolsController extends TableController
     {
         if ($mempool instanceof Device) {
             $device = $mempool;
-            $graphs = \LibreNMS\Util\Html::graphRow([
+            $graphs = Html::graphRow([
                 'device' => $device->device_id,
                 'type' => 'device_mempool',
                 'height' => 100,
@@ -80,7 +83,7 @@ class MempoolsController extends TableController
             ]);
 
             return [
-                'hostname' => Url::deviceLink($device),
+                'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $device]),
                 'mempool_descr' => $graphs[0],
                 'graph' => $graphs[1],
                 'mempool_used' => $graphs[2],
@@ -90,7 +93,7 @@ class MempoolsController extends TableController
 
         /** @var Mempool $mempool */
         return [
-            'hostname' => Url::deviceLink($mempool->device),
+            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $mempool->device]),
             'mempool_descr' => $mempool->mempool_descr,
             'graph' => $this->miniGraph($mempool),
             'mempool_used' => $this->barLink($mempool),

@@ -1,0 +1,80 @@
+mib: SWITCH:IF-MIB
+modules:
+    os:
+        version:
+            - SWITCH::version.0
+        serial:
+            - SWITCH::lswSlotSerialNo.1.1
+        sysDescr_regex: '/FSOS software, (?<hardware_series>[\d\w]+) software \((?<hardware>[\w\d ]+)\), Version (?<version>[\d\w\.]+)\s*\nCopyright \(C\) \d+ by FS\.COM\.  All rights reserved\. \nCompiled (?<compiled>[\w\d \:]+).*/'
+    processors:
+        data:
+            -
+                oid: SWITCH::oneMinute
+                num_oid: '.1.3.6.1.4.1.52642.1.1.9.2.{{ $index }}'
+                type: oneMinute
+    mempools:
+        data:
+            -
+                oid: SWITCH::memory
+                total: SWITCH::memTotalReal
+                used: SWITCH::memTotalUsed
+                free: SWITCH::memTotalFree
+                descr: 'Memory {{ $index }}'
+                precision: 1024
+    sensors:
+        data:
+            -
+                oid:
+                 - ifName
+        temperature:
+            data:
+                -
+                    oid: devMSlotEnvironmentTable
+                    value: devMSlotEnvironmentValue
+                    num_oid: '.1.3.6.1.4.1.52642.1.37.1.3.1.4.{{ $index }}'
+                    index: 'devMSltEnvironmentValue.{{ $index }}'
+                    descr: 'System temperature {{ $subindex2 }}'
+                    group: 'System'
+                    low_limit: devMSlotEnvironmentLowerLimit
+                    warn_limit: devMSlotEnvironmentUpperLimit
+                    high_limit: devMSlotEnvironmentCriticalLimit
+                    snmp_flags: ['-OteQUsab'] # make sure the index is numberic only
+        percent:
+            data:
+                -
+                    oid: devMFanStatusTable
+                    value: devMFanSpeed
+                    num_oid: '.1.3.6.1.4.1.52642.1.37.1.1.1.1.5.{{ $index }}'
+                    index: 'devMFanSpeed.{{ index }}'
+                    descr: 'Fan {{ $subindex2 }} speed'
+                    group: 'Fans'
+                    state_name: FanSpeed
+                    snmp_flags: ['-OteQUsab'] # make sure the index is numberic only
+        state:
+            data:
+                -
+                    oid: devMFanStatusTable
+                    value: devMFanStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.37.1.1.1.1.4.{{ $index }}'
+                    index: 'devMFanStatus.{{ index }}'
+                    descr: 'Fan {{ $subindex2 }} status'
+                    state_name: FanStatus
+                    group: 'Fans'
+                    snmp_flags: ['-OteQUsab']
+                    states:
+                        - { descr: active, graph: 1, value: 1, generic: 0 }
+                        - { descr: deactive, graph: 2, value: 2, generic: 2 }
+                        - { descr: notInstall, graph: 3, value: 3, generic: 2 }
+                        - { descr: unsupport, graph: 4, value: 4, generic: 3 }
+                -
+                    oid: devMPowerStatusTable
+                    value: devMPowerAlertStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.37.1.2.1.7.{{ $index }}'
+                    descr: 'PSU {{ $index }} alarm'
+                    index: 'devMPowerAlertStatus.{{ $index }}'
+                    group: 'PSU'
+                    states:
+                        - { descr: noAlert, graph: 1, value: 1, generic: 0 }
+                        - { descr: alert, graph: 2, value: 2, generic: 2 }
+                        - { descr: unsupported, graph: 3, value: 3, generic: 3 }
+

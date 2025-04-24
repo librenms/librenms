@@ -10,7 +10,7 @@ use LibreNMS\Util\Graph;
 class DeviceLink extends Component
 {
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     public $device;
     /**
@@ -29,7 +29,7 @@ class DeviceLink extends Component
     /**
      * Create a new component instance.
      *
-     * @param  int|\App\Models\Device  $device
+     * @param  int|Device  $device
      */
     public function __construct($device, ?string $tab = null, ?string $section = null)
     {
@@ -46,6 +46,10 @@ class DeviceLink extends Component
      */
     public function render()
     {
+        if (empty($this->device->device_id)) {
+            return view('components.device-link-missing');
+        }
+
         if (! $this->device->canAccess(auth()->user())) {
             return view('components.device-link-no-access');
         }

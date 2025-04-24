@@ -1,4 +1,5 @@
 <?php
+
 /**
  * arista-mos.inc.php
  *

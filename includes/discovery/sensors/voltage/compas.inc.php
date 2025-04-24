@@ -1,4 +1,5 @@
 <?php
+
 /**
  * compas.inc.php
  *
@@ -28,5 +29,5 @@ $index = 0;
 if (is_numeric($busVoltage)) {
     $sensorType = 'compas';
     $descr = 'DC Bus Voltage';
-    discover_sensor($valid['sensor'], 'voltage', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $busVoltage);
+    discover_sensor(null, 'voltage', $device, $curOID, $index, $sensorType, $descr, '1', '1', null, null, null, null, $busVoltage);
 }

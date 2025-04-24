@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -53,15 +55,41 @@ class Component extends DeviceRelatedModel
         $this->attributes['ignore'] = (int) $ignore;
     }
 
-    // ---- Define Relationships ----
-
-    public function logs(): HasMany
+    public function error(): Attribute
     {
-        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
+        );
     }
 
+    public function label(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 255),
+        );
+    }
+
+    public function type(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => is_null($value) ? null : substr($value, 0, 50),
+        );
+    }
+
+    // ---- Define Relationships ----
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ComponentStatusLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(ComponentStatusLog::class, 'component_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ComponentPref, $this>
+     */
     public function prefs(): HasMany
     {
-        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
+        return $this->hasMany(ComponentPref::class, 'component', 'id');
     }
 }

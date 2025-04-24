@@ -39,9 +39,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         $modemmdn = $entry['mdmMDN'];
         $descr = 'mdmStatus - ' . $modemdesc . ' - ' . $modemmdn;
         //Discover Sensors
-        discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
+        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['mdmStatus'], 'snmp', $index);
     }
 }
 // Device Firmware Upgrade Status
@@ -61,7 +59,5 @@ foreach ($upgradestatus as $index => $entry) {
 
     $descr = 'Firmware Upgrade Status';
     //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
+    discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry['devFWUpgradeStatus'], 'snmp', $index);
 }

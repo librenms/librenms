@@ -43,10 +43,10 @@ things you need to fix:
 You can validate your LibreNMS install from the WebUI, using the nav
 bar and clicking on the little Gear Icon -> Validate Config. 
 
-![Validate Config Icon](/img/validate-config-icon.png) 
+![Validate Config Icon](../img/validate-config-icon.png) 
 
 Then You should see the results of validate.
 
 Below is just example of the results.
 
-![Validate results](/img/validate-results.png)
+![Validate results](../img/validate-results.png)

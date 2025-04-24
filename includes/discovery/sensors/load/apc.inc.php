@@ -13,7 +13,7 @@ if ($phasecount > 1) {
         $divisor = 1;
         $load = $data['upsPhaseOutputPercentLoad'];
         if ($load >= 0) {
-            discover_sensor($valid['sensor'], 'load', $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
+            discover_sensor(null, 'load', $device, $load_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $load);
         }
     }
     unset($oids);
@@ -47,7 +47,7 @@ if ($phasecount > 1) {
             if ($oids) {
                 echo $item['type'] . ' ' . $item['mib'] . ' UPS';
             }
-            discover_sensor($valid['sensor'], 'load', $device, $current_oid . '.' . $item['index'], $current_oid . '.' . $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, null, null, null, null, $current);
+            discover_sensor(null, 'load', $device, $current_oid . '.' . $item['index'], $current_oid . '.' . $item['index'], $item['type'], $item['descr'], $item['divisor'], 1, null, null, null, null, $current);
         }
     }//end foreach
 }

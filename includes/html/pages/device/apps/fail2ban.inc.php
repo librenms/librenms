@@ -27,6 +27,7 @@ foreach ($graphs as $key => $text) {
 $jails = $app->data['jails'] ?? [];
 sort($jails);
 foreach ($jails as $jail) {
+    $jail = htmlspecialchars($jail);
     $graph_type = 'fail2ban_jail';
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';

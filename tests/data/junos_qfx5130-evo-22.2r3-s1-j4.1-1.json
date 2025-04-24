@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.4.82.28",
+                    "sysDescr": "Juniper Networks, Inc. qfx5130-32cd , kernel JUNOS 22.2R3-S1.3-EVO, Copyright (c) 1996-2023 Juniper Networks, Inc.",
+                    "sysContact": "<private>",
+                    "version": "22.2R3-S1-J4.1-EVO",
+                    "hardware": "QFX5130-32CD",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "junos",
+                    "type": "network",
+                    "serial": "YR3621430016",
+                    "icon": "junos.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

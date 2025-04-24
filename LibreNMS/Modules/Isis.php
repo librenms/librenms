@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Isis.php
  *
@@ -25,11 +26,13 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
@@ -67,7 +70,7 @@ class Isis implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -75,7 +78,7 @@ class Isis implements Module
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        ModuleModelObserver::observe(\App\Models\IsisAdjacency::class);
+        ModuleModelObserver::observe(IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
@@ -89,7 +92,7 @@ class Isis implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -106,18 +109,6 @@ class Isis implements Module
         $updated->each->save();
     }
 
-    /**
-     * Remove all DB data for this module.
-     * This will be run when the module is disabled.
-     */
-    public function cleanup(Device $device): void
-    {
-        $device->isisAdjacencies()->delete();
-
-        // clean up legacy components from old code
-        $device->components()->where('type', 'ISIS')->delete();
-    }
-
     public function discoverIsIsMib(OS $os): Collection
     {
         // Check if the device has any ISIS enabled interfaces
@@ -126,7 +117,6 @@ class Isis implements Module
 
         if (! empty($circuits)) {
             $adjacencies_data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'ISIS-MIB::isisISAdj', [], null, null, '-OQUstx');
-            $ifIndex_port_id_map = $os->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
             // No ISIS enabled interfaces -> delete the component
             foreach ($circuits as $circuit_id => $circuit_data) {
@@ -143,7 +133,7 @@ class Isis implements Module
                 $attributes = [
                     'device_id' => $os->getDeviceId(),
                     'ifIndex' => $circuit_data['isisCircIfIndex'],
-                    'port_id' => $ifIndex_port_id_map[$circuit_data['isisCircIfIndex']] ?? null,
+                    'port_id' => PortCache::getIdFromIfIndex($circuit_data['isisCircIfIndex'], $os->getDevice()),
                     'isisCircAdminState' => $circuit_data['isisCircAdminState'] ?? 'down',
                     'isisISAdjState' => $adjacency_data['isisISAdjState'] ?? 'down',
                 ];
@@ -172,7 +162,7 @@ class Isis implements Module
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjState', [], 'ISIS-MIB');
 
         if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
-            echo 'New Adjacencies, running discovery';
+            Log::info('New Adjacencies, running discovery');
 
             // don't enable, might be a bad heuristic
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
@@ -196,10 +186,27 @@ class Isis implements Module
         return (int) (max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100);
     }
 
+    public function dataExists(Device $device): bool
+    {
+        return $device->isisAdjacencies()->exists() || $device->components()->where('type', 'ISIS')->exists();
+    }
+
+    /**
+     * Remove all DB data for this module.
+     * This will be run when the module is disabled.
+     */
+    public function cleanup(Device $device): int
+    {
+        // clean up legacy components from old code
+        $legacyDeleted = $device->components()->where('type', 'ISIS')->delete();
+
+        return $device->isisAdjacencies()->delete() + $legacyDeleted;
+    }
+
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
             'isis_adjacencies' => $device->isisAdjacencies()->orderBy('index')

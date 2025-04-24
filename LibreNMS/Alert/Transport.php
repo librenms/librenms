@@ -92,6 +92,7 @@ abstract class Transport implements TransportInterface
             AlertState::ACKNOWLEDGED => Config::get('alert_colour.acknowledged'),
             AlertState::WORSE => Config::get('alert_colour.worse'),
             AlertState::BETTER => Config::get('alert_colour.better'),
+            AlertState::CHANGED => Config::get('alert_colour.changed'),
         ];
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';
@@ -115,7 +116,7 @@ abstract class Transport implements TransportInterface
 
             $val = $this->config[$item['name']];
             if ($item['type'] == 'password') {
-                $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
+                $val = '********';
             } elseif ($item['type'] == 'select') {
                 // Match value to key name for select inputs
                 $val = array_search($val, $item['options']);

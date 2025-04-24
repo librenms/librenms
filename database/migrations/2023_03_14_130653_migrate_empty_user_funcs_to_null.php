@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \App\Models\Sensor::where('user_func', '')->update(['user_func' => null]);
+        App\Models\Sensor::where('user_func', '')->update(['user_func' => null]);
     }
 
     /**

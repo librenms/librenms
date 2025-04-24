@@ -152,7 +152,7 @@ modules:
                 -
                     oid: upsBatteryGroup
                     value: upsBatteryGroupTemperature
-                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.7.{{ $index }}'
                     descr: 'Battery #{{ $index }} Temperature'
                     index: 'upsBatteryGroupTemperature.{{ $index }}'
                     divisor: 10

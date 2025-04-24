@@ -362,11 +362,11 @@ class BillingQueueManager(TimedQueueManager):
     def do_work(self, run_type, group):
         if run_type == "poll":
             logger.info("Polling billing")
-            args = ("-d") if self.config.debug else ()
+            args = ("-d", "-f") if self.config.debug else ("-f")
             exit_code, output = LibreNMS.call_script("poll-billing.php", args)
         else:  # run_type == 'calculate'
             logger.info("Calculating billing")
-            args = ("-d") if self.config.debug else ()
+            args = ("-d", "-f") if self.config.debug else ("-f")
             exit_code, output = LibreNMS.call_script("billing-calculate.php", args)
 
         if exit_code != 0:
@@ -506,7 +506,7 @@ class AlertQueueManager(TimedQueueManager):
 
     def do_work(self, device_id, group):
         logger.info("Checking alerts")
-        args = ("-d") if self.config.debug else ()
+        args = ("-d", "-f") if self.config.debug else ("-f",)
         exit_code, output = LibreNMS.call_script("alerts.php", args)
 
         if self.config.log_output:

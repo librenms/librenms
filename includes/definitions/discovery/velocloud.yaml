@@ -6,6 +6,7 @@ modules:
         pre-cache:
             data:
                 -
+                    snmp_flags: '-OQUsbe'
                     oid:
                         - vceLinkItf
                         - vceLinkName
@@ -19,6 +20,7 @@ modules:
                     descr: 'HA configuration'
                     group: HA
                     value: vceHaAdminState
+                    snmp_flags: '-OQUsbe'
                     states:
                         - { value: 1, graph: 0, generic: 0, descr: none }
                         - { value: 2, graph: 0, generic: 0, descr: ActiveStandbyPair }
@@ -32,6 +34,7 @@ modules:
                     descr: 'HA peer state'
                     group: HA
                     value: vceHaPeerState
+                    snmp_flags: '-OQUsbe'
                     states:
                         - { value: 1, graph: 0, generic: 0, descr: initializing }
                         - { value: 2, graph: 0, generic: 0, descr: active }
@@ -44,6 +47,7 @@ modules:
                     descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} VPN link state'
                     group: 'VCE Links'
                     value: vceLinkVpnState
+                    snmp_flags: '-OQUsbe'
                     states:
                         - { value: 1, graph: 1, generic: 1, descr: initial }
                         - { value: 2, graph: 2, generic: 2, descr: dead }
@@ -60,6 +64,7 @@ modules:
                     descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} WAN link state'
                     group: 'VCE Links'
                     value: vceLinkState
+                    snmp_flags: '-OQUsbe'
                     states:
                         - { value: 1, graph: 1, generic: 1, descr: initial }
                         - { value: 2, graph: 2, generic: 2, descr: dead }
@@ -78,6 +83,7 @@ modules:
                     descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} TX packet loss'
                     group: 'VCE Links'
                     value: vceLinkTxLostPkt
+                    snmp_flags: '-OQUsbe'
                     warn_limit: '1'
                     high_limit: '5'
                 -
@@ -87,5 +93,6 @@ modules:
                     descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} RX packet loss'
                     group: 'VCE Links'
                     value: vceLinkRxLostPkt
+                    snmp_flags: '-OQUsbe'
                     warn_limit: '1'
                     high_limit: '5'

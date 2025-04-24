@@ -3229,5 +3229,31 @@
                 }
             ]
         }
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": "PLANET IGS-10020MT Managed Switch",
+                    "entPhysicalClass": "stack",
+                    "entPhysicalName": "edge-building-f",
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "2.28f130731",
+                    "entPhysicalSoftwareRev": "2.28f130731",
+                    "entPhysicalAlias": "None",
+                    "entPhysicalAssetID": "",
+                    "entPhysicalIsFRU": "true",
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalSerialNum": "System MAC: a8-f7-e0-00-64-6a",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": "",
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

@@ -78,7 +78,13 @@ fwVersion OBJECT-TYPE
 	DESCRIPTION
 			"Router firmware version"
 	::= { device 6 }
-
+connectionUptime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Connection Uptime"
+    ::= { mobile 3 }
 --
 --GSM
 --

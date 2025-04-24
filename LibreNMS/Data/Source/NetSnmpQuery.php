@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SNMP.php
  *
@@ -80,7 +81,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     private array $mibDirs = [];
     private string $context = '';
-    private array|string $options = [self::DEFAULT_FLAGS];
+    private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
     private Device $device;
     private bool $abort = false;
     private bool $cache = false;
@@ -141,7 +142,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      *
      * @param  string|null  $context  Version 2/3 context name
      * @param  string|null  $v3_prefix  Optional context prefix to prepend for Version 3 queries
-     * @return \LibreNMS\Data\Source\SnmpQueryInterface
+     * @return SnmpQueryInterface
      */
     public function context(?string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
@@ -269,7 +270,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Commonly used to fetch a single or multiple explicit values.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function get($oid): SnmpResponse
     {
@@ -281,7 +282,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse
     {
@@ -293,7 +294,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      * snmpnext retrieves the first oid after the given oid.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function next($oid): SnmpResponse
     {
@@ -306,19 +307,20 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function translate(string $oid): string
     {
+        $oid = new Oid($oid);
         $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
-
-        $this->options[] = '-Pu'; // don't error on _
 
         // user did not specify numeric, output full text
         if (! in_array('-On', $this->options)) {
-            $this->options[] = '-OS';
-        } elseif (Oid::isNumeric($oid)) {
+            if (! in_array('-Os', $this->options)) {
+                $this->options[] = '-OS'; // show full oid, unless hideMib is set
+            }
+        } elseif ($oid->isNumeric()) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
         // if mib is not directly specified and it doesn't have a numeric root
-        if (! str_contains($oid, '::') && ! Oid::hasNumericRoot($oid)) {
+        if (! $oid->hasMib() && ! $oid->hasNumericRoot()) {
             $this->options[] = '-IR'; // search for mib
         }
 
@@ -407,8 +409,28 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function exec(string $command, array $oids): SnmpResponse
     {
         // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
-        $driver = $this->cache ? 'array' : 'null';
-        $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
+        $driver = 'null';
+        $key = '';
+
+        if ($this->cache) {
+            $driver = 'array';
+            $key = $this->getCacheKey($command, $oids);
+
+            if (Debug::isEnabled()) {
+                $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
+                $cache_performance[$key] ??= 0;
+
+                if (Cache::driver($driver)->has($key)) {
+                    Log::debug("Cache hit for $command " . implode(',', $oids));
+                    $cache_performance[$key]++;
+                } else {
+                    Log::debug("Cache miss for $command " . implode(',', $oids) . ', grabbing fresh data.');
+                }
+
+                // update cache performance
+                Cache::driver($driver)->put('SnmpQuery_cache_performance', $cache_performance);
+            }
+        }
 
         return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
             $measure = Measurement::start($command);
@@ -546,6 +568,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $oids = implode(',', $oids);
         $options = implode(',', $this->options);
 
-        return "$type|{$this->device->hostname}|$this->context|$oids|$options";
+        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oids|$options";
     }
 }

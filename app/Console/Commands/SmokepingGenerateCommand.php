@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SmokepingGenerateCommand.php
  *
@@ -71,7 +72,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         if (! $this->validateOptions()) {
             return 1;
@@ -374,7 +375,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function balanceProbes($transport, $probeCount)
     {
-        if ($transport === 'udp') {
+        if ($transport === 'udp' || $transport === 'tcp') {
             if ($probeCount === $this->ip4count) {
                 $this->ip4count = 0;
             }

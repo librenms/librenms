@@ -24,7 +24,7 @@ foreach ($load_data as $index => $data) {
     $value = Number::cast($value);
 
     discover_sensor(
-        $valid['sensor'],
+        null,
         'load',
         $device,
         $load_oid,

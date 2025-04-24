@@ -12,6 +12,8 @@ modules:
                     value: identityStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.1.6.{{ $index }}'
                     descr: 'Overall System status'
+                    index: "identityStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -21,6 +23,8 @@ modules:
                     value: serviceH323Status
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.1.{{ $index }}'
                     descr: 'H323 Status'
+                    index: "serviceH323Status.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -28,8 +32,10 @@ modules:
                 -
                     oid: serviceH323
                     value: serviceH323RegistrationStatus
-                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.2.{{ $index }}'
                     descr: 'H323 Status'
+                    index: "serviceH323RegistrationStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -39,6 +45,8 @@ modules:
                     value: serviceSipStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.1.{{ $index }}'
                     descr: 'Sip overall Status'
+                    index: "serviceSipStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -48,6 +56,8 @@ modules:
                     value: serviceSipRegistrationStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.3.1.2.{{ $index }}'
                     descr: 'Sip Status Line {{ $index }}'
+                    index: "serviceSipRegistrationStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -57,6 +67,8 @@ modules:
                     value: serviceIsdnStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.9.1.{{ $index }}'
                     descr: 'ISDN Status'
+                    index: "serviceIsdnStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -66,6 +78,8 @@ modules:
                     value: hardwareOverallStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.1.{{ $index }}'
                     descr: 'Hardware Status'
+                    index: "hardwareOverallStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -75,6 +89,8 @@ modules:
                     value: hardwareMicrophoneStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.5.1.{{ $index }}'
                     descr: 'Microphone Status'
+                    index: "hardwareMicrophoneStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -84,6 +100,8 @@ modules:
                     value: hardwareCameraStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.6.1.{{ $index }}'
                     descr: 'Camera Status'
+                    index: "hardwareCameraStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -93,6 +111,8 @@ modules:
                     value: hardwareNICStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.10.1.{{ $index }}'
                     descr: 'NIC Status'
+                    index: "hardwareNICStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -102,6 +122,8 @@ modules:
                     value: hardwarePTCStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.11.1.{{ $index }}'
                     descr: 'PTC Status'
+                    index: "hardwarePTCStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -111,6 +133,8 @@ modules:
                     value: hardwareUcBoardStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.12.1.{{ $index }}'
                     descr: 'Uc Board Status'
+                    index: "hardwareUcBoardStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -120,6 +144,8 @@ modules:
                     value:  externalIntegrationPresenceStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.7.1.{{ $index }}'
                     descr: 'Poly Presence Service Status'
+                    index: "externalIntegrationPresenceStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -129,6 +155,8 @@ modules:
                     value:  externalIntegrationCDRStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.8.1.{{ $index }}'
                     descr: 'Poly CDR Service Status'
+                    index: "externalIntegrationCDRStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -138,6 +166,8 @@ modules:
                     value:  externalIntegrationSyslogStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.9.1.{{ $index }}'
                     descr: 'Syslog Service Status'
+                    index: "externalIntegrationSyslogStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -147,6 +177,8 @@ modules:
                     value:  externalIntegrationSoftwareUpdateStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.10.1.{{ $index }}'
                     descr: 'Poly Software Update Status'
+                    index: "externalIntegrationSoftwareUpdateStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -156,6 +188,8 @@ modules:
                     value:  externalIntegrationProvisioningStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.11.1.{{ $index }}'
                     descr: 'Poly Provisioning Status'
+                    index: "externalIntegrationProvisioningStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -165,6 +199,8 @@ modules:
                     value:  externalIntegrationExchangeStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.12.1.{{ $index }}'
                     descr: 'Exchange Integration Status'
+                    index: "externalIntegrationExchangeStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -174,6 +210,8 @@ modules:
                     value:  externalIntegrationDirectorySvcsStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.13.1.{{ $index }}'
                     descr: 'Directory Integration Status'
+                    index: "externalIntegrationDirectorySvcsStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
                     states:
                         - { value: 1, descr: disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }

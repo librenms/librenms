@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -21,6 +22,7 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
@@ -34,9 +36,9 @@ if (! empty($snmpData)) {
         if ($upsnut[$index]) {
             $value = intval($upsData['nsExtendOutLine']) / 60;
             if (! empty($value)) {
-                $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index);
+                $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
-                    $valid['sensor'],
+                    null,
                     'runtime',
                     $device,
                     $oid,

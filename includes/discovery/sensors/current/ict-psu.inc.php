@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ict-psu.inc.php
  *
@@ -35,5 +36,5 @@ if (! empty($outputCurrent)) {
     $type = 'ict-psu';
     $currentValue = $outputCurrent / $divisor;
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor(null, 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }

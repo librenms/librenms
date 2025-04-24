@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+
 echo 'Printer Status and Error State ';
 $state = snmp_get($device, 'hrDeviceStatus.1', '-Ovqe', 'HOST-RESOURCES-MIB');
 if (is_numeric($state)) {
@@ -17,7 +19,7 @@ if (is_numeric($state)) {
     );
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.25.3.2.1.5.1',
@@ -34,8 +36,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 $state = snmp_get($device, 'hrPrinterDetectedErrorState.1', '-Ovqe', 'HOST-RESOURCES-MIB');
@@ -81,10 +81,10 @@ if ($state) {
     $state_name = 'hrPrinterDetectedErrorState';
     create_state_index($state_name, $printer_states);
 
-    d_echo('Printer error state: ' . $state_name . ': ' . $state);
+    Log::debug('Printer error state: ' . $state_name . ': ' . $state);
     $sensor_index = 0;
     discover_sensor(
-        $valid['sensor'],
+        null,
         'state',
         $device,
         '.1.3.6.1.2.1.25.3.5.1.2.1',
@@ -101,7 +101,4 @@ if ($state) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

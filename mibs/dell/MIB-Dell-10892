@@ -2,14 +2,14 @@
 --
 -- Title: Systems Management Instrumentation MIB
 --
--- Version: 7.4.0
+-- Version: 11.0.0.0
 --
--- Release Date:Nov 2013
+-- Release Date: December 2022
 --
 -- Description: This MIB defines MIB objects that make system instrumentation
 -- data available to SNMP management applications.
 --
--- Copyright (c) 2000-2013 Dell Inc.
+-- Copyright (c) 2000-2022 Dell Inc.
 -- All Rights Reserved.
 --
 -- Note: The information and functionality described by this MIB file,
@@ -177,7 +177,8 @@ DellStatus                  ::= INTEGER {
     ok(3),                  -- status of object is OK (normal)
     nonCritical(4),         -- status of object is noncritical (warning)
     critical(5),            -- status of object is critical (failure)
-    nonRecoverable(6)       -- status of object is non-recoverable (dead)
+    nonRecoverable(6),      -- status of object is non-recoverable (dead)
+	absent(7)               -- status of object is absent
 }
 
 --
@@ -384,6 +385,14 @@ systemManagementSoftwareManufacturerName        OBJECT-TYPE
 "0100.0013 This attribute defines the manufacturer of the
 systems management software."
     ::= { systemManagementSoftwareGroup 13 }
+systemManagementSoftwareProdUseFeedback        OBJECT-TYPE
+    SYNTAX      DellUnsigned16BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"0100.0014 This attribute defines the current state of the
+Product Use Feedback feature. Possible values are Enabled(1) and Disabled(0)."
+    ::= { systemManagementSoftwareGroup 14 }
 
 
 -------------------------------------------------------------------------------
@@ -1730,7 +1739,7 @@ chassisNodeIDName                   OBJECT-TYPE
     DESCRIPTION
 "0300.0010.0001.0050 This attribute defines the NodeID Code of the
 chassis,if applicable"
-    ::= { chassisInformationTableEntry 50 }	
+    ::= { chassisInformationTableEntry 50 }
 
 
 
@@ -2237,7 +2246,8 @@ DellFirmwareType                                ::= INTEGER {
     unifiedServerConfigurator(19),              -- type is Unified Server Configurator
     lifecycleController(20),                    -- type is Lifecycle Controller
     iDRAC7(21),                                 -- type is Integrated Dell Remote Access Controller 7
-    iDRAC8(22)                                  -- type is Integrated Dell Remote Access Controller 8
+    iDRAC8(22),                                 -- type is Integrated Dell Remote Access Controller 8
+	iDRAC9(23)                                  -- type is Integrated Dell Remote Access Controller 9
 }
 
 FirmwareTableEntry                              ::= SEQUENCE {
@@ -2366,7 +2376,9 @@ DellIntrusionReading                            ::= INTEGER {
     chassisNotBreached(1),                      -- chassis not breached and no uncleared breaches
     chassisBreached(2),                         -- chassis currently breached
     chassisBreachedPrior(3),                    -- chassis breached prior to boot and has not been cleared
-    chassisBreachSensorFailure(4)               -- intrusion sensor has failed
+    chassisBreachSensorFailure(4),              -- intrusion sensor has failed
+	driveBayOpen(5),		                	-- drive bay is open
+    driveBayOpenExtended(6)	                	-- drive bay open extended
 }
 DellIntrusionType                               ::= INTEGER {
     chassisBreachDetectionWhenPowerON(1),       -- type is detect intrusion while power on
@@ -4594,7 +4606,8 @@ AC power cord."
 
 DellBatteryReading                              ::= INTEGER {
     -- Note: These values are bit masks, so combination values are possible.
-    predictiveFailure(1),                       -- battery predictive failure
+	-- If 0 (zero), battery is absent
+	predictiveFailure(1),                       -- battery predictive failure
     failed(2),                                  -- battery failed
     presenceDetected(4)                         -- battery presence detected
 }
@@ -4802,7 +4815,7 @@ powerUsageCumulativeWattageStartDateName        OBJECT-TYPE
     STATUS      mandatory
     DESCRIPTION
 "0600.0060.0001.0008 This attribute defines the date and time at
-which the data collection started for the value reported by the 
+which the data collection started for the value reported by the
 powerUsageCumulativeWattage attribute."
     ::= { powerUsageTableEntry 8 }
 powerUsagePeakWatts                             OBJECT-TYPE
@@ -4820,7 +4833,7 @@ powerUsagePeakWattsStartDateName                OBJECT-TYPE
     STATUS      mandatory
     DESCRIPTION
 "0600.0060.0001.0010 This attribute defines the date and time at
-which the data collection started for the value reported by the 
+which the data collection started for the value reported by the
 powerUsagePeakWatts attribute."
     ::= { powerUsageTableEntry 10 }
 powerUsagePeakWattsReadingDateName              OBJECT-TYPE
@@ -4847,7 +4860,7 @@ powerUsagePeakAmpsStartDateName                 OBJECT-TYPE
     STATUS      mandatory
     DESCRIPTION
 "0600.0060.0001.0013 This attribute defines the date and time at
-which the data collection started for the value reported by the 
+which the data collection started for the value reported by the
 powerUsagePeakAmps attribute."
     ::= { powerUsageTableEntry 13 }
 powerUsagePeakAmpsReadingDateName               OBJECT-TYPE
@@ -7404,6 +7417,7 @@ DellProcessorDeviceFamily                       ::= INTEGER {
     deviceFamilyIs68010(99),                    -- family is 68010
     deviceFamilyIs68020(100),                   -- family is 68020
     deviceFamilyIs68030(101),                   -- family is 68030
+	deviceFamilyIsAMDZen(107),                  -- family is AMD Zen Processor Family
     deviceFamilyIsHobbit(112),                  -- family is Hobbit Family
     deviceFamilyIsCrusoeTM5000(120),            -- family is Crusoe TM5000 Family
     deviceFamilyIsCrusoeTM3000(121),            -- family is Crusoe TM3000 Family
@@ -7488,7 +7502,7 @@ DellProcessorDeviceFamily                       ::= INTEGER {
     deviceFamilyIsDualCoreIntelXeon7xxx(221),   -- family is Dual-Core Intel(R) Xeon(R) processor 7xxx Series
     deviceFamilyIsQuadCoreIntelXeon7xxx(222),   -- family is Quad-Core Intel(R) Xeon(R) processor 7xxx Series
     deviceFamilyIsMultiCoreIntelXeon7xxx(223),  -- family is Multi-Core Intel(R) Xeon(R) processor 7xxx Series
-    deviceFamilyIsMultiCoreIntelXeon3400(224),  -- family is Multi-Core Intel(R) Xeon(R) processor 3400 Series 
+    deviceFamilyIsMultiCoreIntelXeon3400(224),  -- family is Multi-Core Intel(R) Xeon(R) processor 3400 Series
     deviceFamilyIsEmbeddedAMDOpertonQuadCore(230), -- family is Embedded AMD Opteron(TM) Quad-Core Processor Family
     deviceFamilyIsAMDPhenomTripleCore(231),     -- family is AMD Phenom(TM) Triple-Core Processor Family
     deviceFamilyIsAMDTurionUltraDualCoreMobile(232), -- family is AMD Turion(TM) Ultra Dual-Core Mobile Processor Family
@@ -7563,7 +7577,8 @@ ProcessorDeviceTableEntry                       ::= SEQUENCE {
     processorDeviceExtendedSettings             DellUnsigned16BitRange,
     processorDeviceBrandName                    DellString,
     processorDeviceModelName                    DellString,
-    processorDeviceSteppingName                 DellString
+    processorDeviceSteppingName                 DellString,
+    processorDeviceDeprecatedCapabilities       DellUnsigned16BitRange
 }
 
 processorDeviceTable                            OBJECT-TYPE
@@ -7767,13 +7782,17 @@ processorDeviceExtendedCapabilities             OBJECT-TYPE
 processor device.  This attribute is a bit field where a bit has the meaning
 defined below when set to 1 (one).
 
+**NOTE: This attribute should consider processorDeviceDeprecatedCapabilities
+for deprecated values.
+
     Bit
     Position    Meaning if Set
     --------    --------------
     Bit 0       Virtualization Technology (VT) supported
     Bit 1       Demand-Based Switching (DBS) supported
     Bit 2       eXecute Disable (XD) supported
-    Bit 3       Hyper-Threading (HT) supported"
+    Bit 3       Hyper-Threading (HT) supported
+	Bit 4       Turbo Mode (TM) is supported"
     ::= { processorDeviceTableEntry 21 }
 processorDeviceExtendedSettings                 OBJECT-TYPE
     SYNTAX      DellUnsigned16BitRange
@@ -7790,7 +7809,8 @@ defined below when set to 1 (one).
     Bit 0       Virtualization Technology (VT) enabled
     Bit 1       Demand Based Switching (DBS) enabled
     Bit 2       eXecute Disable (XD) enabled
-    Bit 3       Hyper-Threading (HT) enabled"
+    Bit 3       Hyper-Threading (HT) enabled
+	Bit 4       Turbo Mode (TM) is enabled"
     ::= { processorDeviceTableEntry 22 }
 processorDeviceBrandName                        OBJECT-TYPE
     SYNTAX      DellString
@@ -7816,6 +7836,28 @@ processorDeviceSteppingName                     OBJECT-TYPE
 "1100.0030.0001.0025 This attribute defines the stepping of the
 processor device."
     ::= { processorDeviceTableEntry 25 }
+processorDeviceDeprecatedCapabilities             OBJECT-TYPE
+    SYNTAX      DellUnsigned16BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0030.0001.0021 This attribute defines deprecated capabilities of the
+processor device.  This attribute is a bit field where a bit has the meaning
+defined below when set to 1 (one).
+
+**NOTE: This attribute should be used to ignore deprecated Capabilities
+from processorDeviceExtendedCapabilities. The deprecated values should
+not be consumed/displayed as they might have default values.
+
+    Bit
+    Position    Meaning if Set
+    --------    --------------
+    Bit 0       Virtualization Technology (VT) is deprecated
+    Bit 1       Demand-Based Switching (DBS) is deprecated
+    Bit 2       eXecute Disable (XD) is deprecated
+    Bit 3       Hyper-Threading (HT) is deprecated
+	Bit 4       Turbo Mode (TM) is deprecated"
+    ::= { processorDeviceTableEntry 26 }
 
 
 -------------------------------------------------------------------------------
@@ -8249,15 +8291,16 @@ DellMemoryDeviceType                            ::= INTEGER {
     deviceTypeIsDDR2FBDIMM(20),                 -- type is DDR2 FB-DIMM
     deviceTypeIsDDR3(24),                       -- type is DDR3
     deviceTypeIsFBD2(25),                       -- type is FBD2
-    deviceTypeIsDDR4(26)                        -- type is DDR4
+    deviceTypeIsDDR4(26),                       -- type is DDR4
+    deviceTypeIsDDR4(34)                        -- type is DDR5
 }
 
-DellMemoryDeviceRank                            ::= INTEGER {  
+DellMemoryDeviceRank                            ::= INTEGER {
     deviceRankIsUnknown(1),                     -- Rank is unknown
     deviceRankIsSingle(2),                      -- Rank is Single
     deviceRankIsDual(4),	                    -- Rank is Dual
-    deviceRankIsQuad(8),	                    -- Rank is Quad 
-	deviceRankIsOctal(16),	                    -- Rank is Octal  
+    deviceRankIsQuad(8),	                    -- Rank is Quad
+	deviceRankIsOctal(16),	                    -- Rank is Octal
 	deviceRankIsHexa(32)	                    -- Rank is Hexa
 }
 
@@ -8285,7 +8328,31 @@ DellMemoryDeviceFailureModes                    ::= INTEGER {
     eccSingleBitCorrectionFailureRate(2),       -- ECC single bit correction failure rate exceeded
     eccMultiBitFault(4),                        -- ECC multibit fault encountered
     eccSingleBitCorrectionLoggingDisabled(8),   -- ECC single bit correction logging disabled
-    deviceDisabledBySpareActivation(16)         -- device disabled because of spare activation
+    deviceDisabledBySpareActivation(16),        -- device disabled because of spare activation
+    nvdimmNotReady(32),                         -- NVDIMM Not Ready
+    nvdimmSaveError(64),                        -- NVDIMM Save Error
+    nvdimmRestoreErrorOrTimeout(128),           -- NVDIMM Restore Error or Restore Timeout
+    nvdimmIllegalConfiguration(256),            -- Illegal NVDIMM Configuration
+    nvdimmNotResponding(512),                   -- NVDIMM Not Responding
+    nvdimmArmFailureOrTimeout(1024),            -- NVDIMM Arm Failure or Arm Timeout
+    nvdimmsInWriteProtectMode(2048),            -- All NVDIMMs in Write-Protect Mode
+    nvmLifetimeExpired(4096),                   -- NVM Lifetime Expired
+    nvdimmPersistencyLost(8192),                -- NVDIMM Persistency Lost
+    nvdimmPersistencyRestored(16384),           -- NVDIMM Persistency Restored
+    nvmLifetimeLessThanFivePercent(32768),      -- NVM Lifetime less than Five Percent
+    aepUnCorrectableError(65536),               -- Un-correctable Error
+    aepCorrectableError(131072),                -- Correctable Error
+    aepOperatingNormally(262144)                -- Operating Normally
+}
+
+DellMemoryDeviceMemoryTechnology                ::= INTEGER {
+    other(1),                                   -- Technology is Other
+    unknown(2),                                 -- Technology is Unknown
+    dram(3),                                    -- Technology is DRAM
+    nvdimm-n(4),                                -- Technology is NVDIMM-N
+    nvdimm-f(5),                                -- Technology is NVDIMM-F
+    nvdimm-p(6),                                -- Technology is NVDIMM-P
+    intelpersistentmemory(7)                    -- Technology is Intel Persistent Memory
 }
 
 MemoryDeviceTableEntry                          ::= SEQUENCE {
@@ -8315,7 +8382,12 @@ MemoryDeviceTableEntry                          ::= SEQUENCE {
     memoryDeviceAssetTagName                    DellString,
     memoryDeviceSpeedName                       DellString,
     memoryDeviceRank                            DellMemoryDeviceRank,
-    memoryDeviceExtendedSize                    DellUnsigned32BitRange
+    memoryDeviceExtendedSize                    DellUnsigned32BitRange,
+    memoryDeviceMemoryTechnology                DellMemoryDeviceMemoryTechnology,
+    memoryDeviceNonVolatileSize                 DellUnsigned32BitRange,
+    memoryDeviceVolatileSize                    DellUnsigned32BitRange,
+    memoryDeviceCacheSize                       DellUnsigned32BitRange,
+    memoryDeviceWearLevel                       DellUnsigned32BitRange
 }
 
 memoryDeviceTable                               OBJECT-TYPE
@@ -8571,6 +8643,43 @@ memory device.
 
 **NOTE: This attribute replaces the memoryDeviceSize."
     ::= { memoryDeviceTableEntry 27 }
+memoryDeviceMemoryTechnology                                OBJECT-TYPE
+    SYNTAX      DellMemoryDeviceMemoryTechnology
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0050.0001.0028 This attribute defines the Memory technology type of the memory device."
+    ::= { memoryDeviceTableEntry 28 }
+memoryDeviceNonVolatileSize                             OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0050.0001.0029 This attribute defines the size of the Non-volatile portion of the memory device in MegaBytes."
+    ::= { memoryDeviceTableEntry 29 }
+memoryDeviceVolatileSize                                OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0050.0001.0030 This attribute defines the size of the Volatile portion of the memory device in MegaBytes."
+    ::= { memoryDeviceTableEntry 30 }
+memoryDeviceCacheSize                                   OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0050.0001.0031 This attribute defines the size of the Cache portion of the memory device in MegaBytes."
+    ::= { memoryDeviceTableEntry 31 }
+memoryDeviceWearLevel                                   OBJECT-TYPE
+    SYNTAX      DellUnsigned32BitRange
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+"1100.0050.0001.0032 This attribute defines the Remaining Rated Write Endurance of the memory device.
+**NOTE: This attribute is applicable only to Non-Volatile family (NVDIMM-F, NVDIMM-N, NVDIMM-P and Intel Persistent Memory) of Memory devices.
+For other technology devices (DRAM) this attribute would be reported as 255 (0xFF) and should be ignored."
+    ::= { memoryDeviceTableEntry 32 }
 
 
 -------------------------------------------------------------------------------
@@ -9115,10 +9224,11 @@ DellNetworkDeviceCapabilities                   ::= INTEGER {
     supported(1),                               -- device supports reporting capabilities via this attribute
     toe(2),                                     -- device has TOE capability
     iscsiOffload(4),                            -- device has iSCSI Offload capability
-    fcoeOffload(8)                              -- device has FCoE Offload capability
+    fcoeOffload(8),                             -- device has FCoE Offload capability
+	unknown(16)                                 -- device capabilities are unknown
 }
 DellNetworkDeviceNParEPEnabled                  ::= INTEGER {
-    disabled(1),                                -- NParEP mode is not enabled on device 
+    disabled(1),                                -- NParEP mode is not enabled on device
     enabled(2),                                 -- NparEP mode is enabled on device
     unknown (3)                                -- don't know NParEP mode on device
 }
@@ -9858,14 +9968,30 @@ DellSystemSlotType                              ::= INTEGER {
     systemSlotIsAGP(15),                        -- type is AGP
     systemSlotIsAGP2X(16),                      -- type is AGP 2X
     systemSlotIsAGP4X(17),                      -- type is AGP 4X
-    systemSlotIsPC98C20(18),                    -- type is PC-98/C20
-    systemSlotIsPC98C24(19),                    -- type is PC-98/C24
-    systemSlotIsPC98E(20),                      -- type is PC-98/E
-    systemSlotIsPC98LocalBus(21),               -- type is PC-98/Local Bus
-    systemSlotIsPC98Card(22),                   -- type is PC-98/Card
-    systemSlotIsPCIX(23),                       -- type is PCI-X
-    systemSlotIsPCIExpress(24),                 -- type is PCI Express
-    systemSlotIsAGP8X(25),                      -- type is AGP 8X
+    systemSlotIsPCIX(18),                       -- type is PCI-X
+    systemSlotIsAGP8X(19),                      -- type is AGP 8X
+    systemSlotIsM2Socket1DP(20),                -- type is M.2 Socket 1-DP (Mechanical Key A)
+    systemSlotIsM2Socket1SD(21),                -- type is M.2 Socket 1-SD (Mechanical Key E)
+    systemSlotIsM2Socket2(22),                  -- type is M.2 Socket 2 (Mechanical Key B)
+    systemSlotIsM2Socket3(23),                  -- type is M.2 Socket 3 (Mechanical Key M)
+    systemSlotIsMXMT1(24),                      -- type is MXM Type I
+    systemSlotIsMXMT2(25),                      -- type is MXM Type II
+    systemSlotIsMXMT3SC(26),                    -- type is MXM Type III (standard connector)
+    systemSlotIsMXMT3HEC(27),                   -- type is MXM Type III (HE connector)
+    systemSlotIsMXMT4(28),                      -- type is MXM Type IV
+    systemSlotIsMXM3TA(29),                     -- type is MXM 3.0 Type A
+    systemSlotIsMXM3TB(30),                     -- type is MXM 3.0 Type B
+    systemSlotIsPCIEGEN2SFF8639(31),            -- type is PCI Express Gen 2 SFF-8639
+    systemSlotIsPCIEGEN3SFF8639(32),            -- type is PCI Express Gen 3 SFF-86392
+    systemSlotIsPCIEMINI52PWBK(33),             -- type is PCI Express Mini 52-pin with bottom-side keep-outs
+    systemSlotIsPCIEMINI52PWOBK(34),            -- type is PCI Express Mini 52-pin without bottom-side keep-outs
+    systemSlotIsPCIEMINI76P(35),                -- type is PCI Express Mini 76-pin
+    systemSlotIsPC98C20(160),                   -- type is PC-98/C20
+    systemSlotIsPC98C24(161),                   -- type is PC-98/C24
+    systemSlotIsPC98E(162),                     -- type is PC-98/E
+    systemSlotIsPC98LocalBus(163),              -- type is PC-98/Local Bus
+    systemSlotIsPC98Card(164),                  -- type is PC-98/Card
+    systemSlotIsPCIExpress(165),                -- type is PCI Express
     systemSlotIsPCIExpressX1(166),              -- type is PCI Express x1
     systemSlotIsPCIExpressX2(167),              -- type is PCI Express x2
     systemSlotIsPCIExpressX4(168),              -- type is PCI Express x4
@@ -9876,19 +10002,34 @@ DellSystemSlotType                              ::= INTEGER {
     systemSlotIsPCIExpressGen2X2(173),          -- type is PCI Express Gen 2 x2
     systemSlotIsPCIExpressGen2X4(174),          -- type is PCI Express Gen 2 x4
     systemSlotIsPCIExpressGen2X8(175),          -- type is PCI Express Gen 2 x8
-    systemSlotIsPCIExpressGen2X16(176)          -- type is PCI Express Gen 2 x16
+    systemSlotIsPCIExpressGen2X16(176),         -- type is PCI Express Gen 2 x16
+    systemSlotIsPCIExpressGen3(177),            -- type is PCI Express Gen 3
+    systemSlotIsPCIExpressGen3X1(178),          -- type is PCI Express Gen 3 x1
+    systemSlotIsPCIExpressGen3X2(179),          -- type is PCI Express Gen 3 x2
+    systemSlotIsPCIExpressGen3X4(180),          -- type is PCI Express Gen 3 x4
+    systemSlotIsPCIExpressGen3X8(181),          -- type is PCI Express Gen 3 x8
+    systemSlotIsPCIExpressGen3X16(182),         -- type is PCI Express Gen 3 x16
+	systemSlotIsPCIExpressGen4(184),            -- type is PCI Express Gen 4
+    systemSlotIsPCIExpressGen4X1(185),          -- type is PCI Express Gen 4 x1
+    systemSlotIsPCIExpressGen4X2(186),          -- type is PCI Express Gen 4 x2
+    systemSlotIsPCIExpressGen4X4(187),          -- type is PCI Express Gen 4 x4
+    systemSlotIsPCIExpressGen4X8(188),          -- type is PCI Express Gen 4 x8
+    systemSlotIsPCIExpressGen4X16(189)          -- type is PCI Express Gen 4 x16
 }
 DellSystemSlotUsage                             ::= INTEGER {
     systemSlotUsageIsOther(1),                  -- usage is other than following values
     systemSlotUsageIsUnknown(2),                -- usage is unknown
     systemSlotUsageIsAvailable(3),              -- usage is available
-    systemSlotUsageIsInUse(4)                   -- usage is in use
+    systemSlotUsageIsInUse(4),                  -- usage is in use
+    systemSlotUsageIsUnAvailable(5)             -- usage is unavailable
 }
 DellSystemSlotLength                            ::= INTEGER {
     systemSlotLengthIsOther(1),                 -- length is other than following values
     systemSlotLengthIsUnknown(2),               -- length is unknown
     systemSlotLengthIsShort(3),                 -- length is Short
-    systemSlotLengthIsLong(4)                   -- length is Long
+    systemSlotLengthIsLong(4),                  -- length is Long
+    systemSlotLengthIs25dff(5),                 -- length is 2.5" drive form factor
+    systemSlotLengthIs35dff(6)                  -- length is 3.5" drive form factor
 }
 DellSystemSlotCategory                          ::= INTEGER {
     systemSlotCategoryIsOther(1),               -- category is other than following values
@@ -12244,7 +12385,7 @@ lRAGlobalSettingsCapabilitiesUnique             OBJECT-TYPE
     ACCESS      read-only
     STATUS      mandatory
     DESCRIPTION
-"1500.0010.0001.0004 This attribute defines the global settings capabilities 
+"1500.0010.0001.0004 This attribute defines the global settings capabilities
 that all Local Response Agents may or may not allow to be set or reset."
     ::= { lRAGlobalSettingsTableEntry 4 }
 lRAGlobalThermalShutdownCapabilitiesUnique      OBJECT-TYPE
@@ -12252,7 +12393,7 @@ lRAGlobalThermalShutdownCapabilitiesUnique      OBJECT-TYPE
     ACCESS      read-only
     STATUS      mandatory
     DESCRIPTION
-"1500.0010.0001.0005 This attribute defines the thermal shutdown capabilities 
+"1500.0010.0001.0005 This attribute defines the thermal shutdown capabilities
 of the Local Response Agent."
     ::= { lRAGlobalSettingsTableEntry 5 }
 lRAGlobalThermalShutdownStateSettingsUnique     OBJECT-TYPE
@@ -12260,7 +12401,7 @@ lRAGlobalThermalShutdownStateSettingsUnique     OBJECT-TYPE
     ACCESS      read-only
     STATUS      mandatory
     DESCRIPTION
-"1500.0010.0001.0006 This attribute defines the thermal shutdown settings 
+"1500.0010.0001.0006 This attribute defines the thermal shutdown settings
 of the Local Response Agent."
     ::= { lRAGlobalSettingsTableEntry 6 }
 
@@ -13789,20 +13930,24 @@ DellManagementControllerType                            ::= INTEGER {
 	vrtxCMC(18),                                         -- type is VRTX CMC
 	fx2CMC(19),                                          -- type is FX2 Family CMC
 	iDRAC8(32),                                          -- type is iDRAC8 Monolithic
-	iDRAC8Modular(33)                                    -- type is iDRAC8 Modular
+	iDRAC8Modular(33),                                    -- type is iDRAC8 Modular
+	iDRAC8DCS(34),                                       -- type is iDRAC8 DCS
+	iDRAC9(48),                                          -- type is iDRAC9 Monolithic
+	iDRAC9Modular(49),                                   -- type is iDRAC9 Modular
+	iDRAC9DCS(50)                                        -- type is iDRAC9 DCS
 }
 
-DellBladeFormFactorType                                 ::= INTEGER {  
-    formFactorTypeIsSingleWidthHalfHeight(1),            -- Form Factor Type is singleWidthHalfHeight 
+DellBladeFormFactorType                                 ::= INTEGER {
+    formFactorTypeIsSingleWidthHalfHeight(1),            -- Form Factor Type is singleWidthHalfHeight
     formFactorTypeIsDualWidthHalfHeight(2),              -- Form Factor Type is DualWidthHalfHeight
     formFactorTypeIsSingleWidthFullHeight(3),	         -- Form Factor Type is SingleWidthFullHeight
     formFactorTypeIsDualWidthFullHeight(4),	             -- Form Factor Type is DualWidthFullHeight
-    formFactorTypeIsSingleWidthQuarterHeight(5),	     -- Form Factor Type is SingleWidthQuarterHeight 
+    formFactorTypeIsSingleWidthQuarterHeight(5),	     -- Form Factor Type is SingleWidthQuarterHeight
     formFactorTypeIs1UHalfWidth(6),	                     -- Form Factor Type is 1UHalfWidth
     formFactorTypeIs1UQuarterWidth(7),	                 -- Form Factor Type is 1UQuarterWidth
     formFactorTypeIs1UFullWidth(8),	                     -- Form Factor Type is 1UFullWidth
     notApplicable(256)	                                 -- Form Factor Type is Not Applicable for the system
-	
+
 }
 
 
@@ -13820,7 +13965,7 @@ BmcTableEntry                                   ::= SEQUENCE {
     bmcModuleName                               DellString,
     bmcIPv4URLName                              DisplayString (SIZE (0..1024)),
     bmcIPv6URLName                              DisplayString (SIZE (0..1024)),
-	bmcBladeFormFactorName                      DellBladeFormFactorType 
+	bmcBladeFormFactorName                      DellBladeFormFactorType
 }
 
 bmcTable                                        OBJECT-TYPE
@@ -13946,9 +14091,9 @@ bmcBladeFormFactorName                                  OBJECT-TYPE
     STATUS      mandatory
     DESCRIPTION
 "1900.0010.0001.0014 This attribute defines Blade FormFactor."
-    ::= { bmcTableEntry 14 }	
-	
-	
+    ::= { bmcTableEntry 14 }
+
+
 
 
 -------------------------------------------------------------------------------
@@ -14368,6 +14513,26 @@ alertChassisServiceTag                          OBJECT-TYPE
 -------------------------------------------------------------------------------
 -- Miscellaneous Traps
 -------------------------------------------------------------------------------
+alertSystemHeartBeat                                   TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"The Dell OMSA Application generated a test trap."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Administrator has generated heart beat alert."
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1
 
 alertSystemUp                                   TRAP-TYPE
     ENTERPRISE  baseboardGroup
@@ -14494,6 +14659,69 @@ alertSystemSoftwareEvent                        TRAP-TYPE
     --#STATE      OPERATIONAL
 
     ::= 1014
+
+alertUnMonitoredSensorInfoEvent                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1018
+
+alertUnMonitoredSensorWarningEvent                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1019
+
+alertUnMonitoredSensorCriticalEvent                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1020
 
 -------------------------------------------------------------------------------
 -- Temperature Probe Traps
@@ -14894,6 +15122,73 @@ alertChassisIntrusionDetected                   TRAP-TYPE
     ::= 1254
 
 -------------------------------------------------------------------------------
+-- Drive Bay Intrusion Traps
+-------------------------------------------------------------------------------
+
+alertDriveBayIntrusionNormal                     TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Drive Bay intrusion has returned to normal."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1258
+
+alertDriveBayIntrusionDetected                     TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Drive Bay intrusion has been detected"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion detected"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1259
+
+alertDriveBayIntrusionDetectedExtended                 TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Drive Bay intrusion has been detected for extended period of time."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion Detected extended"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1261
+
+-------------------------------------------------------------------------------
 -- Redundancy Traps
 -------------------------------------------------------------------------------
 
@@ -15114,6 +15409,363 @@ alertMemoryDeviceNonRecoverable                 TRAP-TYPE
     --#STATE      DEGRADED
 
     ::= 1405
+
+alertMemoryDeviceNVDIMMPersistencyRestored        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Persistency Restored."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1425
+
+alertMemoryDeviceNVDIMMWarning                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVM Lifetime less than Five Percent."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device NonCritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1426
+
+alertMemoryDeviceNVDIMMNotReady                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Not Ready."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1427
+
+alertMemoryDeviceNVDIMMSaveError                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Save Error."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1428
+
+alertMemoryDeviceNVDIMMRestoreError                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Restore Error or Restore Timeout."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1429
+
+alertMemoryDeviceNVDIMMConfigErr                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device Illegal NVDIMM Configuration error."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1430
+
+alertMemoryDeviceNVDIMMNotResponding                           TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Not Responding."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1431
+
+alertMemoryDeviceNVDIMMArmFailure                               TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Arm Failure."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1432
+
+alertMemoryDeviceNVDIMMWriteProtectMode                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device all NVDIMMs in Write-Protect Mode."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1433
+
+alertMemoryDeviceNVMLifetimeExpired                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVM Lifetime Expired."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1434
+
+alertMemoryDeviceNVDIMMPersistencyLost                      TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Memory device NVDIMM Persistency Lost"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1435
+
+alertMemoryDeviceAEPWarning                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A Non-Critical event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device NonCritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1436
+
+alertMemoryDeviceAEPError                      TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A Critical event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1437
+
+alertMemoryDeviceAEPInfo        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An Information-Only event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device. The NVDIMM is operating normally."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1438
+
+alertMemorySelfhealInitiate                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"The memory health monitor feature has detected a degradation in the DIMM installed. Reboot system to initiate self-heal process."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1439
+
+alertMemoryDevicePPRSuccess                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"The self-heal operation successfully completed at DIMM."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1440
+
+alertMemoryDevicePPRFail                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Unable to complete the self-heal process of the memory in the DIMM because of internal issues."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1441
 
 -------------------------------------------------------------------------------
 -- Fan Enclosure Traps
@@ -15518,6 +16170,27 @@ alertBatteryFailure                             TRAP-TYPE
 
     ::= 1704
 
+alertBatteryAbsent                            TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"Battery has found to be Absent."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Battery Failure"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1706
+
 -------------------------------------------------------------------------------
 -- SD Card Device Traps
 -------------------------------------------------------------------------------
@@ -15563,7 +16236,515 @@ alertSDCardDeviceFailure                        TRAP-TYPE
     --#STATE      DEGRADED
 
     ::= 1754
-		
+
+-------------------------------------------------------------------------------
+-- Memory OEM Traps
+-------------------------------------------------------------------------------
+
+alertMemoryOEMNoAction                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An operation has completed successfully in the memory device. The server and device is operating normally."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1801
+
+alertMemoryOEMCheckConfigInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Check the device and system configuration."
+
+	--Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1802
+
+alertMemoryOEMReseatInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1803
+
+alertMemoryOEMWarmBootInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Perform a warm reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1804
+
+alertMemoryOEMColdBootInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Perform a cold reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1805
+
+alertMemoryOEMRetryInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Retry operation."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1806
+
+alertMemoryOEMSecureEraseInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. The device is cryptographically locked."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1807
+
+alertMemoryOEMUnknownInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An unknown diagnostic event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 1808
+
+alertMemoryOEMCheckConfigWarn	                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Check the device and system configuration."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1809
+
+alertMemoryOEMReseatWarn                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1810
+
+alertMemoryOEMColdBootWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Perform a cold reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1811
+
+alertMemoryOEMContactSupportRepWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Contact service provider if issue persists."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1812
+
+alertMemoryOEMRetryWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Retry operation."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1813
+
+alertMemoryOEMUpdateFrmwareWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Update device firmware."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1814
+
+alertMemoryOEMContactSupportImmWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Contact your service provider for assistance in replacing the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1815
+
+alertMemoryOEMUnknownWarn                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An unknown diagnostic warning event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Non-Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 1816
+
+alertMemoryOEMCheckConfigCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Check the device and system configuration."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1817
+
+alertMemoryOEMReseatCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1818
+
+alertMemoryOEMColdBootCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Perform a cold reboot. "
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1819
+
+alertMemoryOEMRetryCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Retry operation. "
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1820
+
+alertMemoryOEMSantizeCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Sanitize the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1821
+
+alertMemoryOEMUpdateFirwareCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Update device firmware."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1822
+
+alertMemoryOEMContactSupportImmCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Contact your service provider for assistance in replacing the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1823
+
+alertMemoryOEMUnknownCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An unknown critical diagnostic event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 1824
+
 -------------------------------------------------------------------------------
 --
 -- Enhanced Traps
@@ -15724,6 +16905,81 @@ enhancedAlertSystemSoftwareEvent                        TRAP-TYPE
     --#STATE      OPERATIONAL
 
     ::= 5014
+
+enhancedAlertUnMonitoredSensorInfoEvent                 TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5015
+
+enhancedAlertUnMonitoredSensorWarningEvent              TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5016
+
+enhancedAlertUnMonitoredSensorCriticalEvent             TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An Event has generated from UnMonitored Sensors."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server UnMonitored Sensor Event"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5017
 
 -------------------------------------------------------------------------------
 -- Temperature Probe Traps
@@ -16196,6 +17452,85 @@ enhancedAlertChassisIntrusionDetected                   TRAP-TYPE
     ::= 5254
 
 -------------------------------------------------------------------------------
+-- Drive Bay Intrusion Traps
+-------------------------------------------------------------------------------
+
+enhancedAlertDriveBayIntrusionNormal                     TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Drive Bay intrusion has returned to normal."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5258
+
+enhancedAlertDriveBayIntrusionDetected                     TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Drive Bay intrusion has been detected."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion detected"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5259
+
+enhancedAlertDriveBayIntrusionDetectedExtended                   TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Drive Bay intrusion has been detected for extended period of time."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Drive Bay Intrusion Detected Extended"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5261
+
+-------------------------------------------------------------------------------
 -- Redundancy Traps
 -------------------------------------------------------------------------------
 
@@ -16456,6 +17791,431 @@ enhancedAlertMemoryDeviceNonRecoverable                 TRAP-TYPE
     --#STATE      DEGRADED
 
     ::= 5405
+
+enhancedAlertMemoryDeviceNVDIMMPersistencyRestored        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Persistency Restored."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5425
+
+enhancedAlertMemoryDeviceNVDIMMWarning                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVM Lifetime less than Five Percent."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device NonCritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5426
+
+enhancedAlertMemoryDeviceNVDIMMNotReady                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Not Ready."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5427
+
+enhancedAlertMemoryDeviceNVDIMMSaveError                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Save Error."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5428
+
+enhancedAlertMemoryDeviceNVDIMMRestoreError                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Restore Error or Restore Timeout."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5429
+
+enhancedAlertMemoryDeviceNVDIMMConfigErr                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device Illegal NVDIMM Configuration error."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5430
+
+enhancedAlertMemoryDeviceNVDIMMNotResponding                           TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Not Responding."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5431
+
+enhancedAlertMemoryDeviceNVDIMMArmFailure                               TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Arm Failure."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5432
+
+enhancedAlertMemoryDeviceNVDIMMWriteProtectMode                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device all NVDIMMs in Write-Protect Mode."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5433
+
+enhancedAlertMemoryDeviceNVMLifetimeExpired                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVM Lifetime Expired."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5434
+
+enhancedAlertMemoryDeviceNVDIMMPersistencyLost                      TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Memory device NVDIMM Persistency Lost"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5435
+
+enhancedAlertMemoryDeviceAEPError                      TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A Critical event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5436
+
+enhancedAlertMemoryDeviceAEPWarning                    TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A Non-Critical event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device"
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device NonCritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5437
+
+enhancedAlertMemoryDeviceAEPInfo        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An Information-Only event was detected on the Non-Volatile Dual In-line Memory Module NVDIMM device. The NVDIMM is operating normally."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5438
+
+enhancedAlertMemorySelfhealInitiate                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"The memory health monitor feature has detected a degradation in the DIMM installed. Reboot system to initiate self-heal process."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5439
+
+enhancedAlertMemoryDevicePPRSuccess                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"The self-heal operation successfully completed at DIMM."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5440
+
+enhancedAlertMemoryDevicePPRFail                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Unable to complete the self-heal process of the memory in the DIMM installed because of internal issues."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5441
 
 -------------------------------------------------------------------------------
 -- Fan Enclosure Traps
@@ -16932,6 +18692,31 @@ enhancedAlertBatteryFailure                             TRAP-TYPE
 
     ::= 5704
 
+enhancedAlertBatteryAbsent                             TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"Battery has found to be Absent."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Battery Failure"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5706
+
 -------------------------------------------------------------------------------
 -- SD Card Device Traps
 -------------------------------------------------------------------------------
@@ -16986,6 +18771,545 @@ enhancedAlertSDCardDeviceFailure                        TRAP-TYPE
 
     ::= 5754
 
+-------------------------------------------------------------------------------
+-- Memory OEM Traps
+-------------------------------------------------------------------------------
+
+enhancedAlertMemoryOEMNoAction                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An operation has completed successfully in the memory device. The server and device is operating normally."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5801
+
+enhancedAlertMemoryOEMCheckConfigInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Check the device and system configuration."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5802
+
+enhancedAlertMemoryOEMReseatInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5803
+
+enhancedAlertMemoryOEMWarmBootInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Perform a warm reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5804
+
+enhancedAlertMemoryOEMColdBootInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Perform a cold reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5805
+
+enhancedAlertMemoryOEMRetryInfo                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. Retry operation."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5806
+
+enhancedAlertMemoryOEMSecureEraseInfo                      TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"A diagnostic event occurred in the memory device. The device is cryptographically locked."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5807
+
+enhancedAlertMemoryOEMUnknownInfo                         TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData,
+                alertMsgID,
+                alertSystemFQDN,
+                alertServiceTag,
+                alertChassisServiceTag }
+    DESCRIPTION
+"An unknown diagnostic event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Normal"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   INFORMATIONAL
+    --#TIMEINDEX  99
+    --#STATE      OPERATIONAL
+
+    ::= 5808
+
+enhancedAlertMemomoryOEMCheckConfigWarning                          TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Check the device and system configuration."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5809
+
+enhancedAlertMemomoryOEMReseatWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5810
+
+enhancedAlertMemomoryOEMColdBootWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Perform a cold reboot."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5811
+
+enhancedAlertMemomoryOEMContactServiceWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Contact service provider if issue persists."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5812
+
+enhancedAlertMemomoryOEMRetryWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Retry operation."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5813
+
+enhancedAlertMemomoryOEMUpdateFirmwareWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Update device firmware. "
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5814
+
+enhancedAlertMemomoryContactAssistanceWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A diagnostic warning event occurred in the memory device. Contact your service provider for assistance in replacing the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5815
+
+enhancedAlertMemomoryOEMUnknownWarning                        TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An unknown diagnostic warning event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Noncritical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   MINOR
+    --#TIMEINDEX  99
+    --#STATE      DEGRADED
+
+    ::= 5816
+
+enhancedAlertMemoryOEMCheckConfigCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Check the device and system configuration."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5817
+
+enhancedAlertMemoryOEMReseatCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Reseat the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5818
+
+enhancedAlertMemoryOEMColdBootCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Perform a cold reboot. "
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5819
+
+enhancedAlertMemoryOEMRetryCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Retry operation. "
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5820
+
+enhancedAlertMemoryOEMSantizeCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+" A critical diagnostic event occurred in the memory device. Sanitize the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5821
+
+enhancedAlertMemoryOEMUpdateFirwareCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Update device firmware."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5822
+
+enhancedAlertMemoryOEMContactSupportImmCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"A critical diagnostic event occurred in the memory device. Contact your service provider for assistance in replacing the device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5823
+
+enhancedAlertMemoryOEMUnknownCrit                       TRAP-TYPE
+    ENTERPRISE  baseboardGroup
+    VARIABLES { alertSystem,
+                alertTableIndexOID,
+                alertMessage,
+                alertCurrentStatus,
+                alertPreviousStatus,
+                alertData }
+    DESCRIPTION
+"An unknown critical diagnostic event occurred in the memory device."
+
+    --Novell NMS trap annotation
+    --#TYPE       "Server Memory Device Critical"
+    --#SUMMARY    "%s"
+    --#ARGUMENTS  {2}
+    --#SEVERITY   CRITICAL
+    --#TIMEINDEX  99
+    --#STATE      NONOPERATIONAL
+
+    ::= 5824
 
 END
 

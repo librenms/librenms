@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"l2_errors\":0}",
+                    "data": "{\"pools\":[\"arc\"],\"health\":1,\"version\":3,\"l2_errors\":0,\"status_info\":[]}",
                     "deleted_at": null
                 }
             ],
@@ -575,6 +575,48 @@
                     "app_type": "zfs"
                 },
                 {
+                    "metric": "pool_arc_asyncq_read_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_read_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_wait_w",
+                    "value": 17281,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_write_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_asyncq_write_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_bandwidth_r",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_bandwidth_w",
+                    "value": 38581,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
                     "metric": "pool_arc_cap",
                     "value": 89,
                     "value_prev": null,
@@ -583,6 +625,18 @@
                 {
                     "metric": "pool_arc_dedup",
                     "value": 1,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_disk_wait_r",
+                    "value": 18242723,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_disk_wait_w",
+                    "value": 9848678,
                     "value_prev": null,
                     "app_type": "zfs"
                 },
@@ -605,8 +659,104 @@
                     "app_type": "zfs"
                 },
                 {
+                    "metric": "pool_arc_operations_r",
+                    "value": 1598220898304,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_operations_w",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrub_wait",
+                    "value": 10815869,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrubq_read_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_scrubq_read_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
                     "metric": "pool_arc_size",
                     "value": 15942918602752,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_read_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_read_p",
+                    "value": 72190097,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_wait_r",
+                    "value": 1543973,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_wait_w",
+                    "value": 1314010,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_write_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_syncq_write_p",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_total_wait_r",
+                    "value": 108022,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_total_wait_w",
+                    "value": 11548127,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_trim_wait",
+                    "value": 17539772,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_trimq_write_a",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "zfs"
+                },
+                {
+                    "metric": "pool_arc_trimq_write_p",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "zfs"
                 },

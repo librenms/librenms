@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /*
  * Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -33,10 +34,18 @@ use LibreNMS\Util\Debug;
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('d::');
+$options = getopt('fd::');
 
 if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
+}
+
+$scheduler = \LibreNMS\Config::get('schedule_type.alerting');
+if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+    if (Debug::isEnabled()) {
+        echo "Alerts are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
+    }
+    exit(0);
 }
 
 $alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));

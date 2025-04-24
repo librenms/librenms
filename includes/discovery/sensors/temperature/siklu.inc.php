@@ -14,5 +14,5 @@ if (! empty($oids)) {
     [,$current] = explode(' ', $oids);
     $index = $oid;
     $descr = 'System Temp';
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(null, 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }

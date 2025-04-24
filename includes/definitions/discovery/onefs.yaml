@@ -1,3 +1,12 @@
 modules:
-  os:
-    sysDescr_regex: '/Isilon OneFS (?<version>\S+)( (?<hardware>\S+)\(RELEASE\))?/'
+    os:
+        sysDescr_regex: '/Isilon OneFS (?<version>\S+)( (?<hardware>\S+)\(RELEASE\))?/'
+    storage:
+        data:
+            -
+                type: ifs
+                descr: Internal File System
+                size: ISILON-MIB::ifsTotalBytes.0
+                free: ISILON-MIB::ifsAvailableBytes.0
+                free_num_oid: '.1.3.6.1.4.1.12124.1.3.3.0'
+                units: 1024

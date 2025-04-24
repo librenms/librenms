@@ -19,7 +19,7 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
             if ($port['ifAdminStatus'] == 'up') {
-                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+                discover_sensor(null, 'dbm', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
             }
         }
         if (($key == 'rxPower') && is_numeric($value['raisecomOpticalTransceiverParameterValue']) && ($value['raisecomOpticalTransceiverDDMValidStatus'] != 0)) {
@@ -35,7 +35,7 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
             if ($port['ifAdminStatus'] == 'up') {
-                discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'rx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+                discover_sensor(null, 'dbm', $device, $oid, 'rx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
             }
         }
     }

@@ -32,6 +32,7 @@ return [
             'ldap' => ['name' => 'LDAP Settings'],
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
+            'http' => ['name' => 'HTTP Auth Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -40,9 +41,9 @@ return [
             'general' => ['name' => 'General Discovery Settings'],
             'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
+            'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
-            'networks' => ['name' => 'Networks'],
         ],
         'external' => [
             'binaries' => ['name' => 'Binary Locations'],
@@ -67,17 +68,20 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
+            'dispatcherservice' => ['name' => 'Dispatcher Service'],
             'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
+            'scheduledtasks' => ['name' => 'Scheduled Tasks'],
             'server' => ['name' => 'Server'],
             'reporting' => ['name' => 'Reporting'],
         ],
         'webui' => [
             'availability-map' => ['name' => 'Availability Map Settings'],
+            'custom-map' => ['name' => 'Custom Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
             'dashboard' => ['name' => 'Dashboard Settings'],
             'port-descr' => ['name' => 'Interface Description Parsing'],
@@ -91,7 +95,7 @@ return [
         'active_directory' => [
             'users_purge' => [
                 'description' => 'Keep inactive users for',
-                'help' => 'Users will be deleted from LibreNMS after this may days of not logging in. 0 means never and users will be recreated if the user logs back in.',
+                'help' => 'Users will be deleted from LibreNMS after this many days of not logging in. 0 means never and users will be recreated if the user logs back in.',
             ],
         ],
         'addhost_alwayscheckip' => [
@@ -451,6 +455,10 @@ return [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
         ],
+        'auth_ldap_userlist_filter' => [
+            'description' => 'Custom LDAP User filter',
+            'help' => 'Custom ldap filter to limit the number of responses if you have an ldap directory with thousand of users',
+        ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
             'help' => 'Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix',
@@ -497,6 +505,94 @@ return [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
+        'custom_map' => [
+            'background_type' => [
+                'description' => 'Background Type',
+                'help' => 'Default background type for new maps. Requires background data set.',
+            ],
+            'background_data' => [
+                'color' => [
+                    'description' => 'Background Color',
+                    'help' => 'Initial color for map background',
+                ],
+                'lat' => [
+                    'description' => 'Background Map Lattitude',
+                    'help' => 'Initial lattitude for background geo map',
+                ],
+                'lng' => [
+                    'description' => 'Background Map Longitude',
+                    'help' => 'Initial longitude for background geo map',
+                ],
+                'layer' => [
+                    'description' => 'Background Map Layer',
+                    'help' => 'Initial map layer for background geo map',
+                ],
+                'zoom' => [
+                    'description' => 'Background Map Zoom',
+                    'help' => 'Initial map zoom for background geo map',
+                ],
+            ],
+            'edge_font_color' => [
+                'description' => 'Edge Text Color',
+                'help' => 'Default font color for edge labels',
+            ],
+            'edge_font_face' => [
+                'description' => 'Edge Font',
+                'help' => 'Default font face for edge labels',
+            ],
+            'edge_font_size' => [
+                'description' => 'Edge Text Size',
+                'help' => 'Default font size for edge labels',
+            ],
+            'edge_seperation' => [
+                'description' => 'Edge Seperation',
+                'help' => 'Default edge seperation for new maps',
+            ],
+            'height' => [
+                'description' => 'Map Height',
+                'help' => 'Default map height for new maps',
+            ],
+            'node_align' => [
+                'description' => 'Node Alignment',
+                'help' => 'Default node aligment for new maps',
+            ],
+            'node_background' => [
+                'description' => 'Node Background',
+                'help' => 'Default background color for node labels',
+            ],
+            'node_border' => [
+                'description' => 'Node Border',
+                'help' => 'Default border color for node labels',
+            ],
+            'node_font_color' => [
+                'description' => 'Node Text Color',
+                'help' => 'Default font color for node labels',
+            ],
+            'node_font_face' => [
+                'description' => 'Node Font',
+                'help' => 'Default font for node labels',
+            ],
+            'node_font_size' => [
+                'description' => 'Node Text Size',
+                'help' => 'Default font size for node labels',
+            ],
+            'node_size' => [
+                'description' => 'Node Size',
+                'help' => 'Default size for nodes',
+            ],
+            'node_type' => [
+                'description' => 'Node Display Type',
+                'help' => 'Default display type for nodes',
+            ],
+            'reverse_arrows' => [
+                'description' => 'Reverse Edge Arrows',
+                'help' => 'Default arrow direction. Towards center (default) or towards ends',
+            ],
+            'width' => [
+                'description' => 'Map Width',
+                'help' => 'Default map width for new maps',
+            ],
+        ],
         'customers_descr' => [
             'description' => 'Customer Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
@@ -514,9 +610,6 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
@@ -597,6 +690,10 @@ return [
                 'description' => 'Processors',
             ],
 
+            'qos' => [
+                'description' => 'QoS',
+            ],
+
             'route' => [
                 'description' => 'Route',
             ],
@@ -656,6 +753,14 @@ return [
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
+        ],
+        'email_smtp_verifypeer' => [
+            'description' => 'Verify peer certificate',
+            'help' => 'Do not verify peer certificate when connecting to SMTP server via TLS',
+        ],
+        'email_smtp_allowselfsigned' => [
+            'description' => 'Allow self-signed certificate',
+            'help' => 'Allow self-signed certificate when connecting to SMTP server via TLS',
         ],
         'email_attach_graphs' => [
             'description' => 'Attach graph images',
@@ -866,6 +971,10 @@ return [
             'description' => 'Field name containing username',
             'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
+        'http_auth_guest' => [
+            'description' => 'Http Auth guest user',
+            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
+        ],
         'http_proxy' => [
             'description' => 'HTTP Proxy',
             'help' => 'Set this as a fallback if http_proxy environment variable is not available.',
@@ -978,7 +1087,34 @@ return [
                 'description' => 'Allow Redirects',
                 'help' => 'To allow redirect from the InfluxDB server',
             ],
-
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
+            'log_file' => [
+                'description' => 'Log file',
+                'help' => 'Define another log file if wanted for the debug',
+            ],
+            'groups-exclude' => [
+                'description' => 'Excluded device groups',
+                'help' => 'Device groups excluded from sending data to InfluxDBv2',
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'Timeout in seconds',
+            ],
+            'verify' => [
+                'description' => 'Verify',
+                'help' => 'Verify the certificate',
+            ],
+            'batch_size' => [
+                'description' => 'Batch size',
+                'help' => 'How many metrics should be bundled before sending',
+            ],
+            'max_retry' => [
+                'description' => 'Max retry',
+                'help' => 'How many reties we should try',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
@@ -1007,6 +1143,14 @@ return [
             'description' => 'Display network links on the map',
             'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)',
         ],
+        'network_map_worldmap_show_disabled_alerts' => [
+            'description' => 'Show devices with alerts disabled',
+            'help' => 'Show devices on the network map that have alerts disabled',
+        ],
+        'network_map_worldmap_link_type' => [
+            'description' => 'Network map source',
+            'help' => 'Choose the source of data for the network map links',
+        ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
             'help' => 'Enable Integration with NfSen',
@@ -1032,7 +1176,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [
@@ -1173,6 +1317,9 @@ return [
             'ipmi' => [
                 'description' => 'IPMI',
             ],
+            'qos' => [
+                'description' => 'QoS',
+            ],
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -1215,6 +1362,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1241,15 +1391,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Cisco ACE Serverfarms',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Cisco ASA Firewall',
-            ],
-            'cisco-voice' => [
-                'description' => 'Cisco Voice',
-            ],
-            'cisco-cbqos' => [
-                'description' => 'Cisco CBQOS',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1357,9 +1498,41 @@ return [
             'help' => 'Networks from which devices will be discovered automatically.',
         ],
         'autodiscovery' => [
+            'bgp' => [
+                'description' => 'Enable BGP neighbor discovery',
+                'help' => 'Add links and neighbors based on BGP peers',
+            ],
+            'cdp_exclude' => [
+                'platform_regexp' => [
+                    'description' => 'CDP exclude platform regex',
+                    'help' => 'Prevent devices from being added by CDP if sysName matches regular expression',
+                ],
+            ],
             'nets-exclude' => [
                 'description' => 'Networks/IPs to be ignored',
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
+            'ospf' => [
+                'description' => 'Enable OSPF neighbor discovery',
+                'help' => 'Add links and neighbors based on OSPF peers',
+            ],
+            'ospfv3' => [
+                'description' => 'Enable OSPFv3 neighbor discovery',
+                'help' => 'Add links and neighbors based on OSPFv3 peers',
+            ],
+            'xdp' => [
+                'description' => 'Enable xDP discovery protocols',
+                'help' => 'Use LLDP, CDP, etc protocols to discover network topology and neighbors and add them to LibreNMS',
+            ],
+            'xdp_exclude' => [
+                'sysname_regexp' => [
+                    'description' => 'xDP exclude sysName regex',
+                    'help' => 'Prevent devices from being added if sysName matches regular expression',
+                ],
+                'sysdesc_regexp' => [
+                    'description' => 'xDP exclude sysDescr regex',
+                    'help' => 'Prevent devices from being added if sysDescr matches regular expression',
+                ],
             ],
         ],
         'radius' => [
@@ -1429,9 +1602,62 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
-        'service_poller_enabled' => [
-            'description' => 'Enable Polling',
-            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        'schedule_type' => [
+            'alerting' => [
+                'description' => 'Alerting',
+                'help' => 'Alerting task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'billing' => [
+                'description' => 'Billing',
+                'help' => 'Billing task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_billing_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (poll-billing.php and billing-calculate.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'discovery' => [
+                'description' => 'Discovery',
+                'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (discovery.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'ping' => [
+                'description' => 'Fast Ping',
+                'help' => 'Fast ping task scheduling method. Legacy will use cron if the crontab entry exists and use the dispatcher service if the legacy config option service_ping_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'disabled' => 'Disabled (pings only during polling)',
+                    'cron' => 'Cron (ping.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'poller' => [
+                'description' => 'Poller',
+                'help' => 'Poller task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_poller_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (poller.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
+            'services' => [
+                'description' => 'Services',
+                'help' => 'Services task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_services_enabled is set to true.',
+                'options' => [
+                    'legacy' => 'Legacy (Unrestricted)',
+                    'cron' => 'Cron (check-services.php)',
+                    'dispatcher' => 'Dispatcher Service',
+                ],
+            ],
         ],
         'service_master_timeout' => [
             'description' => 'Master Dispatcher Timeout',
@@ -1449,10 +1675,6 @@ return [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
         ],
-        'service_discovery_enabled' => [
-            'description' => 'Discovery Enabled',
-            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
-        ],
         'service_discovery_workers' => [
             'description' => 'Discovery Workers',
             'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
@@ -1460,10 +1682,6 @@ return [
         'service_discovery_frequency' => [
             'description' => 'Discovery Frequency',
             'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
-        ],
-        'service_services_enabled' => [
-            'description' => 'Services Enabled',
-            'help' => 'Enable services workers. Sets the default value for all nodes.',
         ],
         'service_services_workers' => [
             'description' => 'Services Workers',
@@ -1473,10 +1691,6 @@ return [
             'description' => 'Services Frequency',
             'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
         ],
-        'service_billing_enabled' => [
-            'description' => 'Billing Enabled',
-            'help' => 'Enable billing workers. Sets the default value for all nodes.',
-        ],
         'service_billing_frequency' => [
             'description' => 'Billing Frequency',
             'help' => 'How often to collect billing data. Sets the default value for all nodes.',
@@ -1485,17 +1699,9 @@ return [
             'description' => 'Billing Calculate Frequency',
             'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
         ],
-        'service_alerting_enabled' => [
-            'description' => 'Alerting Enabled',
-            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
-        ],
         'service_alerting_frequency' => [
             'description' => 'Alerting Frequency',
             'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
-        ],
-        'service_ping_enabled' => [
-            'description' => 'Fast Ping Enabled',
-            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
         ],
         'service_update_enabled' => [
             'description' => 'Daily Maintenance Enabled',
@@ -1511,11 +1717,15 @@ return [
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
-            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+            'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated. Sets the default value for all nodes.',
         ],
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+        ],
+        'service_health_file' => [
+            'description' => 'Service Health File',
+            'help' => 'Path to health file to ensure the dispatcher service is running',
         ],
         'sfdp' => [
             'description' => 'Path to sfdp',
@@ -1667,7 +1877,7 @@ return [
         ],
         'uptime_warning' => [
             'description' => 'Show Device as warning if Uptime below (seconds)',
-            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h',
+            'help' => 'Shows Device as warning if Uptime is below this value. Custom maps status will reflect this setting. 0 disables warning. Default 24h',
         ],
         'virsh' => [
             'description' => 'Path to virsh',
@@ -1735,6 +1945,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
+        ],
+        'device_location_map_show_devices' => [
+            'description' => 'Show devices on location map',
+            'help' => 'Show all devices on the location map when it is visible',
+        ],
+        'device_location_map_show_device_dependencies' => [
+            'description' => 'Show devices dependecies on location map',
+            'help' => 'Show links between devices on the location map based on parent dependencies',
         ],
         'whois' => [
             'description' => 'Path to whois',
