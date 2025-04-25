@@ -406,7 +406,7 @@ function list_devices(Illuminate\Http\Request $request)
         $cols = explode(',', $request->get('columns'));
         foreach ($devices as &$device) {
             foreach ($device as $key => $value) {
-                if (!in_array($key, $cols)) {
+                if (! in_array($key, $cols)) {
                     unset($device[$key]);
                 }
             }
