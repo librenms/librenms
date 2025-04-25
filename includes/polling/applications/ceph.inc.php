@@ -20,6 +20,7 @@ if (! empty($agent_data['app'][$name])) {
 // Exit if no data is available
 if (empty($ceph_data)) {
     echo "No Ceph data available.\n";
+
     return;
 }
 
