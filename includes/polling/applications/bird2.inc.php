@@ -173,8 +173,8 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received']);
     $bgpPeer->bgpPeerOutTotalMessages = intval($protocol['route_change_stats']['export_updates']['received']);
 
-    $bgpPeer->bgpPeerFsmEstablishedTime = Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now());
-    $bgpPeer->bgpPeerInUpdateElapsedTime = Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now());
+    $bgpPeer->bgpPeerFsmEstablishedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
+    $bgpPeer->bgpPeerInUpdateElapsedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
     $bgpPeer->save();
 
     echo PHP_EOL . $name . ': Processed peer AS' . $bgpPeer->bgpPeerRemoteAs . ' (' . $bgpPeer->astext . ')';

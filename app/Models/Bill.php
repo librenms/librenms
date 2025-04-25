@@ -50,7 +50,9 @@ class Bill extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function ports(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'bill_ports', 'bill_id', 'port_id');

@@ -56,6 +56,13 @@ class HealthCheck extends Command
             if (getenv('SIDECAR_DISPATCHER')) {
                 // check dispatcher
                 $health_file = \LibreNMS\Config::get('service_health_file');
+
+                if (! $health_file) {
+                    $this->warn('Dispatcher service health file not enabled, set service_health_file');
+
+                    return 0;
+                }
+
                 if (! file_exists($health_file)) {
                     $this->error('Dispatcher service not started yet');
 
