@@ -104,6 +104,15 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="temp_units" class="col-sm-4 control-label">{{ __('Temperature Units') }}</label>
+                <div class="col-sm-4">
+                    <select class="form-control ajax-select" name="temperature" data-pref="temp_units" data-previous="{{ $temp_units }}">
+                        <option value="default">{{ __('Celsius') }}</option>
+                        <option value="f" @if($temp_units == 'f') selected @endif>{{ __('Fahrenheit') }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
@@ -187,7 +196,7 @@
     @endconfig
 
     <x-panel title="{{ __('Roles') }}">
-        @forelse(auth()->user()->roles->pluck('title') as $role)
+        @forelse($user->roles->map(fn($r) => Str::title(str_replace('-', ' ', $r->name))) as $role)
             <span class="label label-info tw:mr-1">{{ $role }}</span>
         @empty
             <strong class="red">{{ __('No roles!') }}</strong>
@@ -195,9 +204,9 @@
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @if(auth()->user()->hasGlobalAdmin())
+        @if($user->can('global-admin'))
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseif(auth()->user()->hasGlobalRead())
+        @elseif($user->can('global-read'))
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)

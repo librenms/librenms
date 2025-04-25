@@ -4,6 +4,8 @@ text: 'HP Print server'
 ifname: true
 type: printer
 icon: hp
+mib_dir: hp
+snmp_bulk: false
 over:
     - { graph: device_toner, text: Toner }
 discovery_modules:
@@ -15,6 +17,7 @@ discovery:
         sysDescr:
             - JETDIRECT
             - HP ETHERNET MULTI-ENVIRONMENT
+            - HP Laser MFP
     -
         sysObjectID_regex:
             - '/^.1.3.6.1.4.1.11.1$/'

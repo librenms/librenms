@@ -62,6 +62,9 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         return $query->whereIn('vmwVmDisplayName', $where);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Device, $this>
+     */
     public function parentDevice(): HasOne
     {
         return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');

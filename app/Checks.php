@@ -44,7 +44,7 @@ class Checks
     public static function postAuth()
     {
         // limit popup messages frequency
-        if (Cache::get('checks_popup_timeout') || ! Auth::check()) {
+        if (! Auth::check() || Cache::get('checks_popup_timeout')) {
             return;
         }
 
