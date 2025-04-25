@@ -13,16 +13,16 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
           -
-            php-version: 8.3
+            php-version: 8.4
             name: Unit
             skip-web-check: 1
-            database: mariadb:10.5
+            database: mariadb:11.7
           -
             php-version: 8.2
             name: Unit
