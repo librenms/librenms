@@ -3,11 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Route extends DeviceRelatedModel
+class Route extends PortRelatedModel implements Keyable
 {
     protected $table = 'route';
     protected $primaryKey = 'route_id';
+    protected $fillable = [
+        'created_at',
+        'updated_at',
+        'device_id',
+        'port_id',
+        'context_name',
+        'inetCidrRouteIfIndex',
+        'inetCidrRouteType',
+        'inetCidrRouteProto',
+        'inetCidrRouteNextHopAS',
+        'inetCidrRouteMetric1',
+        'inetCidrRouteDestType',
+        'inetCidrRouteDest',
+        'inetCidrRouteNextHopType',
+        'inetCidrRouteNextHop',
+        'inetCidrRoutePolicy',
+        'inetCidrRoutePfxLen',
+    ];
+
     public static $translateProto = [
         'undefined',
         'other',
@@ -48,5 +68,10 @@ class Route extends DeviceRelatedModel
     public function port(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'port_id', 'port_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return $this->device_id . '-' . $this->route_id;
     }
 }
