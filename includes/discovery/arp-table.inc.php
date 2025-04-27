@@ -58,7 +58,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
         $port_arp = array_merge(
             Arr::wrap($data['IP-MIB::ipNetToMediaPhysAddress'] ?? []),
-            isset($data['IP-MIB::ipNetToPhysicalPhysAddress']) && is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
+            (! empty($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4']) && is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'])) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : [],
         );
 
         echo "{$interface['ifName']}: \n";
