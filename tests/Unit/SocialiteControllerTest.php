@@ -81,7 +81,6 @@ class SocialiteControllerTest extends TestCase
         // Invoke the private method with the chosen provider.
         $method = $reflectionClass->getMethod('setRolesFromClaim');
         $method->setAccessible(true);
-
         return $method->invokeArgs($controller, [$provider, $userMock]);
     }
 
@@ -161,7 +160,6 @@ class SocialiteControllerTest extends TestCase
                 'G_librenms_users' => ['roles' => ['global-read']],
             ]
         );
-
         $this->assertTrue($result);
     }
 
@@ -188,7 +186,6 @@ class SocialiteControllerTest extends TestCase
                 'G_librenms_users' => ['roles' => ['global-read']],
             ]
         );
-
         $this->assertTrue($result);
     }
 }
