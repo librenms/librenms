@@ -139,7 +139,7 @@ class User extends Authenticatable
             'total' => $this->notifications()->count(),
             'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
             'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
-            'sticky' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1))->get(),
+            'sticky' => Notification::leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', '=', 'notifications.notifications_id')->where('key', 'sticky')->where('value', 1)->get(),
             'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
             default => $this->notifications,
         };
