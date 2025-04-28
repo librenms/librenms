@@ -36,47 +36,56 @@ class SocialiteControllerTest extends TestCase
     /**
      * Helper to test setRolesFromClaim().
      *
-     * @param  array  $rawAttributes  The simulated raw user data from getRaw().
-     * @param  array  $expectedRoles  The roles expected to be passed to syncRoles().
+     * @param string $provider      The Socialite provider name (e.g. 'okta' or 'saml2')
+     * @param array  $rawAttributes The simulated raw user data from getRaw().
+     * @param array  $expectedRoles The roles expected to be passed to syncRoles() - the expected returns
+     * @param array  $claimMap      A map of claim-values to roles (config for auth.socialite.claims).
+     * @param array  $scopes        Optional scopes config; defaults to ['groups'].
+     *
      * @return bool The return value from setRolesFromClaim().
      */
-    private function runSetRolesFromClaimTest(array $rawAttributes, array $expectedRoles): bool
-    {
-        // Set the simulated configuration values.
-        \LibreNMS\Config::set('auth.socialite.scopes', ['groups']);
-        \LibreNMS\Config::set('auth.socialite.claims', [
-            'Example-Admin-Group' => ['roles' => ['admin']],
-            'Example-ReadOnly-Group' => ['roles' => ['global-read']],
-        ]);
+    private function runSetRolesFromClaimTest(
+        string $provider,
+        array $rawAttributes,
+        array $expectedRoles,
+        array $claimMap,
+        array $scopes = ['groups']
+    ): bool {
+        // Inject scopes & claims.
+        \LibreNMS\Config::set('auth.socialite.scopes', $scopes);
+        \LibreNMS\Config::set('auth.socialite.claims', $claimMap);
+        \LibreNMS\Config::set('auth.socialite.debug', false);
 
-        // Create a stub for the Socialite user so that getRaw() returns our provided raw attributes.
+        // Stub the Socialite user.
         $socialiteUserStub = $this->createMock(AbstractUser::class);
-        $socialiteUserStub->method('getRaw')->willReturn($rawAttributes);
+        $socialiteUserStub
+            ->method('getRaw')
+            ->willReturn($rawAttributes);
 
-        // Instantiate the controller and inject the Socialite user stub into its private property.
-        $controller = new SocialiteController();
-        $reflectionController = new \ReflectionClass($controller);
-        $socialiteUserProp = $reflectionController->getProperty('socialite_user');
-        $socialiteUserProp->setAccessible(true);
-        $socialiteUserProp->setValue($controller, $socialiteUserStub);
+        // Make the SocialiteController private bits accessable via reflection.
+        $controller      = new SocialiteController();
+        $reflectionClass = new \ReflectionClass($controller);
+        $prop            = $reflectionClass->getProperty('socialite_user');
+        $prop->setAccessible(true);
+        $prop->setValue($controller, $socialiteUserStub);
 
-        // Create a mock for the User model.
+        // Stub the User model and assert syncRoles().
         $userMock = $this->getMockBuilder(User::class)
             ->onlyMethods(['syncRoles'])
             ->getMock();
 
-        // Set expectation: syncRoles should be called exactly once with the expected roles.
+        // we expect syncRoles is called once with our expected roles.
         $userMock->expects($this->once())
             ->method('syncRoles')
             ->with($expectedRoles);
 
-        // Get access to the private method setRolesFromClaim() via reflection.
-        $method = $reflectionController->getMethod('setRolesFromClaim');
+        // Invoke the private method with the chosen provider.
+        $method = $reflectionClass->getMethod('setRolesFromClaim');
         $method->setAccessible(true);
 
-        // Call the method (the provider name "okta" is arbitrary here) and return its result.
-        return $method->invokeArgs($controller, ['okta', $userMock]);
+        return $method->invokeArgs($controller, [$provider, $userMock]);
     }
+
 
     public function testSetRolesFromClaimOktaAdmin(): void
     {
@@ -95,7 +104,13 @@ class SocialiteControllerTest extends TestCase
             'groups' => ['Example-Admin-Group'],
         ];
 
-        $result = $this->runSetRolesFromClaimTest($rawAttributes, ['admin']);
+        $result = $this->runSetRolesFromClaimTest(
+            'okta', $rawAttributes, ['admin'],
+        [
+            'Example-Admin-Group' => ['roles' => ['admin']],
+            'Example-ReadOnly-Group'  => ['roles' => ['global-read']],
+        ] 
+    );
         $this->assertTrue($result);
     }
 
@@ -116,7 +131,67 @@ class SocialiteControllerTest extends TestCase
             'groups' => ['Example-ReadOnly-Group'],
         ];
 
-        $result = $this->runSetRolesFromClaimTest($rawAttributes, ['global-read']);
+        $result = $this->runSetRolesFromClaimTest(
+            'okta', $rawAttributes, ['global-read'],
+        [
+            'Example-Admin-Group' => ['roles' => ['admin']],
+            'Example-ReadOnly-Group'  => ['roles' => ['global-read']],
+        ] );
         $this->assertTrue($result);
     }
+
+    public function testSetRolesFromClaimSaml2Admin(): void
+    {
+        // we don't import LightSaml\Model\Assertion\Attribute so we don't add testtime
+        // dependencies ... we just mock up something with the methods we require
+        $attr = $this->getMockBuilder(\stdClass::class)
+                     ->addMethods(['getName', 'getAllAttributeValues'])
+                     ->getMock();
+    
+        $attr->method('getName')
+             ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
+    
+        $attr->method('getAllAttributeValues')
+             ->willReturn(['G_librenms_admins', ]);
+    
+        $result = $this->runSetRolesFromClaimTest(
+            'saml2',
+            [$attr],
+            ['admin',],
+            [
+                'G_librenms_admins' => ['roles' => ['admin']],
+                'G_librenms_users'  => ['roles' => ['global-read']],
+            ]            
+        );
+    
+        $this->assertTrue($result);
+    }
+
+    public function testSetRolesFromClaimSaml2GlobalRead(): void
+    {
+        // we don't import LightSaml\Model\Assertion\Attribute so we don't add testtime
+        // dependencies ... we just mock up something with the methods we require
+        $attr = $this->getMockBuilder(\stdClass::class)
+                     ->addMethods(['getName', 'getAllAttributeValues'])
+                     ->getMock();
+    
+        $attr->method('getName')
+             ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
+    
+        $attr->method('getAllAttributeValues')
+             ->willReturn(['G_librenms_users',]);
+    
+        $result = $this->runSetRolesFromClaimTest(
+            'saml2',
+            [$attr],
+            ['global-read',],
+            [
+                'G_librenms_admins' => ['roles' => ['admin']],
+                'G_librenms_users'  => ['roles' => ['global-read']],
+            ]            
+        );
+    
+        $this->assertTrue($result);
+    }
+
 }
