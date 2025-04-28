@@ -36,12 +36,11 @@ class SocialiteControllerTest extends TestCase
     /**
      * Helper to test setRolesFromClaim().
      *
-     * @param string $provider      The Socialite provider name (e.g. 'okta' or 'saml2')
-     * @param array  $rawAttributes The simulated raw user data from getRaw().
-     * @param array  $expectedRoles The roles expected to be passed to syncRoles() - the expected returns
-     * @param array  $claimMap      A map of claim-values to roles (config for auth.socialite.claims).
-     * @param array  $scopes        Optional scopes config; defaults to ['groups'].
-     *
+     * @param  string  $provider  The Socialite provider name (e.g. 'okta' or 'saml2')
+     * @param  array  $rawAttributes  The simulated raw user data from getRaw().
+     * @param  array  $expectedRoles  The roles expected to be passed to syncRoles() - the expected returns
+     * @param  array  $claimMap  A map of claim-values to roles (config for auth.socialite.claims).
+     * @param  array  $scopes  Optional scopes config; defaults to ['groups'].
      * @return bool The return value from setRolesFromClaim().
      */
     private function runSetRolesFromClaimTest(
@@ -63,9 +62,9 @@ class SocialiteControllerTest extends TestCase
             ->willReturn($rawAttributes);
 
         // Make the SocialiteController private bits accessable via reflection.
-        $controller      = new SocialiteController();
+        $controller = new SocialiteController();
         $reflectionClass = new \ReflectionClass($controller);
-        $prop            = $reflectionClass->getProperty('socialite_user');
+        $prop = $reflectionClass->getProperty('socialite_user');
         $prop->setAccessible(true);
         $prop->setValue($controller, $socialiteUserStub);
 
@@ -86,7 +85,6 @@ class SocialiteControllerTest extends TestCase
         return $method->invokeArgs($controller, [$provider, $userMock]);
     }
 
-
     public function testSetRolesFromClaimOktaAdmin(): void
     {
         // Test with a 'groups' value that should result in a role of ['admin'].
@@ -106,11 +104,11 @@ class SocialiteControllerTest extends TestCase
 
         $result = $this->runSetRolesFromClaimTest(
             'okta', $rawAttributes, ['admin'],
-        [
-            'Example-Admin-Group' => ['roles' => ['admin']],
-            'Example-ReadOnly-Group'  => ['roles' => ['global-read']],
-        ] 
-    );
+            [
+                'Example-Admin-Group' => ['roles' => ['admin']],
+                'Example-ReadOnly-Group' => ['roles' => ['global-read']],
+            ]
+        );
         $this->assertTrue($result);
     }
 
@@ -133,10 +131,10 @@ class SocialiteControllerTest extends TestCase
 
         $result = $this->runSetRolesFromClaimTest(
             'okta', $rawAttributes, ['global-read'],
-        [
-            'Example-Admin-Group' => ['roles' => ['admin']],
-            'Example-ReadOnly-Group'  => ['roles' => ['global-read']],
-        ] );
+            [
+                'Example-Admin-Group' => ['roles' => ['admin']],
+                'Example-ReadOnly-Group' => ['roles' => ['global-read']],
+            ]);
         $this->assertTrue($result);
     }
 
@@ -147,23 +145,23 @@ class SocialiteControllerTest extends TestCase
         $attr = $this->getMockBuilder(\stdClass::class)
                      ->addMethods(['getName', 'getAllAttributeValues'])
                      ->getMock();
-    
+
         $attr->method('getName')
              ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
-    
+
         $attr->method('getAllAttributeValues')
-             ->willReturn(['G_librenms_admins', ]);
-    
+             ->willReturn(['G_librenms_admins']);
+
         $result = $this->runSetRolesFromClaimTest(
             'saml2',
             [$attr],
-            ['admin',],
+            ['admin'],
             [
                 'G_librenms_admins' => ['roles' => ['admin']],
-                'G_librenms_users'  => ['roles' => ['global-read']],
-            ]            
+                'G_librenms_users' => ['roles' => ['global-read']],
+            ]
         );
-    
+
         $this->assertTrue($result);
     }
 
@@ -174,24 +172,23 @@ class SocialiteControllerTest extends TestCase
         $attr = $this->getMockBuilder(\stdClass::class)
                      ->addMethods(['getName', 'getAllAttributeValues'])
                      ->getMock();
-    
+
         $attr->method('getName')
              ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
-    
+
         $attr->method('getAllAttributeValues')
-             ->willReturn(['G_librenms_users',]);
-    
+             ->willReturn(['G_librenms_users']);
+
         $result = $this->runSetRolesFromClaimTest(
             'saml2',
             [$attr],
-            ['global-read',],
+            ['global-read'],
             [
                 'G_librenms_admins' => ['roles' => ['admin']],
-                'G_librenms_users'  => ['roles' => ['global-read']],
-            ]            
+                'G_librenms_users' => ['roles' => ['global-read']],
+            ]
         );
-    
+
         $this->assertTrue($result);
     }
-
 }
