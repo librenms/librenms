@@ -54,6 +54,7 @@ use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Http;
@@ -103,7 +104,10 @@ class AboutController extends Controller
             'stat_services' => Service::count(),
             'stat_slas' => Sla::count(),
             'stat_storage' => Storage::count(),
-            'stat_syslog' => Syslog::count(),
+            'stat_syslog' => DB::table('information_schema.tables')
+                ->where('table_schema', DB::raw('DATABASE()'))
+                ->where('table_name', 'syslog')
+                ->value('table_rows') ?? 0,
             'stat_toner' => PrinterSupply::count(),
             'stat_vlans' => Vlan::count(),
             'stat_vrf' => Vrf::count(),
