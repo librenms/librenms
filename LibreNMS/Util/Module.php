@@ -61,13 +61,13 @@ class Module
 
     public static function pollingStatus(string $module_name, Device $device, ?bool $manual = null): ModuleStatus
     {
-        return new ModuleStatus(
-            Config::get("poller_modules.$module_name"),
-            Config::get("os.{$device->os}.poller_modules.$module_name"),
-            $device->getAttrib("poll_$module_name"),
-            $manual,
-        );
-    }
+    	return new ModuleStatus(
+            (bool)Config::get("poller_modules.$module_name"),
+            (bool)Config::get("os.{$device->os}.poller_modules.$module_name") ?? null,
+            (bool)$device->getAttrib("poll_$module_name") ?? null,
+        $manual
+    );
+}
 
     public static function parseUserOverrides(array $overrides): array
     {
