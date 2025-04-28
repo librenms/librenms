@@ -32,7 +32,14 @@ class AuthLog extends Model
 {
     public $timestamps = false;
     protected $table = 'authlog';
-    protected $casts = [
-        'datetime' => 'datetime',
-    ];
+
+    /**
+     * @return array{datetime: 'datetime'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'datetime' => 'datetime',
+        ];
+    }
 }

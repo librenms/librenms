@@ -26,20 +26,19 @@
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Throwable;
 
 class FilePermissionsException extends \Exception implements UpgradeableException
 {
     /**
      * Try to convert the given Exception to a FilePermissionsException
-     *
-     * @param  \Exception  $exception
-     * @return static|null
      */
-    public static function upgrade($exception)
+    public static function upgrade(Throwable $exception): ?static
     {
         // cannot write to storage directory
         if ($exception instanceof \ErrorException &&
@@ -63,10 +62,8 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
 
     /**
      * Render the exception into an HTTP or JSON response.
-     *
-     * @return \Illuminate\Http\Response|SymfonyResponse
      */
-    public function render(\Illuminate\Http\Request $request)
+    public function render(Request $request): Response
     {
         $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
         $commands = $this->generateCommands($log_file);
@@ -76,7 +73,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
         $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
 
-        return new SymfonyResponse($content);
+        return response($content);
     }
 
     /**

@@ -26,7 +26,7 @@ class TimeUtilityTest extends TestCase
         $this->assertSame('2 weeks 3 days', Time::formatInterval(17 * 24 * 60 * 60 + 1456, parts: 2));
 
         // different months could change this
-        $this->travelTo(Carbon::createFromTimestamp(30042), function () {
+        $this->travelTo(Carbon::createFromTimestampUTC(30042), function () {
             $this->assertSame('1 month 1 week 2 days 24 minutes', Time::formatInterval(39 * 24 * 60 * 60 + 1456));
             $this->assertSame('1mo 1w 2d 24m 16s', Time::formatInterval(39 * 24 * 60 * 60 + 1456, true, 5));
         });

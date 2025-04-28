@@ -42,7 +42,7 @@ class GraphiteStoreTest extends TestCase
         parent::setUp();
 
         // fix the date
-        Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
+        Carbon::setTestNow(Carbon::createFromTimestampUTC($this->timestamp));
         Config::set('graphite.enable', true);
     }
 

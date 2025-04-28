@@ -124,7 +124,7 @@ if (! $device['status'] && ! $device['last_polled']) {
     $uptime = Time::formatInterval($device['uptime']);
     $uptime_text = 'Uptime';
 } else {
-    $uptime = Time::formatInterval(DeviceCache::getPrimary()->downSince()->diffInSeconds());
+    $uptime = Time::formatInterval((int) DeviceCache::getPrimary()->downSince()->diffInSeconds(null, true));
     $uptime_text = 'Downtime';
 }
 
