@@ -78,7 +78,9 @@ if ($total > 0 && ! isset($vars['archive'])) {
 <div class="container">
     <?php
     /** @var Notification $notif */
+    $notif_found = [];
     foreach (Auth::user()->getNotifications('sticky') as $notif) {
+      $notif_found[] = $notif->notifications_id;
         if (is_numeric($notif->source)) {
             $notif->source = User::where('user_id')->value('username');
         }
@@ -89,7 +91,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
         echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities($notif->title) . '</strong>';
         echo "<span class='pull-right'>";
 
-        if ($notif != Auth::id()) {
+        if ($notif->user_id != Auth::id()) {
             $sticky_user = User::find($notif->user_id);
             echo "<code>Sticky by " . htmlentities($sticky_user->username) . "</code>";
         } else {
@@ -115,6 +117,9 @@ if ($total > 0 && ! isset($vars['archive'])) {
     <?php    } ?>
     <?php
     foreach (Auth::user()->getNotifications('unread') as $notif) {
+        if (in_array($notif->notifications_id, $notif_found)) {
+            continue;
+        }
         if (is_numeric($notif->source)) {
             $source_user = User::find($notif->source);
             $notif->source = $source_user->username;

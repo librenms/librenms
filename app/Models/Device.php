@@ -312,7 +312,7 @@ class Device extends BaseModel
         $deviceOutage = $this->getCurrentOutage();
 
         if ($deviceOutage) {
-            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down, session('preferences.timezone'));
         }
 
         return $this->last_polled ?? Carbon::now();
@@ -339,7 +339,7 @@ class Device extends BaseModel
 
     public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : $this->last_polled?->diffInSeconds();
+        $time = ($this->status == 1) ? $this->uptime : (int) $this->last_polled?->diffInSeconds(null, true);
 
         return Time::formatInterval($time, $short);
     }
