@@ -48,7 +48,6 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Sla;
 use App\Models\Storage;
-use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
