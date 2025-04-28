@@ -298,7 +298,7 @@ class Port extends DeviceRelatedModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortAdsl, $this>
      */
-    public function adsl(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function adsl(): HasOne
     {
         return $this->hasOne(PortAdsl::class, 'port_id');
     }
@@ -306,7 +306,7 @@ class Port extends DeviceRelatedModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortVdsl, $this>
      */
-    public function vdsl(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function vdsl(): HasOne
     {
         return $this->hasOne(PortVdsl::class, 'port_id');
     }

@@ -62,12 +62,12 @@ return [
         ],
 
         // add git information, but cache it unlike the upstream provider
-        \App\Logging\Reporting\Middleware\AddGitInformation::class,
+        App\Logging\Reporting\Middleware\AddGitInformation::class,
 
         // Add more LibreNMS related info
-        \App\Logging\Reporting\Middleware\CleanContext::class,
-        \App\Logging\Reporting\Middleware\SetGroups::class,
-        \App\Logging\Reporting\Middleware\SetInstanceId::class,
+        App\Logging\Reporting\Middleware\CleanContext::class,
+        App\Logging\Reporting\Middleware\SetGroups::class,
+        App\Logging\Reporting\Middleware\SetInstanceId::class,
 
         CensorRequestBodyFields::class => [
             'censor_fields' => [

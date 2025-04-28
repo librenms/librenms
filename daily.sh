@@ -292,6 +292,9 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
+        # Clear caches before update
+        status_run 'Clearing caches' 'php artisan optimize:clear'
+
         # Restore composer files if user installed plugins
         git checkout --quiet -- composer.json composer.lock
 
