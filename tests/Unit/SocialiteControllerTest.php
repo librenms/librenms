@@ -140,17 +140,17 @@ class SocialiteControllerTest extends TestCase
 
     public function testSetRolesFromClaimSaml2Admin(): void
     {
-        // we don't import LightSaml\Model\Assertion\Attribute so we don't add testtime
-        // dependencies ... we just mock up something with the methods we require
-        $attr = $this->getMockBuilder(\stdClass::class)
-                     ->addMethods(['getName', 'getAllAttributeValues'])
-                     ->getMock();
-
-        $attr->method('getName')
-             ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
-
-        $attr->method('getAllAttributeValues')
-             ->willReturn(['G_librenms_admins']);
+        // we don't import LightSaml\Model\Assertion\Attribute for testing     
+        $attr = new class {
+            public function getName(): string
+            {
+                return 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups';
+            }
+            public function getAllAttributeValues(): array
+            {
+                return ['G_librenms_admins'];
+            }
+        };
 
         $result = $this->runSetRolesFromClaimTest(
             'saml2',
@@ -167,17 +167,17 @@ class SocialiteControllerTest extends TestCase
 
     public function testSetRolesFromClaimSaml2GlobalRead(): void
     {
-        // we don't import LightSaml\Model\Assertion\Attribute so we don't add testtime
-        // dependencies ... we just mock up something with the methods we require
-        $attr = $this->getMockBuilder(\stdClass::class)
-                     ->addMethods(['getName', 'getAllAttributeValues'])
-                     ->getMock();
-
-        $attr->method('getName')
-             ->willReturn('http://schemas.microsoft.com/ws/2008/06/identity/claims/groups');
-
-        $attr->method('getAllAttributeValues')
-             ->willReturn(['G_librenms_users']);
+        // we don't import LightSaml\Model\Assertion\Attribute for testing
+        $attr = new class {
+            public function getName(): string
+            {
+                return 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups';
+            }
+            public function getAllAttributeValues(): array
+            {
+                return ['G_librenms_users'];
+            }
+        };
 
         $result = $this->runSetRolesFromClaimTest(
             'saml2',
