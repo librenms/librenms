@@ -67,9 +67,10 @@ echo '<table class="table table-hover table-condensed">';
 echo '<thead>';
 echo '<td class="col-sm-2"><strong>Name</strong></td>';
 echo '<td class="col-sm-1"><strong>Check Type</strong></td>';
+echo '<td class="col-sm-1"><strong>Remote Host</strong></td>';
 echo '<td class="col-sm-4"><strong>Message</strong></td>';
 echo '<td class="col-sm-2"><strong>Description</strong></td>';
-echo '<td class="col-sm-2"><strong>Last Changed</strong></td>';
+echo '<td class="col-sm-1"><strong>Last Changed</strong></td>';
 echo '<td class="col-sm-1"></td>';
 echo '</thead>';
 
@@ -96,12 +97,12 @@ if (count($services) > '0') {
         echo '<td class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</td>';
         echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
         echo '<td class="col-sm-1">';
-        echo '<div class="pull-right">';
         if (Auth::user()->hasGlobalAdmin()) {
-            echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-        <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+            echo '<div class="pull-right">';
+            echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+            echo '</div>';
         }
-        echo '</div>';
         echo '</td>';
         echo '</tr>';
 
@@ -126,7 +127,7 @@ if (count($services) > '0') {
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td class="col-sm-12"">';
+                echo '<td colspan="7">';
 
                 include 'includes/html/print-graphrow.inc.php';
 
