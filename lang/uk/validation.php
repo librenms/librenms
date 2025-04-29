@@ -69,7 +69,6 @@ return [
     'ipv6' => ':attribute має бути валідною IPv6 адресою.',
     'is_regex' => ':attribute не є валідним регулярним виразом',
     'json' => ':attribute має бути валідним JSON.',
-    'keys_in' => ':attribute містить невалідні ключі: :extra. Валідні ключі: :values',
     'lt' => [
         'numeric' => ':attribute має бути меншим за :value.',
         'file' => ':attribute має бути меншим за :value кілобайт.',
