@@ -19,16 +19,16 @@ modules:
         temperature:
             data:
                 -
-                    oid: SwitchInfoEntry
-                    value: swTemperature
+                    oid: DMswitch-MIB::SwitchInfoEntry
+                    value: DMswitch-MIB::swTemperature
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.2.1.12.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
                     index: 'swTemperature.{{ $index }}'
         dbm:
             data:
                 -
-                    oid: ddTransceiversTable
-                    value: ddTransceiversRxPower
+                    oid: DMswitch-MIB::ddTransceiversTable
+                    value: DMswitch-MIB::ddTransceiversRxPower
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.{{ $index }}'
                     descr: '{{ $ifDescr }} Rx Power'
                     index: 'rx-{{ $index }}'
@@ -39,8 +39,8 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: ddTransceiversTable
-                    value: ddTransceiversTxPower
+                    oid: DMswitch-MIB::ddTransceiversTable
+                    value: DMswitch-MIB::ddTransceiversTxPower
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.5.{{ $index }}'
                     descr: '{{ $ifDescr }} Tx Power'
                     index: 'tx-{{ $index }}'
