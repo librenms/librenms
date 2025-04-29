@@ -15,7 +15,7 @@ class Ipv4Mac extends PortRelatedModel implements Keyable
         'device_id',
         'mac_address',
         'ipv4_address',
-        'context_name'
+        'context_name',
     ];
 
     // ---- Define Relationships ----

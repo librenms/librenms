@@ -77,7 +77,7 @@ class Screenos extends \LibreNMS\OS implements OSPolling, ArpTableDiscovery
 
         $arp = new Collection;
 
-        foreach($nsIpArpTable as $data) {
+        foreach ($nsIpArpTable as $data) {
             $ifIndex = $nsIfInfo[$data['NETSCREEN-IP-ARP-MIB::nsIpArpIfIdx']];
 
             $arp->push(new Ipv4Mac([
