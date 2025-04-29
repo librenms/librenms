@@ -129,6 +129,7 @@ class ArpTable implements Module
                         'port_id' => $port_id,
                         'mac_address' => Mac::parse($raw_mac)->hex(),
                         'ipv4_address' => $ip,
+                        'context_name' => $context_name,
                     ]));
                 }
             }
