@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\SnmpQuery;
 
-
 $name = 'ceph';
 $metrics = [];
 
