@@ -1,62 +1,22 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\SnmpQuery;
+
 
 $name = 'ceph';
 $metrics = [];
 
 // Fetch data using Unix Agent or SNMP Extend
-<<<<<<< HEAD
-if (!empty($agent_data['app'][$name])) {
-    echo "Using Unix Agent data.\n";
-    $ceph_data = $agent_data['app'][$name];
-} else {
-    echo "Using SNMP Extend data.\n";
-=======
 if (! empty($agent_data['app'][$name])) {
     echo "\nUsing Unix Agent data.\n";
     $ceph_data = $agent_data['app'][$name];
 } else {
     echo "\nUsing SNMP Extend data.\n";
->>>>>>> fix-to-app-ceph
-    $options = '-Oqv';
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.4.99.101.112.104'; // OID for SNMP Extend
-    $ceph_data = snmp_get($device, $oid, $options);
+    $ceph_data = SnmpQuery::get('.1.3.6.1.4.1.8072.1.3.2.3.1.2.4.99.101.112.104')
+        ->value();
     $ceph_data = preg_replace('/^<<<app-ceph>>>\n/', '', $ceph_data); // Remove header
 }
-<<<<<<< HEAD
-
-// Exit if no data is available
-if (empty($ceph_data)) {
-    echo "No Ceph data available.\n";
-    return;
-}
-
-// Enhanced section parsing
-$lines = explode("\n", $ceph_data);
-$current_section = null;
-
-foreach ($lines as $line) {
-    $line = trim($line);
-    if (empty($line)) {
-        continue;
-    }
-
-    // Detect section headers
-    if (preg_match('/^<<<(.+?)>>>$/', $line, $matches)) {
-        $current_section = $matches[1];
-        echo "Detected section: $current_section\n";
-        continue;
-    }
-    if (strpos($line, '<') === 0 && strpos($line, '>') !== false) {
-        $current_section = trim($line, '<>');
-        echo "Detected subsection: $current_section\n";
-        continue;
-    }
-
-    // Process data based on the current section
-    switch ($current_section) {
-=======
 
 // Exit if no data is available
 if (empty($ceph_data)) {
@@ -115,7 +75,6 @@ foreach ($lines as $line) {
             save_to_datastore_and_rrd($device, $tags, $fields, $rrd_def);
             break;
 
->>>>>>> fix-to-app-ceph
         case 'osdperformance':
             // OSD Performance
             $rrd_def = RrdDefinition::make()
@@ -167,11 +126,7 @@ foreach ($lines as $line) {
             break;
 
         default:
-<<<<<<< HEAD
-            echo "Unknown section: $current_section\n";
-=======
             echo "\nUnknown section: $current_section\n";
->>>>>>> fix-to-app-ceph
             break;
     }
 }
@@ -179,32 +134,19 @@ foreach ($lines as $line) {
 // Helper function to save data to Datastore and RRD
 function save_to_datastore_and_rrd($device, $tags, $fields, $rrd_def)
 {
-<<<<<<< HEAD
-    echo "Saving to Datastore and RRD...\n";
-    echo "Tags: " . json_encode($tags) . "\n";
-    echo "Fields: " . json_encode($fields) . "\n";
-=======
     echo " Saving to Datastore and RRD...\n";
     echo '  Tags: ' . json_encode($tags) . "\n";
     echo '  Fields: ' . json_encode($fields) . "\n";
->>>>>>> fix-to-app-ceph
 
     // Save to Datastore
     app('Datastore')->put($device, 'app', $tags, $fields);
 
     // Debug RRD path
     $rrd_path = '/opt/librenms/rrd/' . $device['hostname'] . '/' . implode('-', $tags['rrd_name']) . '.rrd';
-<<<<<<< HEAD
-    echo "RRD path: $rrd_path\n";
-
-    if (!file_exists($rrd_path)) {
-        echo "Creating RRD file: $rrd_path\n";
-=======
     echo " RRD path: $rrd_path\n";
 
     if (! file_exists($rrd_path)) {
         echo " Creating RRD file: $rrd_path\n";
->>>>>>> fix-to-app-ceph
     }
 }
 
