@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DevCheckCommand.php
  *
@@ -42,7 +43,7 @@ class DevCheckCommand extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, dusk]']), 'all');
+        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, web]']), 'all');
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('module', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('fail-fast', 'f', InputOption::VALUE_NONE);
@@ -54,12 +55,7 @@ class DevCheckCommand extends LnmsCommand
         $this->addOption('commands', 'c', InputOption::VALUE_NONE);
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
+    public function handle(): int
     {
         $this->helper = new CiHelper();
         $this->parseInput();
@@ -75,7 +71,7 @@ class DevCheckCommand extends LnmsCommand
         return $result;
     }
 
-    private function parseInput()
+    private function parseInput(): void
     {
         $check = $this->argument('check');
         if (! in_array($check, ['all', 'lint', 'style', 'unit', 'web', 'ci'])) {

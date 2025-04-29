@@ -47,3 +47,6 @@ bin/
 lib/
 lib64
 pyvenv.cfg
+
+/.phpunit.cache/storage/pail
+/.nova

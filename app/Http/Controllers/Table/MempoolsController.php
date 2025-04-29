@@ -1,4 +1,5 @@
 <?php
+
 /*
  * MempoolsController.php
  *
@@ -74,7 +75,7 @@ class MempoolsController extends TableController
     {
         if ($mempool instanceof Device) {
             $device = $mempool;
-            $graphs = \LibreNMS\Util\Html::graphRow([
+            $graphs = Html::graphRow([
                 'device' => $device->device_id,
                 'type' => 'device_mempool',
                 'height' => 100,

@@ -54,7 +54,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         $fields = [
             'time' => $agent_time,
         ];
-        data_update($device, 'agent', $tags, $fields);
+        app('Datastore')->put($device, 'agent', $tags, $fields);
 
         $os->enableGraph('agent');
 

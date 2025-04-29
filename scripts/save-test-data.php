@@ -148,7 +148,7 @@ try {
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }
-        $test_data = $tester->generateTestData($snmpsim, $no_save);
+        $test_data = $tester->generateTestData($snmpsim->ip, $snmpsim->port, $no_save);
 
         if ($no_save) {
             print_r($test_data);

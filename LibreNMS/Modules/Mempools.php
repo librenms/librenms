@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Mempools.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Mempool;
-use App\Observers\MempoolObserver;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -77,7 +78,7 @@ class Mempools implements Module
         // check if linux or similar and calculate available ram
         $this->calculateAvailable($mempools);
 
-        MempoolObserver::observe(\App\Models\Mempool::class);
+        ModuleModelObserver::observe(Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
         Log::info('');
@@ -133,9 +134,9 @@ class Mempools implements Module
     }
 
     /**
-     * @param  \LibreNMS\OS  $os
-     * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection
+     * @param  OS  $os
+     * @param  Collection  $mempools
+     * @return Collection
      */
     private function defaultPolling($os, $mempools)
     {
@@ -180,8 +181,8 @@ class Mempools implements Module
     /**
      * Calculate available memory.  This is free + buffers + cached.
      *
-     * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection
+     * @param  Collection  $mempools
+     * @return Collection
      */
     private function calculateAvailable(Collection $mempools): Collection
     {

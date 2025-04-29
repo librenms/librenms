@@ -39,7 +39,7 @@ if (! empty($agent_data['app'][$name])) {
                     'rrd_name' => ['app', $name, $app->app_id, 'pool', $pool],
                     'rrd_def' => $rrd_def,
                 ];
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
         } elseif ($section == 'osdperformance') {
             $rrd_def = RrdDefinition::make()
@@ -64,7 +64,7 @@ if (! empty($agent_data['app'][$name])) {
                     'rrd_name' => ['app', $name, $app->app_id, 'osd', $osd],
                     'rrd_def' => $rrd_def,
                 ];
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
         } elseif ($section == 'df') {
             $rrd_def = RrdDefinition::make()
@@ -91,7 +91,7 @@ if (! empty($agent_data['app'][$name])) {
                     'rrd_name' => ['app', $name, $app->app_id, 'df', $df],
                     'rrd_def' => $rrd_def,
                 ];
-                data_update($device, 'app', $tags, $fields);
+                app('Datastore')->put($device, 'app', $tags, $fields);
             }
         }
     }

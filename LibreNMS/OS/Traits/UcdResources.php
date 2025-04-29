@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UcdProcessor.php
  *
@@ -147,7 +148,7 @@ trait UcdResources
                 'type' => 'ucd-dsktable',
                 'storage_index' => $index,
                 'storage_type' => 'ucdDisk',
-                'storage_descr' => $data['UCD-SNMP-MIB::dskPath'],
+                'storage_descr' => $data['UCD-SNMP-MIB::dskPath'] ?? 'Unnamed Storage',
                 'storage_size' => $total * $units,
                 'storage_units' => $units,
                 'storage_used' => $used_calc * $units,

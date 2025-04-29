@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display F5 LTM Details
  *
@@ -120,7 +121,7 @@ if (! empty($components)) {
         }
 
         $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
-        data_update($device, $type, $tags, $fields);
+        app('Datastore')->put($device, $type, $tags, $fields);
     } // End foreach components
 
     unset($f5_stats);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * gw-eydfa.inc.php
  *
@@ -26,7 +27,7 @@
 use Illuminate\Support\Facades\Log;
 
 $oids = snmp_walk($device, 'oaPumpTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
-Log::debug($oids . "\n");
+Log::debug($oids);
 
 if ($oids) {
     echo 'GW EYDFA PUMP ';

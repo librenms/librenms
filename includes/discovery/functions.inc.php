@@ -17,9 +17,6 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Network;
-use App\Models\Ipv6Address;
-use App\Models\Ipv6Network;
-use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -30,7 +27,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -317,66 +313,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
     }//end if
     $link_exists[$local_port_id][$remote_hostname][$remote_port] = 1;
 }
-
-//end discover_link()
-
-function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $context_name = '')
-{
-    global $device;
-
-    if (! IPv6::isValid($ipv6_address, true)) {
-        // ignore link-locals (coming from IPV6-MIB)
-        return;
-    }
-
-    $ipv6 = new IPv6($ipv6_address);
-    $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
-    $ipv6_compressed = $ipv6->compressed();
-
-    $port_id = Port::where([
-        ['device_id', $device['device_id']],
-        ['ifIndex', $ifIndex],
-    ])->value('port_id');
-
-    if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-        Log::debug('IPV6: Found port id: ' . $port_id);
-
-        $ipv6netDB = Ipv6Network::updateOrCreate([
-            'ipv6_network' => $ipv6_network,
-        ], [
-            'context_name' => $context_name,
-        ]);
-
-        if ($ipv6netDB->wasChanged()) {
-            Log::debug('IPV6: Update DB ipv6_networks');
-        }
-
-        $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
-
-        if ($ipv6_network_id) {
-            Log::debug('IPV6: Found network id: ' . $ipv6_network_id);
-
-            $ipv6adrDB = Ipv6Address::updateOrCreate([
-                'ipv6_address' => $ipv6_address,
-                'ipv6_prefixlen' => $ipv6_prefixlen,
-                'port_id' => $port_id,
-            ], [
-                'ipv6_compressed' => $ipv6_compressed,
-                'ipv6_origin' => $ipv6_origin,
-                'ipv6_network_id' => $ipv6_network_id,
-                'context_name' => $context_name,
-            ]);
-
-            if ($ipv6adrDB->wasChanged()) {
-                Log::debug('IPV6: Update DB ipv6_addresses');
-            }
-
-            $full_address = "$ipv6_address/$ipv6_prefixlen";
-            $valid_address = $full_address . '-' . $port_id;
-            $valid['ipv6'][$valid_address] = 1;
-        }//endif network_id
-    }//endif port_id && others
-}//end discover_process_ipv6()
 
 /**
  * create or update IPv4 Addresses and/or IPv4 Networks

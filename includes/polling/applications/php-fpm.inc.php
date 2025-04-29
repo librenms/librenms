@@ -41,7 +41,7 @@ try {
     $app->data = ['version' => 'legacy'];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     update_application($app, 'OK', $fields);
 
@@ -96,7 +96,7 @@ foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
         }
 
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 
@@ -114,7 +114,7 @@ foreach ($var_mappings as $stat => $stat_key) {
     }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // check for added or removed pools
@@ -125,7 +125,7 @@ $removed_pools = array_diff($old_pools, $new_pools);
 
 // if we have any changes in pools, log it
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
-    $log_message = 'Suricata Instance Change:';
+    $log_message = 'PHP-FPM Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
     Eventlog::log($log_message, $device['device_id'], 'application');

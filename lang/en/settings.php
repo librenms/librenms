@@ -41,9 +41,9 @@ return [
             'general' => ['name' => 'General Discovery Settings'],
             'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
+            'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
-            'networks' => ['name' => 'Networks'],
         ],
         'external' => [
             'binaries' => ['name' => 'Binary Locations'],
@@ -294,6 +294,13 @@ return [
                 'scopes' => [
                     'description' => 'Scopes that should be included with in the authentication request',
                     'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
+                ],
+                'default_role' => [
+                    'description' => 'Default Role',
+                ],
+                'claims' => [
+                    'description' => 'Claims',
+                    'help' => 'Map groups to Roles',
                 ],
             ],
         ],
@@ -754,6 +761,14 @@ return [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
         ],
+        'email_smtp_verifypeer' => [
+            'description' => 'Verify peer certificate',
+            'help' => 'Do not verify peer certificate when connecting to SMTP server via TLS',
+        ],
+        'email_smtp_allowselfsigned' => [
+            'description' => 'Allow self-signed certificate',
+            'help' => 'Allow self-signed certificate when connecting to SMTP server via TLS',
+        ],
         'email_attach_graphs' => [
             'description' => 'Attach graph images',
             'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
@@ -1168,7 +1183,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [
@@ -1354,6 +1369,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1487,9 +1505,41 @@ return [
             'help' => 'Networks from which devices will be discovered automatically.',
         ],
         'autodiscovery' => [
+            'bgp' => [
+                'description' => 'Enable BGP neighbor discovery',
+                'help' => 'Add links and neighbors based on BGP peers',
+            ],
+            'cdp_exclude' => [
+                'platform_regexp' => [
+                    'description' => 'CDP exclude platform regex',
+                    'help' => 'Prevent devices from being added by CDP if sysName matches regular expression',
+                ],
+            ],
             'nets-exclude' => [
                 'description' => 'Networks/IPs to be ignored',
                 'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
+            'ospf' => [
+                'description' => 'Enable OSPF neighbor discovery',
+                'help' => 'Add links and neighbors based on OSPF peers',
+            ],
+            'ospfv3' => [
+                'description' => 'Enable OSPFv3 neighbor discovery',
+                'help' => 'Add links and neighbors based on OSPFv3 peers',
+            ],
+            'xdp' => [
+                'description' => 'Enable xDP discovery protocols',
+                'help' => 'Use LLDP, CDP, etc protocols to discover network topology and neighbors and add them to LibreNMS',
+            ],
+            'xdp_exclude' => [
+                'sysname_regexp' => [
+                    'description' => 'xDP exclude sysName regex',
+                    'help' => 'Prevent devices from being added if sysName matches regular expression',
+                ],
+                'sysdesc_regexp' => [
+                    'description' => 'xDP exclude sysDescr regex',
+                    'help' => 'Prevent devices from being added if sysDescr matches regular expression',
+                ],
             ],
         ],
         'radius' => [
@@ -1674,11 +1724,15 @@ return [
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Enabled',
-            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+            'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated. Sets the default value for all nodes.',
         ],
         'service_watchdog_log' => [
             'description' => 'Log File to Watch',
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+        ],
+        'service_health_file' => [
+            'description' => 'Service Health File',
+            'help' => 'Path to health file to ensure the dispatcher service is running',
         ],
         'sfdp' => [
             'description' => 'Path to sfdp',

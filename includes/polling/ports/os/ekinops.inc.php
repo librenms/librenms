@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ekinops.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessErrorsDiscovery.php
  *

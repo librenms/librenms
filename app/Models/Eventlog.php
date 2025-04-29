@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eventlog.php
  *
@@ -36,9 +37,16 @@ class Eventlog extends DeviceRelatedModel
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
-    protected $casts = [
-        'severity' => Severity::class,
-    ];
+
+    /**
+     * @return array{severity: 'LibreNMS\Enum\Severity'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'severity' => Severity::class,
+        ];
+    }
 
     // ---- Helper Functions ----
     /**

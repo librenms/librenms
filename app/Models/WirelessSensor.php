@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessSensor.php
  *
@@ -57,7 +58,16 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
         'access_point_id',
         'rrd_type',
     ];
-    protected $casts = ['sensor_oids' => 'array'];
+
+    /**
+     * @return array{sensor_oids: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'sensor_oids' => 'array',
+        ];
+    }
 
     // ---- Helper Functions ----
 

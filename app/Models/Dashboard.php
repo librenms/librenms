@@ -27,14 +27,19 @@ class Dashboard extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserWidget, $this>
+     */
     public function widgets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
+        return $this->hasMany(UserWidget::class, 'dashboard_id');
     }
 }

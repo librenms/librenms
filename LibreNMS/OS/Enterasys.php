@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Enterasys.php
  *

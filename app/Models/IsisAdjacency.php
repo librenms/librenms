@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IsisAdjacency.php
  *
@@ -26,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class IsisAdjacency extends PortRelatedModel implements Keyable
@@ -52,10 +54,12 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
     ];
 
     // ---- Define Relationships ----
-
-    public function device()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
+    public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Port::class, 'device_id');
+        return $this->belongsTo(Port::class, 'device_id');
     }
 
     public function getCompositeKey()

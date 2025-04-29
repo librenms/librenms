@@ -6658,5 +6658,56 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fd00:0002:0001:0000:0000:0000:0000:0026",
+                    "ipv6_compressed": "fd00:2:1::26",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ipv6_network": "fd00:2:1::/64",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "fd00:0002:0254:0000:0000:0000:0000:0026",
+                    "ipv6_compressed": "fd00:2:254::26",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ipv6_network": "fd00:2:254::/64",
+                    "ifIndex": 254
+                },
+                {
+                    "ipv6_address": "fd00:0002:0254:0000:9ada:c4ff:fe73:3a5e",
+                    "ipv6_compressed": "fd00:2:254:0:9ada:c4ff:fe73:3a5e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": null,
+                    "ipv6_network": "fd00:2:254::/64",
+                    "ifIndex": 254
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:9ada:c4ff:fe73:3a5e",
+                    "ipv6_compressed": "fe80::9ada:c4ff:fe73:3a5e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": null,
+                    "ipv6_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:9ada:c4ff:fe73:3a5e",
+                    "ipv6_compressed": "fe80::9ada:c4ff:fe73:3a5e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": null,
+                    "ipv6_network": null,
+                    "ifIndex": 254
+                }
+            ]
+        }
     }
 }

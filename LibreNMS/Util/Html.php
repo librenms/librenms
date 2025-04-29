@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Html.php
  *
@@ -27,6 +28,7 @@ namespace LibreNMS\Util;
 
 use LibreNMS\Config;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Enum\Severity;
 
 class Html
 {
@@ -183,5 +185,19 @@ class Html
             default:
                 return ['UNKNOWN', 'label-default'];
         }
+    }
+
+    public static function severityToLabel(Severity $severity, string $text): string
+    {
+        $state_label = match ($severity) {
+            Severity::Ok => 'label-success',
+            Severity::Info => 'label-info',
+            Severity::Notice => 'label-primary',
+            Severity::Warning => 'label-warning',
+            Severity::Error => 'label-danger',
+            default => 'label-default',
+        };
+
+        return "<span class=\"label $state_label\">$text</span>";
     }
 }

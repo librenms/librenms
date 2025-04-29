@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Calix E5-1xx Temperature Discovery module
  *

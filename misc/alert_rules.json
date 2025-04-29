@@ -781,6 +781,166 @@
     "severity": "warning"
   },
   {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"amperageProbeStatus\" && sensors.sensor_current REGEXP \"[5-6,8-9]|10\")",
+    "name": "Dell DRAC amperage probe status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"amperageProbeStatus\" && sensors.sensor_current REGEXP \"[4,7]\")",
+    "name": "Dell DRAC amperage probe status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"drsGlobalSystemStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell DRAC global system status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"drsGlobalSystemStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell DRAC global system status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"memoryDeviceStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell DRAC memory device status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"memoryDeviceStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell DRAC memory device status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"physicalDiskState\" && sensors.sensor_current REGEXP \"[5-9]|10\")",
+    "name": "Dell DRAC physical disk state critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"physicalDiskState\" && sensors.sensor_current = 4)",
+    "name": "Dell DRAC physical disk state warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"processorDeviceStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell DRAC processor device status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"processorDeviceStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell DRAC processor device status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"systemBatteryStatus\" && sensors.sensor_current REGEXP \"[5-6,8-9]|10\")",
+    "name": "Dell DRAC system battery status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"systemBatteryStatus\" && sensors.sensor_current REGEXP \"[4,7]\")",
+    "name": "Dell DRAC system battery status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"virtualDiskState\" && sensors.sensor_current = 3)",
+    "name": "Dell DRAC virtual disk state critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"drac\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"virtualDiskState\" && sensors.sensor_current = 4)",
+    "name": "Dell DRAC virtual disk state warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmBladeCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M blade status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmBladeCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M blade status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmFanCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M fan status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmFanCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M fan status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmGlobalSystemStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M global system status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmGlobalSystemStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M global system status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmIOMCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M IOM status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmIOMCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M IOM status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmMMCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M MM status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmMMCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M MM status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmPowerCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M power status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmPowerCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M power status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmPSUTable\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M PSU status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmPSUTable\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M PSU status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmRedCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M redundancy status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmRedCurrStatus\" && sensors.sensor_current = 4)",
+    "name": "Dell OME-M redundancy status warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmTempCurrStatus\" && sensors.sensor_current REGEXP \"[5-6]\")",
+    "name": "Dell OME-M temperature status critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "devices.os = \"dell-ome-m\" && (sensors.sensor_class = \"state\" && sensors.sensor_type = \"dmmTempCurrStatus\" && sensors.sensor_current REGEXP 4)",
+    "name": "Dell OME-M temperature status warning",
+    "severity": "warning"
+  },
+  {
     "rule": "applications.app_type = \"cape\" && application_metrics.metric = \"reported\" && application_metrics.value > 0",
     "name": "CAPE reported = 0, nothing is processing",
     "severity": "critical"

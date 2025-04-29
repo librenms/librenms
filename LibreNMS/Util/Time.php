@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Time.php
  *
@@ -110,6 +111,6 @@ class Time
     {
         $carbon = new Carbon();
 
-        return $carbon->diffInMinutes($date, false);
+        return (int) $carbon->diffInMinutes($date);
     }
 }

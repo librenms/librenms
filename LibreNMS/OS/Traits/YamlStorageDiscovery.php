@@ -1,4 +1,5 @@
 <?php
+
 /*
  * YamlDeviceDiscovery.php
  *

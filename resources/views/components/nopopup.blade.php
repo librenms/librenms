@@ -1,3 +1,3 @@
-<div class="tw-inline-block">
+<div class="tw:inline-block">
     {{ $slot }}
 </div>

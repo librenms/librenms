@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SSOAuthorizer.php
  *

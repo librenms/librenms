@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Measurement.php
  *
@@ -31,7 +32,7 @@ class Measurement
     private $type;
     private $duration;
 
-    private function __construct(string $type, float $duration = null)
+    private function __construct(string $type, ?float $duration = null)
     {
         $this->type = $type;
         $this->start = microtime(true);

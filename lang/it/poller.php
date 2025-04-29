@@ -89,7 +89,7 @@ return [
             ],
             'watchdog_enabled' => [
                 'description' => 'Watchdog Enabled',
-                'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated',
+                'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated',
             ],
             'watchdog_log' => [
                 'description' => 'Log File to Watch',
