@@ -465,6 +465,50 @@ If it doesn't work, please double check your configuration values by using the `
 ### Redirect URL
 If you have a need to, then you can override redirect url with the following commands:
 
+### Issues with Claims to Roles mapping
+If you have scopes configured returning groups that should be mapped to roles you can assist troubleshooting
+by turning on debugging.   The debug file is in `logs/auth.log`.   Ensure you turn it off when finished.
+
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite,debug true
+    ```
+
+The log will looks something like this
+    ```bash
+    cat ~/logs/auth.log
+    [2025-04-24T00:32:51][DEBUG] setRolesFromClaim() starts : John.Citizen@example.com
+        Provider: okta
+        User: {"user_id":23,"auth_type":"socialite_okta","auth_id":"00REDACTED","username":"John.Citizen@example.com","realname":"Citizen, John","email":"John.Citizen@example.com","descr":"","can_modify_passwd":1,"created_at":"2025-04-23T05:05:08.000000Z","updated_at":"2025-04-23T05:05:08.000000Z","enabled":1}
+        Scopes: ["groups"]
+        Claims: {"Example-Group-Admin":{"roles":["admin"]},"Example-Group-Read":{"roles":["global-read"]}}
+        socialite_user class: SocialiteProviders\Manager\OAuth2\User
+
+    [2025-04-24T00:32:51][DEBUG] setRolesFromClaim() socialite_user->getRaw() : John.Citizen@example.com
+        Data Type: array
+        Dump of Data:
+        Array
+        (
+            [sub] => 00REDACTED
+            [name] => Citizen, John
+            [locale] => en_US
+            [email] => John.Citizen@example.com
+            [preferred_username] => jCitizen@my.example.com
+            [given_name] => John
+            [family_name] => Citizen
+            [zoneinfo] => America/Los_Angeles
+            [updated_at] => 1715015601
+            [email_verified] => 1
+            [groups] => Array
+            (
+                [0] => Example-Group-Admin
+            )
+        )
+
+    [2025-04-24T00:32:51][DEBUG] setRolesFromClaim() returned data : John.Citizen@example.com
+        Roles: ["admin"]
+    ```
+
 === "OAuth"
     Replace `github` and the relevant URL below with your identity provider details.
     `lnms config:set auth.socialite.configs.github.redirect https://demo.librenms.org/auth/github/callback`
