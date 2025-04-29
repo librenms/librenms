@@ -233,7 +233,7 @@ if (! empty($peers)) {
                             $vrfInstance = $oid[0];
                             $address = implode('.', array_slice($oid, 3));
                             if (strlen($address) > 15) {
-                                $address = IP::fromHexString($address)->compressed();
+                                $address = IP::fromSnmpString($address)->compressed();
                             }
                             $bgpPeers[$vrfInstance][$address] = $value;
                         }
