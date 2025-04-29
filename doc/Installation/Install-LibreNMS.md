@@ -96,6 +96,12 @@ cd /opt
 git clone https://github.com/librenms/librenms.git
 ```
 
+## Temporarily switch to a working release
+
+```bash
+git checkout 25.3.0
+```
+
 ## Set permissions
 
 ```
@@ -774,6 +780,13 @@ to the file. Run:
 
 ```
 chown librenms:librenms /opt/librenms/config.php
+```
+
+## Switch back to master branch
+
+```bash
+git checkout master
+./daily.sh
 ```
 
 ## Final steps
