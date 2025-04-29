@@ -115,7 +115,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         foreach ($oids as $index => $entry) {
             $current = $entry['JUNIPER-WIRELESS-WAN-MIB::jnxWirelessWANNetworkInfoRSRQ'];
-            $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', current: $current low_limit: -20);
+            $sensors[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $index, 'junos', $index, 'Modem RSRQ', current: $current, low_limit: -20);
         }
 
         return $sensors;
