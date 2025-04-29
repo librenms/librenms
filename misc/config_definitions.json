@@ -1676,6 +1676,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.ipv6-nd": {
+            "order": 163,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.discovery-arp": {
             "order": 90,
             "group": "discovery",
@@ -5488,7 +5495,7 @@
             "type": "boolean"
         },
         "poller_modules.ipSystemStats": {
-            "order": 200,
+            "order": 214,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -5503,6 +5510,20 @@
         },
         "poller_modules.xdsl": {
             "order": 345,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.arp-table": {
+            "order": 17,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.ipv6-nd": {
+            "order": 340,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
