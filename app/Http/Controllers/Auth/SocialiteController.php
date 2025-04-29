@@ -169,7 +169,7 @@ class SocialiteController extends Controller
             if ($is_debug) {
                 /** @var \Monolog\Logger $monolog */
                 $monolog = Log::getLogger();
-                $debugHandler = new StreamHandler(base_path('logs/auth.log'), Level::Debug);
+                $debugHandler = new StreamHandler(LibrenmsConfig::get('log_dir') . '/auth.log', Level::Debug);
                 $debugHandler->setFormatter(new \App\Logging\LogFileFormatter());
                 $monolog->pushHandler($debugHandler);
                 Log::debug('setRolesFromClaim() starts : ' . $user->username . PHP_EOL .
