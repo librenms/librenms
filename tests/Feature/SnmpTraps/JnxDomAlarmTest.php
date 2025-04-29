@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JnxDomAlarmTest.php
  * -Description-

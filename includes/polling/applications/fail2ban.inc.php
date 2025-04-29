@@ -46,7 +46,7 @@ $metrics['total'] = $fields; // don't include legacy ds in db
 $fields['firewalled'] = 'U'; // legacy ds
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $jails = [];
 foreach ($f2b['jails'] as $jail => $banned) {
@@ -56,7 +56,7 @@ foreach ($f2b['jails'] as $jail => $banned) {
 
     $metrics["jail_$jail"] = $fields;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $jails[] = $jail;
 }

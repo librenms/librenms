@@ -1,4 +1,5 @@
 <?php
+
 /**
  * bridge.inc.php
  *

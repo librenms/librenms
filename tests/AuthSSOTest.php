@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthSSO.php
  *
@@ -66,8 +67,6 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_level_map', null);
         Config::set('sso.static_level', -1);
-        /** @phpstan-ignore-next-line */
-        \Bouncer::refresh();
     }
 
     // Set up $_SERVER in env mode
@@ -142,7 +141,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate
         $dbuser = User::thisAuth()->where('username', $user)->firstOrNew();
         $this->assertSame($dbuser->realname, $a->authSSOGetAttr(Config::get('sso.realname_attr')));
-        $this->assertEmpty($dbuser->getRoles());
+        $this->assertEmpty($dbuser->getRoleNames());
         $this->assertSame($dbuser->email, $a->authSSOGetAttr(Config::get('sso.email_attr')));
 
         // Change a few things and reauth

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * groups.inc.php
  *

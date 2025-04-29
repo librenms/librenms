@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Dantel Webmon generic sensor
  *

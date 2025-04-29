@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Lantronix SLC Temperature Sensor Discovery module
  *

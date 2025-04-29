@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UnserializableRouteCache.php
  *
@@ -25,6 +26,9 @@
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Throwable;
 
@@ -33,7 +37,7 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     protected $cli_php_version;
     protected $web_php_version;
 
-    public function __construct($message = '', $code = 0, Throwable $previous = null, $cli_php_version = null, $web_php_version = null)
+    public function __construct($message = '', $code = 0, ?Throwable $previous = null, $cli_php_version = null, $web_php_version = null)
     {
         $this->cli_php_version = $cli_php_version;
         $this->web_php_version = $web_php_version;
@@ -42,11 +46,8 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
 
     /**
      * Try to convert the given Exception to this exception
-     *
-     * @param  \Exception  $exception
-     * @return static|null
      */
-    public static function upgrade($exception)
+    public static function upgrade(Throwable $exception): ?static
     {
         $errorMessage = "Erroneous data format for unserializing 'Symfony\Component\Routing\CompiledRoute'";
         if ($exception instanceof \ErrorException && $exception->message == $errorMessage) {
@@ -61,10 +62,8 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
 
     /**
      * Render the exception into an HTTP or JSON response.
-     *
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
-    public function render(\Illuminate\Http\Request $request)
+    public function render(Request $request): Response|JsonResponse
     {
         $title = trans('exceptions.unserializable_route_cache.title');
         $message = trans('exceptions.unserializable_route_cache.message', ['cli_version' => $this->cli_php_version, 'web_version' => $this->web_php_version]);

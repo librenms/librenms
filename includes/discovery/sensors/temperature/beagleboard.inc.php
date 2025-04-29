@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Temperature Sensors for BeagleBoard
  * Requires snmp extend agent script from librenms-agent

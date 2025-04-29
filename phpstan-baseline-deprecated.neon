@@ -26,14 +26,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/Alert/AlertRules.php
-
-		-
-			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -53,7 +45,7 @@ parameters:
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 4
+			count: 1
 			path: LibreNMS/Alert/AlertUtil.php
 
 		-
@@ -61,7 +53,7 @@ parameters:
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 6
+			count: 3
 			path: LibreNMS/Alert/AlertUtil.php
 
 		-
@@ -114,194 +106,10 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 3
-			path: LibreNMS/Component.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: LibreNMS/Component.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 13
-			path: LibreNMS/IRCBot.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
 			count: 3
-			path: LibreNMS/IRCBot.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 7
-			path: LibreNMS/IRCBot.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/Model.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/OS/Vrp.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: LibreNMS/OS/Vrp.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 2
-			path: LibreNMS/OS/Vrp.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: LibreNMS/ObjectCache.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: html/ajax_listports.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: html/network-map.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: html/network-map.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: html/network-map.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 3
-			path: LibreNMS/Billing.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 4
 			path: LibreNMS/Billing.php
 
 		-
@@ -325,72 +133,80 @@ parameters:
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 1
+			count: 4
 			path: LibreNMS/Billing.php
 
 		-
 			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/caches/alerts.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/caches/devices.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/caches/ports.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/caches/services.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/caches/toner.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 6
-			path: includes/common.php
+			count: 2
+			path: LibreNMS/Billing.php
 
 		-
 			message: """
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 6
-			path: includes/common.php
+			count: 3
+			path: LibreNMS/Component.php
 
 		-
 			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 4
-			path: includes/common.php
+			count: 2
+			path: LibreNMS/Component.php
+
+		-
+			message: """
+				#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+			"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: """
+				#^Call to deprecated function dbUpdate\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Device/YamlDiscovery.php
 
 		-
 			message: """
@@ -398,7 +214,1383 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
 			count: 1
-			path: includes/discovery/applications.inc.php
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRow\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 2
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function dbInsert\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function dbUpdate\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Modules/Isis.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/Modules/Isis.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Modules/Mempools.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Modules/Os.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Airos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: LibreNMS/OS/AirosAf60.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
+			path: LibreNMS/OS/AirosAfLtu.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/Allied.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Allied.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/AllworxVoip.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Apc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Apc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Apsoluteos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Arubaos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/AsuswrtMerlin.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/AsuswrtMerlin.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/AviatWtm.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Avocent.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Awplus.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Awplus.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Awplus.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Axos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Barracudangfirewall.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Bats.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Beagleboard.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Boss.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Boss.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Boss.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Brother.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Ceraos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ceraos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 10
+			path: LibreNMS/OS/Ceraos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Ciscosat.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ciscosb.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Comware.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Comware.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Coriant.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/DdWrt.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Deliberant.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Dhcpatriot.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Dlink.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Dlinkap.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Edgecos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Edgecos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Edgeos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Edgeosolt.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Edgeswitch.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ekinops.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Enterasys.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: LibreNMS/OS/Epmp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Epmp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/Ericsson6600.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/EricssonTn.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ewc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: LibreNMS/OS/Ewc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Fabos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Fortiap.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Fortiextender.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Fortigate.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Fortios.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/FsGbn.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/FsSwitch.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Gaia.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/HarmonyEnhanced.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Helios.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/HiveosWireless.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 11
+			path: LibreNMS/OS/HorizonQuantum.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ifotec.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ifotec.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/InfineraGroove.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ios.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
+			path: LibreNMS/OS/Ios.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Iosxe.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: LibreNMS/OS/Iosxe.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Iosxr.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Jetdirect.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Junos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: LibreNMS/OS/Junos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 10
+			path: LibreNMS/OS/Lcos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 11
+			path: LibreNMS/OS/Lcoslx.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Lcossx.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/Mimosa.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Mimosa.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Netscaler.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Netsure.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Nios.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Openwrt.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Openwrt.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Panos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: LibreNMS/OS/Pepwave.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Pfsense.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 10
+			path: LibreNMS/OS/Pmp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Pmp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Pmp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Powerconnect.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Procurve.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Quanta.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Quantastor.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Radlan.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Radlan.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Riverbed.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Routeros.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/RuckuswirelessSz.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/RuckuswirelessSz.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Rutos2xx.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Scalance.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Schleifenbauer.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Schleifenbauer.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Screenos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Secureplatform.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Sgos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Sgos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Printer.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Unix.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/Shared/Unix.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Shared/Unix.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Shared/Zyxel.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Shared/Zyxel.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Shared/Zyxel.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Siklu.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Siteboss.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Siteboss550.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/SmOs.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: LibreNMS/OS/SmOs.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Smartax.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_translate\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Stellar.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Svos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: LibreNMS/OS/Teldat.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Terra.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/ThreeCom.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Topvision.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Topvision.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Ucos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
+			path: LibreNMS/OS/Unifi.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Valere.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: LibreNMS/OS/Windows.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/WisBridge.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Xerox.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/XirrusAos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Zynos.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: LibreNMS/OS/Zywall.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: LibreNMS/OS/Zyxelwlc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: html/ajax_listports.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: html/data.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchCell\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 2
+			path: includes/common.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRow\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 3
+			path: includes/common.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 3
+			path: includes/common.php
 
 		-
 			message: """
@@ -418,16 +1610,8 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/applications.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/applications.inc.php
@@ -474,6 +1658,22 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/arp-table/edgeswitch.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/arp-table/screenos.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
@@ -514,8 +1714,48 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/bgp-peers/dell-os10.inc.php
@@ -530,43 +1770,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/bgp-peers/timos.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/discovery/bgp-peers/timos.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/bgp-peers/timos.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/bgp-peers/timos.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/bgp-peers/timos.inc.php
+			path: includes/discovery/bgp-peers/firebrick.inc.php
 
 		-
 			message: """
@@ -590,6 +1798,14 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
 			path: includes/discovery/bgp-peers/vrp.inc.php
 
 		-
@@ -606,6 +1822,14 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
 			count: 1
+			path: includes/discovery/cisco-cef.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
 			path: includes/discovery/cisco-cef.inc.php
 
 		-
@@ -634,6 +1858,22 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/cisco-mac-accounting.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/cisco-otv.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
@@ -663,6 +1903,30 @@ parameters:
 			"""
 			count: 1
 			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/cisco-qfp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/cisco-qfp.inc.php
 
 		-
 			message: """
@@ -702,6 +1966,14 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
 			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
 			path: includes/discovery/cisco-vrf-lite.inc.php
 
 		-
@@ -738,35 +2010,27 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/entity-physical.inc.php
+			path: includes/discovery/discovery-protocols.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/entity-physical.inc.php
+			path: includes/discovery/discovery-protocols.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/entity-physical/cimc.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/entity-physical/cimc.inc.php
+			count: 3
+			path: includes/discovery/discovery-protocols.inc.php
 
 		-
 			message: """
@@ -804,6 +2068,14 @@ parameters:
 			message: """
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/entity-state.inc.php
@@ -818,6 +2090,46 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/fdb-table/aos6.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/fdb-table/aos7.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/fdb-table/arubaos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/fdb-table/bridge.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/fdb-table/edgeswitch.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -826,18 +2138,34 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 2
-			path: includes/discovery/functions.inc.php
+			path: includes/discovery/fdb-table/ios.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/fdb-table/vrp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/fdb-table/zynos.inc.php
 
 		-
 			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 9
+			count: 7
 			path: includes/discovery/functions.inc.php
 
 		-
@@ -853,14 +2181,6 @@ parameters:
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 3
-			path: includes/discovery/functions.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
 			count: 1
 			path: includes/discovery/functions.inc.php
 
@@ -868,145 +2188,129 @@ parameters:
 			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 4
+			path: includes/discovery/functions.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbUpdate\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 2
+			path: includes/discovery/functions.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbDelete\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchCell\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbInsert\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbUpdate\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbDelete\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchCell\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/loadbalancers/f5-gtm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/loadbalancers/f5-gtm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 7
-			path: includes/discovery/functions.inc.php
+			path: includes/discovery/loadbalancers/f5-ltm.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 10
-			path: includes/discovery/functions.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/hr-device.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/hr-device.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/hr-device.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/hr-device.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/hr-device.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 2
-			path: includes/discovery/ipv4-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 6
-			path: includes/discovery/ipv4-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/ipv4-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 2
-			path: includes/discovery/ipv4-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 2
-			path: includes/discovery/ipv4-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 2
-			path: includes/discovery/ipv6-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/ipv6-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/ipv6-addresses.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/junose-atm-vp.inc.php
+			path: includes/discovery/loadbalancers/f5-ltm.inc.php
 
 		-
 			message: """
@@ -1036,6 +2340,14 @@ parameters:
 			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/mef.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/mef.inc.php
@@ -1066,6 +2378,14 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ntp/awplus.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
@@ -1090,35 +2410,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/ports-stack.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/discovery/ports-stack.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/ports-stack.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/ports-stack.inc.php
+			path: includes/discovery/ntp/cisco.inc.php
 
 		-
 			message: """
@@ -1146,6 +2442,78 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/ports.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/ports/adva-fsp150cp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ports/airos-af-ltu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ports/brocade.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ports/cnmatrix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ports/edgeosolt.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/ports/loop-telecom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/ports/mlos-nsp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/ports/slms.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
@@ -1178,11 +2546,387 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/sensors/current/procurve.inc.php
+			path: includes/discovery/route.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/route.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/route.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/airflow/geist-watchdog.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/charge/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/charge/dsm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/eatonups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/eltex-mes23xx.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/charge/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/sensors/cisco-entity-sensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/cisco-entity-sensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/christie-projector.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/cisco.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/cisco.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/dhcpatriot.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/epson-projector.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/printer.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/count/sonicwall.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/count/webmon.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 26
+			path: includes/discovery/sensors/current/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/current/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/current/commander-plus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/current/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/cyberpower.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/current/eatonpdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/eatonups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/fs-net-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/current/gamatronicups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/ict-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/ict-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/ict-psu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/current/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_getnext\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/current/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/current/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/netonix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 15
+			path: includes/discovery/sensors/current/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/current/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/current/sitemonitor.inc.php
 
 		-
 			message: """
@@ -1194,11 +2938,27 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 2
-			path: includes/discovery/sensors/dbm/procurve.inc.php
+			path: includes/discovery/sensors/dbm/fabos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/dbm/fabos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 16
+			path: includes/discovery/sensors/dbm/fs-nmu.inc.php
 
 		-
 			message: """
@@ -1210,11 +2970,2363 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/sensors/entity-sensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/entity-sensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/benuos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/eltex-olt.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/f5.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/netonix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 2
-			path: includes/discovery/sensors/temperature/procurve.inc.php
+			path: includes/discovery/sensors/fanspeed/nos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/nos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/onefs.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/quanta.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/fanspeed/sgos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/fanspeed/supermicro.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/supermicro.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/xos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/fanspeed/xos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/frequency/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/frequency/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/frequency/eaton-ats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/frequency/eaton-ats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/frequency/eatonups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/frequency/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/frequency/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/frequency/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/sensors/frequency/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/frequency/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/frequency/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/frequency/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/frequency/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/frequency/rs.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 32
+			path: includes/discovery/sensors/gw-eydfa.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/gw-eydfa.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/humidity/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/humidity/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/humidity/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/humidity/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/sensors/humidity/minkelsrms.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/minkelsrms.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/pcoweb.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/sentry3.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/humidity/webmon.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/load/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/load/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/load/dhcpatriot.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/load/dhcpatriot.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/load/dsm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/load/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/load/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/netscaler.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/openbsd.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/ciscosb.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/dell-ups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/power/dsm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/eatonups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/power/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/netonix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/sensors/power/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/power/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/power/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/smartax.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/power/smartax.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power/xos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/power_consumed/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/adva-aos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 18
+			path: includes/discovery/sensors/pre-cache/adva_fsp150.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 19
+			path: includes/discovery/sensors/pre-cache/adva_fsp3kr7.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/aos-emu2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/aos-emu2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/pre-cache/arris-c3.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/pre-cache/arris-c4.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/avtech.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/sensors/pre-cache/awplus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/ciscoepc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/ciscosb.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/datacom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/dell-powervault.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/eltex-mes21xx.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/eltex-mes23xx.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/pre-cache/enlogic-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/exos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/geist-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/ifotec.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/ifotec.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/pre-cache/infinera-groove.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/pre-cache/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/luminato.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/pbn.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/poweralert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/raisecom-ros.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/raisecom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/pre-cache/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 17
+			path: includes/discovery/sensors/pre-cache/schleifenbauer.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
+			path: includes/discovery/sensors/pre-cache/sentry4.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/serverscheck.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/terra-sdi410c.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/terra-sdi480.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/tpdin.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/pre-cache/websensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/pre-cache/wipipe.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/rpigpiomonitor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 11
+			path: includes/discovery/sensors/runtime/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/runtime/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/runtime/dell-ups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/runtime/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/signal/cambium.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/signal/canopy.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/airos-af-ltu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/state/airos-af60.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/state/aos-emu2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/aos6.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/aos6.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/sensors/state/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/arubaos-cx.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/axiscam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/boss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/commander-plus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/ctm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/dhcpatriot.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/eltek-webpower.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/state/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/eurostor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/extendair.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/state/fs-nmu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/hp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/hp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/ict-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/innovaphone.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/juniper-mss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/loop-telecom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 13
+			path: includes/discovery/sensors/state/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/pcoweb.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/powervault.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/printer.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/procurve.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/quanta.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/serveriron.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/sitemonitor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/state/sm-os.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/state/voss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/state/wipipe.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/aen.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/akcp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/aos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/aos6.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: includes/discovery/sensors/temperature/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/temperature/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/temperature/arris-c4.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/ats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/axiscam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/beagleboard.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/benuos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/binos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/binox.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/boss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: includes/discovery/sensors/temperature/calix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/temperature/calix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/cisco.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/cisco.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/temperature/ciscowlc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/commander-plus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/comware.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/dhcpatriot.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/dnos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/dnos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/eltex-olt.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/equallogic.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/ericsson-ml.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/extendair.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/f5.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/temperature/ftos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/geist-watchdog.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/geist-watchdog.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/hpblmos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/hytera.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/hytera.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/ibmnos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/ies.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/ies.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/temperature/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/junose.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/junose.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/lantronix-slc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/liebert.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/temperature/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/microsemipdsine.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/mimosa.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/sensors/temperature/minkelsrms.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/minkelsrms.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/temperature/netapp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/netapp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/netonix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/nos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/nos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/onefs.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/papouch-tme.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/pcoweb.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/powerconnect.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/powerconnect.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/powerconnect.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/quanta.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/temperature/raisecom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/raritan-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/rfc1628.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/saf.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/sentry3.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/sentry4.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/seos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/seos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/temperature/serveriron.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/temperature/sgos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/siklu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/temperature/sitemonitor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/smartax.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/sub10.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/temperature/sub10.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/temperature/supermicro.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/supermicro.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/terra.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/sensors/temperature/voss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/voss.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/webmon.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/websensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/websensor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/xos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/temperature/zxdsl.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/sensors/voltage/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/voltage/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/voltage/apc.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/areca.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/benuos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/ceraos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/commander-plus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/compas.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/cyberpower.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/dell.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 6
+			path: includes/discovery/sensors/voltage/dsm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/voltage/eaton-ats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/eaton-ats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/voltage/eatonups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/fs-net-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/voltage/gamatronicups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/geist-watchdog.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/hytera.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/hytera.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/ict-pdu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/voltage/ict-psu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/voltage/ipoman.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: includes/discovery/sensors/voltage/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/linux.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/sensors/voltage/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/sensors/voltage/mgeups.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/microsemipdsine.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 15
+			path: includes/discovery/sensors/voltage/netagent2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/netonix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/onefs.inc.php
 
 		-
 			message: """
@@ -1226,43 +5338,67 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/storage.inc.php
+			count: 2
+			path: includes/discovery/sensors/voltage/raritan-pdu.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/storage.inc.php
+			path: includes/discovery/sensors/voltage/rfc1628.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/storage/freenas-dataset.inc.php
+			count: 3
+			path: includes/discovery/sensors/voltage/rfc1628.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/storage/freenas-zpool.inc.php
+			path: includes/discovery/sensors/voltage/saf.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/storage/ucd-dsktable.inc.php
+			path: includes/discovery/sensors/voltage/siklu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/sensors/voltage/sitemonitor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/sensors/voltage/terra.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/services.inc.php
 
 		-
 			message: """
@@ -1292,6 +5428,14 @@ parameters:
 			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/ucd-diskio.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/ucd-diskio.inc.php
@@ -1322,6 +5466,30 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/aos6.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/aos6.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -1332,6 +5500,22 @@ parameters:
 			message: """
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/aos7.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/aos7.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/discovery/vlans/aos7.inc.php
@@ -1354,6 +5538,14 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/discovery/vlans/boss.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -1366,6 +5558,30 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
 			count: 1
+			path: includes/discovery/vlans/cisco-vtp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/cisco-vtp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/discovery/vlans/cisco-vtp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
 			path: includes/discovery/vlans/cisco-vtp.inc.php
 
 		-
@@ -1386,6 +5602,22 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/discovery/vlans/jetstream.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/discovery/vlans/jetstream.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -1402,35 +5634,27 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/vmware-vminfo.inc.php
+			path: includes/discovery/vlans/junos.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/vmware-vminfo.inc.php
+			count: 9
+			path: includes/discovery/vlans/junos.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/discovery/vmware-vminfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/discovery/vmware-vminfo.inc.php
+			path: includes/discovery/vlans/q-bridge-mib.inc.php
 
 		-
 			message: """
@@ -1482,18 +5706,34 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbBulkInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 5
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_twopart_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/functions.php
+			path: includes/discovery/vrf.inc.php
 
 		-
 			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
-			count: 6
+			count: 5
 			path: includes/functions.php
 
 		-
@@ -1501,7 +5741,7 @@ parameters:
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 6
+			count: 1
 			path: includes/functions.php
 
 		-
@@ -1509,7 +5749,7 @@ parameters:
 				#^Call to deprecated function dbFetchRow\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 5
+			count: 2
 			path: includes/functions.php
 
 		-
@@ -1517,7 +5757,7 @@ parameters:
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 3
+			count: 1
 			path: includes/functions.php
 
 		-
@@ -1533,7 +5773,7 @@ parameters:
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
-			count: 5
+			count: 2
 			path: includes/functions.php
 
 		-
@@ -1549,7 +5789,7 @@ parameters:
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
-			count: 6
+			count: 4
 			path: includes/functions.php
 
 		-
@@ -1581,7 +5821,7 @@ parameters:
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 47
+			count: 36
 			path: includes/html/api_functions.inc.php
 
 		-
@@ -1639,46 +5879,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/common/alerts.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/common/availability-map.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 3
-			path: includes/html/common/availability-map.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/common/availability-map.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/common/worldmap.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 9
-			path: includes/html/common/worldmap.inc.php
 
 		-
 			message: """
@@ -1834,22 +6034,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
-			"""
-			count: 1
-			path: includes/html/forms/application-update.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/html/forms/application-update.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbInsert\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
@@ -1898,10 +6082,18 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/html/forms/customoid.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbDelete\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 			"""
-			count: 6
+			count: 5
 			path: includes/html/forms/delete-alert-rule.inc.php
 
 		-
@@ -2357,7 +6549,7 @@ parameters:
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 3
+			count: 1
 			path: includes/html/functions.inc.php
 
 		-
@@ -2782,23 +6974,7 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/graphs/sensor/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/graphs/service/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/graphs/sla-jitter-jitter.inc.php
 
 		-
 			message: """
@@ -2930,6 +7106,14 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function dbFetchRow\\(\\)\\:
+				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+			"""
+			count: 1
+			path: includes/html/modal/new_bill.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -2938,11 +7122,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function gen_snmpwalk_cmd\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/html/modal/new_bill.inc.php
+			path: includes/html/output/capture.inc.php
 
 		-
 			message: """
@@ -3114,24 +7298,8 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/edit/snmp.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/edit/snmp.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
 			count: 1
 			path: includes/html/pages/device/edit/snmp.inc.php
@@ -3167,14 +7335,6 @@ parameters:
 			"""
 			count: 2
 			path: includes/html/pages/device/graphs.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/graphs/availability.inc.php
 
 		-
 			message: """
@@ -3282,27 +7442,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/overview/c6kxbar.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
 			path: includes/html/pages/device/overview/eventlog.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/overview/generic/sensor.inc.php
 
 		-
 			message: """
@@ -3319,14 +7463,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/pages/device/overview/processors.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchKeyValue\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/overview/puppet_agent.inc.php
 
 		-
 			message: """
@@ -3431,22 +7567,6 @@ parameters:
 			"""
 			count: 3
 			path: includes/html/pages/device/port/vlans.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/ports.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/device/ports/neighbours.inc.php
 
 		-
 			message: """
@@ -3642,35 +7762,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/fullscreenmap.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
 			path: includes/html/pages/iftype.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/pages/inventory.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/pages/notifications.inc.php
 
 		-
 			message: """
@@ -3922,14 +8018,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbQuery\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#building\\-queries$#
-			"""
-			count: 1
-			path: includes/html/pages/syslog.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchColumn\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4002,62 +8090,6 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/print-interface.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/print-interface.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 5
-			path: includes/html/print-interface.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 11
-			path: includes/html/print-interface.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/print-map.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-map.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 2
-			path: includes/html/print-map.inc.php
-
-		-
-			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4125,7 +8157,7 @@ parameters:
 				#^Call to deprecated function dbFetchCell\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
-			count: 3
+			count: 1
 			path: includes/html/table/alertlog.inc.php
 
 		-
@@ -4174,38 +8206,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/table/arp-search.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/arp-search.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/arp-search.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/arp-search.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/table/as-selection.inc.php
 
 		-
@@ -4247,30 +8247,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/table/eventlog.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/inventory.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/inventory.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/inventory.inc.php
 
 		-
 			message: """
@@ -4454,22 +8430,6 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
-			path: includes/html/table/tnmsneinfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/table/tnmsneinfo.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchCell\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
 			path: includes/html/table/toner.inc.php
 
 		-
@@ -4479,6 +8439,206 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/table/toner.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/apache.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/asterisk.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/bind.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/bird2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/dhcp-stats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/entropy.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/exim-stats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/freeradius.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/freeswitch.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/icecast.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/mailscanner.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/mysql.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/nfs-server.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/nfs-stats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/nfs-v3-stats.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/nginx.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/nvidia.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/opengridscheduler.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/opensips.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/os-updates.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/pi-hole.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/applications/postfix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/postgres.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/powerdns-dnsdist.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/applications/powerdns-recursor.inc.php
 
 		-
 			message: """
@@ -4506,67 +8666,67 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/aruba-controller.inc.php
+			path: includes/polling/applications/proxmox.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/aruba-controller.inc.php
+			path: includes/polling/applications/rrdcached.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
-			count: 2
-			path: includes/polling/aruba-controller.inc.php
+			count: 1
+			path: includes/polling/applications/sdfsinfo.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/availability.inc.php
+			path: includes/polling/applications/shoutcast.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchColumn\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/availability.inc.php
+			path: includes/polling/applications/unbound.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/availability.inc.php
+			path: includes/polling/applications/ups-nut.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_walk\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/availability.inc.php
+			path: includes/polling/applications/ups-nut.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/availability.inc.php
+			path: includes/polling/applications/voip-monitor.inc.php
 
 		-
 			message: """
@@ -4582,6 +8742,38 @@ parameters:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
 			count: 3
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 12
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 9
 			path: includes/polling/bgp-peers.inc.php
 
 		-
@@ -4626,6 +8818,14 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4650,6 +8850,14 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/cisco-ace-loadbalancer.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4668,6 +8876,14 @@ parameters:
 			message: """
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/polling/cisco-ace-serverfarms.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/polling/cisco-ace-serverfarms.inc.php
@@ -4714,6 +8930,22 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/cisco-ipsec-flow-monitor.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4727,6 +8959,38 @@ parameters:
 			"""
 			count: 1
 			path: includes/polling/cisco-mac-accounting.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/polling/cisco-otv.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/cisco-qfp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/cisco-remote-access-monitor.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/cisco-vpdn.inc.php
 
 		-
 			message: """
@@ -4746,35 +9010,11 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbDelete\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/entity-physical/state.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/polling/entity-physical/state.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/entity-physical/state.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/polling/entity-physical/state.inc.php
+			path: includes/polling/customoid.inc.php
 
 		-
 			message: """
@@ -4796,6 +9036,22 @@ parameters:
 			message: """
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/polling/entity-state.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/entity-state.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/polling/entity-state.inc.php
@@ -4837,8 +9093,40 @@ parameters:
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
 			"""
-			count: 4
+			count: 2
 			path: includes/polling/functions.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/hr-mib.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ipSystemStats.inc.php
 
 		-
 			message: """
@@ -4866,6 +9154,46 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 8
+			path: includes/polling/junose-atm-vp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/polling/loadbalancers/f5-gtm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 7
+			path: includes/polling/loadbalancers/f5-ltm-currconns.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 23
+			path: includes/polling/loadbalancers/f5-ltm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/loadbalancers/f5-ltm.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4876,6 +9204,14 @@ parameters:
 			message: """
 				#^Call to deprecated function dbUpdate\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+			"""
+			count: 1
+			path: includes/polling/mef.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
 			path: includes/polling/mef.inc.php
@@ -4914,19 +9250,27 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/os/vmware-esxi.inc.php
+			path: includes/polling/netscaler-vsvr.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/os/vmware-esxi.inc.php
+			path: includes/polling/ntp/awplus.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_array_num\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ntp/cisco.inc.php
 
 		-
 			message: """
@@ -4954,6 +9298,174 @@ parameters:
 
 		-
 			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 4
+			path: includes/polling/ports.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 22
+			path: includes/polling/ports.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/exalink-fusion.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/f5.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/adva-fsp150cp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/airos-af-ltu.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/airos-af.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/ciena-sds.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/cmm.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/cnmatrix.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/cxr-ts.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/edgeosolt.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/fabos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 3
+			path: includes/polling/ports/os/horizon-quantum.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_multi_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/infinera-groove.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/junos.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/loop-telecom.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/mlos-nsp.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/nokia-isam.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_group\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 2
+			path: includes/polling/ports/os/procera.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ports/os/slms.inc.php
+
+		-
+			message: """
 				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
@@ -4978,19 +9490,35 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetchRows\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/storage.inc.php
+			path: includes/polling/sensors/load/dhcpatriot.inc.php
 
 		-
 			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
 			"""
 			count: 1
-			path: includes/polling/storage.inc.php
+			path: includes/polling/sensors/pre-cache/aos-emu2.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/sensors/pre-cache/geist-watchdog.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/sensors/temperature/cambium.inc.php
 
 		-
 			message: """
@@ -4999,6 +9527,30 @@ parameters:
 			"""
 			count: 1
 			path: includes/polling/ucd-diskio.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ucd-diskio.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmp_get_multi\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ucd-mib.inc.php
+
+		-
+			message: """
+				#^Call to deprecated function snmpwalk_cache_oid\\(\\)\\:
+				Please use SnmpQuery instead$#
+			"""
+			count: 1
+			path: includes/polling/ucd-mib.inc.php
 
 		-
 			message: """
@@ -5103,30 +9655,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/services.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbInsert\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/sql-schema/update.php
-
-		-
-			message: """
-				#^Call to deprecated function dbQuery\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#building\\-queries$#
-			"""
-			count: 2
-			path: includes/sql-schema/update.php
-
-		-
-			message: """
-				#^Call to deprecated function dbUpdate\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
-			"""
-			count: 1
-			path: includes/sql-schema/update.php
 
 		-
 			message: """

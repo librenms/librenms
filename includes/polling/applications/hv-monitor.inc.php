@@ -139,7 +139,7 @@ $totals_fields = [
 
 $rrd_name = ['app', $name, $app->app_id];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $totals_fields);
+app('Datastore')->put($device, 'app', $tags, $totals_fields);
 
 //
 // handle each VM
@@ -235,7 +235,7 @@ foreach ($return_data['VMs'] as $vm => $vm_info) {
 
     $rrd_name = ['app', $name, $app->app_id, 'vm', $vm];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $vm_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $vm_fields);
+    app('Datastore')->put($device, 'app', $tags, $vm_fields);
 }
 sort($VMs);
 $app_data['VMs'] = $VMs;
@@ -278,7 +278,7 @@ foreach ($VMs as $vm) {
 
         $rrd_name = ['app', $name, $app->app_id, 'vmdisk', $vm, '__-__', $disk];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $disk_rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $disk_fields);
+        app('Datastore')->put($device, 'app', $tags, $disk_fields);
     }
     sort($vm_disks);
 
@@ -323,7 +323,7 @@ foreach ($VMs as $vm) {
 
         $rrd_name = ['app', $name, $app->app_id, 'vmif', $vm, '__-__', $vm_if];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $if_rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $if_fields);
+        app('Datastore')->put($device, 'app', $tags, $if_fields);
     }
 
     $app_data['VMifs'][$vm] = $vm_ifs;

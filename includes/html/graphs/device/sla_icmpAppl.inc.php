@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to Graph Huawei VRP Icmp metrics
  *

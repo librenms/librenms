@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SyncsModels.php
  *
@@ -39,7 +40,7 @@ trait SyncsModels
      * @param  \Illuminate\Database\Eloquent\Model  $parentModel
      * @param  string  $relationship
      * @param  \Illuminate\Support\Collection<Keyable>  $models  \LibreNMS\Interfaces\Models\Keyable
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function syncModels($parentModel, $relationship, $models, $existing = null): Collection
     {
@@ -102,9 +103,9 @@ trait SyncsModels
      * Combine a list of existing and potentially new models
      * If the model exists fill any new data from the new models
      *
-     * @param  \Illuminate\Support\Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
-     * @param  \Illuminate\Support\Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
-     * @return \Illuminate\Support\Collection
+     * @param  Collection  $existing  \LibreNMS\Interfaces\Models\Keyable
+     * @param  Collection  $discovered  \LibreNMS\Interfaces\Models\Keyable
+     * @return Collection
      */
     protected function fillNew(Collection $existing, Collection $discovered): Collection
     {

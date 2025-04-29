@@ -1,4 +1,5 @@
 <?php
+
 /**
  * includes/html/pages/device/health.inc.php
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessRssiDiscovery.php
  *

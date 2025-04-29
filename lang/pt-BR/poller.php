@@ -5,23 +5,23 @@ return [
         'settings' => [
             'poller_groups' => [
                 'description' => 'Grupos Atribuídos',
-                'help' => 'Este nó só agirá em dispositivos nestes grupos de poller.',
+                'help' => 'Este nó só agirá em dispositivos nestes grupos de coleta de dados.',
             ],
             'poller_enabled' => [
-                'description' => 'Poller Habilitado',
-                'help' => 'Habilitar workers de poller neste nó.',
+                'description' => 'Coletor de Dados Habilitado',
+                'help' => 'Habilitar workers de coleta de dados neste nó.',
             ],
             'poller_workers' => [
-                'description' => 'Workers de Poller',
-                'help' => 'Quantidade de workers de poller a serem gerados neste nó.',
+                'description' => 'Workers de Coleta de Dados',
+                'help' => 'Quantidade de workers de coleta de dados a serem gerados neste nó.',
             ],
             'poller_frequency' => [
-                'description' => 'Frequência do Poller (Aviso!)',
-                'help' => 'Com que frequência pollar dispositivos neste nó. Aviso! Alterar isso sem corrigir os arquivos rrd quebrará os gráficos. Veja a documentação para mais informações.',
+                'description' => 'Frequência da Coleta de Dados (Aviso!)',
+                'help' => 'Com que frequência coletar dados de dispositivos neste nó. Aviso! Alterar isso sem corrigir os arquivos rrd corromperá os gráficos. Leia a documentação para mais informações.',
             ],
             'poller_down_retry' => [
-                'description' => 'Repetição de Dispositivo Offline',
-                'help' => 'Se um dispositivo estiver offline quando o polling for tentado neste nó. Este é o tempo de espera antes de tentar novamente.',
+                'description' => 'Repetição para Dispositivo Offline',
+                'help' => 'Se um dispositivo estiver offline quando a coleta for tentada neste nó, este é o tempo de espera antes de tentar novamente.',
             ],
             'discovery_enabled' => [
                 'description' => 'Descoberta Habilitada',
@@ -45,7 +45,7 @@ return [
             ],
             'services_frequency' => [
                 'description' => 'Frequência dos Serviços',
-                'help' => 'Com que frequência executar serviços neste nó. Isso deve corresponder à frequência do poller.',
+                'help' => 'Com que frequência executar serviços neste nó. Isso deve corresponder à frequência do coletor de dados.',
             ],
             'billing_enabled' => [
                 'description' => 'Tarifação Habilitada',
@@ -64,8 +64,8 @@ return [
                 'help' => 'Habilitar o worker de alertas neste nó.',
             ],
             'alerting_frequency' => [
-                'description' => 'Frequência de Alertas',
-                'help' => 'Com que frequência as regras de alerta são verificadas neste nó. Note que os dados são atualizados apenas com base na frequência do poller.',
+                'description' => 'Frequência dos Alertas',
+                'help' => 'Com que frequência as regras de alerta são verificadas neste nó. Note que os dados são atualizados apenas com base na frequência do coletor de dados.',
             ],
             'ping_enabled' => [
                 'description' => 'Fast Ping Habilitado',
@@ -92,7 +92,7 @@ return [
                 'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se não tiver sido atualizado',
             ],
             'watchdog_log' => [
-                'description' => 'Arquivo de Log para Monitorar',
+                'description' => 'Arquivo de Log a ser Monitorardo',
                 'help' => 'O padrão é o arquivo de log do LibreNMS.',
             ],
         ],

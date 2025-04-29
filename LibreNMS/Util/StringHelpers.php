@@ -1,4 +1,5 @@
 <?php
+
 /**
  * StringHelpers.php
  *

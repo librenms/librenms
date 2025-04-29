@@ -1,4 +1,5 @@
 <?php
+
 /**
  * hp.inc.php
  *

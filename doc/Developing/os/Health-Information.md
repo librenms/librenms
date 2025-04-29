@@ -1,4 +1,4 @@
-#### Sensors
+## Sensors
 
 This document will guide you through adding health / sensor
 information for your new device.
@@ -39,7 +39,7 @@ the values we expect to see the data in:
 | waterflow                       | l/m                         |
 | percent                         | %                           |
 
-#### Simple health discovery
+### Simple health discovery
 
 We have support for defining health / sensor discovery using YAML
 files so that you don't need to know how to write PHP.
@@ -150,9 +150,29 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-When referencing an oid in another table the full index will be used to match the other table.
-If this is undesirable, you may use a single sub index by appending the sub index after a colon to
-the variable name.  Example `{{ $ifName:2 }}`
+#### Fetching values from other tables/oids
+
+When referencing an oid in another table the full index will be used to match
+the other table. If the indexes of the two tables don't match, you will need
+to specify which indexes to use by their index position starting with 0. The
+data for the other table must be fetched already.
+
+`{{ IF-MIB::ifName:2 }}`
+
+This simple example shows using the 3rd (0 is the first) index value from
+the current table to fetch the IF-MIB::ifName value from the data.
+
+Additionally, you may specify multiple index values with either a
+range or list of index positions.
+
+Range: `{{ IP-MIB::ipAddressPrefixOrigin:0-3 }}`
+List: `{{ IP-MIB::ipAddressPrefixOrigin:2.3.1.4 }}`
+
+#### Skipping rows of the returned data
+
+You can filter rows of the data returned to only discover valid sensors.
+This is often useful when devices always return all sensors possible or
+mix sensor types in a single table.
 
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
@@ -220,7 +240,7 @@ Example:
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
-#### Advanced health discovery
+### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
 the discovery code in php. If it is possible to create via yaml, php discovery
@@ -290,7 +310,7 @@ where possible. The value for the OID is already available as `$sensor_value`.
 Graphing is performed automatically for sensors, no custom graphing is
 required or supported.
 
-#### Adding a new sensor class
+### Adding a new sensor class
 
 You will need to add code for your new sensor class in the following existing files:
 
@@ -338,83 +358,71 @@ This example shows how to build sensors using the advanced method. In this examp
 be collecting optical power level (dBm) from Adva FSP150CC family MetroE devices. This example
 will assume an understanding of SNMP and MIBs.
 
-First we setup `includes/discovery/sensors/pre_cache/adva_fsp150.inc` as shown below. The first
-line walks the cmEntityObject table to get information about the chassis and line cards. From
+The first line walks the cmEntityObject table to get information about the chassis and line cards. From
 this information we extract the model type which will identify which tables in the CM-Facility-Mib
-the ports are populated in. The program then reads the appropriate table into the `$pre_cache`
+the ports are populated in. The program then reads the appropriate table into the `$data`
 array `adva_fsp150_ports`. This array will have OID indexies for each port, which we will use
 later to identify our sensor OIDs.
-
-```
-$pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
-$neType = $pre_cache['adva_fsp150'][1]['neType'];
-
-if ($neType == 'ccxg116pro') {
-    $pre_cache['adva_fsp150_ports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetTrafficPortTable', $pre_cache['adva_fsp150_ports'], 'CM-FACILITY-MIB', null, '-OQUbs');
-} else {
-    $pre_cache['adva_fsp150_ports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetNetPortTable', $pre_cache['adva_fsp150_ports'], 'CM-FACILITY-MIB', null, '-OQUbs');
-    $pre_cache['adva_fsp150_ports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetAccPortTable', $pre_cache['adva_fsp150_ports'], 'CM-FACILITY-MIB', null, '-OQUbs');
-}
-```
 
 Next we are going to build our sensor discovery code. These are optical readings, so the file will be
 created as the dBm sensor type in `includes/discover/sensors/dbm/adva_fsp150.inc.php`. Below is
 a snippet of the code:
 
-```
-foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
-    if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber') {
+```php
+$data = SnmpQuery::walk([
+    'CM-FACILITY-MIB::cmEthernetTrafficPortTable',
+    'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT',
+    'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR',
+])->valuesByIndex();
+
+foreach ($data as $index => $entry) {
+    if (isset($entry['CM-FACILITY-MIB::cmEthernetTrafficPortMediaType']) && $entry['CM-FACILITY-MIB::cmEthernetTrafficPortMediaType'] == 'fiber') {
         //Discover received power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33.' . $index . '.3';
-        $currentRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
-        $currentTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        $currentTx = $data[$index . '.3']['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT'] ?? null;
+        $currentRx = $data[$index . '.3']['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR'] ?? null;
         if ($currentRx != 0 || $currentTx != 0) {
-            $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
-            $entPhysicalIndex_measured = 'ports';
-            $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
+            $ifIndex = $entry['CM-FACILITY-MIB::cmEthernetTrafficPortIfIndex'] ?? 0;
+            $ifName = PortCache::getByIfIndex($ifIndex)?->ifName;
 
-            discover_sensor(
-                null,
-                'dbm',
-                $device,
-                $oidRx,
-                'cmEthernetTrafficPortStatsOPR.' . $index,
-                'adva_fsp150',
-                $descrRx,
-                $divisor,
-                $multiplier,
-                null,
-                null,
-                null,
-                null,
-                $currentRx,
-                'snmp',
-                $entPhysicalIndex,
-                $entPhysicalIndex_measured
-            );
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => $poller_type,
+                'sensor_class' => 'dbm,
+                'device_id' => $device['device_id'],
+                'sensor_oid' => $oidRx,
+                'sensor_index' => 'cmEthernetTrafficPortStatsOPR.' . $index,
+                'sensor_type' => 'adva_fsp150,
+                'sensor_descr' => $ifName . ' Rx Power',
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_limit' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_current' => $currentRx,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'ports',
+            ]));
 
-            $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
-
-            discover_sensor(
-                null,
-                'dbm',
-                $device,
-                $oidTx,
-                'cmEthernetTrafficPortStatsOPT.' . $index,
-                'adva_fsp150',
-                $descrTx,
-                $divisor,
-                $multiplier,
-                null,
-                null,
-                null,
-                null,
-                $currentTx,
-                'snmp',
-                $entPhysicalIndex,
-                $entPhysicalIndex_measured
-            );
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => $poller_type,
+                'sensor_class' => 'dbm,
+                'device_id' => $device['device_id'],
+                'sensor_oid' => $oidRx,
+                'sensor_index' => 'cmEthernetTrafficPortStatsOPT.' . $index,
+                'sensor_type' => 'adva_fsp150,
+                'sensor_descr' => $ifName . ' Tx Power',
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_limit' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_current' => $currentTx,
+                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex_measured' => 'ports',
+            ]));
         }
     }
 }
@@ -438,9 +446,9 @@ that port. Note that while this is the case with Adva, other vendors may differ 
 optics that do not supply DOM. Please check your vendor's mibs.
 
 Next the program assigns the values of $entPhysicalIndex and $entPhysicalIndex_measured. In this
-case $entPhysicalIndex is set to the value of the `cmEthernetTrafficPortIfIndex` so that it is
-associated with port. This will also allow the sensor graphs to show up on the associated port's
-page in the GUI in addition to the Health page.
+case $entPhysicalIndex is set to the value of the `CM-FACILITY-MIB::cmEthernetTrafficPortIfIndex`
+so that it is associated with port. This will also allow the sensor graphs to show up on the
+associated port's page in the GUI in addition to the Health page.
 
 Following that the program uses a database call to get the description of the port which will be
 used as the title for the graph in the GUI.

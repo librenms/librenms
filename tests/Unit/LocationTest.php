@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LocationTest.php
  *
@@ -128,7 +129,16 @@ class LocationTest extends TestCase
         $example = 'SW1A2AA.find.me.uk';
         $expected = ['lat' => 51.50354111111111, 'lng' => -0.12766972222222223];
 
-        $result = (new Dns())->getCoordinates($example);
+        $this->mock(\Net_DNS2_Resolver::class, function (MockInterface $mock) use ($example, $expected) {
+            $loc = new \Net_DNS2_RR_LOC();
+            $loc->name = $example;
+            $loc->latitude = $expected['lat'];
+            $loc->longitude = $expected['lng'];
+            $answer = (object) ['answer' => [$loc]];
+            $mock->shouldReceive('query')->with($example, 'LOC')->once()->andReturn($answer);
+        });
+
+        $result = $this->app->make(Dns::class)->getCoordinates($example);
 
         $this->assertEquals($expected, $result);
     }

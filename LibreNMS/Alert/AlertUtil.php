@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertUtil.php
  *
@@ -148,7 +149,7 @@ class AlertUtil
 
     public static function findContactsRoles(array $roles): array
     {
-        return User::whereIs(...$roles)->whereNot('email', '')->pluck('realname', 'email')->toArray();
+        return User::role($roles)->whereNot('email', '')->pluck('realname', 'email')->toArray();
     }
 
     public static function findContactsSysContact(array $results): array

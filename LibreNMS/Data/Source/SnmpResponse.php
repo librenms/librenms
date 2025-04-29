@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpResponse.php
  *
@@ -120,7 +121,7 @@ class SnmpResponse
             // if this is a textual oid without an index, match the first one at any index
             if (! preg_match('/[.[]\d+]?$/', $oid)) {
                 foreach ($values as $key => $value) {
-                    if (preg_match('/^' . preg_quote($oid) . '[.[]/', $key) && $value !== '') {
+                    if (preg_match('/^' . preg_quote($oid, '/') . '[.[]/', $key) && $value !== '') {
                         return $value;
                     }
                 }
@@ -301,7 +302,7 @@ class SnmpResponse
     {
         return (string) preg_replace([
             '/^.*No Such Instance currently exists.*$/m',
-            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/',
+            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
         ], '', $this->raw);
     }
 

@@ -65,6 +65,7 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.ucd-diskio true
     lnms config:set poller_modules.wireless true
     lnms config:set poller_modules.ospf true
+    lnms config:set poller_modules.ospfv3 true
     lnms config:set poller_modules.cisco-ipsec-flow-monitor false
     lnms config:set poller_modules.cisco-remote-access-monitor false
     lnms config:set poller_modules.cisco-cef false
@@ -152,6 +153,8 @@ configured to be ignored by config options.
 `wifi`: WiFi Support for those devices with support.
 
 `ospf`: OSPF Support.
+
+`ospfv3`: OSPFv3 Support.
 
 `cisco-ipsec-flow-monitor`: IPSec statistics support.
 

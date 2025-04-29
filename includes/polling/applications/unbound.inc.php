@@ -67,7 +67,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'queries', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 //Unbound Cache
 $rrd_def = RrdDefinition::make()
     ->addDataset('queries', 'GAUGE', 0, 125000000000)
@@ -86,7 +86,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'cache', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 //Unbound Operations - Total opcodes and three valuable return codes
 $rrd_def = RrdDefinition::make()
     ->addDataset('opcodeQuery', 'GAUGE', 0, 125000000000)
@@ -107,7 +107,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'operations', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //Unbound requestlist
 $rrd_def = RrdDefinition::make()
@@ -127,7 +127,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'requestlist', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //Unbound recursiontime
 $rrd_def = RrdDefinition::make()
@@ -145,7 +145,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'recursiontime', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $metrics);
 

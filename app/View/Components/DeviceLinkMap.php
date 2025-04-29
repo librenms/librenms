@@ -10,14 +10,14 @@ use LibreNMS\Util\Graph;
 class DeviceLinkMap extends Component
 {
     /**
-     * @var \App\Models\Device
+     * @var Device
      */
     public $device;
 
     /**
      * Create a new component instance.
      *
-     * @param  int|\App\Models\Device  $device
+     * @param  int|Device  $device
      */
     public function __construct($device)
     {

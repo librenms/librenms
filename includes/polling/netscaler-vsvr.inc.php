@@ -95,7 +95,7 @@ if ($device['os'] == 'netscaler') {
                 'rrd_name' => $rrd_name,
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'netscaler-vsvr', $tags, $fields);
+            app('Datastore')->put($device, 'netscaler-vsvr', $tags, $fields);
 
             echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad($vsvr['vsvrType'], 5) . ' | ' . str_pad($vsvr['vsvrState'], 6) . ' | ' . str_pad($vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad($vsvr['vsvrPort'], 5);
             echo ' | ' . str_pad($vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);

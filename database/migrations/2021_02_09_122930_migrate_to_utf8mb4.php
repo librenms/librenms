@@ -27,7 +27,7 @@ return new class extends Migration
 
     protected function migrateCharsetTo($charset, $collation)
     {
-        if (\LibreNMS\DB\Eloquent::getDriver() != 'mysql') {
+        if (LibreNMS\DB\Eloquent::getDriver() != 'mysql') {
             return;
         }
 

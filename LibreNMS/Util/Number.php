@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Number.php
  *
@@ -239,7 +240,7 @@ class Number
      *
      * @throws UncorrectableNegativeException
      */
-    public static function correctIntegerOverflow(mixed $value, ?int $max = null): int|null
+    public static function correctIntegerOverflow(mixed $value, ?int $max = null): ?int
     {
         if ($value === null) {
             return null;

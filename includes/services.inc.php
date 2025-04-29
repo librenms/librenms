@@ -184,7 +184,7 @@ function poll_service($service)
 
         $tags = compact('service_id', 'rrd_name', 'rrd_def');
         //TODO not sure if we have $device at this point, if we do replace faked $device
-        data_update(['hostname' => $service['hostname']], 'services', $tags, $fields);
+        app('Datastore')->put(['hostname' => $service['hostname']], 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {
@@ -199,7 +199,7 @@ function poll_service($service)
         $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
 
         Eventlog::log(
-            "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
+            "Service {$service['service_name']} ({$service['service_type']})' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
             $service['device_id'],
             'service',
             Severity::Warning,
@@ -263,7 +263,7 @@ function check_service($command)
         [$ds,$values] = explode('=', trim($string));
 
         // Keep the first value, discard the others.
-        $value = explode(';', trim($values));
+        $value = $values ? explode(';', trim($values)) : [];
         $value = trim($value[0] ?? '');
 
         // Set an empty uom

@@ -53,7 +53,7 @@ if (isset($ss[0])) {
         ];
 
         $tags = compact('rrd_def');
-        data_update($device, 'ucd_cpu', $tags, $fields);
+        app('Datastore')->put($device, 'ucd_cpu', $tags, $fields);
 
         $os->enableGraph('ucd_cpu');
     }
@@ -88,7 +88,7 @@ if (isset($ss[0])) {
             ];
 
             $tags = compact('oid', 'rrd_name', 'rrd_def');
-            data_update($device, 'ucd_cpu', $tags, $fields);
+            app('Datastore')->put($device, 'ucd_cpu', $tags, $fields);
 
             $os->enableGraph('ucd_cpu');
         }
@@ -141,7 +141,7 @@ if (is_numeric($load_raw[2]['laLoadInt'] ?? null)) {
     ];
 
     $tags = compact('rrd_def');
-    data_update($device, 'ucd_load', $tags, $fields);
+    app('Datastore')->put($device, 'ucd_load', $tags, $fields);
 
     $os->enableGraph('ucd_load');
 }
