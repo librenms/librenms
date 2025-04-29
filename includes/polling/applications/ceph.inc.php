@@ -18,7 +18,11 @@ if (! empty($agent_data['app'][$name])) {
     $ceph_data = $agent_data['app'][$name];
 } else {
     echo "\nUsing SNMP Extend data.\n";
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> fix-to-app-ceph
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
     $options = '-Oqv';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.4.99.101.112.104'; // OID for SNMP Extend
     $ceph_data = snmp_get($device, $oid, $options);
@@ -36,11 +40,35 @@ if (empty($ceph_data)) {
 $lines = explode("\n", $ceph_data);
 $current_section = null;
 
+<<<<<<< HEAD
+=======
+foreach ($lines as $line) {
+    $line = trim($line);
+    if (empty($line)) {
+        continue;
+    }
+
+    // Detect section headers
+    if (preg_match('/^<<<(.+?)>>>$/', $line, $matches)) {
+        $current_section = $matches[1];
+        echo "Detected section: $current_section\n";
+        continue;
+    }
+    if (strpos($line, '<') === 0 && strpos($line, '>') !== false) {
+        $current_section = trim($line, '<>');
+        echo "Detected subsection: $current_section\n";
+        continue;
+    }
+
+    // Process data based on the current section
+    switch ($current_section) {
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
 =======
 
 // Exit if no data is available
 if (empty($ceph_data)) {
     echo "No Ceph data available.\n";
+
     return;
 }
 
@@ -48,7 +76,10 @@ if (empty($ceph_data)) {
 $lines = explode("\n", $ceph_data);
 $current_section = null;
 
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
 foreach ($lines as $line) {
     $line = trim($line);
     if (empty($line)) {
@@ -59,26 +90,37 @@ foreach ($lines as $line) {
     if (preg_match('/^<<<(.+?)>>>$/', $line, $matches)) {
         $current_section = $matches[1];
 <<<<<<< HEAD
+<<<<<<< HEAD
         echo "Detected section: $current_section\n";
 =======
         echo "\nDetected section: $current_section\n";
 >>>>>>> origin/fix-to-app-ceph
+=======
+        echo "\nDetected section: $current_section\n";
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
         continue;
     }
     if (strpos($line, '<') === 0 && strpos($line, '>') !== false) {
         $current_section = trim($line, '<>');
 <<<<<<< HEAD
+<<<<<<< HEAD
         echo "Detected subsection: $current_section\n";
 =======
         echo "\nDetected subsection: $current_section\n";
 >>>>>>> origin/fix-to-app-ceph
+=======
+        echo "\nDetected subsection: $current_section\n";
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
         continue;
     }
 
     // Process data based on the current section
     switch ($current_section) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
         case 'poolstats':
             // Handling for Pool Stats
             $rrd_def = RrdDefinition::make()
@@ -105,7 +147,11 @@ foreach ($lines as $line) {
             save_to_datastore_and_rrd($device, $tags, $fields, $rrd_def);
             break;
 
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> fix-to-app-ceph
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
         case 'osdperformance':
             // OSD Performance
             $rrd_def = RrdDefinition::make()
@@ -161,7 +207,11 @@ foreach ($lines as $line) {
             echo "Unknown section: $current_section\n";
 =======
             echo "\nUnknown section: $current_section\n";
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> fix-to-app-ceph
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
             break;
     }
 }
@@ -177,7 +227,11 @@ function save_to_datastore_and_rrd($device, $tags, $fields, $rrd_def)
     echo " Saving to Datastore and RRD...\n";
     echo '  Tags: ' . json_encode($tags) . "\n";
     echo '  Fields: ' . json_encode($fields) . "\n";
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> fix-to-app-ceph
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
 
     // Save to Datastore
     app('Datastore')->put($device, 'app', $tags, $fields);
@@ -194,7 +248,11 @@ function save_to_datastore_and_rrd($device, $tags, $fields, $rrd_def)
 
     if (! file_exists($rrd_path)) {
         echo " Creating RRD file: $rrd_path\n";
+<<<<<<< HEAD
 >>>>>>> origin/fix-to-app-ceph
+=======
+>>>>>>> fix-to-app-ceph
+>>>>>>> 9151ed11d29f6181e410883613f3a18de6726aa4
     }
 }
 
