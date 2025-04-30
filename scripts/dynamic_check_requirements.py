@@ -3,7 +3,7 @@
 #
 # This file is part of LibreNMS
 
-__author__    = "Orsiris de Jong"
+__author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2021 LibreNMS"
 
 import os
@@ -19,11 +19,13 @@ except ImportError:
 # Try to use packaging for parsing; if unavailable, fallback to pkg_resources
 try:
     from packaging.requirements import Requirement
-    from packaging.specifiers   import SpecifierSet
+    from packaging.specifiers import SpecifierSet
+
     USE_PACKAGING = True
 except ImportError:
     try:
         import pkg_resources
+
         USE_PACKAGING = False
     except ImportError:
         print(
@@ -88,7 +90,9 @@ def check(requirements: List[str], verbose: bool) -> None:
 
             if spec and not spec.contains(installed, prereleases=True):
                 if verbose:
-                    print(f"Required version not satisfied: {name}{spec} (installed {installed})")
+                    print(
+                        f"Required version not satisfied: {name}{spec} (installed {installed})"
+                    )
                 sys.exit(2)
 
         sys.exit(0)
@@ -119,4 +123,3 @@ if __name__ == "__main__":
         print("Required packages:", requirements)
 
     check(requirements, verbose)
-
