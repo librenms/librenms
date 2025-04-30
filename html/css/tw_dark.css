@@ -1236,7 +1236,8 @@ html.tw\:dark .panel-title > .small > a {
 }
 
 html.tw\:dark .panel-footer {
-    background-color: #3e444c
+    background-color: #3e444c;
+    border-color: rgba(0, 0, 0, 0.6);
 }
 
 html.tw\:dark .panel-default {
