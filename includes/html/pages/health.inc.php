@@ -63,6 +63,7 @@ $type_text = [
     'eer' => 'Energy Efficiency Ratio',
     'waterflow' => 'Water Flow Rate',
     'percent' => 'Percent',
+    'span_loss' => 'dB',
 ];
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');
