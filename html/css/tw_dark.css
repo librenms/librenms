@@ -31,8 +31,8 @@ html.tw\:dark textarea {
 
 @media print {
     html.tw\:dark *,
-html.tw\:dark *:before,
-html.tw\:dark *:after {
+    html.tw\:dark *:before,
+    html.tw\:dark *:after {
         color: #000 !important
     }
 
@@ -41,7 +41,7 @@ html.tw\:dark *:after {
     }
 
     html.tw\:dark .table td,
-html.tw\:dark .table th {
+    html.tw\:dark .table th {
         background-color: #fff !important
     }
 }
@@ -338,6 +338,14 @@ html.tw\:dark .table-hover > tbody > tr.danger:hover > td,
 html.tw\:dark .table-hover > tbody > tr:hover > .danger,
 html.tw\:dark .table-hover > tbody > tr.danger:hover > th {
     background-color: #ec4844
+}
+
+html.tw\:dark .bootgrid-table th > .column-header-anchor {
+    color: #bfc0c0;
+}
+
+html.tw\:dark .bootgrid-table th {
+    background-color: #3e444c;
 }
 
 html.tw\:dark legend {
@@ -881,8 +889,8 @@ html.tw\:dark .nav-tabs > li.active > a:focus {
 
 @media (min-width: 768px) {
     html.tw\:dark .nav-tabs.nav-justified > .active > a,
-html.tw\:dark .nav-tabs.nav-justified > .active > a:hover,
-html.tw\:dark .nav-tabs.nav-justified > .active > a:focus {
+    html.tw\:dark .nav-tabs.nav-justified > .active > a:hover,
+    html.tw\:dark .nav-tabs.nav-justified > .active > a:focus {
         border-bottom-color: #272b30
     }
 }
@@ -949,21 +957,21 @@ html.tw\:dark .navbar-default .navbar-nav > .open > a:focus {
     }
 
     html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
-html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+    html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
         color: #fff;
         background-color: #272b2e
     }
 
     html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
-html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
-html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
+    html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
         color: #fff;
         background-color: #272b2e
     }
 
     html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,
-html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,
-html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+    html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+    html.tw\:dark .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a:focus {
         color: #ccc;
         background-color: transparent
     }
