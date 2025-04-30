@@ -1,0 +1,45 @@
+mib: MPBC-2RU-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: MPBC-2RU-MIB::mpbc2RUSRPMonitor
+                    value: MPBC-2RU-MIB::mpbc2RUSRPCaseTempDegCx10
+                    num_oid: '.1.3.6.1.4.1.4464.2.2.8.2.5.{{ $index }}'
+                    descr: 'Case Temperature'
+                    divisor: 10
+                    index: 'mpbc2RUSRPCaseTempDegCx10.{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: MPBC-2RU-MIB::mpbc2RUSRPMonitor
+                    value: MPBC-2RU-MIB::mpbc2RUSRPMonSeedOutputPwrmWx10
+                    num_oid: '.1.3.6.1.4.1.4464.2.2.8.2.6.{{ $index }}'
+                    descr: 'Seed Output Power'
+                    divisor: 10
+                    user_func: mw_to_dbm
+                    index: 'mpbc2RUSRPMonSeedOutputPwrmWx10.{{ $index }}'
+                -
+                    oid: MPBC-2RU-MIB::mpbc2RUSRPMonitor
+                    value: MPBC-2RU-MIB::mpbc2RUSRPMainOutputPwrmWx10
+                    num_oid: '.1.3.6.1.4.1.4464.2.2.8.2.7.{{ $index }}'
+                    descr: 'Main Output Power'
+                    divisor: 10
+                    user_func: mw_to_dbm
+                    index: 'mpbc2RUSRPMainOutputPwrmWx10.{{ $index }}'
+                -
+                    oid: MPBC-2RU-MIB::mpbc2RUPxxMonitor
+                    value: MPBC-2RU-MIB::mpbc2RUPxxOutputPwrmW
+                    num_oid: '.1.3.6.1.4.1.4464.2.2.2.2.8.{{ $index }}'
+                    descr: 'Output Power'
+                    user_func: mw_to_dbm
+                    index: 'mpbc2RUPxxOutputPwrmW.{{ $index }}'
+                -
+                    oid: MPBC-2RU-MIB::mpbc2RUPxxMonitor
+                    value: MPBC-2RU-MIB::mpbc2RUPxxInputPwrmWx100
+                    num_oid: '.1.3.6.1.4.1.4464.2.2.2.2.10.{{ $index }}'
+                    descr: 'Input Power'
+                    divisor: 100
+                    user_func: mw_to_dbm
+                    index: 'mpbc2RUPxxInputPwrmWx100.{{ $index }}'

@@ -171,7 +171,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Storage::observe(\App\Observers\StorageObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
-        \App\Models\User::observe(\App\Observers\UserObserver::class);
+        User::observe(\App\Observers\UserObserver::class);
         \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
         \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
