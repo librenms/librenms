@@ -38,7 +38,7 @@ the values we expect to see the data in:
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
-| span_loss			  | dB				|
+| span_loss                       | dB                          |
 ### Simple health discovery
 
 We have support for defining health / sensor discovery using YAML
