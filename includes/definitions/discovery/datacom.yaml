@@ -19,7 +19,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: DMswitch-MIB::SwitchInfoEntry
+                    oid: DMswitch-MIB::switchInfoTable
                     value: DMswitch-MIB::swTemperature
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.2.1.12.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
