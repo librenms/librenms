@@ -26,6 +26,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'stack_with_syslog' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'syslog', 'flare'],
+            'ignore_exceptions' => false,
+        ],
+
         'console' => [
             'driver' => 'stack',
             'channels' => ['single', 'stdout', 'flare'],
@@ -84,6 +90,13 @@ return [
                 'stream' => 'php://stderr',
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'syslog' => [
+            'driver' => 'syslog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
+            'replace_placeholders' => true,
         ],
 
         'deprecations_channel' => [ // don't name deprecations
