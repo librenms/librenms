@@ -11,18 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ipv6_nd', function (Blueprint $table) {
-            $table->string('context_name', 128)->nullable()->change();
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('ipv6_nd', function (Blueprint $table) {
-            $table->string('context_name', 128)->change();
-        });
+        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('ipv6_nd', function (Blueprint $table) {
+                $table->string('context_name', 128)->nullable()->change();
+            });
+        }
     }
 };
