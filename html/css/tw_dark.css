@@ -961,3 +961,11 @@ html.tw\:dark A.grey:visited, html.tw\:dark A.grey, html.tw\:dark .grey {
 html.tw\:dark A.red:visited, html.tw\:dark A.red, html.tw\:dark .red {
     color: #d61818
     }
+
+html.tw\:dark .overlib-contents {
+    background-color: #2e3338;
+}
+html.tw\:dark #overDiv {
+    border: solid 1px #515151;
+    background-color: #808080;
+}
