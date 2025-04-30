@@ -1,0 +1,89 @@
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataDCBusBusVoltage
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.11.{{ $index }}'
+                    descr: 'DC Bus #{{ $index }} Voltage'
+
+        charge:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataBatBatChargeCapacity
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.91.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Charge'
+
+        runtime:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataBatCalculatedAutonomy
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.92.{{ $index }}'
+                    descr: 'Runtime'
+
+        temperature:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataBatBatTemp
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.71.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Temperature'
+
+        current:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataRectifiersRectifiersOutCurrent
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.22.{{ $index }}'
+                    index: 'es1dc1DataRectifiersRectifiersOutCurrent.{{ $index }}'
+                    descr: 'Output #{{ $index }} Current'
+                    high_limit:  SITE-MONITORING-MIB::es1dc1DataRectifiersRectifiersOutCurrentMax
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataLoadLoadCurrent
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.52.{{ $index }}'
+                    index: 'es1dc1DataLoadLoadCurrent.{{ $index }}'
+                    descr: 'Load #{{ $index }} Current'
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataBatBatInputCurrent
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.61.{{ $index }}'
+                    index: 'es1dc1DataBatBatInputCurrent.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Input Current'
+
+        state:
+            data:
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataBatBatTestState
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.72.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Test Status'
+                    state_name: 'es1dc1DataBatBatTestState'
+                    index: 'es1dc1DataBatBatTestState.{{ $index }}'
+                    states:
+                        - { value: 0, descr: 'Never Tested', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'Success', graph: 0, generic: 0 }
+                        - { value: 2, descr: 'On Going', graph: 0, generic: 1 }
+                        - { value: 3, descr: 'Failed: Timeout', graph: 0, generic: 1 }
+                        - { value: 4, descr: 'Failed: Vbus Too Low', graph: 0, generic: 1 }
+                        - { value: 5, descr: 'Failed: Load Too Low', graph: 0, generic: 1 }
+                        - { value: 6, descr: 'Failed: AC Failure', graph: 0, generic: 2 }
+                        - { value: 7, descr: 'Failed: Canceled', graph: 0, generic: 1 }
+                        - { value: 8, descr: 'Failed: LVD Opened', graph: 0, generic: 1 }
+                        - { value: 9, descr: 'Failed: No Battery', graph: 0, generic: 1 }
+                -
+                    oid:  SITE-MONITORING-MIB::es1dc1DataList
+                    value:  SITE-MONITORING-MIB::es1dc1DataSystemDCMode
+                    num_oid: '.1.3.6.1.4.1.26854.3.2.1.20.1.20.1.13.3.1.{{ $index }}'
+                    descr: 'System DC #{{ $index }} Mode'
+                    state_name: 'es1dc1DataSystemDCMode'
+                    index: 'es1dc1DataSystemDCMode.{{ $index }}'
+                    states:
+                        - { value: 0, descr: 'Float', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'Equalize', graph: 0, generic: 0 }
+                        - { value: 2, descr: 'Battery Test', graph: 0, generic: 1 }
+                        - { value: 3, descr: 'AC Failure', graph: 0, generic: 2 }
+                        - { value: 5, descr: 'Safe', graph: 0, generic: 0 }
