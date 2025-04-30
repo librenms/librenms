@@ -50,7 +50,7 @@
             </div>
         </form>
 
-        @foreach (array_filter(\LibreNMS\Config::get('auth.socialite.configs', []), fn($key) => $key !== '', ARRAY_FILTER_USE_KEY) as $provider => $config)
+        @foreach ($socialite as $provider => $config)
         <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw:mt-5">
             {{ csrf_field() }}
             <button type="submit" id="login" class="btn btn-success btn-block">
