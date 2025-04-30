@@ -1,4 +1,5 @@
 <?php
+
 use LibreNMS\Tests\TestCase;
 
 class LocationCoordinatesTest extends TestCase
@@ -22,6 +23,7 @@ class LocationCoordinatesTest extends TestCase
                 return true;
             }
         }
+
         return false;
     }
 
