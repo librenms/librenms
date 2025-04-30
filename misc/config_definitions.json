@@ -6258,12 +6258,13 @@
             "type": "boolean"
         },
         "site_style": {
-            "default": "light",
+            "default": "device",
             "group": "webui",
             "section": "style",
             "order": 1,
             "type": "select",
             "options": {
+                "device": "device",
                 "blue": "blue",
                 "dark": "dark",
                 "light": "light",

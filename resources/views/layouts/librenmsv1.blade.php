@@ -42,7 +42,8 @@
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
     @endforeach
@@ -81,11 +82,21 @@
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
-            document.documentElement.classList.add('tw:dark')
-        } else {
-            document.documentElement.classList.remove('tw:dark')
-        }
+        (function () {
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            const theme = '{{ LibreNMS\Config::get('applied_site_style') }}';
+            const applyTheme = (isDark) => {
+                document.documentElement.classList.toggle('tw:dark', isDark);
+            };
+
+            applyTheme(theme === 'dark' || (theme === 'device' && mediaQuery.matches));
+
+            mediaQuery.addEventListener('change', (event) => {
+                if (theme === 'device') {
+                    applyTheme(event.matches);
+                }
+            });
+        })();
     </script>
     @auth
         @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))

@@ -2131,3 +2131,14 @@ label {
     padding: 2px 3px 2px 0;
     z-index: 5;
 }
+.fa-nav-icons {
+    color: #383637;
+}
+
+.fa-col-danger {
+    color: #e30613;
+}
+
+.icon-theme {
+    color: black;
+}
