@@ -16,6 +16,9 @@ try:
 except ImportError:
     from importlib_metadata import version, PackageNotFoundError  # type: ignore
 
+# Initialize pkg_resources to satisfy linters
+pkg_resources = None  # type: Optional[object]
+
 # Try to use packaging for parsing; if unavailable, fallback to pkg_resources
 try:
     from packaging.requirements import Requirement
