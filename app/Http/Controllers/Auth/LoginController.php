@@ -51,7 +51,7 @@ class LoginController extends Controller
      */
     public function showLoginForm(Request $request)
     {
-        $socialite = array_filter(LibrenmsConfig::get('auth.socialite.configs', []), fn($key) => $key !== '', ARRAY_FILTER_USE_KEY);
+        $socialite = array_filter(LibrenmsConfig::get('auth.socialite.configs', []), fn ($key) => $key !== '', ARRAY_FILTER_USE_KEY);
 
         // Check if we want to redirect users to the socialite provider directly
         if (! $request->has('redirect') && ! $request->session()->has('block_auto_redirect') && LibrenmsConfig::get('auth.socialite.redirect') && array_key_first($socialite)) {
