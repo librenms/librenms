@@ -406,8 +406,12 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
 
             continue;
         }
-
         [$oid,$value] = explode('=', $entry, 2);
+
+        if (Str::contains($entry, ' = NULL')) {
+            continue;
+        }
+
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
         [$oid, $index] = explode('.', $oid, 2);
