@@ -88,7 +88,7 @@
             const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
             const theme = '{{ LibrenmsConfig::get('applied_site_style') }}';
             const applyTheme = (isDark) => {
-                document.documentElement.classList.toggle('tw:dark', isDark);
+                document.documentElement.classList.toggle('dark', isDark);
             };
 
             applyTheme(theme === 'dark' || (theme === 'device' && mediaQuery.matches));
