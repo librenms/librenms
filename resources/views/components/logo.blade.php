@@ -2,8 +2,8 @@
     'responsive' => false, // crop text at given breakpoint sm,md,lg,xl, etc
 ])
 
-@if(\LibreNMS\Config::get('title_image'))
-    <img {{ $attributes }} src="{{ asset(\LibreNMS\Config::get('title_image')) }}" alt="{{ LibrenmsConfig::get('project_name') }}">
+@if(LibrenmsConfig::get('title_image'))
+    <img {{ $attributes }} src="{{ asset(LibrenmsConfig::get('title_image')) }}" alt="{{ LibrenmsConfig::get('project_name') }}">
 @else
     <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600'])->class($responsive ? ['tw:hidden', "tw:$responsive:inline-block"] : []) }}
          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 32.275086">
