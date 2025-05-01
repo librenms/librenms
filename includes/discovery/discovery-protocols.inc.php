@@ -395,7 +395,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     }
                 }
 
-                if ( ! empty($remote_device_id)) {
+                if (! empty($remote_device_id)) {
                     $remote_device = device_by_id_cache($remote_device_id);
                     if ($remote_device['os'] == 'calix') {
                         $remote_port_name = 'EthPort ' . $lldp['lldpRemPortId'];
