@@ -1,6 +1,6 @@
 <x-panel class="tw:rounded-lg tw:overflow-hidden">
     <x-slot name="title">
-        <x-logo />
+        <x-logo class="logon-logo tw:h-auto tw:w-full" />
     </x-slot>
 
     @config('login_message')

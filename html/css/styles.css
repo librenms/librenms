@@ -1322,10 +1322,6 @@ tr.search:nth-child(odd) {
     font-size: 2.5em;
 }
 
-.navbar-debug {
-  min-height: 25px;
-}
-
 nav.navbar-sticky-top {
   position: sticky;
   top: 0;
@@ -1340,17 +1336,6 @@ nav.navbar-sticky-top {
 .navbar-brand {
   padding: 8px 15px 8px 15px !important;
   line-height: 32px;
-}
-
-@media (min-width: 992px) and (max-width: 1280px) {
-  .navbar-brand {
-    display: none !important;
-  }
-}
-
-.navbar-brand img {
-  height: 100%;
-  max-width: 170px;
 }
 
 #visualization {

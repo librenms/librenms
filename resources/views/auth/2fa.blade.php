@@ -10,7 +10,7 @@
     <div class="col-md-6 col-md-offset-3">
         <x-panel>
             <x-slot name="title">
-                <x-logo />
+                <x-logo class="logon-logo tw:h-auto tw:w-full" />
             </x-slot>
 
             <div class="container-fluid">
