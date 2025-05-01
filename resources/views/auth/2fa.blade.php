@@ -10,7 +10,7 @@
     <div class="col-md-6 col-md-offset-3">
         <x-panel>
             <x-slot name="title">
-                <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
+                <x-logo />
             </x-slot>
 
             <div class="container-fluid">

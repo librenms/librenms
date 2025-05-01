@@ -1,6 +1,6 @@
-<x-panel>
+<x-panel class="tw:rounded-lg tw:overflow-hidden">
     <x-slot name="title">
-        <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
+        <x-logo />
     </x-slot>
 
     @config('login_message')
