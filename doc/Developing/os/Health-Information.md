@@ -38,6 +38,7 @@ the values we expect to see the data in:
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
+
 ### Simple health discovery
 
 We have support for defining health / sensor discovery using YAML
@@ -507,7 +508,6 @@ Ber:
 Eer:
 Waterflow:
 Percent:
-span_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]
