@@ -68,7 +68,7 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
 $sensors = [
     'airflow', 'ber', 'bitrate', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dBm', 'delay', 'eer',
     'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'percent', 'power', 'power_consumed', 'power_factor', 'pressure',
-    'runtime', 'signal', 'snr', 'state', 'temperature', 'tv_signal', 'voltage', 'waterflow', 'quality_factor', 'span_loss',
+    'runtime', 'signal', 'snr', 'state', 'temperature', 'tv_signal', 'voltage', 'waterflow', 'quality_factor',
 ];
 
 foreach ($sensors as $sensor_name) {

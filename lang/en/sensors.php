@@ -191,10 +191,4 @@ return [
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
-    'span_loss' => [
-        'short' => 'Loss',
-        'long' => 'Span loss',
-        'unit' => 'dB',
-        'unit_long' => 'Decibel',
-    ],
 ];

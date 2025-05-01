@@ -70,7 +70,6 @@ require 'overview/sensors/ber.inc.php';
 require 'overview/sensors/eer.inc.php';
 require 'overview/sensors/waterflow.inc.php';
 require 'overview/sensors/loss.inc.php';
-require 'overview/sensors/span_loss.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';

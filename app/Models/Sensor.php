@@ -72,7 +72,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'voltage' => 'bolt',
         'waterflow' => 'tint',
         'percent' => 'percent',
-        'span_loss' => 'wave-square',
     ];
 
     // ---- Helper Methods ----
