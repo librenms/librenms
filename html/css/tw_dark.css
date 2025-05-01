@@ -358,7 +358,8 @@
 
 .dark .form-control {
     color: #272b30;
-    background-color: #fff
+    background-color: #fff;
+    border-color: #000000;
 }
 
 .dark .form-control:focus {
@@ -1535,7 +1536,8 @@
 
 .dark .input-group-addon {
     background-color: #3a3f44;
-    color: #fff
+    color: #fff;
+    border-color: rgba(0, 0, 0, 0.6);
 }
 
 .dark .nav .open > a,
