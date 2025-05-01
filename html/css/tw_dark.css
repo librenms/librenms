@@ -1639,5 +1639,9 @@
 
 .dark .gridster .gs-w{
     color: var(--color-light2);
-    background: #353a41;
+    background-color: #353a41;
+}
+
+.dark .bootgrid-table td.loading, .bootgrid-table td.no-results {
+    background-color: #3e444c;
 }
