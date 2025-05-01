@@ -1604,8 +1604,17 @@
     background-color: #2e3338
 }
 
+.dark #overDiv {
+    border: solid 1px #515151;
+    background-color: #808080;
+}
+
 .dark .overlib {
     color: #bebfbf
+}
+
+.dark .overlib-contents {
+    background-color: #2e3338;
 }
 
 .dark .overlib-text {
@@ -1633,15 +1642,6 @@
 .dark A.red,
 .dark .red {
     color: #d61818
-}
-
-.dark .overlib-contents {
-    background-color: #2e3338;
-}
-
-.dark #overDiv {
-    border: solid 1px #515151;
-    background-color: #808080;
 }
 
 .dark .gridster .gs-w{
