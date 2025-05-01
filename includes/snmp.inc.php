@@ -408,7 +408,7 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         }
         [$oid,$value] = explode('=', $entry, 2);
 
-        if (Str::contains($entry, ' = NULL')) {
+        if (preg_match('/^.+\s=\sNULL$/', $entry, $tmp)) {
             continue;
         }
 
