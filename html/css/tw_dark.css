@@ -876,6 +876,10 @@
     border-color: #fff
 }
 
+.dark .nav-tabs {
+    border-bottom-color: #1c1e22;
+}
+
 .dark .nav-tabs > li > a:hover {
     border-color: #1c1e22 #1c1e22 #1c1e22
 }
@@ -884,7 +888,8 @@
 .dark .nav-tabs > li.active > a:hover,
 .dark .nav-tabs > li.active > a:focus {
     color: #fff;
-    background-color: #3e444c
+    background-color: #3e444c;
+    border-color: #1c1e22;
 }
 
 @media (min-width: 768px) {
