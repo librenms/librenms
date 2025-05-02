@@ -1,0 +1,15 @@
+[Unit]
+Description=LibreNMS logfile to syslog forward
+After=network.target
+
+[Service]
+ExecStart=filesyslogger -c misc/filesyslogger.toml
+ExecReload=/bin/kill -HUP $MAINPID
+WorkingDirectory=/opt/librenms
+User=librenms
+Group=librenms
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
