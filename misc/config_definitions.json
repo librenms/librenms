@@ -464,8 +464,8 @@
             "order": 3,
             "type": "array-sub-keyed",
             "validate": {
-                "value": "array",
-                "value.*": "array",
+                "value": "array|array_keys_not_empty",
+                "value.*": "array|array_keys_not_empty",
                 "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
