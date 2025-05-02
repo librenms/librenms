@@ -535,7 +535,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours((float)$duration_hour)->addMinutes((float)$duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
@@ -2514,7 +2514,7 @@ function get_device_groups(Illuminate\Http\Request $request)
 function maintenance_devicegroup(Illuminate\Http\Request $request)
 {
     $data = $request->json()->all();
-    
+
     if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
@@ -2550,7 +2550,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours((float)$duration_hour)->addMinutes((float)$duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
