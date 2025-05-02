@@ -99,7 +99,8 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            Debug::set(false); // avoid all undefined index errors in the legacy code
+         // Debug::set(false); // avoid all undefined index errors in the legacy code
+
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 

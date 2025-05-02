@@ -55,3 +55,9 @@ LibrenmsConfig::invalidateAndReload();
 Illuminate\Foundation\Bootstrap\HandleExceptions::flushState(); // Reset Laravels error handler
 
 app()->terminate(); // destroy the bootstrap Laravel application
+
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+ini_set('log_errors', '0');
+error_reporting(-1);
+putenv('LOG_CHANNEL=console_debug');
