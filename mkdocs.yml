@@ -191,6 +191,7 @@ nav:
       - High Availability: Support/High-Availability.md
       - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
       - IRC Bot: Extensions/IRC-Bot.md
+      - Log Forwarding To Syslog: Support/Log-Forwarding-To-Syslog.md
       - Oauth/SAML support: Extensions/OAuth-SAML.md
       - Redis Sentinel: Extensions/Redis-Sentinel.md
       - RRDCached: Extensions/RRDCached.md
