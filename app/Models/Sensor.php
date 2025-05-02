@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -41,38 +42,18 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'group',
         'rrd_type',
     ];
-    protected static $icons = [
-        'airflow' => 'angle-double-right',
-        'ber' => 'sort-amount-desc',
-        'charge' => 'battery-half',
-        'chromatic_dispersion' => 'indent',
-        'cooling' => 'thermometer-full',
-        'count' => 'hashtag',
-        'current' => 'bolt fa-flip-horizontal',
-        'dbm' => 'sun-o',
-        'delay' => 'clock-o',
-        'eer' => 'snowflake-o',
-        'fanspeed' => 'refresh',
-        'frequency' => 'line-chart',
-        'humidity' => 'tint',
-        'load' => 'percent',
-        'loss' => 'percentage',
-        'power' => 'power-off',
-        'power_consumed' => 'plug',
-        'power_factor' => 'calculator',
-        'pressure' => 'thermometer-empty',
-        'quality_factor' => 'arrows',
-        'runtime' => 'hourglass-half',
-        'signal' => 'wifi',
-        'snr' => 'signal',
-        'state' => 'bullseye',
-        'temperature' => 'thermometer-three-quarters',
-        'tv_signal' => 'signal',
-        'bitrate' => 'bar-chart',
-        'voltage' => 'bolt',
-        'waterflow' => 'tint',
-        'percent' => 'percent',
-    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // 'sensor_class' => SensorEnum::class, // TODO
+        ];
+    }
 
     // ---- Helper Methods ----
 
@@ -105,18 +86,12 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function icon()
     {
-        return collect(self::$icons)->get($this->sensor_class, 'delicius');
+        return SensorEnum::from($this->sensor_class)->icon();
     }
 
     public static function getTypes()
     {
-        return array_keys(self::$icons);
-    }
-
-    // for the legacy menu
-    public static function getIconMap()
-    {
-        return self::$icons;
+        return SensorEnum::values();
     }
 
     public function guessLimits(bool $high, bool $low): void
