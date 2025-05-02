@@ -11,30 +11,30 @@ discovery:
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: GENSTAR::subModel
+            oid: GENSTAR::subModel.0
             op: 'contains'
             value: 'MPPT'
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: SUNSAVER-MPPT::subModel
+            oid: SUNSAVER-MPPT::subModel.0
             op: 'contains'
             value: 'MPPT'
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: PROSTAR-MPPT::subModel
+            oid: PROSTAR-MPPT::subModel.0
             op: 'contains'
             value: 'MPPT'
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: TRISTAR-MPPT::subModel
+            oid: TRISTAR-MPPT::subModel.0
             op: 'contains'
             value: 'MPPT'
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: TRISTAR-MPPT-600V::subModel
+            oid: TRISTAR-MPPT-600V::subModel.0
             op: 'contains'
             value: 'MPPT'

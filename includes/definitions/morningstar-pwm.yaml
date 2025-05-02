@@ -11,12 +11,12 @@ discovery:
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: PROSTAR-PWM::subModel
+            oid: PROSTAR-PWM::subModel.0
             op: 'contains'
             value: 'PWM'
     -
         sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: TRISTAR::subModel
+            oid: TRISTAR::subModel.0
             op: 'contains'
             value: 'PWM'
