@@ -10,6 +10,7 @@ modules:
                     oid:
                         - cpiPduOutletName
                         - cpiPduOutletDescription
+                        - cpiPduBranchId
                     snmp_flags: ['-OeQUsb', '-Pu']
         current:
             data:
@@ -19,6 +20,14 @@ modules:
                     snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.6.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
+                    index: '{{ $index }}'
+                    divisor: 100
+                -
+                    oid: cpiPduBranchCurrent
+                    value: cpiPduBranchCurrent
+                    snmp_flags: ['-OeQUsb', '-Pu']
+                    num_oid: '.1.3.6.1.4.1.30932.1.10.1.3.110.1.3.{{ $index }}'
+                    descr: 'CB{{ $cpiPduBranchId }}'
                     index: '{{ $index }}'
                     divisor: 100
         voltage:
@@ -31,6 +40,14 @@ modules:
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
                     divisor: 10
+                -
+                    oid: cpiPduBranchVoltage
+                    value: cpiPduBranchVoltage
+                    snmp_flags: ['-OeQUsb', '-Pu']
+                    num_oid: '.1.3.6.1.4.1.30932.1.10.1.3.110.1.5.{{ $index }}'
+                    descr: 'CB{{ $cpiPduBranchId }}'
+                    index: '{{ $index }}'
+                    divisor: 10
         power:
             data:
                 -
@@ -39,6 +56,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.8.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
                     index: '{{ $index }}'
+                -
+                    oid: cpiPduBranchPower
+                    snmp_flags: ['-OeQUsb', '-Pu']
+                    num_oid: '.1.3.6.1.4.1.30932.1.10.1.3.110.1.6.{{ $index }}'
+                    descr: 'CB{{ $cpiPduBranchId }}'
+                    index: '{{ $index }}'
         power_consumed:
             data:
                 -
@@ -46,6 +69,13 @@ modules:
                     snmp_flags: ['-OeQUsb', '-Pu']
                     num_oid: '.1.3.6.1.4.1.30932.1.10.1.4.10.1.10.{{ $index }}'
                     descr: '{{ $cpiPduOutletName }}'
+                    index: '{{ $index }}'
+                    divisor: 360000
+                -
+                    oid: cpiPduBranchEnergy
+                    snmp_flags: ['-OeQUsb', '-Pu']
+                    num_oid: '.1.3.6.1.4.1.30932.1.10.1.3.110.1.9.{{ $index }}'
+                    descr: 'CB{{ $cpiPduBranchId }}'
                     index: '{{ $index }}'
                     divisor: 360000
         state:
@@ -60,3 +90,14 @@ modules:
                     states:
                         - { descr: Off, graph: 1, value: 0, generic: 0 }
                         - { descr: On, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: cpiPduBranchStatus
+                    value: cpiPduBranchStatus
+                    snmp_flags: ['-OeQUsb', '-Pu']
+                    num_oid: '.1.3.6.1.4.1.30932.1.10.1.3.110.1.8.{{ $index }}'
+                    descr: 'CB{{ $cpiPduBranchId }} Status'
+                    state_name: cpiPduBranchStatus
+                    states:
+                        - { descr: NoAlarm, graph: 1, value: 0, generic: 0 }
+                        - { descr: Warning, graph: 1, value: 1, generic: 1 }
+                        - { descr: Aalrm, graph: 1, value: 2, generic: 2 }
