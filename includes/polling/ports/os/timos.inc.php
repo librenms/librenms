@@ -27,6 +27,8 @@
 // get all virtual router ports and statistics
 $timos_vrf_stats = SnmpQuery::enumStrings()->abortOnFailure()->walk([
     'TIMETRA-VRTR-MIB::vRtrIfName',
+    'TIMETRA-VRTR-MIB::vRtrIfAdminState',
+    'TIMETRA-VRTR-MIB::vRtrIfOperState',
     'TIMETRA-VRTR-MIB::vRtrIfDescription',
     'TIMETRA-VRTR-MIB::vRtrIfSpeed',
     'TIMETRA-VRTR-MIB::vRtrIfType',
@@ -50,6 +52,8 @@ unset($timos_vrf_stats);
 $translate = [
     'ifName' => 'TIMETRA-VRTR-MIB::vRtrIfName',
     'ifAlias' => 'TIMETRA-VRTR-MIB::vRtrIfAlias',
+    'ifAdminStatus' => 'TIMETRA-VRTR-MIB::vRtrIfAdminState',
+    'ifOperStatus' => 'TIMETRA-VRTR-MIB::vRtrIfOperState',
     'ifDescr' => 'TIMETRA-VRTR-MIB::vRtrIfDescription',
     'ifSpeed' => 'TIMETRA-VRTR-MIB::vRtrIfSpeed',
     'ifType' => 'TIMETRA-VRTR-MIB::vRtrIfType',
