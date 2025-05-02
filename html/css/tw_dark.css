@@ -362,6 +362,15 @@
     border-color: #000000;
 }
 
+.dark .select2-container {
+    color: #272b30;
+    border-color: #000000;
+}
+
+.dark .select2-container--bootstrap .select2-selection--single .select2-selection__placeholder {
+    color: #272b30;
+}
+
 .dark .form-control:focus {
     border-color: #66afe9
 }
