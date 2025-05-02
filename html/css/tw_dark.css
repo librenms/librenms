@@ -1406,7 +1406,23 @@
 }
 
 .dark .popover {
-    background-color: #2e3338
+    background-color: #2e3338;
+}
+
+.popover.top > .arrow:after {
+    border-top-color: #2e3338;
+}
+
+.popover.right > .arrow:after {
+    border-right-color: #2e3338;
+}
+
+.popover.bottom > .arrow:after {
+    border-bottom-color: #2e3338;
+}
+
+.popover.left > .arrow:after {
+    border-left-color: #2e3338;
 }
 
 .dark .navbar .navbar-nav > li > a:hover {
@@ -1644,7 +1660,7 @@
     color: #d61818
 }
 
-.dark .gridster .gs-w{
+.dark .gridster .gs-w {
     color: var(--color-light2);
     background-color: #353a41;
 }
@@ -1656,6 +1672,7 @@
 .dark tr.bgp:nth-child(even) {
     background: #353a41;
 }
+
 .dark tr.iftype:nth-child(even) {
     background: #353a41;
 }
