@@ -517,7 +517,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
+    empty($request->json('notes')) ? $notes = '' : $notes = $request->json('notes');
     $title = $request->json('title') ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
@@ -533,7 +533,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float)$duration_hour)->addMinutes((float)$duration_min)
             ->format('Y-m-d H:i:00');
     }
 
@@ -2530,7 +2530,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
+    empty($request->json('notes')) ? $notes = '' : $notes = $request->json('notes');
     $title = $request->json('title') ?? $device_group->name;
 
     $alert_schedule = new \App\Models\AlertSchedule([
@@ -2547,7 +2547,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float)$duration_hour)->addMinutes((float)$duration_min)
             ->format('Y-m-d H:i:00');
     }
 
