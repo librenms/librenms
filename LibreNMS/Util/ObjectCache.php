@@ -85,7 +85,7 @@ class ObjectCache
     {
         return Cache::remember('ObjectCache:sensor_list:' . auth()->id(), self::$cache_time, function () {
             $user = auth()->user(); /** @var \App\Models\User $user */
-            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
+            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->distinct()->orderBy('sensor_class')->get();
 
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
