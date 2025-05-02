@@ -8,9 +8,15 @@ type: appliance
 icon: morningstar
 mib_dir: morningstar
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.33333
     -
+        sysObjectID: .1.3.6.1.4.1.33333
         snmpget:
-            oid: GENSTAR::subModel
+            oid: PROSTAR-PWM::subModel
+            op: 'contains'
+            value: 'PWM'
+    -
+        sysObjectID: .1.3.6.1.4.1.33333
+        snmpget:
+            oid: TRISTAR::subModel
             op: 'contains'
             value: 'PWM'
