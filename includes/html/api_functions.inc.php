@@ -500,7 +500,9 @@ function del_device(Illuminate\Http\Request $request)
 
 function maintenance_device(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -513,22 +515,22 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (! $request->json('duration')) {
+    if (! $data['duration']) {
         return api_error(400, 'Duration not provided');
     }
 
-    empty($request->json('notes')) ? $notes = '' : $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device->displayName();
+    empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
+    $title = $data['title'] ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
@@ -545,7 +547,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         $device->save();
     }
 
-    if ($request->json('start')) {
+    if ($data['start']) {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -2511,7 +2513,9 @@ function get_device_groups(Illuminate\Http\Request $request)
 
 function maintenance_devicegroup(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+    
+    if (empty($data) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -2526,23 +2530,22 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(404, "Device group $name not found");
     }
 
-    if (! $request->json('duration')) {
+    if (! $data['duration']) {
         return api_error(400, 'Duration not provided');
     }
 
-    empty($request->json('notes')) ? $notes = '' : $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device_group->name;
-
+    empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
+    $title = $data['title'] ?? $device_group->name;
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
@@ -2554,7 +2557,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $alert_schedule->save();
     $alert_schedule->deviceGroups()->attach($device_group);
 
-    if ($request->json('start')) {
+    if ($data['start']) {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
