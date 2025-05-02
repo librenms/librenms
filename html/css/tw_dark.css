@@ -890,6 +890,10 @@
     border-bottom-color: #1c1e22;
 }
 
+.dark .with-nav-tabs.panel-default .nav-tabs > li > a {
+    color: #bfc0c0;
+}
+
 .dark .nav-tabs > li > a:hover {
     border-color: #1c1e22 #1c1e22 #1c1e22
 }
