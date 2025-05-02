@@ -2515,7 +2515,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
 {
     $data = $request->json()->all();
     
-    if (empty($data) {
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
