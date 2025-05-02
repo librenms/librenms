@@ -54,6 +54,7 @@ class ConfigItemTest extends TestCase
         $this->assertTrue($arraySubKeyedType->checkValue(['0' => ['bar']]));
         $this->assertTrue($arraySubKeyedType->checkValue([0 => ['bar']]));
         $this->assertTrue($arraySubKeyedType->checkValue(['foo' => []]));
+        $this->assertTrue($arraySubKeyedType->checkValue(['foo' => ['bar' => []]]));
 
         $this->assertTrue($arraySubKeyedType->checkValue([true => []])); // PHP converts it to [1 => []]
         $this->assertTrue($arraySubKeyedType->checkValue([false => []])); // PHP converts it to [[]]
@@ -62,6 +63,35 @@ class ConfigItemTest extends TestCase
         $this->assertFalse($arraySubKeyedType->checkValue(['foo' => null]));
         $this->assertFalse($arraySubKeyedType->checkValue(['foo' => false]));
         $this->assertFalse($arraySubKeyedType->checkValue(['' => []]));
+        $this->assertFalse($arraySubKeyedType->checkValue([' ' => []]));
         $this->assertFalse($arraySubKeyedType->checkValue([null => []]));
+    }
+
+    public function testArrayKeysNotEmptyValidation(): void
+    {
+        $array_keys_not_empty = new DynamicConfigItem('testArray', [
+            'type' => 'array-sub-keyed',
+            'validate' => [
+                'value' => 'array_keys_not_empty',
+                'value.*' => 'array_keys_not_empty',
+            ],
+        ]);
+
+        $this->assertTrue($array_keys_not_empty->checkValue(['foo' => ['bar']]));
+        $this->assertTrue($array_keys_not_empty->checkValue(['0' => ['bar']]));
+        $this->assertTrue($array_keys_not_empty->checkValue([0 => ['bar']]));
+        $this->assertTrue($array_keys_not_empty->checkValue(['foo' => []]));
+        $this->assertTrue($array_keys_not_empty->checkValue(['foo' => ['bar' => []]]));
+
+        $this->assertTrue($array_keys_not_empty->checkValue([true => []])); // PHP converts it to [1 => []]
+        $this->assertTrue($array_keys_not_empty->checkValue([false => []])); // PHP converts it to [[]]
+
+        $this->assertFalse($array_keys_not_empty->checkValue(['foo' => 'bar']));
+        $this->assertFalse($array_keys_not_empty->checkValue(['foo' => ['' => []]]));
+        $this->assertFalse($array_keys_not_empty->checkValue(['foo' => null]));
+        $this->assertFalse($array_keys_not_empty->checkValue(['foo' => false]));
+        $this->assertFalse($array_keys_not_empty->checkValue(['' => []]));
+        $this->assertFalse($array_keys_not_empty->checkValue([' ' => []]));
+        $this->assertFalse($array_keys_not_empty->checkValue([null => []]));
     }
 }
