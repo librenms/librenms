@@ -1,6 +1,8 @@
 facility="daemon"
 priority="info"
-socket="/var/run/log"
+# Going to be one of these two depending on OS and/or syslog configuration.
+#socket="/var/run/log"
+socket="/dev/log"
 [daily]
 program="librenmsDaily"
 file="logs/daily.log"
