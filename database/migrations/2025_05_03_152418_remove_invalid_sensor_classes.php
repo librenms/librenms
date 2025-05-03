@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Sensor::whereNotIn('sensor_class', SensorEnum::values())->delete()
+        Sensor::whereNotIn('sensor_class', SensorEnum::values())->delete();
     }
 
     /**
