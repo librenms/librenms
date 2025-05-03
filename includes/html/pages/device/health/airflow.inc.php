@@ -24,7 +24,5 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 $class = 'airflow';
-$unit = 'CFM';
-$graph_type = 'sensor_airflow';
 
 require 'sensors.inc.php';

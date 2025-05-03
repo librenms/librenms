@@ -11,3 +11,6 @@ discovery:
     -
         sysDescr:
             - IronWare
+oids:
+    no_bulk:
+        - ifPhysAddress

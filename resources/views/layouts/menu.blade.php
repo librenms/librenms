@@ -7,12 +7,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="hidden-md hidden-sm navbar-brand" href>
-            @if($title_image)
-                <img src="{{ asset($title_image) }}" alt="{{ $project_name }}">
-            @else
-                {{ $project_name }}
-            @endif
+            <a class="navbar-brand" href>
+                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>
 

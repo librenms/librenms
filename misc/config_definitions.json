@@ -464,8 +464,8 @@
             "order": 3,
             "type": "array-sub-keyed",
             "validate": {
-                "value": "array",
-                "value.*": "array",
+                "value": "array|array_keys_not_empty",
+                "value.*": "array|array_keys_not_empty",
                 "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
@@ -6258,12 +6258,13 @@
             "type": "boolean"
         },
         "site_style": {
-            "default": "light",
+            "default": "device",
             "group": "webui",
             "section": "style",
             "order": 1,
             "type": "select",
             "options": {
+                "device": "device",
                 "blue": "blue",
                 "dark": "dark",
                 "light": "light",
