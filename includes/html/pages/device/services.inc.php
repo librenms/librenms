@@ -67,16 +67,16 @@ echo '</div><div>';
 if (count($services) > '0') {
     // Loop over each service, pulling out the details.
 
-echo '<table class="table table-hover table-condensed">';
-echo '<thead>';
-echo '<td class="col-sm-2"><strong>Name</strong></td>';
-echo '<td class="col-sm-1"><strong>Check Type</strong></td>';
-echo '<td class="col-sm-1"><strong>Remote Host</strong></td>';
-echo '<td class="col-sm-4"><strong>Message</strong></td>';
-echo '<td class="col-sm-2"><strong>Description</strong></td>';
-echo '<td class="col-sm-1"><strong>Last Changed</strong></td>';
-echo '<td class="col-sm-1"></td>';
-echo '</thead>';
+    echo '<table class="table table-hover table-condensed">';
+    echo '<thead>';
+    echo '<td class="col-sm-2"><strong>Name</strong></td>';
+    echo '<td class="col-sm-1"><strong>Check Type</strong></td>';
+    echo '<td class="col-sm-1"><strong>Remote Host</strong></td>';
+    echo '<td class="col-sm-4"><strong>Message</strong></td>';
+    echo '<td class="col-sm-2"><strong>Description</strong></td>';
+    echo '<td class="col-sm-1"><strong>Last Changed</strong></td>';
+    echo '<td class="col-sm-1"></td>';
+    echo '</thead>';
 
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
