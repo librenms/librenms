@@ -515,7 +515,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (! $data['duration']) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
@@ -2530,7 +2530,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(404, "Device group $name not found");
     }
 
-    if (! $data['duration']) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
