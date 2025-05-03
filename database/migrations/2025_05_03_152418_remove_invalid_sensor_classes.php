@@ -1,10 +1,8 @@
 <?php
 
-use LibreNMS\Enum\Sensor as SensorEnum;
 use App\Models\Sensor;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 return new class extends Migration
 {
