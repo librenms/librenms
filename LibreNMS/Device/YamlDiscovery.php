@@ -30,12 +30,12 @@ use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
 class YamlDiscovery
 {
@@ -341,9 +341,10 @@ class YamlDiscovery
             return $pre_cache;
         }
 
-        if (! empty($os->getDiscovery()['modules'])) {
+        $discovery_yaml = $os->getDiscovery();
+        if (! empty($discovery_yaml['modules'])) {
             echo 'Caching data: ';
-            foreach ($os->getDiscovery()['modules'] as $module => $discovery_data) {
+            foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
@@ -352,8 +353,6 @@ class YamlDiscovery
                     } elseif ($key !== 'data') {
                         continue;
                     }
-
-                    $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
                         foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
@@ -370,15 +369,10 @@ class YamlDiscovery
                                     $snmp_flag[] = '-Ih';
                                 }
 
-                                // disable bulk request for specific data
-                                if (isset($data['snmp_bulk'])) {
-                                    Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
-                                }
-
-                                $mib = $os->getDiscovery()['mib'] ?? null;
-                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
-
-                                Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
+                                $pre_cache[$oid] ??= [];
+                                SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
+                                    ->numericIndex()->options($snmp_flag)
+                                    ->walk($oid)->valuesByIndex($pre_cache[$oid]);
                             }
                         }
                     }
