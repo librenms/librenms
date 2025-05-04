@@ -410,7 +410,10 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+        $index = '';
+        if (Str::contains($oid, '.')) {
+            [$oid, $index] = explode('.', $oid, 2);
+        }
 
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
