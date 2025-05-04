@@ -42,6 +42,11 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     Log::debug("discovering $hostname\n");
+    if ( empty(Config::get('nets'))) {
+        Log::debug("Allowed discovery network list is empty - skipping\n");
+
+        return false;
+    }
 
     if (IP::isValid($hostname)) {
         $ip = $hostname;
