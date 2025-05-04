@@ -182,7 +182,7 @@ if (! empty($entity_oids)) {
                 }
 
                 if ($device['os'] === 'arista_eos') {
-                    if ($entry['aristaEntSensorThresholdLowWarning'] != '-1000000000') {
+                    if (isset($entry['aristaEntSensorThresholdLowWarning']) && $entry['aristaEntSensorThresholdLowWarning'] != '-1000000000') {
                         if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'watts') {
                             $temp_low_warn_limit = $entry['aristaEntSensorThresholdLowWarning'] / 10000;
                             $low_warn_limit = round(10 * log10($temp_low_warn_limit), 2);
