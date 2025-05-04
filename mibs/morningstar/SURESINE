@@ -1,0 +1,152 @@
+SURESINE DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32 FROM SNMPv2-SMI
+	morningstar		FROM MORNINGSTAR
+	DisplayString		FROM RFC1213-MIB
+	TEXTUAL-CONVENTION	FROM SNMPv2-TC
+	OBJECT-GROUP		FROM SNMPv2-CONF;
+
+suresine MODULE-IDENTITY
+	LAST-UPDATED "201912200000Z"
+	ORGANIZATION "morningstar"
+	CONTACT-INFO "Morningstar Corporation
+			Postal: Morningstar Corporation
+			8 Pheasant Run
+			Newtown, PA 18940
+			United States of America
+			Tel: +1 215 321 4457
+			E-Mail: info@morningstarcorp.com"
+
+	DESCRIPTION "Morningstar Product: SureSine
+			--
+			Copyright (C) Morningstar Corporation (2019).
+			All Rights Reserved"
+	
+	REVISION "201912200000Z"
+	DESCRIPTION "Original version"
+	::= { morningstar 9 }
+
+
+LoadStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load State"
+	SYNTAX INTEGER {
+			start (0),
+			loadOn (1),
+			lvdWarning (2),
+			lowVoltageDisconnect (3),
+			fault (4),
+			disconnect (5),
+			loadOff (6),
+			unknownState (7),
+			standby (8)
+		}
+AlarmsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarms"
+	SYNTAX BITS {
+			heatsinkTempSensorOpen (0),
+			heatsinkTempSensorShort (1),
+			unknownAlarm (2),
+			suresineHot (3)
+		}
+FaultsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Faults"
+	SYNTAX BITS {
+			reset (0),
+			overcurrent (1),
+			unknownFault (2),
+			software (3),
+			highVoltageDisconnect (4),
+			suresineHot (5),
+			dipSwitchChanged (6),
+			customSettingsEdit (7)
+		}
+subModel OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The device's exact model"
+	::= { suresine 1 }
+serialNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Device Serial Number"
+	::= { suresine 2 }
+deviceVersion OBJECT-TYPE
+	SYNTAX       DisplayString (SIZE (0..32))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Hardware and firmware versions: vHW1.HW2.FW"
+	::= { suresine 3 }
+batteryVoltageSlow OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Voltage(slow)
+		- Description: Battery Voltage(slow)
+		- Scaling Factor: 0.0002581787109375
+		- Units: V
+		- Range: [0.0, 17.0]
+		- Modbus address: 0x0004"
+	::={ suresine 30 }
+acCurrent OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"AC Current
+		- Description: AC Output Current
+		- Scaling Factor: 0.0001953125
+		- Units: A
+		- Range: [0.0, 17]
+		- Modbus address: 0x0005"
+	::={ suresine 31 }
+heatsinkTemperature OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Heatsink Temperature
+		- Description: Heatsink Temperature
+		- Scaling Factor: 1
+		- Units: C
+		- Range: [-128, 127]
+		- Modbus address: 0x0006"
+	::={ suresine 32 }
+loadState OBJECT-TYPE
+	SYNTAX     LoadStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load State
+		- Description: Load State
+		- Modbus address: 0x000B"
+	::={ suresine 33 }
+alarms OBJECT-TYPE
+	SYNTAX     AlarmsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Alarms
+		- Description: Alarms
+		- Modbus address: 0x0008"
+	::={ suresine 34 }
+faults OBJECT-TYPE
+	SYNTAX     FaultsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Faults
+		- Description: Faults
+		- Modbus address: 0x0007"
+	::={ suresine 35 }
+
+END
