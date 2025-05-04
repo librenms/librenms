@@ -218,6 +218,20 @@ class AppServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        Validator::extend('array_keys_not_empty', function ($attribute, $value): bool {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $key => $_) {
+                if (is_string($key) && strlen(trim($key)) == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
     public function bootAuth(): void

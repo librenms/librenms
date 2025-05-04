@@ -5,12 +5,18 @@ includes:
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
+    phpVersion:
+        min: 80200
+        max: 80499
+
     paths:
         - app
+        - bootstrap
         - config
         - database
         - LibreNMS
         - resources
+        - routes
         - tests
 
     excludePaths:

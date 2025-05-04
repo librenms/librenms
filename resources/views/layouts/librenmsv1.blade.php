@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
-    <base href="{{ LibreNMS\Config::get('base_url') }}">
+    <base href="{{ LibrenmsConfig::get('base_url') }}">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @if(!LibreNMS\Config::get('favicon', false))
+    @if(!LibrenmsConfig::get('favicon', false))
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
         <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
     @else
-        <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}">
+        <link rel="shortcut icon" href="{{ LibrenmsConfig::get('favicon') }}">
     @endif
 
     <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
@@ -41,9 +41,12 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
-    @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=03052025') }}" rel="stylesheet">
+    @if(!in_array(LibrenmsConfig::get('applied_site_style'), ['device', 'light', 'dark']))
+    <link href="{{ asset('css/' . LibrenmsConfig::get('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
+    @endif
+    @foreach(LibrenmsConfig::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
     @endforeach
     @yield('css')
@@ -81,11 +84,21 @@
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
-            document.documentElement.classList.add('tw:dark')
-        } else {
-            document.documentElement.classList.remove('tw:dark')
-        }
+        (function () {
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            const theme = '{{ LibrenmsConfig::get('applied_site_style') }}';
+            const applyTheme = (isDark) => {
+                document.documentElement.classList.toggle('dark', isDark);
+            };
+
+            applyTheme(theme === 'dark' || (theme === 'device' && mediaQuery.matches));
+
+            mediaQuery.addEventListener('change', (event) => {
+                if (theme === 'device') {
+                    applyTheme(event.matches);
+                }
+            });
+        })();
     </script>
     @auth
         @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
