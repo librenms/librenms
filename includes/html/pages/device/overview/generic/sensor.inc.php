@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Html;
 
 $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
@@ -8,8 +9,7 @@ $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_cla
 ]); // cache all sensors on device and exclude transceivers
 
 if ($sensors->isNotEmpty()) {
-    $icons = \App\Models\Sensor::getIconMap();
-    $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
+    $sensor_fa_icon = 'fa-' . SensorEnum::from($sensor_class)->icon();
 
     echo '
         <div class="row">

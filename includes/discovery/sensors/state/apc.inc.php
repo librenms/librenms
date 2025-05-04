@@ -122,7 +122,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 
         $current = $data['memSensorsCommStatus'];
     }
-    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
     $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
@@ -141,7 +141,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 
         $current = $data['memSensorsAlarmStatus'];
     }
-    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
     $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
@@ -150,8 +150,8 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
 }
 
 // Monitor contact switches via the UIO ports.
-$apcContactData = snmpwalk_cache_oid($device, 'uioInputContact', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
-if ($apcContactData['uioInputContactStatusTableSize'] > 0) {
+$apcContactData = snmpwalk_cache_oid($device, 'uioInputContact', [], 'PowerNet-MIB', null, '-OQUse');
+if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData['uioInputContactStatusTableSize'] > 0) {
     // NMC2/NMC3/etc Universal Input Output
     foreach (array_keys($apcContactData) as $index) {
         // APC disabled (1), enabled (2)

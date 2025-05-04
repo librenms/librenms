@@ -372,9 +372,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if (str_ends_with($lldp['lldpRemSysDesc'], 'Gigabit Switch w/WebView')) {
                     $lldp['lldpRemPortDesc'] = '';
                 }
-
-                $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
-
+                $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'] ?? '', $remote_port_mac);
                 // add device if configured to do so
                 if (! $remote_device_id && ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
                         Config::get('autodiscovery.xdp') === true) {
@@ -397,32 +395,34 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     }
                 }
 
-                $remote_device = device_by_id_cache($remote_device_id);
-                if ($remote_device['os'] == 'calix') {
-                    $remote_port_name = 'EthPort ' . $lldp['lldpRemPortId'];
-                }
-
-                if ($remote_device['os'] == 'xos') {
-                    $slot_port = explode(':', $remote_port_name);
-                    if (count($slot_port) == 2) {
-                        $n_slot = (int) $slot_port[0];
-                        $n_port = (int) $slot_port[1];
-                    } else {
-                        $n_slot = 1;
-                        $n_port = (int) $slot_port[0];
+                if (! empty($remote_device_id)) {
+                    $remote_device = device_by_id_cache($remote_device_id);
+                    if ($remote_device['os'] == 'calix') {
+                        $remote_port_name = 'EthPort ' . $lldp['lldpRemPortId'];
                     }
-                    $remote_port_name = (string) ($n_slot * 1000 + $n_port);
-                }
 
-                if ($remote_device['os'] == 'netgear' &&
-                        $remote_device['sysDescr'] == 'GS108T' &&
-                        $lldp['lldpRemSysDesc'] == 'Smart Switch') {
-                    // Some netgear switches, as Netgear GS108Tv1 presents it's port name over snmp as
-                    // "Port 1 Gigabit Ethernet" but as 'lldpRemPortId' => 'g1' and
-                    // 'lldpRemPortDesc' => 'Port #1' over lldp.
-                    // So remap g1 to 1 so it matches ifIndex
-                    if (preg_match("/^g(\d+)$/", $lldp['lldpRemPortId'], $matches)) {
-                        $remote_port_name = $matches[1];
+                    if ($remote_device['os'] == 'xos') {
+                        $slot_port = explode(':', $remote_port_name);
+                        if (count($slot_port) == 2) {
+                            $n_slot = (int) $slot_port[0];
+                            $n_port = (int) $slot_port[1];
+                        } else {
+                            $n_slot = 1;
+                            $n_port = (int) $slot_port[0];
+                        }
+                        $remote_port_name = (string) ($n_slot * 1000 + $n_port);
+                    }
+
+                    if ($remote_device['os'] == 'netgear' &&
+                            $remote_device['sysDescr'] == 'GS108T' &&
+                            $lldp['lldpRemSysDesc'] == 'Smart Switch') {
+                        // Some netgear switches, as Netgear GS108Tv1 presents it's port name over snmp as
+                        // "Port 1 Gigabit Ethernet" but as 'lldpRemPortId' => 'g1' and
+                        // 'lldpRemPortDesc' => 'Port #1' over lldp.
+                        // So remap g1 to 1 so it matches ifIndex
+                        if (preg_match("/^g(\d+)$/", $lldp['lldpRemPortId'], $matches)) {
+                            $remote_port_name = $matches[1];
+                        }
                     }
                 }
 
@@ -435,13 +435,13 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if ($remote_port_id == 0) { //We did not find it
                     $remote_port_name = $remote_port_name . ' (' . $remote_port_mac . ')';
                 }
-                if (empty($lldp['lldpRemSysName'])) {
+                if (empty($lldp['lldpRemSysName']) && isset($remote_device)) {
                     $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
                 }
                 if (empty($lldp['lldpRemSysName'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
-                if ($interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
+                if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
                     discover_link(
                         $interface['port_id'],
                         'lldp',
