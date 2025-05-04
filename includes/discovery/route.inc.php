@@ -158,7 +158,11 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'route
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entryClean['inetCidrRouteIfIndex'], $device['device_id']);
         $entryClean['updated_at'] = $update_timestamp;
-        $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
+
+        if (! empty($mixed)) {
+            $current = $mixed['']['ipv4'][$ipRoute['ipRouteDest']][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$ipRoute['ipRouteNextHop']];
+        }
+
         if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
             //we already have a row in DB
             $entryClean['route_id'] = $current['db']['route_id'];
@@ -209,17 +213,21 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     unset($entry['inetCidrRouteMetric4']);
                     unset($entry['inetCidrRouteMetric5']);
                     unset($entry['inetCidrRouteStatus']);
-                    $entryPerType[$inetCidrRouteDestType]++;
-                    $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
-                    if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
+                    isset($entryPerType[$inetCidrRouteDestType]) ? $entryPerType[$inetCidrRouteDestType]++ : $entryPerType[$inetCidrRouteDestType] = 1;
+
+                    $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop] ?? null;
+                    if (isset($current) && ! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
                         //we already have a row in DB
                         $entry['route_id'] = $current['db']['route_id'];
                         $update_row[] = $entry;
                     } else {
                         d_echo(isset($current));
                         d_echo(isset($current['db']));
-                        d_echo($current['db']);
-                        d_echo($delete_row[$current['db']['route_id']]);
+                        if (is_array($current)) {
+                            d_echo($current['db']);
+                            d_echo($delete_row[$current['db']['route_id']]);
+                        }
+
                         $entry['created_at'] = ['NOW()'];
                         $create_row[] = $entry;
                     }

@@ -1,0 +1,686 @@
+-- ***************************************************************
+-- INFINERA-ENTITY-CHASSIS-MIB
+--
+-- October 2008, Sharfuddin Syed / Narendra Gupta
+--
+--
+-- Copyright (c) 2008-2012 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-ENTITY-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32  FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE                      FROM SNMPv2-CONF
+    RowStatus, DisplayString, TruthValue                 FROM SNMPv2-TC
+    entLPPhysicalIndex                                   FROM ENTITY-MIB
+    equipment                                            FROM INFINERA-REG-MIB
+    InfnClientPowerMode,
+    FloatThousandths, FloatHundredths,
+    FloatArbitraryPrecision, InfnChassisOxmSwitchingMode,
+    FloatTenths, InfnChassisType, InfnPmHistStatsControl,
+    InfnChassisSwitchingMode, InfnEnableDisable,
+    InfnClientPowerMode                                  FROM INFINERA-TC-MIB;
+
+chassisMIB MODULE-IDENTITY
+    LAST-UPDATED  "200810200000Z"
+    ORGANIZATION
+        "INFINERA"
+    CONTACT-INFO
+        "Infinera
+        169 Java Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        "This MIB is modeling for CHASSIS equipment table."
+
+::= { equipment 13 }
+
+chassisConformance   OBJECT IDENTIFIER ::= { chassisMIB 3 }
+chassisCompliances   OBJECT IDENTIFIER ::= { chassisConformance 1 }
+chassisGroups        OBJECT IDENTIFIER ::= { chassisConformance 2 }
+
+chassisTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF ChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table contains all chassis modules that are currently present in a network element."
+    ::= { chassisMIB 1 }
+
+chassisEntry  OBJECT-TYPE
+    SYNTAX     ChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A row in the CHASSIS table. Each row in the table is identified with a unique entPhysicalIndexID.
+        "
+    INDEX { entLPPhysicalIndex }
+    ::= { chassisTable 1 }
+
+ChassisEntry ::= SEQUENCE {
+    chassisMoId                             DisplayString,
+    chassisProvChassisType                  InfnChassisType,
+    chassisInstalledChassisType             InfnChassisType,
+    chassisProvSerialNumber                 DisplayString,
+    chassisInstalledSerialNumber            DisplayString,
+    chassisRackName                         DisplayString,
+    chassisRUlocationInRack                 Unsigned32,
+    chassisSwitchCapabilityMode             INTEGER,
+    chassisInletTemperature                 FloatArbitraryPrecision,
+    chassisAcoState                         INTEGER,
+    chassisBayLevelSummaryAlarmReporting    INTEGER,
+    chassisConfiguredMaxPowerDraw           FloatArbitraryPrecision,
+    chassisCurrentEstimatedPowerDraw        FloatArbitraryPrecision,
+    chassisEqptMaxPowerDraw                 FloatArbitraryPrecision,
+    chassisScmMigrationAllowed              TruthValue,
+    chassisScmMigrationInProgress           TruthValue,
+    chassisPowerControl                     INTEGER,
+    chassiscurrentInstalledPowerDraw        FloatArbitraryPrecision,
+    chassisConfiguredPemRating              Unsigned32,
+    chassisRowStatus                        RowStatus,
+    chassisIsNCChassis                      TruthValue,
+    chassisSwitchingMode                    InfnChassisSwitchingMode,
+    chassisMaxAvailablePower                FloatArbitraryPrecision,
+    chassisActvTimingSource                 DisplayString,
+    chassisConfiguredAmbientTemp            Unsigned32,
+    chassisSkewBudget                       INTEGER,
+    chassisOperatingTemperatureThreshold    Integer32,
+    chassisPduCktBreakerRating              FloatArbitraryPrecision,
+    chassisRebootTime                       Integer32,
+    chassisCLEI                             DisplayString,
+    chassisHardwareVersion                  DisplayString,
+    chassisManufacturedDate                 DisplayString,
+    chassisPartNumber                       DisplayString,
+    chassisPON                              DisplayString,
+    chassisHolderType                       INTEGER,
+    chassisHolderState                      INTEGER,
+    chassisAcceptableEquipmentTypeList      DisplayString,
+    chassisUnreachableFromManagement        TruthValue,
+    chassisSerialPortCLIAccess              InfnEnableDisable,
+    chassisAcliSessionAdminState            InfnEnableDisable,
+    chassisFruInsertionDate                 DisplayString,
+    chassisPowerSupplyType                  INTEGER,
+    chassisBaffleType                       INTEGER,
+    chassisPmHistStatsEnable                InfnPmHistStatsControl,
+    chassisInletTemperatureOffset           FloatTenths,
+    chassisHasPluggableEeprom               TruthValue,
+    chassisPluggablePromSerialNumber        DisplayString,
+    chassisOutletTemperature                FloatArbitraryPrecision,
+    chassisTTLMax                           Integer32,
+    chassisTTLCurrentDays                   Integer32,
+    chassisAvailablePower                   FloatArbitraryPrecision,
+    chassisSwitchFabricMode                 InfnChassisOxmSwitchingMode,
+    chassisPicDspVer                        DisplayString,
+    chassisClientPowerMode                  InfnClientPowerMode,
+    chassisClientPowerModeStatus            InfnClientPowerMode
+}
+
+
+chassisMoId  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This is the primary Key of the objects e.g 1, 2, 3..."
+    ::= { chassisEntry 1 }
+
+chassisProvChassisType  OBJECT-TYPE
+    SYNTAX     InfnChassisType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The provisioned chassis. Valid values: OTC, DTC, DTC-A, DTC-B, and MTC-A."
+    ::= { chassisEntry 2 }
+
+chassisInstalledChassisType  OBJECT-TYPE
+    SYNTAX     InfnChassisType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The installed chassis type."
+    ::= { chassisEntry 3 }
+
+chassisProvSerialNumber  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The provisioned serial number of the Expansion Chassis.
+        This field is configured for the expansion chassis in a multi-chassis
+        configuration. This attribute can be modified only when the Admin State
+        of the chassis (Expansion Chassis only) is Locked."
+    ::= { chassisEntry 4 }
+
+chassisInstalledSerialNumber  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The actual serial number of the chassis"
+    ::= { chassisEntry 5 }
+
+chassisRackName  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The name of the rack in which the chassis is installed."
+    ::= { chassisEntry 6 }
+
+chassisRUlocationInRack  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The position of the chassis within the rack. The chassis with lower
+        RU location is displayed at the bottom in the node view and the one
+        with higher number is displayed at the top. If there are more than two
+        chassis having the same rack name, they are displayed next to each
+        other though they might be physically located in the same rack."
+    ::= { chassisEntry 7 }
+
+chassisSwitchCapabilityMode  OBJECT-TYPE
+    SYNTAX     INTEGER {
+        ring (1),
+        mesh (2)
+    }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The switch capability mode for the chassis. Valid values: ring and mesh."
+    ::= { chassisEntry 8 }
+
+chassisInletTemperature  OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Temperature (in Centigrade) of the circuit pack at the inlet.
+        The temperature is displayed as -1 if the circuit pack does not have
+        a temperature sensor."
+    ::= { chassisEntry 9 }
+
+chassisAcoState  OBJECT-TYPE
+    SYNTAX     INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The chassis alarm cutoff state."
+    ::= { chassisEntry 10 }
+
+chassisBayLevelSummaryAlarmReporting  OBJECT-TYPE
+    SYNTAX     INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Flag that enables reporting of bay-level alarms. Typically, this is
+        enabled for one chassis within a bay and disabled for all other chassis
+        in the same bay. Vaid values:enabled and disabled."
+    ::= { chassisEntry 11 }
+
+chassisConfiguredMaxPowerDraw  OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The estimated power drawn by the chassis. This varies depending on the
+        type of the chassis and associated configuration."
+    ::= { chassisEntry 12 }
+
+chassisCurrentEstimatedPowerDraw  OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The sum of estimated power drawn by all the currently installed and
+         pre-provisioned FRUs in the chassis. This value is not indicative of
+         the actual power drawn."
+    ::= { chassisEntry 13 }
+
+chassisEqptMaxPowerDraw  OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The estimated power drawn by the chassis. This varies depending on the
+         type of the chassis and associated configuration."
+    ::= { chassisEntry 14 }
+
+chassisScmMigrationAllowed  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This objects indicate whether user can chnage the chassisSwitchCapabilityMode.
+        If this is false user will not be able to chnage."
+    ::= { chassisEntry 15 }
+
+chassisScmMigrationInProgress  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This objects indicate that switch capability mode change is in
+         progress."
+    ::= { chassisEntry 16 }
+
+chassisPowerControl  OBJECT-TYPE
+    SYNTAX     INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This objects enable the auto power saving if pwoer is hitting the limit."
+    ::= { chassisEntry 17 }
+
+chassiscurrentInstalledPowerDraw  OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The estimated power drawn by the installed equipment in chassis.
+         This varies depending on the type of the chassis and installed equipment."
+    ::= { chassisEntry 18 }
+
+chassisConfiguredPemRating  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This attribute tells what is the compatible PEM rating for the chassis
+        , in case of PEM-35 this attribute should be set to 35 and in case
+        of PEM-70 it should be set to 70. Accordingly RatingAmps attribute of PEM
+        will change and in case RatingAmps value of PEM doesn't matche with
+        its InstalledRatingAmps then equipment mismatch alarm will be raised."
+    ::= { chassisEntry 19 }
+
+chassisRowStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The row status of this CHASSIS entry.
+         Because rows in this table are indexed by entPhysicalIndex, to create a new row one must
+         choose a value of entPhysicalIndex that is not already in use.
+
+         A side-effect of the creation of a row in this table is the creation of a corresponding
+         row in the eqptTable and the entPhysicalTable.
+
+         The status may not be set to active if the chassisMoId, chassisProvEqptType and other
+         read-create objects are not set to valid values.
+
+         This row may only be deleted if it was a pre-provisioned row and the hardware is not present.
+
+         If this row is deleted, the associated row in the Eqpt Table and entPhysicalTable will be
+         deleted by the agent."
+    ::= { chassisEntry 20 }
+
+chassisIsNCChassis  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "whether or not this
+	 chassis houses the Node Controller XCM."
+    ::= { chassisEntry 21 }
+
+chassisSwitchingMode  OBJECT-TYPE
+    SYNTAX     InfnChassisSwitchingMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "current configuration of the chassis
+	switch fabric module."
+    ::= { chassisEntry 22 }
+
+chassisMaxAvailablePower OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Maximum available
+	power in the chassis"
+    ::= { chassisEntry 23 }
+
+chassisActvTimingSource OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION ""
+        ::= { chassisEntry 24 }
+
+chassisOperatingTemperatureThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 25 }
+
+chassisConfiguredAmbientTemp OBJECT-TYPE
+    SYNTAX    Unsigned32
+	MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION ""
+    ::= { chassisEntry 26 }
+
+
+chassisSkewBudget  OBJECT-TYPE
+    SYNTAX     INTEGER {
+        none (1),
+        low  (2),
+        high (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 27 }
+
+chassisPduCktBreakerRating OBJECT-TYPE
+    SYNTAX    FloatArbitraryPrecision
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION ""
+    ::= { chassisEntry 28 }
+
+chassisRebootTime       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 29 }
+
+chassisCLEI     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 30 }
+
+chassisHardwareVersion      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 31 }
+
+chassisManufacturedDate     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 32 }
+
+chassisPartNumber       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 33 }
+
+chassisPON      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 34 }
+
+chassisHolderType       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        chassis(1),
+        self(2),
+        slot(3),
+        subSlot(4),
+        unknown (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 35 }
+
+chassisHolderState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        empty (1),
+        plugIn(2),
+        installed(3),
+        installedAndExpected(4),
+        mismatchOfInstalledAndExpected(5),
+        unknown(6)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { chassisEntry 36 }
+
+chassisAcceptableEquipmentTypeList      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 37 }
+
+chassisUnreachableFromManagement        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 38 }
+
+chassisSerialPortCLIAccess      OBJECT-TYPE
+    SYNTAX      InfnEnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 39}
+
+chassisAcliSessionAdminState    OBJECT-TYPE
+    SYNTAX      InfnEnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 40 }
+
+chassisFruInsertionDate     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 41 }
+
+chassisPowerSupplyType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        native(1),
+        unmanaged3rdparty(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { chassisEntry 42 }
+
+chassisBaffleType       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(1),
+        mtc9AirBaffle(2),
+        mtc9AirBaffle2(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 43 }
+
+chassisPmHistStatsEnable OBJECT-TYPE
+    SYNTAX          InfnPmHistStatsControl
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { chassisEntry 44 }
+
+chassisInletTemperatureOffset  OBJECT-TYPE
+    SYNTAX     FloatTenths
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Inlet Temperature Offset"
+    ::= { chassisEntry 45 }
+
+chassisHasPluggableEeprom  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Flag to indicate if the device has pluggable Eeprom"
+    ::= { chassisEntry 46 }
+
+chassisPluggablePromSerialNumber  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Plugged in Eeprom serial number"
+    ::= { chassisEntry 47 }
+
+chassisOutletTemperature OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The outlet temperature of the chassis"
+    ::= { chassisEntry 48 }
+
+chassisTTLMax OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 49 }
+
+chassisTTLCurrentDays OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { chassisEntry 50 }
+
+chassisAvailablePower OBJECT-TYPE
+    SYNTAX     FloatArbitraryPrecision
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Available power in the chassis"
+    ::= { chassisEntry 51 }
+
+chassisSwitchFabricMode  OBJECT-TYPE
+    SYNTAX     InfnChassisOxmSwitchingMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "current configuration of the chassis
+	        switch fabric module."
+    ::= { chassisEntry 52 }
+
+chassisPicDspVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PIC DSP Version"
+    ::= { chassisEntry 53 }
+
+chassisClientPowerMode OBJECT-TYPE
+    SYNTAX      InfnClientPowerMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "selected client power mode"
+    ::= { chassisEntry 54 }
+
+chassisClientPowerModeStatus OBJECT-TYPE
+    SYNTAX      InfnClientPowerMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "client power mode selected"
+    ::= { chassisEntry 55 }
+
+chassisCompliance  MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        ""
+    MODULE
+        MANDATORY-GROUPS { chassisGroup }
+    ::= { chassisCompliances 1 }
+
+
+
+
+chassisGroup  OBJECT-GROUP
+    OBJECTS { chassisMoId,
+        chassisProvChassisType,
+        chassisInstalledChassisType,
+        chassisProvSerialNumber,
+        chassisInstalledSerialNumber,
+        chassisRackName,
+        chassisRUlocationInRack,
+        chassisSwitchCapabilityMode,
+        chassisInletTemperature,
+        chassisAcoState,
+        chassisBayLevelSummaryAlarmReporting,
+        chassisConfiguredMaxPowerDraw,
+        chassisCurrentEstimatedPowerDraw,
+        chassisEqptMaxPowerDraw,
+        chassisScmMigrationAllowed,
+        chassisScmMigrationInProgress,
+        chassisPowerControl,
+        chassiscurrentInstalledPowerDraw,
+        chassisConfiguredPemRating,
+        chassisRowStatus,
+		chassisIsNCChassis,
+		chassisSwitchingMode,
+        chassisMaxAvailablePower,
+        chassisActvTimingSource,
+        chassisOperatingTemperatureThreshold,
+        chassisConfiguredAmbientTemp,
+        chassisSkewBudget,
+        chassisPduCktBreakerRating,
+        chassisRebootTime                 ,
+        chassisCLEI                       ,
+        chassisHardwareVersion            ,
+        chassisManufacturedDate           ,
+        chassisPartNumber                 ,
+        chassisPON                        ,
+        chassisHolderType                 ,
+        chassisHolderState                ,
+        chassisAcceptableEquipmentTypeList,
+        chassisUnreachableFromManagement  ,
+        chassisSerialPortCLIAccess        ,
+        chassisAcliSessionAdminState      ,
+        chassisFruInsertionDate           ,
+        chassisPowerSupplyType            ,
+        chassisBaffleType                 ,
+		chassisPmHistStatsEnable,
+        chassisInletTemperatureOffset,
+        chassisHasPluggableEeprom,
+        chassisPluggablePromSerialNumber,
+        chassisOutletTemperature,
+        chassisTTLMax,
+        chassisTTLCurrentDays,
+        chassisAvailablePower,
+        chassisSwitchFabricMode,
+        chassisPicDspVer,
+        chassisClientPowerMode,
+        chassisClientPowerModeStatus
+	}
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { chassisGroups 1 }
+END
