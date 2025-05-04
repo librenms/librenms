@@ -435,13 +435,13 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if ($remote_port_id == 0) { //We did not find it
                     $remote_port_name = $remote_port_name . ' (' . $remote_port_mac . ')';
                 }
-                if (empty($lldp['lldpRemSysName'])) {
+                if (empty($lldp['lldpRemSysName']) && isset($remote_device)) {
                     $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
                 }
                 if (empty($lldp['lldpRemSysName'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
-                if ($interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
+                if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
                     discover_link(
                         $interface['port_id'],
                         'lldp',

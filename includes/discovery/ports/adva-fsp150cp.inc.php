@@ -27,7 +27,7 @@ foreach ($advaports as $index => $entry) {
     // Indexes are the same as IfIndex and EntPhysicalIndex
 
     if (isset($port_stats[$index])) {
-        $port_stats[$index]['ifAlias'] = $entry['fsp150IfConfigUserString'];
+        $port_stats[$index]['ifAlias'] = $entry['fsp150IfConfigUserString'] ?? null;
         $port_stats[$index]['ifName'] = $entry['entPhysicalName'];
     }
 }
