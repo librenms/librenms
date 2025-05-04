@@ -64,14 +64,13 @@ $translate = [
     'ifHCOutUcastPkts' => 'TIMETRA-VRTR-MIB::vRtrIfTxPkts',
 ];
 
-$timos_ports = [];
 foreach ($timos_stats as $index => $value) {
     foreach ($translate as $ifEntry => $ifVrtrEntry) {
-        $timos_ports[$index][$ifEntry] = $value[$ifVrtrEntry];
+        $port_stats[$index][$ifEntry] = $value[$ifVrtrEntry] ?? $port_stats[$index][$ifEntry] ?? null;
     }
     if (empty($timos_ports[$index]['ifDescr'])) {
-        $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName'];
+        $port_stats[$index]['ifDescr'] = $value['ifName'] ?? null;
     }
 }
-$port_stats = array_replace_recursive($timos_ports, $port_stats);
-unset($timos_ports);
+
+unset($timos_stats, $translate);
