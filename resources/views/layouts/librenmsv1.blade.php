@@ -69,7 +69,7 @@
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
     <script data-pace-options='{ "eventLag": { "lagThreshold": 30 } }' src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
-    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/select2.full.min.js') }}"></script>
     <script>
         $.ajaxSetup({
             headers: {
@@ -78,7 +78,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=29092024') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=29042025') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>

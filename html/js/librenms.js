@@ -567,6 +567,7 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         width: "auto",
         placeholder: placeholder,
         allowClear: true,
+        containerCssClass: ":all:",
         ajax: {
             url: ajax_url + '/select/' + type,
             delay: 150,
