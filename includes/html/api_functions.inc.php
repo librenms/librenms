@@ -547,7 +547,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         $device->save();
     }
 
-    if ($data['start']) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -2534,7 +2534,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(400, 'Duration not provided');
     }
 
-    empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
+    $notes = $data['notes'] ?? '';
     $title = $data['title'] ?? $device_group->name;
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
@@ -2557,7 +2557,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $alert_schedule->save();
     $alert_schedule->deviceGroups()->attach($device_group);
 
-    if ($data['start']) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
