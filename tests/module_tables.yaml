@@ -7,10 +7,6 @@ applications:
             - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
         order_by: metric
-arp-table:
-    ipv4_mac:
-        excluded_fields: [id, device_id, port_id]
-        order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
 bgp-peers:
     bgpPeers:
         excluded_fields: [device_id, bgpPeer_id, vrf_id]

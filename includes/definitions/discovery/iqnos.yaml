@@ -1,0 +1,77 @@
+mib: INFINERA-ENTITY-CHASSIS-MIB:INFINERA-PM-BANDCTP-MIB:IF-MIB:INFINERA-PM-OSCCTP-MIB:INFINERA-PM-SCHCTP-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifName
+        temperature:
+            data:
+                -
+                    oid:  INFINERA-ENTITY-CHASSIS-MIB::chassisTable
+                    value: INFINERA-ENTITY-CHASSIS-MIB::chassisInletTemperature
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.1.13.1.1.9.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Inlet'
+                    index: 'chassisInletTemperature.{{ $index }}'
+
+        dbm:
+            data:
+                -
+                    oid: INFINERA-PM-BANDCTP-MIB::bandCtpPmRealTable
+                    value: INFINERA-PM-BANDCTP-MIB::bandCtpPmRealBandOptTx
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.1.1.1.9.{{ $index }}'
+                    descr: '{{ $ifName }} Band-C optical power transmitted'
+                    index: 'bandCtpPmRealBandOptTx.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                -
+                    oid: INFINERA-PM-BANDCTP-MIB::bandCtpPmRealTable
+                    value: INFINERA-PM-BANDCTP-MIB::bandCtpPmRealBandOpr
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.1.1.1.3.{{ $index }}'
+                    descr: '{{ $ifName }} Band-C Optical Power Received'
+                    index: 'bandCtpPmRealBandOpr.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                -
+                    oid: INFINERA-PM-OSCCTP-MIB::oscCtpPmRealTable
+                    value: INFINERA-PM-OSCCTP-MIB::oscCtpPmRealOscOPT
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.10.1.1.2.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Optical Power Transmitted'
+                    index: 'oscCtpPmRealOscOPT.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                    divisor: 100
+                -
+                    oid: INFINERA-PM-OSCCTP-MIB::oscCtpPmRealTable
+                    value: INFINERA-PM-OSCCTP-MIB::oscCtpPmRealOscOPR
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.10.1.1.3.{{ $index }}'
+                    descr: '{{ $ifName }} OSC Optical Power Received'
+                    index: 'oscCtpPmRealOscOPR.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                    divisor: 100
+                -
+                    oid: INFINERA-PM-SCHCTP-MIB::schCtpPmRealTable
+                    value: INFINERA-PM-SCHCTP-MIB::schCtpPmRealSchOpt
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.38.1.1.4.{{ $index }}'
+                    descr: '{{ $ifName }} SCH Optical Power Transmitted'
+                    index: 'schCtpPmRealSchOpt.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                    divisor: 100
+                -
+                    oid: INFINERA-PM-SCHCTP-MIB::schCtpPmRealTable
+                    value: INFINERA-PM-SCHCTP-MIB::schCtpPmRealSchOpr
+                    num_oid: '.1.3.6.1.4.1.21296.2.2.2.3.38.1.1.7.{{ $index }}'
+                    descr: '{{ $ifName }} SCH Optical Power Received'
+                    index: 'schCtpPmRealSchOpr.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: '{{ $ifName }}'
+                    divisor: 100

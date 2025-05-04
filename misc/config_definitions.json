@@ -464,8 +464,8 @@
             "order": 3,
             "type": "array-sub-keyed",
             "validate": {
-                "value": "array",
-                "value.*": "array",
+                "value": "array|array_keys_not_empty",
+                "value.*": "array|array_keys_not_empty",
                 "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
@@ -1671,6 +1671,13 @@
         },
         "discovery_modules.arp-table": {
             "order": 20,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.ipv6-nd": {
+            "order": 163,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -5247,9 +5254,9 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
-                "value.*.*.*": "array|size:2|keys_in:match,regex,value",
+                "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
                 "value.*.*.*.regex": "is_regex",
                 "value.*.*.*.match": "string"
@@ -5488,7 +5495,7 @@
             "type": "boolean"
         },
         "poller_modules.ipSystemStats": {
-            "order": 200,
+            "order": 214,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -5503,6 +5510,20 @@
         },
         "poller_modules.xdsl": {
             "order": 345,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.arp-table": {
+            "order": 17,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.ipv6-nd": {
+            "order": 340,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
@@ -6258,12 +6279,13 @@
             "type": "boolean"
         },
         "site_style": {
-            "default": "light",
+            "default": "device",
             "group": "webui",
             "section": "style",
             "order": 1,
             "type": "select",
             "options": {
+                "device": "device",
                 "blue": "blue",
                 "dark": "dark",
                 "light": "light",
