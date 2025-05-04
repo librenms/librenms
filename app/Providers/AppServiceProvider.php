@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
@@ -190,19 +189,6 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('is_regex', function ($attribute, $value) {
             return @preg_match($value, '') !== false;
-        });
-
-        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
-            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
-
-            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
-                return str_replace(
-                    [':extra', ':values'],
-                    [implode(',', $extra_keys), implode(',', $parameters)],
-                    $message);
-            });
-
-            return is_array($value) && empty($extra_keys);
         });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
