@@ -22,16 +22,42 @@ if (! isset($munge)) {
     $munge = false;
 }
 
+if (! isset($no_percentile_x0)) {
+    $no_percentile_x0 = true;
+}
+
+if (! isset($no_percentile_x1)) {
+    $no_percentile_x1 = true;
+}
+
 if (! isset($no_hourly)) {
     $no_hourly = false;
+}
+if (! isset($no_hourly_min)) {
+    $no_hourly_min = true;
+}
+if (! isset($no_hourly_max)) {
+    $no_hourly_max = true;
 }
 
 if (! isset($no_daily)) {
     $no_daily = false;
 }
+if (! isset($no_daily_min)) {
+    $no_daily_min = true;
+}
+if (! isset($no_daily_max)) {
+    $no_daily_max = true;
+}
 
 if (! isset($no_weekly)) {
     $no_weekly = false;
+}
+if (! isset($no_weekly_min)) {
+    $no_weekly_min = true;
+}
+if (! isset($no_weekly_max)) {
+    $no_weekly_max = true;
 }
 
 if (! isset($no_percentile)) {
@@ -76,7 +102,7 @@ if (! isset($colourAalpha)) {
     $colourAalpha = 33;
 }
 
-if (! isset($colour25th)) {
+if (! isset($colour25th) && ! $no_percentile) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -84,7 +110,7 @@ if (! isset($colour25th)) {
     $iter++;
 }
 
-if (! isset($colour50th)) {
+if (! isset($colour50th) && ! $no_percentile) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -92,7 +118,7 @@ if (! isset($colour50th)) {
     $iter++;
 }
 
-if (! isset($colour75th)) {
+if (! isset($colour75th) && ! $no_percentile) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -100,7 +126,23 @@ if (! isset($colour75th)) {
     $iter++;
 }
 
-if (! isset($colour1h)) {
+if (! isset($colourx0th) && ! $no_percentile_x0) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colourx0th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colourx1th) && ! $no_percentile_x1) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colourx1th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1h) && ! $no_hourly) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -108,7 +150,23 @@ if (! isset($colour1h)) {
     $iter++;
 }
 
-if (! isset($colour1d)) {
+if (! isset($colour1h_min) && ! $no_hourly_min) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1h_min = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1h_max) && ! $no_hourly_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1h_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1d) && ! $no_daily) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -116,11 +174,51 @@ if (! isset($colour1d)) {
     $iter++;
 }
 
-if (! isset($colour1w)) {
+if (! isset($colour1d_min) && ! $no_daily_min) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1d_min = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1d_max) && ! $no_daily_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1d_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1w) && ! $no_weekly) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
     $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1w_min) && ! $no_weekly_min) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1w_min = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1w_max) && ! $no_weekly_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1w_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1w_max) && ! $no_weekly_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1w_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
@@ -134,14 +232,32 @@ if ($height > 25) {
         $descr_1h_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour min', $descr_len);
         $descr_1h_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour max', $descr_len);
     }
+    if (! $no_hourly_min) {
+        $descr_1h_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour min', $descr_len);
+    }
+    if (! $no_hourly_max) {
+        $descr_1h_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour max', $descr_len);
+    }
     if (! $no_daily) {
         $descr_1d = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day avg', $descr_len);
         $descr_1d_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day min', $descr_len);
         $descr_1d_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day max', $descr_len);
     }
+    if (! $no_daily_min) {
+        $descr_1d_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day min', $descr_len);
+    }
+    if (! $no_daily_max) {
+        $descr_1d_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day max', $descr_len);
+    }
     if (! $no_weekly) {
         $descr_1w = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week avg', $descr_len);
         $descr_1w_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week min', $descr_len);
+        $descr_1w_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week max', $descr_len);
+    }
+    if (! $no_weekly_min) {
+        $descr_1w_min = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week min', $descr_len);
+    }
+    if (! $no_weekly_max) {
         $descr_1w_max = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week max', $descr_len);
     }
 }
@@ -179,6 +295,26 @@ if ($height > 25) {
     $rrd_options .= ' VDEF:' . $id . '50th=' . $id . ',50,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '25th=' . $id . ',25,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '75th=' . $id . ',75,PERCENTNAN';
+    if (! $no_percentile_x0) {
+        $rrd_options .= ' VDEF:' . $id . 'x0th=' . $id . ',' . $percentile_x0 . ',PERCENTNAN';
+    }
+    if (! $no_percentile_x1) {
+        $rrd_options .= ' VDEF:' . $id . 'x1th=' . $id . ',' . $percentile_x1 . ',PERCENTNAN';
+    }
+
+    if (! $no_hourly_min) {
+        $rrd_options .= ' DEF:' . $id . "1hmin$munge_helper=$filename:$ds:MIN:step=3600";
+        if ($munge) {
+            $rrd_options .= ' CDEF:dsm01h=dsm01hminds,' . $munge_opts;
+        }
+    }
+
+    if (! $no_hourly_max) {
+        $rrd_options .= ' DEF:' . $id . "1hmax$munge_helper=$filename:$ds:MAX:step=3600";
+        if ($munge) {
+            $rrd_options .= ' CDEF:dsm01h=dsm01hmaxds,' . $munge_opts;
+        }
+    }
 
     // the if is needed as with out it the group page will case an error
     // devices/group=1/format=graph_poller_perf/from=-24hour/to=now/
@@ -200,6 +336,22 @@ if ($height > 25) {
             }
         }
     }
+    if (! $no_daily_min) {
+        if ($time_diff >= 61200) {
+            $rrd_options .= ' DEF:' . $id . "1dmin$munge_helper=$filename:$ds:MIN:step=86400";
+            if ($munge) {
+                $rrd_options .= ' CDEF:dsm01dmax=dsm01dminds,' . $munge_opts;
+            }
+        }
+    }
+    if (! $no_daily_max) {
+        if ($time_diff >= 61200) {
+            $rrd_options .= ' DEF:' . $id . "1dmax$munge_helper=$filename:$ds:MAX:step=86400";
+            if ($munge) {
+                $rrd_options .= ' CDEF:dsm01dmax=dsm01dmaxds,' . $munge_opts;
+            }
+        }
+    }
 
     // weekly breaks and causes issues if it is less than 8 days
     if (! $no_weekly) {
@@ -211,6 +363,22 @@ if ($height > 25) {
                 $rrd_options .= ' CDEF:dsm01w=dsm01wds,' . $munge_opts;
                 $rrd_options .= ' CDEF:dsm01wmin=dsm01dminds,' . $munge_opts;
                 $rrd_options .= ' CDEF:dsm01wmax=dsm01dmaxds,' . $munge_opts;
+            }
+        }
+    }
+    if (! $no_weekly_min) {
+        if ($time_diff >= 691200) {
+            $rrd_options .= ' DEF:' . $id . "1wmin$munge_helper=$filename:$ds:MIN:step=604800";
+            if ($munge) {
+                $rrd_options .= ' CDEF:dsm01w=dsm01wminds,' . $munge_opts;
+            }
+        }
+    }
+    if (! $no_weekly_max) {
+        if ($time_diff >= 691200) {
+            $rrd_options .= ' DEF:' . $id . "1wmax$munge_helper=$filename:$ds:MAX:step=604800";
+            if ($munge) {
+                $rrd_options .= ' CDEF:dsm01w=dsm01wmaxds,' . $munge_opts;
             }
         }
     }
@@ -232,6 +400,16 @@ if ($height > 25) {
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1hmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
         $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1hmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
     }
+    if (! $no_hourly_min) {
+        $rrd_optionsb .= ' LINE1.25:' . $id . '1hmin#' . $colour1h_min . ":'$descr_1h_min'";
+        $rrd_optionsb .= ' GPRINT:' . $id . '1hmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1hmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
+        $rrd_optionsb .= ' GPRINT:' . $id . '1hmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1hmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+    }
+    if (! $no_hourly_max) {
+        $rrd_optionsb .= ' LINE1.25:' . $id . '1hmax#' . $colour1h_max . ":'$descr_1h_max'";
+        $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1hmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
+        $rrd_optionsb .= ' GPRINT:' . $id . '1hmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1hmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+    }
 
     if (! $no_daily) {
         if ($time_diff >= 129600) {
@@ -245,6 +423,20 @@ if ($height > 25) {
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
             // 1 hour max
             $rrd_optionsb .= ' COMMENT:"  ' . $descr_1d_max . '"';
+            $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
+            $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+        }
+    }
+    if (! $no_daily_min) {
+        if ($time_diff >= 61200) {
+            $rrd_optionsb .= ' LINE1.25:' . $id . '1dmin#' . $colour1d_min . ":'$descr_1d_min'";
+            $rrd_optionsb .= ' GPRINT:' . $id . '1dmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
+            $rrd_optionsb .= ' GPRINT:' . $id . '1dmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+        }
+    }
+    if (! $no_daily_max) {
+        if ($time_diff >= 61200) {
+            $rrd_optionsb .= ' LINE1.25:' . $id . '1dmax#' . $colour1d_max . ":'$descr_1d_max'";
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         }
@@ -266,6 +458,20 @@ if ($height > 25) {
             $rrd_optionsb .= ' GPRINT:' . $id . '1wmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1wmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         }
     }
+    if (! $no_weekly_min) {
+        if ($time_diff >= 691200) {
+            $rrd_optionsb .= ' LINE1.25:' . $id . '1wmin#' . $colour1w_min . ":'$descr_1w_min'";
+            $rrd_optionsb .= ' GPRINT:' . $id . '1wmin:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1wmin:MIN:%5.' . $float_precision . 'lf%s' . $units;
+            $rrd_optionsb .= ' GPRINT:' . $id . '1wmin:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1wmin:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+        }
+    }
+    if (! $no_weekly_max) {
+        if ($time_diff >= 691200) {
+            $rrd_optionsb .= ' LINE1.25:' . $id . '1wmax#' . $colour1w_max . ":'$descr_1w_max'";
+            $rrd_optionsb .= ' GPRINT:' . $id . '1wmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1wmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
+            $rrd_optionsb .= ' GPRINT:' . $id . '1wmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1wmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+        }
+    }
 
     if (! $no_percentile) {
         if (! $graph_stat_percentile_disable) {
@@ -278,6 +484,14 @@ if ($height > 25) {
             $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
             $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
         }
+    }
+    if (! $no_percentile_x0) {
+        $rrd_optionsb .= ' HRULE:' . $id . 'x0th#' . $colourx0th . ':' . $percentile_x0 . 'th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . 'x0th:%' . $float_precision . 'lf%s\n';
+    }
+    if (! $no_percentile_x1) {
+        $rrd_optionsb .= ' HRULE:' . $id . 'x1th#' . $colourx1th . ':' . $percentile_x1 . 'th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . 'x1th:%' . $float_precision . 'lf%s\n';
     }
 }
 $rrd_options .= $rrd_optionsb;

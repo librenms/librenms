@@ -10,4 +10,4 @@ if (! Rrd::checkRrdExists($filename)) {
     d_echo('RRD "' . $filename . '" not found');
 }
 
-require 'includes/html/graphs/generic_stats.inc.php';
+require 'includes/html/graphs/generic_stats_options.inc.php';

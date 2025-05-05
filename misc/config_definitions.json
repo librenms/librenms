@@ -2318,6 +2318,152 @@
             "order": 7,
             "type": "boolean"
         },
+        "graph_stat_no_hourly_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 8,
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_hourly_min_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 9,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_hourly_max_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 10,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_daily_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 11,
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_daily_min_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 12,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_daily_max_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 13,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_weekly_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 14,
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_weekly_min_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 15,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_weekly_max_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 16,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_percentile_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 17,
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_no_percentile_x0_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 18,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_percentile_x0_val_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 19,
+            "default": 90,
+            "type": "integer"
+        },
+        "graph_stat_no_percentile_x1_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 20,
+            "default": "1",
+            "type": "select",
+            "options": {
+                "0": "False",
+                "1": "True"
+            }
+        },
+        "graph_stat_percentile_x1_val_default": {
+            "group": "webui",
+            "section": "graph",
+            "order": 21,
+            "default": 95,
+            "type": "integer"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
