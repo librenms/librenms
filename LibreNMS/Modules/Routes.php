@@ -103,6 +103,7 @@ class Routes implements Module
         $routes = $routesFromOs->merge($routesFromDiscovery)->filter(function ($data) use ($update_timestamp) {
             $dst = trim(str_replace('"', '', $data->inetCidrRouteDest ?? ''));
             $hop = trim(str_replace('"', '', $data->inetCidrRouteNextHop ?? ''));
+            $context = trim(str_replace('"', '', $data->$data->context_name ?? ''));
 
             if ($dst == '' || $hop == '' || $data->inetCidrRoutePfxLen == '') { // missing crucial data
                 Log::info('incomplete: ' . $dst . ' - ' . $hop . ' - ' . $data->inetCidrRoutePfxLen);
@@ -135,7 +136,7 @@ class Routes implements Module
 
             $data->updated_at = $update_timestamp;
             $data->port_id = $data->port_id ?? 0;
-            $data->context_name = $data->context_name ?? '';
+            $data->context_name = $context;
             $data->inetCidrRouteIfIndex = intval($data->inetCidrRouteIfIndex);
             $data->inetCidrRouteType = intval($data->inetCidrRouteType);
             $data->inetCidrRouteProto = intval($data->inetCidrRouteProto);
@@ -311,16 +312,12 @@ class Routes implements Module
         Log::info('MPLS-L3VPN-STD-MIB');
 
         foreach (SnmpQuery::hideMib()->walk(['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes'])->table(1) as $vpnId => $data) {
-            //mes24xx
-            if (empty($data['mplsL3VpnVrfPerfCurrNumRoutes'])) {
-                Log::info('Skipping all MPLS routes because invalid MPLS-L3VPN-STD-MIB data');
+            if (! empty($data['mplsL3VpnVrfPerfCurrNumRoutes'])) {
+                if ($data['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
+                    Log::info('Skipping all MPLS routes because vpn instance ' . $vpnId . ' has more than ' . $max_routes . ' routes');
 
-                return new Collection;
-            }
-            if ($data['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-                Log::info('Skipping all MPLS routes because vpn instance ' . $vpnId . ' has more than ' . $max_routes . ' routes');
-
-                return new Collection;
+                    return new Collection;
+                }
             }
         }
 
