@@ -25,8 +25,81 @@
 
 namespace App\Observers;
 
+use App\Models\AccessPoint;
+use App\Models\EntPhysical;
+use App\Models\Ipv6Address;
+use App\Models\IsisAdjacency;
+use App\Models\Mempool;
+use App\Models\OspfArea;
+use App\Models\OspfInstance;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
+use App\Models\Ospfv3Area;
+use App\Models\Ospfv3Instance;
+use App\Models\Ospfv3Nbr;
+use App\Models\Ospfv3Port;
+use App\Models\PortAdsl;
+use App\Models\PortsNac;
+use App\Models\PortStack;
+use App\Models\PortStp;
+use App\Models\PortVdsl;
+use App\Models\PrinterSupply;
+use App\Models\Sla;
+use App\Models\Transceiver;
+use App\Models\WirelessSensor;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
+#[ObservedBy([EntPhysical::class])]
+#[ObservedBy([Ipv6Address::class])]
+#[ObservedBy([IsisAdjacency::class])]
+#[ObservedBy([Mempool::class])]
+#[ObservedBy([\App\Models\MplsTunnelCHop::class])]
+#[ObservedBy([\App\Models\MplsTunnelArHop::class])]
+#[ObservedBy([\App\Models\MplsSdpBind::class])]
+#[ObservedBy([\App\Models\MplsSap::class])]
+#[ObservedBy([\App\Models\MplsService::class])]
+#[ObservedBy([\App\Models\MplsSdp::class])]
+#[ObservedBy([\App\Models\MplsLspPath::class])]
+#[ObservedBy([\App\Models\MplsLsp::class])]
+#[ObservedBy([\App\Models\MplsTunnelCHop::class])]
+#[ObservedBy([\App\Models\MplsTunnelArHop::class])]
+#[ObservedBy([\App\Models\MplsSdpBind::class])]
+#[ObservedBy([\App\Models\MplsSap::class])]
+#[ObservedBy([\App\Models\MplsService::class])]
+#[ObservedBy([\App\Models\MplsSdp::class])]
+#[ObservedBy([\App\Models\MplsLspPath::class])]
+#[ObservedBy([\App\Models\MplsLsp::class])]
+#[ObservedBy([PortsNac::class])]
+#[ObservedBy([OspfNbr::class])]
+#[ObservedBy([OspfPort::class])]
+#[ObservedBy([OspfArea::class])]
+#[ObservedBy([OspfInstance::class])]
+#[ObservedBy([Ospfv3Nbr::class])]
+#[ObservedBy([Ospfv3Port::class])]
+#[ObservedBy([Ospfv3Area::class])]
+#[ObservedBy([Ospfv3Instance::class])]
+#[ObservedBy([Ospfv3Nbr::class])]
+#[ObservedBy([Ospfv3Port::class])]
+#[ObservedBy([Ospfv3Area::class])]
+#[ObservedBy([Ospfv3Instance::class])]
+#[ObservedBy([PortStack::class])]
+#[ObservedBy([PrinterSupply::class])]
+#[ObservedBy([\App\Models\Qos::class])]
+#[ObservedBy([Sla::class])]
+#[ObservedBy([\App\Models\Storage::class])]
+#[ObservedBy([PortStp::class])]
+#[ObservedBy([\App\Models\Stp::class])]
+#[ObservedBy([PortStp::class])]
+#[ObservedBy([\App\Models\Stp::class])]
+#[ObservedBy([Transceiver::class])]
+#[ObservedBy([\App\Models\Vminfo::class])]
+#[ObservedBy([\App\Models\Vminfo::class])]
+#[ObservedBy([WirelessSensor::class])]
+#[ObservedBy([PortVdsl::class])]
+#[ObservedBy([PortAdsl::class])]
+#[ObservedBy(['\App\Models\MplsLsp\TnmsneInfo'])]
+#[ObservedBy([AccessPoint::class])]
 class ModuleModelObserver
 {
     /**

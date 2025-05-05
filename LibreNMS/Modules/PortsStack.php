@@ -29,7 +29,6 @@ namespace LibreNMS\Modules;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\PortStack;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -89,7 +88,6 @@ class PortsStack implements Module
             ]);
         });
 
-        ModuleModelObserver::observe(PortStack::class);
         $this->syncModels($os->getDevice(), 'portsStack', $portStacks->filter());
     }
 

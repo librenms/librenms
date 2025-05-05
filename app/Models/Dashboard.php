@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,7 +21,8 @@ class Dashboard extends Model
      * @param  User  $user
      * @return Builder|static
      */
-    public function scopeAllAvailable(Builder $query, $user)
+    #[Scope]
+    protected function allAvailable(Builder $query, $user)
     {
         return $query->where('user_id', $user->user_id)
             ->orWhere('access', '>', 0);

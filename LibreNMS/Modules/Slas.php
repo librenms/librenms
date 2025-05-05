@@ -23,7 +23,6 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Sla;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
@@ -60,7 +59,7 @@ class Slas implements Module
     {
         if ($os instanceof SlaDiscovery) {
             $slas = $os->discoverSlas();
-            ModuleModelObserver::observe(Sla::class);
+
             $this->syncModels($os->getDevice(), 'slas', $slas);
         }
     }

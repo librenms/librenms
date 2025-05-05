@@ -28,7 +28,6 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\PortsNac;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -78,7 +77,6 @@ class Nac implements Module
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
-            ModuleModelObserver::observe(PortsNac::class);
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
             //filter out historical entries

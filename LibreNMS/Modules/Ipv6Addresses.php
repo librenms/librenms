@@ -6,7 +6,6 @@ use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -95,7 +94,6 @@ class Ipv6Addresses implements Module
             }
         });
 
-        ModuleModelObserver::observe(Ipv6Address::class);
         $this->syncModels($os->getDevice(), 'ipv6', $ips);
     }
 

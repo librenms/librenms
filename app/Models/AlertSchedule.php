@@ -29,6 +29,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -170,7 +171,8 @@ class AlertSchedule extends Model
 
     // ---- Query scopes ----
 
-    public function scopeIsActive($query)
+    #[Scope]
+    protected function isActive($query)
     {
         return $query->where(function ($query) {
             $now = CarbonImmutable::now('UTC');

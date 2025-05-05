@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
@@ -197,7 +198,8 @@ class ServiceTemplate extends BaseModel
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDisabled($query)
+    #[Scope]
+    protected function isDisabled($query)
     {
         return $query->where('disabled', 1);
     }

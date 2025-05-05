@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Config;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -12,6 +14,7 @@ use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
+#[ObservedBy([\App\Observers\VminfoObserver::class])]
 class Vminfo extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
@@ -51,7 +54,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         }
     }
 
-    public function scopeGuessFromDevice(Builder $query, Device $device): Builder
+    #[Scope]
+    protected function guessFromDevice(Builder $query, Device $device): Builder
     {
         $where = [$device->hostname];
 

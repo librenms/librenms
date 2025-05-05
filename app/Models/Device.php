@@ -5,6 +5,8 @@ namespace App\Models;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -33,6 +35,7 @@ use Permissions;
  *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
+#[ObservedBy([\App\Observers\DeviceObserver::class])]
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory;
@@ -531,7 +534,8 @@ class Device extends BaseModel
 
     // ---- Query scopes ----
 
-    public function scopeIsUp($query)
+    #[Scope]
+    protected function isUp($query)
     {
         return $query->where([
             ['status', '=', 1],
@@ -541,7 +545,8 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeIsActive($query)
+    #[Scope]
+    protected function isActive($query)
     {
         return $query->where([
             ['ignore', '=', 0],
@@ -549,7 +554,8 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeIsDown($query)
+    #[Scope]
+    protected function isDown($query)
     {
         return $query->where([
             ['status', '=', 0],
@@ -558,7 +564,8 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeIsIgnored($query)
+    #[Scope]
+    protected function isIgnored($query)
     {
         return $query->where([
             ['ignore', '=', 1],
@@ -566,28 +573,32 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeNotIgnored($query)
+    #[Scope]
+    protected function notIgnored($query)
     {
         return $query->where([
             ['ignore', '=', 0],
         ]);
     }
 
-    public function scopeIsDisabled($query)
+    #[Scope]
+    protected function isDisabled($query)
     {
         return $query->where([
             ['disabled', '=', 1],
         ]);
     }
 
-    public function scopeIsDisableNotify($query)
+    #[Scope]
+    protected function isDisableNotify($query)
     {
         return $query->where([
             ['disable_notify', '=', 1],
         ]);
     }
 
-    public function scopeIsNotDisabled($query)
+    #[Scope]
+    protected function isNotDisabled($query)
     {
         return $query->where([
             ['disable_notify', '=', 0],
@@ -595,7 +606,8 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
+    #[Scope]
+    protected function whereAttributeDisabled(Builder $query, string $attribute): Builder
     {
         return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
             $query->on('devices.device_id', 'devices_attribs.device_id')
@@ -606,7 +618,8 @@ class Device extends BaseModel
         });
     }
 
-    public function scopeWhereUptime($query, $uptime, $modifier = '<')
+    #[Scope]
+    protected function whereUptime($query, $uptime, $modifier = '<')
     {
         return $query->where([
             ['uptime', '>', 0],
@@ -614,17 +627,20 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeCanPing(Builder $query): Builder
+    #[Scope]
+    protected function canPing(Builder $query): Builder
     {
         return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         return $this->hasDeviceAccess($query, $user);
     }
 
-    public function scopeInDeviceGroup($query, $deviceGroup)
+    #[Scope]
+    protected function inDeviceGroup($query, $deviceGroup)
     {
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
@@ -635,7 +651,8 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    #[Scope]
+    protected function notInDeviceGroup($query, $deviceGroup)
     {
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
@@ -646,7 +663,8 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeInServiceTemplate($query, $serviceTemplate)
+    #[Scope]
+    protected function inServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
@@ -657,7 +675,8 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    #[Scope]
+    protected function notInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
@@ -668,7 +687,8 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    #[Scope]
+    protected function whereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
     {
         if (empty($deviceSpec)) {
             return $query;

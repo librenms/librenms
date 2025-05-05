@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,7 +55,8 @@ class Alert extends Model
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeActive($query)
+    #[Scope]
+    protected function active($query)
     {
         return $query->where('state', '=', AlertState::ACTIVE);
     }
@@ -65,7 +67,8 @@ class Alert extends Model
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeAcknowledged($query)
+    #[Scope]
+    protected function acknowledged($query)
     {
         return $query->where('state', '=', AlertState::ACKNOWLEDGED);
     }

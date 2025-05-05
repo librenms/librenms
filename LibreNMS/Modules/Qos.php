@@ -25,7 +25,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
@@ -62,7 +61,7 @@ class Qos implements Module
     {
         if ($os instanceof QosDiscovery) {
             $qos = $os->discoverQos();
-            ModuleModelObserver::observe(\App\Models\Qos::class);
+
             $qos = $this->syncModels($os->getDevice(), 'qos', $qos);
             $os->setQosParents($qos);
         }

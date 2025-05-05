@@ -27,7 +27,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -62,7 +61,6 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         if ($os instanceof VminfoDiscovery) {
             $vms = $os->discoverVminfo();
 
-            ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
         }
     }
@@ -84,7 +82,6 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         if ($os instanceof VminfoPolling) {
             $vms = $os->pollVminfo($os->getDevice()->vminfo);
 
-            ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
 
             return;

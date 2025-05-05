@@ -27,8 +27,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Models\PortStp;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -59,12 +57,12 @@ class Stp implements Module
 
         $instances = $os->discoverStpInstances();
         Log::info('Instances: ');
-        ModuleModelObserver::observe(\App\Models\Stp::class);
+
         $this->syncModels($device, 'stpInstances', $instances);
 
         $ports = $os->discoverStpPorts($instances);
         Log::info('Ports: ');
-        ModuleModelObserver::observe(PortStp::class);
+
         $this->syncModels($device, 'stpPorts', $ports);
     }
 
@@ -80,12 +78,12 @@ class Stp implements Module
         Log::info('Instances: ');
         $instances = $device->stpInstances;
         $instances = $os->pollStpInstances($instances);
-        ModuleModelObserver::observe(\App\Models\Stp::class);
+
         $this->syncModels($device, 'stpInstances', $instances);
 
         Log::info('Ports: ');
         $ports = $device->stpPorts;
-        ModuleModelObserver::observe(PortStp::class);
+
         $this->syncModels($device, 'stpPorts', $ports);
     }
 

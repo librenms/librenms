@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,7 +40,8 @@ class Bill extends Model
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;

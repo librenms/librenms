@@ -27,8 +27,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Models\Transceiver;
-use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -61,7 +59,7 @@ class Transceivers implements Module
             $discoveredTransceivers = $os->discoverTransceivers();
 
             // save transceivers
-            ModuleModelObserver::observe(Transceiver::class);
+
             $this->syncModels($os->getDevice(), 'transceivers', $discoveredTransceivers);
         }
     }

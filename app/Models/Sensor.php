@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,6 +17,7 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
+#[ObservedBy([\App\Observers\SensorObserver::class])]
 class Sensor extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
@@ -243,7 +246,8 @@ class Sensor extends DeviceRelatedModel implements Keyable
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsCritical($query)
+    #[Scope]
+    protected function isCritical($query)
     {
         return $query->whereColumn('sensor_current', '<', 'sensor_limit_low')
             ->orWhereColumn('sensor_current', '>', 'sensor_limit');
@@ -253,7 +257,8 @@ class Sensor extends DeviceRelatedModel implements Keyable
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeIsDisabled($query)
+    #[Scope]
+    protected function isDisabled($query)
     {
         return $query->where('sensor_alert', 0);
     }

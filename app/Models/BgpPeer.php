@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -55,7 +56,8 @@ class BgpPeer extends DeviceRelatedModel
     ];
     // ---- Query scopes ----
 
-    public function scopeInAlarm(Builder $query)
+    #[Scope]
+    protected function inAlarm(Builder $query)
     {
         return $query->where(function (Builder $query) {
             $query->where('bgpPeerAdminStatus', 'start')

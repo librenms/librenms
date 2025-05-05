@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -101,7 +102,8 @@ class CustomMap extends BaseModel
         return true;
     }
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;

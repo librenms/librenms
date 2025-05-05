@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PortGroup extends BaseModel
@@ -33,7 +34,8 @@ class PortGroup extends BaseModel
     public $timestamps = false;
     protected $fillable = ['name', 'desc'];
 
-    public function scopeHasAccess($query, User $user)
+    #[Scope]
+    protected function hasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {
             return $query;

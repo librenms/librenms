@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InsufficientDataException;
@@ -9,6 +10,7 @@ use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
+#[ObservedBy([\App\Observers\MempoolObserver::class])]
 class Mempool extends DeviceRelatedModel implements Keyable
 {
     protected $table = 'mempools';
