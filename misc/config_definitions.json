@@ -508,6 +508,13 @@
                 "value.*.roles.*": "string"
             }
         },
+        "auth.socialite.debug": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 7,
+            "type": "boolean",
+            "default": false
+        },
         "auth_ad_base_dn": {
             "group": "auth",
             "section": "ad",
