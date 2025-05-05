@@ -3649,7 +3649,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 682,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -3659,7 +3659,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "\\LibreNMS\\OS\\BaicellsOd04::hhmmss_to_minutes",
+                    "user_func": "hhmmssToMinutes",
                     "rrd_type": "GAUGE",
                     "state_name": null
                 }
