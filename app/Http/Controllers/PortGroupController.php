@@ -41,7 +41,7 @@ class PortGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required|string|unique:port_groups',
         ]);
 
@@ -75,7 +75,7 @@ class PortGroupController extends Controller
      */
     public function update(Request $request, PortGroup $portGroup, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => [
                 'required',
                 'string',

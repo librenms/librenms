@@ -34,12 +34,13 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class CustomMapNodeImageController extends Controller
 {
     public function index(): View
     {
-        $this->authorize('update');
+        Gate::authorize('update');
 
         return view('map.custom-nodeimage-manage', [
             'images' => CustomMapNodeImage::orderBy('name')->get(),
@@ -68,8 +69,8 @@ class CustomMapNodeImageController extends Controller
 
     public function store(FormRequest $request): JsonResponse
     {
-        $this->authorize('update');
-        $this->validate($request, [
+        Gate::authorize('update');
+        $request->validate([
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
         ]);
@@ -94,8 +95,8 @@ class CustomMapNodeImageController extends Controller
 
     public function update(FormRequest $request, CustomMapNodeImage $image): JsonResponse
     {
-        $this->authorize('update', $image);
-        $this->validate($request, [
+        Gate::authorize('update', $image);
+        $request->validate([
             'image' => 'image|mimes:png,jpg,svg,gif',
             'name' => 'string',
         ]);
@@ -112,7 +113,7 @@ class CustomMapNodeImageController extends Controller
 
     public function destroy(CustomMapNodeImage $image): Response
     {
-        $this->authorize('update', $image);
+        Gate::authorize('update', $image);
         if ($image->nodes->count() > 0) {
             return response('Image is in use', 403)
                       ->header('Content-Type', 'text/plain');

@@ -34,7 +34,7 @@ class VlanPortsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        $this->validate($request, ['vlan' => 'integer']);
+        $request->validate(['vlan' => 'integer']);
         $this->vlanId = $request->get('vlan', 1);
 
         return Port::with(['device', 'device.location'])

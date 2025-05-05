@@ -33,7 +33,7 @@ class AvailabilityMapController extends Controller
 {
     public function setView(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'map_view' => 'required|numeric|in:0,1,2',
         ]);
 
@@ -42,7 +42,7 @@ class AvailabilityMapController extends Controller
 
     public function setGroup(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'group_view' => 'required|numeric',
         ]);
 

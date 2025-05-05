@@ -7,15 +7,16 @@ use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class DashboardWidgetController extends Controller
 {
     public function add(Dashboard $dashboard, Request $request): JsonResponse
     {
-        $this->authorize('update', $dashboard);
+        Gate::authorize('update', $dashboard);
 
-        $this->validate($request, [
+        $request->validate([
             'widget_type' => Rule::in(DashboardController::$widgets),
         ]);
 
@@ -42,7 +43,7 @@ class DashboardWidgetController extends Controller
 
     public function remove(UserWidget $widget): JsonResponse
     {
-        $this->authorize('update', $widget->dashboard);
+        Gate::authorize('update', $widget->dashboard);
 
         $widget->delete();
 
@@ -54,7 +55,7 @@ class DashboardWidgetController extends Controller
 
     public function clear(Dashboard $dashboard): JsonResponse
     {
-        $this->authorize('update', $dashboard);
+        Gate::authorize('update', $dashboard);
 
         $dashboard->widgets()->delete();
 
@@ -66,7 +67,7 @@ class DashboardWidgetController extends Controller
 
     public function update(Dashboard $dashboard, Request $request): JsonResponse
     {
-        $this->authorize('update', $dashboard);
+        Gate::authorize('update', $dashboard);
 
         $validated = $this->getValidationFactory()->make(
             json_decode($request->get('data', '[]'), true), [

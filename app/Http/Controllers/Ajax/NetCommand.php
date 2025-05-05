@@ -37,7 +37,7 @@ class NetCommand extends Controller
 {
     public function run(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'cmd' => 'in:whois,ping,tracert,nmap',
             'query' => 'ip_or_hostname',
         ]);

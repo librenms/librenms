@@ -34,17 +34,21 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Spatie\Permission\Models\Role;
 use URL;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -56,7 +60,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', User::class);
+        Gate::authorize('manage', User::class);
 
         return view('user.index', [
             'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
@@ -73,7 +77,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', User::class);
+        Gate::authorize('create', User::class);
 
         $tmp_user = new User;
         $tmp_user->can_modify_passwd = LegacyAuth::getType() == 'mysql' ? 1 : 0; // default to true mysql
@@ -127,7 +131,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $this->authorize('view', $user);
+        Gate::authorize('view', $user);
 
         return $user->username;
     }
@@ -142,7 +146,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $this->authorize('update', $user);
+        Gate::authorize('update', $user);
 
         $data = [
             'user' => $user,
@@ -225,7 +229,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $this->authorize('delete', $user);
+        Gate::authorize('delete', $user);
 
         $user->delete();
 
@@ -282,7 +286,7 @@ class UserController extends Controller
 
     public function authlog()
     {
-        $this->authorize('manage', User::class);
+        Gate::authorize('manage', User::class);
 
         return view('user.authlog', [
             'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),

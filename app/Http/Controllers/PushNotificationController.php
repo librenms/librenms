@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class PushNotificationController extends Controller
+class PushNotificationController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('auth');
+        return [
+            'auth',
+        ];
     }
 
     public function token(): string
@@ -23,7 +26,7 @@ class PushNotificationController extends Controller
 
     public function register(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'description' => 'string',
             'subscription.endpoint' => 'required|url',
             'subscription.keys.auth' => 'required|string',
@@ -45,7 +48,7 @@ class PushNotificationController extends Controller
 
     public function unregister(Request $request): void
     {
-        $this->validate($request, [
+        $request->validate([
             'endpoint' => 'required|url',
         ]);
 

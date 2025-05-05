@@ -28,13 +28,14 @@ namespace App\Http\Controllers;
 
 use App\Models\PollerCluster;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PollerSettingsController extends Controller
 {
     public function update(Request $request, $id, $setting)
     {
         $poller = PollerCluster::findOrFail($id);
-        $this->authorize('update', $poller);
+        Gate::authorize('update', $poller);
 
         $definition = collect($poller->configDefinition())->keyBy('name');
         if (! $definition->has($setting)) {
@@ -50,7 +51,7 @@ class PollerSettingsController extends Controller
     public function destroy($id, $setting)
     {
         $poller = PollerCluster::findOrFail($id);
-        $this->authorize('delete', $poller);
+        Gate::authorize('delete', $poller);
 
         $definition = collect($poller->configDefinition())->keyBy('name');
         if (! $definition->has($setting)) {

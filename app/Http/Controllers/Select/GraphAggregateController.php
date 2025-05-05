@@ -41,7 +41,7 @@ class GraphAggregateController extends Controller
 
     public function __invoke(Request $request)
     {
-        $this->validate($request, $this->rules);
+        $request->validate($this->rules);
 
         $types = [
             'transit',

@@ -5,15 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 
-class DeviceGroupController extends Controller
+class DeviceGroupController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(DeviceGroup::class, 'device_group');
+        return [
+            new Middleware('can:viewAny,App\Models\DeviceGroup', only: ['index']),
+            new Middleware('can:view,device_group', only: ['show']),
+            new Middleware('can:create,App\Models\DeviceGroup', only: ['create', 'store']),
+            new Middleware('can:update,device_group', only: ['edit', 'update']),
+            new Middleware('can:delete,device_group', only: ['destroy']),
+        ];
     }
 
     /**
@@ -23,7 +32,7 @@ class DeviceGroupController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', DeviceGroup::class);
+        Gate::authorize('manage', DeviceGroup::class);
 
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
@@ -51,7 +60,7 @@ class DeviceGroupController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => 'required|string|unique:device_groups',
             'type' => 'required|in:dynamic,static',
             'devices' => 'array|required_if:type,static',
@@ -112,7 +121,7 @@ class DeviceGroupController extends Controller
      */
     public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
     {
-        $this->validate($request, [
+        $request->validate([
             'name' => [
                 'required',
                 'string',

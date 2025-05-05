@@ -61,7 +61,7 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function create(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);

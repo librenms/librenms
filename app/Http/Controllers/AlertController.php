@@ -12,7 +12,7 @@ class AlertController extends Controller
 {
     public function ack(Request $request, Alert $alert): \Illuminate\Http\JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'state' => 'required|int',
             'ack_msg' => 'nullable|string',
             'ack_until_clear' => 'nullable|in:0,1,true,false',

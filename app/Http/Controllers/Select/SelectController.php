@@ -56,7 +56,7 @@ abstract class SelectController extends PaginatedAjaxController
      */
     public function __invoke(Request $request)
     {
-        $this->validate($request, $this->rules());
+        $request->validate($this->rules());
         $limit = $request->get('limit', 50);
 
         $query = $this->baseQuery($request);

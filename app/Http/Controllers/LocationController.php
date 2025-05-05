@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 
@@ -48,9 +49,9 @@ class LocationController extends Controller
      */
     public function update(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
+        Gate::authorize('admin', $request->user());
 
-        $this->validate($request, [
+        $request->validate([
             'lat' => 'required|numeric|max:90|min:-90',
             'lng' => 'required|numeric|max:180|min:-180',
         ]);
@@ -72,7 +73,7 @@ class LocationController extends Controller
      */
     public function destroy(Request $request, Location $location)
     {
-        $this->authorize('admin', $request->user());
+        Gate::authorize('admin', $request->user());
 
         $location->delete();
 

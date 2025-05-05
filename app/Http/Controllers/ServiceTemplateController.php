@@ -8,15 +8,23 @@ use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
 
-class ServiceTemplateController extends Controller
+class ServiceTemplateController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(ServiceTemplate::class, 'template');
+        return [
+            new Middleware('can:viewAny,App\Models\ServiceTemplate', only: ['index']),
+            new Middleware('can:view,template', only: ['show']),
+            new Middleware('can:create,App\Models\ServiceTemplate', only: ['create', 'store']),
+            new Middleware('can:update,template', only: ['edit', 'update']),
+            new Middleware('can:delete,template', only: ['destroy']),
+        ];
     }
 
     /**
@@ -62,24 +70,22 @@ class ServiceTemplateController extends Controller
      */
     public function store(Request $request, ToastInterface $toast)
     {
-        $this->validate(
-            $request, [
-                'name' => 'required|string|unique:service_templates',
-                'groups' => 'array',
-                'groups.*' => 'integer',
-                'devices' => 'array',
-                'devices.*' => 'integer',
-                'check' => 'required|string',
-                'type' => 'required|in:dynamic,static',
-                'rules' => 'json|required_if:type,dynamic',
-                'param' => 'nullable|string',
-                'ip' => 'nullable|string',
-                'desc' => 'nullable|string',
-                'changed' => 'integer',
-                'disabled' => 'integer',
-                'ignore' => 'integer',
-            ]
-        );
+        $request->validate([
+            'name' => 'required|string|unique:service_templates',
+            'groups' => 'array',
+            'groups.*' => 'integer',
+            'devices' => 'array',
+            'devices.*' => 'integer',
+            'check' => 'required|string',
+            'type' => 'required|in:dynamic,static',
+            'rules' => 'json|required_if:type,dynamic',
+            'param' => 'nullable|string',
+            'ip' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
+        ]);
 
         $template = ServiceTemplate::make(
             $request->only(
@@ -148,32 +154,30 @@ class ServiceTemplateController extends Controller
      */
     public function update(Request $request, ServiceTemplate $template, ToastInterface $toast)
     {
-        $this->validate(
-            $request, [
-                'name' => [
-                    'required',
-                    'string',
-                    Rule::unique('service_templates')->where(
-                        function ($query) use ($template) {
-                            $query->where('id', '!=', $template->id);
-                        }
-                    ),
-                ],
-                'type' => 'required|in:dynamic,static',
-                'rules' => 'json|required_if:type,dynamic',
-                'devices' => 'array',
-                'devices.*' => 'integer',
-                'groups' => 'array',
-                'groups.*' => 'integer',
-                'check' => 'string',
-                'param' => 'nullable|string',
-                'ip' => 'nullable|string',
-                'desc' => 'nullable|string',
-                'changed' => 'integer',
-                'disabled' => 'integer',
-                'ignore' => 'integer',
-            ]
-        );
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('service_templates')->where(
+                    function ($query) use ($template) {
+                        $query->where('id', '!=', $template->id);
+                    }
+                ),
+            ],
+            'type' => 'required|in:dynamic,static',
+            'rules' => 'json|required_if:type,dynamic',
+            'devices' => 'array',
+            'devices.*' => 'integer',
+            'groups' => 'array',
+            'groups.*' => 'integer',
+            'check' => 'string',
+            'param' => 'nullable|string',
+            'ip' => 'nullable|string',
+            'desc' => 'nullable|string',
+            'changed' => 'integer',
+            'disabled' => 'integer',
+            'ignore' => 'integer',
+        ]);
 
         $template->fill(
             $request->only(
