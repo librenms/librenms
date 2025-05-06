@@ -30,4 +30,5 @@ return [
 
     'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),
 
+    'name' => 'LibreNMS',
 ];

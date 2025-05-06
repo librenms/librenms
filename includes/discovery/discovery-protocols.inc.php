@@ -139,18 +139,17 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     foreach ($lldp_array as $key => $lldp_array_inner) {
         foreach ($lldp_array_inner as $ifIndex => $lldp) {
             d_echo($lldp);
-            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
-            $remote_device_id = find_device_id($lldp['lldpRemSysName']);
+            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum'] ?? null);
+            $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
 
-            if (! $remote_device_id &&
+            if (Config::get('autodiscovery.xdp') && isset($lldp['lldpRemSysName']) && ! $remote_device_id &&
                     \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
-                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
-                        Config::get('autodiscovery.xdp') === true)
+                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])
             ) {
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
-            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+            if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
                 $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
                 discover_link(
                     $interface['port_id'],
@@ -332,10 +331,13 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     foreach ($lldp_array as $key => $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if ($device['os'] == 'aos7') {
+                if (! isset($lldp_local[$entry_key]['lldpLocPortDesc'])) {
+                    continue;
+                }
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif ($device['os'] == 'routeros') {
                 $ifIndex = $entry_key;
-            } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
+            } elseif (isset($dot1d_array) && isset($dot1d_array[$entry_key]) && is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
                 $ifIndex = $entry_key;
@@ -343,7 +345,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if ($device['os'] == 'aos7') {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
-                $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
+                $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'] ?? null, $ifIndex, $device['device_id']);
             }
             $interface = get_port_by_id($local_port_id);
 
@@ -351,31 +353,30 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
-                if ($lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
+                if (isset($lldp['lldpRemPortId']) && $lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
                     $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
                 }
                 // normalize MAC address if present
                 $remote_port_mac = '';
-                $remote_port_name = $lldp['lldpRemPortId'];
-                if ($lldp['lldpRemChassisIdSubtype'] == 4) { // 4 = macaddress
+                $remote_port_name = $lldp['lldpRemPortId'] ?? null;
+                if ($lldp['lldpRemChassisIdSubtype'] == 4 && isset($lldp['lldpRemChassisId'])) { // 4 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemChassisId']));
                 }
-                if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                if ($lldp['lldpRemPortIdSubtype'] == 3 && isset($lldp['lldpRemPortId'])) { // 3 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId']));
                 }
-                if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2) { // 6=ifName 2=ifAlias
+                if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2 && isset($lldp['lldpRemChassisId'])) { // 6=ifName 2=ifAlias
                     $remote_port_name = $lldp['lldpRemChassisId'];
                 }
                 // Linksys / Cisco SRW2016/24/48 all have lldpRemSysDesc Ethernet Interface, which makes all lldp mappings go to port g1.
                 // ex:
                 //     'lldpRemSysDesc' => '16-Port 10/100/1000 Gigabit Switch w/WebView',
-                if (str_ends_with($lldp['lldpRemSysDesc'], 'Gigabit Switch w/WebView')) {
+                if (isset($lldp['lldpRemSysDesc']) && str_ends_with($lldp['lldpRemSysDesc'], 'Gigabit Switch w/WebView')) {
                     $lldp['lldpRemPortDesc'] = '';
                 }
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'] ?? '', $remote_port_mac);
                 // add device if configured to do so
-                if (! $remote_device_id && ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
-                        Config::get('autodiscovery.xdp') === true) {
+                if (Config::get('autodiscovery.xdp') && ! $remote_device_id && ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] ?? null)) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
 
                     if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
@@ -438,7 +439,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if (empty($lldp['lldpRemSysName']) && isset($remote_device)) {
                     $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
                 }
-                if (empty($lldp['lldpRemSysName'])) {
+                if (empty($lldp['lldpRemSysName']) && isset($lldp['lldpRemSysDesc'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
                 if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
@@ -449,7 +450,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                         $lldp['lldpRemSysName'],
                         $remote_port_name,
                         null,
-                        $lldp['lldpRemSysDesc'],
+                        $lldp['lldpRemSysDesc'] ?? null,
                         $device['device_id'],
                         $remote_device_id
                     );
@@ -528,7 +529,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
     $remote_port = $test['remote_port'];
     d_echo("$local_port_id -> $remote_hostname -> $remote_port \n");
 
-    if (! $link_exists[$local_port_id][$remote_hostname][$remote_port]) {
+    if (! isset($link_exists[$local_port_id][$remote_hostname][$remote_port])) {
         echo '-';
         $rows = dbDelete('links', '`id` = ?', [$test['id']]);
         d_echo("$rows deleted ");
