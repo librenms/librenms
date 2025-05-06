@@ -83,7 +83,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     foreach ($vlans as $vlan_index => $vlan) {
         $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
         d_echo("VLAN --> $vlan_id");
-        if (!empty($vlans_db) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+        if (! empty($vlans_db) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
                 $vlan_upd['vlan_name'] = $vlan[$tmp_name];
