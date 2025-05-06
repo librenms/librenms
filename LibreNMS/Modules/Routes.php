@@ -89,13 +89,9 @@ class Routes implements Module
 
         if ($routesFromOs->isEmpty()) {
             $routesFromDiscovery = $this->discoverInetCidrRoutes($os->getDevice(), $max_routes);
-            if ($routesFromDiscovery->isEmpty()) {
-                $routesFromDiscovery = $this->discoverIpCidrRoutes($os->getDevice(), $max_routes);
-            }
-            if ($routesFromDiscovery->isEmpty()) {
-                $routesFromDiscovery = $this->discoverRfcRoutes($os->getDevice());
-            }
 
+            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
+            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
             $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice()));
             $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes));
         }
@@ -103,7 +99,7 @@ class Routes implements Module
         $routes = $routesFromOs->merge($routesFromDiscovery)->filter(function ($data) use ($update_timestamp) {
             $dst = trim(str_replace('"', '', $data->inetCidrRouteDest ?? ''));
             $hop = trim(str_replace('"', '', $data->inetCidrRouteNextHop ?? ''));
-            $context = trim(str_replace('"', '', $data->$data->context_name ?? ''));
+            $context = trim(str_replace('"', '', $data->context_name ?? ''));
 
             if ($dst == '' || $hop == '' || $data->inetCidrRoutePfxLen == '') { // missing crucial data
                 Log::info('incomplete: ' . $dst . ' - ' . $hop . ' - ' . $data->inetCidrRoutePfxLen);
