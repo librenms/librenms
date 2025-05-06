@@ -354,19 +354,19 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
-                if ($lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
+                if (isset($lldp['lldpRemPortId']) && $lldp['lldpRemPortIdSubtype'] == 5 && ctype_xdigit(str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId'])))) {
                     $lldp['lldpRemPortId'] = StringHelpers::hexToAscii($lldp['lldpRemPortId'], ':');
                 }
                 // normalize MAC address if present
                 $remote_port_mac = '';
-                $remote_port_name = $lldp['lldpRemPortId'];
-                if ($lldp['lldpRemChassisIdSubtype'] == 4) { // 4 = macaddress
+                $remote_port_name = $lldp['lldpRemPortId'] ?? null;
+                if ($lldp['lldpRemChassisIdSubtype'] == 4 && isset($lldp['lldpRemChassisId'])) { // 4 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemChassisId']));
                 }
-                if ($lldp['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                if ($lldp['lldpRemPortIdSubtype'] == 3 && isset($lldp['lldpRemPortId'])) { // 3 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId']));
                 }
-                if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2) { // 6=ifName 2=ifAlias
+                if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2 && isset($lldp['lldpRemChassisId'])) { // 6=ifName 2=ifAlias
                     $remote_port_name = $lldp['lldpRemChassisId'];
                 }
                 // Linksys / Cisco SRW2016/24/48 all have lldpRemSysDesc Ethernet Interface, which makes all lldp mappings go to port g1.
@@ -530,7 +530,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
     $remote_port = $test['remote_port'];
     d_echo("$local_port_id -> $remote_hostname -> $remote_port \n");
 
-    if (! $link_exists[$local_port_id][$remote_hostname][$remote_port]) {
+    if (! isset($link_exists[$local_port_id][$remote_hostname][$remote_port])) {
         echo '-';
         $rows = dbDelete('links', '`id` = ?', [$test['id']]);
         d_echo("$rows deleted ");
