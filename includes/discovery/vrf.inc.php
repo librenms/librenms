@@ -57,6 +57,9 @@ if (Config::get('enable_vrfs')) {
             $descrs = trim(str_replace("$descr_oid.", '', $descrs));
             $descr_table = [];
             foreach (explode("\n", $descrs) as $descr) {
+                if (! Str::contains($descr, ' ')) {
+                    continue;
+                }
                 $t = explode(' ', $descr, 2);
                 $descr_table[$t[0]] = $t[1];
             }
@@ -77,6 +80,7 @@ if (Config::get('enable_vrfs')) {
                 array_push($port_table[$vrf_oid], $port_id);
             }
         }
+        unset($vrf_oid, $port_id);
 
         foreach (explode("\n", $rds) as $oid) {
             if (empty($descr_oid) && strpos($oid, 'Platform_iVRF')) {
