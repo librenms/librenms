@@ -87,10 +87,13 @@ if (Config::get('enable_vrfs')) {
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
-                [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                $vrf_oid = $oid;
+                if (Str::contains($oid, ' ')) {
+                    [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                }
                 $oid_values = explode('.', $vrf_oid);
                 $vrf_name = '';
-                for ($i = 1; $i <= $oid_values[0]; $i++) {
+                for ($i = 1; $i <= $oid_values[0] && isset($oid_values[$i]); $i++) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
@@ -120,13 +123,13 @@ if (Config::get('enable_vrfs')) {
                 }
 
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
-                echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
-                echo "\n  [VRF $vrf_name] DESC  - " . $descr_table[$vrf_oid];
+                echo "\n  [VRF $vrf_name] RD    - " . ($vrf_rd ?? null);
+                echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
                     dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']], 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd ?? null, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
                 }
 
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
