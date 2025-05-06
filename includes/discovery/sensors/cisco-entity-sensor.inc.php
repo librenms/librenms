@@ -63,7 +63,7 @@ if ($device['os_group'] == 'cisco') {
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
             // echo("[" . $entry['entSensorType'] . "|" . $entry['entSensorValue']. "|" . $index . "]");
-            if ($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
+            if (isset($entry['entSensorType'], $entry['entSensorValue'], $entitysensor[$entry['entSensorType']]) && $entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
                 $group = null;
                 $entPhysicalIndex = $index;
                 if ($entity_array[$index]['entPhysicalName'] || $device['os'] == 'iosxr') {
