@@ -113,7 +113,7 @@ class Rewrite
     {
         $rewrite_shortif = [
             'hundredgige' => 'Hu',
-            'twentyfivegige' => 'Tw',
+            'twentyfivegige' => 'Twe',
             'tengigabitethernet' => 'Te',
             'ten-gigabitethernet' => 'Te',
             'tengige' => 'Te',
