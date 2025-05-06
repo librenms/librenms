@@ -184,11 +184,11 @@ class CienaSds extends OS
                     $contents['cienaCesPortXcvrWaveLength'] . ' nm ' : '');
                 $mfgString = ($contents['cienaCesPortXcvrMfgDate'] != '' ?
                     'manufactured ' . $contents['cienaCesPortXcvrMfgDate'] . ' ' : '');
-                $xcvrIndex = '57' . $contents['cienaCesPortXcvrPortNumber'];
+                $xcvrIndex = '57' . ($contents['cienaCesPortXcvrPortNumber'] ?? null);
 
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $xcvrIndex,
-                    'entPhysicalDescr' => 'port ' . $contents['cienaCesPortXcvrPortNumber'] . ' ' . $wavelengthString .
+                    'entPhysicalDescr' => 'port ' . ($contents['cienaCesPortXcvrPortNumber'] ?? null) . ' ' . $wavelengthString .
                         ' transceiver ' . $mfgString,
                     'entPhysicalClass' => 'sensor',
                     'entPhysicalModelName' => $contents['cienaCesPortXcvrVendorPartNum'],
