@@ -88,6 +88,7 @@ if (Config::get('enable_vrfs')) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
                 $vrf_oid = $oid;
+                unset($vrf_rd);
                 if (Str::contains($oid, ' ')) {
                     [$vrf_oid, $vrf_rd] = explode(' ', $oid);
                 }
