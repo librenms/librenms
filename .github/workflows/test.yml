@@ -1,4 +1,4 @@
-name: test
+name: Test
 
 on:
   push:
@@ -12,22 +12,79 @@ permissions:
   contents: read # to fetch code (actions/checkout)
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+
+    outputs:
+      test-shard-matrix: ${{ steps.shards.outputs.test-shard-matrix }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            resources/definitions/os_detection/*.yaml
+
+      - name: Calculate shards
+        id: shards
+        run: |
+          cd resources/definitions/os_detection/
+
+          declare -r SHARDS=8
+          declare -A SHARD_GROUPS
+          declare -i CURRENT_GROUP=1
+
+          declare -a INPUT_FILES=(*.yaml)
+          declare -r PER_SPLIT=$(( ${#INPUT_FILES[@]} / SHARDS ))
+          declare -A FILE_LIST
+
+          # Loop through each input file, extract the first two characters as the key,
+          # and increment the count of files for each unique key in the FILE_LIST array.
+          for FILE in "${INPUT_FILES[@]}"
+          do
+            KEY=${FILE:0:2}
+            FILE_LIST[$KEY]=$(( ${FILE_LIST[$KEY]:-0} + 1 ))
+          done
+
+          # Bash cannot preserve the order of keys in associative arrays.
+          # Sort the keys of the FILE_LIST array and store them in FILE_LIST_KEYS.
+          readarray -t FILE_LIST_KEYS < <(printf '%s\n' "${!FILE_LIST[@]}" | sort)
+
+          for KEY in "${FILE_LIST_KEYS[@]}"
+          do
+            (( GROUP_SIZE += ${FILE_LIST[$KEY]} ))
+            SHARD_GROUPS[$CURRENT_GROUP]+="${KEY},"
+            if [ $GROUP_SIZE -ge $PER_SPLIT ]
+            then
+              GROUP_SIZE=0
+              (( CURRENT_GROUP++ ))
+            fi
+          done
+
+          printf "test-shard-matrix=[" >> "$GITHUB_OUTPUT"
+
+          printf '{"name":"Other", "php-version":"8.4", "database":"mariadb:11.7", "arguments":"--full --exclude-phpunit-group=browser,mibs,os"}, ' >> "$GITHUB_OUTPUT"
+
+          for ((i=1;i<=${#SHARD_GROUPS[@]};i++)); do
+            printf '{"name":"PHP 8.4 - OS (%i/%i)", "php-version":"8.4", "database":"mariadb:11.7", "arguments":"--os %s"}, ' $i ${#SHARD_GROUPS[@]} "${SHARD_GROUPS[$i]::-1}" >> "$GITHUB_OUTPUT"
+          done
+
+          for ((i=1;i<=${#SHARD_GROUPS[@]};i++)); do
+            printf '{"name":"PHP 8.2 - OS (%i/%i)", "php-version":"8.2", "database":"mysql:8.0", "arguments":"--os %s"}, ' $i ${#SHARD_GROUPS[@]} "${SHARD_GROUPS[$i]::-1}" >> "$GITHUB_OUTPUT"
+          done
+
+          printf "]" >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
   test:
+    name: ${{ matrix.name }}
+    needs: [setup]
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        include:
-          -
-            php-version: 8.4
-            name: Unit
-            skip-web-check: 1
-            database: mariadb:11.7
-          -
-            php-version: 8.2
-            name: Unit
-            skip-web-check: 1
-            database: mysql:8.0
+        include: ${{ fromJSON(needs.setup.outputs.test-shard-matrix) }}
+
     services:
       database:
         image: ${{ matrix.database }}
@@ -42,21 +99,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      -
-         name: Set $FILES
-         run: |
-           FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
-           echo $FILES
-
-           echo 'FILES<<EOF' >> $GITHUB_ENV
-           echo $FILES >> $GITHUB_ENV
-           echo 'EOF' >> $GITHUB_ENV
-      -
-         name: Set $PATH
-         run: |
-           echo "/home/runner/.local/bin/" >> $GITHUB_PATH
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -119,6 +161,7 @@ jobs:
         run: |
           composer install --prefer-dist --no-interaction --no-progress
       -
+
         name: Snmpsim setup
         run: |
           php lnms dev:simulate --setup-venv
@@ -147,30 +190,32 @@ jobs:
       -
         name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
+
       -
         name: Migrate Database
         run: php artisan migrate
+
       -
         name: Start SNMPSIM
-        if: matrix.skip-unit-check != '1'
         run: |
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log &
+
       -
         name: lnms dev:check ci
         run: |
-          php lnms dev:check ci
-        env:
-          SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
-          SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
+          php lnms dev:check ci ${{ matrix.arguments }}
+
       -
         name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
+
       -
         name: Dump snmp logs
-        if: failure() && matrix.skip-unit-check != '1'
+        if: failure()
         run: |
           cat /tmp/snmpsimd.log || true
+
       -
         name: Dump context
         if: always()
