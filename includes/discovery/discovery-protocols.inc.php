@@ -139,18 +139,17 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     foreach ($lldp_array as $key => $lldp_array_inner) {
         foreach ($lldp_array_inner as $ifIndex => $lldp) {
             d_echo($lldp);
-            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum']);
-            $remote_device_id = find_device_id($lldp['lldpRemSysName']);
+            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum'] ?? null);
+            $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
 
-            if (! $remote_device_id &&
+            if (Config::get('autodiscovery.xdp') && isset($lldp['lldpRemSysName']) && ! $remote_device_id &&
                     \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
-                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
-                        Config::get('autodiscovery.xdp') === true)
+                    ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])
             ) {
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
-            if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+            if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
                 $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
                 discover_link(
                     $interface['port_id'],
@@ -346,7 +345,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if ($device['os'] == 'aos7') {
                 $local_port_id = find_port_id($ifName, null, $device['device_id']);
             } else {
-                $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'], $ifIndex, $device['device_id']);
+                $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'] ?? null, $ifIndex, $device['device_id']);
             }
             $interface = get_port_by_id($local_port_id);
 
