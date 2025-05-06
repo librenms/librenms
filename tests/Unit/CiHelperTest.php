@@ -38,7 +38,7 @@ final class CiHelperTest extends TestCase
             return false;
         }, $this->getDefaultFlags());
         $allTrue = array_map(function ($flag) {
-            return false;
+            return true;
         }, $this->getDefaultFlags());
 
         $helper->setFlags($allFalse);
