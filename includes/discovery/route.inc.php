@@ -313,6 +313,9 @@ if ($mpls_skip == false) {
     $oid = 'mplsL3VpnVrfRteTable';
     $mpls_route_table = snmpwalk_group($device, $oid, $mib, 7, []);
     foreach ($mpls_route_table as $vpnId => $inetCidrRouteTable) {
+        if (! is_array($inetCidrRouteTable)) {
+            continue;
+        }
         foreach ($inetCidrRouteTable as $inetCidrRouteDestType => $next1) {
             //ipv4 or ipv6
             foreach ($next1 as $inetCidrRouteDest => $next2) {
