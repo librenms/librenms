@@ -831,7 +831,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
             'bgpPeerIdentifier' => $peer['ip'],
             'afi' => $afi,
             'safi' => $safi,
-            'context_name' => $device['context_name'],
+            'context_name' => $device['context_name'] ?? null,
             'AcceptedPrefixes' => 0,
             'DeniedPrefixes' => 0,
             'PrefixAdminLimit' => 0,
