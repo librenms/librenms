@@ -28,6 +28,7 @@ class Route extends PortRelatedModel implements Keyable
         'inetCidrRoutePfxLen',
     ];
 
+    //ipCidrRouteProto from ipForward Mib
     public static $translateProto = [
         'undefined',
         'other',
@@ -43,7 +44,6 @@ class Route extends PortRelatedModel implements Keyable
         'ciscoIgrp',
         'bbnSpfIgp',
         'ospf',
-        'ospfv3',
         'bgp',
         'idpr',
         'ciscoEigrp',
