@@ -146,7 +146,7 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'route
         $entryClean['inetCidrRouteDest'] = $ipRoute['ipRouteDest'];
         $inetCidrRoutePfxLen = IPv4::netmask2cidr($ipRoute['ipRouteMask']); //CONVERT
         $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
-        $entryClean['inetCidrRoutePolicy'] = $ipRoute['ipRouteInfo'];
+        $entryClean['inetCidrRoutePolicy'] = $ipRoute['ipRouteInfo'] ?? null;
         $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
         $entryClean['inetCidrRouteNextHop'] = $ipRoute['ipRouteNextHop'];
         $entryClean['inetCidrRouteMetric1'] = $ipRoute['ipRouteMetric1'];
@@ -236,7 +236,9 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
         }
     }
 
-    $ipForwardNb['0']['inetCidrRouteNumber'] = $entryPerType['ipv4'];
+    if (isset($entryPerType['ipv4'])) {
+        $ipForwardNb['0']['inetCidrRouteNumber'] = $entryPerType['ipv4'];
+    }
     // Some cisco devices report ipv4+ipv6 in inetCidrRouteNumber
     // But only include ipv6 in inetCidrRoute
     // So we count the real amount of ipv4 we get, in order to get the missing ipv4 from ipCidrRouteTable if needed
