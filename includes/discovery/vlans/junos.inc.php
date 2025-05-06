@@ -71,27 +71,18 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     } else {
         foreach ($untag as $key => $tagness) {
             $key = explode('.', $key);
-
-            if (! isset($base_to_index[$key[1]])) {
-                continue;
-            }
+            $base = $base_to_index[$key[1]] ?? '';
 
             if ($tagness['jnxExVlanPortTagness'] == 2) {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 1;
+                $tagness_by_vlan_index[$key[0]][$base]['tag'] = 1;
             } else {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 0;
+                $tagness_by_vlan_index[$key[0]][$base]['tag'] = 0;
             }
         }
     }
     foreach ($vlans as $vlan_index => $vlan) {
-        //dump($vlan_tag);
-        //dump($vlan_index);
-        //dump($tmp_tag);
         $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
         d_echo("VLAN --> $vlan_id");
-        //dump($vlans_db);
-        //dump($vtpdomain_id);
-        //dump($vlan_id);
         if (!empty($vlans_db) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
