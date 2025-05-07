@@ -80,7 +80,7 @@ foreach ($oids as $dst => $tdata) {
         try {
             $ipv6dst = IPv6::fromHexString($dst);
             $inetCidrRouteDest = $ipv6dst->uncompressed();
-            $ipv6hop = IPv6::fromHexString($data['ipv6RouteNextHop']);
+            $ipv6hop = IPv6::fromHexString($data['ipv6RouteNextHop'] ?? null);
             $inetCidrRouteNextHop = $ipv6hop->uncompressed();
             $ifIndex = $data['ipv6RouteIfIndex'];
             $portId = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
@@ -107,7 +107,11 @@ foreach ($oids as $dst => $tdata) {
                 'inetCidrRoutePfxLen' => $inetCidrRoutePfxLen,
             ];
 
-            $current = $mixed[''][$routeType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$routeType][$inetCidrRouteNextHop];
+            $current = null;
+            if (! empty($mixed)) {
+                $current = $mixed[''][$routeType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$routeType][$inetCidrRouteNextHop];
+            }
+
             if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
                 $update_row[] = $entryClean;
             } else {
