@@ -290,8 +290,9 @@ function dbFetchCell($sql, $parameters = [])
     try {
         $query = DB::connection()->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
+        $value = $query->fetchColumn();
 
-        return $query->fetchColumn();
+        return $value === false ? null : $value;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
