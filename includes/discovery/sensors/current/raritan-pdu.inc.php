@@ -23,7 +23,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $divisor = 1000;
 $multiplier = 1;
 
@@ -109,7 +108,6 @@ if ($outlet_oids) {
 
 foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
     for ($x = 1; $x <= $raritan_data['inletPoleCount']; $x++) {
-
         $tmp_index = "$index.$x";
         $new_index = "inletPoleCurrent.$tmp_index";
         $oid = '.1.3.6.1.4.1.13742.4.1.21.2.1.3.' . $tmp_index;

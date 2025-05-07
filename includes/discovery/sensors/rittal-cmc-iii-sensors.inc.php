@@ -24,8 +24,8 @@
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
 
-use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
