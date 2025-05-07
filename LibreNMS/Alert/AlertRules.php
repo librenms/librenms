@@ -126,7 +126,7 @@ class AlertRules
                 } else {
                     $extra = gzcompress(json_encode(['contacts' => AlertUtil::getContacts($qry), 'rule' => $qry]), 9);
                     if (dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
-                        if (!$current_state) {
+                        if (! $current_state) {
                             dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
                             dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
@@ -139,7 +139,7 @@ class AlertRules
                     Log::info('Status: %bNOCHG%n', ['color' => true]);
                 } else {
                     if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
-                        if (!$current_state) {
+                        if (! $current_state) {
                             dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
                             dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
