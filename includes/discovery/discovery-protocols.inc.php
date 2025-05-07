@@ -53,7 +53,15 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
         foreach ($cdp_if_array as $entry_key => $cdp) {
             d_echo($cdp);
 
-            $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
+            if (! isset($cdp['cdpCacheDeviceId'])) {
+                continue;
+            }
+
+            $cdp_ip = null;
+            if (isset($cdp['cdpCacheAddress'])) {
+                $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
+            }
+
             $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
 
             if (
@@ -63,7 +71,7 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
             ) {
                 $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
-                if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
+                if ($cdp_ip && ! $remote_device_id && Config::get('discovery_by_ip', false)) {
                     $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
                 }
             }
