@@ -141,12 +141,14 @@ if (Config::get('enable_vrfs')) {
                 $valid_vrf[$vrf_id] = 1;
 
                 echo "\n  [VRF $vrf_name] PORTS - ";
-                foreach ($port_table[$vrf_oid] as $if_id) {
-                    $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
-                    echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
-                    dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
-                    $if = $interface['port_id'];
-                    $valid_vrf_if[$vrf_id][$if] = 1;
+                if (isset($port_table[$vrf_oid])) {
+                    foreach ($port_table[$vrf_oid] as $if_id) {
+                        $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
+                        echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                        dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                        $if = $interface['port_id'];
+                        $valid_vrf_if[$vrf_id][$if] = 1;
+                    }
                 }
             }//end if
         }//end foreach
