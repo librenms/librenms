@@ -246,17 +246,13 @@ function dbDeleteOrphans($target_table, $parents)
  */
 function dbFetchRows($sql, $parameters = [])
 {
-    global $PDO_FETCH_ASSOC;
-
     try {
-        $PDO_FETCH_ASSOC = true;
-        $rows = Eloquent::DB()->select($sql, (array) $parameters);
+        $query = DB::connection()->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
 
-        return $rows;
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    } finally {
-        $PDO_FETCH_ASSOC = false;
     }
 
     return [];
@@ -271,17 +267,13 @@ function dbFetchRows($sql, $parameters = [])
  */
 function dbFetchRow($sql = null, $parameters = [])
 {
-    global $PDO_FETCH_ASSOC;
-
     try {
-        $PDO_FETCH_ASSOC = true;
-        $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
+        $query = DB::connection()->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
 
-        return $row;
+        return $query->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    } finally {
-        $PDO_FETCH_ASSOC = false;
     }
 
     return [];
@@ -295,19 +287,13 @@ function dbFetchRow($sql = null, $parameters = [])
  */
 function dbFetchCell($sql, $parameters = [])
 {
-    global $PDO_FETCH_ASSOC;
-
     try {
-        $PDO_FETCH_ASSOC = true;
-        $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-        if ($row) {
-            return reset($row);
-            // shift first field off first row
-        }
+        $query = DB::connection()->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+
+        return $query->fetchColumn();
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    } finally {
-        $PDO_FETCH_ASSOC = false;
     }
 
     return null;
@@ -322,22 +308,13 @@ function dbFetchCell($sql, $parameters = [])
  */
 function dbFetchColumn($sql, $parameters = [])
 {
-    global $PDO_FETCH_ASSOC;
-
-    $cells = [];
-
     try {
-        $PDO_FETCH_ASSOC = true;
-        foreach (Eloquent::DB()->select($sql, (array) $parameters) as $row) {
-            $cells[] = reset($row);
-        }
-        $PDO_FETCH_ASSOC = false;
+        $query = DB::connection()->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
 
-        return $cells;
+        return $query->fetchAll(PDO::FETCH_COLUMN, 0);
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    } finally {
-        $PDO_FETCH_ASSOC = false;
     }
 
     return [];

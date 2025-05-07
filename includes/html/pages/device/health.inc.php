@@ -45,7 +45,7 @@ if ($device['os_group'] == 'cisco') {
 unset($datas);
 $datas[] = 'overview';
 
-if (Processor::where('device_id', $device['device_id'])->count()) {
+if (Processor::where('device_id', $device['device_id'])->exists()) {
     $datas[] = 'processor';
 }
 
@@ -53,31 +53,21 @@ if ($qfp) {
     $datas[] = 'qfp';
 }
 
-if (Mempool::where('device_id', $device['device_id'])->count()) {
+if (Mempool::where('device_id', $device['device_id'])->exists()) {
     $datas[] = 'mempool';
 }
 
-if (Storage::where('device_id', $device['device_id'])->count()) {
+if (Storage::where('device_id', $device['device_id'])->exists()) {
     $datas[] = 'storage';
 }
 
-if (DiskIo::where('device_id', $device['device_id'])->count()) {
+if (DiskIo::where('device_id', $device['device_id'])->exists()) {
     $datas[] = 'diskio';
 }
 
-$sensors = [
-    'airflow', 'ber', 'bitrate', 'charge', 'chromatic_dispersion', 'cooling', 'count', 'current', 'dBm', 'delay', 'eer',
-    'fanspeed', 'frequency', 'humidity', 'load', 'loss', 'percent', 'power', 'power_consumed', 'power_factor', 'pressure',
-    'runtime', 'signal', 'snr', 'state', 'temperature', 'tv_signal', 'voltage', 'waterflow', 'quality_factor',
-];
-
-foreach ($sensors as $sensor_name) {
-    if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
-        //strtolower because 'dBm - dbm' difference
-        $lowname = strtolower($sensor_name);
-        $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname . '.short');
-    }
+foreach (Sensor::where('device_id', $device['device_id'])->distinct()->pluck('sensor_class') as $sensor_class) {
+    $datas[] = $sensor_class;
+    $type_text[$sensor_class] = trans('sensors.' . $sensor_class . '.short');
 }
 
 $type_text['overview'] = 'Overview';

@@ -161,7 +161,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
-        /* @var Collection<Mempool> $collection */
+        /** @var Collection<Mempool> $mempools */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
@@ -663,7 +663,7 @@ class Cisco extends OS implements
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
             $instance = parent::discoverStpInstances($vlan);
-            if ($instance[0]->protocolSpecification == 'unknown') {
+            if (isset($instance[0]) && $instance[0]->protocolSpecification == 'unknown') {
                 $instance[0]->protocolSpecification = $stpxSpanningTreeType;
             }
             $instances = $instances->merge($instance);
@@ -700,7 +700,7 @@ class Cisco extends OS implements
                     $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
                     if (empty($ent->ifIndex)) {
                         // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
-                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()->ifIndex;
+                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()?->ifIndex;
                     }
                 }
 
@@ -804,7 +804,7 @@ class Cisco extends OS implements
                     $statements = [];
                     foreach ($spObjects as $sqObject) {
                         // Find child objects (we are the parent) that are type 3 (match statements)
-                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3) {
+                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3 && isset($matchStatements[$sqObject['cbQosConfigIndex']]['cbQosMatchStmtName'])) {
                             $statements[] = $matchStatements[$sqObject['cbQosConfigIndex']]['cbQosMatchStmtName'];
                         }
                     }

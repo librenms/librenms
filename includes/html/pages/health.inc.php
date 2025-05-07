@@ -18,52 +18,23 @@
 
 $no_refresh = true;
 
+$type_text = [
+    'overview' => 'Overview',
+    'mempool' => 'Memory',
+    'storage' => 'Storage',
+    'diskio' => 'Disk I/O',
+    'processor' => 'Processor',
+];
+
 $datas = ['mempool', 'processor', 'storage'];
 
 $used_sensors = \LibreNMS\Util\ObjectCache::sensors();
 foreach ($used_sensors as $group => $types) {
     foreach ($types as $entry) {
         $datas[] = $entry['class'];
+        $type_text[$entry['class']] = trans('sensors.' . $entry['class'] . '.short');
     }
 }
-
-$type_text = [
-    'overview' => 'Overview',
-    'temperature' => 'Temperature',
-    'charge' => 'Battery Charge',
-    'humidity' => 'Humidity',
-    'mempool' => 'Memory',
-    'storage' => 'Storage',
-    'diskio' => 'Disk I/O',
-    'processor' => 'Processor',
-    'voltage' => 'Voltage',
-    'fanspeed' => 'Fanspeed',
-    'frequency' => 'Frequency',
-    'runtime' => 'Runtime',
-    'current' => 'Current',
-    'power' => 'Power',
-    'power_consumed' => 'Power Consumed',
-    'power_factor' => 'Power Factor',
-    'dbm' => 'dBm',
-    'load' => 'Load',
-    'loss' => 'Loss',
-    'state' => 'State',
-    'count' => 'Count',
-    'signal' => 'Signal',
-    'tv_signal' => 'TV signal',
-    'bitrate' => 'Bitrate',
-    'snr' => 'SNR',
-    'pressure' => 'Pressure',
-    'cooling' => 'Cooling',
-    'toner' => 'Toner',
-    'delay' => 'Delay',
-    'quality_factor' => 'Quality factor',
-    'chromatic_dispersion' => 'Chromatic Dispersion',
-    'ber' => 'Bit Error Rate',
-    'eer' => 'Energy Efficiency Ratio',
-    'waterflow' => 'Water Flow Rate',
-    'percent' => 'Percent',
-];
 
 $active_metric = basename(array_key_exists($vars['metric'], $type_text) ? $vars['metric'] : 'processor');
 

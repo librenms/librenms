@@ -2042,7 +2042,8 @@
                     "context_name": ""
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv6-addresses": {
         "discovery": {
@@ -2064,6 +2065,22 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 5
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "e8:f7:24:49:47:d3",
+                    "ipv6_address": "1601:3617:ea0d:0001:0000:0000:0059:2bea",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "e8:f7:24:49:47:d3",
+                    "ipv6_address": "2b17:0000:0000:0000:3659:172b:1516:2b17",
+                    "context_name": ""
                 }
             ]
         }

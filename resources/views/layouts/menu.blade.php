@@ -7,12 +7,8 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="hidden-md hidden-sm navbar-brand" href>
-            @if($title_image)
-                <img src="{{ asset($title_image) }}" alt="{{ $project_name }}">
-            @else
-                {{ $project_name }}
-            @endif
+            <a class="navbar-brand" href>
+                <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>
 
@@ -244,7 +240,7 @@
                                     <ul class="dropdown-menu scrollable-menu">
                                 @endif
                                         @foreach($custommaps as $map_group => $group_maps)
-                                            @if($map_group)
+                                            @if($map_group && $custommaps->count() > 1)
                                             <li class="dropdown-submenu">
                                             <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
                                             </a>
@@ -255,7 +251,7 @@
                                                     {{ ucfirst($map->name) }}
                                                 </a></li>
                                             @endforeach
-                                        @if($map_group)</ul></li>@endif
+                                            @if($map_group && $custommaps->count() > 1)</ul></li>@endif
                                         @endforeach
                                 @if($custommaps->count() == 1)
                                     </ul>
