@@ -100,22 +100,38 @@ class Routes implements Module
             $dst = trim(str_replace('"', '', $data->inetCidrRouteDest ?? ''));
             $hop = trim(str_replace('"', '', $data->inetCidrRouteNextHop ?? ''));
             $context = trim(str_replace('"', '', $data->context_name ?? ''));
+            $prefix = trim($data->inetCidrRoutePfxLen ?? '');
+            $dstType = trim($data->inetCidrRouteDestType ?? '');
 
-            if ($dst == '' || $hop == '' || $data->inetCidrRoutePfxLen == '') { // missing crucial data
-                Log::info('incomplete: ' . $dst . ' - ' . $hop . ' - ' . $data->inetCidrRoutePfxLen);
+            if ($dst == '' || $hop == '') { // missing crucial data
+                Log::info('incomplete: ' . $dst . ' - ' . $hop . ' - ' . $prefix);
 
                 return null;
             }
 
+            if ($prefix == '' && $dstType == 'ipv4') { //try to guess netmask
+                $out = [];
+                $tmp = explode('.', $dst);
+                foreach ($tmp as $tmpdata) {
+                    if (is_numeric($tmpdata) && $tmpdata == '0') {
+                        $out[] = '0';
+                    } elseif (is_numeric($tmpdata) && $tmpdata != '0') {
+                        $out[] = '255';
+                    }
+                }
+                $prefix = implode('.', $out);
+                Log::info('netmask from RFC: ' . $dst . ' - ' . $hop . ' - ' . $prefix);
+            }
+
             try {
-                preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $data->inetCidrRoutePfxLen, $tmp); // is it netmask or cidr?
+                preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $prefix, $tmp); // is it netmask or cidr?
                 $pfxLen = (empty($tmp[1])) ? intval($data->inetCidrRoutePfxLen) : IPv4::netmask2cidr($tmp[1]);
                 Log::debug('try: ' . $dst . ' - ' . $hop . ' - ' . $pfxLen);
 
-                if ($data->inetCidrRouteDestType == 'ipv6') {
+                if ($dstType == 'ipv6') {
                     $dst = IPv6::fromHexString($dst)->uncompressed();
                     $hop = IPv6::fromHexString($hop)->uncompressed();
-                } elseif ($data->inetCidrRouteDestType == 'ipv4') {
+                } elseif ($dstType == 'ipv4') {
                     $tst = new IPv4($dst . '/' . $pfxLen);
                 } else {
                     return null;
