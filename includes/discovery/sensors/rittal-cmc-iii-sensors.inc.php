@@ -44,7 +44,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         $current_index_prefix = $index_r[0];
     }
 
-    if (!isset($cmc_iii_sensors[$sensor_id]) || $cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
+    if (! isset($cmc_iii_sensors[$sensor_id]) || $cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
         $sensor_id++;
 
         if (str_contains($sensor_name, $entry['cmcIIIVarValueStr'])) {
@@ -53,7 +53,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $sensor_desc = "$sensor_name {$entry['cmcIIIVarValueStr']}";
         }
 
-        $cmc_iii_sensors[$sensor_id] = array('name' => $sensor_name, 'desc' => $sensor_desc);
+        $cmc_iii_sensors[$sensor_id] = ['name' => $sensor_name, 'desc' => $sensor_desc];
 
         // count descriptions => used to generate unique description count suffix later
         if (! isset($unique_desc_counter[$sensor_desc])) {
