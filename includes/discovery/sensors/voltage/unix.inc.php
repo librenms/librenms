@@ -57,7 +57,7 @@ if (! empty($snmpData)) {
         7 => ['descr' => 'Input Voltage', 'LL' => 200, 'LW' => 0, 'W' => null, 'H' => 280],
     ];
     foreach ($snmpData as $index => $upsData) {
-        if ($upsnut[$index]) {
+        if (isset($upsnut[$index])) {
             $value = $upsData['nsExtendOutLine'];
             if (is_numeric($value)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();

@@ -4093,15 +4093,7 @@ parameters:
 				#^Call to deprecated function snmp_get\\(\\)\\:
 				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/sensors/state/equallogic.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function snmp_get_multi\\(\\)\\:
-				Please use SnmpQuery instead$#
-			"""
-			count: 1
+			count: 2
 			path: includes/discovery/sensors/state/equallogic.inc.php
 
 		-

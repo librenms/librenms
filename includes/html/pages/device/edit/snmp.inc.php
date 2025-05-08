@@ -325,7 +325,7 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='authalgo' name='authalgo' class='form-control'>";
 foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-    echo "<option value='$algo' " . ($device->authalgo === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp($device->authalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>';
 
@@ -347,7 +347,7 @@ echo "
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
 
 foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-    echo "<option value='$algo' " . ($device->cryptoalgo === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp($device->cryptoalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>
     ';

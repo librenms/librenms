@@ -68,7 +68,7 @@ class DeviceController extends TableController
 
     protected function searchFields($request)
     {
-        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location'];
+        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location', 'purpose', 'notes'];
     }
 
     protected function sortFields($request)
