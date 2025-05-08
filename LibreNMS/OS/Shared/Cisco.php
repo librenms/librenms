@@ -152,7 +152,7 @@ class Cisco extends OS implements
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
         }
 
-        $device->hardware = $hardware ?: snmp_translate($device->sysObjectID, 'SNMPv2-MIB:CISCO-PRODUCTS-MIB', 'cisco');
+        $device->hardware = $hardware ?: SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
     }
 
     public function discoverMempools()
