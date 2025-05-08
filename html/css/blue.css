@@ -25,22 +25,6 @@
     color: #0052cc;
 }
 
-.fa-col-success {
-    color: #3c763d;
-}
-
-.fa-col-info {
-    color: #31708f;
-}
-
-.fa-col-primary {
-    color: #357ebd;
-}
-
-.fa-col-danger {
-    color: #e30613;
-}
-
 .icon-theme {
     color: #0052cc;
 }
@@ -139,7 +123,7 @@
   -webkit-box-shadow: none;
 }
 
-.dropdown-menu li a:focus, 
+.dropdown-menu li a:focus,
 .dropdown-menu li a:hover {
     color: #fff;
     text-decoration: none;
