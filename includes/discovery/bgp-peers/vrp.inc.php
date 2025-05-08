@@ -78,6 +78,8 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
         }
     }
 
+    $vrp_bgp_peer_count = 0;
+
     foreach ($bgpPeers as $vrfName => $vrf) {
         $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
 
