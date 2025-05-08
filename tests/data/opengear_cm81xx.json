@@ -1538,5 +1538,147 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.137.75.165",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "10.137.75.160/28",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "172.17.0.0/16",
+                    "ifIndex": 5
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 4,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 100000001,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.137.75.161",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "0000:0000:0000:0000:0000:0000:0000:0001",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.9",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 4,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.137.75.160",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.4",
+                    "inetCidrRoutePfxLen": 28
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 5,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "172.17.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.5",
+                    "inetCidrRoutePfxLen": 16
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 4,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.6",
+                    "inetCidrRoutePfxLen": 64
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 4,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:0213:c6ff:fe0a:a3c3",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.14",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 4,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "ff00:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.15",
+                    "inetCidrRoutePfxLen": 8
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "00:13:c6:0a:a3:c3",
+                    "ipv6_address": "fe80:0000:0000:0000:0213:c6ff:fe0a:a3c3",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

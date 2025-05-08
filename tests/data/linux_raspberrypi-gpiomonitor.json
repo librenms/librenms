@@ -982,5 +982,46 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.30.1.30",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.30.0.0/16",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "54:b2:03:0b:5d:cc",
+                    "ipv6_address": "2a02:810a:8140:4571:59d2:69cb:912b:adab",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:a0:57:14:83:e2",
+                    "ipv6_address": "fe80:0000:0000:0000:02a0:57ff:fe14:83e2",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "80:2a:a8:79:cd:9f",
+                    "ipv6_address": "fe80:0000:0000:0000:822a:a8ff:fe79:cd9f",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

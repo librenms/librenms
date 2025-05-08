@@ -2537,8 +2537,8 @@
                     "ifName": "Console16",
                     "portName": null,
                     "ifIndex": 16,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2637,8 +2637,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 746,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2737,8 +2737,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2837,8 +2837,8 @@
                     "ifName": "VLAN200",
                     "portName": null,
                     "ifIndex": 1200,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2937,8 +2937,8 @@
                     "ifName": "VLAN1170",
                     "portName": null,
                     "ifIndex": 2170,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3620,5 +3620,101 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1200,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1200,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1200,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 2170,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.15.200.181",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.15.200.0/24",
+                    "ifIndex": 1200
+                },
+                {
+                    "ipv4_address": "192.168.2.10",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.2.0/24",
+                    "ifIndex": 1001
+                }
+            ]
+        }
     }
 }

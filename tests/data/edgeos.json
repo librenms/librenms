@@ -4144,5 +4144,120 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.10.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.10.0/24",
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "10.10.253.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.253.0/24",
+                    "ifIndex": 23
+                },
+                {
+                    "ipv4_address": "10.10.254.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.254.0/24",
+                    "ifIndex": 20
+                },
+                {
+                    "ipv4_address": "10.10.255.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.255.0/24",
+                    "ifIndex": 21
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.16.200.2",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "172.16.200.0/30",
+                    "ifIndex": 26
+                },
+                {
+                    "ipv4_address": "192.168.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 21
+                },
+                {
+                    "ipv4_address": "83.166.203.90",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "83.166.203.88/30",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "84.247.120.33",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "84.247.120.32/29",
+                    "ifIndex": 19
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "40:98:ad:a1:c0:5f",
+                    "ipv6_address": "fe80:0000:0000:0000:047f:b59d:021a:373c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "04:4b:ed:a1:32:f9",
+                    "ipv6_address": "fe80:0000:0000:0000:04a9:c8ea:9180:79c1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "40:98:ad:33:08:f0",
+                    "ipv6_address": "fe80:0000:0000:0000:08d9:f33f:0895:52bc",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:00:27:47:3d:07",
+                    "ipv6_address": "fe80:0000:0000:0000:0a00:27ff:fe47:3d07",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "7c:01:91:8e:0a:01",
+                    "ipv6_address": "fe80:0000:0000:0000:148b:0bde:bbe2:f66c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "14:c9:13:86:4f:57",
+                    "ipv6_address": "fe80:0000:0000:0000:16c9:13ff:fe86:4f57",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "30:52:cb:0f:ac:65",
+                    "ipv6_address": "fe80:0000:0000:0000:8529:ee04:b1a1:e7e1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "84:b2:61:17:d0:8b",
+                    "ipv6_address": "fe80:0000:0000:0000:86b2:61ff:fe17:d08b",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

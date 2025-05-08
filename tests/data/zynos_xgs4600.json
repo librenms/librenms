@@ -15165,5 +15165,44 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "office",
+                    "remote_port": "1/0/26 (00)",
+                    "remote_platform": null,
+                    "remote_version": "M5300-28GF3",
+                    "ifAlias": "Custome",
+                    "ifDescr": "swp28",
+                    "ifName": "1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "qfx",
+                    "remote_port": "619 (00)",
+                    "remote_platform": null,
+                    "remote_version": "Juniper",
+                    "ifAlias": "Custome",
+                    "ifDescr": "swp29",
+                    "ifName": "1/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "helpdesk",
+                    "remote_port": "1/28 (00)",
+                    "remote_platform": null,
+                    "remote_version": "V4.60(ABBI.0)_20190328 | 03/28/2019",
+                    "ifAlias": "swp27",
+                    "ifDescr": "swp27",
+                    "ifName": "1/28"
+                }
+            ]
+        }
     }
 }

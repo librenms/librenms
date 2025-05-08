@@ -6107,5 +6107,36 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.0.10",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.10.0.0/22",
+                    "ifIndex": 300000
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 0,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 20000
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "b8:27:eb:59:96:2b",
+                    "ipv6_address": "2a02:0058:0097:6eee:0000:0000:0000:0002",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

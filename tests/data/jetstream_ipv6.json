@@ -6709,5 +6709,53 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "169.254.102.26",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.102.0/24",
+                    "ifIndex": 254
+                },
+                {
+                    "ipv4_address": "169.254.2.26",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.2.0/24",
+                    "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-wr28",
+                    "remote_port": "eth0.1",
+                    "remote_platform": null,
+                    "remote_version": "OpenWrt 21.02.0",
+                    "ifAlias": "Trunk-K28",
+                    "ifDescr": "gigabitEthernet 1/0/24",
+                    "ifName": "gigabitEthernet 1/0/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw22",
+                    "remote_port": "gi1/0/6",
+                    "remote_platform": null,
+                    "remote_version": "28-port 1G/10G Managed Switch",
+                    "ifAlias": "Trunk-UP",
+                    "ifDescr": "gigabitEthernet 1/0/25",
+                    "ifName": "gigabitEthernet 1/0/25"
+                }
+            ]
+        }
     }
 }

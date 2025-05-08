@@ -3041,5 +3041,85 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.8.2",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "172.17.8.0/28",
+                    "ifIndex": 14
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 14,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "172.17.8.1",
+                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 14,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "172.17.8.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePfxLen": 28
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:0043:3e6b:dc02:9895",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "88:a4:23:00:1a:ae",
+                    "ipv6_address": "fe80:0000:0000:0000:049b:9eab:fe1b:c1ea",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:56ee:6b10:fed5:134d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "88:a4:23:00:19:17",
+                    "ipv6_address": "fe80:0000:0000:0000:b93a:5e0f:e7b3:6213",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

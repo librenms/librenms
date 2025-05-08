@@ -3288,5 +3288,89 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.10.101",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.10.0.0/16",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.2.0.15",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.2.0.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/16",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "192.168.0.21",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.0.0/24",
+                    "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "<private>",
+                    "remote_port": "15",
+                    "remote_platform": null,
+                    "remote_version": "<private>",
+                    "ifAlias": "<private>",
+                    "ifDescr": "swp08",
+                    "ifName": "1/09"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "<private>",
+                    "remote_port": "1",
+                    "remote_platform": null,
+                    "remote_version": "<private>",
+                    "ifAlias": "<private>",
+                    "ifDescr": "swp09",
+                    "ifName": "1/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "<private>",
+                    "remote_port": "LAN-1 (010203040506)",
+                    "remote_platform": null,
+                    "remote_version": "<private>",
+                    "ifAlias": "swp03",
+                    "ifDescr": "swp03",
+                    "ifName": "1/04"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ks-office-sw-d",
+                    "remote_port": "1 (e4186bfb2ead)",
+                    "remote_platform": null,
+                    "remote_version": "GS1900-24",
+                    "ifAlias": "swp06",
+                    "ifDescr": "swp06",
+                    "ifName": "1/07"
+                }
+            ]
+        }
     }
 }

@@ -3058,5 +3058,467 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.183.37.114",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.183.37.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.183.37.14",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.183.37.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.2.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.2.0/24",
+                    "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "169.254.4.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.4.0/24",
+                    "ifIndex": 10
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "ee:d7:fd:22:c3:31",
+                    "ipv6_address": "fd00:0000:0000:0000:0000:0001:0008:0054",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "ce:0a:34:17:7c:de",
+                    "ipv6_address": "fd00:0000:0000:0000:0000:0001:0008:0056",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:11:32:28:bc:d1",
+                    "ipv6_address": "fe80:0000:0000:0000:0211:32ff:fe28:bcd1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:50:56:aa:e9:12",
+                    "ipv6_address": "fe80:0000:0000:0000:0250:56ff:feaa:e912",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:50:56:aa:e9:12",
+                    "ipv6_address": "fe80:0000:0000:0000:0250:56ff:feaa:e912",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fe49:f886",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:49:f8:86",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fe49:f886",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fe49:f887",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:49:f8:87",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fe49:f887",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:f7:9c:4a",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:9c4a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:f7:9c:4a",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:9c4a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:f452",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:f7:f4:52",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:f452",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:f453",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:be:75:f7:f4:53",
+                    "ipv6_address": "fe80:0000:0000:0000:02be:75ff:fef7:f453",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:94:ef:55:ec:5a",
+                    "ipv6_address": "fe80:0000:0000:0000:0a94:efff:fe55:ec5a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:50:56:aa:30:1a",
+                    "ipv6_address": "fe80:0000:0000:0000:18f2:dd8d:753c:a876",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:50:56:aa:30:1a",
+                    "ipv6_address": "fe80:0000:0000:0000:18f2:dd8d:753c:a876",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:96:55:ef",
+                    "ipv6_address": "fe80:0000:0000:0000:1c97:d03d:4f7e:d4f5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:96:55:ef",
+                    "ipv6_address": "fe80:0000:0000:0000:1c97:d03d:4f7e:d4f5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:03:71:7c",
+                    "ipv6_address": "fe80:0000:0000:0000:277a:807a:a253:c915",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:03:71:7c",
+                    "ipv6_address": "fe80:0000:0000:0000:277a:807a:a253:c915",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2a:55:4a:8e:9b:f2",
+                    "ipv6_address": "fe80:0000:0000:0000:2855:4aff:fe8e:9bf2",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:2b78:c975:dddd:c066",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:2b78:c975:dddd:c066",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "32:2f:16:2c:27:8b",
+                    "ipv6_address": "fe80:0000:0000:0000:302f:16ff:fe2c:278b",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:4067:52fb:1f5e:3b76",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:4067:52fb:1f5e:3b76",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "40:a8:f0:31:ed:08",
+                    "ipv6_address": "fe80:0000:0000:0000:42a8:f0ff:fe31:ed08",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:35:b6:bc",
+                    "ipv6_address": "fe80:0000:0000:0000:49bb:b3d4:1e95:22ee",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:35:b6:bc",
+                    "ipv6_address": "fe80:0000:0000:0000:49bb:b3d4:1e95:22ee",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:4f49:00a8:dba8:5bb3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:4f49:00a8:dba8:5bb3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:66:c1:0e",
+                    "ipv6_address": "fe80:0000:0000:0000:546e:398e:ae88:969d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:66:c1:0e",
+                    "ipv6_address": "fe80:0000:0000:0000:546e:398e:ae88:969d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:39:4c:65",
+                    "ipv6_address": "fe80:0000:0000:0000:59df:badc:940d:12be",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:39:4c:65",
+                    "ipv6_address": "fe80:0000:0000:0000:59df:badc:940d:12be",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:03:43:03:7f:9c",
+                    "ipv6_address": "fe80:0000:0000:0000:7051:227c:5792:4b02",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:03:43:03:7f:9c",
+                    "ipv6_address": "fe80:0000:0000:0000:7051:227c:5792:4b02",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:40:6c:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:7c37:43cc:bbd4:09df",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:40:6c:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:7c37:43cc:bbd4:09df",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:92:f2:24",
+                    "ipv6_address": "fe80:0000:0000:0000:80c9:dd3f:6763:864f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:92:f2:24",
+                    "ipv6_address": "fe80:0000:0000:0000:80c9:dd3f:6763:864f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:03:43:03:aa:bc",
+                    "ipv6_address": "fe80:0000:0000:0000:817b:5bfa:7bef:f509",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:03:43:03:aa:bc",
+                    "ipv6_address": "fe80:0000:0000:0000:817b:5bfa:7bef:f509",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "8a:07:d9:e3:43:6d",
+                    "ipv6_address": "fe80:0000:0000:0000:8807:d9ff:fee3:436d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:e1:30:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:907d:521c:6de5:4c02",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:e1:30:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:907d:521c:6de5:4c02",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:20:50:62",
+                    "ipv6_address": "fe80:0000:0000:0000:9122:27ce:017e:8f68",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:20:50:62",
+                    "ipv6_address": "fe80:0000:0000:0000:9122:27ce:017e:8f68",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:03:65:02",
+                    "ipv6_address": "fe80:0000:0000:0000:9618:82ff:fe03:6502",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:04:85:38",
+                    "ipv6_address": "fe80:0000:0000:0000:9618:82ff:fe04:8538",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:76:c1:70",
+                    "ipv6_address": "fe80:0000:0000:0000:9618:82ff:fe76:c170",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:18:82:78:92:6c",
+                    "ipv6_address": "fe80:0000:0000:0000:9618:82ff:fe78:926c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "9c:b6:54:6d:6f:88",
+                    "ipv6_address": "fe80:0000:0000:0000:9eb6:54ff:fe6d:6f88",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "9c:b6:54:b6:da:d0",
+                    "ipv6_address": "fe80:0000:0000:0000:9eb6:54ff:feb6:dad0",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "9c:b6:54:b6:e7:58",
+                    "ipv6_address": "fe80:0000:0000:0000:9eb6:54ff:feb6:e758",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:45:08:c6",
+                    "ipv6_address": "fe80:0000:0000:0000:b9ac:1cc8:6cfe:aab5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:45:08:c6",
+                    "ipv6_address": "fe80:0000:0000:0000:b9ac:1cc8:6cfe:aab5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:09:ed:f5",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe09:edf5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:09:ed:f5",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe09:edf5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:4e:25:33",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe4e:2533",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:4e:25:33",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe4e:2533",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe5d:4981",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe5d:4981",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe74:73e3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe74:73e3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:79:db:4f",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe79:db4f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:79:db:4f",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fe79:db4f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:db:58:0c",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fedb:580c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:24:11:db:58:0c",
+                    "ipv6_address": "fe80:0000:0000:0000:be24:11ff:fedb:580c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "ce:0a:34:17:7c:de",
+                    "ipv6_address": "fe80:0000:0000:0000:cc0a:34ff:fe17:7cde",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:d064:a6fc:71b2:d843",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "fe80:0000:0000:0000:d064:a6fc:71b2:d843",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "d6:ed:f0:d9:01:03",
+                    "ipv6_address": "fe80:0000:0000:0000:d4ed:f0ff:fed9:0103",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:dd8c:67b9:65cb:7aae",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:dd8c:67b9:65cb:7aae",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:01:db:5a",
+                    "ipv6_address": "fe80:0000:0000:0000:dd93:bb3a:d6e9:4dd1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:01:db:5a",
+                    "ipv6_address": "fe80:0000:0000:0000:dd93:bb3a:d6e9:4dd1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:f405:ffa7:2d69:06f0",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:f1:ea:92:c0:e6",
+                    "ipv6_address": "fe80:0000:0000:0000:f405:ffa7:2d69:06f0",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:ad:be:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:f441:adf5:23aa:f6da",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:0c:29:ad:be:2b",
+                    "ipv6_address": "fe80:0000:0000:0000:f441:adf5:23aa:f6da",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

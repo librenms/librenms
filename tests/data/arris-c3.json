@@ -2337,8 +2337,8 @@
                     "ifName": "EthMgt",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2437,8 +2437,8 @@
                     "ifName": "MAC",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3837,8 +3837,8 @@
                     "ifName": "Bridge-Group 0",
                     "portName": null,
                     "ifIndex": 35,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3937,8 +3937,8 @@
                     "ifName": "Bridge-Group 1",
                     "portName": null,
                     "ifIndex": 36,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4037,8 +4037,8 @@
                     "ifName": "Subinterface: FastEthernet 0/0.0",
                     "portName": null,
                     "ifIndex": 37,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4137,8 +4137,8 @@
                     "ifName": "Subinterface: FastEthernet 0/1.0",
                     "portName": null,
                     "ifIndex": 38,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4237,8 +4237,8 @@
                     "ifName": "Subinterface: Cable 1/0.0",
                     "portName": null,
                     "ifIndex": 39,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4337,8 +4337,8 @@
                     "ifName": "Subinterface: Cable 1/0.1",
                     "portName": null,
                     "ifIndex": 40,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5000,5 +5000,129 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 37,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 38,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 39,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 40,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 3,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 5,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 6,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 8,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 10,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 37,
+                    "low_ifIndex": 35,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 38,
+                    "low_ifIndex": 36,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 39,
+                    "low_ifIndex": 35,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 40,
+                    "low_ifIndex": 36,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.11.0.2",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.11.0.0/16",
+                    "ifIndex": 35
+                }
+            ]
+        }
     }
 }
