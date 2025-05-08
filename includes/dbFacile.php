@@ -265,7 +265,7 @@ function dbFetchRows($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbFetchRow($sql = null, $parameters = []): array|null
+function dbFetchRow($sql = null, $parameters = []): ?array
 {
     try {
         $query = DB::connection()->getPdo()->prepare($sql);
