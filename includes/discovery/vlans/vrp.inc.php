@@ -27,7 +27,7 @@
 use App\Models\Eventlog;
 use App\Models\Vlan;
 use LibreNMS\Enum\Severity;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 echo 'HUAWEI VRP VLANs: ';
 

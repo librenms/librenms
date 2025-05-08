@@ -108,7 +108,7 @@ class Vrp extends OS implements
         // Walk through the MIB table for transceiver information
         return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
             // Skip inactive transceivers
-            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
+            if (isset($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType']) && $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
                 return null;
             }
             if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode'] == 1) {
@@ -116,7 +116,7 @@ class Vrp extends OS implements
             }
 
             // Skip when it is not a plugable optic
-            if ($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
+            if (isset($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType']) && $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === '0') {
                 return null;
             }
 
