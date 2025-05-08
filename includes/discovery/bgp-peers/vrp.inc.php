@@ -155,7 +155,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
     }
 
     $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?';
-    foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip']]) as $entry) {
+    foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'] ?? null]) as $entry) {
         $afi = $entry['afi'];
         $safi = $entry['safi'];
         $vrfName = $entry['context_name'];
