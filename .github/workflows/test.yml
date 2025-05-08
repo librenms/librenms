@@ -86,11 +86,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
       -
-        name: Install packages
-        run: |
-          sudo apt-get -qq update --allow-releaseinfo-change
-          sudo apt-get install -y fping python3-pip python3-setuptools snmp sqlite3
-      -
         name: Pip install
         run: |
           python3 -m pip install --upgrade pip
