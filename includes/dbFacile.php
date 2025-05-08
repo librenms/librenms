@@ -265,13 +265,14 @@ function dbFetchRows($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbFetchRow($sql = null, $parameters = [])
+function dbFetchRow($sql = null, $parameters = []): ?array
 {
     try {
         $query = DB::connection()->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
+        $row = $query->fetch(PDO::FETCH_ASSOC);
 
-        return $query->fetch(PDO::FETCH_ASSOC);
+        return $row === false ? null : $row;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
