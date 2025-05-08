@@ -124,7 +124,7 @@ class Cisco extends OS implements
             'entPhysicalContainedIn.1001',
         ];
 
-        $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $data = SnmpQuery::mibs(['ENTITY-MIB', 'OLD-CISCO-CHASSIS-MIB'])->hideMib()->get($oids)->valuesByIndex();
 
         if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
             if (! empty($data[1]['entPhysicalSoftwareRev'])) {
@@ -152,7 +152,10 @@ class Cisco extends OS implements
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
         }
 
-        $device->hardware = $hardware ?: SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+        $device->hardware = $hardware;
+        if (empty($device->hardware) && $device->sysObjectID) {
+            $device->hardware = SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+        }
     }
 
     public function discoverMempools()
@@ -674,8 +677,11 @@ class Cisco extends OS implements
 
     protected function getMainSerial()
     {
-        $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
-//        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = SnmpQuery::mibs(['ENTITY-MIB', 'OLD-CISCO-CHASSIS-MIB'])->hideMib()->get([
+            'entPhysicalSerialNum.1',
+            'entPhysicalSerialNum.1000',
+            'entPhysicalSerialNum.1001',
+        ])->valuesByIndex();
 
         if (! empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
