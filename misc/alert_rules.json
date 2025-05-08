@@ -1006,7 +1006,7 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_perc >= storage.storage_warn",
+    "rule": "storage.storage_perc >= storage.storage_perc_warn",
     "name": "Storage Space Warning",
     "severity": "warning"
   }
