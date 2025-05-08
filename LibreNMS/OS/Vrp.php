@@ -145,6 +145,10 @@ class Vrp extends OS implements
             if ($wavelength <= 0) {
                 $wavelength = null;
             }
+
+            if (! isset($entityToIfIndex[$entIndex])) {
+                return null;
+            }
             $ifIndex = $entityToIfIndex[$entIndex];
             $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
             if (is_null($port_id)) {
