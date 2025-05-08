@@ -18,7 +18,6 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
     }
 }
 
-
 if (isset($pre_cache['sdbDevOutMtPowerFactor']) && is_array($pre_cache['sdbDevOutMtPowerFactor'])) {
     $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
 

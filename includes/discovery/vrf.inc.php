@@ -207,7 +207,6 @@ if (Config::get('enable_vrfs')) {
                     $if = $interface['port_id'];
                     $valid_vrf_if[$vrf_id][$if] = 1;
                 }
-
             }
         } //end foreach
     } elseif ($device['os_group'] == 'arista') {
