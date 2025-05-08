@@ -1006,18 +1006,8 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_perc >= 85 && storage.storage_perc < 90",
-    "name": "Storage Space >= 85% in use",
-    "severity": "warning"
-  },
-  {
-    "rule": "storage.storage_perc >= 90",
-    "name": "Storage Space >= 90% in use",
-    "severity": "critical"
-  },
-  {
     "rule": "storage.storage_perc >= storage.storage_warn",
     "name": "Storage Space Warning",
     "severity": "warning"
-  },
+  }
 ]
