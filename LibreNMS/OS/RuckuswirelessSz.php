@@ -96,7 +96,7 @@ class RuckuswirelessSz extends OS implements
         }
 
         // ap-count - Discover System Total APs
-        $total = SnmpQuery::get('RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP.0')->value();
+        $total = (int) SnmpQuery::get('RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP.0')->value();
         if ($total > 1) {
             $oid = '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.0'; //RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP.0
             $apstatus[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'ruckuswireless-sz', 'total', 'Total APs', $total);
