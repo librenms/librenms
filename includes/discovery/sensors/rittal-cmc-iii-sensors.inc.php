@@ -29,6 +29,7 @@ use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
+$sensor_id = -1;
 $last_index_prefix = $current_index_prefix = '';
 $unique_desc_counter = [];
 
@@ -37,19 +38,14 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     array_pop($var_name_parts);
     $sensor_name = implode(' ', $var_name_parts);
     $var_type = $entry['cmcIIIVarType'];
-    $sensor_id = count($cmc_iii_sensors);
 
     $index_r = explode('.', $index);
     if (count($index_r) > 1) {
         $current_index_prefix = $index_r[0];
     }
 
-    if ((! isset($cmc_iii_sensors[$sensor_id]['name']) || $cmc_iii_sensors[$sensor_id]['name'] != $sensor_name) || $last_index_prefix != $current_index_prefix) {
-        if ($sensor_id == 0) {
-            $sensor_id = 1;
-        } else {
-            $sensor_id++;
-        }
+    if (!isset($cmc_iii_sensors[$sensor_id]) || $cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
+        $sensor_id++;
 
         if (str_contains($sensor_name, $entry['cmcIIIVarValueStr'])) {
             $sensor_desc = $entry['cmcIIIVarValueStr'];
@@ -57,8 +53,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $sensor_desc = "$sensor_name {$entry['cmcIIIVarValueStr']}";
         }
 
-        $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
-        $cmc_iii_sensors[$sensor_id]['desc'] = $sensor_desc;
+        $cmc_iii_sensors[$sensor_id] = array('name' => $sensor_name, 'desc' => $sensor_desc);
 
         // count descriptions => used to generate unique description count suffix later
         if (! isset($unique_desc_counter[$sensor_desc])) {
