@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7a8181c1fbf2d9c760341e1fc1c3142",
+    "content-hash": "6729a909344ffddeb6acbb25d8dad813",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -4478,57 +4478,6 @@
             "time": "2018-01-25T20:47:17+00:00"
         },
         {
-            "name": "pear/net_dns2",
-            "version": "v1.5.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mikepultz/netdns2.git",
-                "reference": "c4a167ff1bc93aaae95601ebc86099376c994581"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mikepultz/netdns2/zipball/c4a167ff1bc93aaae95601ebc86099376c994581",
-                "reference": "c4a167ff1bc93aaae95601ebc86099376c994581",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^9"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Net_DNS2": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Mike Pultz",
-                    "email": "mike@mikepultz.com",
-                    "homepage": "https://mikepultz.com/",
-                    "role": "lead"
-                }
-            ],
-            "description": "Native PHP DNS Resolver and Updater Library",
-            "homepage": "https://netdns2.com/",
-            "keywords": [
-                "PEAR",
-                "dns",
-                "network"
-            ],
-            "support": {
-                "issues": "https://github.com/mikepultz/netdns2/issues",
-                "source": "https://github.com/mikepultz/netdns2"
-            },
-            "time": "2023-10-01T05:15:14+00:00"
-        },
-        {
             "name": "php-amqplib/php-amqplib",
             "version": "v3.7.3",
             "source": {
@@ -5200,6 +5149,57 @@
                 }
             ],
             "time": "2024-12-14T21:12:59+00:00"
+        },
+        {
+            "name": "plesk/net_dns2",
+            "version": "v1.5.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/plesk/net_dns2.git",
+                "reference": "c4a167ff1bc93aaae95601ebc86099376c994581"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/plesk/net_dns2/zipball/c4a167ff1bc93aaae95601ebc86099376c994581",
+                "reference": "c4a167ff1bc93aaae95601ebc86099376c994581",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Net_DNS2": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Pultz",
+                    "email": "mike@mikepultz.com",
+                    "homepage": "https://mikepultz.com/",
+                    "role": "lead"
+                }
+            ],
+            "description": "Native PHP DNS Resolver and Updater Library",
+            "homepage": "https://netdns2.com/",
+            "keywords": [
+                "PEAR",
+                "dns",
+                "network"
+            ],
+            "support": {
+                "issues": "https://github.com/mikepultz/netdns2/issues",
+                "source": "https://github.com/mikepultz/netdns2"
+            },
+            "time": "2023-10-01T05:15:14+00:00"
         },
         {
             "name": "predis/predis",
@@ -14301,6 +14301,6 @@
         "ext-xml": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
