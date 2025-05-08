@@ -25,6 +25,10 @@ if (is_array($temp)) {
 
     // Iterate over each entry from SNMP walk
     foreach ($temp as $index => $entry) {
+        if (! isset($entry['ENTITY-SENSOR-MIB::entPhySensorOperStatus'])) {
+            continue;
+        }
+
         $sensor_value = $entry['ENTITY-SENSOR-MIB::entPhySensorOperStatus'];
 
         // Determine resource type based on OID index

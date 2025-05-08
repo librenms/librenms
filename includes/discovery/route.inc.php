@@ -80,7 +80,7 @@ foreach ($oids as $dst => $tdata) {
         try {
             $ipv6dst = IPv6::fromHexString($dst);
             $inetCidrRouteDest = $ipv6dst->uncompressed();
-            $ipv6hop = IPv6::fromHexString($data['ipv6RouteNextHop']);
+            $ipv6hop = IPv6::fromHexString($data['ipv6RouteNextHop'] ?? null);
             $inetCidrRouteNextHop = $ipv6hop->uncompressed();
             $ifIndex = $data['ipv6RouteIfIndex'];
             $portId = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
@@ -107,7 +107,11 @@ foreach ($oids as $dst => $tdata) {
                 'inetCidrRoutePfxLen' => $inetCidrRoutePfxLen,
             ];
 
-            $current = $mixed[''][$routeType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$routeType][$inetCidrRouteNextHop];
+            $current = null;
+            if (! empty($mixed)) {
+                $current = $mixed[''][$routeType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$routeType][$inetCidrRouteNextHop];
+            }
+
             if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
                 $update_row[] = $entryClean;
             } else {
@@ -146,7 +150,7 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'route
         $entryClean['inetCidrRouteDest'] = $ipRoute['ipRouteDest'];
         $inetCidrRoutePfxLen = IPv4::netmask2cidr($ipRoute['ipRouteMask']); //CONVERT
         $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
-        $entryClean['inetCidrRoutePolicy'] = $ipRoute['ipRouteInfo'];
+        $entryClean['inetCidrRoutePolicy'] = $ipRoute['ipRouteInfo'] ?? null;
         $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
         $entryClean['inetCidrRouteNextHop'] = $ipRoute['ipRouteNextHop'];
         $entryClean['inetCidrRouteMetric1'] = $ipRoute['ipRouteMetric1'];
@@ -236,7 +240,9 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
         }
     }
 
-    $ipForwardNb['0']['inetCidrRouteNumber'] = $entryPerType['ipv4'];
+    if (isset($entryPerType['ipv4'])) {
+        $ipForwardNb['0']['inetCidrRouteNumber'] = $entryPerType['ipv4'];
+    }
     // Some cisco devices report ipv4+ipv6 in inetCidrRouteNumber
     // But only include ipv6 in inetCidrRoute
     // So we count the real amount of ipv4 we get, in order to get the missing ipv4 from ipCidrRouteTable if needed
@@ -313,6 +319,9 @@ if ($mpls_skip == false) {
     $oid = 'mplsL3VpnVrfRteTable';
     $mpls_route_table = snmpwalk_group($device, $oid, $mib, 7, []);
     foreach ($mpls_route_table as $vpnId => $inetCidrRouteTable) {
+        if (! is_array($inetCidrRouteTable)) {
+            continue;
+        }
         foreach ($inetCidrRouteTable as $inetCidrRouteDestType => $next1) {
             //ipv4 or ipv6
             foreach ($next1 as $inetCidrRouteDest => $next2) {
