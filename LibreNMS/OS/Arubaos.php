@@ -92,7 +92,7 @@ class Arubaos extends OS implements
             return [];
         }
 
-        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.1';
+        $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.1.0';
         $apCount = intval($apCount);
 
         $low_warn_const = 1; // Default warning threshold = 1 down AP
