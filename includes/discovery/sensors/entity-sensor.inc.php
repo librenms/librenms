@@ -65,6 +65,10 @@ if (! empty($entity_oids)) {
         $current = null;
         $entPhysicalIndex = null;
 
+        if (! isset($entry['entPhySensorType'])) {
+            continue;
+        }
+
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
@@ -82,7 +86,8 @@ if (! empty($entity_oids)) {
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
             } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
-                $xos_ifindex = end(explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']));
+                $xof_ifindex = explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']);
+                $xos_ifindex = end($xof_ifindex);
                 $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
                 $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
             } elseif (isset($entity_array[$index]['entPhysicalName'])) {
