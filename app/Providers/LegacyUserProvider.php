@@ -30,6 +30,7 @@ use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -48,7 +49,11 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return User::find($identifier);
+        try {
+            return User::find($identifier);
+        } catch (QueryException) {
+            return null;
+        }
     }
 
     /**
@@ -75,10 +80,14 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByToken($identifier, $token): ?Authenticatable
     {
-        $user = new User();
-        $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
+        try {
+            $user = new User();
+            $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
 
-        if (! $user) {
+            if (!$user) {
+                return null;
+            }
+        } catch (QueryException) {
             return null;
         }
 
