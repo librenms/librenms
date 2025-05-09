@@ -1506,11 +1506,6 @@
     background-color: #2e3338
 }
 
-.dark input,
-.dark textarea {
-    color: #272b30
-}
-
 .dark .has-error .help-block,
 .dark .has-error .control-label,
 .dark .has-error .radio,
