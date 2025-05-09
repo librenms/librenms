@@ -84,7 +84,7 @@ class LegacyUserProvider implements UserProvider
             $user = new User();
             $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
 
-            if (!$user) {
+            if (! $user) {
                 return null;
             }
         } catch (QueryException) {
