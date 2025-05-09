@@ -464,8 +464,8 @@
             "order": 3,
             "type": "array-sub-keyed",
             "validate": {
-                "value": "array",
-                "value.*": "array",
+                "value": "array|array_keys_not_empty",
+                "value.*": "array|array_keys_not_empty",
                 "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
@@ -834,17 +834,24 @@
         },
         "autodiscovery.bgp": {
             "default": true,
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 12,
             "type": "boolean"
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
             "type": "array",
-            "default": [
-                "/^Cisco IP Phone/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 7,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "autodiscovery.nets-exclude": {
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 2,
             "type": "array",
             "default": [
@@ -856,26 +863,45 @@
             ]
         },
         "autodiscovery.ospf": {
+            "type": "boolean",
             "default": true,
-            "type": "boolean"
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 13
         },
         "autodiscovery.ospfv3": {
             "default": true,
-            "type": "boolean"
-        },
-        "autodiscovery.snmpscan": {
-            "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 14
         },
         "autodiscovery.xdp": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 4
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
-            "default": [
-                "/-K9W8/"
-            ]
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 6,
+            "validate": {
+                "value.*": "is_regex"
+            }
+        },
+        "autodiscovery.xdp_exclude.sysname_regexp": {
+            "type": "array",
+            "default": [],
+            "group": "discovery",
+            "section": "autodiscovery",
+            "order": 5,
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_entity_sensor_regex": {
             "default": null,
@@ -892,7 +918,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 0,
+            "order": 1,
             "default": [
                 "voip-null",
                 "virtual-",
@@ -922,7 +948,7 @@
             "type": "array",
             "group": "discovery",
             "section": "ports",
-            "order": 1,
+            "order": 2,
             "default": [
                 "/^ng[0-9]+$/",
                 "/^sl[0-9]/"
@@ -1278,7 +1304,7 @@
             "default": 0,
             "type": "select-dynamic",
             "group": "discovery",
-            "section": "networks",
+            "section": "ports",
             "order": 0,
             "options": {
                 "target": "port-group"
@@ -1545,6 +1571,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.ospfv3": {
+            "order": 235,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.cisco-cef": {
             "order": 50,
             "group": "discovery",
@@ -1638,6 +1671,13 @@
         },
         "discovery_modules.arp-table": {
             "order": 20,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.ipv6-nd": {
+            "order": 163,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -1833,6 +1873,48 @@
                 "setting": "email_backend",
                 "operator": "equals",
                 "value": "smtp"
+            }
+        },
+        "email_smtp_verifypeer": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 11,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
+            }
+        },
+        "email_smtp_allowselfsigned": {
+            "default": false,
+            "group": "alerting",
+            "section": "email",
+            "order": 12,
+            "type": "boolean",
+            "when": {
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_secure",
+                        "operator": "equals",
+                        "value": "tls"
+                    }
+                ]
             }
         },
         "email_attach_graphs": {
@@ -4757,7 +4839,7 @@
             "type": "array",
             "default": [],
             "group": "discovery",
-            "section": "networks",
+            "section": "autodiscovery",
             "order": 1
         },
         "network_map_dependencymap_vis_options": {
@@ -5172,9 +5254,9 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
-                "value.*.*.*": "array|size:2|keys_in:match,regex,value",
+                "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
                 "value.*.*.*.regex": "is_regex",
                 "value.*.*.*.match": "string"
@@ -5413,7 +5495,7 @@
             "type": "boolean"
         },
         "poller_modules.ipSystemStats": {
-            "order": 200,
+            "order": 214,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -5428,6 +5510,20 @@
         },
         "poller_modules.xdsl": {
             "order": 345,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.arp-table": {
+            "order": 17,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.ipv6-nd": {
+            "order": 340,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
@@ -5819,7 +5915,7 @@
             "type": "boolean"
         },
         "reporting.throttle": {
-            "default": 300,
+            "default": 30,
             "type": "integer",
             "units": "seconds",
             "group": "system",
@@ -6142,6 +6238,13 @@
             "type": "integer",
             "units": "seconds"
         },
+        "service_health_file": {
+            "default": "",
+            "group": "poller",
+            "section": "distributed",
+            "order": 29,
+            "type": "string"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
@@ -6176,12 +6279,13 @@
             "type": "boolean"
         },
         "site_style": {
-            "default": "light",
+            "default": "device",
             "group": "webui",
             "section": "style",
             "order": 1,
             "type": "select",
             "options": {
+                "device": "device",
                 "blue": "blue",
                 "dark": "dark",
                 "light": "light",

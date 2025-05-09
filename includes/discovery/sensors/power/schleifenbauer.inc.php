@@ -16,15 +16,18 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
     }
 }
 
-$unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
-foreach ($pre_cache['sdbDevOutMtPowerVoltAmpere'] as $sdbDevOutMtIndex => $sdbDevOutMtPowerVoltAmpere) {
-    $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
-    $power_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.10.$unit.$sdbDevOutMtIndex";
-    $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;
-    $descr = $name ?: "$serial_input Apparent Power";
+if (isset($pre_cache['sdbDevOutMtPowerVoltAmpere']) && is_array($pre_cache['sdbDevOutMtPowerVoltAmpere'])) {
+    $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
 
-    // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
-    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutMtIndex * 1000 + 130;
+    foreach ($pre_cache['sdbDevOutMtPowerVoltAmpere'] as $sdbDevOutMtIndex => $sdbDevOutMtPowerVoltAmpere) {
+        $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
+        $power_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.10.$unit.$sdbDevOutMtIndex";
+        $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;
+        $descr = $name ?: "$serial_input Apparent Power";
 
-    discover_sensor(null, 'power', $device, $power_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', null, null, null, null, $sdbDevOutMtPowerVoltAmpere, 'snmp', $entPhysicalIndex);
+        // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
+        $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutMtIndex * 1000 + 130;
+
+        discover_sensor(null, 'power', $device, $power_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', null, null, null, null, $sdbDevOutMtPowerVoltAmpere, 'snmp', $entPhysicalIndex);
+    }
 }

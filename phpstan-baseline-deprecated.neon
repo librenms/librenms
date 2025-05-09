@@ -1101,14 +1101,6 @@ parameters:
 				#^Call to deprecated function snmp_get\\(\\)\\:
 				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: LibreNMS/OS/Pulse.php
-
-		-
-			message: """
-				#^Call to deprecated function snmp_get\\(\\)\\:
-				Please use SnmpQuery instead$#
-			"""
 			count: 2
 			path: LibreNMS/OS/Quanta.php
 
@@ -4101,15 +4093,7 @@ parameters:
 				#^Call to deprecated function snmp_get\\(\\)\\:
 				Please use SnmpQuery instead$#
 			"""
-			count: 1
-			path: includes/discovery/sensors/state/equallogic.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function snmp_get_multi\\(\\)\\:
-				Please use SnmpQuery instead$#
-			"""
-			count: 1
+			count: 2
 			path: includes/discovery/sensors/state/equallogic.inc.php
 
 		-
@@ -6983,14 +6967,6 @@ parameters:
 			"""
 			count: 1
 			path: includes/html/graphs/service/auth.inc.php
-
-		-
-			message: """
-				#^Call to deprecated function dbFetchRow\\(\\)\\:
-				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-			"""
-			count: 1
-			path: includes/html/graphs/sla-jitter-jitter.inc.php
 
 		-
 			message: """

@@ -2987,7 +2987,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 7
                 },
                 {
@@ -2996,7 +2996,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 8
                 },
                 {
@@ -3005,7 +3005,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 9
                 },
                 {
@@ -3014,7 +3014,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 10
                 },
                 {
@@ -3023,7 +3023,7 @@
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "other",
                     "context_name": "",
-                    "ipv6_network": "fe80::/64",
+                    "ipv6_network": null,
                     "ifIndex": 2
                 }
             ]

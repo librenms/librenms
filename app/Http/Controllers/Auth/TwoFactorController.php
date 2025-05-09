@@ -68,7 +68,8 @@ class TwoFactorController extends Controller
 
     public function showTwoFactorForm(Request $request)
     {
-        $twoFactorSettings = $this->loadSettings($request->user());
+        $user = $request->user();
+        $twoFactorSettings = $this->loadSettings($user);
 
         // don't allow visiting this page if not needed
         if (empty($twoFactorSettings) || ! Config::get('twofactor') || session('twofactor')) {
@@ -83,6 +84,7 @@ class TwoFactorController extends Controller
 
             if (! $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please contact administrator.');
+                auth()->logout();
             } elseif ((time() - $twoFactorSettings['last']) < $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please wait :time seconds', ['time' => $lockout_time]);
             }
@@ -90,7 +92,7 @@ class TwoFactorController extends Controller
 
         return view('auth.2fa')->with([
             'key' => $twoFactorSettings['key'],
-            'uri' => TwoFactor::generateUri($request->user()->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
+            'uri' => TwoFactor::generateUri($user->username, $twoFactorSettings['key'], $twoFactorSettings['counter'] !== false),
         ])->withErrors($errors);
     }
 
@@ -98,7 +100,7 @@ class TwoFactorController extends Controller
      * Show the form for creating a new resource.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function create(Request $request)
     {
@@ -125,7 +127,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request)
     {
@@ -139,7 +141,7 @@ class TwoFactorController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function cancelAdd(Request $request)
     {

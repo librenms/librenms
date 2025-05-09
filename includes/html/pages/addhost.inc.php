@@ -281,7 +281,7 @@ if (Config::get('distributed_poller') === true) {
     ';
 
                       foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-                          echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
+                          echo '<option value="' . $group['id'] . '">' . htmlentities($group['group_name']) . '</option>';
                       }
 
                       echo '

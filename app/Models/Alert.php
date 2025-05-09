@@ -35,9 +35,16 @@ use LibreNMS\Enum\AlertState;
 class Alert extends Model
 {
     public $timestamps = false;
-    public $casts = [
-        'info' => 'array',
-    ];
+
+    /**
+     * @return array{info: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'info' => 'array',
+        ];
+    }
 
     // ---- Query scopes ----
 
@@ -64,19 +71,27 @@ class Alert extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertRule, $this>
+     */
     public function rule(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\AlertRule::class, 'rule_id', 'id');
+        return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
+        return $this->belongsToMany(User::class, 'devices_perms', 'device_id', 'user_id');
     }
 }

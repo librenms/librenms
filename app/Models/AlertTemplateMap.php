@@ -34,9 +34,11 @@ class AlertTemplateMap extends BaseModel
     public $timestamps = false;
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertTemplate, $this>
+     */
     public function template(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\AlertTemplate::class, 'alert_templates_id');
+        return $this->belongsTo(AlertTemplate::class, 'alert_templates_id');
     }
 }

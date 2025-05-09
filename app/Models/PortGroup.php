@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 class PortGroup extends BaseModel
 {
     public $timestamps = false;
@@ -41,8 +43,11 @@ class PortGroup extends BaseModel
         return $query;
     }
 
-    public function ports()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
+    public function ports(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'port_group_port', 'port_group_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'port_group_port', 'port_group_id', 'port_id');
     }
 }

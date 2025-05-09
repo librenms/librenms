@@ -26,11 +26,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
+use App\Models\Ipv4Mac;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
+use SnmpQuery;
 
-class Screenos extends \LibreNMS\OS implements OSPolling
+class Screenos extends \LibreNMS\OS implements OSPolling, ArpTableDiscovery
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
@@ -59,5 +65,28 @@ class Screenos extends \LibreNMS\OS implements OSPolling
 
             $this->enableGraph('screenos_sessions');
         }
+    }
+
+    public function discoverArpTable(): Collection
+    {
+        $nsIpArpTable = SnmpQuery::walk('NETSCREEN-IP-ARP-MIB::nsIpArpTable')->table(1);
+
+        if (! empty($nsIpArpTable)) {
+            $nsIfInfo = array_flip(SnmpQuery::walk('NETSCREEN-INTERFACE-MIB::nsIfInfo')->pluck());
+        }
+
+        $arp = new Collection;
+
+        foreach ($nsIpArpTable as $data) {
+            $ifIndex = $nsIfInfo[$data['NETSCREEN-IP-ARP-MIB::nsIpArpIfIdx']];
+
+            $arp->push(new Ipv4Mac([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'mac_address' => Mac::parse($data['NETSCREEN-IP-ARP-MIB::nsIpArpMac'])->hex(),
+                'ipv4_address' => $data['NETSCREEN-IP-ARP-MIB::nsIpArpIp'],
+            ]));
+        }
+
+        return $arp;
     }
 }

@@ -68,7 +68,7 @@ class DeviceController extends TableController
 
     protected function searchFields($request)
     {
-        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location'];
+        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location', 'purpose', 'notes'];
     }
 
     protected function sortFields($request)
@@ -89,7 +89,7 @@ class DeviceController extends TableController
      * Defines the base query for this resource
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
     {
@@ -128,7 +128,7 @@ class DeviceController extends TableController
         }
 
         if ($field == 'state' && ! is_numeric($value)) {
-            return str_replace(['up', 'down'], [1, 0], $value);
+            return str_replace(['up', 'down'], ['1', '0'], $value);
         }
 
         return $value;
@@ -158,7 +158,7 @@ class DeviceController extends TableController
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->downSince()->diffInSeconds(), true),
+            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
@@ -199,7 +199,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
+            $warning_time = Config::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }

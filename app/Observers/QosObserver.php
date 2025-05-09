@@ -9,7 +9,7 @@ class QosObserver
     /**
      * Handle the Qos "updating" event.
      *
-     * @param  \App\Models\Qos  $qos
+     * @param  Qos  $qos
      * @return void
      */
     public function updating(Qos $qos)

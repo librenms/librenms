@@ -228,7 +228,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpLastStatusChange' => round(($value['sdpLastStatusChange'] ?? 0) / 100),
                 'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
                 'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'], true),
+                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
             ]);
         });
     }
@@ -361,23 +361,24 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'MPLS-TE-MIB::mplsTunnelARHopTable',
             'TIMETRA-MPLS-MIB::vRtrMplsTunnelARHopTable',
         ])->mapTable(function ($value, $mplsTunnelARHopListIndex, $mplsTunnelARHopIndex) use ($paths) {
-            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
-            $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
-
-            // vRtrMplsTunnelARHopProtection Bits
-            $localAvailable = 0b10000000;
-            $localInUse = 0b01000000;
-            $bandwidthProtected = 0b00100000;
-            $nodeProtected = 0b00010000;
-            $preemptionPending = 0b00001000;
-            $nodeId = 0b00000100;
-
-            $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
-            $linkProtectionInUse = ($protection & $localInUse) ? 'true' : 'false';
-            $bandwidthProtection = ($protection & $bandwidthProtected) ? 'true' : 'false';
-            $nextNodeProtection = ($protection & $nodeProtected) ? 'true' : 'false';
+            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)?->lsp_path_id;
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
+                $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
+
+                // vRtrMplsTunnelARHopProtection Bits
+                $localAvailable = 0b10000000;
+                $localInUse = 0b01000000;
+                $bandwidthProtected = 0b00100000;
+                $nodeProtected = 0b00010000;
+                $preemptionPending = 0b00001000;
+                $nodeId = 0b00000100;
+
+                $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
+                $linkProtectionInUse = ($protection & $localInUse) ? 'true' : 'false';
+                $bandwidthProtection = ($protection & $bandwidthProtected) ? 'true' : 'false';
+                $nextNodeProtection = ($protection & $nodeProtected) ? 'true' : 'false';
+
                 return new MplsTunnelArHop([
                     'mplsTunnelARHopListIndex' => $mplsTunnelARHopListIndex,
                     'mplsTunnelARHopIndex' => $mplsTunnelARHopIndex,
@@ -419,8 +420,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                     'device_id' => $this->getDeviceId(),
                     'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
                     'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
-                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
-                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
+                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'] ?? null,
+                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'] ?? null,
                     'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
                     'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
                 ]);
@@ -521,7 +522,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
                 'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
                 'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'], true),
+                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
             ]);
         });
     }
@@ -927,6 +928,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         if (isset($data[$ngField])) {
             try {
+                if (is_string($data[$ngField]) && preg_match('/^([0-9A-Fa-f]{2} ?)+$/', $data[$ngField])) {
+                    return IP::fromHexString($data[$ngField])->uncompressed();
+                }
+
                 return IP::parse($data[$ngField])->uncompressed();
             } catch (InvalidIpException $e) {
                 return null;

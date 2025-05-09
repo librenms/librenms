@@ -50,7 +50,7 @@ class UserPreferencesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\View\View
      */
     public function index(Request $request)
@@ -59,7 +59,7 @@ class UserPreferencesController extends Controller
 
         $locales = $this->getValidLocales();
         $styles = $this->getValidStyles();
-        $default_locale = \config('app.locale');
+        $default_locale = \config('app.default_locale'); // always the system default
         $default_style = Config::get('site_style');
 
         $data = [
@@ -75,6 +75,7 @@ class UserPreferencesController extends Controller
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
             'timezone' => UserPref::getPref($user, 'timezone'),
+            'temp_units' => UserPref::getPref($user, 'temp_units'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
             'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
@@ -97,7 +98,7 @@ class UserPreferencesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -117,6 +118,7 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], timezone_identifiers_list())),
             ],
+            'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
             'global_search_ctrlf_focus' => 'required|integer',
         ];

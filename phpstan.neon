@@ -5,12 +5,18 @@ includes:
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
+    phpVersion:
+        min: 80200
+        max: 80499
+
     paths:
         - app
+        - bootstrap
         - config
         - database
         - LibreNMS
         - resources
+        - routes
         - tests
 
     excludePaths:
@@ -21,19 +27,12 @@ parameters:
 
     level: 5
 
-    checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
 
     checkFunctionNameCase: true
     checkInternalClassCaseSensitivity: true
 
     checkModelProperties: true
-
-    checkAlwaysTrueCheckTypeFunctionCall: true
-    checkAlwaysTrueInstanceof: true
-    checkAlwaysTrueStrictComparison: true
-
-    checkGenericClassInNonGenericObjectType: false
 
     ignoreErrors:
         - '#Unsafe usage of new static#'

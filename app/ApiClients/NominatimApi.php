@@ -48,8 +48,6 @@ class NominatimApi extends BaseApi implements Geocoder
 
     /**
      * Build request option array
-     *
-     * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions(string $address): array
     {

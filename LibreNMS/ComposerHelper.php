@@ -133,7 +133,10 @@ class ComposerHelper
             'group' => '',
         ];
 
-        @include 'config.php';
+        if (file_exists('config.php')) {
+            /** @phpstan-ignore include.fileNotFound */
+            @include 'config.php';
+        }
 
         try {
             EnvHelper::init();

@@ -31,7 +31,7 @@ class PollDevice implements ShouldQueue
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
-     * @var \LibreNMS\OS|\LibreNMS\OS\Generic
+     * @var OS|OS\Generic
      */
     private $os;
 
@@ -48,7 +48,7 @@ class PollDevice implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->initDevice();
         PollingDevice::dispatch($this->device);
@@ -140,6 +140,11 @@ class PollDevice implements ShouldQueue
                     $instance->poll($this->os, $datastore);
                 }
             } catch (Throwable $e) {
+                // Re-throw exception if we're in running tests
+                if (defined('PHPUNIT_RUNNING')) {
+                    throw $e;
+                }
+
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                 Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);

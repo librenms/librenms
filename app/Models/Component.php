@@ -77,14 +77,19 @@ class Component extends DeviceRelatedModel
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ComponentStatusLog, $this>
+     */
     public function logs(): HasMany
     {
-        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+        return $this->hasMany(ComponentStatusLog::class, 'component_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ComponentPref, $this>
+     */
     public function prefs(): HasMany
     {
-        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
+        return $this->hasMany(ComponentPref::class, 'component', 'id');
     }
 }

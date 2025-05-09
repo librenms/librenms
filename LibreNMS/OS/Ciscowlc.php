@@ -48,10 +48,10 @@ class Ciscowlc extends Cisco implements
         }
 
         $device = $this->getDeviceArray();
-        $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
-        $radios = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
-        \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
-        $interferences = \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
+        $apNames = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
+        $radios = SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
+        SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
+        $interferences = SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
 
         $numAccessPoints = count($apNames);
         $numClients = 0;

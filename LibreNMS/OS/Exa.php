@@ -60,7 +60,7 @@ class Exa extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        return \SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) {
+        return SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->mapTable(function ($data, $shelf, $card, $port) {
             if ($data['E7-Calix-MIB::e7OltPonPortStatus'] == 0) {
                 return null;
             }

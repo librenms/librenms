@@ -86,7 +86,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         $bbus = SnmpQuery::hideMib()->walk('LSI-MegaRAID-SAS-MIB::bbuTable')->table(1);
         foreach ($bbus as $bbu) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => 1000 + $bbu['pdIndex'],
+                'entPhysicalIndex' => 1000 + ($bbu['pdIndex'] ?? null),
                 'entPhysicalClass' => 'charge',
                 'entPhysicalModelName' => $bbu['deviceName'],
                 'entPhysicalSerialNum' => $bbu['serialNumber'],

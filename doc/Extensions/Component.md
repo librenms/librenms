@@ -262,7 +262,7 @@ of, these are:
 ## API
 
 Component details are available via the API.
-Please see the [API-Docs](/API/#function-get_components) for details.
+Please see the [API-Docs](../API/Devices.md#get_components) for details.
 
 ## Alerting
 

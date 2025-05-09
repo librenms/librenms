@@ -424,7 +424,7 @@ class RunAlerts
             $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
 
             if (! isset($array1_keys[$element2_key])) {
-                $added_elements [] = $element2;
+                $added_elements[] = $element2;
             } else {
                 // Remove matched elements
                 unset($array1_keys[$element2_key]);
@@ -446,12 +446,13 @@ class RunAlerts
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
 
+            $alert['alert_id'] = $alert_status['id'];
+
             if (empty($alert['rule_id']) || ! $this->isRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
                 echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
                 // Alert-Rule does not exist anymore, let's remove the alert-state.
                 dbDelete('alerts', 'rule_id = ? && device_id = ?', [$alert_status['rule_id'], $alert_status['device_id']]);
             } else {
-                $alert['alert_id'] = $alert_status['id'];
                 $alert['state'] = $alert_status['state'];
                 $alert['alerted'] = $alert_status['alerted'];
                 $alert['note'] = $alert_status['note'];
