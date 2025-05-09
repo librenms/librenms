@@ -5,11 +5,11 @@ body:
     attributes:
       value: |
         This issue form is for reporting generic bugs/issues only!
-  
+
         * [Report a device issue here](https://github.com/librenms/librenms/issues/new?template=device_bug.yml)
         * [Add Device request here](https://community.librenms.org/c/device-requests/12)
         * [I have a question or need support](https://www.librenms.org/#support)
-        
+
   - type: textarea
     validations:
       required: true
@@ -27,9 +27,9 @@ body:
         ## Environment
   - type: textarea
     validations:
-      required: true  
+      required: true
     attributes:
-      label: Output of ./validate.php
+      label: Output from running ./validate.php
       description: |
         Please post the output of running: /opt/librenms/validate.php
       render: txt
@@ -38,7 +38,7 @@ body:
       label: What was the last working version of LibreNMS?
       placeholder: 21.7.0
       description: If known, otherwise leave blank.
- 
+
   - type: markdown
     attributes:
       value: |
