@@ -33,6 +33,7 @@ use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
+use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -2783,6 +2784,36 @@ function get_fdb(Illuminate\Http\Request $request)
     });
 }
 
+function get_nac(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+        // save the current details for returning to the client on successful delete
+        $device = Device::find($device_id);
+    }
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($device) {
+        if ($device) {
+            $nac = $device->portsNac;
+
+            return api_success($nac, 'ports_nac');
+        }
+
+        return api_error(404, 'Device does not exist');
+    });
+}
+
 function get_transceivers(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2847,6 +2878,55 @@ function list_fdb_detail(Illuminate\Http\Request $request)
     }
 
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
+}
+
+function list_nac(Illuminate\Http\Request $request)
+{
+    $mac = $request->route('mac');
+
+    $nac = PortsNac::hasAccess(Auth::user())
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
+
+    if ($nac->isEmpty()) {
+        return api_error(404, ' Nac entry does not exist');
+    }
+
+    return api_success($nac, 'ports_nac');
+}
+
+function list_nac_detail(Illuminate\Http\Request $request)
+{
+    $macAddress = Mac::parse($request->route('mac'));
+
+    if (! $macAddress->isValid()) {
+        return api_error(422, 'Invalid MAC address');
+    }
+
+    $extras = ['mac' => $macAddress->readable(),  'mac_oui' => $macAddress->vendor()];
+
+    $nac = PortsNac::hasAccess(Auth::user())
+        ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')
+        ->leftJoin('devices', 'ports_nac.device_id', 'devices.device_id')
+        ->where('mac_address', $macAddress->hex())
+        ->orderBy('ports_nac.updated_at', 'desc')
+        ->select('devices.hostname', 'ports.ifName', 'ports_nac.updated_at')
+        ->limit(1000)->get();
+
+    if ($nac->isEmpty()) {
+        return api_error(404, 'Nac entry does not exist');
+    }
+
+    foreach ($nac as $i => $nac_entry) {
+        if ($nac_entry['updated_at']) {
+            $nac[$i]['last_seen'] = $nac_entry['updated_at']->diffForHumans();
+            $nac[$i]['updated_at'] = $nac_entry['updated_at']->toDateTimeString();
+        }
+    }
+
+    return api_success($nac, 'ports_nac', null, 200, count($nac), $extras);
 }
 
 function list_sensors()
