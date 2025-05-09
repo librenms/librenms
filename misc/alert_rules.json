@@ -1004,5 +1004,10 @@
     "rule": "applications.app_type = \"zfs\" && application_metrics.metric like \"pool_%_%_errors\" && application_metrics.value > \"0\"",
     "name": "ZFS: pool with errors present",
     "severity": "critical"
+  },
+  {
+    "rule": "storage.storage_perc >= storage.storage_perc_warn",
+    "name": "Storage Space Warning",
+    "severity": "warning"
   }
 ]
