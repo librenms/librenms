@@ -251,7 +251,6 @@ $tables = [
 foreach ($tables as $table_value) {
     if (is_array($pre_cache[$table_value['mib_table']])) {
         foreach ($pre_cache[$table_value['mib_table']] as $key => $value) {
-
             $sensor_descr = $table_value['descr'];
             if (is_array($pre_cache[$table_value['index']])) {
                 $sensor_descr = $table_value['descr'] . ' (' . $pre_cache[$table_value['index']][$key][$table_value['index']] . ')';
