@@ -118,6 +118,7 @@ Route::prefix('v0')->group(function () {
         Route::get('{hostname}/links', [App\Api\Controllers\LegacyApiController::class, 'list_links'])->name('list_links_device');
         Route::get('{hostname}/graphs', [App\Api\Controllers\LegacyApiController::class, 'get_graphs'])->name('get_graphs');
         Route::get('{hostname}/fdb', [App\Api\Controllers\LegacyApiController::class, 'get_fdb'])->name('get_fdb');
+        Route::get('{hostname}/nac', [App\Api\Controllers\LegacyApiController::class, 'get_nac'])->name('get_nac');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_health_graphs'])->name('list_available_health_graphs');
         Route::get('{hostname}/wireless/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_wireless_graphs'])->name('list_available_wireless_graphs');
         Route::get('{hostname}/ports', [App\Api\Controllers\LegacyApiController::class, 'get_port_graphs'])->name('get_port_graphs');
@@ -171,6 +172,9 @@ Route::prefix('v0')->group(function () {
         Route::get('fdb/{mac}', [App\Api\Controllers\LegacyApiController::class, 'list_fdb'])->name('list_fdb_mac');
         Route::get('fdb/{mac}/detail', [App\Api\Controllers\LegacyApiController::class, 'list_fdb_detail'])->name('list_fdb_detail');
         Route::get('links', [App\Api\Controllers\LegacyApiController::class, 'list_links'])->name('list_links');
+        Route::get('nac', [App\Api\Controllers\LegacyApiController::class, 'list_nac'])->name('list_nac');
+        Route::get('nac/{mac}', [App\Api\Controllers\LegacyApiController::class, 'list_nac'])->name('list_nac_mac');
+        Route::get('nac/{mac}/detail', [App\Api\Controllers\LegacyApiController::class, 'list_nac_detail'])->name('list_nac_detail');
         Route::get('sensors', [App\Api\Controllers\LegacyApiController::class, 'list_sensors'])->name('list_sensors');
         Route::get('vlans', [App\Api\Controllers\LegacyApiController::class, 'list_vlans'])->name('list_vlans');
     });
