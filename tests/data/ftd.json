@@ -2837,8 +2837,8 @@
                     "ifName": "desc1",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2937,8 +2937,8 @@
                     "ifName": "desc2",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3037,8 +3037,8 @@
                     "ifName": "desc3",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3137,8 +3137,8 @@
                     "ifName": "desc4",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3237,8 +3237,8 @@
                     "ifName": "desc5",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3337,8 +3337,8 @@
                     "ifName": "desc6",
                     "portName": null,
                     "ifIndex": 10,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3437,8 +3437,8 @@
                     "ifName": "desc7",
                     "portName": null,
                     "ifIndex": 11,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5541,5 +5541,102 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.15.15.41",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.15.15.0/24",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "10.15.16.10",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.15.16.8/29",
+                    "ifIndex": 6
+                },
+                {
+                    "ipv4_address": "10.15.3.17",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "10.15.3.16/28",
+                    "ifIndex": 11
+                },
+                {
+                    "ipv4_address": "10.15.4.17",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "10.15.4.16/28",
+                    "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "192.168.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "192.168.200.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.200.0/24",
+                    "ifIndex": 10
+                },
+                {
+                    "ipv4_address": "192.168.205.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.205.0/24",
+                    "ifIndex": 11
+                },
+                {
+                    "ipv4_address": "192.168.206.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.206.0/24",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "192.168.207.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.207.0/24",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "192.168.208.251",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.208.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "192.168.215.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.215.0/24",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "192.168.216.130",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.216.0/24",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "192.168.30.253",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.30.0/24",
+                    "ifIndex": 15
+                }
+            ]
+        }
     }
 }

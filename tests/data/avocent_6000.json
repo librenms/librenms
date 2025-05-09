@@ -2148,5 +2148,41 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.28.232.202",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.28.232.0/24",
+                    "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "7c:f8:80:aa:c3:00",
+                    "ipv6_address": "fe80:0000:0000:0000:7ef8:80ff:feaa:c300",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "7c:f8:80:ff:e2:00",
+                    "ipv6_address": "fe80:0000:0000:0000:7ef8:80ff:feff:e200",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

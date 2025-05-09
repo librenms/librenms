@@ -5137,8 +5137,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5237,8 +5237,8 @@
                     "ifName": "2",
                     "portName": null,
                     "ifIndex": 100001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5337,8 +5337,8 @@
                     "ifName": "3",
                     "portName": null,
                     "ifIndex": 100002,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -6305,5 +6305,184 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "192.168.30.253",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.30.0/24",
+                    "ifIndex": 100000
+                }
+            ]
+        }
     }
 }

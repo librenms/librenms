@@ -10837,8 +10837,8 @@
                     "ifName": "ManagementEthernet 1/1",
                     "portName": null,
                     "ifIndex": 9437185,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -10937,8 +10937,8 @@
                     "ifName": "NULL 0",
                     "portName": null,
                     "ifIndex": 1233125376,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -16825,5 +16825,136 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 2097156,
+                    "low_ifIndex": 1258317312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097284,
+                    "low_ifIndex": 1258317824,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097412,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097540,
+                    "low_ifIndex": 1258319360,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097668,
+                    "low_ifIndex": 1258317312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097796,
+                    "low_ifIndex": 1258317824,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097924,
+                    "low_ifIndex": 1258318848,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098052,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098180,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098308,
+                    "low_ifIndex": 1258318848,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098436,
+                    "low_ifIndex": 1258319360,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2113038,
+                    "low_ifIndex": 1258291712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275076608,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258317312,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258317824,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318848,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258319360,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "192.168.131.158",
+                    "ipv4_prefixlen": 20,
+                    "context_name": "",
+                    "ipv4_network": "192.168.128.0/20",
+                    "ifIndex": 1275076608
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "swrr309a",
+                    "remote_port": "hundredGigE 1/9 (3c2c30167480)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.13(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Tue Feb 27 09:28:17 2018",
+                    "ifAlias": "swrr309a-1/9",
+                    "ifDescr": "hundredGigE 1/32",
+                    "ifName": "hundredGigE 1/32"
+                }
+            ]
+        }
     }
 }

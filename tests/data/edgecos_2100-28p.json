@@ -6837,8 +6837,8 @@
                     "ifName": "Console41",
                     "portName": null,
                     "ifIndex": 41,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6937,8 +6937,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 1000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7037,8 +7037,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7137,8 +7137,8 @@
                     "ifName": "VLAN2",
                     "portName": null,
                     "ifIndex": 1002,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7237,8 +7237,8 @@
                     "ifName": "VLAN3",
                     "portName": null,
                     "ifIndex": 1003,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7337,8 +7337,8 @@
                     "ifName": "VLAN4",
                     "portName": null,
                     "ifIndex": 1004,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7437,8 +7437,8 @@
                     "ifName": "VLAN5",
                     "portName": null,
                     "ifIndex": 1005,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7537,8 +7537,8 @@
                     "ifName": "VLAN6",
                     "portName": null,
                     "ifIndex": 1006,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7637,8 +7637,8 @@
                     "ifName": "VLAN7",
                     "portName": null,
                     "ifIndex": 1007,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7737,8 +7737,8 @@
                     "ifName": "VLAN8",
                     "portName": null,
                     "ifIndex": 1008,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7837,8 +7837,8 @@
                     "ifName": "VLAN9",
                     "portName": null,
                     "ifIndex": 1009,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7937,8 +7937,8 @@
                     "ifName": "VLAN10",
                     "portName": null,
                     "ifIndex": 1010,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -9662,5 +9662,361 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1003,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1006,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1007,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1008,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1003,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1006,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1007,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1008,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1003,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1006,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1007,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1008,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1002,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1003,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1004,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1006,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1007,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1008,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1009,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1010,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.5.30",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.0.5.0/24",
+                    "ifIndex": 1005
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "A-SWC/S/1",
+                    "remote_port": "3C 2C 99 04 83 4B (3c2c9904834b)",
+                    "remote_platform": null,
+                    "remote_version": "ECS4120-28F",
+                    "ifAlias": "Ethernet Port on unit 1, port 25",
+                    "ifDescr": "Ethernet Port on unit 1, port 25",
+                    "ifName": "Port25"
+                }
+            ]
+        }
     }
 }

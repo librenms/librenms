@@ -4231,5 +4231,68 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "1.1.1.1",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "1.1.1.0/28",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "10.0.0.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/30",
+                    "ifIndex": 10
+                },
+                {
+                    "ipv4_address": "172.16.42.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.42.0/24",
+                    "ifIndex": 19
+                },
+                {
+                    "ipv4_address": "192.168.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "2.2.2.2",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "2.2.2.0/28",
+                    "ifIndex": 20
+                },
+                {
+                    "ipv4_address": "3.3.3.3",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "3.3.3.0/28",
+                    "ifIndex": 21
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fd00:0000:0000:0001:0000:0000:0000:0001",
+                    "ipv6_compressed": "fd00:0:0:1::1",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

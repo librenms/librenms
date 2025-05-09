@@ -47690,7 +47690,7 @@
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime":  22,
+                    "bgpPeerFsmEstablishedTime": 22,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 12345,
@@ -47886,5 +47886,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.6527.1.3.17",
+                    "sysDescr": "TiMOS-C-23.10.R3 cpm/hops64 Nokia 7750 SR Copyright (c) 2000-2024 Nokia.\nAll rights reserved. All use subject to applicable license agreements.\r\nBuilt on Thu Feb 15 16:43:14 UTC 2024 by builder in /builds/2310B/R3/panos/main/sros",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "timos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "nokia.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

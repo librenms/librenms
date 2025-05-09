@@ -9137,5 +9137,90 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "100.67.221.13",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.67.221.0/24",
+                    "ifIndex": 10
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "1007-mnt-1",
+                    "remote_port": "Gi1/0/6 (141877dd6fca)",
+                    "remote_platform": null,
+                    "remote_version": "Not Advertised",
+                    "ifAlias": "mgmt1/1/1",
+                    "ifDescr": "mgmt1/1/1",
+                    "ifName": "mgmt1/1/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Not Advertised",
+                    "remote_port": "TenGigabitEthernet 1/43 (f48e3855def6)",
+                    "remote_platform": null,
+                    "remote_version": "Not Advertised",
+                    "ifAlias": "PO-1",
+                    "ifDescr": "ethernet1/1/30",
+                    "ifName": "ethernet1/1/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "core-1",
+                    "remote_port": "517 (e4fc823623c0)",
+                    "remote_platform": null,
+                    "remote_version": "Juniper Networks, Inc. ex4300-32f internet router, kernel JUNOS 17.3R3.10, Build date: 2018-09-07 02:06:48 UTC Copyright (c) 1996-2018 Juniper Networks, Inc.",
+                    "ifAlias": "PO-2",
+                    "ifDescr": "ethernet1/1/29",
+                    "ifName": "ethernet1/1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "1007-lan-2",
+                    "remote_port": "ethernet1/1/25 (4cd98ffb1efe)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Networking OS10 Enterprise.",
+                    "ifAlias": "VLT",
+                    "ifDescr": "ethernet1/1/25",
+                    "ifName": "ethernet1/1/25"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "1007-lan-2",
+                    "remote_port": "ethernet1/1/26 (4cd98ffb1efe)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Networking OS10 Enterprise.",
+                    "ifAlias": "VLT",
+                    "ifDescr": "ethernet1/1/26",
+                    "ifName": "ethernet1/1/26"
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "4c:d9:8f:fb:1f:c7",
+                    "ipv6_address": "fda5:74c8:b79e:0001:0000:0000:0000:0002",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

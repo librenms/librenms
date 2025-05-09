@@ -38803,5 +38803,1227 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1048580,
+                    "low_ifIndex": 1258291712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048708,
+                    "low_ifIndex": 1258292224,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048836,
+                    "low_ifIndex": 1258292736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1048964,
+                    "low_ifIndex": 1258293248,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049092,
+                    "low_ifIndex": 1258293760,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049220,
+                    "low_ifIndex": 1258294272,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049348,
+                    "low_ifIndex": 1258294784,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049476,
+                    "low_ifIndex": 1258295296,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049604,
+                    "low_ifIndex": 1258295808,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049732,
+                    "low_ifIndex": 1258296320,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049860,
+                    "low_ifIndex": 1258296832,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049988,
+                    "low_ifIndex": 1258297344,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050116,
+                    "low_ifIndex": 1258297856,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050244,
+                    "low_ifIndex": 1258298368,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050372,
+                    "low_ifIndex": 1258298880,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050500,
+                    "low_ifIndex": 1258299392,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1052677,
+                    "low_ifIndex": 1258308096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1053189,
+                    "low_ifIndex": 1258310144,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1054724,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1054980,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097157,
+                    "low_ifIndex": 1258291712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2097669,
+                    "low_ifIndex": 1258291712,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098181,
+                    "low_ifIndex": 1258292736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2098693,
+                    "low_ifIndex": 1258292736,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2100868,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2102788,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2102916,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2103301,
+                    "low_ifIndex": 1258316288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2105349,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2105861,
+                    "low_ifIndex": 1258318336,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2107406,
+                    "low_ifIndex": 1258301952,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2107918,
+                    "low_ifIndex": 1258301952,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2108421,
+                    "low_ifIndex": 1258302976,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2108933,
+                    "low_ifIndex": 1258302976,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276195328,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276200448,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276205568,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276206080,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276244480,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276244992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276245504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276297216,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276298752,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276299776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276330496,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276356096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276368896,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258291712,
+                    "low_ifIndex": 1276379648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292224,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276195328,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276200448,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276205568,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276206080,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276244480,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276244992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276245504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276297216,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276298752,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276299776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276330496,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276356096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276368896,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258292736,
+                    "low_ifIndex": 1276379648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293248,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258293760,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294272,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258294784,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295296,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258295808,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296320,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258296832,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297344,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258297856,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298368,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258298880,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258299392,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276195328,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276200448,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276205568,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276206080,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276244480,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276244992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276245504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276297216,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276298752,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276299776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276330496,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276356096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276368896,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258301952,
+                    "low_ifIndex": 1276379648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276195328,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276200448,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276205568,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276206080,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276244480,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276244992,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276245504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276297216,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276298752,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276299776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276330496,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276356096,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276368896,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258302976,
+                    "low_ifIndex": 1276379648,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258308096,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275593728,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275595264,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275595776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275596288,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275596800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258310144,
+                    "low_ifIndex": 1275597312,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258314240,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258314752,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258316288,
+                    "low_ifIndex": 1275119104,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258316288,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275068928,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275119104,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1258318336,
+                    "low_ifIndex": 1275119616,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.232.5.201",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "10.232.4.0/23",
+                    "ifIndex": 1276298752
+                },
+                {
+                    "ipv4_address": "10.32.224.10",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.32.224.0/24",
+                    "ifIndex": 9437185
+                },
+                {
+                    "ipv4_address": "169.254.254.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "169.254.254.0/30",
+                    "ifIndex": 9437185
+                },
+                {
+                    "ipv4_address": "172.31.12.7",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.31.12.0/24",
+                    "ifIndex": 7340033
+                },
+                {
+                    "ipv4_address": "192.168.240.47",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.240.0/24",
+                    "ifIndex": 1275119104
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "fortyGigE 1/53 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Fo1/53-Po53 VLTi",
+                    "ifDescr": "fortyGigE 1/53",
+                    "ifName": "fortyGigE 1/53"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "fortyGigE 1/54 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Fo1/54-Po53 VLTi",
+                    "ifDescr": "fortyGigE 1/54",
+                    "ifName": "fortyGigE 1/54"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-ag7",
+                    "remote_port": "ManagementEthernet 1/1 (e4f004e18918)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.1) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Fri Aug 10 23:10:14 2018",
+                    "ifAlias": "abc-ag7 Ma1/1 VLT Backup Link",
+                    "ifDescr": "ManagementEthernet 1/1",
+                    "ifName": "ManagementEthernet 1/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "abc-cs2",
+                    "remote_port": "fortyGigE 1/50 (e4f004fb1ffb)",
+                    "remote_platform": null,
+                    "remote_version": "Dell EMC Real Time Operating System Software. Dell EMC Operating System Version: 2.0. Dell EMC Application Software Version: 9.14(0.2) Copyright (c) 1999-2018 Dell Inc. All Rights Reserved.Build Time: Sat Sep 22 02:36:45 2018",
+                    "ifAlias": "abc-cs2 Fo1/50-Po50 Uplink to Core",
+                    "ifDescr": "fortyGigE 1/49",
+                    "ifName": "fortyGigE 1/49"
+                }
+            ]
+        }
     }
 }

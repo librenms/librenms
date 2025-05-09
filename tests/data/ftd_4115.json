@@ -1537,8 +1537,8 @@
                     "ifName": "Port-channel1",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1637,8 +1637,8 @@
                     "ifName": "Po1.951",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1737,8 +1737,8 @@
                     "ifName": "Po2",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1837,8 +1837,8 @@
                     "ifName": "Ethernet1/7",
                     "portName": null,
                     "ifIndex": 10,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1937,8 +1937,8 @@
                     "ifName": "failover",
                     "portName": null,
                     "ifIndex": 11,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2401,5 +2401,58 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.0.14",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.8/29",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "10.0.0.22",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.16/29",
+                    "ifIndex": 8
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2001:0420:2852:201f:0000:0000:0000:0004",
+                    "ipv6_compressed": "2001:420:2852:201f::4",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 9
+                },
+                {
+                    "ipv6_address": "2001:0420:2852:201f:0000:0000:0000:000e",
+                    "ipv6_compressed": "2001:420:2852:201f::e",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 8
+                },
+                {
+                    "ipv6_address": "fd00:0000:0000:0001:0000:0000:0000:0001",
+                    "ipv6_compressed": "fd00:0:0:1::1",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

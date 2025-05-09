@@ -5446,5 +5446,185 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.240.200.2",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "10.240.200.0/27",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.240.216.196",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "10.240.216.192/27",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "127.0.0.2",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 5
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.240.216.193",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 10,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.6",
+                    "inetCidrRoutePfxLen": 64
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 1,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "0000:0000:0000:0000:0000:0000:0000:0001",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.18",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 10,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "0000:0000:0000:0000:0000:0000:0000:0002",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.19",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.240.216.192",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
+                    "inetCidrRoutePfxLen": 27
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1002,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "169.254.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
+                    "inetCidrRoutePfxLen": 16
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 3,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.14",
+                    "inetCidrRoutePfxLen": 64
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 10,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:6c7b:04ff:fe8c:b709",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.20",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 3,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "fe80:0000:0000:0000:70de:a5ff:fe75:c533",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.21",
+                    "inetCidrRoutePfxLen": 128
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 3,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 256,
+                    "inetCidrRouteDestType": "ipv6",
+                    "inetCidrRouteDest": "ff00:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRouteNextHopType": "ipv6",
+                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
+                    "inetCidrRoutePolicy": "zeroDotZero.22",
+                    "inetCidrRoutePfxLen": 8
+                }
+            ]
+        }
     }
 }

@@ -561,5 +561,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 0,
+                    "inetCidrRouteType": 0,
+                    "inetCidrRouteProto": 0,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "",
+                    "inetCidrRoutePolicy": "",
+                    "inetCidrRoutePfxLen": 0
+                }
+            ]
+        }
     }
 }
