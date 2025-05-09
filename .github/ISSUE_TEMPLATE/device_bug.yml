@@ -28,7 +28,7 @@ body:
     validations:
       required: true
     attributes:
-      label: Output from running ./validate.php
+      label: Output from running `php validate.php`
       description: |
         Please post the output of running: /opt/librenms/validate.php
       render: txt
