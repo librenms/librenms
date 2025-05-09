@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "JAE214600ZR",
                     "icon": "cisco.svg"
                 }
             ]

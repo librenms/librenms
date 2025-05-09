@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "FDO26520FT2",
                     "icon": "cisco.svg"
                 }
             ]
