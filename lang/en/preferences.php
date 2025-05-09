@@ -14,5 +14,5 @@ return [
 
     'title' => 'Preferences',
     'lang' => 'English',
-
+    'theme' => 'Theme',
 ];
