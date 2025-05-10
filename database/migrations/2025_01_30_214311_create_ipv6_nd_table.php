@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('device_id');
             $table->string('mac_address', 32);
             $table->string('ipv6_address', 128);
-            $table->string('context_name', 128);
+            $table->string('context_name', 128)->nullable();
         });
     }
 

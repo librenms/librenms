@@ -239,7 +239,7 @@ function is_port_valid($port, $device)
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'] ?? '';
     $ifAlias = $port['ifAlias'] ?? '';
-    $ifType = $port['ifType'];
+    $ifType = $port['ifType'] ?? '';
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {

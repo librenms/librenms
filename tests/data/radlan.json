@@ -5,11 +5,11 @@
                 {
                     "mac_address": "00900b2a11ad",
                     "ipv4_address": "10.37.105.100",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
-        "poller": null
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

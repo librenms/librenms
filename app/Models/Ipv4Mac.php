@@ -4,11 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ipv4Mac extends PortRelatedModel
+class Ipv4Mac extends PortRelatedModel implements Keyable
 {
     protected $table = 'ipv4_mac';
     public $timestamps = false;
+    protected $fillable = [
+        'port_id',
+        'device_id',
+        'mac_address',
+        'ipv4_address',
+        'context_name',
+    ];
 
     // ---- Define Relationships ----
     /**
@@ -36,5 +44,10 @@ class Ipv4Mac extends PortRelatedModel
     public function remote_ports_maybe(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'view_port_mac_links', 'ipv4_mac_id', 'remote_port_id');
+    }
+
+    public function getCompositeKey(): string
+    {
+        return $this->getAttribute('port_id') . '_' . $this->getAttribute('ipv4_address');
     }
 }

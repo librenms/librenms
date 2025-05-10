@@ -156,11 +156,6 @@ parameters:
 			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
-			message: "#^Cannot access property \\$password on object\\|string\\.$#"
-			count: 1
-			path: app/Http/Requests/UpdateUserRequest.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
 			count: 1
 			path: app/Models/DeviceRelatedModel.php
