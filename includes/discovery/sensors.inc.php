@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\Sensor;
 use LibreNMS\OS;
 
 /** @var OS $os */
@@ -42,45 +43,9 @@ if (isset($device['hardware']) && strstr($device['hardware'], 'ProLiant')) {
 if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
-if ($device['os'] == 'loop-telecom') {
-    include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
-}
-
-$run_sensors = [
-    'airflow',
-    'current',
-    'charge',
-    'dbm',
-    'fanspeed',
-    'frequency',
-    'humidity',
-    'load',
-    'loss',
-    'power',
-    'power_consumed',
-    'power_factor',
-    'runtime',
-    'signal',
-    'state',
-    'count',
-    'temperature',
-    'tv_signal',
-    'bitrate',
-    'voltage',
-    'snr',
-    'pressure',
-    'cooling',
-    'delay',
-    'quality_factor',
-    'chromatic_dispersion',
-    'ber',
-    'eer',
-    'waterflow',
-    'percent',
-];
 
 // filter submodules
-$run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
+$run_sensors = array_intersect(Sensor::values(), Config::get('discovery_submodules.sensors', Sensor::values()));
 
 sensors($run_sensors, $os, $pre_cache);
 unset(

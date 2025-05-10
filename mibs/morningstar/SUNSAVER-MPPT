@@ -1,0 +1,682 @@
+SUNSAVER-MPPT DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32 FROM SNMPv2-SMI
+	morningstar		FROM MORNINGSTAR
+	DisplayString		FROM RFC1213-MIB
+	TEXTUAL-CONVENTION	FROM SNMPv2-TC
+	OBJECT-GROUP		FROM SNMPv2-CONF;
+
+sunsaverMppt MODULE-IDENTITY
+	LAST-UPDATED "201912200000Z"
+	ORGANIZATION "morningstar"
+	CONTACT-INFO "Morningstar Corporation
+			Postal: Morningstar Corporation
+			8 Pheasant Run
+			Newtown, PA 18940
+			United States of America
+			Tel: +1 215 321 4457
+			E-Mail: info@morningstarcorp.com"
+
+	DESCRIPTION "Morningstar Product: SunSaver MPPT
+			Device Type: 7
+			Device Model: 0
+			Meterbus Type: 5
+			--
+			Copyright (C) Morningstar Corporation (2019).
+			All Rights Reserved"
+	
+	REVISION "201912200000Z"
+	DESCRIPTION "Original version"
+	::= { morningstar 3 }
+
+
+ChargeStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Control State"
+	SYNTAX INTEGER {
+			start (0),
+			nightCheck (1),
+			disconnect (2),
+			night (3),
+			fault (4),
+			bulkMppt (5),
+			absorption (6),
+			float (7),
+			equalize (8)
+		}
+LoadStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load State"
+	SYNTAX INTEGER {
+			start (0),
+			normal (1),
+			lvdWarning (2),
+			lvd (3),
+			fault (4),
+			disconnect (5),
+			normalOff (6),
+			override (7),
+			notUsed (8)
+		}
+DipSwitchesEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "DIP Switches"
+	SYNTAX INTEGER {
+			off-off-off-off (0),
+			on-off-off-off (1),
+			off-on-off-off (2),
+			on-on-off-off (3),
+			off-off-on-off (4),
+			on-off-on-off (5),
+			off-on-on-off (6),
+			on-on-on-off (7),
+			off-off-off-on (8),
+			on-off-off-on (9),
+			off-on-off-on (10),
+			on-on-off-on (11),
+			off-off-on-on (12),
+			on-off-on-on (13),
+			off-on-on-on (14),
+			on-on-on-on (15)
+		}
+LedStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "LED State"
+	SYNTAX INTEGER {
+			ledStart (0),
+			ledStart2 (1),
+			ledBranch (2),
+			equalizeFastGreen (3),
+			floatSlowGreen (4),
+			absorptionFlashingGreen (5),
+			green (6),
+			undefined (7),
+			yellow (8),
+			undefined1 (9),
+			flashingRed (10),
+			red (11),
+			r-y-gError (12),
+			ry-gError (13),
+			rg-yError (14),
+			r-yErrorHtd (15),
+			r-gErrorHvd (16),
+			ry-gyError (17),
+			gyrFlashingError (18),
+			gyrX2 (19)
+		}
+ArrayFaultsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Array Faults"
+	SYNTAX BITS {
+			overcurrent (0),
+			mosfetSShorted (1),
+			softwareFault (2),
+			batteryHvd (3),
+			arrayHvd (4),
+			customSettingsEdit (5),
+			rtsShorted (6),
+			rtsNoLongerValid (7),
+			localTempSensorDamaged (8),
+			fault10Undefined (9),
+			fault11Undefined (10),
+			fault12Undefined (11),
+			fault13Undefined (12),
+			fault14Undefined (13),
+			fault15Undefined (14),
+			fault16Undefined (15)
+		}
+LoadFaultsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load Faults"
+	SYNTAX BITS {
+			externalShortCircuit (0),
+			overcurrent (1),
+			mosfetShorted (2),
+			software (3),
+			loadHvd (4),
+			highTempDisconnect (5),
+			customSettingsEdit (6),
+			unknownLoadFault (7)
+		}
+AlarmsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarms"
+	SYNTAX BITS {
+			rtsOpen (0),
+			rtsShorted (1),
+			rtsDisconnected (2),
+			heatsinkTempSensorOpen (3),
+			heatsinkTempSensorShorted (4),
+			sspptHot (5),
+			currentLimit (6),
+			currentOffset (7),
+			undefined (8),
+			undefined1 (9),
+			uncalibrated (10),
+			rtsMiswire (11),
+			undefined12 (12),
+			undefined123 (13),
+			systemMiswire (14),
+			mosfetSOpen (15),
+			p12VoltageReferenceOff (16),
+			highVaCurrentLimit (17),
+			alarm19Undefined (18),
+			alarm20Undefined (19),
+			alarm21Undefined (20),
+			alarm22Undefined (21),
+			alarm23Undefined (22),
+			alarm24Undefined (23)
+		}
+ArrayFaultsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Array Faults(daily)"
+	SYNTAX BITS {
+			overcurrent (0),
+			mosfetSShorted (1),
+			softwareFault (2),
+			batteryHvd (3),
+			arrayHvd (4),
+			customSettingsEdit (5),
+			rtsShorted (6),
+			rtsNoLongerValid (7),
+			localTempSensorDamaged (8),
+			fault11Undefined (9),
+			fault12Undefined (10),
+			fault13Undefined (11),
+			fault14Undefined (12),
+			fault15Undefined (13),
+			fault16Undefined (14),
+			fault17Undefined (15)
+		}
+LoadFaultsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load Faults(daily)"
+	SYNTAX BITS {
+			externalShortCircuit (0),
+			overcurrent (1),
+			mosfetShorted (2),
+			software (3),
+			loadHvd (4),
+			highTempDisconnect (5),
+			customSettingsEdit (6),
+			unknownLoadFault (7)
+		}
+AlarmsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarms(daily)"
+	SYNTAX BITS {
+			rtsOpen (0),
+			rtsShorted (1),
+			rtsDisconnected (2),
+			heatsinkTempSensorOpen (3),
+			heatsinkTempSensorShorted (4),
+			sspptHot (5),
+			currentLimit (6),
+			currentOffset (7),
+			undefined (8),
+			undefined1 (9),
+			uncalibrated (10),
+			rtsMiswire (11),
+			undefined12 (12),
+			undefined123 (13),
+			systemMiswire (14),
+			mosfetSOpen (15),
+			p12VoltageReferenceOff (16),
+			highVaCurrentLimit (17),
+			alarm19Undefined (18),
+			alarm20Undefined (19),
+			alarm21Undefined (20),
+			alarm22Undefined (21),
+			alarm23Undefined (22),
+			alarm24Undefined (23)
+		}
+subModel OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The device's exact model"
+	::= { sunsaverMppt 1 }
+serialNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Device Serial Number"
+	::= { sunsaverMppt 2 }
+deviceVersion OBJECT-TYPE
+	SYNTAX       DisplayString (SIZE (0..32))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Hardware and firmware versions: vHW1.HW2.FW"
+	::= { sunsaverMppt 3 }
+batteryVoltage OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Voltage
+		- Description: Battery voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0008"
+	::={ sunsaverMppt 30 }
+arrayVoltage OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voltage
+		- Description: Array Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x0009"
+	::={ sunsaverMppt 31 }
+loadVoltage OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Voltage
+		- Description: Load Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x000A"
+	::={ sunsaverMppt 32 }
+chargeCurrent OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Charge Current
+		- Description: Charge Current
+		- Scaling Factor: 0.002415771484375
+		- Units: A
+		- Range: [0, 16]
+		- Modbus address: 0x000B"
+	::={ sunsaverMppt 33 }
+loadCurrent OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Current
+		- Description: Load Current
+		- Scaling Factor: 0.002415771484375
+		- Units: A
+		- Range: [0, 60]
+		- Modbus address: 0x000C"
+	::={ sunsaverMppt 34 }
+heatsinkTemperature OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Heatsink Temperature
+		- Description: Heatsink Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x000D"
+	::={ sunsaverMppt 35 }
+batteryTemperature OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Temperature
+		- Description: Battery Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x000E"
+	::={ sunsaverMppt 36 }
+ambientTemperature OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ambient Temperature
+		- Description: Ambient Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x000F"
+	::={ sunsaverMppt 37 }
+rtsTemperature OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"RTS Temperature
+		- Description: RTS Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x0010"
+	::={ sunsaverMppt 38 }
+chargeState OBJECT-TYPE
+	SYNTAX     ChargeStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Charge State
+		- Description: Control State
+		- Modbus address: 0x0011"
+	::={ sunsaverMppt 39 }
+arrayFaults OBJECT-TYPE
+	SYNTAX     ArrayFaultsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Faults
+		- Description: Array Faults
+		- Modbus address: 0x0012"
+	::={ sunsaverMppt 40 }
+batteryVoltageSlow OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Voltage (slow)
+		- Description: Battery Voltage (slow)
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0013"
+	::={ sunsaverMppt 41 }
+targetVoltage OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Target Voltage
+		- Description: Target Regulation Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0014"
+	::={ sunsaverMppt 42 }
+ahChargeResettable OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge(Resettable)
+		- Description: Ah Charge(Resettable)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0015 L=0x0016"
+	::={ sunsaverMppt 43 }
+ahChargeTotal OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge(Total)
+		- Description: Ah Charge(Total)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0017 L=0x0018"
+	::={ sunsaverMppt 44 }
+kwhCharge OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"kWh Charge
+		- Description: Kilowatt Hours
+		- Scaling Factor: 0.1
+		- Units: kWh
+		- Range: [0.0, 65535]
+		- Modbus address: 0x0019"
+	::={ sunsaverMppt 45 }
+loadState OBJECT-TYPE
+	SYNTAX     LoadStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load State
+		- Description: Load State
+		- Modbus address: 0x001A"
+	::={ sunsaverMppt 46 }
+loadFaults OBJECT-TYPE
+	SYNTAX     LoadFaultsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Faults
+		- Description: Load Faults
+		- Modbus address: 0x001B"
+	::={ sunsaverMppt 47 }
+lvdSetpoint OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LVD Setpoint
+		- Description: LVD Setpoint (current compensated)
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x001C"
+	::={ sunsaverMppt 48 }
+ahLoadResettable OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load(Resettable)
+		- Description: Ah Load(Resettable)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x001D L=0x001E"
+	::={ sunsaverMppt 49 }
+ahLoadTotal OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load(Total)
+		- Description: Ah Load(Total)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x001F L=0x0020"
+	::={ sunsaverMppt 50 }
+hourmeter OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Hourmeter
+		- Description: Hourmeter
+		- Scaling Factor: 1.0
+		- Units: hrs
+		- Range: [0.0, 1677215]
+		- Modbus addresses: H=0x0021 L=0x0022"
+	::={ sunsaverMppt 51 }
+alarms OBJECT-TYPE
+	SYNTAX     AlarmsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Alarms
+		- Description: Alarms
+		- Modbus addresses: H=0x0023 L=0x0024"
+	::={ sunsaverMppt 52 }
+dipSwitches OBJECT-TYPE
+	SYNTAX     DipSwitchesEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"DIP Switches
+		- Description: DIP Switches
+		- Modbus address: 0x0025"
+	::={ sunsaverMppt 53 }
+ledState OBJECT-TYPE
+	SYNTAX     LedStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LED State
+		- Description: LED State
+		- Modbus address: 0x0026"
+	::={ sunsaverMppt 54 }
+arrayPower OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Power
+		- Description: Array Power
+		- Scaling Factor: 0.01509857177734375
+		- Units: W
+		- Range: [0.0, 500]
+		- Modbus address: 0x0027"
+	::={ sunsaverMppt 55 }
+arrayVmp OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Vmp
+		- Description: Array Max. Power Point Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 5000.0]
+		- Modbus address: 0x0028"
+	::={ sunsaverMppt 56 }
+arrayMaxPowerSweep OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Max. Power(sweep)
+		- Description: Array Max. Power (last sweep)
+		- Scaling Factor: 0.01509857177734375
+		- Units: W
+		- Range: [0.0, 500]
+		- Modbus address: 0x0029"
+	::={ sunsaverMppt 57 }
+arrayVoc OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voc
+		- Description: Array Open Circuit Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x002A"
+	::={ sunsaverMppt 58 }
+vbMinDaily OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Min Daily
+		- Description: Min. Daily Battery Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80]
+		- Modbus address: 0x002B"
+	::={ sunsaverMppt 59 }
+vbMaxDaily OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Max Daily
+		- Description: Max. Daily Battery Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 80]
+		- Modbus address: 0x002C"
+	::={ sunsaverMppt 60 }
+ahChargeDaily OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge(daily)
+		- Description: Charge Amp-hours(daily)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 65535]
+		- Modbus address: 0x002D"
+	::={ sunsaverMppt 61 }
+ahLoadDaily OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load(daily)
+		- Description: Load Amp-hours(daily)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 65535]
+		- Modbus address: 0x002E"
+	::={ sunsaverMppt 62 }
+arrayFaultsDaily OBJECT-TYPE
+	SYNTAX     ArrayFaultsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Faults(daily)
+		- Description: Array Faults(daily)
+		- Modbus address: 0x002F"
+	::={ sunsaverMppt 63 }
+loadFaultsDaily OBJECT-TYPE
+	SYNTAX     LoadFaultsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Faults(daily)
+		- Description: Load Faults(daily)
+		- Modbus address: 0x0030"
+	::={ sunsaverMppt 64 }
+alarmsDaily OBJECT-TYPE
+	SYNTAX     AlarmsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Alarms(daily)
+		- Description: Alarms(daily)
+		- Modbus addresses: H=0x0031 L=0x0032"
+	::={ sunsaverMppt 65 }
+vbMin OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Min
+		- Description: Minimum Battery Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 5000.0]
+		- Modbus address: 0x0035"
+	::={ sunsaverMppt 66 }
+vbMax OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Max
+		- Description: Maximum Battery Voltage
+		- Scaling Factor: 0.0030517578125
+		- Units: V
+		- Range: [0.0, 5000.0]
+		- Modbus address: 0x0036"
+	::={ sunsaverMppt 67 }
+
+END

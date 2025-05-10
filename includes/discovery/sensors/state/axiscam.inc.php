@@ -42,7 +42,7 @@ if (is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . $entry['storageName'], 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
+        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . ($entry['storageName'] ?? null), 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
     }
 }
 

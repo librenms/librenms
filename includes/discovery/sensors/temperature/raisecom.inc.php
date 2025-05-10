@@ -6,7 +6,7 @@ $multiplier = 1;
 $divisor = 1000;
 foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
     foreach ($data as $key => $value) {
-        if (($key == 'transceiverTemperature') && is_numeric($value['raisecomOpticalTransceiverParameterValue']) && ($value['raisecomOpticalTransceiverDDMValidStatus'] == 1)) {
+        if (isset($value['raisecomOpticalTransceiverParameterValue'], $value['raisecomOpticalTransceiverDDMValidStatus']) && ($key == 'transceiverTemperature') && is_numeric($value['raisecomOpticalTransceiverParameterValue']) && ($value['raisecomOpticalTransceiverDDMValidStatus'] == 1)) {
             $oid = '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.' . $index . '.1';
             $sensor_type = 'raisecomOpticalTransceiverTemperature';
             $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
@@ -25,9 +25,10 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
 $descr = 'System Temperature';
 $oid = '.1.3.6.1.4.1.8886.1.1.4.2.1.0'; // raisecomTemperatureValue
 $value = snmp_get($device, $oid, ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
-$low_limit = snmp_get($device, 'raisecomTemperatureThresholdLow.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
-$high_limit = snmp_get($device, 'raisecomTemperatureThresholdHigh.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
 
 if (is_numeric($value)) {
-    discover_sensor(null, 'temperature', $device, $oid, 0, 'raisecomTemperatureValue', $descr, '1', '1', $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value);
+    $low_limit = snmp_get($device, 'raisecomTemperatureThresholdLow.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
+    $high_limit = snmp_get($device, 'raisecomTemperatureThresholdHigh.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
+
+    discover_sensor(null, 'temperature', $device, $oid, 0, 'raisecomTemperatureValue', $descr, '1', '1', $low_limit, null, null, $high_limit, $value);
 }

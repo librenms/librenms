@@ -109,7 +109,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             $this->enableGraph('panos_sessions_udp');
         }
 
-        if (is_numeric($data[0]['panSessionActiveICMP'])) {
+        if (isset($data[0]['panSessionActiveICMP']) && is_numeric($data[0]['panSessionActiveICMP'])) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions_icmp', 'GAUGE', 0, 3000000);
 
             $fields = [

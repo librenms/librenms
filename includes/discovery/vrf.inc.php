@@ -57,6 +57,9 @@ if (Config::get('enable_vrfs')) {
             $descrs = trim(str_replace("$descr_oid.", '', $descrs));
             $descr_table = [];
             foreach (explode("\n", $descrs) as $descr) {
+                if (! Str::contains($descr, ' ')) {
+                    continue;
+                }
                 $t = explode(' ', $descr, 2);
                 $descr_table[$t[0]] = $t[1];
             }
@@ -77,6 +80,7 @@ if (Config::get('enable_vrfs')) {
                 array_push($port_table[$vrf_oid], $port_id);
             }
         }
+        unset($vrf_oid, $port_id);
 
         foreach (explode("\n", $rds) as $oid) {
             if (empty($descr_oid) && strpos($oid, 'Platform_iVRF')) {
@@ -87,10 +91,14 @@ if (Config::get('enable_vrfs')) {
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
-                [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                $vrf_oid = $oid;
+                unset($vrf_rd);
+                if (Str::contains($oid, ' ')) {
+                    [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                }
                 $oid_values = explode('.', $vrf_oid);
                 $vrf_name = '';
-                for ($i = 1; $i <= $oid_values[0]; $i++) {
+                for ($i = 1; $i <= $oid_values[0] && isset($oid_values[$i]); $i++) {
                     $vrf_name .= chr($oid_values[$i]);
                 }
 
@@ -120,25 +128,27 @@ if (Config::get('enable_vrfs')) {
                 }
 
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
-                echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
-                echo "\n  [VRF $vrf_name] DESC  - " . $descr_table[$vrf_oid];
+                echo "\n  [VRF $vrf_name] RD    - " . ($vrf_rd ?? null);
+                echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
                     dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'device_id' => $device['device_id']], 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd ?? null, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
                 }
 
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
                 $valid_vrf[$vrf_id] = 1;
 
                 echo "\n  [VRF $vrf_name] PORTS - ";
-                foreach ($port_table[$vrf_oid] as $if_id) {
-                    $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
-                    echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
-                    dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
-                    $if = $interface['port_id'];
-                    $valid_vrf_if[$vrf_id][$if] = 1;
+                if (isset($port_table[$vrf_oid])) {
+                    foreach ($port_table[$vrf_oid] as $if_id) {
+                        $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
+                        echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                        dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                        $if = $interface['port_id'];
+                        $valid_vrf_if[$vrf_id][$if] = 1;
+                    }
                 }
             }//end if
         }//end foreach
@@ -149,10 +159,10 @@ if (Config::get('enable_vrfs')) {
         $port_table = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', [], 'TIMETRA-VRTR-MIB');
 
         foreach ($vrtr as $vrf_oid => $vr) {
-            $vrf_name = $vr['vRtrName'];
-            $vrf_desc = $vr['vRtrName'];
-            $vrf_as = $vr['vRtrAS4Byte'];
-            $vrf_rd = $vr['vRtrRouteDistinguisher'];
+            $vrf_name = $vr['vRtrName'] ?? null;
+            $vrf_desc = $vr['vRtrDescription'] ?? null;
+            $vrf_as = $vr['vRtrAS4Byte'] ?? null;
+            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? null;
             // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
             // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
@@ -177,7 +187,7 @@ if (Config::get('enable_vrfs')) {
                 'vrf_name' => $vrf_name,
                 'bgpLocalAs' => $vrf_as,
                 'mplsVpnVrfRouteDistinguisher' => $vrf_rd,
-                'mplsVpnVrfDescription' => $$vrf_desc,
+                'mplsVpnVrfDescription' => $vrf_desc,
                 'device_id' => $device['device_id'],
             ];
 
@@ -190,12 +200,13 @@ if (Config::get('enable_vrfs')) {
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
             $valid_vrf[$vrf_id] = 1;
             echo "\n  [VRF $vrf_name] PORTS - ";
-            foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
-                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-                echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
-                dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
-                $if = $interface['port_id'];
-                $valid_vrf_if[$vrf_id][$if] = 1;
+            foreach ($port_table[$vrf_oid] ?? [] as $if_index => $if_name) {
+                if ($interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index])) {
+                    echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
+                    dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                    $if = $interface['port_id'];
+                    $valid_vrf_if[$vrf_id][$if] = 1;
+                }
             }
         } //end foreach
     } elseif ($device['os_group'] == 'arista') {
@@ -222,7 +233,7 @@ if (Config::get('enable_vrfs')) {
                 'vrf_name' => $vrf_name,
                 //'bgpLocalAs' => $vrf_as,
                 'mplsVpnVrfRouteDistinguisher' => $vrf_rd,
-                //'mplsVpnVrfDescription' => $$vrf_desc,
+                //'mplsVpnVrfDescription' => $vrf_desc,
                 'device_id' => $device['device_id'],
             ];
 
