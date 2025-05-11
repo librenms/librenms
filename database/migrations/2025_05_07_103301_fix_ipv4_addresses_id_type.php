@@ -17,9 +17,11 @@ return new class extends Migration
             ->orWhere('ipv4_network_id', '')
             ->update(['ipv4_network_id' => 0]);
 
-        Schema::table('ipv4_addresses', function (Blueprint $table) {
-            $table->unsignedInteger('ipv4_network_id')->default(0)->change();
-        });
+        if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('ipv4_addresses', function (Blueprint $table) {
+                $table->unsignedInteger('ipv4_network_id')->default(0)->change();
+            });
+        }
     }
 
     /**
