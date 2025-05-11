@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="site_style" class="col-sm-4 control-label">{{ __('CSS Style') }}</label>
+                <label for="site_style" class="col-sm-4 control-label">{{ __('preferences.theme') }}</label>
                 <div class="col-sm-4">
                     <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
                         <option value="default">{{ __('Default') }} ({{ $site_style_default }})</option>

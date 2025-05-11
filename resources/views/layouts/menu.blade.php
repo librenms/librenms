@@ -580,12 +580,12 @@
                         <span class="visible-xs-inline-block">{{ __('User') }}</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('My Settings') }}</a></li>
                         <li><a href="{{ url('notifications') }}"><span
                                     class="badge count-notif">{{ $notification_count }}</span> {{ __('Notifications') }}
                             </a></li>
-                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('preferences.index') }}"><i class="fa fa-cog fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> {{ __('My Settings') }}</a></li>
+                        <li><x-theme-toggle /></li>
                         <li>
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> {{ __('Logout') }}
