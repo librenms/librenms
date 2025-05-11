@@ -4270,5 +4270,60 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.30.4.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.30.4.0/24",
+                    "ifIndex": 16
+                },
+                {
+                    "ipv4_address": "10.30.7.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.30.7.0/24",
+                    "ifIndex": 11
+                },
+                {
+                    "ipv4_address": "169.254.3.203",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.3.0/24",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "192.168.100.7",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.100.0/24",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "192.168.207.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.207.0/24",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "192.168.210.7",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.210.0/24",
+                    "ifIndex": 10
+                },
+                {
+                    "ipv4_address": "198.19.3.65",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "198.19.3.64/26",
+                    "ifIndex": 12
+                }
+            ]
+        }
     }
 }

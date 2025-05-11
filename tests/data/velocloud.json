@@ -1137,8 +1137,8 @@
                     "ifName": "GE3",
                     "portName": null,
                     "ifIndex": 16777218,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1537,8 +1537,8 @@
                     "ifName": "br-management",
                     "portName": null,
                     "ifIndex": 16777222,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1637,8 +1637,8 @@
                     "ifName": "br-network1",
                     "portName": null,
                     "ifIndex": 16777223,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1737,8 +1737,8 @@
                     "ifName": "br-network2324",
                     "portName": null,
                     "ifIndex": 16777224,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2454,5 +2454,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "0.0.0.0",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 16777216
+                }
+            ]
+        }
     }
 }

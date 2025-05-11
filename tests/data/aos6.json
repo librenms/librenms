@@ -20520,5 +20520,60 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.150.134.113",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.150.134.0/25",
+                    "ifIndex": 13600003
+                },
+                {
+                    "ipv4_address": "10.150.134.243",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.150.134.128/25",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "10.169.96.243",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.96.128/25",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "10.169.96.54",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.96.0/26",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 13600010
+                },
+                {
+                    "ipv4_address": "172.31.34.238",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "172.31.32.0/21",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "172.31.64.11",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "172.31.64.0/22",
+                    "ifIndex": 13600001
+                }
+            ]
+        }
     }
 }
