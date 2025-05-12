@@ -4,6 +4,7 @@ modules:
         serial:
             - ENTITY-MIB::entPhysicalSerialNum.1
             - ENTITY-MIB::entPhysicalSerialNum.4
+            - ENTITY-MIB::entPhysicalSerialNum.9
             - ENTITY-MIB::entPhysicalSerialNum.10
         version:
             - ENTITY-MIB::entPhysicalSoftwareRev.1
@@ -12,4 +13,5 @@ modules:
         hardware:
             - ENTITY-MIB::entPhysicalModelName.1
             - ENTITY-MIB::entPhysicalModelName.4
+            - ENTITY-MIB::entPhysicalModelName.9
             - ENTITY-MIB::entPhysicalModelName.10
