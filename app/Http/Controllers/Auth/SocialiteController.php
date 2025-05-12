@@ -166,6 +166,9 @@ class SocialiteController extends Controller
         ) {
             $roles = [];
             $attributes = $this->socialite_user->getRaw();
+            $idtoken = Arr::get($this->socialite_user->accessTokenResponseBody, 'id_token');
+            $jwtcontents = json_decode(base64_decode(explode(".", $idtoken)[1]));
+            $roles = array_merge($roles, $jwtcontents->roles);
 
             if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
                 $parsed_attributes = [];
