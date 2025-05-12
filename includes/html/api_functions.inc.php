@@ -2798,8 +2798,9 @@ function get_nac(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function () use ($device) {
-    $nac = $device->portsNac;
-    return api_success($nac, 'ports_nac');
+        $nac = $device->portsNac;
+
+        return api_success($nac, 'ports_nac');
     });
 }
 
