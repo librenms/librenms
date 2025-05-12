@@ -174,7 +174,6 @@ Route::prefix('v0')->group(function () {
         Route::get('links', [App\Api\Controllers\LegacyApiController::class, 'list_links'])->name('list_links');
         Route::get('nac', [App\Api\Controllers\LegacyApiController::class, 'list_nac'])->name('list_nac');
         Route::get('nac/{mac}', [App\Api\Controllers\LegacyApiController::class, 'list_nac'])->name('list_nac_mac');
-        Route::get('nac/{mac}/detail', [App\Api\Controllers\LegacyApiController::class, 'list_nac_detail'])->name('list_nac_detail');
         Route::get('sensors', [App\Api\Controllers\LegacyApiController::class, 'list_sensors'])->name('list_sensors');
         Route::get('vlans', [App\Api\Controllers\LegacyApiController::class, 'list_vlans'])->name('list_vlans');
     });
