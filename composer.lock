@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7a8181c1fbf2d9c760341e1fc1c3142",
+    "content-hash": "cba0451949a5dd4c745e85481a15a502",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -1944,6 +1944,76 @@
                 }
             ],
             "time": "2025-02-03T10:55:03+00:00"
+        },
+        {
+            "name": "idealo/php-rdkafka-ffi",
+            "version": "v0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/idealo/php-rdkafka-ffi.git",
+                "reference": "1070e0093aa0d6a41781622c7dcc44a032e35e51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/idealo/php-rdkafka-ffi/zipball/1070e0093aa0d6a41781622c7dcc44a032e35e51",
+                "reference": "1070e0093aa0d6a41781622c7dcc44a032e35e51",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ffi": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "conflict": {
+                "ext-rdkafka": "*"
+            },
+            "require-dev": {
+                "composer/semver": "^3.2",
+                "ircmaxell/php-c-parser": "dev-master#fd8f5efefd0fcc6c5119d945694acaa3a6790ada",
+                "klitsche/dog": "^0.4",
+                "klitsche/ffigen": "0.8.1",
+                "phpbench/phpbench": "^1.1",
+                "phpunit/phpunit": "^9.4 || ^10.5",
+                "symfony/css-selector": "^5.1",
+                "symfony/dom-crawler": "^5.1",
+                "symplify/easy-coding-standard": "^12.0"
+            },
+            "suggest": {
+                "ext-pcntl": "*",
+                "ext-zend opcache": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/constants.php",
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Dirk Adler",
+                    "email": "dirk.adler@idealo.de"
+                }
+            ],
+            "description": "PHP Kafka client - binding librdkafka via FFI",
+            "keywords": [
+                "client",
+                "ffi",
+                "kafka",
+                "librdkafka",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/idealo/php-rdkafka-ffi/issues",
+                "source": "https://github.com/idealo/php-rdkafka-ffi/tree/v0.6.0"
+            },
+            "time": "2025-01-25T16:18:43+00:00"
         },
         {
             "name": "influxdata/influxdb-client-php",
@@ -4937,16 +5007,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v6.9.3",
+            "version": "v6.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "2f5c94fe7493efc213f643c23b1b1c249d40f47e"
+                "reference": "bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/2f5c94fe7493efc213f643c23b1b1c249d40f47e",
-                "reference": "2f5c94fe7493efc213f643c23b1b1c249d40f47e",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144",
+                "reference": "bf74d75a1fde6beaa34a0ddae2ec5fce0f72a144",
                 "shasum": ""
             },
             "require": {
@@ -5006,7 +5076,7 @@
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
             "support": {
                 "issues": "https://github.com/PHPMailer/PHPMailer/issues",
-                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.9.3"
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v6.10.0"
             },
             "funding": [
                 {
@@ -5014,7 +5084,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-11-24T18:04:13+00:00"
+            "time": "2025-04-24T15:19:31+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -14291,6 +14361,7 @@
     "platform": {
         "php": "^8.2",
         "ext-curl": "*",
+        "ext-ffi": "*",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -14301,6 +14372,6 @@
         "ext-xml": "*",
         "ext-zlib": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

@@ -86,6 +86,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
       -
+        name: Install packages
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y fping python3-pip python3-setuptools snmp sqlite3 librdkafka-dev
+      -
         name: Pip install
         run: |
           python3 -m pip install --upgrade pip
