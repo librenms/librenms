@@ -58,7 +58,9 @@ class SchemaDumpCommand extends DumpCommand
         \Artisan::call('migrate', $parameters, $stdout);
 
         $file = $this->option('path') ?: base_path('/misc/db_schema.yaml');
-        $yaml = Yaml::dump(Schema::dump($database), 3, 2);
+        $dump = Schema::dump($database);
+        ksort($dump);
+        $yaml = Yaml::dump($dump, 3, 2);
 
         if (file_put_contents($file, $yaml)) {
             $this->info(basename($file) . ' updated!');
