@@ -10,6 +10,14 @@ class PortsFdb extends PortRelatedModel
     protected $table = 'ports_fdb';
     protected $primaryKey = 'ports_fdb_id';
     public $timestamps = true;
+    protected $fillable = [
+        'port_id',
+        'mac_address',
+        'vlan_id',
+        'device_id',
+        'created_at',
+        'updated_at',
+    ];
 
     // ---- Define Relationships ----
     /**
