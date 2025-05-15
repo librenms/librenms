@@ -51,4 +51,11 @@ class UserFuncHelper
 
         return Number::cast(explode(',', $this->value_raw)[$channel] ?? '') * $this->sensor['sensor_multiplier'] / $this->sensor['sensor_divisor'];
     }
+
+    public function hhmmssToMinutes(): int
+    {
+        [$h, $m, $s] = explode(':', $this->value_raw);
+
+        return (int) ((int) $h * 60 + (int) $m + (int) $s / 60);
+    }
 }

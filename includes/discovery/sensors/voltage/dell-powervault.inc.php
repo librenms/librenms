@@ -12,11 +12,11 @@ if (is_array($pre_cache['dell-powervault'])) {
     foreach ($pre_cache['dell-powervault'] as $index => $entry) {
         if (str_contains($entry['connUnitSensorMessage'], 'Voltage')) {
             $connUnitSensorMessage = explode(':', $entry['connUnitSensorMessage']);
-            preg_match('/^ ([0-9]+\.[0-9]+)V/$', array_pop($connUnitSensorMessage), $matches)[1];
+            preg_match('/^ ([0-9]+\.[0-9]+)V$/', array_pop($connUnitSensorMessage), $matches);
             $value = $matches[1];
             $descr = implode(':', $connUnitSensorMessage);
 
-            discover_sensor($valid['sensor'], 'voltage', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
+            discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
         }
     }
 }
