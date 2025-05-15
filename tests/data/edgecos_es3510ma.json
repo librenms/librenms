@@ -3180,7 +3180,8 @@
                     "context_name": ""
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "fdb-table": {
         "discovery": {

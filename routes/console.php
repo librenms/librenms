@@ -46,7 +46,7 @@ Artisan::command('update', function () {
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
-    PingCheck::dispatch($this->argument('groups', []));
+    PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery

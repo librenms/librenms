@@ -31,6 +31,9 @@ foreach ($prefixes as $prefix => $numOidPrefix) {
     $walk = snmpwalk_cache_oid($device, $prefix . 'Table', [], 'WEBMON-EDGE-MATRIX-MIB');
 
     foreach ($walk as $index => $oid) {
+        if (! isset($oid[$prefix . 'SensorType'])) {
+            continue;
+        }
         if ($oid[$prefix . 'Configured'] != '0' && $oid[$prefix . 'SensorType'] != 'humidity' && $oid[$prefix . 'SensorType'] != 'temperature' && $oid[$prefix . 'LiveRaw']) {
             $num_oid = $numOidPrefix . $index;
             $descr = $oid[$prefix . 'Description'];
