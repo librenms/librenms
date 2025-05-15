@@ -39,7 +39,6 @@ use Throwable;
 class ErrorReporting
 {
     private ?bool $reportingEnabled = null;
-    private ?bool $dumpErrors = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
         \LibreNMS\Exceptions\DatabaseConnectException::class,
@@ -54,7 +53,7 @@ class ErrorReporting
         $this->adjustErrorHandlingForAppEnv(app()->environment());
 
         $exceptions->dontReportDuplicates();
-        $exceptions->throttle(fn(Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
+        $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
         $exceptions->reportable([$this, 'reportable']);
         $exceptions->report([$this, 'report']);
         $exceptions->render([$this, 'render']);
