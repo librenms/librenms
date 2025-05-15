@@ -31,7 +31,7 @@ foreach ($advaports as $index => $entry) {
             $port_stats[$index]['ifAlias'] = $entry['FSP150-MIB::fsp150IfConfigUserString'];
         }
         if (isset($entry['ENTITY-MIB::entPhysicalName'])) {
-            $port_stats[$index]['ifDescr'] = $entry['ENTITY-MIB::entPhysicalName'];
+            $port_stats[$index]['ifName'] = $entry['ENTITY-MIB::entPhysicalName'];
         }
     }
 }
