@@ -47,7 +47,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-            $descr = $port->ifName;
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
@@ -82,7 +82,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['rxOpticalPower'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
             $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-            $descr = $port->ifName;
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([

@@ -40,7 +40,7 @@ if ($oids) {
             if ($type == 8) {
                 $value = $value / $divisor;
                 $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-                $descr = $port->ifName;
+                $descr = $port?->ifName;
                 discover_sensor(
                     null, 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
@@ -50,7 +50,7 @@ if ($oids) {
             if ($type == 9) {
                 $value = $value / $divisor;
                 $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-                $descr = $port->ifName;
+                $descr = $port?->ifName;
                 discover_sensor(
                     null, 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );

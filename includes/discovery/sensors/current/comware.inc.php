@@ -21,7 +21,7 @@ $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSC
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasCurrent']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasCurrent'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
         $port = PortCache::getByIfIndex($index, $device['device_id']);
-        if ($port->ifAdminStatus != 'up') {
+        if ($port?->ifAdminStatus != 'up') {
             continue;
         }
 

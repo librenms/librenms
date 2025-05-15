@@ -46,7 +46,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'])) {
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / 1000 / $divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'] / 1000 / $divisor;
             $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-            $descr = $port->ifName;
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.3.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([

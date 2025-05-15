@@ -37,7 +37,7 @@ foreach ($oids as $ifIndex => $data) {
         $low_warn_limit = $data['supply']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
         $low_limit = $data['supply']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
         $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-        $descr = $port->ifName;
+        $descr = $port?->ifName;
         $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.6';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([

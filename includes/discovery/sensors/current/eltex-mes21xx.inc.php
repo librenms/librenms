@@ -40,7 +40,7 @@ if ($oids) {
             if ($type == 7) {
                 $value = $value / $divisor;
                 $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
-                $descr = $port->ifName;
+                $descr = $port?->ifName;
                 discover_sensor(
                     null, 'current', $device, $split, 'txbias' . $ifIndex, 'rlPhyTestTableTxBias', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
