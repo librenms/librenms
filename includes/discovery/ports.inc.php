@@ -105,6 +105,11 @@ if ($device['port_association_mode']) {
 $ports_mapped = get_ports_mapped($device['device_id']);
 $ports_db = $ports_mapped['ports'];
 
+str_contains(null, '');
+strtok('');
+$a = $ports['undefined'];
+
+throw new ErrorException('fatal');
 //
 // Rename any old RRD files still named after the previous ifIndex based naming schema.
 foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {

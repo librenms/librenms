@@ -31,7 +31,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
@@ -52,28 +51,24 @@ class ErrorReporting
 
     public function __construct(Exceptions $exceptions)
     {
-        $this->adjustErrorHandlingForAppEnv();
+        $this->adjustErrorHandlingForAppEnv(app()->environment());
+
+        $exceptions->dontReportDuplicates();
+        $exceptions->throttle(fn(Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
+        $exceptions->reportable([$this, 'reportable']);
+        $exceptions->report([$this, 'report']);
+        $exceptions->render([$this, 'render']);
 
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
         });
+    }
 
-        $exceptions->dontReportDuplicates();
-        $exceptions->throttle(function (Throwable $e) {
-            return Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30));
-        });
+    public function reportable(Throwable $e): bool
+    {
+        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
-
-        // override default log message
-        $exceptions->reportable(function (Throwable $e) {
-            \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
-
-            return false;
-        });
-
-        // handle uncaught exceptions
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        return false; // false = block default log message
     }
 
     public function report(Throwable $e): bool
@@ -161,9 +156,9 @@ class ErrorReporting
         return true;
     }
 
-    private function adjustErrorHandlingForAppEnv(): void
+    private function adjustErrorHandlingForAppEnv(string $environment): void
     {
-        if (App::environment('production')) {
+        if ($environment == 'production') {
             // in production, don't halt execution on non-fatal errors
             set_error_handler(function ($severity, $message, $file, $line) {
                 error_log("PHP Error($severity): $message in $file on line $line");
