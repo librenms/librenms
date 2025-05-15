@@ -44,7 +44,7 @@ class InfluxDB extends BaseDatastore
         parent::__construct();
         $this->db = $influx;
 
-        if( Config::get('influxdb.create_db', false) ){
+        if( Config::get('influxdb.create_db', true) ){
             // if the database doesn't exist, create it.
             try {
                 if (! $this->db->exists()) {
