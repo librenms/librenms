@@ -37,20 +37,22 @@ use Log;
 class InfluxDB extends BaseDatastore
 {
     /** @var Database */
-    private $connection;
+    private $db;
 
     public function __construct(Database $influx)
     {
         parent::__construct();
-        $this->connection = $influx;
+        $this->db = $influx;
 
-        // if the database doesn't exist, create it.
-        try {
-            if (! $influx->exists()) {
-                $influx->create();
+        if( Config::get('influxdb.create_db', false) ){
+            // if the database doesn't exist, create it.
+            try {
+                if (! $this->db->exists()) {
+                    $this->db->create();
+                }
+            } catch (\Exception $e) {
+                Log::warning('InfluxDB: Could not create database');
             }
-        } catch (\Exception $e) {
-            Log::warning('InfluxDB: Could not create database');
         }
     }
 
@@ -122,7 +124,7 @@ class InfluxDB extends BaseDatastore
                 ),
             ];
 
-            $this->connection->writePoints($points);
+            $this->db->writePoints($points);
             $this->recordStatistic($stat->end());
         } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB exception: ' . $e->getMessage());

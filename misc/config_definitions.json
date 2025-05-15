@@ -4471,6 +4471,13 @@
             "section": "influxdb",
             "order": 8
         },
+        "influxdb.create_db": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 9
+        },
 	"influxdbv2.enable": {
             "default": false,
             "type": "boolean",

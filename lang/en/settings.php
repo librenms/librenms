@@ -1056,6 +1056,10 @@ return [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
             ],
+            'create_db' => [
+                'description' => 'Create Database',
+                'help' => 'Tests if database exists, create if not',
+            ],
         ],
         'influxdbv2' => [
             'bucket' => [
