@@ -40,7 +40,7 @@ if (is_array($temp)) {
         $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
         $descr = trim($port?->ifDescr . ' Suspended Status');
 
-        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
+        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus !== 'notPresent') {
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
         }
