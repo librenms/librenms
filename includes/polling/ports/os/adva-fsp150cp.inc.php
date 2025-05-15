@@ -18,16 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-$advaports = snmpwalk_cache_oid($device, 'fsp150IfConfigUserString', [], 'FSP150-MIB');
-$advaports = snmpwalk_cache_oid($device, 'entPhysicalName', $advaports, 'ENTITY-MIB');
-
-d_echo($advaports);
+$advaports = SnmpQuery::walk([
+    'FSP150-MIB::fsp150IfConfigUserString',
+    'ENTITY-MIB::entPhysicalName',
+])->table(1);
 
 foreach ($advaports as $index => $entry) {
     // Indexes are the same as IfIndex and EntPhysicalIndex
 
     if (isset($port_stats[$index])) {
-        $port_stats[$index]['ifAlias'] = $entry['fsp150IfConfigUserString'];
-        $port_stats[$index]['ifName'] = $entry['entPhysicalName'];
-    }
+        if (isset($entry['FSP150-MIB::fsp150IfConfigUserString'])) {
+            $port_stats[$index]['ifAlias'] = $entry['FSP150-MIB::fsp150IfConfigUserString'];
+        }
+        if (isset($entry['ENTITY-MIB::entPhysicalName'])) {
+            $port_stats[$index]['ifDescr'] = $entry['ENTITY-MIB::entPhysicalName'];
+        }    }
 }
