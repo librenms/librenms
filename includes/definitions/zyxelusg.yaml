@@ -1,0 +1,18 @@
+os: zyxelusg
+text: 'ZyXEL USG'
+group: zyxel
+type: firewall
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: zyxel
+icon: zyxel
+discovery:
+    -
+        sysDescr_regex:
+            - '/^USG/'
+discovery_modules:
+    mpls: false
+    ospfv3: false
+    ipv6-addresses: false
