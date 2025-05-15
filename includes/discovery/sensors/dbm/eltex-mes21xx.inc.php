@@ -39,8 +39,8 @@ if ($oids) {
             //type8 = tx dBm
             if ($type == 8) {
                 $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port->ifName;
                 discover_sensor(
                     null, 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );
@@ -49,8 +49,8 @@ if ($oids) {
             //type9 = rx dBm
             if ($type == 9) {
                 $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port->ifName;
                 discover_sensor(
                     null, 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );

@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Util\Rewrite;
-
 /*
  * LibreNMS
  *
@@ -22,8 +20,8 @@ $divisor_alarm = 1000000;
 $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->table(1);
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasCurrent']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasCurrent'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
-        $interface = get_port_by_index_cache($device['device_id'], $index);
-        if ($interface['ifAdminStatus'] != 'up') {
+        $port = PortCache::getByIfIndex($index, $device['device_id']);
+        if ($port->ifAdminStatus != 'up') {
             continue;
         }
 
@@ -36,7 +34,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
 
-        $descr = Rewrite::shortenIfName($interface['ifDescr']) . ' Bias Current';
+        $descr = $port->getShortLabel() . ' Bias Current';
         discover_sensor(null, 'current', $device, $oid, 'bias-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

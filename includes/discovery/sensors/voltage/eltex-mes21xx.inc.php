@@ -39,8 +39,8 @@ if ($oids) {
             // type6 = voltage
             if ($type == 6) {
                 $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port->ifName;
                 discover_sensor(
                     null, 'voltage', $device, $split, 'SfpVolt' . $ifIndex, 'rlPhyTestTableTransceiverSupply', 'SfpVolt-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
                 );

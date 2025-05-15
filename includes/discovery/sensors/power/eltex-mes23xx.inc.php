@@ -35,8 +35,8 @@ if ($pre_cache['eltex-mes23xx-poe']) {
                 $low_warn_limit = 0;
                 $low_limit = 0;
                 [$unit, $ifIndex] = explode('.', $index);
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port->ifName;
                 $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $unit . '.' . $ifIndex;
                 discover_sensor(
                     null,

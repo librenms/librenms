@@ -53,7 +53,8 @@ if (isset($eltexPhyTransceiverDiagnosticTable['lossOfSignal'])) {
         $high_warn_limit = null;
         $low_warn_limit = null;
         $low_limit = null;
-        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port->ifName;
         $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.6.1')->toNumeric();
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([

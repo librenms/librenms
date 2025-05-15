@@ -22,8 +22,8 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
         }
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.7';
         $sensor_type = 'rlPhyTestTableTxBias';
-        $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-        $descr = trim(($port_descr['ifDescr'] ?? '') . ' Bias Current');
+        $port = \App\Facades\PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $descr = trim($port->ifDescr . ' Bias Current');
         $current = $value['rlPhyTestTableTxBias'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';

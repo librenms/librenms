@@ -36,7 +36,8 @@ foreach ($oids as $ifIndex => $data) {
         $high_warn_limit = $data['txOutput']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
         $low_warn_limit = $data['txOutput']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
         $low_limit = $data['txOutput']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
-        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port->ifName;
         $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.8';
         $entPhysicalIndex = $ifIndex;
         $entPhysicalIndex_measured = 'ports';
@@ -68,7 +69,8 @@ foreach ($oids as $ifIndex => $data) {
         $high_warn_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
         $low_warn_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
         $low_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
-        $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port->ifName;
         $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.9';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
