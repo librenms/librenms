@@ -21,6 +21,7 @@ you can do so by running the following commands:
 ```bash
 cd /opt/librenms
 git pull
+rm bootstrap/cache/*.php
 ./scripts/composer_wrapper.php install --no-dev
 ./lnms migrate
 ./validate.php

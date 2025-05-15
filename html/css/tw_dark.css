@@ -2,10 +2,6 @@
     color: #bfc0c0
 }
 
-.dark .fa-col-danger {
-    color: #e30613
-}
-
 .dark .icon-theme {
     color: #bfc0c0
 }
@@ -1508,11 +1504,6 @@
 
 .dark .table-responsive > .table {
     background-color: #2e3338
-}
-
-.dark input,
-.dark textarea {
-    color: #272b30
 }
 
 .dark .has-error .help-block,

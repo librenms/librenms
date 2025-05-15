@@ -112,6 +112,8 @@ class Rewrite
     public static function shortenIfName($name)
     {
         $rewrite_shortif = [
+            'hundredgige' => 'Hu',
+            'twentyfivegige' => 'Twe',
             'tengigabitethernet' => 'Te',
             'ten-gigabitethernet' => 'Te',
             'tengige' => 'Te',

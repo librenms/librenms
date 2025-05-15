@@ -43,9 +43,6 @@ if (isset($device['hardware']) && strstr($device['hardware'], 'ProLiant')) {
 if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
-if ($device['os'] == 'loop-telecom') {
-    include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
-}
 
 // filter submodules
 $run_sensors = array_intersect(Sensor::values(), Config::get('discovery_submodules.sensors', Sensor::values()));
