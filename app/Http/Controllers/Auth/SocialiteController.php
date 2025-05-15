@@ -31,9 +31,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Exceptions\AuthenticationException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
 
 class SocialiteController extends Controller
 {
@@ -159,42 +162,79 @@ class SocialiteController extends Controller
     {
         $scopes = LibrenmsConfig::get('auth.socialite.scopes');
         $claims = LibrenmsConfig::get('auth.socialite.claims');
+        $is_debug = LibrenmsConfig::get('auth.socialite.debug');
+        $monolog = null;
 
-        if (is_array($scopes) &&
-            $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
-            ! empty($claims)
-        ) {
-            $roles = [];
-            $attributes = $this->socialite_user->getRaw();
-
-            if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
-                $parsed_attributes = [];
-                foreach ($attributes as $attribute_object) {
-                    $attribute_name = $attribute_object->getName();
-                    $attribute_values = $attribute_object->getAllAttributeValues();
-                    $parsed_attributes[$attribute_name] = $attribute_values;
-                }
-                $attributes = $parsed_attributes;
+        try {
+            if ($is_debug) {
+                /** @var \Monolog\Logger $monolog */
+                $monolog = Log::getLogger();
+                $debugHandler = new StreamHandler(LibrenmsConfig::get('log_dir') . '/auth.log', Level::Debug);
+                $debugHandler->setFormatter(new \App\Logging\LogFileFormatter());
+                $monolog->pushHandler($debugHandler);
+                Log::debug('setRolesFromClaim() starts : ' . $user->username . PHP_EOL .
+                    '  Provider: ' . $provider . PHP_EOL .
+                    '  User: ' . json_encode($user) . PHP_EOL .
+                    '  Scopes: ' . json_encode($scopes) . PHP_EOL .
+                    '  Claims: ' . json_encode($claims) . PHP_EOL .
+                    '  socialite_user class: ' . get_class($this->socialite_user) . PHP_EOL
+                );
             }
 
-            foreach ($scopes as $scope) {
-                foreach ($attributes as $attribute_name => $attribute_values) {
-                    if (strpos($attribute_name, $scope) !== false) {
-                        foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
-                            $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+            if (is_array($scopes) &&
+                $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
+                ! empty($claims)
+            ) {
+                $roles = [];
+                $attributes = $this->socialite_user->getRaw();
+
+                if ($is_debug) {
+                    $type = is_object($attributes) ? get_class($attributes) : gettype($attributes);
+                    Log::debug('setRolesFromClaim() socialite_user->getRaw() : ' . $user->username . PHP_EOL .
+                        '  Data Type: ' . $type . PHP_EOL .
+                        '  Dump of Data: ' . PHP_EOL .
+                        '  ' . print_r($attributes, true) . PHP_EOL
+                    );
+                }
+
+                if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
+                    $parsed_attributes = [];
+                    foreach ($attributes as $attribute_object) {
+                        $attribute_name = $attribute_object->getName();
+                        $attribute_values = $attribute_object->getAllAttributeValues();
+                        $parsed_attributes[$attribute_name] = $attribute_values;
+                    }
+                    $attributes = $parsed_attributes;
+                }
+
+                foreach ($scopes as $scope) {
+                    foreach ($attributes as $attribute_name => $attribute_values) {
+                        if (strpos($attribute_name, $scope) !== false) {
+                            foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
+                                $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+                            }
                         }
                     }
                 }
+
+                if (count($roles) > 0) {
+                    $user->syncRoles(array_unique($roles));
+                    if ($is_debug) {
+                        Log::debug('setRolesFromClaim() returned data : ' . $user->username . PHP_EOL .
+                            ' Roles: ' . json_encode($roles) . PHP_EOL
+                        );
+                    }
+
+                    return true;
+                }
             }
 
-            if (count($roles) > 0) {
-                $user->syncRoles(array_unique($roles));
-
-                return true;
+            return false;
+        } finally {
+            if ($monolog) {
+                $monolog->popHandler();
             }
         }
-
-        return false;
     }
 
     private function pairUser(string $provider): RedirectResponse

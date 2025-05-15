@@ -302,6 +302,10 @@ return [
                     'description' => 'Claims',
                     'help' => 'Map groups to Roles',
                 ],
+                'debug' => [
+                    'description' => 'Auth Debugging',
+                    'help' => 'Enable debug logs in logs/auth.log',
+                ],
             ],
         ],
         'auth_ad_base_dn' => [
