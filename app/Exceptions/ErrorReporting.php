@@ -31,6 +31,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Git;
 use Spatie\LaravelIgnition\Facades\Flare;
@@ -51,6 +52,8 @@ class ErrorReporting
 
     public function __construct(Exceptions $exceptions)
     {
+        $this->adjustErrorHandlingForAppEnv();
+
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
         });
@@ -60,33 +63,26 @@ class ErrorReporting
             return Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30));
         });
 
-        app()->booted(function () {
-            $this->dumpErrors = LibrenmsConfig::get('reporting.dump_errors', false);
-            if ($this->dumpErrors) {
-                config([
-                    'logging.deprecations.channel' => 'deprecations_channel',
-                    'logging.deprecations.trace' => true,
-                ]);
-            }
+
+        // override default log message
+        $exceptions->reportable(function (Throwable $e) {
+            \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+
+            return false;
         });
 
-        // handle exceptions
+        // handle uncaught exceptions
         $exceptions->report([$this, 'report']);
         $exceptions->render([$this, 'render']);
     }
 
     public function report(Throwable $e): bool
     {
-        if ($this->dumpErrors) {
-            \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
-        }
-
         if ($this->isReportingEnabled()) {
             Flare::report($e);
         }
 
-        // block logging errors if in a legacy entry point (init.php)
-        return ! defined('IGNORE_ERRORS');
+        return true;
     }
 
     public function render(Throwable $exception, Request $request): ?Response
@@ -163,5 +159,30 @@ class ErrorReporting
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    private function adjustErrorHandlingForAppEnv(): void
+    {
+        if (App::environment('production')) {
+            // in production, don't halt execution on non-fatal errors
+            set_error_handler(function ($severity, $message, $file, $line) {
+                error_log("PHP Error($severity): $message in $file on line $line");
+
+                // For notices and warnings, prevent conversion to exceptions
+                if (in_array($severity, [E_NOTICE, E_WARNING, E_USER_NOTICE, E_USER_WARNING, E_DEPRECATED])) {
+                    return true; // Prevent the standard error handler from running
+                }
+
+                return false; // For other errors, let Laravel handle them
+            });
+        } else {
+            // non-prod, show deprecations
+            app()->booted(function () {
+                config([
+                    'logging.deprecations.channel' => 'deprecations_channel',
+                    'logging.deprecations.trace' => true,
+                ]);
+            });
+        }
     }
 }
