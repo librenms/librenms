@@ -25,9 +25,9 @@
  */
 
 $oids = SnmpQuery::hideMib()->walk([
-        'MARVELL-POE-MIB::rlPethPsePortPowerLimit',
-        'MARVELL-POE-MIB::rlPethPsePortOutputPower',
-        ])->table(2);
+    'MARVELL-POE-MIB::rlPethPsePortPowerLimit',
+    'MARVELL-POE-MIB::rlPethPsePortOutputPower',
+])->table(2);
 
 foreach ($oids as $unit => $indexData) {
     foreach ($indexData as $ifIndex => $data) {
