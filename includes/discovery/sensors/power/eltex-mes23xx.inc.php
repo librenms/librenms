@@ -24,20 +24,20 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-use LibreNMS\Util\Oid;
-
-$oids = SnmpQuery::hideMib()->walk('MARVELL-POE-MIB::rlPethPsePortPowerLimit')->table(2);
-$oids = SnmpQuery::hideMib()->walk('MARVELL-POE-MIB::rlPethPsePortOutputPower')->table(2, $oids);
+$oids = SnmpQuery::hideMib()->walk([
+        'MARVELL-POE-MIB::rlPethPsePortPowerLimit',
+        'MARVELL-POE-MIB::rlPethPsePortOutputPower',
+        ])->table(2);
 
 foreach ($oids as $unit => $indexData) {
     foreach ($indexData as $ifIndex => $data) {
         if (isset($data['rlPethPsePortOutputPower'])) {
             $value = $data['rlPethPsePortOutputPower'] / $divisor;
             if ($value) {
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
+                $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+                $descr = $port?->ifName;
                 $index = $unit . '.' . $ifIndex;
-                $oid = Oid::of('MARVELL-POE-MIB::rlPethPsePortOutputPower.' . $index)->toNumeric();
+                $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $index;
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
