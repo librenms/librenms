@@ -115,7 +115,12 @@
 </head>
 <body>
 @if(Auth::check())
-    <script>updateResolution();</script>
+    <script>
+        // only update resolution if it doesn't match what is stored in the session
+        if (window.innerWidth !== {{ session('screen_width') }} || window.innerHeight !== {{ session('screen_height') }}) {
+            updateResolution(false);
+        }
+    </script>
 @endif
 
 @if(Request::get('bare') == 'yes')
