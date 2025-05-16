@@ -124,7 +124,7 @@ class Cisco extends OS implements
             'entPhysicalContainedIn.1001',
         ];
 
-        $data = snmp_get_multi($this->getDeviceArray(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $data = SnmpQuery::mibs(['ENTITY-MIB', 'OLD-CISCO-CHASSIS-MIB'])->hideMib()->get($oids)->valuesByIndex();
 
         if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
             if (! empty($data[1]['entPhysicalSoftwareRev'])) {
@@ -152,7 +152,10 @@ class Cisco extends OS implements
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
         }
 
-        $device->hardware = $hardware ?: snmp_translate($device->sysObjectID, 'SNMPv2-MIB:CISCO-PRODUCTS-MIB', 'cisco');
+        $device->hardware = $hardware;
+        if (empty($device->hardware) && $device->sysObjectID) {
+            $device->hardware = SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+        }
     }
 
     public function discoverMempools()
@@ -161,7 +164,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
-        /* @var Collection<Mempool> $collection */
+        /** @var Collection<Mempool> $mempools */
         $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
@@ -663,7 +666,7 @@ class Cisco extends OS implements
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
             $instance = parent::discoverStpInstances($vlan);
-            if ($instance[0]->protocolSpecification == 'unknown') {
+            if (isset($instance[0]) && $instance[0]->protocolSpecification == 'unknown') {
                 $instance[0]->protocolSpecification = $stpxSpanningTreeType;
             }
             $instances = $instances->merge($instance);
@@ -674,8 +677,11 @@ class Cisco extends OS implements
 
     protected function getMainSerial()
     {
-        $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
-//        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = SnmpQuery::mibs(['ENTITY-MIB', 'OLD-CISCO-CHASSIS-MIB'])->hideMib()->get([
+            'entPhysicalSerialNum.1',
+            'entPhysicalSerialNum.1000',
+            'entPhysicalSerialNum.1001',
+        ])->valuesByIndex();
 
         if (! empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
@@ -700,7 +706,7 @@ class Cisco extends OS implements
                     $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
                     if (empty($ent->ifIndex)) {
                         // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
-                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()->ifIndex;
+                        $ent->ifIndex = $this->getDevice()->entityPhysical()->where('entPhysicalContainedIn', '=', $ent->entPhysicalIndex)->whereNotNull('ifIndex')->first()?->ifIndex;
                     }
                 }
 
@@ -804,7 +810,7 @@ class Cisco extends OS implements
                     $statements = [];
                     foreach ($spObjects as $sqObject) {
                         // Find child objects (we are the parent) that are type 3 (match statements)
-                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3) {
+                        if ($sqObject['cbQosParentObjectsIndex'] == $objectId && $sqObject['cbQosObjectsType'] == 3 && isset($matchStatements[$sqObject['cbQosConfigIndex']]['cbQosMatchStmtName'])) {
                             $statements[] = $matchStatements[$sqObject['cbQosConfigIndex']]['cbQosMatchStmtName'];
                         }
                     }

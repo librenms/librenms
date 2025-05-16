@@ -208,17 +208,25 @@ class AlertSchedule extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\Device, $this>
+     */
     public function devices(): MorphToMany
     {
         return $this->morphedByMany(Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\DeviceGroup, $this>
+     */
     public function deviceGroups(): MorphToMany
     {
         return $this->morphedByMany(DeviceGroup::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<\App\Models\Location, $this>
+     */
     public function locations(): MorphToMany
     {
         return $this->morphedByMany(Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');

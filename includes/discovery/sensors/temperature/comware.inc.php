@@ -28,7 +28,7 @@ if (! empty($entphydata)) {
     foreach ($entphydata as $index) {
         foreach ($tempdata as $tempindex => $value) {
             if ($index['entPhysicalIndex'] == $tempindex && $value['hh3cEntityExtTemperature'] != 65535) {
-                if ($value['hh3cEntityExtTemperatureThreshold'] != 65535) {
+                if (isset($value['hh3cEntityExtTemperatureThreshold']) && $value['hh3cEntityExtTemperatureThreshold'] != 65535) {
                     $hightemp = $value['hh3cEntityExtTemperatureThreshold'];
                 } else {
                     $hightemp = null;

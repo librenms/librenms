@@ -42,6 +42,11 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     Log::debug("discovering $hostname\n");
+    if (empty(Config::get('nets'))) {
+        Log::debug("Allowed discovery network list is empty - skipping\n");
+
+        return false;
+    }
 
     if (IP::isValid($hostname)) {
         $ip = $hostname;
@@ -167,15 +172,15 @@ function discover_device(&$device, $force_module = false)
             try {
                 include "includes/discovery/$module.inc.php";
             } catch (Throwable $e) {
+                // Re-throw exception if we're in running tests
+                if (defined('PHPUNIT_RUNNING')) {
+                    throw $e;
+                }
+
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
                 report($e);
-
-                // Re-throw exception if we're in CI
-                if (getenv('CI') == true) {
-                    throw $e;
-                }
             }
 
             $module_time = microtime(true) - $module_start;
@@ -826,7 +831,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
             'bgpPeerIdentifier' => $peer['ip'],
             'afi' => $afi,
             'safi' => $safi,
-            'context_name' => $device['context_name'],
+            'context_name' => $device['context_name'] ?? null,
             'AcceptedPrefixes' => 0,
             'DeniedPrefixes' => 0,
             'PrefixAdminLimit' => 0,

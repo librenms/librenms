@@ -109,8 +109,8 @@ Route::middleware(['auth'])->group(function () {
     // Device Tabs
     Route::prefix('device/{device}')->name('device.')->group(function () {
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
-        Route::put('module/{module}', [App\Http\Controllers\Device\Tabs\ModuleController::class, 'update'])->name('module.update');
-        Route::delete('module/{module}', [App\Http\Controllers\Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
+        Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
+        Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
@@ -123,12 +123,12 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
-        Route::post('custom/{map}/clone', [Maps\CustomMapController::class, 'clone'])->name('maps.custom.clone');
+        Route::post('custom/{map}/clone', [CustomMapController::class, 'clone'])->name('maps.custom.clone');
         Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
-        Route::get('devicedependency', [Maps\DeviceDependencyController::class, 'dependencyMap']);
+        Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
         Route::post('getgeolinks', [Maps\MapDataController::class, 'getGeographicLinks'])->name('maps.getgeolinks');
@@ -168,7 +168,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
 
-        Route::get('plugin/settings', \App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
+        Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
         Route::post('plugin/settings/{plugin:plugin_name}', [PluginSettingsController::class, 'update'])->name('plugin.update');
 
