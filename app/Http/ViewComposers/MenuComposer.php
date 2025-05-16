@@ -64,7 +64,7 @@ class MenuComposer
         $vars = [];
         /** @var User $user */
         $user = Auth::user();
-        $site_style = Config::get('applied_site_style');
+        $site_style = session('applied_site_style');
 
         //global Settings
         $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
