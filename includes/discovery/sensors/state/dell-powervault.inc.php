@@ -22,7 +22,7 @@ if (is_array($pre_cache['dell-powervault'])) {
 
             create_state_index($descr, $states);
 
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, $null, $value);
+            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
         }
     }
 }

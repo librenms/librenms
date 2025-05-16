@@ -861,9 +861,10 @@ ipv4_mac:
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv4_address, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ipv4_mac_device_id_index: { Name: ipv4_mac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ipv4_mac_mac_address_index: { Name: ipv4_mac_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ipv4_mac_port_id_index: { Name: ipv4_mac_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_networks:
@@ -895,9 +896,11 @@ ipv6_nd:
     - { Field: device_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv6_address, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ipv6_nd_device_id_index: { Name: ipv6_nd_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ipv6_nd_port_id_index: { Name: ipv6_nd_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv6_networks:
   Columns:
     - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

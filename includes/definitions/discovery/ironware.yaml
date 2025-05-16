@@ -32,6 +32,7 @@ modules:
                 -
                     oid:
                         - ifDescr
+                        - snAgentTemp2SensorDescr
         dbm:
             data:
                 -
@@ -64,6 +65,19 @@ modules:
                     divisor: 2
                     num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
                     descr: snAgentTempSensorDescr
+                    index: '{{ $index }}'
+                    group: 'Module Temperatures'
+                    skip_values:
+                        -
+                            oid: snAgentTemp2SensorDescr.1.1.1
+                            op: 'exists'
+                            value: true
+                -
+                    oid: snAgentTemp2Table
+                    value: snAgentTemp2Value
+                    divisor: 2
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.3.1.5.{{ $index }}'
+                    descr: '{{ $subindex0 }}/{{ $subindex1 }} {{ $snAgentTemp2SensorDescr }}'
                     index: '{{ $index }}'
                     group: 'Module Temperatures'
                 -

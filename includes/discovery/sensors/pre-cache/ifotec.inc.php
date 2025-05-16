@@ -41,6 +41,9 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
         // .ifoTemperatureTable.ifoTemperatureEntry.<ifoSysProductIndex>
         $data = snmp_walk($device, 'ifoTemperatureEntry', '-OQn', 'IFOTEC-SMI');
         foreach (explode(PHP_EOL, $data) as $line) {
+            if (! Str::contains($line, ' = ')) {
+                continue;
+            }
             [$oid, $value] = explode(' = ', $line);
 
             $processed = false;

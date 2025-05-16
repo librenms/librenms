@@ -197,6 +197,10 @@ class Lcoslx extends OS implements
                 continue;
             }
 
+            if (! isset($entry['lcosLXStatusWLANStationEntryPhySignal'])) {
+                continue;
+            }
+
             $sensors[$bssid] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
@@ -251,7 +255,7 @@ class Lcoslx extends OS implements
                     'lcos-rx',
                     $bssid,
                     'RX Rate ' . $entry['lcosLXStatusWLANStationEntryNetworkName'] . " $bssid",
-                    $entry['lcosLXStatusWLANStationEntryEffTxRate'],
+                    $entry['lcosLXStatusWLANStationEntryEffRxRate'],
                     1000000
                 );
             }
