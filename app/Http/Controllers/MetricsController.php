@@ -40,10 +40,10 @@ class MetricsController extends Controller
     public function index(Request $request, AboutMetrics $aboutMetrics, CollectorRegistry $registry)
     {
         if (Config::get('prometheus_metrics.enable', false)) {
-            $port =  Config::get('prometheus_metrics.port');
+            $port = Config::get('prometheus_metrics.port');
             if ($port) {
                 if ($request->getPort() !== $port) {
-                    abort(404, 'Metrics exposed on ' . $port );
+                    abort(404, 'Metrics exposed on ' . $port);
                 }
             }
 
