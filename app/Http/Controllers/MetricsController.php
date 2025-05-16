@@ -52,9 +52,10 @@ class MetricsController extends Controller
 
             // Register and set each gauge
             foreach ($stats as $name => $value) {
+                $metric_name = preg_replace('/^stat_/', 'qty_', $name);
                 $gauge = $registry->getOrRegisterGauge(
                     'librenms',        // namespace
-                    "{$name}",   // metric name
+                    "{$metric_name}",   // metric name
                     "",    // help
                     []                 // no labels
                 );
