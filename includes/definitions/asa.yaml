@@ -7,6 +7,9 @@ icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 poller_modules:
     applications: false
     bgp-peers: false
