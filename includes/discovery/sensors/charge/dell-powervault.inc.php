@@ -16,7 +16,7 @@ if (is_array($pre_cache['dell-powervault'])) {
             $value = $matches[1];
             $descr = implode(':', $connUnitSensorMessage);
 
-            discover_sensor($valid['sensor'], 'charge', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
+            discover_sensor(null, 'charge', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
         }
     }
 }

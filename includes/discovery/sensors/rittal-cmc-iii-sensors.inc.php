@@ -24,6 +24,7 @@
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
 
+use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
@@ -43,7 +44,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         $current_index_prefix = $index_r[0];
     }
 
-    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
+    if ((! isset($cmc_iii_sensors[$sensor_id]['name']) || $cmc_iii_sensors[$sensor_id]['name'] != $sensor_name) || $last_index_prefix != $current_index_prefix) {
         if ($sensor_id == 0) {
             $sensor_id = 1;
         } else {
@@ -90,9 +91,9 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $cmc_iii_sensors[$sensor_id]['oid'] = '.1.3.6.1.4.1.2606.7.4.2.2.1.11.' . $index;
 
             if (! empty($entry['cmcIIIVarValueInt'])) {
-                $cmc_iii_sensors[$sensor_id]['value'] = $entry['cmcIIIVarValueInt'];
+                $cmc_iii_sensors[$sensor_id]['value'] = Number::cast($entry['cmcIIIVarValueInt']);
             } else {
-                $cmc_iii_sensors[$sensor_id]['value'] = $entry['cmcIIIVarValueStr'];
+                $cmc_iii_sensors[$sensor_id]['value'] = Number::cast($entry['cmcIIIVarValueStr']);
             }
 
             if ($entry['cmcIIIVarScale'][0] == '-') {

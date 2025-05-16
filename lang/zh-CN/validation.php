@@ -156,7 +156,6 @@ return [
     'alpha_space' => ':attribute 只能包含字母、数字、下划线和空格。',
     'ip_or_hostname' => ':attribute 必须是一个有效的IP地址/网络或主机名。',
     'is_regex' => ':attribute 不是一个有效的正则表达式',
-    'keys_in' => ':attribute 包含无效的键: :extra。有效键为: :values',
 
     /*
     |--------------------------------------------------------------------------
@@ -292,7 +291,7 @@ return [
                 'not_detected' => 'Python包装器cron条目不存在',
             ],
             'CheckRedis' => [
-                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_DRIVER=redis',
+                'bad_driver' => '使用:driver进行锁定，您应设置CACHE_STORE=redis',
                 'ok' => 'Redis功能正常',
                 'unavailable' => 'Redis不可用',
             ],

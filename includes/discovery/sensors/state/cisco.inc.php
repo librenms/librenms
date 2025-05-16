@@ -218,7 +218,7 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
                     $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
-                    $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
+                    $descr = $tablevalue['descr'] . ($stack_port_descr['ifDescr'] ?? null);
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {

@@ -90,8 +90,13 @@ class DynamicConfigItem implements \ArrayAccess
                 return false;
             }
 
-            foreach ($value as $v) {
+            foreach ($value as $key => $v) {
                 if (! is_array($v)) {
+                    return false;
+                }
+
+                // check keys not empty
+                if (is_string($key) && strlen(trim($key)) == 0) {
                     return false;
                 }
             }
