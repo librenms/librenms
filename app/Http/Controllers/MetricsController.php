@@ -56,7 +56,7 @@ class MetricsController extends Controller
                 $gauge = $registry->getOrRegisterGauge(
                     'librenms',        // namespace
                     "{$metric_name}",   // metric name
-                    "",    // help
+                    '',    // help
                     []                 // no labels
                 );
                 $gauge->set($value);
