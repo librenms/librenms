@@ -42,12 +42,17 @@ class MplsSdpBind extends Model implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\MplsSdp, $this>
+     */
     public function sdp(): BelongsTo
     {
         return $this->belongsTo(MplsSdp::class, 'sdp_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\MplsService, $this>
+     */
     public function service(): BelongsTo
     {
         return $this->belongsTo(MplsService::class, 'svc_id');

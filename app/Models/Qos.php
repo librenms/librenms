@@ -38,11 +38,17 @@ class Qos extends Model implements Keyable
         return $this->device_id . '-' . $this->type . '-' . $this->rrd_id;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Qos, $this>
+     */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Qos::class, 'parent_id', 'qos_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Qos, $this>
+     */
     public function children(): HasMany
     {
         return $this->hasMany(Qos::class, 'qos_id', 'parent_id');

@@ -16,8 +16,6 @@
  * @author     LibreNMS Contributors
 */
 
-$graph_type = 'sensor_temperature';
-$unit = '°C';
 $class = 'temperature';
 
 require 'includes/html/pages/health/sensors.inc.php';
