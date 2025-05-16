@@ -38,6 +38,7 @@ class PrometheusServiceProvider extends ServiceProvider
         $this->app->singleton(CollectorRegistry::class, function () {
             // Use the in-memory adapter:
             $adapter = new InMemory();
+
             return new CollectorRegistry($adapter);
         });
     }

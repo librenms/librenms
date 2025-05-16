@@ -27,9 +27,8 @@
 namespace App\Http\Controllers;
 
 use App;
-
-use App\Services\AboutMetrics;
 use App\Models\Callback;
+use App\Services\AboutMetrics;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
@@ -59,12 +58,12 @@ class AboutController extends Controller
             'version_python' => $version->python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool' => Rrd::version(),
-            'version_netsnmp' => str_replace('version: ', '', rtrim(shell_exec(Config::get('snmpget', 'snmpget') . ' -V 2>&1'))),          
+            'version_netsnmp' => str_replace('version: ', '', rtrim(shell_exec(Config::get('snmpget', 'snmpget') . ' -V 2>&1'))),
         ];
 
         $metrics = $aboutMetrics->collect();
 
-        return view('about.index', array_merge( $static, $metrics ));
+        return view('about.index', array_merge($static, $metrics));
     }
 
     public function clearReportingData(): JsonResponse
