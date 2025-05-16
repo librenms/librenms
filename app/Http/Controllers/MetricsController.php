@@ -26,9 +26,9 @@
 
 namespace App\Http\Controllers;
 
-use LibreNMS\Config;
-use Illuminate\Http\Request;
 use App\Services\AboutMetrics;
+use Illuminate\Http\Request;
+use LibreNMS\Config;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
 
@@ -39,9 +39,9 @@ class MetricsController extends Controller
      */
     public function index(Request $request, AboutMetrics $aboutMetrics, CollectorRegistry $registry)
     {
-        if(Config::get('prometheus_metrics.enable', false)){
-            if(Config::get('prometheus_metrics.port')){
-                if($request->getPort() !== Config::get('prometheus_metrics_port')){
+        if (Config::get('prometheus_metrics.enable', false)) {
+            if (Config::get('prometheus_metrics.port')) {
+                if ($request->getPort() !== Config::get('prometheus_metrics_port')) {
                     abort(404);
                 }
             }
@@ -62,7 +62,7 @@ class MetricsController extends Controller
 
             // Render Prometheus text format
             $renderer = new RenderTextFormat();
-            $body     = $renderer->render($registry->getMetricFamilySamples());
+            $body = $renderer->render($registry->getMetricFamilySamples());
 
             return response($body, 200)
                ->header('Content-Type', RenderTextFormat::MIME_TYPE);
