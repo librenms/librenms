@@ -6014,7 +6014,7 @@
             "type": "color"
         },
         "rrdgraph_def_text_color_dark": {
-            "default": "bfc0c0",
+            "default": "f8f9f9",
             "type": "color"
         },
         "rrdgraph_real_percentile": {
