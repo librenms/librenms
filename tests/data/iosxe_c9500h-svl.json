@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "CAT2223L007",
                     "icon": "cisco.svg"
                 }
             ]
