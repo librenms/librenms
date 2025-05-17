@@ -28,9 +28,11 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\CustomMap;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use LibreNMS\Config;
 
-class CustomMapController extends WidgetController
+class CustomMapController extends WidgetController implements HasMiddleware
 {
     protected $title = 'Custom Map';
     protected $defaults = [
@@ -39,9 +41,15 @@ class CustomMapController extends WidgetController
         'screenshot' => false,
     ];
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(CustomMap::class, 'map');
+        return [
+            new Middleware('can:viewAny,App\Models\CustomMap', only: ['index']),
+            new Middleware('can:view,map', only: ['show']),
+            new Middleware('can:create,App\Models\CustomMap', only: ['create', 'store']),
+            new Middleware('can:update,map', only: ['edit', 'update']),
+            new Middleware('can:delete,map', only: ['destroy']),
+        ];
     }
 
     public function getView(Request $request)

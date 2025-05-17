@@ -25,7 +25,7 @@ class VlanDevicesController extends TableController
 
     protected function baseQuery(Request $request)
     {
-        $this->validate($request, ['vlan' => 'integer']);
+        $request->validate(['vlan' => 'integer']);
         $this->vlanId = $request->get('vlan', 1);
 
         return Device::distinct()

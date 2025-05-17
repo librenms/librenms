@@ -27,14 +27,12 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NotesController implements DeviceTab
 {
-    use AuthorizesRequests;
-
     public function visible(Device $device): bool
     {
         return true;
@@ -69,7 +67,7 @@ class NotesController implements DeviceTab
      */
     public function update(Request $request, Device $device)
     {
-        $this->authorize('update-notes', $device);
+        Gate::authorize('update-notes', $device);
 
         $device->notes = $request->input('note');
         $device->save();

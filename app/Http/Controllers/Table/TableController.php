@@ -57,7 +57,7 @@ abstract class TableController extends PaginatedAjaxController
      */
     public function __invoke(Request $request)
     {
-        $this->validate($request, $this->rules());
+        $request->validate($this->rules());
 
         /** @var Builder $query */
         $query = $this->baseQuery($request);

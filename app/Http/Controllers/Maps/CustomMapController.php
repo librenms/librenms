@@ -34,15 +34,23 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 
-class CustomMapController extends Controller
+class CustomMapController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(CustomMap::class, 'map');
+        return [
+            new Middleware('can:viewAny,App\Models\CustomMap', only: ['index']),
+            new Middleware('can:view,map', only: ['show']),
+            new Middleware('can:create,App\Models\CustomMap', only: ['create', 'store']),
+            new Middleware('can:update,map', only: ['edit', 'update']),
+            new Middleware('can:delete,map', only: ['destroy']),
+        ];
     }
 
     public function index(): View

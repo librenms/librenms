@@ -32,11 +32,14 @@ use App\Models\UserPref;
 use App\Models\UserWidget;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Config;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
     /** @var string[] */
     public static $widgets = [
@@ -66,9 +69,15 @@ class DashboardController extends Controller
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->authorizeResource(Dashboard::class, 'dashboard');
+        return [
+            new Middleware('can:viewAny,App\Models\Dashboard', only: ['index']),
+            new Middleware('can:view,dashboard', only: ['show']),
+            new Middleware('can:create,App\Models\Dashboard', only: ['create', 'store']),
+            new Middleware('can:update,dashboard', only: ['edit', 'update']),
+            new Middleware('can:delete,dashboard', only: ['destroy']),
+        ];
     }
 
     /**
@@ -177,7 +186,7 @@ class DashboardController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'dashboard_name' => 'string|max:255',
         ]);
 
@@ -197,7 +206,7 @@ class DashboardController extends Controller
 
     public function update(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $validated = $this->validate($request, [
+        $validated = $request->validate([
             'dashboard_name' => 'string|max:255',
             'access' => 'int|in:0,1,2',
         ]);
@@ -224,13 +233,13 @@ class DashboardController extends Controller
 
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
             'target_user_id' => 'required|exists:App\Models\User,user_id',
         ]);
 
         $target_user_id = $request->get('target_user_id');
 
-        $this->authorize('copy', [$dashboard, $target_user_id]);
+        Gate::authorize('copy', [$dashboard, $target_user_id]);
 
         $dashboard_copy = $dashboard->replicate()->fill([
             'user_id' => $target_user_id,

@@ -42,7 +42,7 @@ class GraylogStreamsController extends Controller
      */
     public function __invoke(Request $request, GraylogApi $api)
     {
-        $this->validate($request, [
+        $request->validate([
             'limit' => 'int',
             'page' => 'int',
             'term' => 'nullable|string',

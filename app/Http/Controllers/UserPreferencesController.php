@@ -30,6 +30,7 @@ use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
@@ -38,13 +39,15 @@ use LibreNMS\Config;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
-class UserPreferencesController extends Controller
+class UserPreferencesController extends Controller implements HasMiddleware
 {
     private $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -123,7 +126,7 @@ class UserPreferencesController extends Controller
             'global_search_ctrlf_focus' => 'required|integer',
         ];
 
-        $this->validate($request, [
+        $request->validate([
             'pref' => ['required', Rule::in(array_keys($valid_prefs))],
             'value' => $valid_prefs[$request->pref] ?? 'required|integer',
         ]);

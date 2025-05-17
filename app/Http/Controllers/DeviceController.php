@@ -6,11 +6,11 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Carbon\Carbon;
-use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Debug;
@@ -76,9 +76,9 @@ class DeviceController extends Controller
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
             $port = $device->ports()->findOrFail($vars->get('port'));
-            $this->authorize('view', $port);
+            Gate::authorize('view', $port);
         } else {
-            $this->authorize('view', $device);
+            Gate::authorize('view', $device);
         }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');

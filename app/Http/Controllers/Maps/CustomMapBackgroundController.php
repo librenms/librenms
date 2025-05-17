@@ -32,12 +32,13 @@ use App\Models\CustomMapBackground;
 use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 
 class CustomMapBackgroundController extends Controller
 {
     public function get(CustomMap $map)
     {
-        $this->authorize('view', $map);
+        Gate::authorize('view', $map);
 
         if ($map->background_type !== 'image') {
             abort(404);
@@ -63,8 +64,8 @@ class CustomMapBackgroundController extends Controller
 
     public function save(FormRequest $request, CustomMap $map)
     {
-        $this->authorize('update', $map);
-        $this->validate($request, [
+        Gate::authorize('update', $map);
+        $request->validate([
             'type' => 'in:image,color,map,none',
             'image' => 'required_if:type,image|mimes:png,jpg,svg,gif',
             'color' => 'required_if:type,color|regex:/^#[0-9a-f]{6,8}$/',
