@@ -5,7 +5,6 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
 $oids = SnmpQuery::cache()->options('-OteQUsab')->walk('FCMGMT-MIB::connUnitSensorTable')->valuesByIndex();
 
 if (is_array($oids)) {
