@@ -16,7 +16,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $graph_params->scale_min = 0;
 
-if (\LibreNMS\Config::get('applied_site_style') != 'dark') {
+if (session('applied_site_style') != 'dark') {
     // light
     $line_color = '#36393d';
     $jitter_color = '#ccd2decc';

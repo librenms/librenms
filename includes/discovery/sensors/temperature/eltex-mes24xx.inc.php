@@ -45,7 +45,8 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
             $high_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'];
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'];
             $low_limit = $data['eltexPhyTransceiverDiagnosticLowAlarmThreshold'];
-            $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+            $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.1.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([

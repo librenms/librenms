@@ -224,8 +224,8 @@ if ($device['os_group'] == 'cisco') {
                         }
                     }
                     if ($tmp_ifindex != 0) {
-                        $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
-                        if (is_array($tmp_port)) {
+                        $port_id = PortCache::getIdFromIfIndex($tmp_ifindex, $device['device_id']);
+                        if ($port_id) {
                             $entPhysicalIndex = $phys_index;
                             $entry['entSensorMeasuredEntity'] = 'ports';
                             $group = 'transceiver';

@@ -150,20 +150,6 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_index_cache($device_id, $ifIndex)
-{
-    global $port_index_cache;
-
-    if (isset($port_index_cache[$device_id][$ifIndex]) && is_array($port_index_cache[$device_id][$ifIndex])) {
-        $port = $port_index_cache[$device_id][$ifIndex];
-    } else {
-        $port = get_port_by_ifIndex($device_id, $ifIndex);
-        $port_index_cache[$device_id][$ifIndex] = $port;
-    }
-
-    return $port;
-}
-
 function get_port_by_ifIndex($device_id, $ifIndex)
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);

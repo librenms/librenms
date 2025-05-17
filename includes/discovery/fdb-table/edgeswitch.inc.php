@@ -30,8 +30,7 @@ use LibreNMS\Util\Mac;
 $binding = snmpwalk_group($device, 'agentDynamicDsBindingTable', 'EdgeSwitch-SWITCHING-MIB', 1);
 
 foreach ($binding as $mac => $data) {
-    $port = get_port_by_index_cache($device['device_id'], $data['agentDynamicDsBindingIfIndex']);
-    $port_id = $port['port_id'];
+    $port_id = PortCache::getIdFromIfIndex($data['agentDynamicDsBindingIfIndex'], $device['device_id']);
     $mac_address = Mac::parse($mac)->hex();
     $vlan_id = $data['agentDynamicDsBindingVlanId'] ?: 0;
     $insert[$vlan_id][$mac_address]['port_id'] = $port_id;

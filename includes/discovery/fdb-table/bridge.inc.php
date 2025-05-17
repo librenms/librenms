@@ -49,8 +49,7 @@ if (! empty($fdbPort_table)) {
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
         if (isset($data['dot1dBasePortIfIndex'])) {
-            $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-            $portid_dict[$portLocal] = $port['port_id'];
+            $portid_dict[$portLocal] = \App\Facades\PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
         }
     }
 

@@ -26,14 +26,25 @@
 
 namespace App\Http\Controllers\Ajax;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ResolutionController extends Controller
+class SessionController
 {
-    public function set(Request $request)
+    public function style(Request $request): JsonResponse
     {
-        $this->validate($request, [
+        $request->validate([
+            'style' => 'required|string|in:dark,light',
+        ]);
+
+        $request->session()->put('applied_site_style', $request->style);
+
+        return response()->json(['style' => $request->style]);
+    }
+
+    public function resolution(Request $request): string
+    {
+        $request->validate([
             'width' => 'required|numeric',
             'height' => 'required|numeric',
         ]);

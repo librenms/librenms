@@ -210,7 +210,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('search/port', Ajax\PortSearchController::class);
         Route::post('set_map_group', [Ajax\AvailabilityMapController::class, 'setGroup']);
         Route::post('set_map_view', [Ajax\AvailabilityMapController::class, 'setView']);
-        Route::post('set_resolution', [Ajax\ResolutionController::class, 'set']);
+        Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
+        Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::get('netcmd', [Ajax\NetCommand::class, 'run']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
         Route::get('snmp/capabilities', Ajax\SnmpCapabilities::class)->name('snmp.capabilities');
