@@ -254,7 +254,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('table')->group(function () {
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
-            Route::post('diskio', Table\DiskioController::class)->name('table.diskio');;
+            Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class);
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SensorController.php
  *
@@ -53,7 +54,7 @@ class SensorController
             default => ucfirst($metric),
         };
 
-        $blade_view = match($metric) {
+        $blade_view = match ($metric) {
             'mempool' => 'sensor.mempool',
             'processor' => 'sensor.processor',
             'storage' => 'sensor.storage',
