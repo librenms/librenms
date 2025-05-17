@@ -33,6 +33,14 @@ return new class extends Migration
      */
     private function moveFiles(string $old_discovery_dir, string $new_discovery_dir): void
     {
+        if (! is_dir($old_discovery_dir)) {
+            return; // nothing to do
+        }
+
+        if (! is_dir($new_discovery_dir)) {
+            mkdir($new_discovery_dir);
+        }
+
         foreach (new DirectoryIterator($old_discovery_dir) as $fileinfo) {
             if ($fileinfo->isDot()) {
                 continue;
