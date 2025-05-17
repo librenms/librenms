@@ -1,0 +1,1543 @@
+FOURELLE-VENTURI2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    Integer32 
+        FROM SNMPv2-SMI
+    venturiWireless
+        FROM VENTURI-WIRELESS-SMI
+;
+
+
+venturi2 MODULE-IDENTITY
+    LAST-UPDATED    "201101030000Z"
+    ORGANIZATION    "Venturi Wireless"
+    CONTACT-INFO
+       "Contact:  Customer Support
+
+        Postal:   Venturi Wireless
+                  490 North McCarthy Boulevard
+                  Milpitas, California, USA 95035
+
+        Phone:    408-215-5100
+        FAX:      408-215-5105
+
+        Web:      www.venturiwireless.com
+        
+        E-mail:   VenturiCustomerOps@venturiwireless.com"
+
+    DESCRIPTION
+        "The Venturi Rel 2 MIB module.
+
+          Copyright 2004-2011 Venturi Wireless
+          All rights reserved.
+
+          This MIB module specifies the overall structure
+          of Venturi Wireless SNMP accessible management information."
+
+    REVISION    "201101030000Z"
+        DESCRIPTION
+            "2.7 - Updated copyright date to 2011"
+
+    REVISION    "201001060000Z"
+        DESCRIPTION 
+            "2.6 - Updated copyright date to 2010"
+        
+    REVISION    "200504260000Z"
+        DESCRIPTION
+            "2.5 - Add two new traps:
+                          venturi2LowCriticalBufs 
+                          venturi2LowCriticalBufsClear 
+            "
+
+    REVISION    "200411300000Z"
+        DESCRIPTION
+            "2.4 - added to statistics
+                     appStatsEntry.asFromClientless
+                     appStatsEntry.asToClientless
+                     statFromClientlessOctets
+                     statToClientlessOctets
+                    
+                   added to statistics64
+                     appStatsEntry64.asFromClientless64
+                     appStatsEntry64.asToClientless64
+                     statFromClientlessOctets64
+                     statToClientlessOctets64
+
+                   add new trap
+                     venturi2URLCollectionTrap
+            "
+
+
+    REVISION    "200408230000Z"
+        DESCRIPTION
+            "2.3 - Deprecate the following traps:
+                          venturi2droppedPackets 
+                          venturi2duplicatePackets
+                          venturi2outOfSequencePackets
+                          venturi2timeSyncError
+                          venturi2internalError 
+                          venturi2serverOverload
+                          venturi2diskOverload
+                          venturi2cpuOverload
+                          venturi2memoryOverload
+                          venturi2optimizationFailure
+                          
+                   Replace serverOverload with 
+                          venturi2TCPOverload
+
+                   Replace internalError with 
+                          venturi2networkErrorTrap
+                          venturi2kernelTrap 
+                          venturi2licenseTrap
+                          venturi2sharedMemoryTrap
+                          venturi2fileSystemTrap
+
+                   Replace venturi2diskOverload with 
+                          venturi2CacheOverload
+                          venturi2LogOverload
+
+                   Add clears for serveral of the traps:
+                          venturi2swapOverloadClear
+                          ventur12networkClear
+                          ventur12kernelClear
+                          ventur12licenseClear
+                          ventur12sharedMemoryClear
+                          ventur12fileSystemClear
+                          venturi2TCPOverloadClear
+                          venturi2CacheOverloadClear
+                          venturi2LogOverloadClear
+
+                   Add the following to the trapInfo section:
+                          trapSeverity
+                          ftpHost
+                          ftpUser
+                          ftpDirectory
+                          timeout
+                          retries
+                         
+                   Add trapSeverity to the varbind list of all traps. "
+
+    REVISION    "200405190000Z"
+        DESCRIPTION
+            "2.2 - Prefix trap names with 'venturi2' to make them
+                   unique (HP Openview requirement)."
+        
+    REVISION    "200401050000Z"
+        DESCRIPTION
+            "2.1 - Add serverOverloadTrap.
+                   Add OBJECTS to trap definitions.
+                   Fix some MIB validation problems."
+
+    REVISION    "200303270000Z"
+        DESCRIPTION
+            "2.0 - Company name change."
+
+    REVISION    "200207310000Z"
+        DESCRIPTION
+            "1.3 - Added CPU Utilization and compressor queue depth stats.
+                   Also removed references to configurable thresholds 
+                   that are not really configurable."
+
+    REVISION    "200206101500Z"
+        DESCRIPTION
+            "1.2 - Addition of sysNumCPUs."
+
+    REVISION    "200206100000Z"
+        DESCRIPTION
+            "1.1 - Addition of 64-bit tables, more stats, and appStatsTable."
+
+    REVISION    "200107160000Z"
+        DESCRIPTION
+            "1.0 - Initial document."
+
+    ::= { venturiWireless 2 }
+
+
+-----------------------------------------------
+--  Divisions within this MIB
+-----------------------------------------------
+traps OBJECT IDENTIFIER      ::= { venturi2 0 }
+general OBJECT IDENTIFIER    ::= { venturi2 1 }
+trapInfo OBJECT IDENTIFIER   ::= { venturi2 2 }
+
+
+-------------------------------
+--  Traps
+-------------------------------
+
+venturi2Started NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS     current
+    DESCRIPTION
+        " Trap issued when Venturi software starts execution. "
+
+    --#TYPE      "Venturi Software (re)start completed successfully."
+    --#SUMMARY   "VenturiServer: Software (re)start completed successfully.  "
+    --#SUMMARY   "If not intentional, contact Venturi."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 1 }
+
+venturi2Stopped NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when Venturi software is shutting down. "
+
+    --#TYPE      "Venturi Software stopped."
+    --#SUMMARY   "VenturiServer: Software stopped.  "
+    --#SUMMARY   "If venturi Started alarm does not follow, contact Venturi."
+    --#SEVERITY CRITICAL
+    ::= { traps 2 }
+
+venturi2cpuOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when the Venturi server's CPUs are overloaded. 
+        (Trap currently not generated.)"
+    ::= { traps 3 }
+
+venturi2memoryOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, currentValue, threshold, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when current the Venturi server is out of
+          free memory. (Trap currently not generated)."
+    ::= { traps 4 }
+
+venturi2diskOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, totalPercent, threshold, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when the free space on any file system 
+          (flash disk or HDD) is under 5%." 
+
+    --#TYPE      "Disk Overload"
+    --#SUMMARY   "VenturiServer: Free disk space is under %d percent for disk: %s."
+    --#ARGUMENTS  { 5, 3 }
+    --#SEVERITY MINOR
+    ::= { traps 5 }
+
+venturi2diskFailure NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued on a failure of the hard disk. "
+
+    --#TYPE      "Disk Failure"
+    --#SUMMARY   "VenturiServer: Disk %s has failed."
+    --#ARGUMENTS  { 3 }
+    --#SEVERITY CRITICAL
+    ::= { traps 6 }
+
+venturi2optimizationFailure     NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Currently not issued.  Reserved for a trap issued when 
+          on a compression/decompression error. "
+    ::= { traps 7 }
+
+venturi2duplicatePackets NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, totalPercent, threshold, totalCount, timeWindow, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when the duplicate packet rate on the Venturi
+          Transport over all connected users has exceeded 6% over the
+          past 2 seconds."
+
+    --#TYPE      "Duplicate packet error."
+    --#SUMMARY   "VenturiServer: Duplicate pkt. (%d percent) exceeded threshold (%d percent)."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY MINOR
+    ::= { traps 8 }
+
+venturi2droppedPackets NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, totalPercent, threshold, totalCount, timeWindow, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when the dropped (discarded) packet rate on the
+          Venturi Transport over all connected users has exceeded 6% 
+          over the past 2 seconds."
+
+    --#TYPE      "Dropped packet error."
+    --#SUMMARY   "VenturiServer: Dropped pkt. (%d percent) exceeded threshold (%d percent)."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY MINOR
+    ::= { traps 9 }
+
+venturi2outOfSequencePackets NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, totalPercent, threshold, totalCount, timeWindow, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when the out-of-sequence packet rate on the 
+          Venturi Transport over all connected users has exceeded 6% 
+          over the past 2 seconds."
+
+    --#TYPE      "Out of sequence packet error."
+    --#SUMMARY   "VenturiServer: Out of sequence pkt. (%d percent) exceeded threshold (%d percent)."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY MINOR
+    ::= { traps 10 }
+
+venturi2testTrap NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued at user request.  The product user interface
+          has an option to issue a test trap as a diagnostic tool. "
+
+    --#TYPE      "Test Trap"
+    --#SUMMARY   "VenturiServer: Test trap was generated."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 11 }
+
+venturi2fanAlarm NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, fan, currentValue, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the speed of one of the fans falls below
+          an acceptable threshold. "
+
+    --#TYPE      "Fan Alarm"
+    --#SUMMARY   "VenturiServer: Fan %s failing (current RPM=%d, should be above %d)."
+    --#ARGUMENTS  { 3, 4, 5 }
+    --#SEVERITY CRITICAL
+    ::= { traps 12 }
+
+venturi2powerSupplyAlarm NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, powerSupplyLead, cur, min, max, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when one of the voltages from the power
+          supply is out of spec by an unacceptable amount. "
+
+    --#TYPE      "Power Supply Alarm"
+    --#SUMMARY   "VenturiServer: Supply Lead (%s) voltage bad (cur=%s, min=%s, max=%s)."
+    --#ARGUMENTS  { 3, 4, 5, 6 }
+    --#SEVERITY CRITICAL
+    ::= { traps 13 }
+
+venturi2temperatureAlarm NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, name, currentValue, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the temperature of the system exceeds
+          an acceptable level. "
+
+    --#TYPE      "Temperature Alarm"
+    --#SUMMARY   "VenturiServer: Temperature Sensor (%s) is too hot (cur %d deg.; max %d deg.)."
+    --#ARGUMENTS  { 3, 4, 5 }
+    --#SEVERITY CRITICAL
+    ::= { traps 14 }
+
+venturi2licensesExceeded NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the use of the system has exceeded
+          the number of licenses purchased. "
+
+    --#TYPE      "Licenses exceeded"
+    --#SUMMARY   "VenturiServer: Licenses exceeded on system."
+    --#SEVERITY MINOR
+    ::= { traps 15 }
+
+venturi2swapOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, currentValue, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the Venturi server is out of swap space."
+
+    --#TYPE      "Swap Overload"
+    --#SUMMARY   "VenturiServer: Out of swap space (currently %d percent used)."
+    --#ARGUMENTS  { 3 }
+    --#SEVERITY MINOR
+    ::= { traps 16 }
+
+venturi2fileOpenFailed NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, filename, openFlags, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued on failure of a file open.  This may 
+          indicate a configuration error."
+
+    --#TYPE      "File Open Failed"
+    --#SUMMARY   "VenturiServer: Failed to open file %s with flags %s."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY CRITICAL
+    ::= { traps 17 }
+
+venturi2timeSyncError NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, timeSyncMethod, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued on time synchronization failure."
+
+    --#TYPE      "Time sync failure"
+    --#SUMMARY   "VenturiServer: Time sync failure (method used=%s)."
+    --#ARGUMENTS  { 3 }
+    --#SEVERITY MAJOR
+    ::= { traps 18 }
+
+venturi2internalError NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, extraInfo, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap is generated when content being optimized is processed with 
+    unexpected results.  Trap varBinds provides mCode/errorCode numbers.  "
+      
+    --#TYPE      "Internal Error"
+    --#SUMMARY   "VenturiServer: Internal Error."
+    --#SEVERITY MAJOR
+    ::= { traps 19 }
+
+venturi2moduleInitFailed NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when Venturi is starting and a module 
+          fails to initialize."
+
+    --#TYPE      "Module Initialization Error"
+    --#SUMMARY   "VenturiServer: Module failed to initialize."
+    --#SEVERITY CRITICAL
+    ::= { traps 20 }
+
+venturi2serverOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, threshold, limit, alarmState, trapSeverity }
+    STATUS    deprecated
+    DESCRIPTION
+        " Trap issued when Venturi enters or exits the overload
+          alarm state.  The trap includes the threshold passed, the 
+          limit value, and the set state.  Threshold is a percent
+          of the limit value.  The limit is the TCP bandwidth 
+          specified for this server.  The alarm state indicates 
+          whether we are entering (1) or leaving (0) the alarm state."
+
+    --#TYPE      "Server Overload Error"
+    --#SUMMARY   "VenturiServer: Capacity Overload state:%d, threshold:%d percent."
+    --#ARGUMENTS  { 5, 3 }
+    --#SEVERITY CRITICAL
+    ::= { traps 21 }
+
+venturi2statsCollectionTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity,
+                filename, ftpHost, ftpUser, ftpDirectory, timeout, retries }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to collecting and uploading
+         statistics to the configured FTP server."
+
+    --#TYPE      "Statistics Collection Error"
+    --#SUMMARY   "VenturiServer: Statistics collection failure."
+    --#SEVERITY MINOR
+    ::= { traps 22 }
+
+venturi2logCollectionTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity,
+                filename, ftpHost, ftpUser, ftpDirectory, timeout, retries }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to collecting and uploading
+         event logs to the configured FTP server."
+
+    --#TYPE      "Log Collection Error"
+    --#SUMMARY   "VenturiServer: Log collection failure."
+    --#SEVERITY MINOR
+    ::= { traps 23 }
+
+venturi2networkErrorTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to network initialization."
+
+    --#TYPE      "Network Error"
+    --#SUMMARY   "VenturiServer: Network Initialization Error."
+    --#SEVERITY CRITICAL
+    ::= { traps 24 }
+
+venturi2kernelTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to the kernel."
+
+    --#TYPE      "Kernel Error"
+    --#SUMMARY   "VenturiServer: Kernel Errors."
+    --#SEVERITY CRITICAL
+    ::= { traps 25 }
+
+venturi2licenseTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to hardware licensing."
+
+    --#TYPE      "Licence Error"
+    --#SUMMARY   "VenturiServer: Hardware Licensing Errors."
+    --#SEVERITY CRITICAL
+    ::= { traps 26 }
+
+venturi2sharedMemoryTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to shared memory."
+
+    --#TYPE      "Shared Memory Error"
+    --#SUMMARY   "VenturiServer: Shared memory errors."
+    --#SEVERITY CRITICAL
+    ::= { traps 27 }
+
+venturi2fileSystemTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to the file system."
+
+    --#TYPE      "File System Error"
+    --#SUMMARY   "VenturiServer: File System Errors."
+    --#SEVERITY CRITICAL
+    ::= { traps 28 }
+
+venturi2swapOverloadClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with lack of
+         swap space has been cleared."
+
+    --#TYPE      "Swap Overload Clear"
+    --#SUMMARY   "VenturiServer: Clear to earlier Swap Overload problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 30 }
+
+venturi2networkClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with network
+         initialization has been cleared."
+
+    --#TYPE      "System Network Error Clear"
+    --#SUMMARY   "VenturiServer: Clear to Network Interface Initialization Problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 31 }
+
+venturi2kernelClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with the kernel has
+         been cleared."
+
+    --#TYPE      "System Kernel Error Clear"
+    --#SUMMARY   "VenturiServer: Clear to kernel problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 32 }
+
+venturi2licenseClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with hardware
+         licensing has been cleared."
+
+    --#TYPE      "System License Error Clear"
+   --#SUMMARY   "VenturiServer: Clear to license problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 33 }
+
+venturi2sharedMemoryClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with shared
+         memory access has been cleared."
+
+    --#TYPE      "System Shared Memory Error Clear"
+    --#SUMMARY   "VenturiServer: Clear to Shared Memory problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 34 }
+
+venturi2fileSystemClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with file system
+         access has been cleared."
+
+    --#TYPE      "File System Error Clear"
+    --#SUMMARY   "VenturiServer:  Clear to the File System access problem."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 35 }
+
+venturi2TCPOverload  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, threshold, limit, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued when the threshold for the TCP bandwidth has been
+         exceeded on this server.  The trap includes the threshold passed
+         and the limit value.  Threshold is a percent of the limit value.
+         The limit is the TCP bandwidth capacity specified for this server."
+
+    --#TYPE      "TCP Overload"
+    --#SUMMARY   "VenturiServer: Capacity Overload, limit:%d, upper threshold:%d percent."
+    --#ARGUMENTS  { 4, 3 }
+    --#SEVERITY MAJOR
+    ::= { traps 36 }
+
+venturi2TCPOverloadClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, threshold, limit, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate earlier bandwidth overload condition has been cleared."
+
+    --#TYPE      "TCP Overload Clear"
+    --#SUMMARY   "VenturiServer: Clear to Capacity Overload, limit:%d, lower threshold:%d percent."
+    --#ARGUMENTS  { 4, 3 }
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 37 }
+
+venturi2CacheOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, totalPercent, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the free space on cache partition 
+          is under the minimum threshold ." 
+
+    --#TYPE      "Cache Overload"
+    --#SUMMARY   "VenturiServer: Free cache space is under %d percent for partition: %s."
+    --#ARGUMENTS  { 5, 3 }
+    --#SEVERITY MINOR
+    ::= { traps 38 }
+
+venturi2CacheOverloadClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, totalPercent, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with 
+         free cache space has been cleared."
+
+    --#TYPE      "Cache Overload Clear"
+    --#SUMMARY   "VenturiServer: Clear to free cache space problem, partition: %s, free: %d percent."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 39 }
+
+venturi2LogOverload NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, totalPercent, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the free space on log partition 
+          is under the minimum threshold ." 
+
+    --#TYPE      "Log Overload"
+    --#SUMMARY   "VenturiServer: Free log space is under %d percent for partition: %s."
+    --#ARGUMENTS  { 5, 3 }
+    --#SEVERITY MINOR
+    ::= { traps 40 }
+
+venturi2LogOverloadClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, disk, totalPercent, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "Trap issued to indicate that the earlier problem with 
+         free log space has been cleared."
+
+    --#TYPE      "Log Overload Clear"
+    --#SUMMARY   "VenturiServer: Clear to free log space problem, partition: %s, free: %d percent."
+    --#ARGUMENTS  { 3, 4 }
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 41 }
+
+venturi2URLCollectionTrap  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, trapSeverity,
+                filename, ftpHost, ftpUser, ftpDirectory, timeout, retries }
+    STATUS    current
+    DESCRIPTION
+        "Trap generated due to problems related to collecting and uploading
+         event URL logs to the configured FTP server."
+
+    --#TYPE      "URL Log Collection Error"
+    --#SUMMARY   "VenturiServer: URL Log collection failure."
+    --#SEVERITY MINOR
+    ::= { traps 42 }
+
+venturi2LowCriticalBufs NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, currentValue, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        "The server is experiencing a critical low buffer condition.  While 
+         in this condition new client connections will be rejected and only 
+         in-sequence packets will be acknowledged.  This may be experienced
+         as a slowdown in the server and is an indication that the server is
+         operating beyond its capacity.  The trap includes the current number 
+         of free buffers and the threshold.  When the server's free buffer 
+         level drops below this threshold the server enters this condition."
+    --#TYPE      "Low Critical Buffer Condition"
+    --#SUMMARY   "VenturiServer: the server is in a low buffer state. "
+    --#SUMMARY   "If this condition does not clear when traffic levels lower, "
+    --#SUMMARY   "reboot the server.  If this condition clears as traffic levels "
+    --#SUMMARY   "lower and this condition  occurs frequently, consider "
+    --#SUMMARY   "installing additional Venturi capacity."
+    --#SEVERITY CRITICAL
+
+    ::= { traps 43 }
+
+venturi2LowCriticalBufsClear  NOTIFICATION-TYPE
+    OBJECTS    { mCode, errorCode, systemId, currentValue, threshold, trapSeverity }
+    STATUS    current
+    DESCRIPTION
+        " Trap issued when the server normal buffer reserves have been restored."
+    --#TYPE      "Low Critical Buffer Condition Clear"
+    --#SUMMARY   "VenturiServer: the server has returned to normal free buffer levels. "
+    --#SUMMARY   "No action; Venturi has returned to normal operation."
+    --#SEVERITY INFORMATIONAL
+    ::= { traps 44 }
+
+
+-------------------------------
+--  System Global Information
+-------------------------------
+system OBJECT IDENTIFIER ::= { general 1 }
+
+sysType OBJECT-TYPE
+    SYNTAX        BITS {server(0), client(1)}
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether the software is running as a client,
+         a server, or both. 
+         Note:  The BITS syntax describes an object implemented
+                as an OCTET STRING where each of the bits have a
+                meaning.  So, sysType will be returned as a single
+                octet.  The most significant bit of this octet 
+                indicates whether the system is a Venturi server
+                and the next bit indicates whether it is a client.
+                The value returned for a server will be x80, for
+                a client x40, and for a system acting as both client
+                and server xC0.  The values in parentheses next to
+                'client' and 'server' in the definition above indicate
+                the bit number."
+    ::= { system 1 }
+
+sysVersion OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Venturi software version string."
+    ::= { system 2 }
+
+sysStartTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+--    UNITS         "seconds since epoch (midnight, January 1, 1970 GMT)"
+    DESCRIPTION
+        "Time the Venturi software started execution in seconds since epoc
+         (midnight, January 1, 1970 GMT)."
+    ::= { system 3 }
+
+sysUpTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+--    UNITS         "seconds"
+    DESCRIPTION
+        "Number of seconds since the Venturi software was started."
+    ::= { system 4 }
+
+sysBuildId OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The software build identifier."
+    ::= { system 5 }
+
+sysLicenses OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+--    UNITS         "licenses"
+    DESCRIPTION
+        "Number of licenses purchased for this system."
+    ::= { system 6 }
+
+sysLicensesUsed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+--    UNITS         "licenses"
+    DESCRIPTION
+        "Number of licenses currently in use on this system."
+    ::= { system 7 }
+
+sysCustomerId OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Opaque string uniquely identifying the customer."
+    ::= { system 8 }
+
+sysNumCPUs OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of CPUs in this system."
+    ::= { system 9 }
+
+-------------------------------
+-- Statistics
+-------------------------------
+statistics OBJECT IDENTIFIER ::= { general 2 }
+
+statOnlineUsers OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current number of on-line users.  On a client, this will
+        always be 1.  On a server, this is the number of clients
+        currently connected."
+    ::= { statistics 1 }
+
+statCurrentConnections OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current number of TCP connections to external sources
+        (i.e., to sources other than Venturi servers or clients)."
+    ::= { statistics 2 }
+
+statTotalConnections OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of user connections opened since Venturi started."
+    ::= { statistics 3 }
+
+statTotalConnectionDuration OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Sum of the duration of all user connections since Venturi started."
+    ::= { statistics 4 }
+
+statVTPInOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets received by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics 5 }
+
+statVTPOutOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics 6 }
+
+statVTPInPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets received by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics 7 }
+
+statVTPOutPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets sent by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics 8 }
+
+statToCompOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent from VTP Transport to compressor."
+    ::= { statistics 9 }
+
+statFromCompOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets rcvd by VTP Transport from compressor."
+    ::= { statistics 10 }
+
+statExtInOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets received by Venturi from external (nonVTP) sources."
+    ::= { statistics 11 }
+
+statExtOutOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent by Venturi to external (nonVTP) destinations."
+    ::= { statistics 12 }
+
+appStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of application statistics broken down by protocol."
+    ::= { statistics 13 }
+
+appStatsEntry OBJECT-TYPE
+    SYNTAX      AppStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the application statistics table."
+    INDEX       { asRowId } 
+    ::= { appStatsTable 1 }
+
+AppStatsEntry ::=
+    SEQUENCE {
+        asRowId             Integer32,
+        asProtocol          OCTET STRING,
+        asFromExternal      Counter32,
+        asToExternal        Counter32,
+        asFromTransport     Counter32,
+        asToTransport       Counter32,
+        asCurConnections    Gauge32,
+        asNumRequests       Counter32,
+        asMaxRequests       Gauge32,
+        asFromClientless    Counter32,
+        asToClientless      Counter32
+    }
+
+asRowId OBJECT-TYPE
+    SYNTAX        Integer32 (1..7)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Row number of this entry."
+    ::= { appStatsEntry 1 }
+
+asProtocol OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Printable name of the protocol for which the
+         row's statistics apply."
+    ::= { appStatsEntry 2 }
+
+asFromExternal OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered from external (i.e., not from a Venturi
+         client.  For example, this would include bytes received
+         from web servers."
+    ::= { appStatsEntry 3 }
+
+asToExternal OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered to external (i.e., not to a Venturi
+         client.  For example, this would include bytes sent 
+         to web servers."
+    ::= { appStatsEntry 4 }
+
+asFromTransport OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes sent from Venturi Transport to the compressors."
+    ::= { appStatsEntry 5 }
+
+asToTransport OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes sent from compressors to Venturi Transport."
+    ::= { appStatsEntry 6 }
+ 
+asCurConnections OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current number of connections."
+    ::= { appStatsEntry 7 }
+
+asNumRequests OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total requests."
+    ::= {  appStatsEntry 8 }
+
+asMaxRequests OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Maximum requests."
+    ::= { appStatsEntry 9 }
+
+asFromClientless OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered from a clientless browser connection."
+    ::= { appStatsEntry 10 }
+
+asToClientless OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered to a clientless browser connection."
+    ::= { appStatsEntry 11 }
+
+statCpuUtilization OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The overall CPU utilization of the Venturi server as a percent."
+    ::= { statistics 14 }
+
+statQdepth2comp OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of buffers currently queued to the compressors for 
+        processing."
+    ::= { statistics 15 }
+
+statFromClientlessOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of octets received in bypass." 
+    ::= { statistics 16 }
+
+statToClientlessOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of octets sent in bypass."
+    ::= { statistics 17 }
+
+
+-------------------------------
+--  64-bit Statistics
+--
+--  These are 64-bit equivalents of selected variables
+--  under statistics (above)
+-------------------------------
+statistics64 OBJECT IDENTIFIER ::= { general 3 }
+
+statVTPInOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets received by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics64 5 }
+
+statVTPOutOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics64 6 }
+
+statVTPInPkts64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets received by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics64 7 }
+
+statVTPOutPkts64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets sent by Venturi over VTP (Venturi Transport
+        Protocol)."
+    ::= { statistics64 8 }
+
+statToCompOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent from VTP Transport to compressor."
+    ::= { statistics64 9 }
+
+statFromCompOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets rcvd by VTP Transport from compressor."
+    ::= { statistics64 10 }
+
+statExtInOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets received by Venturi from external (nonVTP) sources."
+    ::= { statistics64 11 }
+
+statExtOutOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of octets sent by Venturi to external (nonVTP) destinations."
+    ::= { statistics64 12 }
+
+appStatsTable64 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppStatsEntry64
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of application statistics broken down by protocol."
+    ::= { statistics64 13 }
+
+appStatsEntry64 OBJECT-TYPE
+    SYNTAX      AppStatsEntry64
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the application statistics table."
+    INDEX       { asRowId64 } 
+    ::= { appStatsTable64 1 }
+
+AppStatsEntry64 ::=
+    SEQUENCE {
+        asRowId64           Integer32,
+        asProtocol64        OCTET STRING,
+        asFromExternal64    Counter64,
+        asToExternal64      Counter64,
+        asFromTransport64   Counter64,
+        asToTransport64     Counter64,
+        asCurConnections64  Gauge32,
+        asNumRequests64     Counter64,
+        asMaxRequests64     Gauge32,
+        asFromClientless64  Counter64,
+        asToClientless64    Counter64
+    }
+
+asRowId64 OBJECT-TYPE
+    SYNTAX        Integer32 (1..7)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Row number of this entry."
+    ::= { appStatsEntry64 1 }
+
+asProtocol64 OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Printable name of the protocol for which the
+         row's statistics apply."
+    ::= { appStatsEntry64 2 }
+
+asFromExternal64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered from external (i.e., not from a Venturi
+         client.  For example, this would include bytes received
+         from web servers.  It also includes any data transfered
+         from browsers using the single-sided compressor feature."
+    ::= { appStatsEntry64 3 }
+
+asToExternal64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered to external (i.e., not to a Venturi
+         client.  For example, this would include requests sent 
+         to web servers.  It also includes any data sent to
+         browsers using the single-sided compressor feature."
+    ::= { appStatsEntry64 4 }
+
+asFromTransport64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes sent from Venturi Transport to the compressors."
+    ::= { appStatsEntry64 5 }
+
+asToTransport64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes sent from compressors to Venturi Transport."
+    ::= { appStatsEntry64 6 }
+ 
+asCurConnections64 OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Current number of connections."
+    ::= { appStatsEntry64 7 }
+
+asNumRequests64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Total requests."
+    ::= {  appStatsEntry64 8 }
+
+asMaxRequests64 OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Maximum requests."
+    ::= { appStatsEntry64 9 }
+
+asFromClientless64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered from a clientless browser connection."
+    ::= { appStatsEntry64 10 }
+
+asToClientless64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Bytes transfered to a clientless browser connection."
+    ::= { appStatsEntry64 11 }
+
+statFromClientlessOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of octets received in bypass." 
+    ::= { statistics64 16 }
+
+statToClientlessOctets64 OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of octets sent in bypass."
+    ::= { statistics64 17 }
+
+
+-------------------------------
+--  Trap Information
+--
+--   The objects in this section are not accessible, but describe objects
+--   sent as extra information with one or more of the traps defined above.
+-------------------------------
+
+errorCode OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Error code associated with the trap."
+    ::= { trapInfo 1 }
+
+filename OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Filename associated with the trap."
+    ::= { trapInfo 2 }
+
+fan OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "A string identifying the failing fan."
+    ::= { trapInfo 3 }
+
+openFlags OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..8))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "File open flags."
+    ::= { trapInfo 4 }
+
+mCode OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Major code associated with the trap."
+    ::= { trapInfo 5 }
+
+timeSyncMethod OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Time synchronization method."
+    ::= { trapInfo 6 }
+
+totalPercent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Used in traps like dropped packet, out of seq packets,
+        and dup packets traps, this is the percent of total
+        packets in the time window that were dropped, out of seq,
+        or duplicates.  Meaning is dependent on the trap which 
+        includes this object."
+    ::= { trapInfo 7 }
+
+totalCount OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Used in traps like dropped packet, out of seq packets,
+        and dup packets traps, this is the count of total
+        packets seen in the time window.  Meaning is dependent 
+        on the trap which includes this object."
+    ::= { trapInfo 8 }
+
+threshold OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Used in traps like dropped packet, out of seq packets,
+        and dup packets traps, this is the occurrence threshold.
+        Meaning is dependent on the trap which includes this object."
+    ::= { trapInfo 9 }
+
+timeWindow OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Used in traps like dropped packet, out of seq packets,
+        and dup packets traps, this is the time window (in seconds)
+        over which the count was taken and threshold applied.
+        Meaning is dependent on the trap which includes this object."
+    ::= { trapInfo 10 }
+
+disk OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Disk associated with trap."
+    ::= { trapInfo 11 }
+
+powerSupplyLead OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Power supply lead associated with trap."
+    ::= { trapInfo 12 }
+
+extraInfo OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Optional extra information (e.g., used with internalError trap)."
+    ::= { trapInfo 13 }
+
+systemId OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Unique system identifier.  Value used currently is MAC address of eth0."
+    ::= { trapInfo 14 }
+
+currentValue OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Used in traps which return a current value for some
+         measure, possibly to be compared to a threshold.
+        Meaning is dependent on the trap which includes this object."
+    ::= { trapInfo 15 }
+
+name OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "Name field associated with this trap.  For example in temperature
+        alarm, this would be the name of the termperature sensor.  In general,
+        the meaning of this field is determined by the specific trap including
+        this object."
+    ::= { trapInfo 16 }
+
+cur OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "String representing the current value associated with this trap."
+    ::= { trapInfo 17 }
+
+min OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "String representing the minimum value (low threshold) associated 
+        with this trap."
+    ::= { trapInfo 18 }
+
+max OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "String representing the maximum value (high threshold) associated 
+        with this trap."
+    ::= { trapInfo 19 }
+
+alarmState OBJECT-TYPE
+    SYNTAX        Integer32 (0..1)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This is an ON/OFF indicator for traps that are generated when
+        entering and exiting an alarm state.  For example, the 
+        serverOverload trap is generated both when entering and exiting 
+        an overload state."
+    ::= { trapInfo 20 } 
+limit OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This is a limit value associated with this trap.  For example, 
+        for serverOverload traps this is the value of the TCP bandwidth 
+        limitation of the server in kbps."
+    ::= { trapInfo 21 }
+
+trapSeverity OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      critical(1), 
+                      major(2), 
+                      minor(3), 
+                      warning(4), 
+                      informational(5) 
+                  }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "This is a varbind in every Venturi enterprise trap.  It 
+         indicates the configured serverity of the incident being
+         reported."
+    ::= { trapInfo 22 }
+
+ftpHost OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "The FTP host having a problem with a file upload."
+    ::= { trapInfo 23 }
+
+ftpUser OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "The FTP user having a problem with a file upload."
+    ::= { trapInfo 24 }
+
+ftpDirectory OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(1..128))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "The FTP directory having a problem with a file upload."
+    ::= { trapInfo 25 }
+
+timeout OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "The timeout interval in FTP upload configuration."
+    ::= { trapInfo 26 }
+
+retries OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+         "The retries in FTP upload configuration."
+    ::= { trapInfo 27 }
+
+END

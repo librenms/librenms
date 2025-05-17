@@ -57,8 +57,7 @@ if (! empty($fdbPort_table)) {
     }
 
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$portLocal] = $port['port_id'];
+        $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
 
     // Collect data and populate $insert
