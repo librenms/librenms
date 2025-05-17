@@ -84,7 +84,7 @@
                     "storage_free_oid": null,
                     "storage_perc": 64,
                     "storage_perc_oid": null,
-                    "storage_perc_warn": 80
+                    "storage_perc_warn": 60
                 },
                 {
                     "type": "hrstorage",
@@ -100,7 +100,7 @@
                     "storage_free_oid": null,
                     "storage_perc": 64,
                     "storage_perc_oid": null,
-                    "storage_perc_warn": 80
+                    "storage_perc_warn": 60
                 },
                 {
                     "type": "hrstorage",
@@ -116,7 +116,7 @@
                     "storage_free_oid": null,
                     "storage_perc": 48,
                     "storage_perc_oid": null,
-                    "storage_perc_warn": 80
+                    "storage_perc_warn": 60
                 },
                 {
                     "type": "hrstorage",
@@ -132,7 +132,7 @@
                     "storage_free_oid": null,
                     "storage_perc": 57,
                     "storage_perc_oid": null,
-                    "storage_perc_warn": 80
+                    "storage_perc_warn": 60
                 }
             ]
         },
