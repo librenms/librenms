@@ -149,7 +149,7 @@ snmp.max_repeaters: 30
 **CAUTION**: The above example uses the correct, flattened notation whereas you might be tempted to create a
 block for `snmp` with sub-keys `community` and `max_repeaters`.  Do **NOT** do this as the whole `snmp`
 block will be overwritten, replaced with only those two sub-keys.  The config keys in your `seeders` file
-must match those specified in `misc/config_definitions.json`.
+must match those specified in `resources/definitions/config_definitions.json`.
 
 ## Directories
 
@@ -510,7 +510,7 @@ lnms config:set device_traffic_iftype.+ '/loopback/'
 ```
 
 Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see misc/config_definitions.json for the full list.
+contains more items, please see resources/definitions/config_definitions.json for the full list.
 
 ```bash
 lnms config:set enable_clear_discovery true
@@ -870,7 +870,7 @@ Interfaces can be automatically ignored during discovery by modifying
 bad_if\* entries in a default array, unsetting a default array and
 customizing it, or creating an OS specific array. The preferred method
 for ignoring interfaces is to use an OS specific array. The default
-arrays can be found in misc/config_definitions.json. OS specific
+arrays can be found in resources/definitions/config_definitions.json. OS specific
 definitions (includes/definitions/\_specific_os_.yaml) can contain
 bad_if\* arrays, but should only be modified via pull-request as
 manipulation of the definition files will block updating:

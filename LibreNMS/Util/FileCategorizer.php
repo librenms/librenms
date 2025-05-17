@@ -100,7 +100,7 @@ class FileCategorizer extends Categorizer
 
     private function validateOs($os)
     {
-        return file_exists("includes/definitions/$os.yaml") ? $os : null;
+        return file_exists("resources/definitions/os_detection/$os.yaml") ? $os : null;
     }
 
     private function osFromMibs(): void
@@ -125,7 +125,7 @@ class FileCategorizer extends Categorizer
                 '--files-with-matches',
                 '--file=-',
                 '--',
-                'includes/definitions/',
+                'resources/definitions/os_',
                 'includes/discovery/',
                 'includes/polling/',
                 'LibreNMS/OS/',
@@ -146,7 +146,7 @@ class FileCategorizer extends Categorizer
 
     private function osFromFile($file)
     {
-        if (Str::startsWith($file, 'includes/definitions/')) {
+        if (Str::startsWith($file, 'resources/definitions/os_')) {
             return basename($file, '.yaml');
         } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
             return $this->validateOs(basename($file, '.inc.php'));

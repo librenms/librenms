@@ -128,6 +128,6 @@ Alert when:
 
 You can also select Alert Rule from the Alerts Collection. These Alert
 Rules are submitted by users in the community :) If would like to
-submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/misc/alert_rules.json)
+submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/resources/definitions/alert_rules.json)
 
 ![Alert Rules Collection](../img/alert-rules-collection.png)

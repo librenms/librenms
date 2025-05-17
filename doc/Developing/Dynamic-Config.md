@@ -4,7 +4,7 @@ Adding support for users to update a new config option via the WebUI
 is now a lot easier for general options. This document shows you how
 to add a new config option and even section to the WebUI.
 
-Config settings are defined in `misc/config_definitions.json`
+Config settings are defined in `resources/definitions/config_definitions.json`
 
 You should give a little thought to the name of your config setting.
 For example: a good setting for snmp community, would be `snmp.community`.

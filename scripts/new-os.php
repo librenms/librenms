@@ -17,8 +17,8 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);
-    $definition_file = Config::get('install_dir') . "/includes/definitions/{$options['o']}.yaml";
-    $discovery_file = Config::get('install_dir') . "/includes/definitions/discovery/{$options['o']}.yaml";
+    $definition_file = resource_path("definitions/os_detection/{$options['o']}.yaml");
+    $discovery_file = resource_path("definitions/os_discovery/{$options['o']}.yaml");
     $test_file = Config::get('install_dir') . "/tests/snmpsim/{$options['o']}.snmprec";
     if (file_exists($definition_file)) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");
