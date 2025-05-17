@@ -337,8 +337,8 @@
                     "ifName": "CMM Port 2",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -437,8 +437,8 @@
                     "ifName": "CMM Port 3",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1352,5 +1352,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.5.4.201",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.5.0.0/16",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

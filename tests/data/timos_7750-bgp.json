@@ -47690,7 +47690,7 @@
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 0,
                     "bgpPeerOutTotalMessages": 0,
-                    "bgpPeerFsmEstablishedTime":  22,
+                    "bgpPeerFsmEstablishedTime": 22,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 12345,

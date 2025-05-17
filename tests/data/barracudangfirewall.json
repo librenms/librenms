@@ -1937,8 +1937,8 @@
                     "ifName": "p2",
                     "portName": null,
                     "ifIndex": 7752,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2137,8 +2137,8 @@
                     "ifName": "ppp15056",
                     "portName": null,
                     "ifIndex": 11954,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2237,8 +2237,8 @@
                     "ifName": "vpnr0",
                     "portName": null,
                     "ifIndex": 19060,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2437,8 +2437,8 @@
                     "ifName": "gre0",
                     "portName": null,
                     "ifIndex": 31771,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2837,8 +2837,8 @@
                     "ifName": "vpn0",
                     "portName": null,
                     "ifIndex": 41874,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2937,8 +2937,8 @@
                     "ifName": "pvpn0",
                     "portName": null,
                     "ifIndex": 48660,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3888,5 +3888,109 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 54030
+                },
+                {
+                    "ipv4_address": "127.0.3.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "127.0.3.0/24",
+                    "ifIndex": 41874
+                },
+                {
+                    "ipv4_address": "192.168.120.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 33560
+                },
+                {
+                    "ipv4_address": "192.168.122.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 11954
+                },
+                {
+                    "ipv4_address": "192.168.123.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 65045
+                },
+                {
+                    "ipv4_address": "192.168.131.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 51493
+                },
+                {
+                    "ipv4_address": "192.168.150.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 62463
+                },
+                {
+                    "ipv4_address": "192.168.151.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 31621
+                },
+                {
+                    "ipv4_address": "192.168.199.251",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.199.0/24",
+                    "ifIndex": 49771
+                },
+                {
+                    "ipv4_address": "192.168.199.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 49771
+                },
+                {
+                    "ipv4_address": "192.168.21.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 54030
+                },
+                {
+                    "ipv4_address": "192.168.255.254",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 35406
+                },
+                {
+                    "ipv4_address": "82.214.94.174",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 3689
+                },
+                {
+                    "ipv4_address": "91.185.99.193",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 32398
+                }
+            ]
+        }
     }
 }
