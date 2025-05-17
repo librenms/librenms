@@ -83,7 +83,7 @@
                                     </span>
                                     <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
                                     <select class="form-control" name="access" style="width:160px;">
-                                    @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
+                                    @foreach (array('Private','Shared (Read)','Shared (Admins)','Shared') as $k => $v)
                                         <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
                                     @endforeach
                                     </select>
@@ -513,7 +513,7 @@
 
                 @if (
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
-                        ($dashboard->access == 0 || $dashboard->access == 2)
+                        ($dashboard->access == 0 || $dashboard->access == 3)
                     )
                         '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
                 @endif
