@@ -244,7 +244,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.8.1",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -258,7 +258,7 @@
                     "inetCidrRouteDest": "10.200.8.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.8.244",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 }
             ]

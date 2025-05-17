@@ -493,6 +493,14 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class, 'port_id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\PortStack, $this>
      */
     public function stackChildren(): HasManyThrough
