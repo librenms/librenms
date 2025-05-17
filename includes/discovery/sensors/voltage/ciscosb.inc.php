@@ -23,8 +23,8 @@ foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
 
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.6';
         $sensor_type = 'rlPhyTestTableTransceiverSupply';
-        $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-        $descr = trim(($port_descr['ifDescr'] ?? null) . ' Supply Voltage');
+        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $descr = trim($port?->ifDescr . ' Supply Voltage');
         $voltage = $value['rlPhyTestTableTransceiverSupply'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
