@@ -128,7 +128,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return $this->translations->firstWhere('state_value', $this->sensor_current);
     }
 
-
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>

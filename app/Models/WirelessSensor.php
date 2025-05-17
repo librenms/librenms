@@ -111,7 +111,8 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
 
         return match ($this->sensor_class) {
             'power', 'rate' => Number::formatSi($value, 3, 0, $this->unit()),
-            'frequency' => Number::formatSi($value * 1000 * 1000, 3, 0, 'Hz'),
+            'frequency' => Number::formatSi($value * 1000000, 3, 0, 'Hz'),
+            'distance' => Number::formatSi($value * 1000, 2, 3, 'm'),
             'dbm' => round($value, 3) . ' ' . $this->unit(),
             default => $value . ' ' . $this->unit(),
         };

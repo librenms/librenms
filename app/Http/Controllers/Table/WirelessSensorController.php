@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessSensorController.php
  *
@@ -32,7 +33,6 @@ use Illuminate\Validation\Rule;
 
 class WirelessSensorController extends SensorsController
 {
-
     protected function rules(): array
     {
         return [
