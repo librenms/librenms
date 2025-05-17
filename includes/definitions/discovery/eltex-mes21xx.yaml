@@ -26,6 +26,11 @@ modules:
                 size: RADLAN-File::rlFileTotalSizeOfFlash
 
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifName
         state:
             data:
                 -

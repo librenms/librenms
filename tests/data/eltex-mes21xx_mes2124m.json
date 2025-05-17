@@ -6685,7 +6685,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.90.1.2.1.3.74.11",
                     "sensor_index": "SfpLOS74",
                     "sensor_type": "rlPhyTestGetTable",
-                    "sensor_descr": "SfpLOS-",
+                    "sensor_descr": "SfpLOS-gi1/0/26",
                     "group": "transceiver",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
