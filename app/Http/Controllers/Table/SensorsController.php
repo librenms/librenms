@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Sensor;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -62,7 +63,7 @@ class SensorsController extends TableController
     }
 
     /**
-     * @param  Sensor  $sensor
+     * @param  Sensor|WirelessSensor  $sensor
      */
     public function formatItem($sensor): array
     {
