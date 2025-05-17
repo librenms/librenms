@@ -28,6 +28,7 @@ $oids = SnmpQuery::hideMib()->walk([
     'MARVELL-POE-MIB::rlPethPsePortPowerLimit',
     'MARVELL-POE-MIB::rlPethPsePortOutputPower',
 ])->table(2);
+$divisor = 1000;
 
 foreach ($oids as $unit => $indexData) {
     foreach ($indexData as $ifIndex => $data) {
@@ -46,7 +47,7 @@ foreach ($oids as $unit => $indexData) {
                     'sensor_index' => 'Poe' . $index,
                     'sensor_type' => 'rlPethPsePortOutputPower',
                     'sensor_descr' => 'PoE-' . $descr,
-                    'sensor_divisor' => 1000,
+                    'sensor_divisor' => $divisor,
                     'sensor_multiplier' => 1,
                     'sensor_limit_low' => 0,
                     'sensor_limit_low_warn' => 0,
