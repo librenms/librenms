@@ -21,7 +21,7 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(Sensor::getTypes()),
+            'class' => Rule::in(\LibreNMS\Enum\Sensor::values()),
         ];
     }
 
@@ -67,10 +67,9 @@ class SensorsController extends TableController
     public function formatItem($sensor): array
     {
         $request = \Illuminate\Support\Facades\Request::instance();
-        $graph_type = 'sensor_' . $request->input('class');
         $graph_array = [
-            'type' => $graph_type,
-            'popup_title' => htmlentities(strip_tags($sensor->device->displayName() . ': ' . $sensor->sensor_descr)),
+            'type' => $sensor->getGraphType(),
+            'popup_title' => htmlentities(strip_tags($sensor->device?->displayName() . ': ' . $sensor->sensor_descr)),
             'id' => $sensor->sensor_id,
             'from' => '-1d',
             'height' => 20,
