@@ -8,7 +8,7 @@ $cur_oid = '.1.3.6.1.3.94.1.8.1.6.';
 // The list is also a mix of voltages, temperatures, and state, and uses both F and C for temperatures
 // The order is not stable between software versions
 
-$oids = SnmpQuery::cache()->options('-OQUbs')->walk('FCMGMT-MIB::connUnitSensorMessage')->valuesByIndex();
+$oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUnitSensorMessage')->valuesByIndex();
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
