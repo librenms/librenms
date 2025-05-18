@@ -13,7 +13,6 @@ use LibreNMS\Util\Url;
 
 class SensorsController extends TableController
 {
-
     protected $model = Sensor::class;
 
     protected $default_sort = ['device_hostname' => 'asc', 'sensor_descr' => 'asc'];
@@ -145,8 +144,8 @@ class SensorsController extends TableController
     /**
      * Export data as CSV with sensor class filter
      *
-     * @param Request $request
-     * @param string|null $class
+     * @param  Request  $request
+     * @param  string|null  $class
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function export(Request $request, $class = null)
@@ -154,9 +153,9 @@ class SensorsController extends TableController
         if ($class) {
             $request->merge(['class' => $class]);
         }
-        
+
         $this->validate($request, $this->rules());
-        
+
         return parent::export($request);
     }
 }

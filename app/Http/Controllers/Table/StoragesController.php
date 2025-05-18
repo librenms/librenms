@@ -12,7 +12,6 @@ use LibreNMS\Util\Url;
 
 class StoragesController extends TableController
 {
-
     protected $model = Storage::class;
 
     protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];

@@ -135,7 +135,7 @@ class OutagesController extends TableController
         return $output;
     }
 
-        /**
+    /**
      * Get headers for CSV export
      *
      * @return array

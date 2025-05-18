@@ -142,7 +142,7 @@ abstract class TableController extends PaginatedAjaxController
         if ($request->has('current') && $request->has('rowCount')) {
             $limit = $request->get('rowCount');
             $page = $request->get('current');
-            
+
             if ($limit > 0) {
                 $offset = ($page - 1) * $limit;
                 $query->skip($offset)->take($limit);
