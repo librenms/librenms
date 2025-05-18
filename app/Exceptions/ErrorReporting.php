@@ -133,7 +133,7 @@ class ErrorReporting
 
         // Only run in production
         if (! app()->isProduction()) {
-            \Log::debug('Reporting disabled because app is not in production');
+            \Log::debug('Reporting disabled because app is not in production mode');
 
             return false;
         }
@@ -153,7 +153,7 @@ class ErrorReporting
                 return false;
             }
 
-            if (! $git->isOfficialCommit()) {
+            if (! $git->isOfficialCommits()) {
                 \Log::debug('Reporting disabled due to local modifications');
 
                 return false;
