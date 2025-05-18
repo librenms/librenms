@@ -47,7 +47,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
     public function __construct()
     {
-        $this->schema_file = Config::get('install_dir') . '/misc/db_schema.yaml';
+        $this->schema_file = resource_path('definitions/db_schema.yaml');
     }
 
     /**
