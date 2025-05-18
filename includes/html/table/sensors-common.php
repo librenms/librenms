@@ -16,7 +16,6 @@
  * @author     LibreNMS Contributors
 */
 
-use App\Facades\DeviceCache;
 use LibreNMS\Config;
 
 $graph_type = $vars['graph_type'];
@@ -117,7 +116,6 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
-
     $response[] = [
         'hostname' => generate_device_link($sensor),
         'sensor_descr' => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
