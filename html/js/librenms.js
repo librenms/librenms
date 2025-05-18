@@ -245,24 +245,16 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
     var tableId = grid.attr('id');
 
     if ($('#' + tableId + '-export-button').length === 0) {
-        var exportUrl = grid.data('ajaxurl');
-        var isLegacy = exportUrl && exportUrl.indexOf('ajax_table_export.php') !== -1;
+        var ajaxUrl = grid.data('ajaxurl');
 
-        if (exportUrl && !isLegacy) {
-            exportUrl += '/export';
-        }
-
-        if (exportUrl) {
+        if (ajaxUrl) {
+            var exportUrl = ajaxUrl + '/export';
             var actionsContainer = null;
 
-            if (isLegacy) {
-                actionsContainer = grid.closest('div.col-md-12').find('div.bootgrid-header div.actions');
-            } else {
-                var panel = grid.closest('div.panel');
-                if (panel.length) {
-                    actionsContainer = panel.find('div.actions');
+            var panel = grid.closest('div.panel');
+            if (panel.length) {
+                actionsContainer = panel.find('div.actions');
                 }
-            }
 
             if (actionsContainer && actionsContainer.length) {
                 var exportButton = $(

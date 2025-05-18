@@ -65,20 +65,6 @@ if ($rowCount != -1) {
 
 $sql = "SELECT * $sql";
 
-if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
-    $headers = [
-        'Device ID',
-        'Device',
-        'Sensor',
-        'Current',
-        'Low Limit',
-        'High Limit',
-    ];
-
-    fputcsv($output, $headers);
-}
-
-$response = [];
 foreach (dbFetchRows($sql, $param) as $sensor) {
     $alert = '';
     if (! isset($sensor['sensor_current'])) {
@@ -132,37 +118,19 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
 
-    if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
-        $deviceModel = DeviceCache::get((int) $sensor['device_id']);
-        $device_id = $sensor['device_id'];
-        $sensor_descr = $sensor['sensor_descr'];
-        $current_val = strip_tags($sensor_current);
-        $limit_low = is_null($sensor['sensor_limit_low']) ? '' : $sensor['sensor_limit_low'] . $unit;
-        $limit_high = is_null($sensor['sensor_limit']) ? '' : $sensor['sensor_limit'] . $unit;
+    $response[] = [
+        'hostname' => generate_device_link($sensor),
+        'sensor_descr' => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
+        'graph' => \LibreNMS\Util\Url::overlibLink($link_graph, $sensor_minigraph, $overlib_content),
+        'alert' => $alert,
+        'sensor_current' => $sensor_current,
+        'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 0, '') . $unit) . '</span>',
+        'sensor_limit' => is_null($sensor['sensor_limit']) ? '-' :
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 0, '') . $unit) . '</span>',
+    ];
 
-        fputcsv($output, [
-            $device_id,
-            $deviceModel->displayName(),
-            $sensor_descr,
-            $current_val,
-            $limit_low,
-            $limit_high,
-        ]);
-    } else {
-        $response[] = [
-            'hostname' => generate_device_link($sensor),
-            'sensor_descr' => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
-            'graph' => \LibreNMS\Util\Url::overlibLink($link_graph, $sensor_minigraph, $overlib_content),
-            'alert' => $alert,
-            'sensor_current' => $sensor_current,
-            'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
-                '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 0, '') . $unit) . '</span>',
-            'sensor_limit' => is_null($sensor['sensor_limit']) ? '-' :
-                '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 0, '') . $unit) . '</span>',
-        ];
-    }
-
-    if ($vars['view'] == 'graphs' && ! isset($_REQUEST['export'])) {
+    if ($vars['view'] == 'graphs') {
         $daily_graph = 'graph.php?id=' . $sensor['sensor_id'] . '&amp;type=' . $graph_type . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=211&amp;height=100';
         $daily_url = 'graph.php?id=' . $sensor['sensor_id'] . '&amp;type=' . $graph_type . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=400&amp;height=150';
 
@@ -190,12 +158,10 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     } //end if
 }//end foreach
 
-if (! isset($_REQUEST['export'])) {
-    $output = [
-        'current' => $current,
-        'rowCount' => $rowCount,
-        'rows' => $response,
-        'total' => $count,
-    ];
-    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-}
+$output = [
+    'current' => $current,
+    'rowCount' => $rowCount,
+    'rows' => $response,
+    'total' => $count,
+];
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
