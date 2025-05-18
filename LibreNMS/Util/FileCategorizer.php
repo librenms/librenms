@@ -65,7 +65,7 @@ class FileCategorizer extends Categorizer
             return Str::endsWith($item, '.svg') ? $item : false;
         });
         $this->addCategory('resources', function ($item) {
-            return Str::startsWith($item, 'resources/') ? $item : false;
+            return (str_starts_with($item, 'resources/') && ! str_starts_with($item, 'resources/definitions/os_')) ? $item : false;
         });
         $this->addCategory('full-checks', function ($item) {
             return in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false;
