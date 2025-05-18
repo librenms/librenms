@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Traits\HasThresholds;
 use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\Models\Keyable;

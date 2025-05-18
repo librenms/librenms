@@ -72,9 +72,9 @@ class SensorController
     }
 
     /**
-     * @return string[]
+     * @return array<array<string, (array|string)>>.
      */
-    private function getMetrics(Request $request): array
+    private function getMetrics(Request c$request): array
     {
         $metrics = [
             'mempool' => [
