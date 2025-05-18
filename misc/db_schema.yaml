@@ -861,9 +861,10 @@ ipv4_mac:
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv4_address, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ipv4_mac_device_id_index: { Name: ipv4_mac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ipv4_mac_mac_address_index: { Name: ipv4_mac_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ipv4_mac_port_id_index: { Name: ipv4_mac_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_networks:
@@ -895,9 +896,11 @@ ipv6_nd:
     - { Field: device_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv6_address, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ipv6_nd_device_id_index: { Name: ipv6_nd_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    ipv6_nd_port_id_index: { Name: ipv6_nd_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv6_networks:
   Columns:
     - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -976,8 +979,8 @@ locations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: location, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: lat, Type: 'double(10,6)', 'Null': true, Extra: '' }
-    - { Field: lng, Type: 'double(10,6)', 'Null': true, Extra: '' }
+    - { Field: lat, Type: 'decimal(10,8)', 'Null': true, Extra: '' }
+    - { Field: lng, Type: 'decimal(11,8)', 'Null': true, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
     - { Field: fixed_coordinates, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
@@ -1657,7 +1660,7 @@ poller_cluster_stats:
     - { Field: poller_type, Type: varchar(64), 'Null': false, Extra: '', Default: '' }
     - { Field: depth, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: devices, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: worker_seconds, Type: 'double unsigned', 'Null': false, Extra: '' }
+    - { Field: worker_seconds, Type: double, 'Null': false, Extra: '' }
     - { Field: workers, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: frequency, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
@@ -2252,7 +2255,7 @@ slas:
     - { Field: owner, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: tag, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rtt_type, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: rtt, Type: 'double(8,2) unsigned', 'Null': true, Extra: '' }
+    - { Field: rtt, Type: double, 'Null': true, Extra: '' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: opstatus, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

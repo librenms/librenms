@@ -17,21 +17,23 @@ class LoadUserPreferences
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $preferences = ['locale', 'site_style', 'timezone'];
-        $this->loadPreferences($request, $preferences);
+        if (auth()->check()) {
+            $preferences = ['locale', 'site_style', 'timezone'];
+            $this->loadPreferences($request, $preferences);
 
-        $this->setPreference($request, 'locale', function ($locale) {
-            app()->setLocale($locale);
-        });
+            $this->setPreference($request, 'locale', function ($locale) {
+                app()->setLocale($locale);
+            });
 
-        $this->setPreference($request, 'site_style', function ($style) {
-            Config::set('applied_site_style', $style);
-        });
+            $this->setPreference($request, 'site_style', function ($style) {
+                Config::set('applied_site_style', $style);
+            });
 
-        $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
-            $request->session()->put('preferences.timezone', $timezone);
-            $request->session()->put('preferences.timezone_static', true);
-        });
+            $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+                $request->session()->put('preferences.timezone', $timezone);
+                $request->session()->put('preferences.timezone_static', true);
+            });
+        }
 
         return $next($request);
     }

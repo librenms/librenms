@@ -20,7 +20,6 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Util\Oid;
 
 /**
  * @deprecated Please use SnmpQuery instead
@@ -410,7 +409,11 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+        $index = '';
+        if (Str::contains($oid, '.')) {
+            [$oid, $index] = explode('.', $oid, 2);
+        }
+
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
         }
@@ -619,51 +622,6 @@ function snmp_gen_auth(&$device, $cmd = [])
 
     return $cmd;
 }//end snmp_gen_auth()
-
-/**
- * SNMP translate between numeric and textual oids
- *
- * Default options for a numeric oid is -Os
- * Default options for a textual oid is -On
- * You may override these by setting $options (an empty string for no options)
- *
- * @param  string|null  $oid
- * @param  string  $mib
- * @param  string  $mibdir  the mib directory (relative to the LibreNMS mibs directory)
- * @param  array|string  $options  Options to pass to snmptranslate
- * @param  array|null  $device
- * @return string
- *
- * @deprecated Please use SnmpQuery instead
- */
-function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
-{
-    if (empty($oid)) {
-        return '';
-    }
-
-    $measure = Measurement::start('snmptranslate');
-    $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
-
-    $oid = Oid::of($oid);
-    if ($oid->isNumeric()) {
-        $default_options = ['-Os', '-Pu'];
-    } else {
-        if ($mib != 'ALL' && ! $oid->hasMib()) {
-            $oid = "$mib::$oid";
-        }
-        $default_options = ['-On', '-Pu'];
-    }
-    $options = is_null($options) ? $default_options : $options;
-    $cmd = array_merge($cmd, (array) $options);
-    $cmd[] = $oid->oid;
-
-    $result = trim(external_exec($cmd));
-
-    $measure->manager()->recordSnmp($measure->end());
-
-    return $result;
-}
 
 /**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes

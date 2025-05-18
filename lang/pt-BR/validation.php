@@ -156,7 +156,6 @@ return [
     'alpha_space' => 'O campo :attribute pode conter apenas letras, números, sublinhados e espaços.',
     'ip_or_hostname' => 'O campo :attribute deve ser um endereço IP/rede ou nome de host válido.',
     'is_regex' => 'O campo :attribute não é uma expressão regular válida',
-    'keys_in' => 'O campo :attribute contém chaves inválidas: :extra. Chaves válidas: :values',
 
     /*
     |--------------------------------------------------------------------------
@@ -292,7 +291,7 @@ return [
                 'not_detected' => 'A entrada cron do wrapper Python não está presente',
             ],
             'CheckRedis' => [
-                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_DRIVER=redis',
+                'bad_driver' => 'Usando :driver para bloqueio, você deve definir CACHE_STORE=redis',
                 'ok' => 'Redis está funcional',
                 'unavailable' => 'Redis está indisponível',
             ],

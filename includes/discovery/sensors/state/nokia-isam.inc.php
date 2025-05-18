@@ -6,7 +6,7 @@ foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
     if (is_array($data)) {
         $oid = '.1.3.6.1.4.1.637.61.1.23.3.1.7.' . $index;
         $state_name = 'eqptBoardOperError';
-        $current = $data['eqptBoardOperError'];
+        $current = $data['eqptBoardOperError'] ?? null;
         // Skip empty and not planned boards / false table entrys
         if ($current == 0 || $data['eqptSlotActualType'] == 'EMPTY' && $data['eqptSlotPlannedType'] == 'NOT_PLANNED') {
             continue;

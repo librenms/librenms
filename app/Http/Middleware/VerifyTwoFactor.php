@@ -20,7 +20,7 @@ class VerifyTwoFactor
     public function handle(Request $request, Closure $next): Response
     {
         // check twofactor
-        if (Config::get('twofactor') === true) {
+        if (auth()->check() && Config::get('twofactor') === true) {
             // don't apply on 2fa checking routes
             $route_name = $request->route()->getName();
             if ($route_name && Str::startsWith($route_name, '2fa.')) {

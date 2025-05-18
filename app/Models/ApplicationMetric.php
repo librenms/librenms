@@ -13,7 +13,9 @@ class ApplicationMetric extends Model
     public $timestamps = false;
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Application, $this>
+     */
     public function app(): BelongsTo
     {
         return $this->belongsTo(Application::class, 'app_id');

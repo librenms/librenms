@@ -105,10 +105,12 @@ if (! empty($oids1)) {
             $member_id = $split_oid[count($split_oid) - 2];
             $num_index = $member_id . '.' . $num_index;
             $oid = $base_oid . $num_index;
-            $extra = snmp_get_multi($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
+            $extra = snmp_get($device, $oid, '-OQne', 'EQLMEMBER-MIB', 'equallogic');
+
             Log::debug($extra);
+
             if (! empty($extra)) {
-                [$foid,$pstatus] = explode(' = ', $extra, 2);
+                [$foid,$pstatus] = [$extra[0], $extra[1]];
                 $index = (100 + $index);
                 $low_limit = 0.5;
                 $high_limit = 1.5;
