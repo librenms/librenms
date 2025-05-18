@@ -26,7 +26,7 @@
 $divisor = 1;
 $multiplier = 1000;
 
-$oids = SnmpQuery::cache()->hideMib()->walk('TERRA-sdi410C-MIB::sdi410cstatus')->table(1);
+$oids = SnmpQuery::hideMib()->walk('TERRA-sdi410C-MIB::sdi410cstatus')->table(1);
 
 if (is_array($oids)) {
     d_echo('Terra sdi410C Bitrates');
