@@ -13,6 +13,9 @@ use LibreNMS\Util\Url;
 
 class SensorsController extends TableController
 {
+
+    protected $model = Sensor::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'sensor_descr' => 'asc'];
 
     protected function rules(): array
@@ -100,5 +103,60 @@ class SensorsController extends TableController
             'sensor_limit_low' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit_low')),
             'sensor_limit' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit')),
         ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Sensor',
+            'Current',
+            'Limit Low',
+            'Limit High',
+            'Sensor Class',
+            'Sensor Type',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Sensor  $sensor
+     * @return array
+     */
+    protected function formatExportRow($sensor)
+    {
+        return [
+            $sensor->device ? $sensor->device->displayName() : '',
+            $sensor->sensor_descr,
+            $sensor->formatValue(),
+            $sensor->formatValue('sensor_limit_low'),
+            $sensor->formatValue('sensor_limit'),
+            $sensor->sensor_class,
+            $sensor->sensor_type,
+        ];
+    }
+
+    /**
+     * Export data as CSV with sensor class filter
+     *
+     * @param Request $request
+     * @param string|null $class
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function export(Request $request, $class = null)
+    {
+        if ($class) {
+            $request->merge(['class' => $class]);
+        }
+        
+        $this->validate($request, $this->rules());
+        
+        return parent::export($request);
     }
 }

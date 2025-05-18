@@ -12,6 +12,9 @@ use LibreNMS\Util\Url;
 
 class StoragesController extends TableController
 {
+
+    protected $model = Storage::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
 
     protected function sortFields($request): array
@@ -82,5 +85,36 @@ class StoragesController extends TableController
         $bar = Html::percentageBar(400, 20, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
 
         return Url::graphPopup($graph_array, $bar);
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Storage',
+            'Used',
+            'Free',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Storage  $storage
+     * @return array
+     */
+    protected function formatExportRow($storage)
+    {
+        return [
+            $storage->device ? $storage->device->displayName() : '',
+            $storage->storage_descr,
+            Number::formatBi($storage->storage_used),
+            Number::formatBi($storage->storage_free),
+        ];
     }
 }

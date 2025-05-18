@@ -254,7 +254,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
             var panel = grid.closest('div.panel');
             if (panel.length) {
                 actionsContainer = panel.find('div.actions');
-                }
+            }
 
             if (actionsContainer && actionsContainer.length) {
                 var exportButton = $(

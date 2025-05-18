@@ -79,12 +79,12 @@ switch ($class) {
 
             <div class="pull-right">
                     <?php echo $displayoptions; ?>
-                </div>
             </div>
         </div>
     </div>
     <div class="table-responsive">
-        <table id="sensors" class="table table-hover table-condensed storage">
+        <table id="sensors" class="table table-hover table-condensed storage"
+                data-ajaxurl="<?php echo url('/ajax/table/sensors', ['class' => $class]); ?>">
             <thead>
                 <tr>
                     <th data-column-id="hostname">Device</th>

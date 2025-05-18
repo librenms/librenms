@@ -261,14 +261,18 @@ Route::middleware(['auth'])->group(function () {
             Route::post('mempools', Table\MempoolsController::class);
             Route::get('mempools/export', Table\MempoolsController::class . '@export');
             Route::post('outages', Table\OutagesController::class);
+            Route::get('outages/export', Table\OutagesController::class . '@export');
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
             Route::post('port-stp', Table\PortStpController::class);
             Route::post('ports', Table\PortsController::class)->name('table.ports');
             Route::get('ports/export', Table\PortsController::class . '@export');
             Route::post('processors', Table\ProcessorsController::class)->name('table.processors');
+            Route::get('processors/export', Table\ProcessorsController::class . '@export');
             Route::post('routes', Table\RoutesTablesController::class);
             Route::post('sensors', Table\SensorsController::class)->name('table.sensors');
+            Route::get('sensors/{class?}/export', Table\SensorsController::class . '@export');
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
+            Route::get('storages/export', Table\StoragesController::class . '@export');
             Route::post('syslog', Table\SyslogController::class);
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
