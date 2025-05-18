@@ -285,7 +285,14 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
-                    var headerContainer = $('#' + gridId + '-header');
+                    // pagination and row count
+                    var currentPage = grid.bootgrid('getCurrentPage');
+                    var rowCount = grid.bootgrid('getRowCount');
+                    urlParams.push('current=' + currentPage);
+                    urlParams.push('rowCount=' + rowCount);
+
+                    // get all filters from the header
+                    var headerContainer = $('.' + gridId + '-headers-table-menu');
                     if (headerContainer.length) {
                         headerContainer.find('input[name]').each(function() {
                             var field = $(this);
