@@ -114,7 +114,7 @@ class DBSetupTest extends DBTestCase
 
     public function testValidateSchema(): void
     {
-        $file = resource_path('definitions/db_schema.yaml');
+        $file = resource_path('definitions/schema/db_schema.yaml');
         if (is_file($file)) {
             DB::connection($this->connection)->statement('SET time_zone = "+00:00";');
 
@@ -124,7 +124,7 @@ class DBSetupTest extends DBTestCase
 
             $current_schema = Schema::dump($this->connection);
 
-            $message = "Schema does not match the expected schema defined by resources/definitions/db_schema.yaml\n";
+            $message = "Schema does not match the expected schema defined by resources/definitions/schema/db_schema.yaml\n";
             $message .= "If you have changed the schema, make sure you update it with: lnms schema:dump\n";
 
             $this->assertEquals($master_schema, $current_schema, $message);
