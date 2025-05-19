@@ -4692,5 +4692,88 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.60.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.1.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "10.60.104.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.104.0/24",
+                    "ifIndex": 18
+                },
+                {
+                    "ipv4_address": "10.60.64.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.64.0/21",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "10.60.72.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.72.0/21",
+                    "ifIndex": 16
+                },
+                {
+                    "ipv4_address": "10.60.80.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.80.0/24",
+                    "ifIndex": 17
+                },
+                {
+                    "ipv4_address": "10.60.84.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.60.84.0/22",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "10.60.88.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.60.88.0/22",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "10.60.96.1",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.60.96.0/21",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "149.3.168.15",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "149.3.168.0/24",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "46.145.182.108",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "46.145.182.104/29",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

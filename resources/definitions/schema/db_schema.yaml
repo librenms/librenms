@@ -848,7 +848,7 @@ ipv4_addresses:
     - { Field: ipv4_address_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: ipv4_address, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ipv4_prefixlen, Type: int, 'Null': false, Extra: '' }
-    - { Field: ipv4_network_id, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ipv4_network_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
