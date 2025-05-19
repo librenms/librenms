@@ -83,7 +83,7 @@
                                     </span>
                                     <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
                                     <select class="form-control" name="access" style="width:160px;">
-                                    @foreach (array('Private','Shared (Read)','Shared (Admins)','Shared') as $k => $v)
+                                    @foreach (array('Private','Shared (Read)','Shared (Admin RW)','Shared') as $k => $v)
                                         <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
                                     @endforeach
                                     </select>

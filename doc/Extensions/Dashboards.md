@@ -48,8 +48,8 @@ List of Widgets:
 - Private: Sets the dashboard to only the user that created the
   dashboard can view and edit.
 - Shared Read: Sets the dashboard to allow other users to view the
-  dashboard, but cant make changes to the dashboard.
-- Shared Admins: Sets the dashboard to allow other users to view
+  dashboard, but can't make changes to the dashboard.
+- Shared Admin RW: Sets the dashboard to allow other users to view
   the dashboard, but allows Admins to makes changes.
 - Shared: Allows all users to view the dashboard and make changes.
 
