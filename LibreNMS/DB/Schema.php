@@ -106,7 +106,7 @@ class Schema
     public function getSchema()
     {
         if (! isset($this->schema)) {
-            $file = Config::get('install_dir') . '/misc/db_schema.yaml';
+            $file = resource_path('definitions/schema/db_schema.yaml');
             $this->schema = Yaml::parse(file_get_contents($file));
         }
 

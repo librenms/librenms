@@ -833,7 +833,7 @@ function file_download($filename, $content)
 
 function get_rules_from_json()
 {
-    return json_decode(file_get_contents(Config::get('install_dir') . '/misc/alert_rules.json'), true);
+    return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
 
 function search_oxidized_config($search_in_conf_textbox)
