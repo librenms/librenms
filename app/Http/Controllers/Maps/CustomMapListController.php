@@ -39,7 +39,7 @@ class CustomMapListController extends Controller
 
         return view('map.custom-list', [
             'maps' => CustomMap::hasAccess($request->user())->orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
-            'group' => $group,
+            'open_group' => $group,
         ]);
     }
 }
