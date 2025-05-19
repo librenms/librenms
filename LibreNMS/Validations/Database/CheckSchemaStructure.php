@@ -28,7 +28,6 @@ namespace LibreNMS\Validations\Database;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\Validation;
@@ -47,7 +46,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
     public function __construct()
     {
-        $this->schema_file = Config::get('install_dir') . '/misc/db_schema.yaml';
+        $this->schema_file = resource_path('definitions/schema/db_schema.yaml');
     }
 
     /**
