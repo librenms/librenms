@@ -46,7 +46,8 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txOpticalPower'])) {
             $high_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / -$divisor;
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
-            $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+            $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.4.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
@@ -80,7 +81,8 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['rxOpticalPower'])) {
             $high_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'] / -$divisor;
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'] / -$divisor;
             $low_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'] / -$divisor;
-            $descr = get_port_by_index_cache($device['device_id'], $ifIndex)['ifName'];
+            $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+            $descr = $port?->ifName;
             $oid = Oid::of('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticCurrentValue.' . $ifIndex . '.5.1')->toNumeric();
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
