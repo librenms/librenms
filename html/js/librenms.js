@@ -629,6 +629,23 @@ function popUp(URL)
     window.open(URL, '_blank', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');
 }
 
+function applySiteStyle(newStyle) {
+    // translate device to actual style
+    if (newStyle === 'device') {
+        newStyle = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    document.documentElement.classList.toggle('dark', newStyle === 'dark');
+
+    if (window.siteStyle !== newStyle) {
+        window.siteStyle = newStyle;
+        $.post(ajax_url + '/set_style', { style: newStyle });
+        document.querySelectorAll('img.graph-image').forEach(img => {
+            img.src = img.src.replace(/&style=\w+/g, '') + '&style=' + newStyle;
+        });
+    }
+}
+
 // popup component javascript.  Hopefully temporary.
 document.addEventListener("alpine:init", () => {
     Alpine.data("popup", () => ({

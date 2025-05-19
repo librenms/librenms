@@ -9,8 +9,8 @@ foreach ($pre_cache['rosMgmtOpticalTransceiverDDMTable'] as $index => $data) {
         if (($key == 'txPower') && is_numeric($value['rosMgmtOpticalTransceiverParameterValue']) && ($value['rosMgmtOpticalTransceiverDDMValidStatus'] == 1)) {
             $oid = '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.' . $index . '.3';
             $sensor_type = 'rosMgmtOpticalTransceiverTxPower';
-            $port = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
-            $descr = $port['ifDescr'] . ' Transmit Power';
+            $port = PortCache::getByIfIndex(str_replace('1.', '', $index), $device['device_id']);
+            $descr = $port?->ifDescr . ' Transmit Power';
             $low_limit = $value['rosMgmtOpticalTransceiverParamLowAlarmThresh'] / $divisor;
             $low_warn_limit = $value['rosMgmtOpticalTransceiverParamLowWarningThresh'] / $divisor;
             $warn_limit = $value['rosMgmtOpticalTransceiverParamHighWarningThresh'] / $divisor;
@@ -25,8 +25,8 @@ foreach ($pre_cache['rosMgmtOpticalTransceiverDDMTable'] as $index => $data) {
         if (($key == 'rxPower') && is_numeric($value['rosMgmtOpticalTransceiverParameterValue']) && ($value['rosMgmtOpticalTransceiverDDMValidStatus'] != 0)) {
             $oid = '.1.3.6.1.4.1.8886.1.18.2.2.1.1.2.' . $index . '.4';
             $sensor_type = 'rosMgmtOpticalTransceiverRxPower';
-            $port = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
-            $descr = $port['ifDescr'] . ' Receive Power';
+            $port = PortCache::getByIfIndex(str_replace('1.', '', $index), $device['device_id']);
+            $descr = $port?->ifDescr . ' Receive Power';
             $low_limit = $value['rosMgmtOpticalTransceiverParamLowAlarmThresh'] / $divisor;
             $low_warn_limit = $value['rosMgmtOpticalTransceiverParamLowWarningThresh'] / $divisor;
             $warn_limit = $value['rosMgmtOpticalTransceiverParamHighWarningThresh'] / $divisor;

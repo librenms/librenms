@@ -29,7 +29,7 @@ d_echo($valid_diskio);
 foreach (dbFetchRows($sql) as $test) {
     d_echo($test['diskio_index'] . ' -> ' . $test['diskio_descr'] . "\n");
 
-    if ($valid_diskio[$test['diskio_index']] !== $test['diskio_descr']) {
+    if (isset($valid_diskio[$test['diskio_index']]) && $valid_diskio[$test['diskio_index']] !== $test['diskio_descr']) {
         echo '-';
         dbDelete('ucd_diskio', '`diskio_id` = ?', [$test['diskio_id']]);
     }
