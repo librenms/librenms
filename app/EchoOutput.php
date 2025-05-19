@@ -31,7 +31,7 @@ class EchoOutput extends Output
     /**
      * @return void
      */
-    protected function doWrite(string $message ?? '', bool $newline): void
+    protected function doWrite(string $message, bool $newline): void
     {
         echo $message;
 
