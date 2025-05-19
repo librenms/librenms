@@ -55,10 +55,10 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             $uri = $scheme . $uri . ':' . $port;
         }
 
-        $this->ldap_connection = @ldap_connect($uri);
+        $this->ldap_connection = ldap_connect($uri);
 
-        if (! $this->ldap_connection) {
-            throw new AuthenticationException('Fatal error while connecting to LDAP server, uri not valid: ' . Config::get('auth_ldap_server') . ':' . Config::get('auth_ldap_port'));
+        if (empty($this->ldap_connection)) {
+            throw new AuthenticationException('Fatal error while connecting to LDAP server, uri not valid: ' . $uri);
         }
         if (Config::get('auth_ldap_version')) {
             ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version'));
