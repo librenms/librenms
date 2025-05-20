@@ -39,7 +39,7 @@ class AboutAlerts
     public function active(): array
     {
         return Cache::remember('alerts_active', 60, function () {
-            // This withCount will return zero for rules with no active alerts
+            // return zero for rules with no active alerts
             return AlertRule::where('disabled', 0)
                 ->withCount(['alerts as open_count' => function ($q) {
                     $q->where('state', '>', 0)
@@ -58,23 +58,21 @@ class AboutAlerts
         return Cache::remember('alerts_raised_last_5m', 60, function () {
             $cutoff = Carbon::now()->subMinutes(5);
 
-            // 1) Get all enabled rule names
             $rules = AlertRule::where('disabled', 0)
-                              ->pluck('name');
+                ->pluck('name');
 
-            // 2) Count logs per rule in the last 5m
             $counts = AlertLog::selectRaw('r.name AS rule_name, COUNT(*) AS cnt')
                 ->join('alert_rules AS r', 'r.id', '=', 'alert_log.rule_id')
-                ->where('r.disabled', 0)
-                ->where('state', '>', 0)
-                ->where('time_logged', '>', $cutoff)
+                ->whereRaw('r.disabled = ?', [0])
+                ->where('alert_log.state', '>', 0)
+                ->where('alert_log.time_logged', '>', $cutoff)
                 ->groupBy('r.name')
                 ->pluck('cnt', 'rule_name')
                 ->toArray();
 
-            // 3) Ensure every rule is present, defaulting to 0
+            // zero-fill any rules that had no rows in the last 5m
             return $rules->mapWithKeys(function ($ruleName) use ($counts) {
-                return [$ruleName => $counts[$ruleName] ?? 0];
+                return [ $ruleName => $counts[$ruleName] ?? 0 ];
             })->toArray();
         });
     }
