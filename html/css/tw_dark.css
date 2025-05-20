@@ -1669,7 +1669,7 @@
     background-color: #353a41;
 }
 
-.dark .bootgrid-table td.loading, .bootgrid-table td.no-results {
+.dark .bootgrid-table td.loading, .dark .bootgrid-table td.no-results {
     background-color: #3e444c;
 }
 

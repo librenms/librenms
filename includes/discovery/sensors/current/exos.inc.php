@@ -1,12 +1,35 @@
 <?php
 
-echo 'Exos ';
+/**
+ * exos.inc.php
+ *
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+$oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUnitSensorTable')->valuesByIndex();
 
-if (is_array($pre_cache['exos']['connUnitSensorTable'])) {
-    foreach ($pre_cache['exos']['connUnitSensorTable'] as $index => $entry) {
+if (is_array($oids)) {
+    foreach ($oids as $index => $entry) {
         if (preg_match('/Current.* ([: 0-9\.]+A)/', $entry['connUnitSensorMessage'], $temp_value)) {
             $value = str_replace('A', '', $temp_value[1]);
-            discover_sensor(null, 'current', $device, ".1.3.6.1.3.94.1.8.1.6.{$index}", $entry['connUnitSensorIndex'], 'exos', $entry['connUnitSensorName'], 1, '1', null, null, null, null, $value);
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'current',
+                'sensor_oid' => '.1.3.6.1.3.94.1.8.1.6.' . $index,
+                'sensor_index' => $entry['connUnitSensorIndex'],
+                'sensor_type' => 'exos',
+                'sensor_descr' => $entry['connUnitSensorName'],
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit' => null,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => null,
+                'entPhysicalIndex_measured' => null,
+                'user_func' => null,
+                'group' => null,
+            ]));
         }
     }
 }
