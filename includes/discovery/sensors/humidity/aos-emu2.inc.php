@@ -22,8 +22,15 @@
  *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-foreach ($pre_cache['emu2_temp'] as $id => $temp) {
+
+//pre-cache
+$oids = SnmpQuery::cache()->hideMib()->walk([
+    'PowerNet-MIB::emsProbeStatusEntry',
+])->table(1);
+
+foreach ($oids as $id => $temp) {
     if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
         $index = $temp['emsProbeStatusProbeIndex'];
         $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
@@ -32,7 +39,26 @@ foreach ($pre_cache['emu2_temp'] as $id => $temp) {
         $low_warn_limit = $temp['emsProbeStatusProbeLowHumidityThresh'];
         $high_limit = $temp['emsProbeStatusProbeMaxHumidityThresh'];
         $high_warn_limit = $temp['emsProbeStatusProbeHighHumidityThresh'];
-        $current = $temp['emsProbeStatusProbeHumidity'];
-        discover_sensor(null, 'humidity', $device, $oid, $index, 'aos-emu2', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        $value = $temp['emsProbeStatusProbeHumidity'];
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'humidity',
+            'sensor_oid' => $oid,
+            'sensor_index' => $index,
+            'sensor_type' => 'aos-emu2',
+            'sensor_descr' => $descr,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => $low_warn_limit,
+            'sensor_limit_warn' => $high_warn_limit,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => null,
+            'entPhysicalIndex_measured' => null,
+            'user_func' => null,
+            'group' => null,
+        ]));
     }
 }
