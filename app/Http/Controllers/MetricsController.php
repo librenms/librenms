@@ -47,8 +47,10 @@ class MetricsController extends Controller
                 }
             }
 
-            // Collect the same stats as /about
-            $stats = $aboutMetrics->collect();
+            // grab the stats from cache, or re-collect if it's been >300s
+            $stats = \Cache::remember('about_metrics', 300, function () use ($aboutMetrics) {
+                return $aboutMetrics->collect();
+            });
 
             // Register and set each gauge
             foreach ($stats as $name => $value) {
