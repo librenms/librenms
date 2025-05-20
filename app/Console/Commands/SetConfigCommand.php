@@ -229,7 +229,7 @@ class SetConfigCommand extends LnmsCommand
         $validator = new Validator;
         $validator->validate(
             $os_data,
-            (object) ['$ref' => 'file://' . base_path('/misc/os_schema.json')],
+            (object) ['$ref' => 'file://' . resource_path('definitions/schema/os_schema.json')],
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
