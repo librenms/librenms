@@ -45,6 +45,24 @@
                                     <button type=button class="btn btn-primary" value="save" id="portclear" onclick="edgePortClear();">{{ __('Clear') }}</button>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <label for="edgeoverridebw" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.override_bandwidth') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="edgeoverridebw">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="display:none" id="edgerxbwfield">
+                                <label for="edgerxbw" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.rxbw') }}</label>
+                                <div class="col-sm-9">
+                                        <input type=number id="edgerxbw" class="form-control input-sm" placeholder="bps" value="" />
+                                </div>
+                            </div>
+                            <div class="form-group row" style="display:none" id="edgetxbwfield">
+                                <label for="edgetxbw" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.txbw') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=number id="edgetxbw" class="form-control input-sm" placeholder="bps" value="" />
+                                </div>
+                            </div>
                             <div class="form-group row existing-edge" id="edgePortReverseRow" style="display:none">
                                 <label for="portreverse" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.reverse') }}</label>
                                 <div class="col-sm-9">
@@ -206,6 +224,9 @@
         edgedata.edge2.smooth.type = $("#edgestyle").val();
         edgedata.edge1.from = $("#edgefrom").val();
         edgedata.edge2.from = $("#edgeto").val();
+        edgedata.edge1.override_bw = edgedata.edge2.override_bw = $("#edgeoverridebw").bootstrapSwitch('state');
+        edgedata.edge1.rxbw = edgedata.edge2.txbw = $("#edgerxbw").val() || 0;
+        edgedata.edge1.txbw = edgedata.edge2.rxbw = $("#edgetxbw").val() || 0;
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
@@ -324,6 +345,9 @@
         edgePortSearchUpdate($("#edgefrom").val(), $("#edgeto").val(), edgedata.id);
         edgeCheckColourReset(edgedata.edge1.font.color, newedgeconf.font.color, "edgecolourtextreset");
 
+        $("#edgeoverridebw").bootstrapSwitch('state', edgedata.edge1.override_bw);
+        $("#edgerxbw").val(edgedata.edge1.rxbw);
+        $("#edgetxbw").val(edgedata.edge1.txbw);
         $("#edgestyle").val(edgedata.edge1.smooth.type);
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
@@ -406,5 +430,15 @@
 
         init_select2('#edgedevicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#edgeModal')});
         $("#edgedevicesearch").on("select2:select", edgeDeviceSelect).on("select2:clear", edgeDeviceSelect);
+
+        $('#edgeoverridebw').on('switchChange.bootstrapSwitch', function (event, state) {
+            if (state) {
+                $("#edgerxbwfield").show();
+                $("#edgetxbwfield").show();
+            } else {
+                $("#edgerxbwfield").hide();
+                $("#edgetxbwfield").hide();
+            }
+        });
    });
 </script>

@@ -515,6 +515,9 @@ custom_map_edges:
     - { Field: custom_map_node1_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: custom_map_node2_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: override_bandwidth, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: rx_bandwidth, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: tx_bandwidth, Type: bigint, 'Null': true, Extra: '' }
     - { Field: reverse, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: showpct, Type: tinyint, 'Null': false, Extra: '' }

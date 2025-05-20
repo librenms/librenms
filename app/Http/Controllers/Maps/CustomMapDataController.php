@@ -61,6 +61,9 @@ class CustomMapDataController extends Controller
                 'custom_map_node1_id' => $edge->custom_map_node1_id,
                 'custom_map_node2_id' => $edge->custom_map_node2_id,
                 'port_id' => $edge->port_id,
+                'override_bw' => $edge->override_bandwidth,
+                'rxbw' => $edge->rx_bandwidth,
+                'txbw' => $edge->tx_bandwidth,
                 'reverse' => $edge->reverse,
                 'style' => $edge->style,
                 'showpct' => $edge->showpct,
@@ -84,6 +87,17 @@ class CustomMapDataController extends Controller
                 $speedfrom = 0;
                 $rateto = 0;
                 $ratefrom = 0;
+
+                // Get user defined speeds if override is enabled
+                if ($edges[$edgeid]['override_bw']) {
+                    $speedto = $edges[$edgeid]['txbw'] ?? 0;
+                    $speedfrom = $edges[$edgeid]['rxbw'] ?? 0;
+
+                    if ($speedto == 0 || $speedfrom == 0) {
+                        $speedto = 0;
+                        $speedfrom = 0;
+                    }
+                }
 
                 // Try to interpret the SNMP speeds
                 if ($edge->port->port_descr_speed) {
@@ -303,6 +317,9 @@ class CustomMapDataController extends Controller
                 $dbedge->custom_map_node1_id = strpos($edge['from'], 'new') == 0 ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
                 $dbedge->custom_map_node2_id = strpos($edge['to'], 'new') == 0 ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
                 $dbedge->port_id = $edge['port_id'] ? $edge['port_id'] : null;
+                $dbedge->override_bandwidth = $edge['override_bw'];
+                $dbedge->rx_bandwidth = $edge['rxbw'];
+                $dbedge->tx_bandwidth = $edge['txbw'];
                 $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
