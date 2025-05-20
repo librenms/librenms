@@ -1,17 +1,42 @@
 <?php
 
-echo ' IPOMANII-MIB ';
+/*
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
 
-$oids_out = [];
+// pre-cache
+$oidsOut = SnmpQuery::cache()->hideMib()->walk([
+    'IPOMANII-MIB::outletConfigDesc',
+    'IPOMANII-MIB::outletConfigLocation'
+])->table(1);
 
-d_echo('outletStatusKwatt ');
-$oids_out = snmpwalk_cache_multi_oid($device, 'outletStatusKwatt', $oids_out, 'IPOMANII-MIB');
+//data
+$oidsPowOut = SnmpQuery::hideMib()->walk([
+    'IPOMANII-MIB::outletStatusKwatt',
+])->table(1);
 
-if (is_array($oids_out)) {
-    foreach ($oids_out as $index => $entry) {
-        $power_consumed_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.4.' . $index;
-        $divisor = 1000;
-        $descr = (trim($pre_cache['ipoman']['out'][$index]['outletConfigDesc'], '"') != '' ? trim($pre_cache['ipoman']['out'][$index]['outletConfigDesc'], '"') : "Output $index");
-        discover_sensor(null, 'power_consumed', $device, $power_consumed_oid, $power_consumed_oid, 'ipoman', $descr, $divisor, 1, 0, null, null, 0);
-    }
+foreach ($oidsPowOut as $index => $entry) {
+    $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.4.' . $index;
+    $divisor = 1000;
+    $descr = (trim($oidsOut[$index]['outletConfigDesc'], '"') != '' ? trim($oidsOut[$index]['outletConfigDesc'], '"') : "Output $index");
+
+    app('sensor-discovery')->discover(new \App\Models\Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'power_consumed',
+        'sensor_oid' => $oid,
+        'sensor_index' => $oid,
+        'sensor_type' => 'ipoman',
+        'sensor_descr' => $descr,
+        'sensor_divisor' => $divisor,
+        'sensor_multiplier' => 1,
+        'sensor_limit_low' => 0,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit' => 0,
+        'sensor_current' => 0,
+        'entPhysicalIndex' => null,
+        'entPhysicalIndex_measured' => null,
+        'user_func' => null,
+        'group' => null,
+    ]));
 }
