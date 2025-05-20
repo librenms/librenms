@@ -34,7 +34,6 @@ class PrometheusServiceProvider extends ServiceProvider
 {
     public function register()
     {
-
         $this->app->bind(CollectorRegistry::class, function () {
             return new CollectorRegistry(new InMemory());
         });

@@ -26,15 +26,15 @@
 
 namespace App\Services;
 
-use App\Models\AlertRule;
 use App\Models\AlertLog;
+use App\Models\AlertRule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class AboutAlerts
 {
     /**
-     * @return array<string,int>  rule_name => open_count
+     * @return array<string,int> rule_name => open_count
      */
     public function active(): array
     {
@@ -51,7 +51,7 @@ class AboutAlerts
     }
 
     /**
-     * @return array<string,int>  rule_name => count in last 5m, zero if none
+     * @return array<string,int> rule_name => count in last 5m, zero if none
      */
     public function raisedLast5m(): array
     {

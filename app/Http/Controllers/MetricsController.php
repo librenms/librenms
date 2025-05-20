@@ -29,10 +29,10 @@ namespace App\Http\Controllers;
 use App\Services\AboutAlerts;
 use App\Services\AboutMetrics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use LibreNMS\Config;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
-use Illuminate\Support\Facades\Cache;
 
 class MetricsController extends Controller
 {
@@ -52,9 +52,9 @@ class MetricsController extends Controller
             }
         }
 
-        $stats = Cache::remember('about_metrics', 300, fn() => $aboutMetrics->collect());
+        $stats = Cache::remember('about_metrics', 300, fn () => $aboutMetrics->collect());
         foreach ($stats as $stat => $val) {
-            $g = $registry->getOrRegisterGauge('librenms', 'qty_'.preg_replace('/^stat_/', '', $stat), '', []);
+            $g = $registry->getOrRegisterGauge('librenms', 'qty_' . preg_replace('/^stat_/', '', $stat), '', []);
             $g->set($val);
         }
 
@@ -67,7 +67,7 @@ class MetricsController extends Controller
                     'Number of currently open alerts',
                     ['rule']
                 );
-                $g->set($openCount, [ $ruleName ]);
+                $g->set($openCount, [$ruleName]);
             }
 
             foreach ($aboutAlerts->raisedLast5m() as $ruleName => $raisedCnt) {
@@ -77,7 +77,7 @@ class MetricsController extends Controller
                     'Alerts that changed to active in the past 5 minutes',
                     ['rule']
                 );
-                $g->set($raisedCnt, [ $ruleName ]);
+                $g->set($raisedCnt, [$ruleName]);
             }
         }
 
