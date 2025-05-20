@@ -164,7 +164,7 @@ function generate_dynamic_graph_tag($args)
         $urlargs[] = $key . '=' . $value;
     }
 
-    return '<img style="width:' . $width . 'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -833,7 +833,7 @@ function file_download($filename, $content)
 
 function get_rules_from_json()
 {
-    return json_decode(file_get_contents(Config::get('install_dir') . '/misc/alert_rules.json'), true);
+    return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
 
 function search_oxidized_config($search_in_conf_textbox)
