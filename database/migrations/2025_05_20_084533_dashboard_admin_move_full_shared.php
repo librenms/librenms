@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +11,7 @@ return new class extends Migration
     {
         // Move existing Shared
         DB::table('dashboards')
-            ->where('access','2')
+            ->where('access', '2')
             ->update(['access' => '3']);
     }
 
@@ -23,7 +21,7 @@ return new class extends Migration
     public function down(): void
     {
         DB::table('dashboards')
-            ->where('access','3')
+            ->where('access', '3')
             ->update(['access' => '2']);
     }
 };
