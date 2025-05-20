@@ -32,7 +32,7 @@ trait HasThresholds
 {
     public function currentStatus(): Severity
     {
-        if ($this->sensor_class == 'state' && method_exists($this, 'currentTranslation')) {
+        if ($this->sensor_class == 'state' && $this instanceof \App\Models\Sensor) {
             return $this->currentTranslation()?->severity() ?? Severity::Unknown;
         }
 
