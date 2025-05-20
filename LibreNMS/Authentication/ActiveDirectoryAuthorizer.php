@@ -211,7 +211,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
 
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
+        $this->ldap_connection = ldap_connect(Config::get('auth_ad_url'));
+        if (empty($this->ldap_connection)) {
+            throw new AuthenticationException('Fatal error while connecting to AD, uri not valid: ' . Config::get('auth_ad_url'));
+        }
 
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
