@@ -57,11 +57,11 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
         }
 
         foreach ((array) $vlan_data as $ifIndex => $vlan_port) {
-            $port = get_port_by_index_cache($device['device_id'], $ifIndex);
+            $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
 
             $db_w = [
                 'device_id' => $device['device_id'],
-                'port_id' => $port['port_id'] ?? null,
+                'port_id' => $port?->port_id,
                 'vlan' => $vlan_id,
             ];
 
@@ -73,12 +73,12 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
 
             echo str_pad($db_a['baseport'], 10);
             echo str_pad($ifIndex, 10);
-            echo str_pad($port['ifName'] ?? $port['ifDescr'] ?? '', 25);
+            echo str_pad($port?->getLabel(), 25);
             echo str_pad($db_a['priority'], 10);
             echo str_pad($db_a['state'], 15);
             echo str_pad($db_a['cost'], 10);
 
-            $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port['port_id'] ?? null, $vlan_id]);
+            $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port?->port_id, $vlan_id]);
 
             if ($from_db && $from_db['port_vlan_id']) {
                 $db_id = $from_db['port_vlan_id'];

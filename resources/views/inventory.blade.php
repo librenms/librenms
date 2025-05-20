@@ -14,7 +14,8 @@
                 @endif
             </x-slot>
 
-            <table id="inventory" class="table table-hover table-condensed table-striped">
+            <table id="inventory" class="table table-hover table-condensed table-striped"
+                data-ajaxurl="{{ route('table.inventory') }}">
                 <thead>
                 <tr>
                     <th data-column-id="device" data-order="asc">@lang('Device')</th>

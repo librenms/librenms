@@ -36,7 +36,8 @@
                         "propertyNames": {
                             "pattern": "^value",
                             "type": "string"
-                        }
+                        },
+                        "required": ["value"]
                     },
                     "when": {
                         "properties": {

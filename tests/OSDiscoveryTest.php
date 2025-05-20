@@ -161,7 +161,7 @@ class OSDiscoveryTest extends TestCase
     {
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
-        if (count($config_os) < count(glob(Config::get('install_dir') . '/includes/definitions/*.yaml'))) {
+        if (count($config_os) < count(glob(resource_path('definitions/os_detection/*.yaml')))) {
             $config_os = array_keys(Config::get('os'));
         }
 
