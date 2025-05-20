@@ -34,12 +34,9 @@ class PrometheusServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // Singleton so every controller gets the same registry instance
-        $this->app->singleton(CollectorRegistry::class, function () {
-            // Use the in-memory adapter:
-            $adapter = new InMemory();
 
-            return new CollectorRegistry($adapter);
+        $this->app->bind(CollectorRegistry::class, function () {
+            return new CollectorRegistry(new InMemory());
         });
     }
 

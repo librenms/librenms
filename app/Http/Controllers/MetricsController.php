@@ -26,50 +26,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\AboutAlerts;
 use App\Services\AboutMetrics;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use Prometheus\CollectorRegistry;
 use Prometheus\RenderTextFormat;
+use Illuminate\Support\Facades\Cache;
 
 class MetricsController extends Controller
 {
     /**
      * Expose Prometheus metrics on port 9100 only.
      */
-    public function index(Request $request, AboutMetrics $aboutMetrics, CollectorRegistry $registry)
+    public function index(Request $request, AboutMetrics $aboutMetrics, AboutAlerts $aboutAlerts, CollectorRegistry $registry)
     {
-        if (Config::get('prometheus_metrics.enable', false)) {
-            $port = Config::get('prometheus_metrics.port');
-            if ($port) {
-                if ($request->getPort() !== $port) {
-                    abort(404, 'Metrics exposed on ' . $port);
-                }
-            }
-
-            // grab the stats from cache, or re-collect if it's been >300s
-            $stats = \Cache::remember('about_metrics', 300, function () use ($aboutMetrics) {
-                return $aboutMetrics->collect();
-            });
-
-            // Register and set each gauge
-            foreach ($stats as $name => $value) {
-                $metric_name = preg_replace('/^stat_/', 'qty_', $name);
-                $gauge = $registry->getOrRegisterGauge(
-                    'librenms',        // namespace
-                    "{$metric_name}",   // metric name
-                    '',    // help
-                    []                 // no labels
-                );
-                $gauge->set($value);
-            }
-
-            // Render Prometheus text format
-            $renderer = new RenderTextFormat();
-            $body = $renderer->render($registry->getMetricFamilySamples());
-
-            return response($body, 200)
-               ->header('Content-Type', RenderTextFormat::MIME_TYPE);
+        if (! Config::get('prometheus_metrics.enable')) {
+            abort(404);
         }
+
+        $port = Config::get('prometheus_metrics.port');
+        if ($port) {
+            if ($request->getPort() !== $port) {
+                abort(404, 'Metrics exposed on ' . $port);
+            }
+        }
+
+        $stats = Cache::remember('about_metrics', 300, fn() => $aboutMetrics->collect());
+        foreach ($stats as $stat => $val) {
+            $g = $registry->getOrRegisterGauge('librenms', 'qty_'.preg_replace('/^stat_/', '', $stat), '', []);
+            $g->set($val);
+        }
+
+        if (Config::get('prometheus_metrics.alerts', false)) {
+            //  active alerts
+            foreach ($aboutAlerts->active() as $ruleName => $openCount) {
+                $g = $registry->getOrRegisterGauge(
+                    'librenms',
+                    'alerts_active',
+                    'Number of currently open alerts',
+                    ['rule']
+                );
+                $g->set($openCount, [ $ruleName ]);
+            }
+
+            foreach ($aboutAlerts->raisedLast5m() as $ruleName => $raisedCnt) {
+                $g = $registry->getOrRegisterGauge(
+                    'librenms',
+                    'alerts_raised_last_5m',
+                    'Alerts that changed to active in the past 5 minutes',
+                    ['rule']
+                );
+                $g->set($raisedCnt, [ $ruleName ]);
+            }
+        }
+
+        // Render Prometheus text format
+        $renderer = new RenderTextFormat();
+        $body = $renderer->render($registry->getMetricFamilySamples());
+
+        return response($body, 200)
+            ->header('Content-Type', RenderTextFormat::MIME_TYPE);
     }
 }

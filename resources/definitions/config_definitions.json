@@ -5899,11 +5899,18 @@
             "section": "server",
             "order": 6
         },
+        "prometheus_metrics.alerts": {
+            "default": false,
+            "type": "boolean",
+            "group": "system",
+            "section": "server",
+            "order": 7
+        },                
         "prometheus_metrics.port": {
             "type": "integer",
             "group": "system",
             "section": "server",
-            "order": 7
+            "order": 8
         },
         "public_status": {
             "default": false,
