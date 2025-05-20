@@ -72,7 +72,7 @@ class AboutAlerts
 
             // zero-fill any rules that had no rows in the last 5m
             return $rules->mapWithKeys(function ($ruleName) use ($counts) {
-                return [ $ruleName => $counts[$ruleName] ?? 0 ];
+                return [$ruleName => $counts[$ruleName] ?? 0];
             })->toArray();
         });
     }
