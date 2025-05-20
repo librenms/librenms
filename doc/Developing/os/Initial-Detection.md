@@ -9,7 +9,7 @@ snmpget an oid and check for a value.  snmpget is discouraged because it slows
 down all os detections, not just the added os.
 
 To begin, create the new OS file which should be called
-`includes/definitions/pulse.yaml`. Here is a working example:
+`resources/definitions/os_detection/pulse.yaml`. Here is a working example:
 
 ```yaml
 os: pulse
