@@ -7,7 +7,7 @@
 // pre-cache
 $oidsOut = SnmpQuery::cache()->hideMib()->walk([
     'IPOMANII-MIB::outletConfigDesc',
-    'IPOMANII-MIB::outletConfigLocation'
+    'IPOMANII-MIB::outletConfigLocation',
 ])->table(1);
 
 //data
