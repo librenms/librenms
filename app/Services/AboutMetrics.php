@@ -37,16 +37,16 @@ use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Mempool;
-use App\Models\Qos;
 use App\Models\Port;
+use App\Models\PrinterSupply;
 use App\Models\Processor;
 use App\Models\Pseudowire;
+use App\Models\Qos;
 use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Syslog;
-use App\Models\PrinterSupply;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
@@ -91,4 +91,3 @@ class AboutMetrics
         ];
     }
 }
-
