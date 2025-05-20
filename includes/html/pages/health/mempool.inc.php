@@ -33,7 +33,8 @@ $graph_view = $vars['view'] == 'graphs';
         </div>
     </div>
     <div class="table-responsive">
-        <table id="mempool" class="table table-hover table-condensed mempool">
+        <table id="mempool" class="table table-hover table-condensed mempool"
+            data-ajaxurl="<?php echo url('/ajax/table/mempools'); ?>">
             <thead>
                 <tr>
                     <th data-column-id="hostname">Device</th>
@@ -51,7 +52,7 @@ $graph_view = $vars['view'] == 'graphs';
         ajax: true,
         rowCount: [50, 100, 250, -1],
         post: function ()
-        {
+{
             return {
                 view: '<?php echo htmlspecialchars($vars['view']); ?>'
             };
