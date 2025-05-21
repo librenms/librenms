@@ -216,7 +216,7 @@ class AvailabilityMapController extends WidgetController
             return '';
         }
 
-        return $service->service_type . ' - ' . __($state_name);
+        return $service->service_name;
     }
 
     private function getDeviceTooltip(Device $device, string $state_name): string
