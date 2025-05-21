@@ -276,7 +276,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('processors/export', [Table\ProcessorsController::class, 'export']);
             Route::post('routes', Table\RoutesTablesController::class);
             Route::post('sensors', Table\SensorsController::class)->name('table.sensors');
-            Route::get('sensors/{class?}/export', [Table\SensorsController::class, 'export']);
+            Route::get('sensors/export', [Table\SensorsController::class, 'export']);
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
             Route::post('syslog', Table\SyslogController::class);
