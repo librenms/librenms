@@ -3,7 +3,6 @@
 /**
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
 $oids = SnmpQuery::hideMib()->walk([
     'CADANT-CMTS-EQUIPMENT-MIB::cardTemperature',
     'CADANT-CMTS-EQUIPMENT-MIB::cardName',
