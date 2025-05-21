@@ -37,9 +37,9 @@ if ($sensor->hasThresholds()) {
 // defined, so it's forced to +-1% of the min/max.
 if ($sensor->doesntHaveThresholds()) {
     $rrd_options .= ' CDEF:canvas_max=sensor_max,1.01,*';
-    $rrd_options .= ' LINE1:canvas_max#000000ff::dashes'; // Hidden for scale only
+    $rrd_options .= ' LINE1:canvas_max#00000000::dashes'; // Hidden for scale only
     $rrd_options .= ' CDEF:canvas_min=sensor_min,0.99,*';
-    $rrd_options .= ' LINE1:canvas_min#000000ff::dashes'; // Hidden for scale only
+    $rrd_options .= ' LINE1:canvas_min#00000000::dashes'; // Hidden for scale only
 }
 
 $rrd_options .= ' COMMENT:"\n"';
