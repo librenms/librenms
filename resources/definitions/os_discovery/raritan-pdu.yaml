@@ -28,9 +28,9 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   divisor: 1000
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
@@ -60,9 +60,9 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   divisor: 10
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
@@ -75,9 +75,9 @@ modules:
                 - oid: PDU2-MIB::outletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsOutletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.4.3.1.4.{{ $index }}'
-                  index: 'measurementsOutletSensorValue.{{ $index }}'
                   divisor: 10
                   descr: '{{ PDU2-MIB::outletLabel:0-1 }} {{ PDU2-MIB::outletName:0-1 }}'
+                  index: 'measurementsOutletSensorValue.{{ $index }}'
                   group: Outlet
                   low_limit: PDU2-MIB::outletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
@@ -93,6 +93,7 @@ modules:
                   value: PDU2-MIB::measurementsExternalSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.5.3.1.4.{{ $index }}'
                   descr: PDU2-MIB::externalSensorName
+                  index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: External
                   low_limit: PDU2-MIB::externalSensorLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::externalSensorLowerWarningThreshold
@@ -108,8 +109,8 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
@@ -138,8 +139,8 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
@@ -168,8 +169,8 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   states:
                       - { value: 0, descr: On, graph: 0, generic: 0 }
@@ -194,6 +195,7 @@ modules:
                 - oid: PDU2-MIB::externalSensorMeasurementsTable
                   value: PDU2-MIB::measurementsExternalSensorValue
                   descr: PDU2-MIB::externalSensorName
+                  index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Door
                   states:
                       - { value: 0, descr: Closed, graph: 0, generic: 0 }
@@ -205,6 +207,7 @@ modules:
                 - oid: PDU2-MIB::externalSensorMeasurementsTable
                   value: PDU2-MIB::measurementsExternalSensorValue
                   descr: PDU2-MIB::externalSensorName
+                  index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Lock
                   states:
                       - { value: 0, descr: Locked, graph: 0, generic: 0 }
@@ -216,6 +219,7 @@ modules:
                 - oid: PDU2-MIB::externalSensorMeasurementsTable
                   value: PDU2-MIB::measurementsExternalSensorValue
                   descr: PDU2-MIB::externalSensorName
+                  index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Door Handle
                   states:
                       - { value: 0, descr: Locked, graph: 0, generic: 0 }
@@ -230,6 +234,7 @@ modules:
                   value: PDU2-MIB::measurementsExternalSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.5.3.1.4.{{ $index }}'
                   descr: PDU2-MIB::externalSensorName
+                  index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: External
                   low_limit: PDU2-MIB::externalSensorLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::externalSensorLowerWarningThreshold
@@ -245,8 +250,8 @@ modules:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsInletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
-                  index: 'measurementsInletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
                   low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
@@ -259,8 +264,8 @@ modules:
                 - oid: PDU2-MIB::outletSensorMeasurementsTable
                   value: PDU2-MIB::measurementsOutletSensorValue
                   num_oid: '.1.3.6.1.4.1.13742.6.5.4.3.1.4.{{ $index }}'
-                  index: 'measurementsOutletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::outletLabel:0-1 }} {{ PDU2-MIB::outletName:0-1 }}'
+                  index: 'measurementsOutletSensorValue.{{ $index }}'
                   group: Outlet
                   low_limit: PDU2-MIB::outletSensorSignedLowerCriticalThreshold
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
