@@ -17,7 +17,7 @@
     </div>
     <div class="table-responsive">
         <table id="processor" class="table table-hover table-condensed"
-               data-ajaxurl="{{ route('table.processors') }}">
+               data-url="{{ route('table.processors') }}">
             <thead>
             <tr>
                 <th data-column-id="device_hostname">{{ __('Device') }}</th>
@@ -38,8 +38,7 @@
             return {
                 view: '{{ $view }}>'
             };
-        },
-        url: "{{ route('table.processors') }}"
+        }
     });
 </script>
 @endsection
