@@ -1,6 +1,11 @@
 mib: ARRIS-C3-FPD-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                    - IF-MIB::ifName
         temperature:
             data:
                 -
@@ -101,3 +106,17 @@ modules:
                     states:
                         - { descr: attached, graph: 0, value: 1, generic: 0 }
                         - { descr: detached, graph: 0, value: 2, generic: 2 }
+        snr:
+            data:
+                -
+                    oid: DOCS-IF-MIB::docsIfSignalQualityTable
+                    value: DOCS-IF-MIB::docsIfSigQSignalNoise
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.4.1.5.{{ $index }}'
+                    descr: 'Channel  - {{ $IF-MIB::ifName }}'
+                    index: 'docsIfSigQSignalNoise.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: IF-MIB::ifName
+                            op: not_regex
+                            value: '/.0$/'
