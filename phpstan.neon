@@ -25,7 +25,7 @@ parameters:
     scanDirectories:
         - includes
 
-    level: 6
+    level: 7
 
     treatPhpDocTypesAsCertain: false
 

@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/AlertDB.php
+
+		-
 			message: '#^Class LibreNMS\\Alert\\AlertData extends generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -29,6 +35,24 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message: '#^Parameter \#1 \$data of function gzcompress expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Alert/AlertUtil.php
 
 		-
 			message: '#^Method LibreNMS\\Alert\\AlertUtil\:\:findContactsOwners\(\) has parameter \$results with no value type specified in iterable type array\.$#'
@@ -101,6 +125,12 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: LibreNMS/Alert/AlertUtil.php
+
+		-
+			message: '#^Call to an undefined method object\:\:deliverAlert\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: LibreNMS/Alert/RunAlerts.php
 
 		-
 			message: '#^Method LibreNMS\\Alert\\RunAlerts\:\:alertLog\(\) has no return type specified\.$#'
@@ -211,6 +241,18 @@ parameters:
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
+			message: '#^Parameter \#1 \$data of function gzcompress expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Template\:\:bladeBody\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -253,14 +295,38 @@ parameters:
 			path: LibreNMS/Alert/Template.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of TRelatedModel of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<TRelatedModel\>\)\: Illuminate\\Database\\Eloquent\\Builder\<TRelatedModel\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<TRelatedModel\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of TRelatedModel of Illuminate\\Database\\Eloquent\\Model, ''alert_rule_id'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Template.php
+
+		-
 			message: '#^Property LibreNMS\\Alert\\Template\:\:\$template has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Alert/Template.php
 
 		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 2
+			path: LibreNMS/Alert/Transport.php
+
+		-
+			message: '#^Call to an undefined method object\:\:name\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: LibreNMS/Alert/Transport.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\:\:list\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport.php
+
+		-
+			message: '#^Method LibreNMS\\Alert\\Transport\:\:make\(\) should return LibreNMS\\Interfaces\\Alert\\Transport but returns object\.$#'
+			identifier: return.type
 			count: 1
 			path: LibreNMS/Alert/Transport.php
 
@@ -331,6 +397,18 @@ parameters:
 			path: LibreNMS/Alert/Transport/Api.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\:\:\$username\.$#'
+			identifier: property.notFound
+			count: 1
+			path: LibreNMS/Alert/Transport/Browserpush.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\:\:pushSubscriptions\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: LibreNMS/Alert/Transport/Browserpush.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Browserpush\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -343,6 +421,12 @@ parameters:
 			path: LibreNMS/Alert/Transport/Browserpush.php
 
 		-
+			message: '#^Possibly invalid array key type \(array\|string\)\.$#'
+			identifier: array.invalidKey
+			count: 1
+			path: LibreNMS/Alert/Transport/Browserpush.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Canopsis\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -351,6 +435,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Canopsis\:\:deliverAlert\(\) has parameter \$alert_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport/Canopsis.php
+
+		-
+			message: '#^Parameter \#1 \$body of class PhpAmqpLib\\Message\\AMQPMessage constructor expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Alert/Transport/Canopsis.php
 
@@ -379,6 +469,12 @@ parameters:
 			path: LibreNMS/Alert/Transport/Clickatell.php
 
 		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Clickatell.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Discord\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -399,6 +495,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Discord\:\:getColorOfAlertState\(\) has parameter \$alert_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport/Discord.php
+
+		-
+			message: '#^Method LibreNMS\\Alert\\Transport\\Discord\:\:getColorOfAlertState\(\) should return int but returns float\|int\.$#'
+			identifier: return.type
 			count: 1
 			path: LibreNMS/Alert/Transport/Discord.php
 
@@ -589,6 +691,18 @@ parameters:
 			path: LibreNMS/Alert/Transport/Ilert.php
 
 		-
+			message: '#^Parameter \#1 \$string of function strlen expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Ilert.php
+
+		-
+			message: '#^Cannot access offset ''name'' on array\{name\: string, passwd\: string, uid\: int, gid\: int, gecos\: string, dir\: string, shell\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Alert/Transport/Irc.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Irc\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -597,6 +711,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Irc\:\:deliverAlert\(\) has parameter \$alert_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport/Irc.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fclose expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Irc.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fwrite expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Irc.php
+
+		-
+			message: '#^Parameter \#1 \$user_id of function posix_getpwuid expects int, int\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Alert/Transport/Irc.php
 
@@ -733,6 +865,12 @@ parameters:
 			path: LibreNMS/Alert/Transport/Nagios.php
 
 		-
+			message: '#^Method LibreNMS\\Alert\\Transport\\Nagios\:\:deliverAlert\(\) should return bool but returns int\<0, max\>\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Nagios.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Opsgenie\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -743,6 +881,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/Alert/Transport/Opsgenie.php
+
+		-
+			message: '#^Argument of an invalid type array\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Alert/Transport/Osticket.php
 
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Osticket\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
@@ -777,6 +921,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Playsms\:\:deliverAlert\(\) has parameter \$alert_data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport/Playsms.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Alert/Transport/Playsms.php
 
@@ -859,6 +1009,12 @@ parameters:
 			path: LibreNMS/Alert/Transport/Sensu.php
 
 		-
+			message: '#^Parameter \#4 \$template of class LibreNMS\\Exceptions\\AlertTransportDeliveryException constructor expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Alert/Transport/Sensu.php
+
+		-
 			message: '#^Property LibreNMS\\Alert\\Transport\\Sensu\:\:\$status type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -925,6 +1081,12 @@ parameters:
 			path: LibreNMS/Alert/Transport/Smseagle.php
 
 		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alert/Transport/Smseagle.php
+
+		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Smsfeedback\:\:configTemplate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -981,6 +1143,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Alert\\Transport\\Telegram\:\:embedGraphs\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Alert/Transport/Telegram.php
+
+		-
+			message: '#^Parameter \#1 \$finfo of function finfo_buffer expects finfo, finfo\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Alert/Transport/Telegram.php
 
@@ -1105,6 +1273,12 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFluentParser.php
 
 		-
+			message: '#^Cannot access offset 0 on list\<string\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
 			message: '#^Method LibreNMS\\Alerting\\QueryBuilderParser\:\:__construct\(\) has parameter \$builder with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -1165,6 +1339,24 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderParser.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_chunk expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, array\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
+			message: '#^Part \$value \(array\|float\|int\|string\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
 			message: '#^Property LibreNMS\\Alerting\\QueryBuilderParser\:\:\$builder has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1199,6 +1391,42 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''dn'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''memberof'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''name'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''objectsid'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset 0 on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
 			message: '#^Method LibreNMS\\Authentication\\ADAuthorizationAuthorizer\:\:authLdapSessionCacheGet\(\) has no return type specified\.$#'
@@ -1345,6 +1573,42 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
+			message: '#^Offset 0 might not exist on array\{0\?\: array\{string, int\<\-1, max\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_shift expects array, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result given\.$#'
+			identifier: argument.type
+			count: 4
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result\|false given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
 			message: '#^Property LibreNMS\\Authentication\\ADAuthorizationAuthorizer\:\:\$AUTH_IS_EXTERNAL has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1355,6 +1619,42 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Property LibreNMS\\Authentication\\ADAuthorizationAuthorizer\:\:\$ldap_connection \(LDAP\\Connection\|null\) does not accept LDAP\\Connection\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 4
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''dn'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''name'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''objectsid'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Cannot access offset 0 on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
 
 		-
 			message: '#^Method LibreNMS\\Authentication\\ActiveDirectoryAuthorizer\:\:authenticate\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
@@ -1513,6 +1813,42 @@ parameters:
 			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
 
 		-
+			message: '#^Offset 0 might not exist on array\{0\?\: array\{string, int\<\-1, max\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_shift expects array, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result\|false given\.$#'
+			identifier: argument.type
+			count: 5
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
 			message: '#^Property LibreNMS\\Authentication\\ActiveDirectoryAuthorizer\:\:\$CAN_UPDATE_PASSWORDS has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -1521,6 +1857,12 @@ parameters:
 		-
 			message: '#^Property LibreNMS\\Authentication\\ActiveDirectoryAuthorizer\:\:\$is_bound has no type specified\.$#'
 			identifier: missingType.property
+			count: 1
+			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
+
+		-
+			message: '#^Property LibreNMS\\Authentication\\ActiveDirectoryAuthorizer\:\:\$ldap_connection \(LDAP\\Connection\|null\) does not accept LDAP\\Connection\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
 
@@ -1577,6 +1919,54 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Authentication/HttpAuthAuthorizer.php
+
+		-
+			message: '#^Argument of an invalid type array\<int\|string, array\|int\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''cn'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 3
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''dn'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''uid'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''uidnumber'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset 0 on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Cannot access offset mixed on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
 			message: '#^Method LibreNMS\\Authentication\\LdapAuthorizationAuthorizer\:\:authLdapSessionCacheGet\(\) has no return type specified\.$#'
@@ -1639,10 +2029,64 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result\|false given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
 			message: '#^Property LibreNMS\\Authentication\\LdapAuthorizationAuthorizer\:\:\$AUTH_IS_EXTERNAL has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Property LibreNMS\\Authentication\\LdapAuthorizationAuthorizer\:\:\$ldap_connection \(LDAP\\Connection\|null\) does not accept LDAP\\Connection\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
+
+		-
+			message: '#^Argument of an invalid type array\<int\|string, array\|int\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 3
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''count'' on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''dn'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Cannot access offset ''uid'' on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Cannot access offset 0 on array\<int\|string, array\|int\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Cannot access offset string on array\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
 
 		-
 			message: '#^Method LibreNMS\\Authentication\\LdapAuthorizer\:\:authenticate\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
@@ -1707,6 +2151,30 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Authentication\\LdapAuthorizer\:\:setAuthLdapSuffixOu\(\) has parameter \$username with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$entry of method LibreNMS\\Authentication\\LdapAuthorizer\:\:ldapToUser\(\) expects array, array\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Parameter \#2 \$result of function ldap_get_entries expects LDAP\\Result, array\|LDAP\\Result\|false given\.$#'
+			identifier: argument.type
+			count: 6
+			path: LibreNMS/Authentication/LdapAuthorizer.php
+
+		-
+			message: '#^Property LibreNMS\\Authentication\\LdapAuthorizer\:\:\$ldap_connection \(LDAP\\Connection\|null\) does not accept LDAP\\Connection\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizer.php
 
@@ -1829,6 +2297,18 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Authentication/SSOAuthorizer.php
+
+		-
+			message: '#^Method LibreNMS\\Authentication\\TwoFactor\:\:verifyHOTP\(\) should return bool\|int but returns float\|int\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Authentication/TwoFactor.php
+
+		-
+			message: '#^Parameter \#2 \$counter of static method LibreNMS\\Authentication\\TwoFactor\:\:oathHOTP\(\) expects bool\|int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
 			message: '#^Property LibreNMS\\Authentication\\TwoFactor\:\:\$base32 has no type specified\.$#'
@@ -2173,6 +2653,36 @@ parameters:
 			path: LibreNMS/Billing.php
 
 		-
+			message: '#^Parameter \#1 \$object of function date_add expects DateTime, DateTime\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Billing.php
+
+		-
+			message: '#^Parameter \#1 \$object of function date_format expects DateTimeInterface, DateTime\|false given\.$#'
+			identifier: argument.type
+			count: 4
+			path: LibreNMS/Billing.php
+
+		-
+			message: '#^Parameter \#1 \$object of function date_sub expects DateTime, DateTime\|false given\.$#'
+			identifier: argument.type
+			count: 6
+			path: LibreNMS/Billing.php
+
+		-
+			message: '#^Parameter \#2 \$interval of function date_add expects DateInterval, DateInterval\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Billing.php
+
+		-
+			message: '#^Parameter \#2 \$interval of function date_sub expects DateInterval, DateInterval\|false given\.$#'
+			identifier: argument.type
+			count: 6
+			path: LibreNMS/Billing.php
+
+		-
 			message: '#^Method LibreNMS\\Cache\\PermissionsCache\:\:billsForUser\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -2205,6 +2715,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Cache\\PermissionsCache\:\:getPortPermissions\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/Cache/PermissionsCache.php
+
+		-
+			message: '#^Method LibreNMS\\Cache\\PermissionsCache\:\:getUserId\(\) should return int\|null but returns int\|string\|null\.$#'
+			identifier: return.type
 			count: 1
 			path: LibreNMS/Cache/PermissionsCache.php
 
@@ -2407,6 +2923,12 @@ parameters:
 			path: LibreNMS/Component.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Component\>\:\:pluck\(\) expects Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\Component, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Component.php
+
+		-
 			message: '#^Property LibreNMS\\Component\:\:\$reserved has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -2469,6 +2991,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\ComposerHelper\:\:setPermissions\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: LibreNMS/ComposerHelper.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/ComposerHelper.php
 
@@ -2617,6 +3145,36 @@ parameters:
 			path: LibreNMS/DB/Schema.php
 
 		-
+			message: '#^Parameter \#1 \$data of function unserialize expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/DB/Schema.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/DB/Schema.php
+
+		-
+			message: '#^Parameter \#1 \$path of function basename expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/DB/Schema.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Connection\:\:select\(\) expects string, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: LibreNMS/DB/Schema.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<int\<0, max\>, string\>\|iterable\<int\<0, max\>, string\>\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/DB/Schema.php
+
+		-
 			message: '#^Property LibreNMS\\DB\\Schema\:\:\$relationship_blacklist has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -2661,6 +3219,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Data\\Graphing\\GraphParameters\:\:toRrdOptions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Data/Graphing/GraphParameters.php
+
+		-
+			message: '#^Offset ''subtype'' might not exist on array\{0\?\: string, type\?\: non\-empty\-string, 1\?\: non\-empty\-string, subtype\?\: non\-empty\-string, 2\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/Data/Graphing/GraphParameters.php
+
+		-
+			message: '#^Offset ''type'' might not exist on array\{0\?\: string, type\?\: non\-empty\-string, 1\?\: non\-empty\-string, subtype\?\: non\-empty\-string, 2\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: LibreNMS/Data/Graphing/GraphParameters.php
 
@@ -2785,6 +3355,30 @@ parameters:
 			path: LibreNMS/Data/Source/NetSnmpQuery.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_diff expects array, array\|string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Data/Source/NetSnmpQuery.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, array\|string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: LibreNMS/Data/Source/NetSnmpQuery.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, array\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Data/Source/NetSnmpQuery.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, array\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Data/Source/NetSnmpQuery.php
+
+		-
 			message: '#^Property LibreNMS\\Data\\Source\\NetSnmpQuery\:\:\$cleanup type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -2901,6 +3495,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Data\\Source\\SnmpResponse\:\:valuesByIndex\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Data/Source/SnmpResponse.php
+
+		-
+			message: '#^Possibly invalid array key type \(list\<string\>\|string\|null\)\.$#'
+			identifier: offsetAccess.invalidOffset
 			count: 1
 			path: LibreNMS/Data/Source/SnmpResponse.php
 
@@ -3205,6 +3805,18 @@ parameters:
 			path: LibreNMS/Data/Store/Prometheus.php
 
 		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: '#^Binary operation "\." between list\<string\>\|string and '' '' results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
 			message: '#^Method LibreNMS\\Data\\Store\\Rrd\:\:close\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -3237,6 +3849,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Data\\Store\\Rrd\:\:getRrdFiles\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: '#^Method LibreNMS\\Data\\Store\\Rrd\:\:getRrdFiles\(\) should return array but returns list\<string\>\|false\.$#'
+			identifier: return.type
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php
 
@@ -3321,6 +3939,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Data\\Store\\Rrd\:\:update\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Data/Store/Rrd.php
+
+		-
+			message: '#^Parameter \#1 \$array of function sort expects TArray of array\<string\>, list\<string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php
 
@@ -3452,6 +4076,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$model of static method LibreNMS\\Model\:\:onDelete\(\) expects static\(LibreNMS\\Device\\Processor\), LibreNMS\\Device\\Processor given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message: '#^Parameter \#2 \$length of function array_chunk expects int\<1, max\>, int\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: LibreNMS/Device/Processor.php
@@ -3745,6 +4375,30 @@ parameters:
 			path: LibreNMS/Device/YamlDiscovery.php
 
 		-
+			message: '#^Parameter \#1 \$haystack of function str_contains expects string, int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Device/YamlDiscovery.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Device/YamlDiscovery.php
+
+		-
+			message: '#^Parameter \#2 \$index of static method LibreNMS\\Device\\YamlDiscovery\:\:replaceValues\(\) expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Device/YamlDiscovery.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Device/YamlDiscovery.php
+
+		-
 			message: '#^Method LibreNMS\\Discovery\\Yaml\\IndexField\:\:calculateValue\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -3777,6 +4431,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Discovery\\Yaml\\YamlDiscoveryField\:\:calculateValue\(\) has parameter \$yaml with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Discovery/Yaml/YamlDiscoveryField.php
+
+		-
+			message: '#^Parameter \#1 \$name of static method LibreNMS\\Device\\YamlDiscovery\:\:replaceValues\(\) expects string, int\|string\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Discovery/Yaml/YamlDiscoveryField.php
 
@@ -3829,6 +4489,12 @@ parameters:
 			path: LibreNMS/Discovery/YamlDiscoveryDefinition.php
 
 		-
+			message: '#^Parameter \#1 \$oid of static method LibreNMS\\Util\\Oid\:\:of\(\) expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Discovery/YamlDiscoveryDefinition.php
+
+		-
 			message: '#^Unable to resolve the template type TKey in call to function collect$#'
 			identifier: argument.templateType
 			count: 1
@@ -3839,6 +4505,18 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: LibreNMS/Discovery/YamlDiscoveryDefinition.php
+
+		-
+			message: '#^Method LibreNMS\\Enum\\ImageFormat\:\:getImageEnd\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Enum/ImageFormat.php
+
+		-
+			message: '#^Method LibreNMS\\Enum\\PortAssociationMode\:\:getId\(\) should return int\|null but returns int\|string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Enum/PortAssociationMode.php
 
 		-
 			message: '#^Method LibreNMS\\Exceptions\\AlertTransportDeliveryException\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
@@ -3909,6 +4587,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Exceptions\\FilePermissionsException\:\:generateCommands\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Exceptions/FilePermissionsException.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Exceptions/FilePermissionsException.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Exceptions/FilePermissionsException.php
 
@@ -4153,6 +4843,12 @@ parameters:
 			path: LibreNMS/Exceptions/JsonAppWrongVersionException.php
 
 		-
+			message: '#^Method LibreNMS\\Exceptions\\LdapMissingException\:\:render\(\) should return Illuminate\\Http\\Response but returns Illuminate\\Http\\JsonResponse\|Illuminate\\Http\\Response\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Exceptions/LdapMissingException.php
+
+		-
 			message: '#^Method LibreNMS\\Exceptions\\UnserializableRouteCache\:\:__construct\(\) has parameter \$cli_php_version with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4177,6 +4873,12 @@ parameters:
 			path: LibreNMS/Exceptions/UnserializableRouteCache.php
 
 		-
+			message: '#^Parameter \#1 \$string of function rtrim expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Exceptions/UnserializableRouteCache.php
+
+		-
 			message: '#^Property LibreNMS\\Exceptions\\UnserializableRouteCache\:\:\$cli_php_version has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -4187,6 +4889,48 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: LibreNMS/Exceptions/UnserializableRouteCache.php
+
+		-
+			message: '#^Cannot access offset ''ifAdminStatus'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''ifInOctets_rate'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''ifInUcastPkts_rate'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''ifOperStatus'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''ifOutOctets_rate'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''ifOutUcastPkts_rate'' on Illuminate\\Database\\Eloquent\\Relations\\HasMany\<App\\Models\\Port, App\\Models\\Device\>\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Cannot access offset ''name'' on array\{name\: string, passwd\: string, uid\: int, gid\: int, gecos\: string, dir\: string, shell\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/IRCBot.php
 
 		-
 			message: '#^Method LibreNMS\\IRCBot\:\:_auth\(\) has no return type specified\.$#'
@@ -4605,6 +5349,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\IRCBot\:\:sendMessage\(\) has parameter \$message with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''ignore'' given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Parameter \#1 \$string of function strlen expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/IRCBot.php
+
+		-
+			message: '#^Parameter \#1 \$user_id of function posix_getpwuid expects int, int\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/IRCBot.php
 
@@ -5929,6 +6691,24 @@ parameters:
 			path: LibreNMS/Modules/Core.php
 
 		-
+			message: '#^Parameter \#1 \$seconds of static method LibreNMS\\Util\\Time\:\:formatInterval\(\) expects int\|null, float\|int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/Core.php
+
+		-
+			message: '#^Parameter \#3 \$length of function substr expects int\|null, int\<0, max\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/Core.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$uptime \(int\|null\) does not accept float\|int\<1, max\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/Modules/Core.php
+
+		-
 			message: '#^Method LibreNMS\\Modules\\EntityPhysical\:\:dependencies\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -6043,6 +6823,12 @@ parameters:
 			path: LibreNMS/Modules/Ipv6Addresses.php
 
 		-
+			message: '#^Method LibreNMS\\Modules\\Ipv6Addresses\:\:parsePrefixLen\(\) should return int but returns int\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Modules/Ipv6Addresses.php
+
+		-
 			message: '#^Method LibreNMS\\Modules\\Ipv6Addresses\:\:syncModels\(\) has parameter \$existing with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6075,6 +6861,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Modules\\Ipv6Addresses\:\:syncModelsByGroup\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/Modules/Ipv6Addresses.php
+
+		-
+			message: '#^Parameter \#1 \$cidr of method LibreNMS\\Util\\IP\:\:getNetwork\(\) expects int\|null, int\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Modules/Ipv6Addresses.php
 
@@ -6277,6 +7069,12 @@ parameters:
 			path: LibreNMS/Modules/LegacyModule.php
 
 		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/LegacyModule.php
+
+		-
 			message: '#^Property LibreNMS\\Modules\\LegacyModule\:\:\$module_deps type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -6475,6 +7273,12 @@ parameters:
 			path: LibreNMS/Modules/Netstats.php
 
 		-
+			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/Netstats.php
+
+		-
 			message: '#^Method LibreNMS\\Modules\\Os\:\:dependencies\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -6483,6 +7287,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Modules\\Os\:\:dump\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Modules/Os.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$sysContact \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
@@ -6627,6 +7437,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Modules\\Ospfv3\:\:syncModelsByGroup\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/Modules/Ospfv3.php
+
+		-
+			message: '#^Property App\\Models\\Ospfv3Nbr\:\:\$router_id \(string\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/Modules/Ospfv3.php
+
+		-
+			message: '#^Property App\\Models\\Ospfv3Port\:\:\$ospfv3IfBackupDesignatedRouter \(string\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/Modules/Ospfv3.php
+
+		-
+			message: '#^Property App\\Models\\Ospfv3Port\:\:\$ospfv3IfDesignatedRouter \(string\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Modules/Ospfv3.php
 
@@ -6789,6 +7617,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Modules\\PrinterSupplies\:\:syncModelsByGroup\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: '#^Parameter \#1 \$part of static method LibreNMS\\Util\\Number\:\:calculatePercent\(\) expects float\|int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: '#^Parameter \#1 \$part of static method LibreNMS\\Util\\Number\:\:calculatePercent\(\) expects float\|int, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Modules/PrinterSupplies.php
+
+		-
+			message: '#^Property App\\Models\\PrinterSupply\:\:\$supply_current \(int\) does not accept bool\|float\|int\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
 
@@ -7585,6 +8431,12 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
+			message: '#^Method LibreNMS\\OS\:\:make\(\) should return LibreNMS\\OS but returns object\.$#'
+			identifier: return.type
+			count: 2
+			path: LibreNMS/OS.php
+
+		-
 			message: '#^Method LibreNMS\\OS\:\:memValid\(\) has parameter \$storage with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7743,6 +8595,36 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\:\:replaceStringsInFields\(\) has parameter \$os_yaml with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: '#^Parameter \#1 \$oid of method LibreNMS\\Data\\Source\\SnmpQueryInterface\:\:get\(\) expects array\|string, array\|ArrayAccess given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: '#^Parameter \#5 \$description of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects string, list\<string\>\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: '#^Property App\\Models\\Stp\:\:\$timeSinceTopologyChange \(string\) does not accept int\|string\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/OS.php
 
@@ -8041,6 +8923,30 @@ parameters:
 			path: LibreNMS/OS/Alfo80hd.php
 
 		-
+			message: '#^Property App\\Models\\Device\:\:\$features \(string\|null\) does not accept list\<string\>\|string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Allied.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$hardware \(string\|null\) does not accept list\<string\>\|string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Allied.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept list\<string\>\|string\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Allied.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/AllworxVoip.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Aos\:\:discoverProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8135,6 +9041,24 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Aprisa.php
+
+		-
+			message: '#^Offset ''hardware'' might not exist on array\{0\?\: string, rev\?\: non\-empty\-string, 1\?\: non\-empty\-string, version\?\: non\-empty\-string, 2\?\: non\-empty\-string, hardware\?\: non\-empty\-string, 3\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/OS/ArrisCm.php
+
+		-
+			message: '#^Offset ''rev'' might not exist on array\{0\?\: string, rev\?\: non\-empty\-string, 1\?\: non\-empty\-string, version\?\: non\-empty\-string, 2\?\: non\-empty\-string, hardware\?\: non\-empty\-string, 3\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/OS/ArrisCm.php
+
+		-
+			message: '#^Offset ''version'' might not exist on array\{0\?\: string, rev\?\: non\-empty\-string, 1\?\: non\-empty\-string, version\?\: non\-empty\-string, 2\?\: non\-empty\-string, hardware\?\: non\-empty\-string, 3\?\: non\-empty\-string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/OS/ArrisCm.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\ArrisDsr4410md\:\:discoverWirelessQuality\(\) return type has no value type specified in iterable type array\.$#'
@@ -8455,6 +9379,12 @@ parameters:
 			path: LibreNMS/OS/AsuswrtMerlin.php
 
 		-
+			message: '#^Parameter \#2 \$string of function explode expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/OS/AsuswrtMerlin.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\AviatWtm\:\:discoverWirelessFrequency\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8515,6 +9445,18 @@ parameters:
 			path: LibreNMS/OS/Boss.php
 
 		-
+			message: '#^Parameter \#2 \$string of function explode expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Boss.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept string\|true\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Boss.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Ceraos\:\:discoverWirelessErrors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8553,6 +9495,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Ceraos\:\:fetchHardware\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: LibreNMS/OS/Ceraos.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$serial \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/OS/Ceraos.php
 
@@ -8653,10 +9601,34 @@ parameters:
 			path: LibreNMS/OS/Datadomain.php
 
 		-
+			message: '#^Parameter \#2 \$string of function explode expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/DdWrt.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$hardware \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/DdWrt.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Deliberant\:\:discoverWirelessClients\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Deliberant.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of static method Illuminate\\Support\\Str\:\:contains\(\) expects string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Dhcpatriot.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Dhcpatriot.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Dlinkap\:\:discoverMempools\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -8667,6 +9639,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Dlinkap\:\:discoverProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Dlinkap.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept string\|true\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/OS/Dlinkap.php
 
@@ -8737,8 +9715,26 @@ parameters:
 			path: LibreNMS/OS/Edgeswitch.php
 
 		-
+			message: '#^Parameter \#1 \$data of method LibreNMS\\OS\\Edgeswitch\:\:parseCpuUsage\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/OS/Edgeswitch.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Edgeswitch.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Ekinops\:\:ekinopsInfo\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Ekinops.php
+
+		-
+			message: '#^Parameter \#1 \$ekiInfo of static method LibreNMS\\OS\\Ekinops\:\:ekinopsInfo\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Ekinops.php
 
@@ -8803,6 +9799,12 @@ parameters:
 			path: LibreNMS/OS/Enterasys.php
 
 		-
+			message: '#^Parameter \#1 \$string of function substr expects string, int\<1001, max\>\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Enterasys.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Epmp\:\:discoverWirelessClients\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8823,6 +9825,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Epmp\:\:discoverWirelessSnr\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Epmp.php
+
+		-
+			message: '#^Parameter \#1 \$part of static method LibreNMS\\Util\\Number\:\:calculatePercent\(\) expects float\|int, float\|int\<min, \-1\>\|int\<1, max\>\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Epmp.php
+
+		-
+			message: '#^Parameter \#2 \$total of static method LibreNMS\\Util\\Number\:\:calculatePercent\(\) expects float\|int, float\|int\<min, \-1\>\|int\<1, max\>\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Epmp.php
 
@@ -9007,6 +10021,18 @@ parameters:
 			path: LibreNMS/OS/Fabos.php
 
 		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Fabos.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Fabos.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Fortiap\:\:discoverWirelessClients\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -9077,6 +10103,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Fortigate.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Fortios.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Fortiwlc\:\:discoverWirelessApCount\(\) return type has no value type specified in iterable type array\.$#'
@@ -9475,6 +10507,18 @@ parameters:
 			path: LibreNMS/OS/Ios.php
 
 		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Ios.php
+
+		-
+			message: '#^Binary operation "/" between int\<1, max\>\|string and 100 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: LibreNMS/OS/Iosxe.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Iosxe\:\:discoverIsIs\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -9535,6 +10579,12 @@ parameters:
 			path: LibreNMS/OS/Iosxe.php
 
 		-
+			message: '#^Method LibreNMS\\OS\\Iosxe\:\:pollIsIs\(\) should return Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\IsisAdjacency\> but returns Illuminate\\Support\\Collection\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/OS/Iosxe.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Iosxe\:\:profileApn\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -9579,6 +10629,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Iosxe\:\:syncModelsByGroup\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/OS/Iosxe.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|true given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Iosxe.php
 
@@ -9657,6 +10713,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Junos\:\:retrieveJuniperType\(\) has parameter \$rtt_type with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: LibreNMS/OS/Junos.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Junos.php
 
@@ -9799,6 +10861,18 @@ parameters:
 			path: LibreNMS/OS/Lcossx.php
 
 		-
+			message: '#^Parameter \#1 \$input of method LibreNMS\\OS\\Lcossx\:\:convertProcessorData\(\) expects array, array\|bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Lcossx.php
+
+		-
+			message: '#^Parameter \#1 \$input of method LibreNMS\\OS\\Lcossx\:\:convertProcessorData\(\) expects array, array\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Lcossx.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Ligoos\:\:discoverWirelessClients\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -9821,6 +10895,24 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Ligoos.php
+
+		-
+			message: '#^Cannot access property \$memory on SimpleXMLElement\|false\.$#'
+			identifier: property.nonObject
+			count: 10
+			path: LibreNMS/OS/Linux.php
+
+		-
+			message: '#^Cannot access property \$name on SimpleXMLElement\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: LibreNMS/OS/Linux.php
+
+		-
+			message: '#^Cannot access property \$vcpu on SimpleXMLElement\|false\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: LibreNMS/OS/Linux.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Linux\:\:discoverEntityPhysical\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -9855,6 +10947,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var for variable \$vms contains generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: LibreNMS/OS/Linux.php
+
+		-
+			message: '#^Parameter \#1 \$message of static method Illuminate\\Log\\Logger\:\:debug\(\) expects array\|Illuminate\\Contracts\\Support\\Arrayable\|Illuminate\\Contracts\\Support\\Jsonable\|Illuminate\\Support\\Stringable\|string, SimpleXMLElement\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Linux.php
 
@@ -9947,6 +11045,12 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: LibreNMS/OS/MrvOd.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Netsure.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Nimbleos\:\:discoverStorage\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -10071,6 +11175,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Openwrt\:\:getSensorData\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Openwrt.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/OS/Openwrt.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$hardware \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/OS/Openwrt.php
 
@@ -10219,6 +11335,18 @@ parameters:
 			path: LibreNMS/OS/Pmp.php
 
 		-
+			message: '#^Parameter \#1 \$haystack of static method Illuminate\\Support\\Str\:\:contains\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Pmp.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 7
+			path: LibreNMS/OS/Pmp.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Powerconnect\:\:discoverProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -10257,6 +11385,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Powerconnect\:\:pollVxworksProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Powerconnect.php
+
+		-
+			message: '#^Parameter \#1 \$codepoint of function chr expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Powerconnect.php
+
+		-
+			message: '#^Parameter \#1 \$data of method LibreNMS\\OS\\Powerconnect\:\:parseCpuUsage\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/OS/Powerconnect.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Powerconnect.php
 
@@ -10409,6 +11555,30 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Quanta.php
+
+		-
+			message: '#^Parameter \#1 \$data of method LibreNMS\\OS\\Quanta\:\:parseCpuUsage\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/OS/Quanta.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Quanta.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$hardware \(string\|null\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Radlan.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$version \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Radlan.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Radwin\:\:discoverWirelessDistance\(\) return type has no value type specified in iterable type array\.$#'
@@ -10585,10 +11755,22 @@ parameters:
 			path: LibreNMS/OS/Routeros.php
 
 		-
+			message: '#^Parameter \#1 \$ifIndex of static method LibreNMS\\Cache\\Port\:\:getIdFromIfIndex\(\) expects int\|string\|null, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Routeros.php
+
+		-
 			message: '#^Property LibreNMS\\OS\\Routeros\:\:\$qosIdxToParent with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
 			path: LibreNMS/OS/Routeros.php
+
+		-
+			message: '#^Binary operation "\+" between int\|string\|null and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: LibreNMS/OS/Ruckuswireless.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Ruckuswireless\:\:discoverWirelessApCount\(\) return type has no value type specified in iterable type array\.$#'
@@ -11059,6 +12241,18 @@ parameters:
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
+			message: '#^Parameter \#9 \$entPhysicalIndex of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Shared/Cisco.php
+
+		-
 			message: '#^Property LibreNMS\\OS\\Shared\\Cisco\:\:\$osDbFields has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -11103,6 +12297,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Shared\\Foundry\:\:discoverProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/OS/Shared/Foundry.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Shared/Foundry.php
+
+		-
+			message: '#^Parameter \#7 \$current_usage of static method LibreNMS\\Device\\Processor\:\:discover\(\) expects int\|null, float\|int\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Shared/Foundry.php
 
@@ -11335,6 +12541,18 @@ parameters:
 			path: LibreNMS/OS/Siklu.php
 
 		-
+			message: '#^Property App\\Models\\Device\:\:\$sysName \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Siteboss.php
+
+		-
+			message: '#^Property App\\Models\\Device\:\:\$sysName \(string\|null\) does not accept bool\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/OS/Siteboss550.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\SmOs\:\:discoverTransceivers\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -11422,6 +12640,12 @@ parameters:
 			message: '#^Method LibreNMS\\OS\\Smartax\:\:discoverProcessors\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
+			path: LibreNMS/OS/Smartax.php
+
+		-
+			message: '#^Parameter \#1 \$array of function reset expects array\|object, array\|bool given\.$#'
+			identifier: argument.type
+			count: 2
 			path: LibreNMS/OS/Smartax.php
 
 		-
@@ -11549,6 +12773,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/OS/Terra.php
+
+		-
+			message: '#^Parameter \#3 \$length of function substr expects int\|null, int\<0, max\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/ThreeCom.php
 
 		-
 			message: '#^Method LibreNMS\\OS\\Timos\:\:discoverEntityPhysical\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -11989,6 +13219,18 @@ parameters:
 			path: LibreNMS/OS/Vrp.php
 
 		-
+			message: '#^Parameter \#1 \.\.\.\$arg1 of function max expects non\-empty\-array, list\<numeric\-string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/OS/Vrp.php
+
+		-
 			message: '#^Method LibreNMS\\OS\\Windows\:\:discoverDellHardware\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -12009,6 +13251,12 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\OS\\Windows\:\:discoverSupermicroHardware\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: LibreNMS/OS/Windows.php
+
+		-
+			message: '#^Offset ''generic'' might not exist on array\{0\?\: string, generic\?\: non\-empty\-string, 1\?\: non\-empty\-string, family\?\: numeric\-string, 2\?\: numeric\-string, model\?\: numeric\-string, 3\?\: numeric\-string, stepping\?\: numeric\-string, \.\.\.\}\.$#'
+			identifier: offsetAccess.notFound
 			count: 1
 			path: LibreNMS/OS/Windows.php
 
@@ -12217,6 +13465,12 @@ parameters:
 			path: LibreNMS/Plugins.php
 
 		-
+			message: '#^Method LibreNMS\\Plugins\:\:call\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Plugins.php
+
+		-
 			message: '#^Method LibreNMS\\Plugins\:\:scanNew\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -12225,6 +13479,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Plugins\:\:scanRemoved\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: LibreNMS/Plugins.php
+
+		-
+			message: '#^Offset ''extension'' might not exist on array\{dirname\: string, basename\: string, extension\?\: string, filename\: string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: LibreNMS/Plugins.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function call_user_func expects callable\(\)\: mixed, array\{mixed, string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Plugins.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function call_user_func_array expects callable\(\)\: mixed, array\{mixed, string\} given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Plugins.php
 
@@ -12297,6 +13569,12 @@ parameters:
 		-
 			message: '#^Property LibreNMS\\Proc\:\:\$_pipes type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Proc.php
+
+		-
+			message: '#^Property LibreNMS\\Proc\:\:\$_process \(resource\) does not accept resource\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Proc.php
 
@@ -12377,6 +13655,48 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomAlarmId.php
+
+		-
+			message: '#^Parameter \#1 \$num of function decbin expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomAlarmId.php
+
+		-
+			message: '#^Parameter \#1 \$string of function substr expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmCleared.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmId.php
+
+		-
+			message: '#^Parameter \#1 \$num of function decbin expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmId.php
+
+		-
+			message: '#^Parameter \#1 \$string of function substr expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmSet.php
+
+		-
+			message: '#^Method LibreNMS\\Snmptrap\\Trap\:\:findOid\(\) should return string but returns int\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Snmptrap/Trap.php
 
 		-
 			message: '#^Method LibreNMS\\Snmptrap\\Trap\:\:findOids\(\) return type has no value type specified in iterable type array\.$#'
@@ -12483,6 +13803,24 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Util\\CiHelper\:\:setOS\(\) has parameter \$os with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Util/CiHelper.php
+
+		-
+			message: '#^Parameter \#1 \$string of function rtrim expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/CiHelper.php
+
+		-
+			message: '#^Parameter \#1 \$string of function rtrim expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Util/CiHelper.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Util/CiHelper.php
 
@@ -12895,6 +14233,18 @@ parameters:
 			path: LibreNMS/Util/EnvHelper.php
 
 		-
+			message: '#^Parameter \#1 \$content of static method LibreNMS\\Util\\EnvHelper\:\:setEnv\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/EnvHelper.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/EnvHelper.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\FileCategorizer\:\:__construct\(\) has parameter \$items with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12945,6 +14295,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Util\\Git\:\:run\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Util/Git.php
+
+		-
+			message: '#^Parameter \#3 \$callback of static method Illuminate\\Support\\Facades\\Cache\:\:remember\(\) expects Closure, callable\(\)\: mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Git.php
+
+		-
+			message: '#^Property LibreNMS\\Util\\Git\:\:\$install_dir \(string\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Util/Git.php
 
@@ -13063,6 +14425,18 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
+			message: '#^Parameter \#2 \$contents of method LibreNMS\\Util\\GitHub\:\:pushFileContents\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/GitHub.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/GitHub.php
+
+		-
 			message: '#^Property LibreNMS\\Util\\GitHub\:\:\$changelog has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -13147,6 +14521,24 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Cannot assign offset ''graph_type'' to array\|string\.$#'
+			identifier: offsetAssign.dimType
+			count: 2
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\Graph\:\:error\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\Graph\:\:get\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13179,6 +14571,36 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Util\\Graph\:\:getTypes\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Parameter \#1 \$width of function imagecreate expects int\<1, max\>, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Parameter \#2 \$height of function imagecreate expects int\<1, max\>, \(float\|int\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Parameter \#2 \$red of function imagecolorallocate expects int\<0, 255\>, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Parameter \#2 \$subtype of static method LibreNMS\\Util\\Graph\:\:isMibGraph\(\) expects string, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: '#^Parameter \#6 \$color of function imagestring expects int, int\<0, max\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
@@ -13273,6 +14695,12 @@ parameters:
 			path: LibreNMS/Util/Html.php
 
 		-
+			message: '#^Method LibreNMS\\Util\\IP\:\:__toString\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/IP.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\IP\:\:extractCidr\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13287,6 +14715,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Util\\IP\:\:packed\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: LibreNMS/Util/IP.php
+
+		-
+			message: '#^Parameter \#1 \$ip of function long2ip expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/IP.php
+
+		-
+			message: '#^Parameter \#1 \$ipv4 of class LibreNMS\\Util\\IPv4 constructor expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Util/IP.php
 
@@ -13313,6 +14753,54 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: LibreNMS/Util/IPv4.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\IPv4\:\:getNetmask\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/IPv4.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\IPv4\:\:getNetworkAddress\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/IPv4.php
+
+		-
+			message: '#^Argument of an invalid type array\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/IPv6.php
+
+		-
+			message: '#^Cannot access offset \(int\|string\) on non\-empty\-array\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: LibreNMS/Util/IPv6.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\IPv6\:\:ntop\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/IPv6.php
+
+		-
+			message: '#^Parameter \#1 \$ip of static method LibreNMS\\Util\\IPv6\:\:ntop\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/IPv6.php
+
+		-
+			message: '#^Parameter \#2 \$string of function unpack expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Util/IPv6.php
+
+		-
+			message: '#^Parameter \#3 \$length of function substr expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/IPv6.php
 
 		-
 			message: '#^Method LibreNMS\\Util\\Laravel\:\:bootCli\(\) has no return type specified\.$#'
@@ -13363,6 +14851,24 @@ parameters:
 			path: LibreNMS/Util/Mac.php
 
 		-
+			message: '#^Argument of an invalid type array\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/Mail.php
+
+		-
+			message: '#^Argument of an invalid type array\|string supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/Mail.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/Mail.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\Mail\:\:parseEmails\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13375,6 +14881,30 @@ parameters:
 			path: LibreNMS/Util/Mail.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_keys expects array, array\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Mail.php
+
+		-
+			message: '#^Parameter \#1 \$string of function substr expects string, array\<string\>\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Mail.php
+
+		-
+			message: '#^Cannot access an offset on list\<string\>\|true\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Util/Module.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\Module\:\:fromName\(\) should return LibreNMS\\Interfaces\\Module but returns object\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Util/Module.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\Module\:\:parseUserOverrides\(\) has parameter \$overrides with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13385,6 +14915,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/Util/Module.php
+
+		-
+			message: '#^Argument of an invalid type array\|Illuminate\\Support\\Collection\|stdClass supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
 			message: '#^Method LibreNMS\\Util\\ModuleTestHelper\:\:__construct\(\) has parameter \$modules with no value type specified in iterable type array\.$#'
@@ -13615,6 +15157,36 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 3
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message: '#^Parameter \#1 \$output of method LibreNMS\\Util\\ModuleTestHelper\:\:extractModuleOutput\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message: '#^Parameter \#1 \$text of function d_echo expects array\|float\|int\|string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function preg_replace expects array\<float\|int\|string\>\|string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
 			message: '#^Property LibreNMS\\Util\\ModuleTestHelper\:\:\$discovery_module_output has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -13723,6 +15295,24 @@ parameters:
 			path: LibreNMS/Util/Notifications.php
 
 		-
+			message: '#^Parameter \#1 \$data of function simplexml_load_string expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Notifications.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Notifications.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Notifications.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\Number\:\:fillMissingRatio\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -13803,6 +15393,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Util\\Number\:\:formatSi\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: LibreNMS/Util/Number.php
+
+		-
+			message: '#^Parameter \#1 \$num of function round expects float\|int, float\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Number.php
+
+		-
+			message: '#^Parameter \#2 \$total of static method LibreNMS\\Util\\Number\:\:calculatePercent\(\) expects float\|int, float\|int\|string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Util/Number.php
 
@@ -14179,6 +15781,30 @@ parameters:
 			path: LibreNMS/Util/StringHelpers.php
 
 		-
+			message: '#^Parameter \#1 \$codepoint of function chr expects int, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/StringHelpers.php
+
+		-
+			message: '#^Parameter \#2 \$array of function implode expects array\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/StringHelpers.php
+
+		-
+			message: '#^Method LibreNMS\\Util\\Time\:\:parseAt\(\) should return int but returns float\|int\.$#'
+			identifier: return.type
+			count: 2
+			path: LibreNMS/Util/Time.php
+
+		-
+			message: '#^Parameter \#1 \$date of method Carbon\\Carbon\:\:diffInMinutes\(\) expects DateTimeInterface\|string\|null, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Time.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\Url\:\:deviceLink\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14377,6 +16003,18 @@ parameters:
 			path: LibreNMS/Util/Url.php
 
 		-
+			message: '#^Parameter \#2 \$start of static method LibreNMS\\Util\\Url\:\:minigraphImage\(\) expects int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Util/Url.php
+
+		-
+			message: '#^Parameter \#3 \$end of static method LibreNMS\\Util\\Url\:\:minigraphImage\(\) expects int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Util/Url.php
+
+		-
 			message: '#^Method LibreNMS\\Util\\UserFuncHelper\:\:__call\(\) has parameter \$arguments with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14386,6 +16024,18 @@ parameters:
 			message: '#^Method LibreNMS\\Util\\UserFuncHelper\:\:__construct\(\) has parameter \$sensor with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
+			path: LibreNMS/Util/UserFuncHelper.php
+
+		-
+			message: '#^Parameter \#1 \$date of static method LibreNMS\\Util\\Time\:\:dateToMinutes\(\) expects int\|string, float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/UserFuncHelper.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, float\|int\|string\|null given\.$#'
+			identifier: argument.type
+			count: 2
 			path: LibreNMS/Util/UserFuncHelper.php
 
 		-
@@ -14405,6 +16055,42 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: LibreNMS/Util/Validate.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_intersect_key expects array, array\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function substr_count expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: '#^Parameter \#1 \$ini_string of function parse_ini_string expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: '#^Parameter \#2 \$timestamp of function date expects int\|null, int\|string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Util/Version.php
 
 		-
 			message: '#^Unable to resolve the template type TValue in call to method static method Illuminate\\Support\\Arr\:\:first\(\)$#'
@@ -14443,10 +16129,22 @@ parameters:
 			path: LibreNMS/ValidationResult.php
 
 		-
+			message: '#^Property LibreNMS\\ValidationResult\:\:\$fix \(string\|null\) does not accept array\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: LibreNMS/ValidationResult.php
+
+		-
 			message: '#^Property LibreNMS\\ValidationResult\:\:\$list type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/ValidationResult.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Validations/BaseValidation.php
 
 		-
 			message: '#^Method LibreNMS\\Validations\\Database\\CheckMysqlEngine\:\:findNonInnodbTables\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -14503,6 +16201,12 @@ parameters:
 			path: LibreNMS/Validations/Database/CheckSchemaStructure.php
 
 		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Validations/Database/CheckSchemaStructure.php
+
+		-
 			message: '#^Property LibreNMS\\Validations\\Database\\CheckSchemaStructure\:\:\$descriptions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14513,6 +16217,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/Validations/Database/CheckSchemaStructure.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Validations/Dependencies.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match_all expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: LibreNMS/Validations/Dependencies.php
 
 		-
 			message: '#^Method LibreNMS\\Validations\\Php\:\:checkExtensions\(\) has no return type specified\.$#'
@@ -14537,6 +16253,24 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: LibreNMS/Validations/Php.php
+
+		-
+			message: '#^Parameter \#1 \$string of function rtrim expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 4
+			path: LibreNMS/Validations/Php.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Validations/Php.php
+
+		-
+			message: '#^Cannot access an offset on list\<string\>\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Validations/Poller/CheckPythonWrapper.php
 
 		-
 			message: '#^Method LibreNMS\\Validations\\Programs\:\:checkFping6\(\) has no return type specified\.$#'
@@ -14599,6 +16333,12 @@ parameters:
 			path: LibreNMS/Validations/Programs.php
 
 		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Validations/Programs.php
+
+		-
 			message: '#^Method LibreNMS\\Validations\\Python\:\:checkExtensions\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -14629,10 +16369,28 @@ parameters:
 			path: LibreNMS/Validations/Python.php
 
 		-
+			message: '#^Cannot access offset 4 on array\{0\: int, 1\: int, 2\: int, 3\: int, 4\: int, 5\: int, 6\: int, 7\: int, \.\.\.\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Validations/Rrd/CheckRrdDirPermissions.php
+
+		-
 			message: '#^Method LibreNMS\\Validations\\Scheduler\:\:generateCommands\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: LibreNMS/Validations/Scheduler.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: LibreNMS/Validator.php
+
+		-
+			message: '#^Cannot access offset ''name'' on array\{name\: string, passwd\: string, uid\: int, gid\: int, gecos\: string, dir\: string, shell\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: LibreNMS/Validator.php
 
 		-
 			message: '#^Method LibreNMS\\Validator\:\:execAsUser\(\) has @param\-out PHPDoc tag for parameter \$output with no value type specified in iterable type array\.$#'
@@ -14643,6 +16401,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Validator\:\:execAsUser\(\) has parameter \$output with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Validator.php
+
+		-
+			message: '#^Method LibreNMS\\Validator\:\:getBaseDir\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: LibreNMS/Validator.php
+
+		-
+			message: '#^Method LibreNMS\\Validator\:\:getUsername\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
 			count: 1
 			path: LibreNMS/Validator.php
 
@@ -14659,8 +16429,26 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
+			message: '#^Offset ''class'' might not exist on array\{function\: string, line\?\: int, file\?\: string, class\?\: class\-string, type\?\: ''\-\>''\|''\:\:'', args\?\: array\<mixed\>, object\?\: object\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 2
+			path: LibreNMS/Validator.php
+
+		-
+			message: '#^Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class\-string\<T of object\>\|T of object, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: LibreNMS/Validator.php
+
+		-
 			message: '#^Property LibreNMS\\Validator\:\:\$results type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: LibreNMS/Validator.php
+
+		-
+			message: '#^Property LibreNMS\\Validator\:\:\$username \(string\|null\) does not accept string\|false\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: LibreNMS/Validator.php
 
@@ -14845,6 +16633,12 @@ parameters:
 			path: app/ApiClients/RipeApi.php
 
 		-
+			message: '#^Cannot access offset ''name'' on array\{name\: string, passwd\: string, uid\: int, gid\: int, gecos\: string, dir\: string, shell\: string\}\|false\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Checks.php
+
+		-
 			message: '#^Method App\\Checks\:\:postAuth\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -14879,6 +16673,12 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Checks.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/ConfigRepository.php
 
 		-
 			message: '#^Method App\\ConfigRepository\:\:forget\(\) has parameter \$key with no value type specified in iterable type array\.$#'
@@ -14935,10 +16735,34 @@ parameters:
 			path: app/ConfigRepository.php
 
 		-
+			message: '#^Method App\\ConfigRepository\:\:toJson\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/ConfigRepository.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/ConfigRepository.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/ConfigRepository.php
+
+		-
 			message: '#^Property App\\ConfigRepository\:\:\$config type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/ConfigRepository.php
+
+		-
+			message: '#^Property App\\Models\\User\:\:\$auth_id \(string\|null\) does not accept int\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Console/Commands/AddUserCommand.php
 
 		-
 			message: '#^Method App\\Console\\Commands\\BashCompletionCommand\:\:completeArguments\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
@@ -14989,6 +16813,60 @@ parameters:
 			path: app/Console/Commands/BashCompletionCommand.php
 
 		-
+			message: '#^Parameter \#1 \$command of method App\\Console\\Commands\\BashCompletionCommand\:\:completeArguments\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#1 \$current of method App\\Console\\Commands\\BashCompletionCommand\:\:optionExpectsValue\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of static method Illuminate\\Support\\Str\:\:startsWith\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#1 \$partial of method App\\Console\\Commands\\BashCompletionCommand\:\:completeCommand\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#2 \$partial of method App\\Console\\Commands\\BashCompletionCommand\:\:completeArguments\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#2 \$partial of method App\\Console\\Commands\\BashCompletionCommand\:\:completeOption\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#2 \$partial of method App\\Console\\Commands\\BashCompletionCommand\:\:completeOptionValue\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#2 \$previous of method App\\Console\\Commands\\BashCompletionCommand\:\:optionExpectsValue\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/BashCompletionCommand.php
+
+		-
 			message: '#^Unable to resolve the template type TFlatMapKey in call to method Illuminate\\Support\\Collection\<\(int\|string\),Symfony\\Component\\Console\\Input\\InputOption\>\:\:flatMap\(\)$#'
 			identifier: argument.templateType
 			count: 1
@@ -15005,6 +16883,12 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/Console/Commands/DevCheckCommand.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:delete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Console/Commands/DevSimulate.php
 
 		-
 			message: '#^Method App\\Console\\Commands\\DevSimulate\:\:addDevice\(\) has parameter \$community with no type specified\.$#'
@@ -15033,6 +16917,18 @@ parameters:
 		-
 			message: '#^Method App\\Console\\Commands\\DevSimulate\:\:queueRemoval\(\) has parameter \$device_id with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: app/Console/Commands/DevSimulate.php
+
+		-
+			message: '#^Parameter \#1 \$path of function basename expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/DevSimulate.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<int\<0, max\>, string\>\|iterable\<int\<0, max\>, string\>\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Console/Commands/DevSimulate.php
 
@@ -15091,14 +16987,32 @@ parameters:
 			path: app/Console/Commands/GetConfigCommand.php
 
 		-
+			message: '#^Parameter \#1 \$string of method Illuminate\\Console\\Command\:\:line\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Console/Commands/GetConfigCommand.php
+
+		-
 			message: '#^Property App\\Console\\Commands\\InternalHttpRequest\:\:\$app is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
 
 		-
+			message: '#^Cannot access offset ''config'' on Illuminate\\Contracts\\Foundation\\Application\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Console/Commands/KeyRotate.php
+
+		-
 			message: '#^Method App\\Console\\Commands\\MaintenanceFetchOuis\:\:buildOuiList\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Console/Commands/MaintenanceFetchOuis.php
+
+		-
+			message: '#^Parameter \#2 \$length of function array_chunk expects int\<1, max\>, int given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Console/Commands/MaintenanceFetchOuis.php
 
@@ -15167,6 +17081,30 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Console/Commands/ReportDevices.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fclose expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/ReportDevices.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fputcsv expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Console/Commands/ReportDevices.php
+
+		-
+			message: '#^Parameter \#1 \$string of method Illuminate\\Console\\Command\:\:line\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Console/Commands/ReportDevices.php
+
+		-
+			message: '#^Parameter \#1 \$stream of class Symfony\\Component\\Console\\Output\\StreamOutput constructor expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/SchemaDumpCommand.php
 
 		-
 			message: '#^Method App\\Console\\Commands\\SetConfigCommand\:\:completeArgument\(\) has no return type specified\.$#'
@@ -15451,6 +17389,24 @@ parameters:
 			path: app/Console/Commands/SnmpTranslate.php
 
 		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Console/Commands/TranslationGenerateCommand.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/TranslationGenerateCommand.php
+
+		-
+			message: '#^Parameter \#1 \$string of function md5 expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/TranslationGenerateCommand.php
+
+		-
 			message: '#^Method App\\Console\\DynamicInputOption\:\:__construct\(\) has parameter \$default with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -15507,6 +17463,12 @@ parameters:
 		-
 			message: '#^Method App\\Console\\LnmsCommand\:\:validate\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Console/LnmsCommand.php
+
+		-
+			message: '#^Parameter \#3 \$mode of class App\\Console\\DynamicInputOption constructor expects int\<0, 31\>\|null, int\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Console/LnmsCommand.php
 
@@ -15649,6 +17611,12 @@ parameters:
 			path: app/Http/Controllers/AboutController.php
 
 		-
+			message: '#^Parameter \#1 \$string of function rtrim expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/AboutController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Ajax\\AvailabilityMapController\:\:setGroup\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -15733,6 +17701,18 @@ parameters:
 			path: app/Http/Controllers/Ajax/SearchController.php
 
 		-
+			message: '#^Parameter \#1 \$string of function strip_tags expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/AlertTransportController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\Auth\\LoginController\:\:loggedOut\(\) should return Illuminate\\Http\\RedirectResponse but returns Illuminate\\Http\\RedirectResponse\|Illuminate\\Routing\\Redirector\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Auth/LoginController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Auth\\RegisterController\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -15785,6 +17765,18 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: app/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\UserWidget\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\UserWidget\>\:\:fill\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardWidgetController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\UserWidget\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\UserWidget\>\:\:save\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/DashboardWidgetController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Device\\Tabs\\AccessPointsController\:\:data\(\) return type has no value type specified in iterable type array\.$#'
@@ -16033,6 +18025,12 @@ parameters:
 			path: app/Http/Controllers/Device/Tabs/PortsController.php
 
 		-
+			message: '#^Possibly invalid array key type \(array\|string\)\.$#'
+			identifier: array.invalidKey
+			count: 1
+			path: app/Http/Controllers/Device/Tabs/PortsController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Device\\Tabs\\PortsController\:\:\$defaults type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -16237,6 +18235,12 @@ parameters:
 			path: app/Http/Controllers/DeviceController.php
 
 		-
+			message: '#^Possibly invalid array key type \(list\<string\>\|string\)\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: app/Http/Controllers/DeviceController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\DeviceController\:\:\$tabs has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -16273,6 +18277,12 @@ parameters:
 			path: app/Http/Controllers/Install/ChecksController.php
 
 		-
+			message: '#^Binary operation "\." between non\-falsy\-string and array\|string\|null results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Http/Controllers/Install/DatabaseController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Install\\DatabaseController\:\:index\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -16287,6 +18297,12 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Install\\DatabaseController\:\:test\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Install/DatabaseController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of class App\\StreamedOutput constructor expects resource, resource\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Install/DatabaseController.php
 
@@ -16329,6 +18345,12 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Install\\FinalizeController\:\:writeEnvFile\(\) has no return type specified\.$#'
 			identifier: missingType.return
+			count: 1
+			path: app/Http/Controllers/Install/FinalizeController.php
+
+		-
+			message: '#^Parameter \#1 \$content of static method LibreNMS\\Util\\EnvHelper\:\:setEnv\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Install/FinalizeController.php
 
@@ -16549,6 +18571,12 @@ parameters:
 			path: app/Http/Controllers/Maps/CustomMapDataController.php
 
 		-
+			message: '#^Parameter \#1 \$haystack of function str_ends_with expects string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Maps/CustomMapDataController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Maps\\CustomMapNodeImageController\:\:show\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -16621,6 +18649,54 @@ parameters:
 			path: app/Http/Controllers/Maps/MapDataController.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:qualifyColumn\(\) expects Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''device_id'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''disable_notify'' given\.$#'
+			identifier: argument.type
+			count: 4
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''disabled'' given\.$#'
+			identifier: argument.type
+			count: 6
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''ifOperStatus'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''ignore'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''lat'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''lng'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Maps/MapDataController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Maps\\NetMapController\:\:netMap\(\) has parameter \$vars with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -16631,6 +18707,18 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/Http/Controllers/NacController.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Http/Controllers/OuiLookupController.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/OverviewController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\PaginatedAjaxController\:\:baseQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
@@ -16855,6 +18943,18 @@ parameters:
 			path: app/Http/Controllers/PollerGroupController.php
 
 		-
+			message: '#^Call to an undefined method App\\Models\\PollerCluster\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\PollerCluster\>\:\:configDefinition\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/PollerSettingsController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\PollerCluster\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\PollerCluster\>\:\:save\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/PollerSettingsController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\PollerSettingsController\:\:destroy\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -16955,6 +19055,12 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Controllers/Select/CustomMapMenuGroupController.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$dashboard_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Select/DashboardController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Select\\DashboardController\:\:baseQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
@@ -17095,6 +19201,12 @@ parameters:
 			path: app/Http/Controllers/Select/EventlogController.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''device_id'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Select/EventlogController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Select\\EventlogController\:\:\$default_sort type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17145,6 +19257,18 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Select\\GraphController\:\:formatGraph\(\) has parameter \$top with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Select/GraphController.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_shift expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Select/GraphController.php
+
+		-
+			message: '#^Parameter \#2 \$device of static method LibreNMS\\Util\\Graph\:\:getSubtypes\(\) expects App\\Models\\Device\|null, App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Select/GraphController.php
 
@@ -17317,6 +19441,24 @@ parameters:
 			path: app/Http/Controllers/Select/RoleController.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\Paginator\|Illuminate\\Support\\Collection\:\:hasMorePages\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Pagination\\Paginator\|Illuminate\\Support\\Collection\:\:items\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder\:\:whereKey\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Select\\SelectController\:\:filterById\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -17349,6 +19491,24 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Select\\SelectController\:\:prependItem\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
+			message: '#^Parameter \#2 \$query of method App\\Http\\Controllers\\PaginatedAjaxController\:\:filter\(\) expects Illuminate\\Database\\Eloquent\\Builder, Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
+			message: '#^Parameter \#2 \$query of method App\\Http\\Controllers\\PaginatedAjaxController\:\:search\(\) expects Illuminate\\Database\\Eloquent\\Builder, Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Select/SelectController.php
+
+		-
+			message: '#^Parameter \#2 \$query of method App\\Http\\Controllers\\PaginatedAjaxController\:\:sort\(\) expects Illuminate\\Database\\Eloquent\\Builder, Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Select/SelectController.php
 
@@ -17409,6 +19569,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var for variable \$query contains generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Select/SyslogController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''device_id'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Select/SyslogController.php
 
@@ -17587,6 +19753,18 @@ parameters:
 			path: app/Http/Controllers/Table/DeviceController.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''poller_group'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/DeviceController.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''id'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/DeviceController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Table\\DeviceController\:\:\$detailed has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -17761,6 +19939,12 @@ parameters:
 			path: app/Http/Controllers/Table/FdbTablesController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Table\\FdbTablesController\:\:resolveDns\(\) should return string but returns string\|false\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Table/FdbTablesController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Table\\FdbTablesController\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17797,6 +19981,12 @@ parameters:
 			path: app/Http/Controllers/Table/FdbTablesController.php
 
 		-
+			message: '#^Parameter \#1 \$ip of static method LibreNMS\\Util\\IP\:\:isValid\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/FdbTablesController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Table\\FdbTablesController\:\:\$macCountCache has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -17829,6 +20019,12 @@ parameters:
 		-
 			message: '#^Method App\\Http\\Controllers\\Table\\GraylogController\:\:severityLabel\(\) has parameter \$severity with no type specified\.$#'
 			identifier: missingType.parameter
+			count: 1
+			path: app/Http/Controllers/Table/GraylogController.php
+
+		-
+			message: '#^Parameter \#1 \$interval of method DateTime\:\:add\(\) expects DateInterval, DateInterval\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Table/GraylogController.php
 
@@ -18583,6 +20779,42 @@ parameters:
 			path: app/Http/Controllers/Table/SyslogController.php
 
 		-
+			message: '#^Call to an undefined method Countable\|Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:count\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Call to an undefined method Countable\|Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:currentPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Call to an undefined method Countable\|Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:items\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Call to an undefined method Countable\|Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\:\:total\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:getTable\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Cannot call method toArray\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Table\\TableController\:\:formatExportRow\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18619,6 +20851,12 @@ parameters:
 			path: app/Http/Controllers/Table/TableController.php
 
 		-
+			message: '#^Method App\\Http\\Controllers\\Table\\TableController\:\:prepareExportQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Table\\TableController\:\:sortFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18633,6 +20871,42 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var for variable \$query contains generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fclose expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fprintf expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#1 \$stream of function fputcsv expects resource, resource\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#2 \$columns of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:paginate\(\) expects array\<int, model property of Illuminate\\Database\\Eloquent\\Model\>, array\<int, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#2 \$query of method App\\Http\\Controllers\\PaginatedAjaxController\:\:filter\(\) expects Illuminate\\Database\\Eloquent\\Builder, Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/TableController.php
+
+		-
+			message: '#^Parameter \#2 \$query of method App\\Http\\Controllers\\PaginatedAjaxController\:\:search\(\) expects Illuminate\\Database\\Eloquent\\Builder, Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Query\\Builder given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Http/Controllers/Table/TableController.php
 
@@ -18697,6 +20971,12 @@ parameters:
 			path: app/Http/Controllers/Table/VlanDevicesController.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''ifVlan'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Table/VlanDevicesController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\Table\\VlanPortsController\:\:baseQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -18757,6 +21037,12 @@ parameters:
 			path: app/Http/Controllers/UserController.php
 
 		-
+			message: '#^Property App\\Models\\User\:\:\$auth_id \(string\|null\) does not accept int\|string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Http/Controllers/UserController.php
+
+		-
 			message: '#^Method App\\Http\\Controllers\\UserPreferencesController\:\:getValidLocales\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -18787,10 +21073,22 @@ parameters:
 			path: app/Http/Controllers/UserPreferencesController.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_reduce expects array\<string\>, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/UserPreferencesController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\UserPreferencesController\:\:\$cachedPreferences has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/Http/Controllers/UserPreferencesController.php
+
+		-
+			message: '#^Call to an undefined method object\:\:fix\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/ValidateController.php
 
 		-
 			message: '#^Property App\\Http\\Controllers\\Widgets\\AlertlogController\:\:\$defaults type has no value type specified in iterable type array\.$#'
@@ -18809,6 +21107,18 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Controllers/Widgets/AlertsController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\DeviceGroup\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\DeviceGroup\>\:\:devices\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\DeviceGroup\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\DeviceGroup\>\:\:services\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Widgets\\AvailabilityMapController\:\:getDevices\(\) return type has no value type specified in iterable type array\.$#'
@@ -18847,6 +21157,30 @@ parameters:
 			path: app/Http/Controllers/Widgets/ComponentStatusController.php
 
 		-
+			message: '#^Access to an undefined property App\\Models\\CustomMap\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CustomMap\>\:\:\$height\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/CustomMapController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CustomMap\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CustomMap\>\:\:\$options\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/CustomMapController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CustomMap\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CustomMap\>\:\:\$width\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/CustomMapController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\CustomMap\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CustomMap\>\:\:getBackgroundConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/CustomMapController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Widgets\\CustomMapController\:\:\$defaults type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18865,10 +21199,112 @@ parameters:
 			path: app/Http/Controllers/Widgets/DeviceTypeController.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Device\>\:\:pluck\(\) expects Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\Device, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Widgets/DeviceTypeController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Widgets\\EventlogController\:\:\$defaults type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Controllers/Widgets/EventlogController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Application\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Application\>\:\:\$app_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Application\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Application\>\:\:\$device\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Bill\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Bill\>\:\:\$bill_name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\MuninPlugin\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\MuninPlugin\>\:\:\$device\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\MuninPlugin\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\MuninPlugin\>\:\:\$device_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\MuninPlugin\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\MuninPlugin\>\:\:\$mplug_type\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Port\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Port\>\:\:\$device\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$device\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$device_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$service_desc\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$service_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Service\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Service\>\:\:\$service_type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Application\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Application\>\:\:displayName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:displayName\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Port\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Port\>\:\:getLabel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Port\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Port\>\:\:getShortLabel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/GraphController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Widgets\\GraphController\:\:convertLegacySettingId\(\) has no return type specified\.$#'
@@ -18959,6 +21395,30 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Controllers/Widgets/NotesController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:displayName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/ServerStatsController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:mempools\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/ServerStatsController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:processors\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/ServerStatsController.php
+
+		-
+			message: '#^Call to an undefined method App\\Models\\Device\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Device\>\:\:storage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/ServerStatsController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Widgets\\ServerStatsController\:\:getSettings\(\) return type has no value type specified in iterable type array\.$#'
@@ -19129,6 +21589,18 @@ parameters:
 			path: app/Http/Controllers/Widgets/TopDevicesController.php
 
 		-
+			message: '#^Parameter \#2 \$start of static method LibreNMS\\Util\\Url\:\:minigraphImage\(\) expects int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Widgets/TopDevicesController.php
+
+		-
+			message: '#^Parameter \#3 \$end of static method LibreNMS\\Util\\Url\:\:minigraphImage\(\) expects int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Widgets/TopDevicesController.php
+
+		-
 			message: '#^Property App\\Http\\Controllers\\Widgets\\TopDevicesController\:\:\$defaults type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -19145,6 +21617,24 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Controllers/Widgets/TopInterfacesController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\DeviceGroup\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\DeviceGroup\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/WidgetController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\PortGroup\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\PortGroup\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/WidgetController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\UserWidget\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\UserWidget\>\:\:\$settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Widgets/WidgetController.php
 
 		-
 			message: '#^Method App\\Http\\Controllers\\Widgets\\WidgetController\:\:__invoke\(\) has no return type specified\.$#'
@@ -19213,6 +21703,12 @@ parameters:
 			path: app/Http/Interfaces/ToastInterface.php
 
 		-
+			message: '#^Cannot access offset ''config'' on Illuminate\\Contracts\\Container\\Container\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: app/Http/Middleware/HandleCors.php
+
+		-
 			message: '#^Property App\\Http\\Middleware\\HandleCors\:\:\$map has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -19267,14 +21763,44 @@ parameters:
 			path: app/Http/Requests/TwoFactorManagementRequest.php
 
 		-
+			message: '#^Parameter \#1 \$model of method Illuminate\\Database\\Eloquent\\Model\:\:is\(\) expects Illuminate\\Database\\Eloquent\\Model\|null, object\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Requests/TwoFactorManagementRequest.php
+
+		-
+			message: '#^Access to an undefined property \(object\|string\)\:\:\$password\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Requests/UpdateUserRequest.php
+
+		-
 			message: '#^Method App\\Http\\Requests\\UpdateUserRequest\:\:rules\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
+			message: '#^Parameter \#1 \$model of method Illuminate\\Database\\Eloquent\\Model\:\:is\(\) expects Illuminate\\Database\\Eloquent\\Model\|null, \(object\|string\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Requests/UpdateUserRequest.php
+
+		-
+			message: '#^Cannot access offset ''devices'' on array\|Illuminate\\Contracts\\Support\\Arrayable\|JsonSerializable\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Http/Resources/AlertRule.php
+
+		-
 			message: '#^Method App\\Http\\Resources\\AlertRule\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Http/Resources/AlertRule.php
+
+		-
+			message: '#^Method App\\Http\\Resources\\AlertRule\:\:toArray\(\) should return array but returns array\|\(ArrayAccess&Illuminate\\Contracts\\Support\\Arrayable\)\|\(ArrayAccess&JsonSerializable\)\.$#'
+			identifier: return.type
 			count: 1
 			path: app/Http/Resources/AlertRule.php
 
@@ -19333,10 +21859,28 @@ parameters:
 			path: app/Jobs/PollDevice.php
 
 		-
+			message: '#^Parameter \#3 \$length of function substr expects int\|null, int\<0, max\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/QueryMetricListener.php
+
+		-
+			message: '#^Call to an undefined method object\:\:handle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Listeners/SocialiteWasCalledListener.php
+
+		-
 			message: '#^Method App\\Logging\\CliColorFormatter\:\:__construct\(\) has parameter \$ignoreEmptyContextAndExtra with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/Logging/CliColorFormatter.php
+
+		-
+			message: '#^Parameter \#2 \$properties of method Spatie\\FlareClient\\Report\:\:group\(\) expects array\<string, mixed\>, array\<int\|string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Logging/Reporting/Middleware/SetInstanceId.php
 
 		-
 			message: '#^Method App\\Models\\Alert\:\:scopeAcknowledged\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
@@ -19363,6 +21907,12 @@ parameters:
 			path: app/Models/Alert.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''state'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Models/Alert.php
+
+		-
 			message: '#^Class App\\Models\\AlertLog uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
 			count: 1
@@ -19371,6 +21921,18 @@ parameters:
 		-
 			message: '#^Method App\\Models\\AlertLog\:\:details\(\) return type with generic class Illuminate\\Database\\Eloquent\\Casts\\Attribute does not specify its types\: TGet, TSet$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/AlertLog.php
+
+		-
+			message: '#^Parameter \#1 \$data of function gzcompress expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/AlertLog.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/AlertLog.php
 
@@ -19537,6 +22099,12 @@ parameters:
 			path: app/Models/AlertSchedule.php
 
 		-
+			message: '#^Parameter \#2 \$replace of function str_replace expects array\<string\>\|string, list\<int\|string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/AlertSchedule.php
+
+		-
 			message: '#^Property App\\Models\\AlertSchedule\:\:\$days has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -19551,6 +22119,12 @@ parameters:
 		-
 			message: '#^Class App\\Models\\AlertTransport uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/AlertTransport.php
+
+		-
+			message: '#^Method App\\Models\\AlertTransport\:\:instance\(\) should return LibreNMS\\Alert\\Transport but returns object\.$#'
+			identifier: return.type
 			count: 1
 			path: app/Models/AlertTransport.php
 
@@ -19653,6 +22227,24 @@ parameters:
 		-
 			message: '#^Method App\\Models\\BgpPeer\:\:scopeInAlarm\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/BgpPeer.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:orWhere\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''bgpPeerAdminStatus'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/BgpPeer.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''bgpPeerAdminStatus'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/BgpPeer.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''bgpPeerState'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/BgpPeer.php
 
@@ -19899,6 +22491,18 @@ parameters:
 		-
 			message: '#^Method App\\Models\\Dashboard\:\:scopeAllAvailable\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Models/Dashboard.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:orWhere\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''access'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Dashboard.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''user_id'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/Dashboard.php
 
@@ -20275,6 +22879,24 @@ parameters:
 			path: app/Models/Device.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''device_id'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Device.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''disabled'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Device.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''hostname'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Models/Device.php
+
+		-
 			message: '#^Method App\\Models\\DeviceGroup\:\:scopeHasAccess\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -20521,6 +23143,24 @@ parameters:
 			path: app/Models/Mempool.php
 
 		-
+			message: '#^Parameter \#1 \$num of function round expects float\|int, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Mempool.php
+
+		-
+			message: '#^Parameter \#2 \$max of static method LibreNMS\\Util\\Number\:\:correctIntegerOverflow\(\) expects int\|null, float\|int\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Models/Mempool.php
+
+		-
+			message: '#^Property App\\Models\\Mempool\:\:\$fillable \(list\<string\>\) does not accept array\<int\<0, max\>, string\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Models/Mempool.php
+
+		-
 			message: '#^Method App\\Models\\Notification\:\:scopeIsSticky\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -20593,6 +23233,12 @@ parameters:
 			path: app/Models/Plugin.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''plugin_active'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Plugin.php
+
+		-
 			message: '#^Method App\\Models\\Poller\:\:scopeIsActive\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -20614,6 +23260,12 @@ parameters:
 			message: '#^Method App\\Models\\Poller\:\:scopeIsInactive\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
+			path: app/Models/Poller.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''last_polled'' given\.$#'
+			identifier: argument.type
+			count: 2
 			path: app/Models/Poller.php
 
 		-
@@ -20659,10 +23311,22 @@ parameters:
 			path: app/Models/PollerCluster.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''last_report'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Models/PollerCluster.php
+
+		-
 			message: '#^Method App\\Models\\PollerGroup\:\:list\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
 			path: app/Models/PollerGroup.php
+
+		-
+			message: '#^Cannot call method hasGlobalRead\(\) on App\\Models\\User\|int\<min, \-1\>\|int\<1, max\>\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Port.php
 
 		-
 			message: '#^Class App\\Models\\Port uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
@@ -20953,6 +23617,12 @@ parameters:
 			path: app/Models/Sensor.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''sensor_alert'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Sensor.php
+
+		-
 			message: '#^Method App\\Models\\Service\:\:scopeIsActive\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -21025,6 +23695,12 @@ parameters:
 			path: app/Models/Service.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''service_disabled'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Service.php
+
+		-
 			message: '#^Method App\\Models\\ServiceTemplate\:\:scopeIsDisabled\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
@@ -21051,6 +23727,12 @@ parameters:
 		-
 			message: '#^Method App\\Models\\ServiceTemplate\:\:updateServiceTemplatesForDeviceGroup\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/ServiceTemplate.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''disabled'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/ServiceTemplate.php
 
@@ -21219,6 +23901,30 @@ parameters:
 		-
 			message: '#^Method App\\Models\\User\:\:toFlare\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\:\:where\(\) expects array\<int\|model property of App\\Models\\Notification, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\: Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\Notification, ''key'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\:\:where\(\) expects array\<int\|model property of App\\Models\\Notification, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\: Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Notification\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\Notification, ''value'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:orWhere\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''auth_type'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''auth_type'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Models/User.php
 
@@ -21505,6 +24211,12 @@ parameters:
 			path: app/Plugins/Hooks/DeviceOverviewHook.php
 
 		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Plugins/Hooks/DeviceOverviewHook.php
+
+		-
 			message: '#^Method App\\Plugins\\Hooks\\MenuEntryHook\:\:data\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -21549,6 +24261,12 @@ parameters:
 		-
 			message: '#^Method App\\Plugins\\Hooks\\PortTabHook\:\:handle\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/Plugins/Hooks/PortTabHook.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: app/Plugins/Hooks/PortTabHook.php
 
@@ -21637,6 +24355,18 @@ parameters:
 			path: app/Plugins/PluginManager.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{mixed, ''authorize''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Plugins/PluginManager.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Container\\Container\:\:call\(\) expects \(callable\(\)\: mixed\)\|string, array\{mixed, ''handle''\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Plugins/PluginManager.php
+
+		-
 			message: '#^Property App\\Plugins\\PluginManager\:\:\$hooks with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
 			count: 1
@@ -21693,6 +24423,18 @@ parameters:
 		-
 			message: '#^Class App\\Polling\\Measure\\MeasurementCollection extends generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
 			identifier: missingType.generics
+			count: 1
+			path: app/Polling/Measure/MeasurementCollection.php
+
+		-
+			message: '#^Method App\\Polling\\Measure\\MeasurementCollection\:\:getCountDiff\(\) should return int but returns float\|int\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Polling/Measure/MeasurementCollection.php
+
+		-
+			message: '#^Method App\\Polling\\Measure\\MeasurementCollection\:\:getTotalCount\(\) should return int but returns float\|int\.$#'
+			identifier: return.type
 			count: 1
 			path: app/Polling/Measure/MeasurementCollection.php
 
@@ -21793,6 +24535,12 @@ parameters:
 			path: app/Providers/LegacyUserProvider.php
 
 		-
+			message: '#^Method App\\Providers\\LegacyUserProvider\:\:retrieveById\(\) should return Illuminate\\Contracts\\Auth\\Authenticatable\|null but returns App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Providers/LegacyUserProvider.php
+
+		-
 			message: '#^Method App\\Providers\\LegacyUserProvider\:\:validateCredentials\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -21803,6 +24551,18 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: app/Providers/LegacyUserProvider.php
+
+		-
+			message: '#^Argument of an invalid type array\<string, class\-string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Providers/PluginProvider.php
+
+		-
+			message: '#^Argument of an invalid type list\<string\>\|false supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Providers/PluginProvider.php
 
 		-
 			message: '#^Method App\\Providers\\TokenUserProvider\:\:retrieveByCredentials\(\) has parameter \$credentials with no value type specified in iterable type array\.$#'
@@ -21865,8 +24625,26 @@ parameters:
 			path: app/View/Components/Graph.php
 
 		-
+			message: '#^Binary operation "\*" between 300\|340\|non\-falsy\-string and int results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/View/Components/GraphRow.php
+
+		-
 			message: '#^Method App\\View\\Components\\GraphRow\:\:__construct\(\) has parameter \$graphs with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
+			count: 1
+			path: app/View/Components/GraphRow.php
+
+		-
+			message: '#^Property App\\View\\Components\\GraphRow\:\:\$device \(null\) does not accept App\\Models\\Device\|int\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/View/Components/GraphRow.php
+
+		-
+			message: '#^Property App\\View\\Components\\GraphRow\:\:\$port \(null\) does not accept App\\Models\\Port\|int\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: app/View/Components/GraphRow.php
 
@@ -21973,6 +24751,18 @@ parameters:
 			path: app/View/Components/Submenu.php
 
 		-
+			message: '#^Offset ''path'' might not exist on array\{scheme\?\: string, host\?\: string, port\?\: int\<0, 65535\>, user\?\: string, pass\?\: string, path\?\: string, query\: string, fragment\?\: string\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: app/View/Components/Submenu.php
+
+		-
+			message: '#^Parameter \#1 \$key of method Illuminate\\Http\\Request\:\:input\(\) expects string\|null, int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/View/Components/Submenu.php
+
+		-
 			message: '#^Property App\\View\\Components\\Toast\:\:\$purifier_config type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -22015,6 +24805,12 @@ parameters:
 			path: app/View/SimpleTemplate.php
 
 		-
+			message: '#^Parameter \#1 \$title of static method Illuminate\\Support\\Str\:\:slug\(\) expects string, bool\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: config/database.php
+
+		-
 			message: '#^Method Database\\Factories\\AlertScheduleFactory\:\:recurring\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -22027,10 +24823,34 @@ parameters:
 			path: database/factories/LocationFactory.php
 
 		-
+			message: '#^Method Database\\Factories\\Ospfv3NbrFactory\:\:definition\(\) should return array\<model property of App\\Models\\OspfNbr, mixed\> but returns array\<string, int\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: database/factories/Ospfv3NbrFactory.php
+
+		-
+			message: '#^Method Database\\Factories\\Ospfv3PortFactory\:\:definition\(\) should return array\<model property of App\\Models\\OspfPort, mixed\> but returns array\<string, int\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: database/factories/Ospfv3PortFactory.php
+
+		-
 			message: '#^Class Database\\Factories\\RoleFactory extends generic class Illuminate\\Database\\Eloquent\\Factories\\Factory but does not specify its types\: TModel$#'
 			identifier: missingType.generics
 			count: 1
 			path: database/factories/RoleFactory.php
+
+		-
+			message: '#^Method Database\\Factories\\RoleFactory\:\:definition\(\) should return array\<model property of Illuminate\\Database\\Eloquent\\Model, mixed\> but returns array\<string, string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: database/factories/RoleFactory.php
+
+		-
+			message: '#^Parameter \#1 \$column of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\UserWidget\>\:\:where\(\) expects array\<int\|model property of App\\Models\\UserWidget, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\UserWidget\>\)\: Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\UserWidget\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\UserWidget\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\UserWidget, ''widget_id'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: database/migrations/2019_07_09_150217_update_users_widgets_settings.php
 
 		-
 			message: '#^Method Illuminate\\Database\\Migrations\\Migration@anonymous/database/migrations/2020_04_06_001048_the_great_index_rename\.php\:7\:\:renameIndex\(\) has no return type specified\.$#'
@@ -22087,6 +24907,12 @@ parameters:
 			path: database/migrations/2021_02_09_122930_migrate_to_utf8mb4.php
 
 		-
+			message: '#^Parameter \#1 \$column of static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sla\>\:\:where\(\) expects array\<int\|model property of App\\Models\\Sla, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sla\>\)\: Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sla\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Sla\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of App\\Models\\Sla, ''opstatus_old'' given\.$#'
+			identifier: argument.type
+			count: 1
+			path: database/migrations/2023_04_27_164904_update_slas_opstatus_tinyint.php
+
+		-
 			message: '#^Method Illuminate\\Database\\Migrations\\Migration@anonymous/database/migrations/2023_06_18_201914_migrate_level_to_roles\.php\:7\:\:getLevel\(\) has parameter \$rolesByUserId with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -22097,6 +24923,48 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: database/migrations/2025_03_27_125749_move_definition_files.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: database/seeders/ConfigSeeder.php
+
+		-
+			message: '#^Parameter \#1 \.\.\.\$arrays of function array_merge expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: database/seeders/ConfigSeeder.php
+
+		-
+			message: '#^Parameter \#1 \$groups of job class App\\Jobs\\PingCheck constructor expects array in App\\Jobs\\PingCheck\:\:dispatch\(\), array\|bool\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: routes/console.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, array\|bool\|string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: routes/console.php
+
+		-
+			message: '#^Parameter \#1 \$path of function base_path expects string, array\|string\|true given\.$#'
+			identifier: argument.type
+			count: 1
+			path: routes/dev-console.php
+
+		-
+			message: '#^Part \$tag \(array\|bool\|string\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 3
+			path: routes/dev-console.php
+
+		-
+			message: '#^Cannot call method assertExitCode\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 10
+			path: tests/AddHostCliTest.php
 
 		-
 			message: '#^Method LibreNMS\\Tests\\AlertingTest\:\:getTransportFiles\(\) return type with generic class RegexIterator does not specify its types\: TKey, TValue, TIterator$#'
@@ -22148,6 +25016,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$attr of method LibreNMS\\Authentication\\SSOAuthorizer\:\:authSSOGetAttr\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/AuthSSOTest.php
+
+		-
+			message: '#^Parameter \#1 \$column of method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:where\(\) expects array\<int\|model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\|\(Closure\(Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\)\: void\)\|Illuminate\\Contracts\\Database\\Query\\Expression\|model property of Illuminate\\Database\\Eloquent\\Model, ''name'' given\.$#'
 			identifier: argument.type
 			count: 2
 			path: tests/AuthSSOTest.php
@@ -22219,6 +25093,24 @@ parameters:
 			path: tests/ConfigTest.php
 
 		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/DBSetupTest.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Connection\:\:select\(\) expects string, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: tests/DBSetupTest.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Illuminate\\Database\\Connection\:\:selectOne\(\) expects string, float\|int\|string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/DBSetupTest.php
+
+		-
 			message: '#^Property LibreNMS\\Tests\\DBSetupTest\:\:\$connection has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -22229,6 +25121,12 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: tests/DBSetupTest.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/DocsTest.php
 
 		-
 			message: '#^Property LibreNMS\\Tests\\DocsTest\:\:\$hidden_pages has no type specified\.$#'
@@ -22247,6 +25145,42 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: tests/DocsTest.php
+
+		-
+			message: '#^Cannot call method assertExitCode\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 8
+			path: tests/Feature/Commands/TestConfigCommands.php
+
+		-
+			message: '#^Cannot call method doesntExpectOutput\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/Commands/TestConfigCommands.php
+
+		-
+			message: '#^Cannot call method expectsConfirmation\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/Commands/TestConfigCommands.php
+
+		-
+			message: '#^Cannot call method expectsOutput\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: tests/Feature/Commands/TestConfigCommands.php
+
+		-
+			message: '#^Cannot call method expectsQuestion\(\) on Illuminate\\Testing\\PendingCommand\|int\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/Commands/TestConfigCommands.php
+
+		-
+			message: '#^Parameter \#1 \$output of method Illuminate\\Testing\\PendingCommand\:\:expectsOutput\(\) expects string\|null, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Feature/Commands/TestConfigCommands.php
 
 		-
 			message: '#^Method LibreNMS\\Tests\\Feature\\SnmpTraps\\CienaCesPortNotificationTrapTest\:\:testCienaCesPortDownNotification\(\) has no return type specified\.$#'
@@ -22429,6 +25363,24 @@ parameters:
 			path: tests/MibTest.php
 
 		-
+			message: '#^Parameter \#1 \$array of function array_unshift expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/MibTest.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, string\|false\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/MibTest.php
+
+		-
+			message: '#^Possibly invalid array key type \(list\<string\>\|string\)\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: tests/MibTest.php
+
+		-
 			message: '#^Method LibreNMS\\Tests\\Mocks\\SnmpQueryMock\:\:deviceArray\(\) has parameter \$device with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -22471,6 +25423,30 @@ parameters:
 			path: tests/Mocks/SnmpQueryMock.php
 
 		-
+			message: '#^Parameter \#1 \$oid of method LibreNMS\\Tests\\Mocks\\SnmpQueryMock\:\:outputLine\(\) expects string, array\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/Mocks/SnmpQueryMock.php
+
+		-
+			message: '#^Parameter \#1 \$oid of method LibreNMS\\Tests\\Mocks\\SnmpQueryMock\:\:translateNumber\(\) expects string, array\|string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/Mocks/SnmpQueryMock.php
+
+		-
+			message: '#^Parameter \#1 \$str of function strtok expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Mocks/SnmpQueryMock.php
+
+		-
+			message: '#^Parameter \#3 \$length of function substr expects int\|null, int\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Mocks/SnmpQueryMock.php
+
+		-
 			message: '#^Property LibreNMS\\Tests\\Mocks\\SnmpQueryMock\:\:\$cache type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -22498,6 +25474,18 @@ parameters:
 			message: '#^Method LibreNMS\\Tests\\OSDiscoveryTest\:\:osProvider\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
+			path: tests/OSDiscoveryTest.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/OSDiscoveryTest.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_map expects array, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 2
 			path: tests/OSDiscoveryTest.php
 
 		-
@@ -22549,6 +25537,12 @@ parameters:
 			path: tests/OSModulesTest.php
 
 		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/OSModulesTest.php
+
+		-
 			message: '#^Property LibreNMS\\Tests\\OSModulesTest\:\:\$discoveryModules has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -22579,6 +25573,12 @@ parameters:
 			path: tests/QueryBuilderTest.php
 
 		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/QueryBuilderTest.php
+
+		-
 			message: '#^Method LibreNMS\\Tests\\RrdtoolTest\:\:buildCommandProxy\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -22605,6 +25605,18 @@ parameters:
 		-
 			message: '#^Method LibreNMS\\Tests\\SVGTest\:\:getSvgFiles\(\) return type with generic class RegexIterator does not specify its types\: TKey, TValue, TIterator$#'
 			identifier: missingType.generics
+			count: 1
+			path: tests/SVGTest.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of static method Illuminate\\Support\\Str\:\:contains\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/SVGTest.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, string\|false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: tests/SVGTest.php
 
@@ -22705,6 +25717,12 @@ parameters:
 			path: tests/TestCase.php
 
 		-
+			message: '#^Parameter \#2 \$string of function explode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/TestCase.php
+
+		-
 			message: '#^Method LibreNMS\\Tests\\Unit\\CiHelperTest\:\:assertFlagsSet\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -22721,6 +25739,36 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: tests/Unit/CiHelperTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ComponentStatusLog\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\ComponentStatusLog\>\:\:\$message\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Unit/ComponentTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ComponentStatusLog\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\ComponentStatusLog\>\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Unit/ComponentTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Component\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Component\>\:\:\$device_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Unit/ComponentTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Component\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Component\>\:\:\$logs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Unit/ComponentTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Component\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Component\>\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Unit/ComponentTest.php
 
 		-
 			message: '#^Method LibreNMS\\Tests\\Unit\\ComponentTest\:\:buildExpected\(\) has no return type specified\.$#'
@@ -22861,6 +25909,42 @@ parameters:
 			path: tests/YamlSchemaTest.php
 
 		-
+			message: '#^Method LibreNMS\\Tests\\YamlSchemaTest\:\:listFiles\(\) should return array but returns array\|ArrayAccess\|TReduceInitial\|TReduceReturnType\.$#'
+			identifier: return.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of static method Illuminate\\Support\\Str\:\:contains\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$input of static method Symfony\\Component\\Yaml\\Yaml\:\:parse\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$path of function basename expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$value of function collect expects Illuminate\\Contracts\\Support\\Arrayable\<int\<0, max\>, string\>\|iterable\<int\<0, max\>, string\>\|null, list\<string\>\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
 			message: '#^Property LibreNMS\\Tests\\YamlSchemaTest\:\:\$excluded type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -22877,3 +25961,9 @@ parameters:
 			identifier: argument.templateType
 			count: 1
 			path: tests/YamlSchemaTest.php
+
+		-
+			message: '#^Parameter \#1 \$directory of function chdir expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/bootstrap.php
