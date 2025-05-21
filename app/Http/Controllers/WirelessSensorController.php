@@ -34,6 +34,9 @@ class WirelessSensorController
         ]);
     }
 
+    /**
+     * @return array<array<string, string>>
+     */
     private function getMetrics(Request $request): array
     {
         $types = \LibreNMS\Device\WirelessSensor::getTypes();
