@@ -1,25 +1,47 @@
 <?php
 
-echo 'IPOMANII-MIB: ';
+/*
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
 
-$oids = [];
+// pre-cache
+$oidsIn = SnmpQuery::cache()->hideMib()->walk([
+    'IPOMANII-MIB::inletConfigDesc',
+])->table(1);
 
-d_echo('inletConfigFrequencyHigh ');
-$oids = snmpwalk_cache_multi_oid($device, 'inletConfigFrequencyHigh', $oids, 'IPOMANII-MIB');
-d_echo('inletConfigFrequencyLow ');
-$oids = snmpwalk_cache_multi_oid($device, 'inletConfigFrequencyLow', $oids, 'IPOMANII-MIB');
-d_echo('inletStatusFrequency ');
-$oids = snmpwalk_cache_multi_oid($device, 'inletStatusFrequency', $oids, 'IPOMANII-MIB');
+//data
+$oidsFreqIn = SnmpQuery::hideMib()->walk([
+    'IPOMANII-MIB::inletConfigFrequencyHigh',
+    'IPOMANII-MIB::inletConfigFrequencyLow',
+    'IPOMANII-MIB::inletStatusFrequency',
+])->table(1);
 
-if (is_array($oids)) {
-    foreach ($oids as $index => $entry) {
-        $freq_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.4.' . $index;
-        $divisor = 10;
-        $descr = (trim($pre_cache['ipoman']['in'][$index]['inletConfigDesc'], '"') != '' ? trim($pre_cache['ipoman']['in'][$index]['inletConfigDesc'], '"') : "Inlet $index");
-        $current = ($entry['inletStatusFrequency'] / 10);
-        $low_limit = $entry['inletConfigFrequencyLow'];
-        $high_limit = $entry['inletConfigFrequencyHigh'];
-        discover_sensor(null, 'frequency', $device, $freq_oid, $index, 'ipoman', $descr, $divisor, '1', $low_limit, null, null, $high_limit, $current);
-        // FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
-    }
+foreach ($oidsFreqIn as $index => $entry) {
+    $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.4.' . $index;
+    $divisor = 10;
+    $descr = (trim($oidsIn[$index]['inletConfigDesc'], '"') != '' ? trim($oidsIn[$index]['inletConfigDesc'], '"') : "Inlet $index");
+    $value = ($entry['inletStatusFrequency'] / 10);
+    $low_limit = $entry['inletConfigFrequencyLow'];
+    $high_limit = $entry['inletConfigFrequencyHigh'];
+
+    // FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
+    app('sensor-discovery')->discover(new \App\Models\Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'frequency',
+        'sensor_oid' => $oid,
+        'sensor_index' => $index,
+        'sensor_type' => 'ipoman',
+        'sensor_descr' => $descr,
+        'sensor_divisor' => $divisor,
+        'sensor_multiplier' => 1,
+        'sensor_limit_low' => $low_limit,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit' => $high_limit,
+        'sensor_current' => $value,
+        'entPhysicalIndex' => null,
+        'entPhysicalIndex_measured' => null,
+        'user_func' => null,
+        'group' => null,
+    ]));
 }

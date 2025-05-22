@@ -16,7 +16,8 @@
 
 $common_output[] = '
 <div class="table-responsive">
-    <table id="outages" class="table table-hover table-condensed table-striped">
+    <table id="outages" class="table table-hover table-condensed table-striped"
+        data-ajaxUrl="' . url('/ajax/table/outages') . '">
         <thead>
             <tr>
                 <th data-column-id="status" data-sortable="false"></th>

@@ -11,6 +11,8 @@ use LibreNMS\Util\Url;
 
 class ProcessorsController extends TableController
 {
+    protected $model = Processor::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'processor_descr' => 'asc'];
 
     protected function sortFields($request): array
@@ -72,6 +74,35 @@ class ProcessorsController extends TableController
             'processor_descr' => $descr,
             'graph' => $mini_graph,
             'processor_usage' => $usage,
+        ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Processor',
+            'Usage',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Processor  $processor
+     * @return array
+     */
+    protected function formatExportRow($processor)
+    {
+        return [
+            $processor->device ? $processor->device->displayName() : '',
+            $processor->processor_descr,
+            $processor->processor_usage,
         ];
     }
 }

@@ -47,7 +47,7 @@
 
 **Template Example:**
 
-This will send a set of images (photos or files) followed by the text message, every [signedGraphTag](../Templates/#signedgraphtag) helper will be removed from the message content. 
+This will send a set of images (photos or files) followed by the text message, every [signedGraphTag](../Templates.md/#signedgraphtag) helper will be removed from the message content.
 
 ```php
 {{ $alert->title }}

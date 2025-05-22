@@ -353,7 +353,7 @@ if (! empty($peers)) {
                     } elseif ($device['os'] == 'aos7') {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
                         $peer_data = [];
-                        $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', $al_descr, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                        $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', [], 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
                         $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [], 'BGP4-MIB', 'aos7', '-OQUs');
                         $peer_data['bgpPeerDescr'] = $al_descr[$peer_identifier]['alaBgpPeerName'];
                         $peer_data['bgpPeerState'] = $al_peer[$peer_identifier]['bgpPeerState'];
@@ -669,8 +669,8 @@ if (! empty($peers)) {
                     } else {
                         $tmp_peer = $peer['bgpPeerIdentifier'];
                     }
-                    $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
-                    $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', $out_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                    $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                    $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
 
                     $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
                     $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
@@ -697,7 +697,7 @@ if (! empty($peers)) {
 
                 if ($device['os'] === 'aos7') {
                     $tmp_peer = $peer['bgpPeerIdentifier'];
-                    $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', $al_prefixes, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                    $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', [], 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
                     $cbgpPeerAcceptedPrefixes = $al_prefixes[$tmp_peer]['alaBgpPeerRcvdPrefixes'];
                 }
 
@@ -737,14 +737,14 @@ if (! empty($peers)) {
                 }
 
                 // Validate data
-                $cbgpPeerAcceptedPrefixes = set_numeric($cbgpPeerAcceptedPrefixes);
-                $cbgpPeerDeniedPrefixes = set_numeric($cbgpPeerDeniedPrefixes);
-                $cbgpPeerPrefixAdminLimit = set_numeric($cbgpPeerPrefixAdminLimit);
-                $cbgpPeerPrefixThreshold = set_numeric($cbgpPeerPrefixThreshold);
-                $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold);
-                $cbgpPeerAdvertisedPrefixes = set_numeric($cbgpPeerAdvertisedPrefixes);
-                $cbgpPeerSuppressedPrefixes = set_numeric($cbgpPeerSuppressedPrefixes);
-                $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes);
+                $cbgpPeerAcceptedPrefixes = set_numeric($cbgpPeerAcceptedPrefixes ?? 0);
+                $cbgpPeerDeniedPrefixes = set_numeric($cbgpPeerDeniedPrefixes ?? 0);
+                $cbgpPeerPrefixAdminLimit = set_numeric($cbgpPeerPrefixAdminLimit ?? 0);
+                $cbgpPeerPrefixThreshold = set_numeric($cbgpPeerPrefixThreshold ?? 0);
+                $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold ?? 0);
+                $cbgpPeerAdvertisedPrefixes = set_numeric($cbgpPeerAdvertisedPrefixes ?? 0);
+                $cbgpPeerSuppressedPrefixes = set_numeric($cbgpPeerSuppressedPrefixes ?? 0);
+                $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes ?? 0);
 
                 $cbgpPeers_cbgp_fields = [
                     'AcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,

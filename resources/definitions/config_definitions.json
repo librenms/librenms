@@ -1085,11 +1085,6 @@
             "group": "webui",
             "section": "custom-map",
             "order": 100,
-            "options": {
-                "Streets":  "Streets",
-                "Sattelite": "Sattelite",
-                "Topography":  "Topography"
-            },
             "when": {
                 "setting": "custom_map.background_type",
                 "operator": "equals",
@@ -6277,7 +6272,7 @@
             "group": "poller",
             "section": "distributed",
             "order": 29,
-            "type": "string"
+            "type": "text"
         },
         "service_watchdog_enabled": {
             "default": false,
