@@ -305,6 +305,31 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     echo '</script>
     ';
 }
+
+$tags = \App\Models\Device::find($device['device_id'])->getTag();
+
+foreach ($tags as $key => $value) {
+    if (\App\Models\DeviceTagKey::where('key', $key)->first()->visible) {
+        $label = ucwords(str_replace('_', ' ', $key));
+        echo '<div class="row">';
+        echo '<div class="col-sm-4">' . Clean::html($label, []) . '</div>';
+
+        if (\App\Models\DeviceTagKey::where('key', $key)->first()->type === 'email') {
+            echo '<div class="col-sm-8"><a href="mailto:' . Clean::html($value, []) . '">' . Clean::html($value, []) . '</a></div>';
+        } elseif (\App\Models\DeviceTagKey::where('key', $key)->first()->type === 'url') {
+            echo '<div class="col-sm-8"><a href="' . Clean::html($value, []) . '" target="_blank" rel="noopener noreferrer">' . Clean::html($value, []) . '</a></div>';
+        } elseif (\App\Models\DeviceTagKey::where('key', $key)->first()->type === 'timestamp') {
+            try {
+                echo '<div class="col-sm-8">' . DateTimeImmutable::createFromFormat('U', $value)->format(DateTime::ISO8601) . '</div>';
+            } catch (Exception $e) {
+                echo '<div class="col-sm-8">' . Clean::html($value, []) . '</div>';
+            }
+        } else {
+            echo '<div class="col-sm-8">' . Clean::html($value, []) . '</div>';
+        }
+        echo '</div>';
+    }
+}
 ?>
       </div>
     </div>
