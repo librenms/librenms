@@ -39,6 +39,7 @@ class ServerStatsController extends WidgetController
         'cpu' => 0,
         'mempools' => [],
         'disks' => [],
+        'unit' => 'MB',
     ];
 
     public function title(Request $request)
@@ -56,9 +57,10 @@ class ServerStatsController extends WidgetController
         return $this->title;
     }
 
-    public function getView(Request $request)
+     public function getView(Request $request)
     {
         $data = $this->getSettings();
+        $data['unit'] = $data['unit'] ?? 'MB';
 
         if (is_null($data['device'])) {
             return $this->getSettingsView($request);
@@ -67,8 +69,31 @@ class ServerStatsController extends WidgetController
         $device = Device::hasAccess($request->user())->find($data['device']);
         if ($device) {
             $data['cpu'] = $device->processors()->avg('processor_usage');
-            $data['mempools'] = $device->mempools()->select(\DB::raw('mempool_descr, ROUND(mempool_used / (1024*1024), 0) as used, ROUND(mempool_total /(1024*1024), 0) as total'))->get();
-            $data['disks'] = $device->storage()->select(\DB::raw('storage_descr, ROUND(storage_used / (1024*1024), 0) as used, ROUND(storage_size / (1024*1024), 0) as total'))->get();
+
+            switch (strtoupper($data['unit'])) {
+                case 'GB':
+                    $factor = 1024;
+                    break;
+                case 'TB':
+                    $factor = 1024 * 1024;
+                    break;
+                case 'MB':
+                default:
+                    $factor = 1;
+                    break;
+            }
+
+            $data['mempools'] = $device->mempools()->select(\DB::raw("
+                mempool_descr,
+                ROUND(mempool_used / (1024 * 1024 * $factor), 2) as used,
+                ROUND(mempool_total / (1024 * 1024 * $factor), 2) as total
+            "))->get();
+
+            $data['disks'] = $device->storage()->select(\DB::raw("
+                storage_descr,
+                ROUND(storage_used / (1024 * 1024 * $factor), 2) as used,
+                ROUND(storage_size / (1024 * 1024 * $factor), 2) as total
+            "))->get();
         }
 
         return view('widgets.server-stats', $data);
@@ -78,7 +103,8 @@ class ServerStatsController extends WidgetController
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
-
+        $settings['unit'] = $settings['unit'] ?? 'MB';
+        
         return view('widgets.settings.server-stats', $settings);
     }
 

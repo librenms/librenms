@@ -16,6 +16,15 @@
     </div>
 
     <div class="form-group">
+        <label for="unit">Display Unit</label>
+        <select name="unit" class="form-control">
+            <option value="MB" {{ $unit == 'MB' ? 'selected' : '' }}>MB</option>
+            <option value="GB" {{ $unit == 'GB' ? 'selected' : '' }}>GB</option>
+            <option value="TB" {{ $unit == 'TB' ? 'selected' : '' }}>TB</option>
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="columnsize-{{ $id }}" class="control-label">{{ __('Columns') }}</label>
         <select name="columnsize" id="columnsize-{{ $id }}" class="form-control">
             <option value="1" @if($columnsize == 1) selected @endif>1</option>
