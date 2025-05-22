@@ -2348,6 +2348,32 @@ syslog:
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
+tags:
+  Columns:
+    - { Field: tag_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: tag_key_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: value, Type: varchar(256), 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [tag_id], Unique: true, Type: BTREE }
+    tags_device_id_index: { Name: tags_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    tags_tag_key_id_index: { Name: tags_tag_key_id_index, Columns: [tag_key_id], Unique: false, Type: BTREE }
+  Constraints:
+    tags_device_id_foreign: { name: tags_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    tags_tag_key_id_foreign: { name: tags_tag_key_id_foreign, foreign_key: tag_key_id, table: tag_keys, key: tag_key_id, extra: 'ON DELETE CASCADE' }
+tag_keys:
+  Columns:
+    - { Field: tag_key_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: key, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: type, Type: "enum('string','integer','email','url','timestamp')", 'Null': false, Extra: '', Default: string }
+    - { Field: visible, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [tag_key_id], Unique: true, Type: BTREE }
+    tag_keys_key_unique: { Name: tag_keys_key_unique, Columns: [key], Unique: true, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
