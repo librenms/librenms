@@ -2115,14 +2115,14 @@
                     "context_name": "",
                     "inetCidrRouteIfIndex": 0,
                     "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 3,
+                    "inetCidrRouteProto": 2,
                     "inetCidrRouteNextHopAS": 0,
                     "inetCidrRouteMetric1": 1,
                     "inetCidrRouteDestType": "ipv4",
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "169.254.101.1",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -2143,14 +2143,14 @@
                     "context_name": "",
                     "inetCidrRouteIfIndex": 10,
                     "inetCidrRouteType": 3,
-                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteProto": 1,
                     "inetCidrRouteNextHopAS": 0,
                     "inetCidrRouteMetric1": 0,
                     "inetCidrRouteDestType": "ipv4",
                     "inetCidrRouteDest": "169.254.101.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
