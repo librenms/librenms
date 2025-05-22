@@ -112,7 +112,7 @@ function shorthost($hostname, $len = 12)
     return $shorthost;
 }
 
-function print_error($text): void
+function print_error(string $text): void
 {
     if (Laravel::isCli()) {
         c_echo('%r' . $text . "%n\n");
@@ -121,7 +121,7 @@ function print_error($text): void
     }
 }
 
-function print_message($text): void
+function print_message(string $text): void
 {
     if (Laravel::isCli()) {
         c_echo('%g' . $text . "%n\n");
@@ -313,7 +313,7 @@ function get_graph_subtypes($type, $device = null): array
     return $types;
 } // get_graph_subtypes
 
-function generate_smokeping_file(array $device, $file = '')
+function generate_smokeping_file(array $device, $file = ''): string
 {
     $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
 
@@ -638,7 +638,7 @@ function string_to_float($value): string
  * Converts uW to dBm
  * $value must be positive
  */
-function uw_to_dbm($value)
+function uw_to_dbm($value): null|int|float
 {
     if ($value < 0) {
         return null;
@@ -655,7 +655,7 @@ function uw_to_dbm($value)
  * Converts mW to dBm
  * $value must be positive
  */
-function mw_to_dbm($value)
+function mw_to_dbm($value): null|int|float
 {
     if ($value < 0) {
         return null;

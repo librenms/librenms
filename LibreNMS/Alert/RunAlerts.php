@@ -87,7 +87,7 @@ class RunAlerts
      * @param  array  $alert  Alert-Result from DB
      * @return array|bool|string
      */
-    public function describeAlert(array $alert)
+    public function describeAlert(array $alert): false|string|array
     {
         $obj = [];
         $i = 0;
@@ -387,7 +387,7 @@ class RunAlerts
      * @param  array  $idFields
      * @return string
      */
-    private function generateComparisonKeyForFault($element, $idFields): string
+    private function generateComparisonKeyForFault($element, array $idFields): string
     {
         $keyParts = [];
         foreach ($idFields as $field) {
@@ -643,7 +643,7 @@ class RunAlerts
     }
 
     // Log alert event
-    public function alertLog($result, array $obj, $transport): void
+    public function alertLog($result, array $obj, string $transport): void
     {
         $prefix = [
             AlertState::RECOVERED => 'recovery',

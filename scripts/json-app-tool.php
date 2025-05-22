@@ -5,7 +5,7 @@
 /**
  * @return mixed[]
  */
-function data_flatten($array, $prefix = '', $joiner = '_'): array
+function data_flatten($array, string $prefix = '', string $joiner = '_'): array
 {
     $return = [];
     foreach ($array as $key => $value) {

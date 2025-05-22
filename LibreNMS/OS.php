@@ -100,7 +100,7 @@ class OS implements
     private ?array $device = null; // annoying use of references to make sure this is in sync with global $device variable
     private array $graphs; // stores device graphs
     private $cache; // data cache
-    private $pre_cache; // pre-fetch data cache
+    private ?array $pre_cache = null; // pre-fetch data cache
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -118,7 +118,7 @@ class OS implements
      *
      * @return array
      */
-    public function &getDeviceArray()
+    public function &getDeviceArray(): ?array
     {
         return $this->device;
     }
@@ -329,7 +329,7 @@ class OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $processors = $this->discoverHrProcessors();
 

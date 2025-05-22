@@ -149,7 +149,7 @@ class Fortiap extends Fortinet implements
         return $sensors;
     }
 
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }

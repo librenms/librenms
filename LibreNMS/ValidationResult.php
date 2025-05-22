@@ -151,7 +151,7 @@ class ValidationResult
     /**
      * @return string|array|null
      */
-    public function getFix()
+    public function getFix(): ?string
     {
         return $this->fix;
     }
@@ -163,7 +163,7 @@ class ValidationResult
      * @param  string|array  $fix
      * @return ValidationResult $this
      */
-    public function setFix($fix): ValidationResult
+    public function setFix(?string $fix): ValidationResult
     {
         $this->fix = $fix;
 

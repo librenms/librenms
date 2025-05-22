@@ -240,7 +240,7 @@ function discover_sensor($unused, $class, array $device, $oid, $index, $type, $d
     return true;
 }
 
-function discover_juniAtmVp(array &$valid, $device, $port_id, $vp_id, $vp_descr): void
+function discover_juniAtmVp(array &$valid, $device, string $port_id, string $vp_id, string $vp_descr): void
 {
     Log::debug("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 

@@ -1954,7 +1954,7 @@ function delete_bill(Illuminate\Http\Request $request): \Illuminate\Http\JsonRes
     return api_error(400, 'Could not remove bill with id ' . $bill_id);
 }
 
-function check_bill_key_value($bill_key, $bill_value)
+function check_bill_key_value($bill_key, $bill_value): \Illuminate\Http\JsonResponse|true
 {
     $bill_types = ['quota', 'cdr'];
 

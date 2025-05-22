@@ -98,7 +98,7 @@ class Plugins
      * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
-    public static function load($file, $pluginName)
+    public static function load($file, $pluginName): ?object
     {
         chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
@@ -127,7 +127,7 @@ class Plugins
      * @param  string  $pluginName
      * @return object|null
      */
-    private static function getInstance($file, $pluginName): ?object
+    private static function getInstance($file, string $pluginName): ?object
     {
         $ns_prefix = 'LibreNMS\\Plugins\\';
         $ns_psr4 = $ns_prefix . $pluginName . '\\' . $pluginName;
@@ -158,7 +158,7 @@ class Plugins
      * @param  string  $hook  Name of the hook to get count for
      * @return int|bool
      */
-    public static function countHooks($hook)
+    public static function countHooks($hook): int|false
     {
         // count all plugins implementing a specific hook
         self::start();
@@ -176,7 +176,7 @@ class Plugins
      * @param  array|false  $params  Optional array of parameters for hook
      * @return string
      */
-    public static function call($hook, $params = false)
+    public static function call($hook, $params = false): string|false
     {
         chdir(Config::get('install_dir') . '/html');
         self::start();

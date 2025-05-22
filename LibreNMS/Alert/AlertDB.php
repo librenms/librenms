@@ -59,7 +59,7 @@ class AlertDB
      * @param  string  $rule  Rule to generate SQL for
      * @return string|bool
      */
-    public static function genSQLOld($rule)
+    public static function genSQLOld($rule): false|string
     {
         $rule = AlertUtil::runMacros($rule);
         if (empty($rule)) {

@@ -58,7 +58,7 @@ function dbQuery($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbInsert($data, $table)
+function dbInsert($data, string $table): string|false|null
 {
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
@@ -131,7 +131,7 @@ function dbBulkInsert($data, $table)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbUpdate($data, $table, $where = null, $parameters = [])
+function dbUpdate($data, string $table, $where = null, $parameters = [])
 {
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
@@ -172,7 +172,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
  * @see https://laravel.com/docs/eloquent#deleting-models
  */
-function dbDelete($table, $where = null, $parameters = [])
+function dbDelete(string $table, $where = null, $parameters = [])
 {
     $sql = 'DELETE FROM `' . $table . '`';
     if ($where) {

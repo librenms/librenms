@@ -380,7 +380,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  string  $target  the name of the table to target, for alerting, this should be devices
      * @return array
      */
-    protected function generateGlue($target = 'devices'): array
+    protected function generateGlue(string $target = 'devices'): array
     {
         $tables = $this->getTables();  // get all tables in query
 
@@ -460,7 +460,7 @@ class QueryBuilderParser implements \JsonSerializable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->builder;
     }

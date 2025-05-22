@@ -48,8 +48,8 @@ class ModuleTestHelper
     private string $snmprec_dir;
     private string $json_dir;
     private $file_name;
-    private $discovery_module_output = [];
-    private $poller_module_output = [];
+    private array $discovery_module_output = [];
+    private array $poller_module_output = [];
     private string|bool|null $discovery_output = null;
     private string|bool|null $poller_output = null;
 
@@ -66,7 +66,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public function __construct($modules, $os, $variant = '')
+    public function __construct($modules, string $os, $variant = '')
     {
         $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->variant = strtolower($variant);
@@ -117,12 +117,12 @@ class ModuleTestHelper
         $this->quiet = $quiet;
     }
 
-    public function setSnmprecSavePath($path): void
+    public function setSnmprecSavePath(string $path): void
     {
         $this->snmprec_file = $path;
     }
 
-    public function setJsonSavePath($path): void
+    public function setJsonSavePath(string $path): void
     {
         $this->json_file = $path;
     }
@@ -812,7 +812,7 @@ class ModuleTestHelper
         return json_decode(file_get_contents($this->json_file), true);
     }
 
-    public function getJsonFilepath($short = false)
+    public function getJsonFilepath($short = false): string
     {
         if ($short) {
             return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');

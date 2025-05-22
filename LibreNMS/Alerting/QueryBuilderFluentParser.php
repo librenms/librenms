@@ -78,7 +78,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      * @param  string  $condition  AND or OR
      * @return Builder
      */
-    protected function parseRuleToQuery($query, $rule, $condition)
+    protected function parseRuleToQuery($query, array $rule, $condition)
     {
         [$field, $op, $value] = $this->expandRule($rule);
 

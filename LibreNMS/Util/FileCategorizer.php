@@ -98,7 +98,7 @@ class FileCategorizer extends Categorizer
         return $this->categorized;
     }
 
-    private function validateOs(string|array|null $os)
+    private function validateOs(string|array|null $os): string|array|null
     {
         return file_exists("resources/definitions/os_detection/$os.yaml") ? $os : null;
     }

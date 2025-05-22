@@ -85,7 +85,7 @@ class DeviceGroup extends BaseModel
      *
      * @return QueryBuilderFluentParser
      */
-    public function getParser()
+    public function getParser(): \LibreNMS\Alerting\QueryBuilderFluentParser
     {
         return ! empty($this->rules) ?
             QueryBuilderFluentParser::fromJson($this->rules) :

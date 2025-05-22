@@ -97,7 +97,7 @@ class IPv6 extends IP
      *
      * @return string|false
      */
-    public function compressed()
+    public function compressed(): string|false
     {
         return self::ntop(inet_pton($this->ip));
     }
@@ -108,7 +108,7 @@ class IPv6 extends IP
      * @param  int  $cidr  If not given will use the cidr stored with this IP
      * @return string
      */
-    public function getNetworkAddress($cidr = null)
+    public function getNetworkAddress($cidr = null): string|false
     {
         $cidr = (int) ($cidr ?? $this->cidr);
 

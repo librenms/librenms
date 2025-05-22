@@ -47,7 +47,7 @@ class Viptela extends OS implements ProcessorDiscovery, ProcessorPolling
      *
      * @return array Processor
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $idle_cpu = 100 - (int) \SnmpQuery::get([$this->procOid])->value();
         $processors[] = Processor::discover(

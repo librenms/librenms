@@ -106,7 +106,7 @@ if ($exec) {
     exit(1);
 }
 
-function curl_fetch($url, $proxy, $use_https, $output = false)
+function curl_fetch($url, $proxy, $use_https, $output = false): bool|string
 {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

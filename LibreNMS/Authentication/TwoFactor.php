@@ -131,7 +131,7 @@ class TwoFactor
      * @param  int|bool  $counter  Counter, if false timestamp is used
      * @return bool|int
      */
-    public static function verifyHOTP($key, $otp, $counter = false)
+    public static function verifyHOTP($key, $otp, $counter = false): int|float|bool
     {
         if (self::oathHOTP($key, $counter) == $otp) {
             return true;

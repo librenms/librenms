@@ -112,7 +112,7 @@ class DeviceController extends Controller
         return view('device.tabs.legacy', get_defined_vars());
     }
 
-    private function renderLegacyTab(array|string $tab, Device $device, $data)
+    private function renderLegacyTab(array|string $tab, Device $device, $data): string|false
     {
         ob_start();
         $device = $device->toArray();

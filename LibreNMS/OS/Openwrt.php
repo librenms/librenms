@@ -119,7 +119,7 @@ class Openwrt extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         return $this->getSensorData('clients', '', true, false);
     }
@@ -130,7 +130,7 @@ class Openwrt extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return $this->getSensorData('frequency', '', false, false);
     }
@@ -141,7 +141,7 @@ class Openwrt extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         return $this->getSensorData('noise-floor', '', false, false);
     }
@@ -166,7 +166,7 @@ class Openwrt extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessSNR()
+    public function discoverWirelessSNR(): array
     {
         return $this->getSensorData('snr', '', false, true);
     }

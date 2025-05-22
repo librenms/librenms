@@ -82,7 +82,10 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
         return $processors;
     }
 
-    public function pollProcessors(array $processors)
+    /**
+     * @return mixed[]
+     */
+    public function pollProcessors(array $processors): array
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
         if (get_debug_type($data) != 'array') {

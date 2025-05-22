@@ -37,7 +37,7 @@ class SettingsController extends Controller
      * @param  string  $id
      * @return JsonResponse
      */
-    public function update(DynamicConfig $config, Request $request, $id)
+    public function update(DynamicConfig $config, Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $value = $request->get('value');
 
@@ -66,7 +66,7 @@ class SettingsController extends Controller
      * @param  string  $id
      * @return JsonResponse
      */
-    public function destroy(DynamicConfig $config, $id)
+    public function destroy(DynamicConfig $config, $id): \Illuminate\Http\JsonResponse
     {
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);

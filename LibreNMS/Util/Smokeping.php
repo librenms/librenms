@@ -76,7 +76,7 @@ class Smokeping
         return $this->getFiles();
     }
 
-    public function generateFileName($file = ''): string
+    public function generateFileName(string $file = ''): string
     {
         if (Config::get('smokeping.integration') === true) {
             return Config::get('smokeping.dir') . '/' . ($this->device->type ?: 'Ungrouped') . '/' . $file;
@@ -88,7 +88,7 @@ class Smokeping
     /**
      * @return list<array{device: object, graph: non-empty-array<('dest' | 'device' | 'src' | 'type'), mixed>}>
      */
-    public function otherGraphs($direction): array
+    public function otherGraphs(string $direction): array
     {
         $remote = $direction == 'in' ? 'src' : 'dest';
         $data = [];

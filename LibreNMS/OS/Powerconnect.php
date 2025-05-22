@@ -52,7 +52,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDeviceArray();
         if (Str::startsWith($device['sysObjectID'], [

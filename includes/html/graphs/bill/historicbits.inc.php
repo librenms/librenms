@@ -51,7 +51,7 @@ function TimeCallback($aVal): string
     }
 }//end TimeCallback()
 
-function InvertCallback($x)
+function InvertCallback($x): int|float
 {
     return $x * -1;
 }//end InvertCallback

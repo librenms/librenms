@@ -250,7 +250,7 @@ class IRCBot
 
     //end connect_alert()
 
-    private function read(string $buff)
+    private function read(string $buff): string|false
     {
         $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
@@ -593,7 +593,7 @@ class IRCBot
 
     //end doAuth()
 
-    private function sendMessage($message, $chan)
+    private function sendMessage($message, string $chan): int|false
     {
         if ($this->debug) {
             $this->log("Sending 'PRIVMSG " . trim($chan) . ' :' . trim($message) . "'");
@@ -1004,7 +1004,7 @@ class IRCBot
 
     //end _status()
 
-    private function _color($text, ?string $fg_color, $bg_color = null, $other = null): string
+    private function _color(string $text, ?string $fg_color, $bg_color = null, $other = null): string
     {
         $colors = [
             'white' => '00',
@@ -1051,7 +1051,7 @@ class IRCBot
 
     // end _color
 
-    private function _html2irc(string $string)
+    private function _html2irc(string $string): string|array|null
     {
         $string = urldecode($string);
         $string = preg_replace('#<b>#i', chr(2), $string);

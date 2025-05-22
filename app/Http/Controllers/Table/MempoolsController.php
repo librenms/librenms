@@ -101,7 +101,7 @@ class MempoolsController extends TableController
         ];
     }
 
-    private function miniGraph(Mempool $mempool)
+    private function miniGraph(Mempool $mempool): string
     {
         $graph = [
             'type' => 'mempool_usage',
@@ -116,7 +116,7 @@ class MempoolsController extends TableController
         return Url::overlibLink($link, Url::graphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
     }
 
-    private function barLink(Mempool $mempool)
+    private function barLink(Mempool $mempool): string
     {
         $graph = [
             'type' => 'mempool_usage',

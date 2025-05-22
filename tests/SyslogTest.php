@@ -40,7 +40,7 @@ class SyslogTest extends TestCase
         return $entry;
     }
 
-    private function createData($line, $resultDelta): array
+    private function createData(string $line, array $resultDelta): array
     {
         $entry = $this->fillLine($line);
         $data = [];

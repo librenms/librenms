@@ -49,7 +49,7 @@ class Application extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
-    public function displayName()
+    public function displayName(): string
     {
         return StringHelpers::niceCase($this->app_type);
     }

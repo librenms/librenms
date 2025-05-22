@@ -138,7 +138,7 @@ class Html
         return $graph_data;
     }
 
-    public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null): string
+    public static function percentageBar(string $width, string $height, $percent, string $left_text = '', string $right_text = '', $warn = null, $shadow = null, $colors = null): string
     {
         $percent = min($percent, 100);
         if ($colors === null) {

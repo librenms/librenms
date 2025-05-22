@@ -80,7 +80,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
      * @param  string  $log_file
      * @return array
      */
-    private function generateCommands($log_file): array
+    private function generateCommands(string $log_file): array
     {
         $user = config('librenms.user');
         $group = config('librenms.group');

@@ -87,7 +87,7 @@ class HiveosWireless extends OS implements
      *
      * @return array Sensors
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }

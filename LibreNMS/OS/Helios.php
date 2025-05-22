@@ -40,7 +40,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return $this->discoverOid('frequency', 'mlRadioInfoFrequency', '.1.3.6.1.4.1.47307.1.4.2.1.4.');
     }
@@ -51,7 +51,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         return $this->discoverOid('power', 'mlRadioInfoTxPower', '.1.3.6.1.4.1.47307.1.4.2.1.7.');
     }
@@ -62,7 +62,7 @@ class Helios extends OS implements WirelessFrequencyDiscovery, WirelessPowerDisc
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         return $this->discoverOid('rssi', 'mlRadioInfoRSSILocal', '.1.3.6.1.4.1.47307.1.4.2.1.10.');
     }

@@ -44,7 +44,7 @@ function get_service_status($device = null): array
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
+function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = ''): string|false|null
 {
     if (! is_array($device)) {
         $device = device_by_id_cache($device);
@@ -113,7 +113,7 @@ function delete_service($service = null)
     return dbDelete('services', '`service_id` =  ?', [$service]);
 }
 
-function discover_service(array $device, $service): void
+function discover_service(array $device, string $service): void
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
@@ -342,7 +342,7 @@ function check_service($command): array
  *
  * @return array
  */
-function list_available_services()
+function list_available_services(): array
 {
     return \LibreNMS\Services::list();
 }

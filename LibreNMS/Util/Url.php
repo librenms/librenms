@@ -49,7 +49,7 @@ class Url
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink($device, $text = '', array $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1): string
     {
         if (! $device instanceof Device || ! $device->hostname) {
             return $escape_text ? htmlentities($text) : (string) $text;
@@ -194,7 +194,7 @@ class Url
      * @param  bool  $single_graph
      * @return mixed|string
      */
-    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
@@ -249,12 +249,12 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl($port, $vars = [])
+    public static function portUrl($port, $vars = []): string
     {
         return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
     }
 
-    public static function sensorUrl($sensor, $vars = [])
+    public static function sensorUrl($sensor, $vars = []): string
     {
         return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
@@ -263,7 +263,7 @@ class Url
      * @param  Port  $port
      * @return string
      */
-    public static function portThumbnail($port)
+    public static function portThumbnail($port): string
     {
         $graph_array = [
             'port_id' => $port->port_id,
@@ -281,7 +281,7 @@ class Url
      * @param  Port  $port
      * @return string
      */
-    public static function portErrorsThumbnail($port)
+    public static function portErrorsThumbnail($port): string
     {
         $graph_array = [
             'port_id' => $port->port_id,
@@ -322,7 +322,7 @@ class Url
      * @param  string  $prefix
      * @return string
      */
-    private static function urlParams($vars, $prefix = '/')
+    private static function urlParams(array $vars, $prefix = '/')
     {
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
@@ -362,7 +362,7 @@ class Url
         return '<img class="graph-image" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
-    public static function graphPopup(array $args, $content = null, $link = null)
+    public static function graphPopup(array $args, $content = null, $link = null): string
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
         $original_from = $args['from'];
@@ -408,7 +408,7 @@ class Url
         return $tag . ' />';
     }
 
-    public static function overlibLink($url, $text, $contents, $class = null): string
+    public static function overlibLink(string $url, string $text, $contents, $class = null): string
     {
         $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
@@ -430,7 +430,7 @@ class Url
         return $output;
     }
 
-    public static function overlibContent(array $graph_array, $text): string
+    public static function overlibContent(array $graph_array, string $text): string
     {
         $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
 
@@ -461,7 +461,7 @@ class Url
      * @param  int  $absolute_size
      * @return string
      */
-    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0): string
+    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', string $class = 'minigraph-image', $absolute_size = 0): string
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
 
@@ -659,7 +659,7 @@ class Url
         return $vars;
     }
 
-    private static function escapeBothQuotes($string)
+    private static function escapeBothQuotes(string $string): string
     {
         return str_replace(["'", '"'], "\'", $string);
     }

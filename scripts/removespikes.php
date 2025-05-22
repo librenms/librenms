@@ -853,7 +853,7 @@ function displayTime($pdp): string
     }
 }
 
-function debug($string): void
+function debug(string $string): void
 {
     global $debug;
 

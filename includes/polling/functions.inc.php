@@ -54,7 +54,7 @@ function sensor_precache(array $device, $type): array
     return $sensor_cache;
 }
 
-function poll_sensor($device, $class): void
+function poll_sensor($device, string $class): void
 {
     $sensors = [];
     $misc_sensors = [];
@@ -491,7 +491,7 @@ function json_app_get($device, $extend, $min_version = 1)
  *                          than '', and array keys with.
  * @return array The flattened array.
  */
-function data_flatten($array, $prefix = '', $joiner = '_'): array
+function data_flatten($array, string $prefix = '', string $joiner = '_'): array
 {
     $return = [];
     foreach ($array as $key => $value) {

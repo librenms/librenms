@@ -58,7 +58,7 @@ class Component
         return $counts->isEmpty() ? false : $counts->all();
     }
 
-    public function getComponentType($TYPE = null)
+    public function getComponentType($TYPE = null): false|array
     {
         if (is_null($TYPE)) {
             $SQL = 'SELECT DISTINCT `type` as `name` FROM `component` ORDER BY `name`';
@@ -161,7 +161,7 @@ class Component
         return $count;
     }
 
-    public function getComponentStatusLog($component_id, $start, $end)
+    public function getComponentStatusLog(string $component_id, string $start, string $end): false|array
     {
         if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...

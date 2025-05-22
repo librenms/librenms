@@ -99,7 +99,7 @@ function collectd_list_hosts(): array
  * @param  string  $arg_host  Name of host for which to return plugins
  * @return array Sorted list of plugins (sorted alphabetically)
  */
-function collectd_list_plugins($arg_host): array
+function collectd_list_plugins(string $arg_host): array
 {
     $plugins = [];
     foreach (Config::get('datadirs') as $datadir) {
@@ -131,7 +131,7 @@ function collectd_list_plugins($arg_host): array
  * @param  string  $arg_plugin  Name of plugin
  * @return array Sorted list of plugin instances (sorted alphabetically)
  */
-function collectd_list_pinsts($arg_host, $arg_plugin): array
+function collectd_list_pinsts(string $arg_host, $arg_plugin): array
 {
     $pinsts = [];
     foreach (Config::get('datadirs') as $datadir) {
@@ -173,7 +173,7 @@ function collectd_list_pinsts($arg_host, $arg_plugin): array
  *
  * @return array Sorted list of types (sorted alphabetically)
  */
-function collectd_list_types($arg_host, $arg_plugin, $arg_pinst): array
+function collectd_list_types(string $arg_host, string $arg_plugin, string $arg_pinst): array
 {
     $types = [];
     $my_plugin = $arg_plugin . (strlen($arg_pinst) ? '-' . $arg_pinst : '');
@@ -217,7 +217,7 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst): array
  *
  * @return array Sorted list of type instances (sorted alphabetically)
  */
-function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type): array
+function collectd_list_tinsts(string $arg_host, string $arg_plugin, string $arg_pinst, $arg_type): array
 {
     $tinsts = [];
     $my_plugin = $arg_plugin . (strlen($arg_pinst) ? '-' . $arg_pinst : '');
@@ -429,7 +429,7 @@ function _rrd_info($file): array
     return $info;
 }//end _rrd_info()
 
-function rrd_get_color($code, $line = true): mixed
+function rrd_get_color(string $code, $line = true): mixed
 {
     $name = ($line ? 'f_' : 'h_') . $code;
     if (! Config::has("rrd_colors.$name")) {

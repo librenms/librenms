@@ -342,7 +342,7 @@ class CiHelper
      * @param  string  $type
      * @return false|string the method name to run
      */
-    private function canCheck($type)
+    private function canCheck(string|int $type): false|string
     {
         if ($this->flags["{$type}_skip"] || $this->completedChecks[$type]) {
             return false;

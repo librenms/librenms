@@ -99,7 +99,7 @@ class GraphController extends Controller
         ]);
     }
 
-    private function formatGraph($top, $graph): array
+    private function formatGraph(string $top, string $graph): array
     {
         $text = $graph;
         if (Str::contains('_', $graph)) {

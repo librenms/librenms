@@ -214,7 +214,7 @@ abstract class TableController extends PaginatedAjaxController
      * @param  string  $filename
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    protected function generateCsvResponse($data, $headers, $filename)
+    protected function generateCsvResponse($data, $headers, string $filename)
     {
         return response()->stream(
             function () use ($data, $headers) {

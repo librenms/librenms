@@ -75,7 +75,7 @@ class Billing
         return $cur_used / $since * $total;
     }
 
-    public static function getValue($host, $port, $id, $inout): int
+    public static function getValue($host, $port, string $id, string $inout): int
     {
         $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
         $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);

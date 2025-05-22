@@ -55,7 +55,7 @@ class Lcos extends OS implements
      * @param  string  $index
      * @return string decimal encoded OID string
      */
-    private function strToDecOid($index): string
+    private function strToDecOid(int|string $index): string
     {
         $dec_index = [];
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
@@ -103,7 +103,7 @@ class Lcos extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return  $this->pollWirelessChannelAsFrequency($sensors);
     }

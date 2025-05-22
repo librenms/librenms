@@ -110,7 +110,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return int
      */
-    public function buildProbesConfiguration()
+    public function buildProbesConfiguration(): int
     {
         $probes = $this->assembleProbes(Config::get('smokeping.probes'));
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
@@ -123,7 +123,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return int
      */
-    public function buildTargetsConfiguration($devices)
+    public function buildTargetsConfiguration($devices): int
     {
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
@@ -297,7 +297,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  array  ...$blocks  Blocks of smokeping configuration arranged in arrays of strings
      * @return int
      */
-    private function render(...$blocks): int
+    private function render(array ...$blocks): int
     {
         foreach (array_merge(...$blocks) as $line) {
             $this->line($line);

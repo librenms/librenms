@@ -147,7 +147,7 @@ class BashCompletionCommand extends Command
      * @param  string  $partial
      * @return Collection
      */
-    private function completeCommand($partial)
+    private function completeCommand(string|array|bool $partial)
     {
         $all_commands = collect(\Artisan::all())->keys()->filter(function ($cmd) {
             return $cmd != 'list:bash-completion';

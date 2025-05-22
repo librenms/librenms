@@ -132,7 +132,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         // instant
         return $this->discoverInstantRadio('frequency', 'aiRadioChannel');
@@ -144,7 +144,7 @@ class Arubaos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         // instant
         return $this->discoverInstantRadio('noise-floor', 'aiRadioNoiseFloor');
@@ -156,7 +156,7 @@ class Arubaos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         // instant
         return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
@@ -203,7 +203,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         // instant
         return $this->discoverInstantRadio('utilization', 'aiRadioUtilization64');
@@ -216,7 +216,7 @@ class Arubaos extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }

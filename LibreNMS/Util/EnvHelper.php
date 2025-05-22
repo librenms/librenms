@@ -73,7 +73,7 @@ class EnvHelper
      * @param  array  $unset  Remove the given KEYS from the config
      * @return string
      */
-    public static function setEnv($content, $settings, $unset = [])
+    public static function setEnv($content, $settings, $unset = []): string
     {
         // ensure trailing line return
         if (substr($content, -1) !== PHP_EOL) {
@@ -114,7 +114,7 @@ class EnvHelper
      *
      * @throws FileWriteFailedException
      */
-    public static function init()
+    public static function init(): string|null|false
     {
         $env_file = base_path('.env');
         try {

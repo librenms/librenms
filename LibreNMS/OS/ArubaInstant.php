@@ -171,7 +171,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioChannel')
-            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, string $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -197,7 +197,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioNoiseFloor')
-            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, string $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -224,7 +224,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioTransmitPower')
-            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, string $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -250,7 +250,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioUtilization64')
-            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, string $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -280,7 +280,7 @@ class ArubaInstant extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }

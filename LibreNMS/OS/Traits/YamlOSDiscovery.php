@@ -145,7 +145,7 @@ trait YamlOSDiscovery
         }
     }
 
-    private function fetch(array $oids, $numeric)
+    private function fetch(array $oids, $numeric): array
     {
         return snmp_get_multi_oid($this->getDeviceArray(), $oids, $numeric ? '-OUQn' : '-OUQ');
     }

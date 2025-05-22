@@ -36,7 +36,7 @@ trait CompletesPluginArgument
      * @param  string  $previous
      * @return array|false
      */
-    public function completeArgument($name, $value, $previous)
+    public function completeArgument($name, string $value, $previous)
     {
         if ($name == 'plugin') {
             return Plugin::where('plugin_name', 'like', $value . '%')

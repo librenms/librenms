@@ -198,7 +198,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         return $user_id;
     }
 
-    public function getUser($user_id)
+    public function getUser($user_id): array|false
     {
         $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
         $filter = "($uid_attr=$user_id)";
@@ -245,7 +245,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
 
-    protected function getMembername($username)
+    protected function getMembername(string $username)
     {
         if (Config::get('auth_ldap_groupmembertype') == 'fulldn') {
             $membername = Config::get('auth_ldap_prefix') . $username . Config::get('auth_ldap_suffix');

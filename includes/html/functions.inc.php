@@ -54,7 +54,7 @@ function toner2colour($descr, $percent): array
     return $colour;
 }//end toner2colour()
 
-function generate_link($text, $vars, $new_vars = []): string
+function generate_link(string $text, $vars, $new_vars = []): string
 {
     return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
@@ -77,7 +77,7 @@ function generate_overlib_content(array $graph_array, $text): string
     return $overlib_content;
 }//end generate_overlib_content()
 
-function generate_device_link(array $device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+function generate_device_link(array $device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1): string
 {
     $deviceModel = DeviceCache::get((int) $device['device_id']);
 
@@ -342,7 +342,7 @@ function generate_port_url(array $port, $vars = []): string
     return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
-function generate_sap_url(array $sap, $vars = [])
+function generate_sap_url(array $sap, $vars = []): string
 {
     // Overwrite special QinQ sap identifiers
     if ($sap['sapEncapValue'] == '*') {
@@ -947,7 +947,7 @@ function get_oxidized_nodes_list(): void
  * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-function generate_stacked_graphs($force_stack = false, $transparency = '88')
+function generate_stacked_graphs($force_stack = false, $transparency = '88'): array
 {
     if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
@@ -970,7 +970,7 @@ function generate_stacked_graphs($force_stack = false, $transparency = '88')
  * The second value is the time interval. If not specified, it
  * defaults to 300, or 5 minutes.
  */
-function lowest_time($time, $seconds = 300)
+function lowest_time($time, $seconds = 300): float|int
 {
     return $time - ($time % $seconds);
 }
@@ -1033,7 +1033,7 @@ function time_to_nfsen_subpath($time)
  * Takes a hostname and transforms it to the name
  * used by nfsen.
  */
-function nfsen_hostname($hostname)
+function nfsen_hostname($hostname): string|array
 {
     $nfsen_hostname = str_replace('.', Config::get('nfsen_split_char'), $hostname);
 

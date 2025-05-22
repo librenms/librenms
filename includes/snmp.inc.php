@@ -299,7 +299,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
  *
  * @deprecated Please use SnmpQuery instead
  */
-function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
+function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null): false|string|array|null
 {
     $measure = Measurement::start('snmpget');
 
@@ -338,7 +338,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  *
  * @deprecated Please use SnmpQuery instead
  */
-function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
+function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null): false|string
 {
     $measure = Measurement::start('snmpgetnext');
 
@@ -359,7 +359,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 /**
  * @deprecated Please use SnmpQuery instead
  */
-function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
+function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null): string|array|null|false
 {
     $measure = Measurement::start('snmpwalk');
 
@@ -437,7 +437,7 @@ function snmpwalk_cache_oid($device, $oid, array $array = [], $mib = null, $mibd
  *
  * @deprecated Please use SnmpQuery instead
  */
-function snmpwalk_cache_oid_num($device, $oid, $array = [], $mib = null, $mibdir = null)
+function snmpwalk_cache_oid_num($device, $oid, $array = [], $mib = null, $mibdir = null): array
 {
     return snmpwalk_cache_oid($device, $oid, $array, $mib, $mibdir, $snmpflags = '-OQUn');
 }//end snmpwalk_cache_oid_num()
@@ -649,7 +649,7 @@ function snmp_gen_auth(&$device, $cmd = [])
  *
  * @deprecated Please use SnmpQuery instead
  */
-function snmpwalk_array_num($device, $oid, $indexes = 1)
+function snmpwalk_array_num($device, $oid, $indexes = 1): false|null|array
 {
     $array = [];
     $string = snmp_walk($device, $oid, '-Osqn');

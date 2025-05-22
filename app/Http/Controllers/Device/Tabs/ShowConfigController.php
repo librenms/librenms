@@ -97,7 +97,7 @@ class ShowConfigController extends Controller implements DeviceTab
         return $this->rancidFile;
     }
 
-    private function findRancidConfigFile()
+    private function findRancidConfigFile(): string|false
     {
         if (Config::has('rancid_configs') && ! is_array(Config::get('rancid_configs'))) {
             Config::set('rancid_configs', (array) Config::get('rancid_configs', []));

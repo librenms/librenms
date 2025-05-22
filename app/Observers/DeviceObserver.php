@@ -207,7 +207,7 @@ class DeviceObserver
         }
     }
 
-    public static function attributeChangedMessage($attribute, $value, $previous): string
+    public static function attributeChangedMessage($attribute, string $value, $previous): string
     {
         return trans("device.attributes.$attribute") . ': '
             . (($previous && $previous != $value) ? "$previous -> " : '')

@@ -29,7 +29,7 @@ function list_bills($bill_name)
 }
 
 // Create a new bill.
-function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
+function create_bill(string $bill_name, string $bill_type, string $bill_cdr, $bill_day): string|false|null
 {
     /** create_bill
      * Note:
@@ -52,7 +52,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
 }
 
 // This will get an array of devices we are interested in from the CLI glob
-function get_devices($host_glob, $nameType)
+function get_devices($host_glob, string $nameType)
 {
     return dbFetchRows('SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `' . $nameType . '` LIKE ?', ["%$host_glob%"]);
 }

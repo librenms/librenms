@@ -121,7 +121,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         return $proc;
     }
 
-    public static function fromYaml(OS $os, $index, array $data)
+    public static function fromYaml(OS $os, $index, array $data): static
     {
         $precision = empty($data['precision']) ? 1 : $data['precision'];
 
@@ -257,7 +257,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         return $value;
     }
 
-    public static function processYaml(OS $os)
+    public static function processYaml(OS $os): array
     {
         $discovery = $os->getDiscovery('processors');
 
@@ -276,7 +276,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      *
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return $this->valid;
     }

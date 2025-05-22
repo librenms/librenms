@@ -151,7 +151,7 @@ class UserPreferencesController extends Controller
         return $definitions->get('site_style')->getOptions();
     }
 
-    private function updatePreference($preference, $value): void
+    private function updatePreference(string $preference, $value): void
     {
         if ($value == 'default') {
             UserPref::forgetPref(Auth::user(), $preference);

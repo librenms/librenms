@@ -51,7 +51,7 @@ class Teldat extends OS implements
      * @param  int  $ifIndex
      * @return string with Short Interface Name
      */
-    public function shortIfName($ifName, $ifIndex)
+    public function shortIfName($ifName, $ifIndex): string|array|null
     {
         $device = ($ifName == '' ? strval($ifIndex) : preg_replace('/cellular/', 'Ce', $ifName));
 

@@ -82,7 +82,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      * @param  string  $attr  The name of the attribute to find
      * @return string|null
      */
-    public function authSSOGetAttr($attr, $prefix = 'HTTP_')
+    public function authSSOGetAttr($attr, string $prefix = 'HTTP_')
     {
         // Check attribute originates from a trusted proxy - we check it on every attribute just in case this gets called after initial login
         if ($this->authSSOProxyTrusted()) {

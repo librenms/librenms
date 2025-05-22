@@ -13,7 +13,7 @@ $allowed_afs = $app->data['allowed_afs'] ?? [];
  * @param  array  $graphs
  * @return $graphs
  */
-function ss_graph_builder($gen_type, array $ss_netid_mapper, $allowed_sockets, array $graphs): array
+function ss_graph_builder(string $gen_type, array $ss_netid_mapper, $allowed_sockets, array $graphs): array
 {
     $graph_name = 'ss_' . $gen_type;
     $graphs[$graph_name]['type'] = $gen_type;
@@ -46,7 +46,7 @@ function ss_graph_builder($gen_type, array $ss_netid_mapper, $allowed_sockets, a
  * @param  null|string  $netid
  * @param  string  $graph_desc
  */
-function ss_graph_printer($gen_type, $app_id, $netid, $graph_desc): void
+function ss_graph_printer(string $gen_type, $app_id, $netid, string $graph_desc): void
 {
     $graph_type = $gen_type;
     $graph_array['height'] = '100';

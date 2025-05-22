@@ -134,7 +134,7 @@ class DeviceController extends TableController
         return $value;
     }
 
-    private function isDetailed()
+    private function isDetailed(): bool
     {
         if (is_null($this->detailed)) {
             $this->detailed = \Request::get('format', 'list_detail') == 'list_detail';
@@ -224,7 +224,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getOsText(\App\Models\Device $device): string
+    private function getOsText(array $device): string
     {
         $os_text = htmlspecialchars(Config::getOsSetting($device->os, 'text'));
 
@@ -271,7 +271,7 @@ class DeviceController extends TableController
      * @param  mixed  $icon
      * @return string
      */
-    private function formatMetric($device, $count, string $tab, string $icon): string
+    private function formatMetric($device, string $count, string $tab, string $icon): string
     {
         $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
@@ -284,7 +284,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getLocation(\App\Models\Device $device): string
+    private function getLocation(array $device): string
     {
         $location = $device->location ?? '';
 
@@ -293,7 +293,7 @@ class DeviceController extends TableController
             : substr($location, 0, 32);
     }
 
-    private function getActions(Device $device): array
+    private function getActions(array $device): array
     {
         $actions = [
             [

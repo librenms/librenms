@@ -79,7 +79,7 @@ $ousage['per'] = Number::calculatePercent($bill_data['total_data'], $bill_data['
 $ousage['per'] = (($ousage['per'] < 0) ? '0' : $ousage['per']);
 $ousage['bg'] = \LibreNMS\Util\Color::percentage($ousage['per'], null);
 
-function showPercent($per)
+function showPercent(string $per): string
 {
     $background = \LibreNMS\Util\Color::percentage($per, null);
     $right_background = $background['right'];

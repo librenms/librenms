@@ -56,12 +56,12 @@ class Template
         return $this->template;
     }
 
-    public function getTitle($data)
+    public function getTitle(array $data)
     {
         return $this->bladeTitle($data);
     }
 
-    public function getBody($data)
+    public function getBody(array $data)
     {
         return $this->bladeBody($data);
     }

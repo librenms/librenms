@@ -420,7 +420,7 @@ GRAPHQL;
      * @param  string  $contents  new file contents
      * @param  string  $message  The commit message
      */
-    private function pushFileContents($file, string|bool|array|null $contents, string $message): string
+    private function pushFileContents(string $file, string|bool|array|null $contents, string $message): string
     {
         $existing = Http::client()->withHeaders($this->getHeaders())->get($this->github . '/contents/' . $file);
         $existing_sha = $existing->json()['sha'];

@@ -116,7 +116,7 @@ class Proc
      * @param  string  $command
      * @return array
      */
-    public function sendCommand($command)
+    public function sendCommand($command): array
     {
         $this->sendInput($this->checkAddEOL($command));
 
@@ -275,7 +275,7 @@ class Proc
      *
      * @return int|null
      */
-    public function getExitCode()
+    public function getExitCode(): ?int
     {
         return $this->_exitcode;
     }
@@ -285,7 +285,7 @@ class Proc
      *
      * @return bool
      */
-    public function isSynchronous()
+    public function isSynchronous(): bool
     {
         return $this->_synchronous;
     }
@@ -297,7 +297,7 @@ class Proc
      *
      * @param  bool  $synchronous
      */
-    public function setSynchronous($synchronous): void
+    public function setSynchronous(bool $synchronous): void
     {
         $this->_synchronous = $synchronous;
     }
@@ -309,7 +309,7 @@ class Proc
      * @param  string  $string
      * @return string
      */
-    private function checkAddEOL($string)
+    private function checkAddEOL(string $string): string
     {
         if (! Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;

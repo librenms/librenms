@@ -250,7 +250,7 @@ class Schema
         return false;
     }
 
-    public function getTableRelationships()
+    public function getTableRelationships(): array
     {
         if (! isset($this->relationships)) {
             $schema = $this->getSchema();

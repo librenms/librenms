@@ -79,7 +79,7 @@ class Unifi extends OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         return $this->discoverHrProcessors() ?: $this->discoverFrogfootProcessors();
     }
@@ -259,7 +259,7 @@ class Unifi extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }

@@ -23,7 +23,7 @@ use LibreNMS\Enum\Severity;
  * @param  array  $options  get_opts array (only m key is checked)
  * @return bool
  */
-function parse_modules($type, $options)
+function parse_modules(string $type, $options)
 {
     $override = false;
 
@@ -63,7 +63,7 @@ function parse_modules($type, $options)
     return $override;
 }
 
-function logfile($string): void
+function logfile(string $string): void
 {
     $file = Config::get('log_file');
     $fd = fopen($file, 'a');
@@ -204,7 +204,7 @@ function hex2str($hex): string
 }
 
 // Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
+function snmp_hexstring($hex): string
 {
     return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
@@ -332,7 +332,7 @@ function port_fill_missing_and_trim(&$port, $device): void
     }
 }
 
-function convert_delay($delay)
+function convert_delay($delay): int|float
 {
     if (preg_match('/(\d+)([mhd]?)/', $delay, $matches)) {
         $multipliers = [
@@ -660,7 +660,7 @@ function get_device_oid_limit($device)
  * @param  string  $sql
  * @return int exit code
  */
-function lock_and_purge($table, $sql): int
+function lock_and_purge(string $table, $sql): int
 {
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
@@ -689,7 +689,7 @@ function lock_and_purge($table, $sql): int
  * @param  string  $msg
  * @return int exit code
  */
-function lock_and_purge_query($table, $sql, $msg): int
+function lock_and_purge_query(string $table, $sql, $msg): int
 {
     $purge_name = $table . '_purge';
 
@@ -739,7 +739,7 @@ function is_disk_valid(array $disk, array $device): bool
  *
  * @return string
  */
-function describe_bgp_error_code($code, $subcode)
+function describe_bgp_error_code(string $code, string $subcode)
 {
     // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
 

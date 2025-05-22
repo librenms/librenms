@@ -38,7 +38,7 @@ class Mail
      * @param  string  $emails
      * @return array|false
      */
-    public static function parseEmails($emails)
+    public static function parseEmails($emails): array|false
     {
         $result = [];
         $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';

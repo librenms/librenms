@@ -33,7 +33,7 @@ class Packetlight extends OS
     /**
      * Subtract 30 (for yaml user_func)
      */
-    public static function offsetSfpDbm($value)
+    public static function offsetSfpDbm($value): int|float
     {
         return $value - 30;
     }
@@ -41,7 +41,7 @@ class Packetlight extends OS
     /**
      * Subtract 128 (for yaml user_func)
      */
-    public static function offsetSfpTemperature($value)
+    public static function offsetSfpTemperature($value): int|float
     {
         return $value - 128;
     }

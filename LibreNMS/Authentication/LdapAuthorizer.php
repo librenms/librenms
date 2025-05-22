@@ -172,7 +172,7 @@ class LdapAuthorizer extends AuthorizerBase
         return -1;
     }
 
-    public function getUser($user_id)
+    public function getUser($user_id): array|false
     {
         $connection = $this->getLdapConnection();
 
@@ -195,7 +195,7 @@ class LdapAuthorizer extends AuthorizerBase
         return false;
     }
 
-    protected function getMembername($username)
+    protected function getMembername(string $username)
     {
         $type = Config::get('auth_ldap_groupmembertype');
 
@@ -245,7 +245,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return string
      */
-    protected function getFullDn($username): string
+    protected function getFullDn(string $username): string
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
@@ -258,7 +258,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return false|true
      */
-    protected function setAuthLdapSuffixOu($username): bool
+    protected function setAuthLdapSuffixOu(string $username): bool
     {
         $connection = $this->getLdapConnection();
         $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';

@@ -32,8 +32,8 @@ class MeasurementSummary
     private int $count = 0;
     private float $duration = 0.0;
 
-    private $checkpointCount = 0;
-    private $checkpointDuration = 0.0;
+    private int $checkpointCount = 0;
+    private float $checkpointDuration = 0.0;
 
     public function __construct(string $type)
     {

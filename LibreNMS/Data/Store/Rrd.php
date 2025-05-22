@@ -306,7 +306,7 @@ class Rrd extends BaseDatastore
      * @param  string  $vmport
      * @return string full path to the rrd.
      */
-    public function proxmoxName($pmxcluster, $vmid, $vmport): string
+    public function proxmoxName($pmxcluster, string $vmid, string $vmport): string
     {
         $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
         // this is not needed for remote rrdcached
@@ -365,7 +365,7 @@ class Rrd extends BaseDatastore
      * @param  string  $extension  File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = '.rrd'): string
+    public function name($host, $extra, string $extension = '.rrd'): string
     {
         $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
@@ -522,7 +522,7 @@ class Rrd extends BaseDatastore
      * @param  string  $category  which category of graphs are searched
      * @return array array of rrd files for this host
      */
-    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null): array
+    public function getRrdApplicationArrays(array $device, $app_id, $app_name, $category = null): array
     {
         $entries = [];
         $separator = '-';
@@ -717,7 +717,7 @@ class Rrd extends BaseDatastore
      * @param  string  $type
      * @return string
      */
-    private function coalesceStatisticType($type)
+    private function coalesceStatisticType(string $type): string
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
     }
