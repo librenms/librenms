@@ -74,7 +74,7 @@ function logfile($string)
         return;
     }
 
-    fputs($fd, $string . "\n");
+    fwrite($fd, $string . "\n");
     fclose($fd);
 }
 

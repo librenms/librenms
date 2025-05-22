@@ -54,7 +54,7 @@ $i = 0;
 foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER BY `entPhysicalIndex`, `afi`, `cef_index`', [$device['device_id']]) as $cef) {
     $entity = dbFetchRow('SELECT * FROM `entPhysical` WHERE device_id = ? AND `entPhysicalIndex` = ?', [$device['device_id'], $cef['entPhysicalIndex']]);
 
-    if (! is_integer($i / 2)) {
+    if (! is_int($i / 2)) {
         $bg_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
         $bg_colour = \LibreNMS\Config::get('list_colour.odd');

@@ -231,7 +231,7 @@ if ($format == 'graph') {
 
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
-        if (is_integer($row / 2)) {
+        if (is_int($row / 2)) {
             $row_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
             $row_colour = \LibreNMS\Config::get('list_colour.odd');

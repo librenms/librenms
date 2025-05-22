@@ -138,7 +138,7 @@ function process_syslog($entry, $update)
                     $entry['program'] = str_replace('"', '', $val);
                 }
             }
-            $entry['msg'] = join(' ', $msg);
+            $entry['msg'] = implode(' ', $msg);
         }//end if
 
         if (! isset($entry['program'])) {
