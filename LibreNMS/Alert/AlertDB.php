@@ -44,7 +44,7 @@ class AlertDB
      * @param  mixed  $query_builder
      * @return bool|string
      */
-    public static function genSQL($rule, $query_builder = false)
+    public static function genSQL($rule, $query_builder = false): string|null|false
     {
         if ($query_builder) {
             return QueryBuilderParser::fromJson($query_builder)->toSql();
