@@ -110,7 +110,7 @@ class SchemaTest extends TestCase
     /**
      * @return Schema
      */
-    private function getSchemaMock()
+    private function getSchemaMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         // use a Mock so we don't have to rely on the schema being stable.
         $schema = $this->getMockBuilder(Schema::class)

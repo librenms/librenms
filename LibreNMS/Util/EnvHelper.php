@@ -44,7 +44,7 @@ class EnvHelper
      *
      * @throws FileWriteFailedException
      */
-    public static function writeEnv($settings, $unset = [], $file = '.env')
+    public static function writeEnv($settings, $unset = [], $file = '.env'): string
     {
         try {
             $original_content = file_get_contents($file);

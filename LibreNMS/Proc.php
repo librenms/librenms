@@ -116,7 +116,7 @@ class Proc
      * @param  string  $command
      * @return array
      */
-    public function sendCommand($command): array
+    public function sendCommand(string $command): array
     {
         $this->sendInput($this->checkAddEOL($command));
 

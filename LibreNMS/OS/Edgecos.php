@@ -83,7 +83,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDevice();
 

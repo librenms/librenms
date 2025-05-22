@@ -36,7 +36,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 class ShowConfigController extends Controller implements DeviceTab
 {
     private $rancidPath;
-    private $rancidFile;
+    private string|bool|null $rancidFile = null;
 
     public function visible(Device $device): bool
     {

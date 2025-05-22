@@ -169,7 +169,7 @@ class OS implements
         }));
     }
 
-    public function preCache()
+    public function preCache(): array
     {
         if (is_null($this->pre_cache)) {
             $this->pre_cache = YamlDiscovery::preCache($this);

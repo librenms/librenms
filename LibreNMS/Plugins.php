@@ -98,7 +98,7 @@ class Plugins
      * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
-    public static function load($file, $pluginName): ?object
+    public static function load($file, string $pluginName): ?object
     {
         chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);

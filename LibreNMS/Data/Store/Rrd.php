@@ -397,7 +397,7 @@ class Rrd extends BaseDatastore
      *
      * @throws \Exception thrown when the rrdtool process(s) cannot be started
      */
-    private function command(string $command, $filename, string $options)
+    private function command(string $command, $filename, string $options): ?array
     {
         $stat = Measurement::start($this->coalesceStatisticType($command));
         $output = null;

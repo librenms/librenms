@@ -282,7 +282,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         return $sensors;
     }
 
-    private function fetchHardware()
+    private function fetchHardware(): string|array|false|null
     {
         $sysObjectID = $this->getDevice()->sysObjectID;
 

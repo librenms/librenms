@@ -42,7 +42,7 @@ class IRCBot
 
     private $last_activity = 0;
 
-    private $data = '';
+    private string $data = '';
 
     private array $authd = [];
 
@@ -498,7 +498,7 @@ class IRCBot
 
     //end proceedCommand()
 
-    private function respond($msg)
+    private function respond($msg): int|false
     {
         $chan = $this->getChan($this->data);
 

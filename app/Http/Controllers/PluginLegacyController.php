@@ -22,7 +22,7 @@ class PluginLegacyController extends Controller
 
     public function __invoke(?Plugin $plugin): \Illuminate\Contracts\View\View
     {
-        if (! empty($plugin)) {
+        if ($plugin instanceof \App\Models\Plugin) {
             $plugin_path = \LibreNMS\Config::get('plugin_dir') . '/' . $plugin->plugin_name . '/' . $plugin->plugin_name . '.inc.php';
 
             if (is_file($plugin_path)) {

@@ -156,7 +156,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         return file_get_contents(base_path('config.php.default'));
     }
 
-    private function getEnvFileContents()
+    private function getEnvFileContents(): string
     {
         return EnvHelper::setEnv(
             file_get_contents(base_path('.env')),

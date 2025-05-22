@@ -32,7 +32,7 @@ class SyslogTest extends TestCase
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
 
-    private function fillLine($line): array
+    private function fillLine(string $line): array
     {
         $entry = [];
         [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim($line));
