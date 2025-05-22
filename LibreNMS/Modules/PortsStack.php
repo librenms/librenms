@@ -75,7 +75,7 @@ class PortsStack implements Module
             return;
         }
 
-        $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex) use ($os) {
+        $portStacks = $data->mapTable(function (array $data, $lowIfIndex, $highIfIndex) use ($os) {
             if ($lowIfIndex == '0' || $highIfIndex == '0') {
                 return null;  // we don't care about the default entries for ports that have stacking enabled
             }

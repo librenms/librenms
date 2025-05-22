@@ -41,7 +41,7 @@ class Ptp800 extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $transmit = '.1.3.6.1.4.1.17713.8.12.3.0'; //"CAMBIUM-PTP800-MIB::transmitPower.0"
         $receive = '.1.3.6.1.4.1.17713.8.12.1.0'; //"CAMBIUM-PTP800-MIB::receivePower.0";
@@ -78,7 +78,7 @@ class Ptp800 extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $receive = '.1.3.6.1.4.1.17713.8.20.1.0'; //"CAMBIUM-PTP800-MIB::receiveDataRate.0"
         $transmit = '.1.3.6.1.4.1.17713.8.20.2.0'; //"CAMBIUM-PTP800-MIB::transmitDataRate.0"

@@ -72,7 +72,7 @@ class PollerController extends Controller
         return view('poller.performance', ['current_tab' => 'performance']);
     }
 
-    protected function pollerStatus($poller, $last)
+    protected function pollerStatus($poller, \DateTimeInterface|\Carbon\WeekDay|\Carbon\Month|string|int|float|null $last)
     {
         $since_last_poll = (int) Carbon::parse($last)->diffInSeconds(null, true);
 
@@ -96,7 +96,7 @@ class PollerController extends Controller
         });
     }
 
-    private function checkTimeSinceLastPoll($seconds)
+    private function checkTimeSinceLastPoll(int $seconds): string
     {
         if ($seconds >= $this->rrdstep) {
             return 'danger';

@@ -40,7 +40,7 @@ use Session;
 
 class UserPreferencesController extends Controller
 {
-    private $cachedPreferences = ['locale', 'site_style', 'timezone'];
+    private array $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
     public function __construct()
     {
@@ -133,9 +133,9 @@ class UserPreferencesController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    private function getValidLocales()
+    private function getValidLocales(): mixed
     {
-        return array_reduce(glob(base_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
+        return array_reduce(glob(base_path('lang') . '/*', GLOB_ONLYDIR), function (array $locales, $locale) {
             $locale = basename($locale);
             $lang = __('preferences.lang', [], $locale);
             $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
@@ -151,7 +151,7 @@ class UserPreferencesController extends Controller
         return $definitions->get('site_style')->getOptions();
     }
 
-    private function updatePreference($preference, $value)
+    private function updatePreference($preference, $value): void
     {
         if ($value == 'default') {
             UserPref::forgetPref(Auth::user(), $preference);

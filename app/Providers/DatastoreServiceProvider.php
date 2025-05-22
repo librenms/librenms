@@ -67,7 +67,7 @@ class DatastoreServiceProvider extends ServiceProvider
         $this->registerInflux();
     }
 
-    public function registerInflux()
+    public function registerInflux(): void
     {
         $this->app->singleton('InfluxDB\Database', function ($app) {
             return \LibreNMS\Data\Store\InfluxDB::createFromConfig();

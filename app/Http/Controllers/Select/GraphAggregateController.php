@@ -33,7 +33,7 @@ use LibreNMS\Config;
 
 class GraphAggregateController extends Controller
 {
-    private $rules = [
+    private array $rules = [
         'limit' => 'int',
         'page' => 'int',
         'term' => 'nullable|string',

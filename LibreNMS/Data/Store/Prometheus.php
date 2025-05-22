@@ -37,7 +37,7 @@ use Log;
 class Prometheus extends BaseDatastore
 {
     private $client;
-    private $base_uri;
+    private string $base_uri;
 
     private $enabled;
     private $prefix;
@@ -66,17 +66,17 @@ class Prometheus extends BaseDatastore
         $this->enabled = self::isEnabled();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Prometheus';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): mixed
     {
         return Config::get('prometheus.enable', false);
     }
 
-    public function put($device, $measurement, $tags, $fields)
+    public function put($device, $measurement, $tags, $fields): void
     {
         $stat = Measurement::start('put');
         // skip if needed
@@ -131,7 +131,7 @@ class Prometheus extends BaseDatastore
      *
      * @return bool
      */
-    public function wantsRrdTags()
+    public function wantsRrdTags(): bool
     {
         return false;
     }

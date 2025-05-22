@@ -75,7 +75,7 @@ class UpdateUserRequest extends FormRequest
      * @param  \Illuminate\Validation\Validator  $validator
      * @return void
      */
-    public function withValidator($validator)
+    public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
             // if not an admin and new_password is set, check old password matches

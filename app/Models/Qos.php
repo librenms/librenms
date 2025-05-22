@@ -33,7 +33,7 @@ class Qos extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->device_id . '-' . $this->type . '-' . $this->rrd_id;
     }

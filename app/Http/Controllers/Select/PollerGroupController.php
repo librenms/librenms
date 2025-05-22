@@ -30,7 +30,7 @@ use App\Models\PollerGroup;
 
 class PollerGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['group_name', 'descr'];
     }

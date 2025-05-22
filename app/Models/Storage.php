@@ -29,7 +29,7 @@ class Storage extends DeviceRelatedModel implements Keyable
         'storage_perc_warn',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->type-$this->storage_index";
     }

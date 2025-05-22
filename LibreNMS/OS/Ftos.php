@@ -38,7 +38,7 @@ class Ftos extends Dnos
         $device->hardware = $this->getHardware();
     }
 
-    protected function getHardware()
+    protected function getHardware(): ?string
     {
         $hardware = [
             '.1.3.6.1.4.1.6027.1.1.1' => 'E1200',

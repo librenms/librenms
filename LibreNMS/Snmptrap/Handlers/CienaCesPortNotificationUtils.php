@@ -40,7 +40,7 @@ class CienaCesPortNotificationUtils
      * @param  Trap  $trap
      * @return string
      */
-    public static function getCienaChassis($trap)
+    public static function getCienaChassis($trap): string
     {
         if (str_starts_with($trap->getOidData($trap->findOid('SNMPv2-MIB::snmpTrapOID.0')), 'CIENA-CES-PORT-MIB')) {
             return $trap->getOidData($trap->findOid('CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingChassisIndex'));
@@ -55,7 +55,7 @@ class CienaCesPortNotificationUtils
      * @param  Trap  $trap
      * @return string
      */
-    public static function getCienaShelf($trap)
+    public static function getCienaShelf($trap): string
     {
         if (str_starts_with($trap->getOidData($trap->findOid('SNMPv2-MIB::snmpTrapOID.0')), 'CIENA-CES-PORT-MIB')) {
             return $trap->getOidData($trap->findOid('CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingShelfIndex'));
@@ -70,7 +70,7 @@ class CienaCesPortNotificationUtils
      * @param  Trap  $trap
      * @return string
      */
-    public static function getCienaSlot($trap)
+    public static function getCienaSlot($trap): string
     {
         if (str_starts_with($trap->getOidData($trap->findOid('SNMPv2-MIB::snmpTrapOID.0')), 'CIENA-CES-PORT-MIB')) {
             return $trap->getOidData($trap->findOid('CIENA-CES-PORT-MIB::cienaCesChPortPgIdMappingNotifSlotIndex'));
@@ -85,7 +85,7 @@ class CienaCesPortNotificationUtils
      * @param  Trap  $trap
      * @return string
      */
-    public static function getCienaPort($trap)
+    public static function getCienaPort($trap): string
     {
         if (str_starts_with($trap->getOidData($trap->findOid('SNMPv2-MIB::snmpTrapOID.0')), 'CIENA-CES-PORT-MIB')) {
             return $trap->getOidData($trap->findOid('CIENA-CES-PORT-MIB::cienaCesPortPgIdMappingNotifPortNumber'));

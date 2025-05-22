@@ -128,7 +128,7 @@ class DevicePoll extends LnmsCommand
         return 1; // failed to poll
     }
 
-    private function dispatchWork()
+    private function dispatchWork(): int
     {
         \Log::setDefaultDriver('stack');
         $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));

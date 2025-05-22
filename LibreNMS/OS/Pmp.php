@@ -258,7 +258,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $rssi_oid = '.1.3.6.1.4.1.161.19.3.2.2.2.0';
 
@@ -282,7 +282,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         if ($this->isAp()) {
             $snr_horizontal = '.1.3.6.1.4.1.161.19.3.1.4.1.84.2'; // WHISP-APS-MIB::signalToNoiseRatioHorizontal.2
@@ -320,7 +320,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $frequency = '.1.3.6.1.4.1.161.19.3.1.7.37.0'; //WHISP-APS-MIB::currentRadioFreqCarrier
 
@@ -345,7 +345,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         $lowdownlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; // WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
         $lowuplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; // WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
@@ -450,7 +450,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSsr()
+    public function discoverWirelessSsr(): array
     {
         if ($this->isAp()) {
             $ssr = '.1.3.6.1.4.1.161.19.3.1.4.1.86.2'; //WHISP-APS-MIB::signalStrengthRatio.2
@@ -476,7 +476,7 @@ class Pmp extends OS implements
      *
      * @return bool
      */
-    private function isAp()
+    private function isAp(): bool
     {
         $device = $this->getDeviceArray();
 
@@ -490,7 +490,7 @@ class Pmp extends OS implements
      * FSK 900 MHz, 2.4 GHz: OID returns 100's of KHz
      * OFDM: OID returns 10's of KHz"
      */
-    private function freqDivisor()
+    private function freqDivisor(): int
     {
         $device = $this->getDeviceArray();
 
@@ -520,7 +520,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $registeredSM = '.1.3.6.1.4.1.161.19.3.1.7.1.0'; //WHISP-APS-MIB::regCount.0
 
@@ -543,7 +543,7 @@ class Pmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         $fecInErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.95.0';
         $fecOutErrorsCount = '.1.3.6.1.4.1.161.19.3.3.1.97.0';

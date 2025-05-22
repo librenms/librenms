@@ -54,7 +54,7 @@ if (! is_file($install_dir . '/vendor/autoload.php')) {
 require_once $install_dir . '/vendor/autoload.php';
 
 if (! function_exists('module_selected')) {
-    function module_selected($module, $modules)
+    function module_selected($module, $modules): bool
     {
         return in_array($module, (array) $modules);
     }

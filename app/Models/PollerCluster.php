@@ -104,7 +104,7 @@ class PollerCluster extends Model
      * @param  \Illuminate\Support\Collection|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
-    public function configDefinition($groups = null)
+    public function configDefinition($groups = null): array
     {
         if ($groups === null || $groups === true) {
             $groups = PollerGroup::list();

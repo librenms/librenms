@@ -67,7 +67,10 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $device->features = $num_radios . ' radios in unit';
     }
 
-    public function discoverWirelessXpi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessXpi(): array
     {
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 
@@ -92,7 +95,10 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessFrequency(): array
     {
         $sensors = [];
         // MWRM-RADIO-MIB::genEquipRfuCfgTxFreq
@@ -139,7 +145,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 
@@ -182,7 +188,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      *
      * @return array Sensors
      */
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 
@@ -210,7 +216,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      *
      * @return array Sensors
      */
-    public function discoverWirelessMse()
+    public function discoverWirelessMse(): array
     {
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 
@@ -241,7 +247,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
 

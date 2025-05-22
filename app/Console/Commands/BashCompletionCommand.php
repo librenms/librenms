@@ -102,7 +102,7 @@ class BashCompletionCommand extends Command
      * @param  InputDefinition  $command_def
      * @return false|InputOption
      */
-    private function optionExpectsValue($current, $previous, $command_def)
+    private function optionExpectsValue(string|array|bool $current, string|array|bool $previous, $command_def)
     {
         // handle long option =
         if (Str::startsWith($current, '--') && Str::contains($current, '=')) {
@@ -123,7 +123,10 @@ class BashCompletionCommand extends Command
         return false;
     }
 
-    private function parseOption(InputOption $def)
+    /**
+     * @return array{}|array{0: non-falsy-string, 1?: non-falsy-string}
+     */
+    private function parseOption(InputOption $def): array
     {
         $opts = [];
 
@@ -172,7 +175,7 @@ class BashCompletionCommand extends Command
      * @param  array  $prev_options  Previous words in the command
      * @return Collection
      */
-    private function completeOption($command, $partial, $prev_options)
+    private function completeOption($command, string|array|bool $partial, $prev_options)
     {
         // default options
         $options = collect([
@@ -208,7 +211,7 @@ class BashCompletionCommand extends Command
         });
     }
 
-    private function getPreviousOptions($words)
+    private function getPreviousOptions($words): mixed
     {
         return array_reduce($words, function ($result, $word) {
             if (Str::startsWith($word, '-')) {
@@ -227,7 +230,7 @@ class BashCompletionCommand extends Command
      * @param  string  $partial
      * @return Collection
      */
-    private function completeOptionValue($option, $partial)
+    private function completeOptionValue($option, string|array|bool $partial)
     {
         if ($option && preg_match('/\[(.+)\]/', $option->getDescription(), $values)) {
             return collect(explode(',', $values[1]))
@@ -250,7 +253,7 @@ class BashCompletionCommand extends Command
      * @param  string  $current_word
      * @return Collection
      */
-    private function completeArguments($command, $partial, $current_word)
+    private function completeArguments(string|bool $command, string|array|bool $partial, string $current_word)
     {
         switch ($command) {
             case 'device:remove':

@@ -82,8 +82,8 @@ class QueryBuilderParser implements \JsonSerializable
         'is_not_empty' => "''",
     ];
 
-    protected $builder;
-    protected $schema;
+    protected array $builder;
+    protected \LibreNMS\DB\Schema $schema;
     private $tables;
 
     private function __construct(array $builder)
@@ -112,7 +112,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  array  $rules
      * @return array List of tables found in rules
      */
-    protected function findTablesRecursive($rules)
+    protected function findTablesRecursive(array $rules)
     {
         $tables = [];
 
@@ -148,7 +148,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  string|array  $json
      * @return static
      */
-    public static function fromJson($json)
+    public static function fromJson($json): static
     {
         if (! is_array($json)) {
             $json = json_decode($json, true) ?: [];
@@ -163,7 +163,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  string  $query
      * @return static
      */
-    public static function fromOld($query)
+    public static function fromOld($query): static
     {
         $condition = null;
         $rules = [];
@@ -242,7 +242,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  bool  $expand
      * @return null|string The rule or null if this is invalid.
      */
-    public function toSql($expand = true)
+    public function toSql($expand = true): ?string
     {
         if (empty($this->builder) || ! array_key_exists('condition', $this->builder)) {
             return null;
@@ -270,7 +270,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  bool  $wrap  Wrap in parenthesis
      * @return string
      */
-    private function parseGroup($rule, $expand = false, $wrap = true)
+    private function parseGroup(array $rule, $expand = false, bool $wrap = true): string
     {
         $group_rules = [];
 
@@ -298,7 +298,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  bool  $expand  Expand macros?
      * @return string
      */
-    protected function parseRule($rule, $expand = false)
+    protected function parseRule(array $rule, $expand = false): string
     {
         $field = $rule['field'];
         $builder_op = $rule['operator'];
@@ -347,7 +347,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         $count = 0;
         while ($count++ < $depth_limit && Str::contains($subject, 'macros.')) {
-            $subject = preg_replace_callback('/%?macros.([^ =()]+)/', function ($matches) use ($macros) {
+            $subject = preg_replace_callback('/%?macros.([^ =()]+)/', function (array $matches) use ($macros) {
                 $name = $matches[1];
                 if (isset($macros[$name])) {
                     return $macros[$name];
@@ -380,7 +380,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  string  $target  the name of the table to target, for alerting, this should be devices
      * @return array
      */
-    protected function generateGlue($target = 'devices')
+    protected function generateGlue($target = 'devices'): array
     {
         $tables = $this->getTables();  // get all tables in query
 
@@ -409,7 +409,7 @@ class QueryBuilderParser implements \JsonSerializable
      * @param  string  $child
      * @return string
      */
-    public function getGlue($parent, $child)
+    public function getGlue($parent, $child): string
     {
         // first check to see if there is a single shared column name ending with _id
         $shared_keys = array_filter(array_intersect(

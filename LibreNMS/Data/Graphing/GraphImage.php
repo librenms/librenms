@@ -54,7 +54,7 @@ class GraphImage
         return $this->format->contentType();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->data;
     }

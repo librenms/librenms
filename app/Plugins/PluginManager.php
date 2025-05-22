@@ -37,13 +37,11 @@ use Log;
 
 class PluginManager implements PluginManagerInterface
 {
-    /** @var Collection */
-    private $hooks;
+    private \Illuminate\Support\Collection $hooks;
     /** @var Collection */
     private $plugins;
 
-    /** @var array */
-    private $validPlugins = [];
+    private array $validPlugins = [];
 
     public function __construct()
     {
@@ -111,7 +109,7 @@ class PluginManager implements PluginManagerInterface
     public function call(string $hookType, array $args = [], ?string $plugin = null): array
     {
         return $this->hooksFor($hookType, $args, $plugin)
-            ->map(function ($hook) use ($args, $hookType) {
+            ->map(function (array $hook) use ($args, $hookType) {
                 try {
                     return app()->call([$hook['instance'], 'handle'], $this->fillArgs($args, $hook['plugin_name']));
                 } catch (Exception|\Error $e) {
@@ -250,7 +248,7 @@ class PluginManager implements PluginManagerInterface
             ->when($onlyPlugin, function (Collection $hooks, $only) {
                 return $hooks->where('plugin_name', $only);
             })
-            ->filter(function ($hook) use ($args) {
+            ->filter(function (array $hook) use ($args) {
                 return app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name']));
             });
     }

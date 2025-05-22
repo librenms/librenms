@@ -83,7 +83,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
     }
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         if (isset($credentials['username']) && $this->userExists($credentials['username'])) {
             return true;
@@ -97,7 +97,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-    public function userExists($username, $throw_exception = false)
+    public function userExists($username, $throw_exception = false): bool
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
             return true;
@@ -240,7 +240,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
      *
      * @return string
      */
-    protected function getFullDn(string $username)
+    protected function getFullDn(string $username): string
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
@@ -261,7 +261,10 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         return $membername;
     }
 
-    public function getGroupList()
+    /**
+     * @return list<mixed>
+     */
+    public function getGroupList(): array
     {
         $ldap_groups = [];
         $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';

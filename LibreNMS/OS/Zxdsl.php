@@ -39,7 +39,7 @@ class Zxdsl extends \LibreNMS\OS
         }
     }
 
-    protected function parseVariant($oid)
+    protected function parseVariant($oid): string
     {
         $variant = ' ';
         $parts = explode('.', trim($oid, '.'));

@@ -54,7 +54,7 @@ class IPv4 extends IP
      * @param  bool  $exclude_reserved  Exclude reserved IP ranges.
      * @return bool
      */
-    public static function isValid($ipv4, $exclude_reserved = false)
+    public static function isValid($ipv4, $exclude_reserved = false): bool
     {
         $filter = FILTER_FLAG_IPV4;
         if ($exclude_reserved) {
@@ -70,7 +70,7 @@ class IPv4 extends IP
      * @param  string  $netmask
      * @return int
      */
-    public static function netmask2cidr($netmask)
+    public static function netmask2cidr($netmask): int
     {
         $long = ip2long($netmask);
         $base = ip2long('255.255.255.255');
@@ -83,7 +83,7 @@ class IPv4 extends IP
      *
      * @return string
      */
-    public function getNetmask()
+    public function getNetmask(): string
     {
         return long2ip($this->cidr2long($this->cidr));
     }
@@ -93,7 +93,7 @@ class IPv4 extends IP
      *
      * @return int
      */
-    private function cidr2long($cidr)
+    private function cidr2long($cidr): int
     {
         return -1 << (32 - (int) $cidr);
     }
@@ -122,7 +122,7 @@ class IPv4 extends IP
      * @param  int  $cidr  if not given will use the cidr stored with this IP
      * @return string
      */
-    public function getNetworkAddress($cidr = null)
+    public function getNetworkAddress($cidr = null): string
     {
         if (is_null($cidr)) {
             $cidr = $this->cidr;
@@ -136,7 +136,7 @@ class IPv4 extends IP
      *
      * @return string
      */
-    public function toSnmpIndex()
+    public function toSnmpIndex(): string
     {
         return (string) $this->ip;
     }

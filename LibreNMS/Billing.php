@@ -205,7 +205,7 @@ class Billing
         return $data;
     }
 
-    private static function getSum($bill_id, $datefrom, $dateto)
+    private static function getSum($bill_id, $datefrom, $dateto): ?array
     {
         $sum = dbFetchRow('SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 

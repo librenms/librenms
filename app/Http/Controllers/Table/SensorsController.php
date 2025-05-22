@@ -109,7 +109,7 @@ class SensorsController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -128,7 +128,7 @@ class SensorsController extends TableController
      * @param  Sensor  $sensor
      * @return array
      */
-    protected function formatExportRow($sensor)
+    protected function formatExportRow($sensor): array
     {
         return [
             $sensor->device ? $sensor->device->displayName() : '',

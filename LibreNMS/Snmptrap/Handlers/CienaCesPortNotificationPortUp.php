@@ -43,7 +43,7 @@ class CienaCesPortNotificationPortUp implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $chassis = CienaCesPortNotificationUtils::getCienaChassis($trap);
         $shelf = CienaCesPortNotificationUtils::getCienaShelf($trap);

@@ -69,7 +69,7 @@ class UserPref extends BaseModel
         return $value;
     }
 
-    public function setValueAttribute($value)
+    public function setValueAttribute($value): void
     {
         if (is_array($value)) {
             $this->attributes['value'] = json_encode($value);

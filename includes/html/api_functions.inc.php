@@ -279,7 +279,7 @@ function get_graph_by_service(Request $request)
     });
 }
 
-function list_locations()
+function list_locations(): \Illuminate\Http\JsonResponse
 {
     $locations = dbFetchRows('SELECT `locations`.* FROM `locations` WHERE `locations`.`location` IS NOT NULL');
     $total_locations = count($locations);
@@ -314,7 +314,7 @@ function get_device(Illuminate\Http\Request $request)
     });
 }
 
-function list_devices(Illuminate\Http\Request $request)
+function list_devices(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     // This will return a list of devices
 
@@ -405,7 +405,7 @@ function list_devices(Illuminate\Http\Request $request)
     return api_success($devices, 'devices');
 }
 
-function add_device(Illuminate\Http\Request $request)
+function add_device(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     // This will add a device using the data passed encoded with json
     $data = $request->json()->all();
@@ -468,7 +468,7 @@ function add_device(Illuminate\Http\Request $request)
     return api_success([$device->attributesToArray()], 'devices', $message);
 }
 
-function del_device(Illuminate\Http\Request $request)
+function del_device(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
@@ -499,7 +499,7 @@ function del_device(Illuminate\Http\Request $request)
     return api_success([$device], 'devices', $response);
 }
 
-function maintenance_device(Illuminate\Http\Request $request)
+function maintenance_device(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = $request->json()->all();
 
@@ -666,7 +666,7 @@ function show_endpoints(Illuminate\Http\Request $request, Router $router)
     return response()->json($output, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
 
-function list_bgp(Illuminate\Http\Request $request)
+function list_bgp(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $sql = '';
     $sql_params = [];
@@ -737,7 +737,7 @@ function list_bgp(Illuminate\Http\Request $request)
     return api_success($bgp_sessions, 'bgp_sessions');
 }
 
-function get_bgp(Illuminate\Http\Request $request)
+function get_bgp(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $bgpPeerId = $request->route('id');
     if (! is_numeric($bgpPeerId)) {
@@ -756,7 +756,7 @@ function get_bgp(Illuminate\Http\Request $request)
     return api_success($bgp_session, 'bgp_session');
 }
 
-function edit_bgp_descr(Illuminate\Http\Request $request)
+function edit_bgp_descr(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $bgp_descr = $request->json('bgp_descr');
     if (! $bgp_descr) {
@@ -813,7 +813,7 @@ function list_cbgp(Illuminate\Http\Request $request)
     return api_success($bgp_counters, 'bgp_counters');
 }
 
-function list_ospf(Illuminate\Http\Request $request)
+function list_ospf(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $sql = '';
     $sql_params = [];
@@ -833,7 +833,7 @@ function list_ospf(Illuminate\Http\Request $request)
     return api_success($ospf_neighbours, 'ospf_neighbours');
 }
 
-function list_ospf_ports(Illuminate\Http\Request $request)
+function list_ospf_ports(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $ospf_ports = OspfPort::hasAccess(Auth::user())
               ->get();
@@ -844,7 +844,7 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
-function list_ospfv3(Illuminate\Http\Request $request)
+function list_ospfv3(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->get('hostname');
     $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
@@ -861,7 +861,7 @@ function list_ospfv3(Illuminate\Http\Request $request)
     return api_success($ospf_neighbours, 'ospfv3_neighbours', count: $ospf_neighbours->count());
 }
 
-function list_ospfv3_ports(Illuminate\Http\Request $request)
+function list_ospfv3_ports(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->get('hostname');
     $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
@@ -922,7 +922,7 @@ function get_components(Illuminate\Http\Request $request)
     });
 }
 
-function add_components(Illuminate\Http\Request $request)
+function add_components(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     $ctype = $request->route('type');
@@ -935,7 +935,7 @@ function add_components(Illuminate\Http\Request $request)
     return api_success($component, 'components');
 }
 
-function edit_components(Illuminate\Http\Request $request)
+function edit_components(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     $data = json_decode($request->getContent(), true);
@@ -951,7 +951,7 @@ function edit_components(Illuminate\Http\Request $request)
     return api_success_noresult(200);
 }
 
-function delete_components(Illuminate\Http\Request $request)
+function delete_components(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $cid = $request->route('component');
 
@@ -992,7 +992,7 @@ function get_graphs(Illuminate\Http\Request $request)
     });
 }
 
-function trigger_device_discovery(Illuminate\Http\Request $request)
+function trigger_device_discovery(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     // return details of a single device
     $hostname = $request->route('hostname');
@@ -1175,7 +1175,7 @@ function get_port_fdb(Illuminate\Http\Request $request)
     });
 }
 
-function get_network_ip_addresses(Illuminate\Http\Request $request)
+function get_network_ip_addresses(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $network_id = $request->route('id');
     $ipv4 = dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `ipv4_network_id` = ?', [$network_id]);
@@ -1214,7 +1214,7 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
-function update_port_description(Illuminate\Http\Request $request)
+function update_port_description(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $port_id = $request->route('portid');
     $port = Port::hasAccess(Auth::user())
@@ -1256,7 +1256,7 @@ function update_port_description(Illuminate\Http\Request $request)
     }
 }
 
-function get_port_description(Illuminate\Http\Request $request)
+function get_port_description(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $port_id = $request->route('portid');
     $port = Port::hasAccess(Auth::user())
@@ -1350,7 +1350,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
     }
 }
 
-function list_alert_rules(Illuminate\Http\Request $request)
+function list_alert_rules(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $id = $request->route('id');
 
@@ -1415,7 +1415,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     return api_success($alerts, 'alerts');
 }
 
-function add_edit_rule(Illuminate\Http\Request $request)
+function add_edit_rule(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -1526,7 +1526,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     return api_success_noresult(200);
 }
 
-function delete_rule(Illuminate\Http\Request $request)
+function delete_rule(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $rule_id = $request->route('id');
     if (is_numeric($rule_id)) {
@@ -1540,7 +1540,7 @@ function delete_rule(Illuminate\Http\Request $request)
     return api_error(400, 'Invalid rule id has been provided');
 }
 
-function ack_alert(Illuminate\Http\Request $request)
+function ack_alert(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $alert_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
@@ -1566,7 +1566,7 @@ function ack_alert(Illuminate\Http\Request $request)
     }
 }
 
-function unmute_alert(Illuminate\Http\Request $request)
+function unmute_alert(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $alert_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
@@ -1638,7 +1638,7 @@ function get_inventory_for_device(Illuminate\Http\Request $request)
     });
 }
 
-function search_oxidized(Illuminate\Http\Request $request)
+function search_oxidized(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $search_in_conf_textbox = $request->route('searchstring');
     $result = search_oxidized_config($search_in_conf_textbox);
@@ -1650,7 +1650,7 @@ function search_oxidized(Illuminate\Http\Request $request)
     }
 }
 
-function get_oxidized_config(Illuminate\Http\Request $request)
+function get_oxidized_config(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('device_name');
     $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $hostname . '?format=json'), true);
@@ -1734,7 +1734,7 @@ function list_oxidized(Illuminate\Http\Request $request)
     return response()->json($return, 200, [], JSON_PRETTY_PRINT);
 }
 
-function list_bills(Illuminate\Http\Request $request)
+function list_bills(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $bills = [];
     $bill_id = $request->route('bill_id');
@@ -1932,7 +1932,7 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
     });
 }
 
-function delete_bill(Illuminate\Http\Request $request)
+function delete_bill(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $bill_id = $request->route('bill_id');
 
@@ -2115,7 +2115,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
     return api_success($bill_id, 'bill_id');
 }
 
-function update_device(Illuminate\Http\Request $request)
+function update_device(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
@@ -2167,7 +2167,7 @@ function update_device(Illuminate\Http\Request $request)
     }
 }
 
-function rename_device(Illuminate\Http\Request $request)
+function rename_device(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -2187,7 +2187,7 @@ function rename_device(Illuminate\Http\Request $request)
     }
 }
 
-function add_port_group(Illuminate\Http\Request $request)
+function add_port_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -2209,7 +2209,7 @@ function add_port_group(Illuminate\Http\Request $request)
     return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
 }
 
-function get_port_groups(Illuminate\Http\Request $request)
+function get_port_groups(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $query = PortGroup::query();
 
@@ -2222,7 +2222,7 @@ function get_port_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
-function get_ports_by_group(Illuminate\Http\Request $request)
+function get_ports_by_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $name = $request->route('name');
     if (! $name) {
@@ -2244,7 +2244,7 @@ function get_ports_by_group(Illuminate\Http\Request $request)
     return api_success($ports->makeHidden('pivot')->toArray(), 'ports');
 }
 
-function assign_port_group(Illuminate\Http\Request $request)
+function assign_port_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $port_group_id = $request->route('port_group_id');
     $data = json_decode($request->getContent(), true);
@@ -2268,7 +2268,7 @@ function assign_port_group(Illuminate\Http\Request $request)
     return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been added to Port Group Id ' . $port_group_id);
 }
 
-function remove_port_group(Illuminate\Http\Request $request)
+function remove_port_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $port_group_id = $request->route('port_group_id');
     $data = json_decode($request->getContent(), true);
@@ -2292,7 +2292,7 @@ function remove_port_group(Illuminate\Http\Request $request)
     return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been removed from Port Group Id ' . $port_group_id);
 }
 
-function add_device_group(Illuminate\Http\Request $request)
+function add_device_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -2333,7 +2333,7 @@ function add_device_group(Illuminate\Http\Request $request)
     return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
 }
 
-function update_device_group(Illuminate\Http\Request $request)
+function update_device_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -2393,7 +2393,7 @@ function update_device_group(Illuminate\Http\Request $request)
     return api_success_noresult(200, "Device group $name updated");
 }
 
-function delete_device_group(Illuminate\Http\Request $request)
+function delete_device_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $name = $request->route('name');
     if (! $name) {
@@ -2415,7 +2415,7 @@ function delete_device_group(Illuminate\Http\Request $request)
     return api_success_noresult(200, "Device group $name deleted");
 }
 
-function update_device_group_add_devices(Illuminate\Http\Request $request)
+function update_device_group_add_devices(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -2452,7 +2452,7 @@ function update_device_group_add_devices(Illuminate\Http\Request $request)
     return api_success_noresult(200, 'Devices added');
 }
 
-function update_device_group_remove_devices(Illuminate\Http\Request $request)
+function update_device_group_remove_devices(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -2489,7 +2489,7 @@ function update_device_group_remove_devices(Illuminate\Http\Request $request)
     return api_success_noresult(200, 'Devices removed');
 }
 
-function get_device_groups(Illuminate\Http\Request $request)
+function get_device_groups(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
 
@@ -2512,7 +2512,7 @@ function get_device_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
-function maintenance_devicegroup(Illuminate\Http\Request $request)
+function maintenance_devicegroup(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = $request->json()->all();
 
@@ -2565,7 +2565,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     }
 }
 
-function get_devices_by_group(Illuminate\Http\Request $request)
+function get_devices_by_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $name = $request->route('name');
     if (! $name) {
@@ -2620,7 +2620,7 @@ function list_vrf(Illuminate\Http\Request $request)
     return api_success($vrfs, 'vrfs');
 }
 
-function get_vrf(Illuminate\Http\Request $request)
+function get_vrf(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $vrfId = $request->route('id');
     if (! is_numeric($vrfId)) {
@@ -2636,7 +2636,7 @@ function get_vrf(Illuminate\Http\Request $request)
     return api_success($vrf, 'vrf');
 }
 
-function list_mpls_services(Illuminate\Http\Request $request)
+function list_mpls_services(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -2652,7 +2652,7 @@ function list_mpls_services(Illuminate\Http\Request $request)
     return api_success($mpls_services, 'mpls_services', null, 200, $mpls_services->count());
 }
 
-function list_mpls_saps(Illuminate\Http\Request $request)
+function list_mpls_saps(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -2668,7 +2668,7 @@ function list_mpls_saps(Illuminate\Http\Request $request)
     return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
 }
 
-function list_ipsec(Illuminate\Http\Request $request)
+function list_ipsec(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
@@ -2738,7 +2738,7 @@ function list_links(Illuminate\Http\Request $request)
     return api_success($links, 'links');
 }
 
-function get_link(Illuminate\Http\Request $request)
+function get_link(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $linkId = $request->route('id');
     if (! is_numeric($linkId)) {
@@ -2804,7 +2804,7 @@ function get_nac(Illuminate\Http\Request $request)
     });
 }
 
-function get_transceivers(Illuminate\Http\Request $request)
+function get_transceivers(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
 
@@ -2821,7 +2821,7 @@ function get_transceivers(Illuminate\Http\Request $request)
     return api_success($device->transceivers()->hasAccess($request->user())->get(), 'transceivers');
 }
 
-function list_fdb(Illuminate\Http\Request $request)
+function list_fdb(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $mac = $request->route('mac');
 
@@ -2838,7 +2838,7 @@ function list_fdb(Illuminate\Http\Request $request)
     return api_success($fdb, 'ports_fdb');
 }
 
-function list_fdb_detail(Illuminate\Http\Request $request)
+function list_fdb_detail(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $macAddress = Mac::parse($request->route('mac'));
 
@@ -2870,7 +2870,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
-function list_nac(Illuminate\Http\Request $request)
+function list_nac(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $mac = $request->route('mac');
 
@@ -2887,7 +2887,7 @@ function list_nac(Illuminate\Http\Request $request)
     return api_success($nac, 'ports_nac');
 }
 
-function list_sensors()
+function list_sensors(): \Illuminate\Http\JsonResponse
 {
     $sensors = Sensor::hasAccess(Auth::user())->get();
     $total_sensors = $sensors->count();
@@ -2964,7 +2964,7 @@ function list_ip_networks(Illuminate\Http\Request $request)
     }
 }
 
-function list_arp(Illuminate\Http\Request $request)
+function list_arp(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $query = $request->route('query');
     $cidr = $request->route('cidr');
@@ -2995,7 +2995,7 @@ function list_arp(Illuminate\Http\Request $request)
     return api_success($arp, 'arp');
 }
 
-function list_services(Illuminate\Http\Request $request)
+function list_services(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $where = [];
     $params = [];
@@ -3041,7 +3041,7 @@ function list_services(Illuminate\Http\Request $request)
     return api_success($services, 'services');
 }
 
-function list_logs(Illuminate\Http\Request $request, Router $router)
+function list_logs(Illuminate\Http\Request $request, Router $router): \Illuminate\Http\JsonResponse
 {
     $type = $router->current()->getName();
     $hostname = $request->route('hostname');
@@ -3144,7 +3144,7 @@ function validate_column_list(?string $columns, string $table, array $default = 
     return $column_names;
 }
 
-function missing_fields($required_fields, $data)
+function missing_fields($required_fields, $data): bool
 {
     foreach ($required_fields as $required) {
         if (empty($data[$required])) {
@@ -3155,7 +3155,7 @@ function missing_fields($required_fields, $data)
     return false;
 }
 
-function add_service_template_for_device_group(Illuminate\Http\Request $request)
+function add_service_template_for_device_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (json_last_error() || ! is_array($data)) {
@@ -3191,7 +3191,7 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
     return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
 }
 
-function get_service_templates(Illuminate\Http\Request $request)
+function get_service_templates(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
         return api_error(403, 'Insufficient permissions to access service templates');
@@ -3206,7 +3206,7 @@ function get_service_templates(Illuminate\Http\Request $request)
     return api_success($templates->makeHidden('pivot')->toArray(), 'templates', 'Found ' . $templates->count() . ' service templates');
 }
 
-function add_service_for_host(Illuminate\Http\Request $request)
+function add_service_for_host(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
@@ -3232,7 +3232,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to add the service');
 }
 
-function add_parents_to_host(Illuminate\Http\Request $request)
+function add_parents_to_host(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     $device_id = $request->route('id');
@@ -3257,7 +3257,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     return api_error(400, 'Check your parent and device IDs');
 }
 
-function del_parents_from_host(Illuminate\Http\Request $request)
+function del_parents_from_host(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $device_id = $request->route('id');
     $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
@@ -3290,7 +3290,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     return api_error(400, 'Device dependency cannot be deleted check device and parents ids');
 }
 
-function validateDeviceIds($ids)
+function validateDeviceIds($ids): bool
 {
     foreach ($ids as $id) {
         $invalidId = ! is_numeric($id) || $id < 1 || is_null(Device::find($id));
@@ -3302,7 +3302,7 @@ function validateDeviceIds($ids)
     return true;
 }
 
-function add_location(Illuminate\Http\Request $request)
+function add_location(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $data = json_decode($request->getContent(), true);
     if (missing_fields(['location', 'lat', 'lng'], $data)) {
@@ -3319,7 +3319,7 @@ function add_location(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to add the location');
 }
 
-function edit_location(Illuminate\Http\Request $request)
+function edit_location(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $location = $request->route('location_id_or_name');
     if (empty($location)) {
@@ -3338,7 +3338,7 @@ function edit_location(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to update location');
 }
 
-function get_location(Illuminate\Http\Request $request)
+function get_location(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $location = $request->route('location_id_or_name');
     if (empty($location)) {
@@ -3357,7 +3357,7 @@ function get_location_id_by_name($location)
     return dbFetchCell('SELECT id FROM locations WHERE location = ?', $location);
 }
 
-function del_location(Illuminate\Http\Request $request)
+function del_location(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $location = $request->route('location');
     if (empty($location)) {
@@ -3379,7 +3379,7 @@ function del_location(Illuminate\Http\Request $request)
     return api_error(500, "Failed to delete the location $location");
 }
 
-function get_poller_group(Illuminate\Http\Request $request)
+function get_poller_group(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $poller_group = $request->route('poller_group_id_or_name');
     if (empty($poller_group)) {
@@ -3394,7 +3394,7 @@ function get_poller_group(Illuminate\Http\Request $request)
     return api_success($data, 'get_poller_group');
 }
 
-function del_service_from_host(Illuminate\Http\Request $request)
+function del_service_from_host(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $service_id = $request->route('id');
     if (empty($service_id)) {
@@ -3408,7 +3408,7 @@ function del_service_from_host(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to delete the service');
 }
 
-function search_by_mac(Illuminate\Http\Request $request)
+function search_by_mac(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $macAddress = Mac::parse((string) $request->route('search'))->hex();
 
@@ -3438,7 +3438,7 @@ function search_by_mac(Illuminate\Http\Request $request)
 
     return api_success($ports, 'ports');
 }
-function edit_service_for_host(Illuminate\Http\Request $request)
+function edit_service_for_host(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $service_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
@@ -3452,7 +3452,7 @@ function edit_service_for_host(Illuminate\Http\Request $request)
 /**
  * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
  */
-function post_syslogsink(Illuminate\Http\Request $request)
+function post_syslogsink(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
 {
     $json = $request->json()->all();
 
@@ -3472,7 +3472,7 @@ function post_syslogsink(Illuminate\Http\Request $request)
 /**
  * Display Librenms Instance Info
  */
-function server_info()
+function server_info(): \Illuminate\Http\JsonResponse
 {
     $version = \LibreNMS\Util\Version::get();
 

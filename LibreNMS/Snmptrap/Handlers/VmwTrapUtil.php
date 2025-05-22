@@ -43,7 +43,7 @@ class VmwTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getGuestName($trap)
+    public static function getGuestName($trap): string
     {
         return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmDisplayName'));
     }
@@ -54,7 +54,7 @@ class VmwTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getGuestId($trap)
+    public static function getGuestId($trap): string
     {
         return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmID'));
     }
@@ -65,7 +65,7 @@ class VmwTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getGuestConfigPath($trap)
+    public static function getGuestConfigPath($trap): string
     {
         return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmConfigFilePath'));
     }

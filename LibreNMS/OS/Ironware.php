@@ -38,7 +38,7 @@ class Ironware extends Foundry
         $this->rewriteHardware();
     }
 
-    private function rewriteHardware()
+    private function rewriteHardware(): void
     {
         $rewrite_ironware_hardware = [
             'snFIWGSwitch' => 'Stackable FastIron workgroup',

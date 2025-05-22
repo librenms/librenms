@@ -18,7 +18,7 @@ Config::set('influxdb.enable', false);
 Config::set('influxdbv2.enable', false);
 Config::set('nographite', true);
 
-function print_help()
+function print_help(): void
 {
     echo "-h <device id> | <device hostname wildcard>  Poll single device, wildcard hostname, or comma separated list\n";
     echo "-e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change\n";

@@ -66,7 +66,7 @@ function rename_mib_file($file)
     return false; // name already correct
 }
 
-function extract_mib_name($file)
+function extract_mib_name($file): string
 {
     // extract the mib name (tried regex, but was too complex and I had to read the whole file)
     if ($handle = fopen($file, 'r')) {

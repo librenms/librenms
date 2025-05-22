@@ -30,7 +30,7 @@ use App\Models\Bill;
 
 class BillController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['bill_name', 'bill_notes'];
     }

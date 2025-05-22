@@ -28,7 +28,7 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
-    public static function niceCase($string)
+    public static function niceCase($string): string
     {
         $replacements = [
             'bind' => 'BIND',
@@ -82,7 +82,7 @@ class StringHelpers
      * @param  string  $string
      * @return string
      */
-    public static function camelToTitle($string)
+    public static function camelToTitle($string): string
     {
         return ucwords(implode(' ', preg_split('/(?=[A-Z])/', $string)));
     }
@@ -131,7 +131,7 @@ class StringHelpers
     {
         $pre_format = str_replace(['-', '_'], ' ', $name);
         $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
-        $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
+        $class = preg_replace_callback('/^(\d)(.)/', function (array $matches) {
             $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
 
             return $numbers[$matches[1]] . strtoupper($matches[2]);

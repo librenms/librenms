@@ -40,7 +40,7 @@ class UpsmgUtilityRestored implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $sensor = $device->sensors()->where('sensor_type', 'upsmgInputBadStatus')->first();
         if (! $sensor) {

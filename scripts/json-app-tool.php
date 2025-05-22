@@ -2,7 +2,10 @@
 <?php
 
 // Pulled from includes/polling/functions.inc.php
-function data_flatten($array, $prefix = '', $joiner = '_')
+/**
+ * @return mixed[]
+ */
+function data_flatten($array, $prefix = '', $joiner = '_'): array
 {
     $return = [];
     foreach ($array as $key => $value) {

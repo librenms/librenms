@@ -34,7 +34,7 @@ class Validate
      * @param  string  $hostname
      * @return bool
      */
-    public static function hostname($hostname)
+    public static function hostname($hostname): bool
     {
         // The Internet standards (Request for Comments) for protocols mandate that
         // component hostname labels may contain only the ASCII letters 'a' through 'z'

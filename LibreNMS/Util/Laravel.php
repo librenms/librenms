@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
 {
-    public static function bootCli()
+    public static function bootCli(): void
     {
         // make sure Laravel isn't already booted
         if (self::isBooted()) {
@@ -50,7 +50,7 @@ class Laravel
      *
      * @param  bool  $authenticate  Use session+db to authenticate user (does not authorize)
      */
-    public static function bootWeb($authenticate = false)
+    public static function bootWeb($authenticate = false): void
     {
         // this is not a substitute for the normal Laravel boot, just a way to make auth work for external php
         if (self::isBooted()) {
@@ -71,7 +71,7 @@ class Laravel
 //        $response->send(); // don't send response, legacy code will
     }
 
-    public static function isBooted()
+    public static function isBooted(): bool
     {
         return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
@@ -95,7 +95,7 @@ class Laravel
      * @param  \Illuminate\Http\Request  $request
      * @param  bool  $auth
      */
-    private static function rewriteDummyHeaders($request, $auth)
+    private static function rewriteDummyHeaders($request, $auth): void
     {
         // set dummy path allows url helper to work and prevents full init again
         $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');

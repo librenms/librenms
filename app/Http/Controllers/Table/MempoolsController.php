@@ -37,12 +37,12 @@ use LibreNMS\Util\Url;
 
 class MempoolsController extends TableController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['hostname', 'mempool_descr'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['mempool_descr', 'mempool_perc', 'mempool_used', 'hostname'];
     }
@@ -71,7 +71,7 @@ class MempoolsController extends TableController
     /**
      * @param  Device|Mempool  $mempool
      */
-    public function formatItem($mempool)
+    public function formatItem($mempool): array
     {
         if ($mempool instanceof Device) {
             $device = $mempool;
@@ -142,7 +142,7 @@ class MempoolsController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device ID',
@@ -162,7 +162,7 @@ class MempoolsController extends TableController
      * @param  Mempool  $mempool
      * @return array
      */
-    protected function formatExportRow($mempool)
+    protected function formatExportRow($mempool): array
     {
         $is_percent = $mempool->mempool_total == 100;
 

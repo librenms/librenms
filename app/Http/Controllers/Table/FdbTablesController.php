@@ -42,7 +42,7 @@ class FdbTablesController extends TableController
 {
     protected $macCountCache = [];
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'port_id' => 'nullable|integer',
@@ -52,7 +52,7 @@ class FdbTablesController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'ports_fdb.device_id' => 'device_id',
@@ -159,7 +159,7 @@ class FdbTablesController extends TableController
     /**
      * @param  PortsFdb  $fdb_entry
      */
-    public function formatItem($fdb_entry)
+    public function formatItem($fdb_entry): array
     {
         $mac = Mac::parse($fdb_entry->mac_address);
         $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address');

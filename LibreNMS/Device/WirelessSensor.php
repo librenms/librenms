@@ -32,7 +32,7 @@ class WirelessSensor
 {
     protected $type;
     protected $device_id;
-    protected $oids;
+    protected array $oids;
     protected $subtype;
     protected $index;
     protected $description;

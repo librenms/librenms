@@ -45,7 +45,7 @@ class Ptp250 extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $transmit = '.1.3.6.1.4.1.17713.250.5.3.0'; //"CAMBIUM-PTP250-MIB::transmitPower.0"
         $receive = '.1.3.6.1.4.1.17713.250.5.1.0'; //"CAMBIUM-PTP250-MIB::receivePower.0";
@@ -82,7 +82,7 @@ class Ptp250 extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         $noise_floor = '.1.3.6.1.4.1.17713.250.5.15.0'; //"CAMBIUM-PTP250-MIB::noiseFloor.0";;
 
@@ -105,7 +105,7 @@ class Ptp250 extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $receive = '.1.3.6.1.4.1.17713.250.11.1.0'; //"CAMBIUM-PTP250-MIB::receiveDataRate.0"
         $transmit = '.1.3.6.1.4.1.17713.250.11.2.0'; //"CAMBIUM-PTP250-MIB::transmitDataRate.0"
@@ -174,7 +174,7 @@ class Ptp250 extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSsr()
+    public function discoverWirelessSsr(): array
     {
         $ssr = '.1.3.6.1.4.1.17713.250.5.13.0'; // CAMBIUM-PTP250-MIB::signalStrengthRatio.0
 

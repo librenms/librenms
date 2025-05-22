@@ -28,10 +28,7 @@ namespace App\Logging;
 
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
-    /**
-     * @var \Console_Color2
-     */
-    private $console_color;
+    private \Console_Color2 $console_color;
 
     protected bool $console;
 

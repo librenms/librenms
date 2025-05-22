@@ -10,7 +10,7 @@ class Ird extends Shared\Unix implements
     WirelessFrequencyDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $lnbfrequency_oid = '.1.3.6.1.4.1.1070.3.1.1.104.3.1.0'; // PBI4000P-5000P-MIB::lnbFrequency
         $satfrequency_oid = '.1.3.6.1.4.1.1070.3.1.1.104.3.2.0'; // PBI4000P-5000P-MIB::satFrequency
@@ -21,7 +21,7 @@ class Ird extends Shared\Unix implements
         ];
     }
 
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $oid_total_bitrate = '.1.3.6.1.4.1.1070.3.1.1.104.1.1.3.0'; // PBI4000P-5000P-MIB::tunerTotalBitrate
         $oid_valid_maxbitrate = '.1.3.6.1.4.1.1070.3.1.1.104.1.1.4.0'; // PBI4000P-5000P-MIB::tunerValidBitrate

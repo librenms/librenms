@@ -53,7 +53,10 @@ class ChecksController extends InstallationController implements InstallerStep
         ]));
     }
 
-    private function moduleResults()
+    /**
+     * @return list<array{name: (array | string), status: bool}>
+     */
+    private function moduleResults(): array
     {
         $results = [];
 
@@ -68,7 +71,7 @@ class ChecksController extends InstallationController implements InstallerStep
         return $results;
     }
 
-    private function checkPhpVersion()
+    private function checkPhpVersion(): bool
     {
         return version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '>=');
     }

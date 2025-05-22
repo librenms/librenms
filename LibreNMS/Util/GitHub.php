@@ -91,7 +91,7 @@ class GitHub
      *
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         $headers = [
             'Content-Type' => 'application/json',
@@ -120,7 +120,7 @@ class GitHub
     /**
      * Get a single pull request information
      */
-    public function getPullRequest()
+    public function getPullRequest(): void
     {
         $pull_request = Http::client()->withHeaders($this->getHeaders())->get($this->github . "/pulls/{$this->pr}");
         $this->pr = $pull_request->json();
@@ -132,7 +132,7 @@ class GitHub
      * @param  string  $date
      * @param  string  $after
      */
-    public function getPullRequests($date, $after = null)
+    public function getPullRequests($date, $after = null): void
     {
         if ($after) {
             $after = ", after: \"$after\"";
@@ -204,9 +204,9 @@ GRAPHQL;
      * @param  array  $labels
      * @return array
      */
-    private function parseLabels($labels)
+    private function parseLabels($labels): array
     {
-        return array_map(function ($label) {
+        return array_map(function (array $label) {
             $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
 
             return str_replace('-', ' ', $name);
@@ -216,7 +216,7 @@ GRAPHQL;
     /**
      * Build the data for the change log.
      */
-    public function buildChangeLog()
+    public function buildChangeLog(): void
     {
         $valid_labels = array_keys($this->changelog);
 
@@ -263,7 +263,7 @@ GRAPHQL;
      * @param  array  $user
      * @param  string  $type
      */
-    private function recordUserInfo($user, $type = 'changelog_users')
+    private function recordUserInfo(array $user, string $type = 'changelog_users'): void
     {
         $user_count = &$this->$type;
 
@@ -279,7 +279,7 @@ GRAPHQL;
     /**
      * Format the change log into Markdown.
      */
-    public function formatChangeLog()
+    public function formatChangeLog(): void
     {
         $tmp_markdown = "## $this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
@@ -312,7 +312,7 @@ GRAPHQL;
      * @param  array  $users
      * @return string
      */
-    private function formatUserList($users)
+    private function formatUserList($users): string
     {
         $output = '';
         arsort($users);
@@ -326,7 +326,7 @@ GRAPHQL;
     /**
      * Update the specified file with the new Change log info.
      */
-    public function writeChangeLog()
+    public function writeChangeLog(): void
     {
         if (file_exists($this->file)) {
             $existing = file_get_contents($this->file);
@@ -355,7 +355,7 @@ GRAPHQL;
      *
      * @throws Exception
      */
-    public function createRelease()
+    public function createRelease(): bool
     {
         // push the changelog and version bump
         $this->pushFileContents($this->file, file_get_contents($this->file), "Changelog for $this->tag");
@@ -383,7 +383,7 @@ GRAPHQL;
      *
      * @throws Exception
      */
-    public function createChangelog($write = true)
+    public function createChangelog($write = true): void
     {
         $previous_release = $this->getRelease($this->from);
         if (! is_null($this->pr)) {
@@ -406,7 +406,7 @@ GRAPHQL;
         }
     }
 
-    private function pushVersionBump()
+    private function pushVersionBump(): string
     {
         $version_file = 'LibreNMS/Util/Version.php';
         $contents = file_get_contents(base_path($version_file));
@@ -420,7 +420,7 @@ GRAPHQL;
      * @param  string  $contents  new file contents
      * @param  string  $message  The commit message
      */
-    private function pushFileContents($file, $contents, $message): string
+    private function pushFileContents($file, string|bool|array|null $contents, string $message): string
     {
         $existing = Http::client()->withHeaders($this->getHeaders())->get($this->github . '/contents/' . $file);
         $existing_sha = $existing->json()['sha'];

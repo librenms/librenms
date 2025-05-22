@@ -19,7 +19,7 @@ use LibreNMS\Util\Url;
 
 class DeviceController extends Controller
 {
-    private $tabs = [
+    private array $tabs = [
         'overview' => \App\Http\Controllers\Device\Tabs\OverviewController::class,
         'graphs' => \App\Http\Controllers\Device\Tabs\GraphsController::class,
         'health' => \App\Http\Controllers\Device\Tabs\HealthController::class,
@@ -112,7 +112,7 @@ class DeviceController extends Controller
         return view('device.tabs.legacy', get_defined_vars());
     }
 
-    private function renderLegacyTab($tab, Device $device, $data)
+    private function renderLegacyTab(array|string $tab, Device $device, $data)
     {
         ob_start();
         $device = $device->toArray();
@@ -133,7 +133,10 @@ class DeviceController extends Controller
         return $output;
     }
 
-    private function buildDeviceGraphArrays($device)
+    /**
+     * @return list<array{width: 150, height: 45, device: mixed, type: mixed, from: mixed, legend: 'no', bg: 'FFFFFF00', popup_title: mixed}>
+     */
+    private function buildDeviceGraphArrays(\App\Models\Device $device): array
     {
         $graph_array = [
             'width' => 150,

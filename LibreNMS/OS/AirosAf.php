@@ -47,7 +47,7 @@ class AirosAf extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessDistance()
+    public function discoverWirelessDistance(): array
     {
         $oid = '.1.3.6.1.4.1.41112.1.3.2.1.4.1'; // UBNT-AirFIBER-MIB::radioLinkDistM.1
 
@@ -62,7 +62,7 @@ class AirosAf extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.1.1.5.1'; // UBNT-AirFIBER-MIB::txFrequency.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.1.1.6.1'; // UBNT-AirFIBER-MIB::rxFrequency.1
@@ -93,7 +93,7 @@ class AirosAf extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.1.1.9.1'; // UBNT-AirFIBER-MIB::txPower.1
         $rx0_oid = '.1.3.6.1.4.1.41112.1.3.2.1.11.1'; // UBNT-AirFIBER-MIB::rxPower0.1
@@ -112,7 +112,7 @@ class AirosAf extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $tx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.6.1'; // UBNT-AirFIBER-MIB::txCapacity.1
         $rx_oid = '.1.3.6.1.4.1.41112.1.3.2.1.5.1'; // UBNT-AirFIBER-MIB::rxCapacity.1

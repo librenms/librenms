@@ -237,7 +237,7 @@ class UserController extends Controller
      * @param  mixed  $dashboard
      * @return bool
      */
-    protected function updateDashboard(User $user, $dashboard)
+    protected function updateDashboard(User $user, $dashboard): bool
     {
         if ($dashboard) {
             $existing = UserPref::getPref($user, 'dashboard');
@@ -256,7 +256,7 @@ class UserController extends Controller
      * @param  string  $timezone
      * @return bool
      */
-    protected function updateTimezone(User $user, $timezone)
+    protected function updateTimezone(User $user, $timezone): bool
     {
         $existing = UserPref::getPref($user, 'timezone');
         if ($timezone != 'default') {

@@ -31,7 +31,7 @@ use Symfony\Component\Process\Process;
  * @param  array  $command
  * @return null|string
  */
-function external_exec($command)
+function external_exec($command): string
 {
     $device = DeviceCache::getPrimary();
 
@@ -112,7 +112,7 @@ function shorthost($hostname, $len = 12)
     return $shorthost;
 }
 
-function print_error($text)
+function print_error($text): void
 {
     if (Laravel::isCli()) {
         c_echo('%r' . $text . "%n\n");
@@ -121,7 +121,7 @@ function print_error($text)
     }
 }
 
-function print_message($text)
+function print_message($text): void
 {
     if (Laravel::isCli()) {
         c_echo('%g' . $text . "%n\n");
@@ -130,12 +130,12 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
+function get_sensor_rrd(array $device, $sensor)
 {
     return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 }
 
-function get_sensor_rrd_name($device, $sensor)
+function get_sensor_rrd_name(array $device, array $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
     if (Config::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
@@ -150,7 +150,7 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
+function get_port_by_ifIndex($device_id, $ifIndex): ?array
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
@@ -167,7 +167,7 @@ function get_port_by_id($port_id)
     }
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus)
+function ifclass($ifOperStatus, $ifAdminStatus): string
 {
     // fake a port model
     return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
@@ -195,7 +195,7 @@ function gethostbyid($device_id)
     return DeviceCache::get((int) $device_id)->hostname;
 }
 
-function getifbyid($id)
+function getifbyid($id): ?array
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
 }
@@ -205,17 +205,17 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function set_dev_attrib($device, $attrib_type, $attrib_value)
+function set_dev_attrib(array $device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
-function get_dev_attrib($device, $attrib_type)
+function get_dev_attrib(array $device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
 }
 
-function del_dev_attrib($device, $attrib_type)
+function del_dev_attrib(array $device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
@@ -227,7 +227,7 @@ function del_dev_attrib($device, $attrib_type)
  * @param  string  $string  the string to print with console color
  * @param  bool  $enabled  if set to false, this function does nothing
  */
-function c_echo($string, $enabled = true)
+function c_echo($string, $enabled = true): void
 {
     if (! $enabled) {
         return;
@@ -265,7 +265,7 @@ function c_echo($string, $enabled = true)
 /*
  * @return true if client IP address is authorized to access graphs
  */
-function is_client_authorized($clientip)
+function is_client_authorized($clientip): bool
 {
     if (Config::get('allow_unauth_graphs', false)) {
         d_echo("Unauthorized graphs allowed\n");
@@ -287,11 +287,13 @@ function is_client_authorized($clientip)
 
     return false;
 } // is_client_authorized
-
 /*
  * @return an array of all graph subtypes for the given type
  */
-function get_graph_subtypes($type, $device = null)
+/**
+ * @return list<(array | string)>
+ */
+function get_graph_subtypes($type, $device = null): array
 {
     $type = basename($type);
     $types = [];
@@ -311,7 +313,7 @@ function get_graph_subtypes($type, $device = null)
     return $types;
 } // get_graph_subtypes
 
-function generate_smokeping_file($device, $file = '')
+function generate_smokeping_file(array $device, $file = '')
 {
     $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get((int) $device['device_id']));
 
@@ -335,7 +337,7 @@ function round_Nth($val, $round_to)
     }
 } // end round_Nth
 
-function is_customoid_graph($type, $subtype)
+function is_customoid_graph($type, $subtype): bool
 {
     if (! empty($subtype) && $type == 'customoid') {
         return true;
@@ -351,7 +353,7 @@ function is_customoid_graph($type, $subtype)
  * @return string Empty if not valid.
  */
 // Fuction is from https://php.net/manual/en/function.inet-ntop.php
-function inet6_ntop($ip)
+function inet6_ntop($ip): string|false
 {
     $l = strlen($ip);
     if ($l == 4 or $l == 16) {
@@ -390,7 +392,7 @@ function format_hostname($device): string
  * @param  bool  $with_statistics  Query port statistics, too. (optional, default false)
  * @return array
  */
-function get_ports_mapped($device_id, $with_statistics = false)
+function get_ports_mapped($device_id, $with_statistics = false): array
 {
     $ports = [];
     $maps = [
@@ -433,7 +435,7 @@ function get_ports_mapped($device_id, $with_statistics = false)
  * @param  string  $port_association_mode  Port association mode to use for mapping
  * @return int port_id (or Null)
  */
-function get_port_id($ports_mapped, $port, $port_association_mode)
+function get_port_id(array $ports_mapped, $port, $port_association_mode)
 {
     // Get port_id according to port_association_mode used for this device
     if (! in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
@@ -470,7 +472,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  * @param  array  $last  Glues on the fringe
  * @return array|false
  */
-function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
+function ResolveGlues(array $tables, $target, $x = 0, $hist = [], $last = [])
 {
     if (count($tables) == 1 && $x != 0) {
         if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], $target]) == 1) {
@@ -550,7 +552,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
  * @param  string  $alert_rules_name
  * @return string
  */
-function get_sql_filter_min_severity($min_severity, $alert_rules_name)
+function get_sql_filter_min_severity($min_severity, $alert_rules_name): string
 {
     $alert_severities = [
         // alert_rules.status is enum('ok','warning','critical')
@@ -581,7 +583,7 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
  * @param  string  $scale  fahrenheit or celsius
  * @return string (containing a float)
  */
-function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
+function fahrenheit_to_celsius($value, $scale = 'fahrenheit'): string
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
@@ -598,7 +600,7 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
  * @param  string  $scale  fahrenheit or celsius
  * @return string (containing a float)
  */
-function celsius_to_fahrenheit($value, $scale = 'celsius')
+function celsius_to_fahrenheit($value, $scale = 'celsius'): string
 {
     if ($scale === 'celsius') {
         $value = ($value * 1.8) + 32;
@@ -615,7 +617,7 @@ function celsius_to_fahrenheit($value, $scale = 'celsius')
  * @param  string  $scale  fahrenheit or celsius
  * @return string (containing a float)
  */
-function kelvin_to_celsius($value, $scale = 'celsius')
+function kelvin_to_celsius($value, $scale = 'celsius'): string
 {
     if ($scale === 'celsius') {
         $value = $value - 273.15;
@@ -627,7 +629,7 @@ function kelvin_to_celsius($value, $scale = 'celsius')
 /**
  * Converts string to float
  */
-function string_to_float($value)
+function string_to_float($value): string
 {
     return sprintf('%.02f', $value);
 }
@@ -740,7 +742,7 @@ function ieee754_to_decimal($value)
  * @param  string|int  $column
  * @return array
  */
-function array_by_column($array, $column)
+function array_by_column($array, $column): array
 {
     return array_combine(array_column($array, $column), $array);
 }

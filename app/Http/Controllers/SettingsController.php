@@ -100,7 +100,7 @@ class SettingsController extends Controller
      * @param  int  $status
      * @return JsonResponse
      */
-    protected function jsonResponse($id, $message, $value = null, $status = 200)
+    protected function jsonResponse($id, $message, $value = null, $status = 200): \Illuminate\Http\JsonResponse
     {
         return new JsonResponse([
             'message' => __($message, ['id' => $id]),

@@ -72,7 +72,7 @@ class Template
      * @param  array  $data
      * @return string
      */
-    public function bladeBody($data)
+    public function bladeBody(array $data)
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
@@ -88,7 +88,7 @@ class Template
      * @param  array  $data
      * @return string
      */
-    public function bladeTitle($data)
+    public function bladeTitle(array $data)
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {

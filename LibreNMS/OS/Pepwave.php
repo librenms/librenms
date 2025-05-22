@@ -43,7 +43,7 @@ class Pepwave extends OS implements
     WirelessRssiDiscovery,
     WirelessSinrDiscovery
 {
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $oid = '.1.3.6.1.4.1.27662.4.1.1.7.0';
 
@@ -52,7 +52,10 @@ class Pepwave extends OS implements
         ];
     }
 
-    public function discoverWirelessRssi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRssi(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRssi', 'CELLULAR');
         $sensors = [];
@@ -65,7 +68,10 @@ class Pepwave extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessSnr()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessSnr(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalSnr', 'CELLULAR');
         $sensors = [];
@@ -78,7 +84,10 @@ class Pepwave extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessSinr()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessSinr(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalSinr', 'CELLULAR');
         $sensors = [];
@@ -91,7 +100,10 @@ class Pepwave extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRsrp()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRsrp(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRsrp', 'CELLULAR');
         $sensors = [];
@@ -104,7 +116,10 @@ class Pepwave extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRsrq()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRsrq(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 'cellularSignalRsrq', 'CELLULAR');
         $sensors = [];

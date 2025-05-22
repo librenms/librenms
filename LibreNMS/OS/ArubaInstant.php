@@ -77,7 +77,7 @@ class ArubaInstant extends OS implements
     public function discoverProcessors(): array
     {
         return SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')
-            ->mapTable(function ($data, $aiAPMACAddress) {
+            ->mapTable(function (array $data, $aiAPMACAddress) {
                 $mac = Mac::parse($aiAPMACAddress);
                 $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.' . $mac->oid();
                 $description = $data['AI-AP-MIB::aiAPSerialNum'];
@@ -171,7 +171,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioChannel')
-            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -197,7 +197,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioNoiseFloor')
-            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -224,7 +224,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioTransmitPower')
-            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -250,7 +250,7 @@ class ArubaInstant extends OS implements
         $sn = SnmpQuery::cache()->walk('AI-AP-MIB::aiAPSerialNum')->table(1);
 
         return SnmpQuery::walk('AI-AP-MIB::aiRadioUtilization64')
-            ->mapTable(function ($data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
+            ->mapTable(function (array $data, $aiRadioAPMACAddress, $aiRadioIndex) use ($sn) {
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
@@ -292,7 +292,7 @@ class ArubaInstant extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessClients(array $sensors)
+    public function pollWirelessClients(array $sensors): array
     {
         $data = [];
         if (! empty($sensors)) {
@@ -324,7 +324,7 @@ class ArubaInstant extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessApCount(array $sensors)
+    public function pollWirelessApCount(array $sensors): array
     {
         $data = [];
         if (! empty($sensors) && count($sensors) == 1) {

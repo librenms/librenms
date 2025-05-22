@@ -48,7 +48,7 @@ class ServiceController extends SelectController
     /**
      * @param  Service  $service
      */
-    public function formatItem($service)
+    public function formatItem($service): array
     {
         return [
             'id' => $service->service_id,

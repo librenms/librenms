@@ -57,21 +57,21 @@ class TestScheduledMaintenance extends DBTestCase
         $this->assertScheduleLapsed(Carbon::parse('9999-09-09 20:00'), $schedule);
     }
 
-    private function assertScheduleActive($time, $schedule)
+    private function assertScheduleActive(\Carbon\CarbonImmutable|\Carbon\Carbon $time, $schedule): void
     {
         $this->setTestNow($time);
         $this->assertEquals(AlertScheduleStatus::ACTIVE, $schedule->status, "$schedule is not active at $time (code)");
         $this->assertTrue(AlertSchedule::where('schedule_id', $schedule->schedule_id)->isActive()->exists(), "$schedule is not active at $time (sql)");
     }
 
-    private function assertScheduleSet($time, $schedule)
+    private function assertScheduleSet($time, $schedule): void
     {
         $this->setTestNow($time);
         $this->assertEquals(AlertScheduleStatus::SET, $schedule->status, "$schedule is not set at $time (code)");
         $this->assertFalse(AlertSchedule::where('schedule_id', $schedule->schedule_id)->isActive()->exists(), "$schedule is not set at $time (sql)");
     }
 
-    private function assertScheduleLapsed($time, $schedule)
+    private function assertScheduleLapsed($time, $schedule): void
     {
         $this->setTestNow($time);
         $this->assertEquals(AlertScheduleStatus::LAPSED, $schedule->status, "$schedule is not lapsed at $time (code)");
@@ -83,13 +83,13 @@ class TestScheduledMaintenance extends DBTestCase
      *
      * @param  Carbon|CarbonImmutable  $time
      */
-    private function setTestNow($time)
+    private function setTestNow($time): void
     {
         Carbon::setTestNow($time);
         CarbonImmutable::setTestNow($time);
     }
 
-    private function setTimezone($timezone)
+    private function setTimezone($timezone): void
     {
         config(['app.timezone' => $timezone]);
         date_default_timezone_set($timezone);

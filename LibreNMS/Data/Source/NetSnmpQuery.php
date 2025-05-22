@@ -45,10 +45,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
-    /**
-     * @var array
-     */
-    private $cleanup = [
+    private array $cleanup = [
         'command' => [
             [
                 '/-c\' \'[\S]+\'/',

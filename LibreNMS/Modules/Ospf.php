@@ -145,7 +145,7 @@ class Ospf implements Module
             $ospf_ports = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfIfTable')
-                ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
+                ->mapTable(function (array $ospf_port, $ip, $ifIndex) use ($context_name, $os) {
                     // find port_id
                     $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $os->getDevice());
                     if ($ospf_port['port_id'] == 0) {
@@ -173,7 +173,7 @@ class Ospf implements Module
             $ospf_neighbours = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfNbrTable')
-                ->mapTable(function ($ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
+                ->mapTable(function (array $ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
                     // get neighbor port_id
                     $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
 

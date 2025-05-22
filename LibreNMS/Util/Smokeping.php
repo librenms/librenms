@@ -32,7 +32,7 @@ use LibreNMS\Config;
 
 class Smokeping
 {
-    private $device;
+    private \App\Models\Device $device;
     private $files;
 
     public function __construct(Device $device)
@@ -40,7 +40,7 @@ class Smokeping
         $this->device = $device;
     }
 
-    public static function make(Device $device)
+    public static function make(Device $device): static
     {
         return new static($device);
     }
@@ -76,7 +76,7 @@ class Smokeping
         return $this->getFiles();
     }
 
-    public function generateFileName($file = '')
+    public function generateFileName($file = ''): string
     {
         if (Config::get('smokeping.integration') === true) {
             return Config::get('smokeping.dir') . '/' . ($this->device->type ?: 'Ungrouped') . '/' . $file;
@@ -85,7 +85,10 @@ class Smokeping
         }
     }
 
-    public function otherGraphs($direction)
+    /**
+     * @return list<array{device: object, graph: non-empty-array<('dest' | 'device' | 'src' | 'type'), mixed>}>
+     */
+    public function otherGraphs($direction): array
     {
         $remote = $direction == 'in' ? 'src' : 'dest';
         $data = [];
@@ -111,22 +114,22 @@ class Smokeping
         return $data;
     }
 
-    public function hasGraphs()
+    public function hasGraphs(): bool
     {
         return $this->hasInGraph() || $this->hasOutGraph();
     }
 
-    public function hasInGraph()
+    public function hasInGraph(): bool
     {
         return ! empty($this->getFiles()['in'][$this->device->hostname]);
     }
 
-    public function hasOutGraph()
+    public function hasOutGraph(): bool
     {
         return ! empty($this->getFiles()['out'][$this->device->hostname]);
     }
 
-    private function filenameToHostname($name)
+    private function filenameToHostname(string $name): string
     {
         if (Config::get('smokeping.integration') === true) {
             $name = str_replace('_', '.', $name);

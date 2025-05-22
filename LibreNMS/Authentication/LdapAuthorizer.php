@@ -14,7 +14,7 @@ class LdapAuthorizer extends AuthorizerBase
     protected ?Connection $ldap_connection = null;
     private $userloginname = '';
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         $connection = $this->getLdapConnection(true);
 
@@ -75,7 +75,7 @@ class LdapAuthorizer extends AuthorizerBase
         throw new AuthenticationException();
     }
 
-    public function userExists($username, $throw_exception = false)
+    public function userExists($username, $throw_exception = false): bool
     {
         try {
             $connection = $this->getLdapConnection();
@@ -219,7 +219,10 @@ class LdapAuthorizer extends AuthorizerBase
         return $username;
     }
 
-    public function getGroupList()
+    /**
+     * @return list<mixed>
+     */
+    public function getGroupList(): array
     {
         $ldap_groups = [];
 
@@ -242,7 +245,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return string
      */
-    protected function getFullDn($username)
+    protected function getFullDn($username): string
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
@@ -255,7 +258,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return false|true
      */
-    protected function setAuthLdapSuffixOu($username)
+    protected function setAuthLdapSuffixOu($username): bool
     {
         $connection = $this->getLdapConnection();
         $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
@@ -286,7 +289,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @throws AuthenticationException
      */
-    protected function getLdapConnection($skip_bind = false)
+    protected function getLdapConnection($skip_bind = false): ?\LDAP\Connection
     {
         if ($this->ldap_connection) {
             return $this->ldap_connection; // bind already attempted
@@ -305,7 +308,7 @@ class LdapAuthorizer extends AuthorizerBase
      * @param  array  $entry  ldap entry array
      * @return array
      */
-    private function ldapToUser($entry)
+    private function ldapToUser(int|array $entry): array
     {
         $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
 
@@ -352,7 +355,7 @@ class LdapAuthorizer extends AuthorizerBase
         }
     }
 
-    public function bind($credentials = [])
+    public function bind($credentials = []): void
     {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);

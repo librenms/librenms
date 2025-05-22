@@ -69,7 +69,7 @@ class SensorObserver
      * @param  Sensor  $sensor
      * @return void
      */
-    public function updating(Sensor $sensor)
+    public function updating(Sensor $sensor): void
     {
         // prevent update of limits
         if ($sensor->sensor_custom == 'Yes') {

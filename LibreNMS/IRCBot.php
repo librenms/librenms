@@ -36,7 +36,7 @@ use LibreNMS\Util\Version;
 
 class IRCBot
 {
-    private $config;
+    private array $config;
 
     private $user;
 
@@ -44,7 +44,7 @@ class IRCBot
 
     private $data = '';
 
-    private $authd = [];
+    private array $authd = [];
 
     private $debug = false;
 
@@ -52,17 +52,17 @@ class IRCBot
 
     private $port = '';
 
-    private $ssl = false;
+    private bool $ssl = false;
 
     private $pass = '';
 
     private $nick = 'LibreNMS';
 
-    private $tempnick = null;
+    private ?string $tempnick = null;
 
     private $chan = [];
 
-    private $commands = [
+    private array $commands = [
         'auth',
         'quit',
         'listdevices',
@@ -79,23 +79,23 @@ class IRCBot
 
     private $command = '';
 
-    private $external = [];
+    private array $external = [];
 
-    private $tick = 62500;
+    private int $tick = 62500;
 
-    private $j = 0;
+    private int $j = 0;
 
-    private $socket = [];
+    private array $socket = [];
 
-    private $floodcount = 0;
+    private int $floodcount = 0;
 
     private $max_retry = 5;
 
-    private $nickwait;
+    private int $nickwait;
 
-    private $buff;
+    private ?array $buff = null;
 
-    private $tokens;
+    private ?array $tokens = null;
 
     public function __construct()
     {
@@ -222,7 +222,7 @@ class IRCBot
 
     //end init()
 
-    private function connectAlert()
+    private function connectAlert(): bool
     {
         $container_dir = '/data';
         if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
@@ -250,7 +250,7 @@ class IRCBot
 
     //end connect_alert()
 
-    private function read($buff)
+    private function read(string $buff)
     {
         $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
@@ -324,7 +324,7 @@ class IRCBot
 
     //end alertData()
 
-    private function sendAlert($sendto, $severity, $alert)
+    private function sendAlert($sendto, string|array $severity, array $alert): void
     {
         $sendto = explode(' ', $sendto)[0];
         $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
@@ -442,7 +442,7 @@ class IRCBot
 
     //end getData()
 
-    private function joinChan($chan = false)
+    private function joinChan($chan = false): bool
     {
         if ($chan) {
             $this->chan[] = $chan;
@@ -457,7 +457,7 @@ class IRCBot
 
     //end joinChan()
 
-    private function handleCommand()
+    private function handleCommand(): bool
     {
         $this->command = str_replace(':.', '', $this->command);
         $tmp = explode(':.' . $this->command . ' ', $this->data);
@@ -478,7 +478,7 @@ class IRCBot
 
     //end handleCommand()
 
-    private function proceedCommand($command, $params)
+    private function proceedCommand(string $command, string $params)
     {
         $command = strtolower($command);
         if (in_array($command, $this->commands)) {
@@ -507,7 +507,7 @@ class IRCBot
 
     //end respond()
 
-    private function getChan($param)
+    private function getChan($param): string
     {
         $data = explode('PRIVMSG ', $this->data, 3);
         $data = explode(' ', $data[1], 2);
@@ -517,7 +517,7 @@ class IRCBot
 
     //end getChan()
 
-    private function getUser($param)
+    private function getUser($param): string
     {
         $arrData = explode('!', $param, 2);
 
@@ -526,7 +526,7 @@ class IRCBot
 
     //end getUser()
 
-    private function getUserHost($param)
+    private function getUserHost($param): string
     {
         $arrData = explode(' ', $param, 2);
 
@@ -535,7 +535,7 @@ class IRCBot
 
     //end getUserHost()
 
-    private function connect($try = 0)
+    private function connect(int|float $try = 0)
     {
         if ($try > $this->max_retry) {
             $this->log('Failed too many connection attempts, aborting');
@@ -582,7 +582,7 @@ class IRCBot
 
     //end connect()
 
-    private function doAuth()
+    private function doAuth(): bool
     {
         if ($this->ircRaw('USER ' . $this->nick . ' 0 ' . $this->nick . ' :' . $this->nick) && $this->ircRaw('NICK ' . $this->nick)) {
             return true;
@@ -604,7 +604,7 @@ class IRCBot
 
     //end sendMessage()
 
-    private function log($msg)
+    private function log($msg): bool
     {
         $log = '[' . date('r') . '] IRCbot ' . trim($msg) . "\n";
         echo $log;
@@ -632,7 +632,7 @@ class IRCBot
 
     //end chkdb()
 
-    private function isAuthd()
+    private function isAuthd(): bool
     {
         if ($this->user['expire'] >= time()) {
             $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
@@ -652,7 +652,7 @@ class IRCBot
 
     //end getAuthUser()
 
-    private function hostAuth()
+    private function hostAuth(): bool
     {
         $this->log('HostAuth');
         global $authorizer;
@@ -680,7 +680,7 @@ class IRCBot
 
     //end hostAuth
 
-    private function ircRaw($params)
+    private function ircRaw(string $params): int|false
     {
         return fwrite($this->socket['irc'], $params . "\r\n");
     }
@@ -793,7 +793,7 @@ class IRCBot
 
     //end _version()
 
-    private function _log($params)
+    private function _log($params): bool
     {
         $num = 1;
         $hostname = '';
@@ -1004,7 +1004,7 @@ class IRCBot
 
     //end _status()
 
-    private function _color($text, $fg_color, $bg_color = null, $other = null)
+    private function _color($text, ?string $fg_color, $bg_color = null, $other = null): string
     {
         $colors = [
             'white' => '00',
@@ -1051,7 +1051,7 @@ class IRCBot
 
     // end _color
 
-    private function _html2irc($string)
+    private function _html2irc(string $string)
     {
         $string = urldecode($string);
         $string = preg_replace('#<b>#i', chr(2), $string);

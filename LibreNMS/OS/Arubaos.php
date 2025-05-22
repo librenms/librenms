@@ -69,7 +69,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
 
@@ -162,12 +162,15 @@ class Arubaos extends OS implements
         return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
-    protected function decodeChannel($channel)
+    protected function decodeChannel($channel): int
     {
         return Number::cast($channel) & 255; // mask off the channel width information
     }
 
-    private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    private function discoverInstantRadio(string $type, string $oid, string $desc = 'Radio %s'): array
     {
         $data = SnmpQuery::numeric()->walk("AI-AP-MIB::$oid")->groupByIndex(1); // group by radio index
 

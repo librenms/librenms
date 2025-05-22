@@ -81,7 +81,7 @@ class YamlSchemaTest extends TestCase
     private function listFiles($pattern): array
     {
         return collect(glob($pattern))
-            ->reduce(function ($array, $file) {
+            ->reduce(function (array $array, $file) {
                 if (Str::contains($file, $this->excluded)) {
                     return $array;
                 }
@@ -124,7 +124,7 @@ class YamlSchemaTest extends TestCase
         }
 
         $errors = collect($validator->getErrors())
-            ->reduce(function ($out, $error) {
+            ->reduce(function ($out, array $error) {
                 return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
             }, '');
 

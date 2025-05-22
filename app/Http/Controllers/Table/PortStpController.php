@@ -34,7 +34,7 @@ use LibreNMS\Util\Mac;
 
 class PortStpController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'int',
@@ -58,7 +58,7 @@ class PortStpController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'device_id',
@@ -84,7 +84,7 @@ class PortStpController extends TableController
     /**
      * @param  PortStp  $stpPort
      */
-    public function formatItem($stpPort)
+    public function formatItem($stpPort): array
     {
         $drMac = Mac::parse($stpPort->designatedRoot);
         $dbMac = Mac::parse($stpPort->designatedBridge);

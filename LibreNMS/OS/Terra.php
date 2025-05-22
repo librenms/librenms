@@ -69,7 +69,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDeviceArray();
 

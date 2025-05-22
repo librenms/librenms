@@ -161,7 +161,7 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels($device): Collection
+    private function discoveryLevels(array $device): Collection
     {
         $levels = new Collection();
 
@@ -230,7 +230,7 @@ class PrinterSupplies implements Module
         return $levels;
     }
 
-    private function discoveryPapers($device): Collection
+    private function discoveryPapers(array $device): Collection
     {
         Log::info('Tray Paper Level: ');
         $papers = new Collection();

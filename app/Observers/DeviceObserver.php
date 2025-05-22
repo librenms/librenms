@@ -186,7 +186,7 @@ class DeviceObserver
      * @param  array  $pivotIdsAttributes  additional pivot attributes
      * @return void
      */
-    public function pivotAttached(Device $device, $relationName, $pivotIds, $pivotIdsAttributes)
+    public function pivotAttached(Device $device, $relationName, $pivotIds, $pivotIdsAttributes): void
     {
         if ($relationName == 'parents') {
             // a parent attached to this device
@@ -207,7 +207,7 @@ class DeviceObserver
         }
     }
 
-    public static function attributeChangedMessage($attribute, $value, $previous)
+    public static function attributeChangedMessage($attribute, $value, $previous): string
     {
         return trans("device.attributes.$attribute") . ': '
             . (($previous && $previous != $value) ? "$previous -> " : '')

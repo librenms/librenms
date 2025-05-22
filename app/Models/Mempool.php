@@ -84,7 +84,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
      * @param  string  $default
      * @return Mempool
      */
-    public function setClass($class = null, $default = 'system')
+    public function setClass($class = null, $default = 'system'): static
     {
         if ($class) {
             $this->mempool_class = $class;
@@ -122,12 +122,12 @@ class Mempool extends DeviceRelatedModel implements Keyable
         return $this;
     }
 
-    public function setMempoolPercAttribute($percent)
+    public function setMempoolPercAttribute($percent): void
     {
         $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
     }

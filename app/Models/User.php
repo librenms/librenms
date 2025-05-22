@@ -106,7 +106,7 @@ class User extends Authenticatable
      *
      * @param  string  $password
      */
-    public function setPassword($password)
+    public function setPassword($password): void
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
     }
@@ -178,34 +178,34 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeAdminOnly($query)
+    public function scopeAdminOnly($query): void
     {
         $query->role('admin');
     }
 
     // ---- Accessors/Mutators ----
 
-    public function setRealnameAttribute($realname)
+    public function setRealnameAttribute($realname): void
     {
         $this->attributes['realname'] = (string) $realname;
     }
 
-    public function setDescrAttribute($descr)
+    public function setDescrAttribute($descr): void
     {
         $this->attributes['descr'] = (string) $descr;
     }
 
-    public function setEmailAttribute($email)
+    public function setEmailAttribute($email): void
     {
         $this->attributes['email'] = (string) $email;
     }
 
-    public function setCanModifyPasswdAttribute($modify)
+    public function setCanModifyPasswdAttribute($modify): void
     {
         $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
     }
 
-    public function setEnabledAttribute($enable)
+    public function setEnabledAttribute($enable): void
     {
         $this->attributes['enabled'] = $enable ? 1 : 0;
     }

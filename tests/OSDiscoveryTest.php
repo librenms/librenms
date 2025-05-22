@@ -39,7 +39,7 @@ use PHPUnit\Framework\Attributes\Group;
 
 class OSDiscoveryTest extends TestCase
 {
-    private static $unchecked_files;
+    private static array $unchecked_files;
 
     public static function setUpBeforeClass(): void
     {
@@ -116,7 +116,7 @@ class OSDiscoveryTest extends TestCase
      * @param  string  $expected_os  The os we should get back from getHostOS()
      * @param  string  $filename  the name of the snmprec file to use
      */
-    private function checkOS($expected_os, $filename = null)
+    private function checkOS($expected_os, $filename = null): void
     {
         $start = microtime(true);
 

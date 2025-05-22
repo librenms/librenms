@@ -107,7 +107,7 @@ class TestConfigCommands extends InMemoryDbTestCase
      * @param  string  $setting
      * @param  mixed  $expected
      */
-    private function assertCliSets(string $setting, $expected): void
+    private function assertCliSets(string $setting, string|bool|array $expected): void
     {
         $this->assertCliGets($setting, null);
         $this->artisan('config:set', ['setting' => $setting, 'value' => json_encode($expected)])->assertExitCode(0);

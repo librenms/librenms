@@ -87,7 +87,7 @@ class RunAlerts
      * @param  array  $alert  Alert-Result from DB
      * @return array|bool|string
      */
-    public function describeAlert($alert)
+    public function describeAlert(array $alert)
     {
         $obj = [];
         $i = 0;
@@ -207,7 +207,7 @@ class RunAlerts
         return $obj;
     }
 
-    public function clearStaleAlerts()
+    public function clearStaleAlerts(): void
     {
         $sql = 'SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=' . AlertState::CLEAR . ' AND `devices`.`hostname` IS NULL';
         foreach (dbFetchRows($sql) as $alert) {
@@ -225,7 +225,7 @@ class RunAlerts
      * @param  int  $rule  Rule-ID
      * @return bool
      */
-    public function isRuleValid($device_id, $rule)
+    public function isRuleValid($device_id, $rule): bool
     {
         global $rulescache;
         if (empty($rulescache[$device_id]) || ! isset($rulescache[$device_id])) {
@@ -247,7 +247,7 @@ class RunAlerts
      * @param  array  $alert
      * @return bool
      */
-    public function issueAlert($alert)
+    public function issueAlert($alert): bool
     {
         if (Config::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
@@ -275,7 +275,7 @@ class RunAlerts
      *
      * @return void
      */
-    public function runAcks()
+    public function runAcks(): void
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' && alerts.open = ' . AlertState::ACTIVE) as $alert) {
             $rextra = json_decode($alert['extra'], true);
@@ -297,7 +297,7 @@ class RunAlerts
      *
      * @return void
      */
-    public function runFollowUp()
+    public function runFollowUp(): void
     {
         foreach ($this->loadAlerts('alerts.state > ' . AlertState::CLEAR . ' && alerts.open = 0') as $alert) {
             if ($alert['state'] != AlertState::ACKNOWLEDGED || ($alert['info']['until_clear'] === false)) {
@@ -372,7 +372,7 @@ class RunAlerts
      * @param  array  $element
      * @return array
      */
-    private function extractIdFieldsForFault($element)
+    private function extractIdFieldsForFault($element): array
     {
         return array_filter(array_keys($element), function ($key) {
             // Exclude location_id as it is not relevant for the comparison
@@ -387,7 +387,7 @@ class RunAlerts
      * @param  array  $idFields
      * @return string
      */
-    private function generateComparisonKeyForFault($element, $idFields)
+    private function generateComparisonKeyForFault($element, $idFields): string
     {
         $keyParts = [];
         foreach ($idFields as $field) {
@@ -405,7 +405,7 @@ class RunAlerts
      * @param  array  $array2
      * @return array [$added, $removed]
      */
-    private function diffBetweenFaults($array1, $array2)
+    private function diffBetweenFaults($array1, $array2): array
     {
         $array1_keys = [];
         $added_elements = [];
@@ -437,7 +437,10 @@ class RunAlerts
         return [$added_elements, $removed_elements];
     }
 
-    public function loadAlerts($where)
+    /**
+     * @return list<non-empty-array>
+     */
+    public function loadAlerts($where): array
     {
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
@@ -472,7 +475,7 @@ class RunAlerts
      *
      * @return void
      */
-    public function runAlerts()
+    public function runAlerts(): void
     {
         foreach ($this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' && alerts.open = 1') as $alert) {
             $noiss = false;
@@ -588,7 +591,7 @@ class RunAlerts
      * @param  array  $obj  Alert-Array
      * @return void
      */
-    public function extTransports($obj)
+    public function extTransports($obj): void
     {
         $type = new Template;
 
@@ -640,7 +643,7 @@ class RunAlerts
     }
 
     // Log alert event
-    public function alertLog($result, $obj, $transport)
+    public function alertLog($result, array $obj, $transport): void
     {
         $prefix = [
             AlertState::RECOVERED => 'recovery',
@@ -677,7 +680,7 @@ class RunAlerts
      * @param  int  $device  Device-ID
      * @return bool
      */
-    public function isParentDown($device)
+    public function isParentDown($device): bool
     {
         $parent_count = dbFetchCell('SELECT count(*) from `device_relationships` WHERE `child_device_id` = ?', [$device]);
         if (! $parent_count) {

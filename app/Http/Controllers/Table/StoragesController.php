@@ -91,7 +91,7 @@ class StoragesController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -107,7 +107,7 @@ class StoragesController extends TableController
      * @param  Storage  $storage
      * @return array
      */
-    protected function formatExportRow($storage)
+    protected function formatExportRow($storage): array
     {
         return [
             $storage->device ? $storage->device->displayName() : '',

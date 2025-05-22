@@ -28,7 +28,7 @@ namespace LibreNMS\OS\Shared;
 
 class Fortinet extends \LibreNMS\OS
 {
-    protected function getHardwareName()
+    protected function getHardwareName(): ?string
     {
         $rewrite_fortinet_hardware = [
             '.1.3.6.1.4.1.12356.112.100.1' => 'FortiADC Unknown',

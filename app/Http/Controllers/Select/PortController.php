@@ -35,7 +35,7 @@ class PortController extends SelectController
      *
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -49,7 +49,7 @@ class PortController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return (array) $request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
@@ -88,7 +88,7 @@ class PortController extends SelectController
         return $query;
     }
 
-    public function formatItem($port)
+    public function formatItem($port): array
     {
         /** @var Port $port */
         $label = $port->getShortLabel();

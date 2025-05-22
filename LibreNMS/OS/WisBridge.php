@@ -87,7 +87,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.1.1.4.1'; //WIS-BRIDGE-MIB::wisRadioFreq.1
 
@@ -102,7 +102,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessCapacity()
+    public function discoverWirelessCapacity(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.6.1.4.1';
 
@@ -117,7 +117,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessCcq()
+    public function discoverWirelessCcq(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.7.1'; //WIS-BRIDGE-MIB::wisWlStatCcq.1
         $oid = '';
@@ -133,7 +133,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.15.1'; //WIS-BRIDGE-MIB::wisWlStatStaCount.1
 
@@ -148,7 +148,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessDistance()
+    public function discoverWirelessDistance(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.1.1.7.1'; //WIS-BRIDGE-MIB::wisRadioDistance.1
         $oid = '';
@@ -164,7 +164,7 @@ class WisBridge extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.8.1'; //WIS-BRIDGE-MIB::wisWlStatNoiseFloor.1
 
@@ -179,7 +179,7 @@ class WisBridge extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $tx_oid = '.1.3.6.1.4.1.62821.1.4.1.1.6.1'; //WIS-BRIDGE-MIB::wisRadioTxPower.1
         $rx_oid = '.1.3.6.1.4.1.62821.1.4.3.1.5.1'; //WIS-BRIDGE-MIB::wisWlStatSignal.1
@@ -196,7 +196,7 @@ class WisBridge extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessQuality()
+    public function discoverWirelessQuality(): array
     {
         $oidAirMax = '.1.3.6.1.4.1.62821.1.4.6.1.3.1';
         $oidAirMax = '';
@@ -212,7 +212,7 @@ class WisBridge extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $tx_oid = '.1.3.6.1.4.1.62821.1.4.3.1.9.1'; //WIS-BRIDGE-MIB::wisWlStatTxRate.1
         $rx_oid = '.1.3.6.1.4.1.62821.1.4.3.1.10.1'; //WIS-BRIDGE-MIB::wisWlStatRxRate.1
@@ -229,7 +229,7 @@ class WisBridge extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.6.1'; //WIS-BRIDGE-MIB::wisWlStatRssi.1
         $sensors = [

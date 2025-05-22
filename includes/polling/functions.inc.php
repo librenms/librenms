@@ -19,13 +19,16 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\UserFuncHelper;
 
-function bulk_sensor_snmpget($device, $sensors)
+/**
+ * @return mixed[]
+ */
+function bulk_sensor_snmpget($device, $sensors): array
 {
     $oid_per_pdu = get_device_oid_limit($device);
     $sensors = array_chunk($sensors, $oid_per_pdu);
     $cache = [];
     foreach ($sensors as $chunk) {
-        $oids = array_map(function ($data) {
+        $oids = array_map(function (array $data) {
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
@@ -41,7 +44,7 @@ function bulk_sensor_snmpget($device, $sensors)
  * @param  string  $type  type/class of sensor
  * @return array
  */
-function sensor_precache($device, $type)
+function sensor_precache(array $device, $type): array
 {
     $sensor_cache = [];
     if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
@@ -51,7 +54,7 @@ function sensor_precache($device, $type)
     return $sensor_cache;
 }
 
-function poll_sensor($device, $class)
+function poll_sensor($device, $class): void
 {
     $sensors = [];
     $misc_sensors = [];
@@ -133,7 +136,7 @@ function poll_sensor($device, $class)
  * @param  $device
  * @param  $all_sensors
  */
-function record_sensor_data($device, $all_sensors)
+function record_sensor_data(array $device, $all_sensors): void
 {
     foreach ($all_sensors as $sensor) {
         $class = trans('sensors.' . $sensor['sensor_class'] . '.short');
@@ -221,7 +224,7 @@ function record_sensor_data($device, $all_sensors)
  * @param  array  $metrics  an array of additional metrics to store in the database for alerting
  * @param  string  $status  This is the current value for alerting
  */
-function update_application($app, $response, $metrics = [], $status = '')
+function update_application($app, $response, $metrics = [], $status = ''): void
 {
     if (! $app) {
         d_echo('$app does not exist, could not update');
@@ -288,7 +291,7 @@ function update_application($app, $response, $metrics = [], $status = '')
         if (is_array(current($metrics))) {
             $metrics = array_reduce(
                 array_keys($metrics),
-                function ($carry, $metric_group) use ($metrics) {
+                function (array $carry, $metric_group) use ($metrics) {
                     if ($metric_group == 'none') {
                         $prefix = '';
                     } else {
@@ -488,7 +491,7 @@ function json_app_get($device, $extend, $min_version = 1)
  *                          than '', and array keys with.
  * @return array The flattened array.
  */
-function data_flatten($array, $prefix = '', $joiner = '_')
+function data_flatten($array, $prefix = '', $joiner = '_'): array
 {
     $return = [];
     foreach ($array as $key => $value) {

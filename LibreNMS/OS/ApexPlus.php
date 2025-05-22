@@ -23,7 +23,10 @@ class ApexPlus extends OS implements
     WirelessRateDiscovery,
     WirelessErrorRateDiscovery
 {
-    public function discoverWirelessRssi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRssi(): array
     {
         // GIGA-PLUS-MIB::rfRSSIInt
         $oid = '.1.3.6.1.4.1.5454.1.80.3.14.2.0';
@@ -40,7 +43,7 @@ class ApexPlus extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         // GIGA-PLUS-MIB::rfTxFrequencyInt, rfRxFrequencyInt
         $txoid = '.1.3.6.1.4.1.5454.1.80.3.1.1.2.0';
@@ -66,7 +69,10 @@ class ApexPlus extends OS implements
         ];
     }
 
-    public function discoverWirelessMse()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessMse(): array
     {
         // GIGA-PLUS-MIB::modemMSEInt
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.2.2.0';
@@ -83,7 +89,10 @@ class ApexPlus extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRate()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRate(): array
     {
         // GIGA-PLUS-MIB::rfSpeedInt
         $oid = '.1.3.6.1.4.1.5454.1.80.3.6.4.2.0';
@@ -100,7 +109,10 @@ class ApexPlus extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessErrorRate()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessErrorRate(): array
     {
         // GIGA-PLUS-MIB::modemBER
         $oid = '.1.3.6.1.4.1.5454.1.80.2.4.1.1.0';

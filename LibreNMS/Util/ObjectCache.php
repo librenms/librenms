@@ -47,7 +47,7 @@ use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
 {
-    private static $cache_time = 300;
+    private static int $cache_time = 300;
 
     public static function applications()
     {
@@ -129,9 +129,9 @@ class ObjectCache
     /**
      * @param  int  $device_id  device id of the device to get counts for, 0 means all
      * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
-     * @return mixed
+     * @return mixed[]
      */
-    public static function portCounts($fields = ['total'], $device_id = 0)
+    public static function portCounts($fields = ['total'], $device_id = 0): array
     {
         $result = [];
         foreach ($fields as $field) {
@@ -175,7 +175,7 @@ class ObjectCache
      * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, disabled
      * @return array
      */
-    public static function deviceCounts($fields = ['total'])
+    public static function deviceCounts($fields = ['total']): array
     {
         $result = [];
         foreach ($fields as $field) {
@@ -211,7 +211,7 @@ class ObjectCache
      * @param  array  $fields  array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
      * @return array
      */
-    public static function serviceCounts($fields = ['total'], $device_id = 0)
+    public static function serviceCounts($fields = ['total'], $device_id = 0): array
     {
         $result = [];
         foreach ($fields as $field) {
@@ -249,7 +249,7 @@ class ObjectCache
      * @param  array  $fields  array of counts to get. Valid options: total, ok, critical, disable_notify
      * @return array
      */
-    public static function sensorCounts($fields = ['total'], $device_id = 0)
+    public static function sensorCounts($fields = ['total'], $device_id = 0): array
     {
         $result = [];
         foreach ($fields as $field) {

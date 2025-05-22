@@ -46,7 +46,7 @@ class Aos7portViolation implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $reason = $trap->getOidData($trap->findOid('ALCATEL-IND1-PORT-MIB::portViolationSource.2.0'));
         $current = $trap->getOidData($trap->findOid('ALCATEL-IND1-PORT-MIB::portViolationReason.3.0'));

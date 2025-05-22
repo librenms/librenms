@@ -45,7 +45,7 @@ class Aos6DoSTrap implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $type = $trap->getOidData($trap->findOid('ALCATEL-IND1-IP-MIB::alaDoSType'));
         $detected = $trap->getOidData($trap->findOid('ALCATEL-IND1-IP-MIB::alaDoSDetected'));

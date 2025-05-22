@@ -125,7 +125,7 @@ OUT;
         $this->assertEquals(1, $actual->exit_code);
     }
 
-    private function mockFpingProcess($output, $exitCode)
+    private function mockFpingProcess(string $output, int $exitCode)
     {
         $process = \Mockery::mock(Process::class);
         $process->shouldReceive('getCommandLine', 'run');

@@ -32,7 +32,7 @@ use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
 {
-    private $stats;
+    private \App\Polling\Measure\MeasurementCollection $stats;
 
     public function __construct()
     {

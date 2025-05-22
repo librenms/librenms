@@ -39,7 +39,7 @@ use LibreNMS\Util\UserFuncHelper;
  *
  * @throws InvalidIpException
  */
-function discover_new_device($hostname, $device, $method, $interface = null)
+function discover_new_device($hostname, array $device, $method, $interface = null)
 {
     Log::debug("discovering $hostname\n");
     if (empty(Config::get('nets'))) {
@@ -126,7 +126,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
  * @param  bool  $force_module  Ignore device module overrides
  * @return bool if the device was discovered or skipped
  */
-function discover_device(&$device, $force_module = false)
+function discover_device(array &$device, $force_module = false): bool
 {
     DeviceCache::setPrimary($device['device_id']);
     App::forgetInstance('sensor-discovery');
@@ -203,7 +203,7 @@ function discover_device(&$device, $force_module = false)
 //end discover_device()
 
 // Discover sensors
-function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, $class, array $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
 {
     $low_limit = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
@@ -240,7 +240,7 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
     return true;
 }
 
-function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(array &$valid, $device, $port_id, $vp_id, $vp_descr): void
 {
     Log::debug("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
 
@@ -259,7 +259,7 @@ function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
 
 //end discover_juniAtmVp()
 
-function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id)
+function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostname, $remote_port, $remote_platform, $remote_version, $local_device_id, $remote_device_id): void
 {
     global $link_exists;
 
@@ -332,7 +332,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
  *
  * @throws InvalidIpException
  */
-function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address, $mask, $context_name = '')
+function discover_process_ipv4(array &$valid_v4, array $device, int $ifIndex, $ipv4_address, $mask, $context_name = ''): void
 {
     $cidr = IPv4::netmask2cidr($mask);
     try {
@@ -397,7 +397,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
  * @return bool true if sensor is valid
  *              false if sensor is invalid
 */
-function check_entity_sensor($string, $device)
+function check_entity_sensor($string, array $device): bool
 {
     $fringe = array_merge(Config::get('bad_entity_sensor_regex', []), Config::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
 
@@ -422,7 +422,7 @@ function check_entity_sensor($string, $device)
  * @param  string  $oid  the OID of this sensor
  * @return int
  */
-function get_device_divisor($device, $os_version, $sensor_type, $oid)
+function get_device_divisor(array $device, $os_version, $sensor_type, $oid): int
 {
     if ($device['os'] == 'poweralert') {
         if ($sensor_type == 'current' || $sensor_type == 'frequency') {
@@ -490,7 +490,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
  * @param  $sensor_type
  * @param  $pre_cache
  */
-function discovery_process($os, $sensor_class, $pre_cache)
+function discovery_process($os, $sensor_class, $pre_cache): void
 {
     $discovery = $os->getDiscovery('sensors');
     $device = $os->getDeviceArray();
@@ -666,7 +666,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
  * @param  OS  $os
  * @param  array  $pre_cache
  */
-function sensors($types, $os, $pre_cache = [])
+function sensors($types, $os, $pre_cache = []): void
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
@@ -690,7 +690,10 @@ function sensors($types, $os, $pre_cache = [])
     }
 }
 
-function build_bgp_peers($device, $data, $peer2)
+/**
+ * @return list<array{ip: (array | string), as: mixed, localip: '0.0.0.0', ver: string}>
+ */
+function build_bgp_peers(array $device, $data, $peer2): array
 {
     Log::debug("Peers : $data\n");
     $remove = [
@@ -746,7 +749,10 @@ function build_bgp_peers($device, $data, $peer2)
     return $peerlist;
 }
 
-function build_cbgp_peers($device, $peer, $af_data, $peer2)
+/**
+ * @return non-empty-array<non-empty-array<1>>[]
+ */
+function build_cbgp_peers(array $device, array $peer, $af_data, $peer2): array
 {
     Log::debug('afi data :: ');
     Log::debug($af_data);
@@ -791,7 +797,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
     return $af_list;
 }
 
-function add_bgp_peer($device, $peer)
+function add_bgp_peer(array $device, array $peer): void
 {
     if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['ip']]) < '1') {
         $bgpPeers = [
@@ -823,7 +829,7 @@ function add_bgp_peer($device, $peer)
     }
 }
 
-function add_cbgp_peer($device, $peer, $afi, $safi)
+function add_cbgp_peer($device, array $peer, $afi, $safi): void
 {
     if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $peer['ip'], $afi, $safi]) == 0) {
         $cbgp = [
@@ -863,7 +869,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
  * @param  string  $platform
  * @return bool
  */
-function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
+function can_skip_discovery($sysName, $sysDescr = '', $platform = ''): bool
 {
     if ($sysName) {
         foreach ((array) Config::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
@@ -907,7 +913,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
  * @param  string  $mac_address
  * @return int the device_id or 0
  */
-function find_device_id($name = '', $ip = '', $mac_address = '')
+function find_device_id($name = '', $ip = '', $mac_address = ''): int
 {
     $where = [];
     $params = [];
@@ -989,7 +995,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
  * @param  string  $mac_address  check against ifPhysAddress (should be in lowercase hexadecimal)
  * @return int
  */
-function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
+function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null): int
 {
     if (! ($device_id || $mac_address)) {
         return 0;

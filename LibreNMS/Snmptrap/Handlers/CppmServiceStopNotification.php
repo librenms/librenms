@@ -47,7 +47,7 @@ class CppmServiceStopNotification implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $cppmServiceName = $trap->getOidData($trap->findOid('CPPM-MIB::cppmServiceName.0'));
         $cppmTrapMessage = $trap->getOidData($trap->findOid('CPPM-MIB::cppmTrapMessage.0'));

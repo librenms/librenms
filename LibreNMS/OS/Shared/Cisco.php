@@ -310,7 +310,7 @@ class Cisco extends OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
         $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
@@ -466,7 +466,7 @@ class Cisco extends OS implements
         $devices = SnmpQuery::walk('CISCO-FLASH-MIB::ciscoFlashDeviceName')->pluck();
 
         return SnmpQuery::walk('CISCO-FLASH-MIB::ciscoFlashPartitionTable')
-            ->mapTable(function ($data, $ciscoFlashDeviceIndex, $ciscoFlashPartitionIndex) use ($devices) {
+            ->mapTable(function (array $data, $ciscoFlashDeviceIndex, $ciscoFlashPartitionIndex) use ($devices) {
                 $index = "$ciscoFlashDeviceIndex.$ciscoFlashPartitionIndex";
                 $size = $data['CISCO-FLASH-MIB::ciscoFlashPartitionSize'] == 4294967295
                     ? $data['CISCO-FLASH-MIB::ciscoFlashPartitionSizeExtended']
@@ -497,13 +497,13 @@ class Cisco extends OS implements
             });
     }
 
-    public function pollNac()
+    public function pollNac(): \Illuminate\Support\Collection
     {
         $nac = new Collection();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx');
         if (! empty($portAuthSessionEntry)) {
-            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx'))->mapWithKeys(function ($item, $key) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB', null, '-OQUsx'))->mapWithKeys(function (array $item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
 
@@ -722,7 +722,7 @@ class Cisco extends OS implements
             $snmpData = collect(SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
             $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && in_array($ent['entPhysicalVendorType'], $arrayOfContainers));
             $dataFilter = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null));
-            $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
+            $data = $dataFilter->map(function (array $e, $e_index) use ($snmpData) {
                 $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
                     $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
@@ -857,7 +857,7 @@ class Cisco extends OS implements
         return $qos;
     }
 
-    public function setQosParents($qos)
+    public function setQosParents($qos): void
     {
         $qos->each(function (Qos $thisQos, int $key) use ($qos) {
             $parent_idx = $this->qosIdxToParent->get($thisQos->snmp_idx);
@@ -879,7 +879,7 @@ class Cisco extends OS implements
         });
     }
 
-    public function pollQos($qos)
+    public function pollQos($qos): void
     {
         $poll_time = time();
         $preBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);

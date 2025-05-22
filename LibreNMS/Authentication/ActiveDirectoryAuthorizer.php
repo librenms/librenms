@@ -21,7 +21,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
     protected ?Connection $ldap_connection = null;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         $this->connect();
 
@@ -61,7 +61,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         throw new AuthenticationException(ldap_error($this->ldap_connection));
     }
 
-    protected function userInGroup($username, $groupname)
+    protected function userInGroup($username, $groupname): bool
     {
         $connection = $this->getConnection();
 
@@ -107,7 +107,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return (int) $entries['count'] > 0;
     }
 
-    public function userExists($username, $throw_exception = false)
+    public function userExists($username, $throw_exception = false): bool
     {
         $connection = $this->getConnection();
 

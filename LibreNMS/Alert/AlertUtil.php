@@ -81,7 +81,7 @@ class AlertUtil
      * @param  array  $results  Rule-Result
      * @return array
      */
-    public static function getContacts($results)
+    public static function getContacts($results): array
     {
         if (empty($results)) {
             return [];
@@ -218,7 +218,7 @@ class AlertUtil
      * @param  int  $device_id  Device-ID
      * @return bool
      */
-    public static function hasDisableNotify($device_id)
+    public static function hasDisableNotify($device_id): bool
     {
         $device = Device::find($device_id);
 

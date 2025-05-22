@@ -17,7 +17,7 @@ class Mni extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $radio_index = \SnmpQuery::get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $transmit_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.2.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseTxPower"
@@ -57,7 +57,7 @@ class Mni extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $radio_index = \SnmpQuery::get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $receive_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.17.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps";

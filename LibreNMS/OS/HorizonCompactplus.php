@@ -11,7 +11,7 @@ use LibreNMS\OS;
 
 class HorizonCompactplus extends OS implements WirelessSnrDiscovery, WirelessPowerDiscovery, WirelessRssiDiscovery, WirelessErrorsDiscovery
 {
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oid = '.1.3.6.1.4.1.7262.2.5.4.2.1.1.8.1';
 
@@ -20,7 +20,7 @@ class HorizonCompactplus extends OS implements WirelessSnrDiscovery, WirelessPow
         ];
     }
 
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $oid = '.1.3.6.1.4.1.7262.2.5.4.4.1.1.7.1';
 
@@ -29,7 +29,7 @@ class HorizonCompactplus extends OS implements WirelessSnrDiscovery, WirelessPow
         ];
     }
 
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.7262.2.5.4.2.1.1.3.1';
 
@@ -38,7 +38,7 @@ class HorizonCompactplus extends OS implements WirelessSnrDiscovery, WirelessPow
         ];
     }
 
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         $oid = '.1.3.6.1.4.1.7262.2.5.4.2.2.1.4.1';
 

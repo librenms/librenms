@@ -40,7 +40,7 @@ class MeasurementManager
     /**
      * @var \Illuminate\Support\Collection<MeasurementCollection>
      */
-    private static $categories;
+    private static ?\Illuminate\Support\Collection $categories = null;
 
     public function __construct()
     {

@@ -159,7 +159,7 @@ class EnvHelper
      * @param  string  $dotenv
      * @return string
      */
-    private static function fixComments($dotenv)
+    private static function fixComments($dotenv): string
     {
         return implode(PHP_EOL, array_map(function ($line) {
             $parts = explode('=', $line, 2);
@@ -216,7 +216,7 @@ class EnvHelper
      *
      * @return bool
      */
-    public static function librenmsDocker()
+    public static function librenmsDocker(): bool
     {
         return getenv('LIBRENMS_DOCKER') === '1';
     }

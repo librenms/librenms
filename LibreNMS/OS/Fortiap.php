@@ -30,7 +30,7 @@ class Fortiap extends Fortinet implements
     WirelessFrequencyPolling,
     WirelessPowerDiscovery
 {
-    protected function getHardwareName()
+    protected function getHardwareName(): ?string
     {
         $rewrite_fortiap_hardware = [
             '.1.3.6.1.4.1.12356.120.10.23112' => 'FAP-231F',
@@ -79,7 +79,10 @@ class Fortiap extends Fortinet implements
         $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
-    public function discoverWirelessClients()
+    /**
+     * @return \LibreNMS\Device\WirelessSensor[]
+     */
+    public function discoverWirelessClients(): array
     {
         $fapVapStaInfoCounts = snmpwalk_cache_oid($this->getDeviceArray(), 'fapVapStaInfoCount', [], 'FORTINET-FORTIAP-MIB');
         if (empty($fapVapStaInfoCounts)) {
@@ -122,7 +125,10 @@ class Fortiap extends Fortinet implements
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessFrequency(): array
     {
         $fapRadioChannelOper = $this->getCacheByIndex('fapRadioChannelOper', 'FORTINET-FORTIAP-MIB');
 
@@ -148,7 +154,10 @@ class Fortiap extends Fortinet implements
         return $this->pollWirelessChannelAsFrequency($sensors);
     }
 
-    public function discoverWirelessPower()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessPower(): array
     {
         $fapRadioTxPowerOper = $this->getCacheByIndex('fapRadioTxPowerOper', 'FORTINET-FORTIAP-MIB');
 

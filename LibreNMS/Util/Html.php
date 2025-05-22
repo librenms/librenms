@@ -38,7 +38,7 @@ class Html
      * @param  string  $app_state
      * @return array
      */
-    public static function appStateIcon($app_state)
+    public static function appStateIcon($app_state): array
     {
         switch ($app_state) {
             case 'OK':
@@ -78,7 +78,7 @@ class Html
      * @param  bool  $print
      * @return array
      */
-    public static function graphRow($graph_array, $print = false)
+    public static function graphRow(array $graph_array, $print = false): array
     {
         if (session('widescreen')) {
             if (! array_key_exists('height', $graph_array)) {
@@ -138,7 +138,7 @@ class Html
         return $graph_data;
     }
 
-    public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null)
+    public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null): string
     {
         $percent = min($percent, 100);
         if ($colors === null) {

@@ -74,7 +74,7 @@ class Dns implements Geocoder
         }
     }
 
-    public function getCoordinates($hostname)
+    public function getCoordinates($hostname): array
     {
         $r = $this->getRecord($hostname, 'LOC');
 

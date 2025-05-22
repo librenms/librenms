@@ -173,7 +173,7 @@ abstract class PaginatedAjaxController extends Controller
      * @param  Builder  $query
      * @return Builder
      */
-    protected function sort($request, $query)
+    protected function sort(\Illuminate\Http\Request $request, $query)
     {
         $columns = $this->sortFields($request);
 

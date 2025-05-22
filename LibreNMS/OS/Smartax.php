@@ -38,7 +38,7 @@ class Smartax extends OS implements ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $proc_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.5.0';
         $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';

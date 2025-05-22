@@ -145,7 +145,7 @@ class Rewrite
      * @param  bool  $short
      * @return string
      */
-    public static function ciscoHardware(&$device, $short = false)
+    public static function ciscoHardware(array &$device, $short = false)
     {
         if ($device['os'] == 'ios') {
             if ($device['hardware']) {

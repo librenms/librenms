@@ -36,7 +36,7 @@ use LibreNMS\Util\StringHelpers;
 
 class GraphController extends Controller
 {
-    private $rules = [
+    private array $rules = [
         'limit' => 'int',
         'page' => 'int',
         'term' => 'nullable|string',
@@ -99,7 +99,7 @@ class GraphController extends Controller
         ]);
     }
 
-    private function formatGraph($top, $graph)
+    private function formatGraph($top, $graph): array
     {
         $text = $graph;
         if (Str::contains('_', $graph)) {

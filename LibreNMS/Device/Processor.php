@@ -43,7 +43,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     protected static $table = 'processors';
     protected static $primaryKey = 'processor_id';
 
-    private $valid = true;
+    private bool $valid = true;
 
     public $processor_id;
     public $device_id;
@@ -83,7 +83,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $warn_percent = 75,
         $entPhysicalIndex = null,
         $hrDeviceIndex = null
-    ) {
+    ): static {
         $proc = new static();
         $proc->processor_type = $type;
         $proc->device_id = $device_id;
@@ -96,7 +96,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         // handle string indexes
         if (Str::contains($oid, '"')) {
-            $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
+            $oid = preg_replace_callback('/"([^"]+)"/', function (array $matches) {
                 return Oid::encodeString($matches[1])->oid;
             }, $oid);
         }
@@ -139,7 +139,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         );
     }
 
-    public static function runDiscovery(OS $os)
+    public static function runDiscovery(OS $os): void
     {
         // check yaml first
         $processors = self::processYaml($os);
@@ -168,7 +168,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         echo PHP_EOL;
     }
 
-    public static function poll(OS $os)
+    public static function poll(OS $os): void
     {
         $processors = dbFetchRows('SELECT * FROM processors WHERE device_id=?', [$os->getDeviceId()]);
 
@@ -203,7 +203,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
     }
 
-    private static function pollProcessors(OS $os, $processors)
+    /**
+     * @return mixed[]
+     */
+    private static function pollProcessors(OS $os, $processors): array
     {
         if (empty($processors)) {
             return [];
@@ -237,7 +240,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         return $results;
     }
 
-    private static function processData($data, $precision)
+    private static function processData($data, $precision): ?float
     {
         if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches) !== 1) {
             return null;
@@ -284,7 +287,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
      * @param  array  $exclude  exclude columns
      * @return array
      */
-    public function toArray($exclude = [])
+    public function toArray($exclude = []): array
     {
         $array = [
             'processor_id' => $this->processor_id,
@@ -306,7 +309,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     /**
      * @param  Processor  $processor
      */
-    public static function onCreate($processor)
+    public static function onCreate($processor): void
     {
         $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
         Eventlog::log($message, $processor->device_id, static::$table, Severity::Notice, $processor->processor_id);
@@ -317,7 +320,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     /**
      * @param  Processor  $processor
      */
-    public static function onDelete($processor)
+    public static function onDelete($processor): void
     {
         $message = "Processor Removed: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
         Eventlog::log($message, $processor->device_id, static::$table, Severity::Notice, $processor->processor_id);

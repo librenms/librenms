@@ -59,7 +59,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      * @param  string  $parent_condition  AND or OR  (for root, this should be null)
      * @return Builder
      */
-    protected function parseGroupToQuery($query, $rule, $parent_condition = null)
+    protected function parseGroupToQuery($query, array $rule, $parent_condition = null)
     {
         return $query->where(function ($query) use ($rule) {
             foreach ($rule['rules'] as $group_rule) {
@@ -131,7 +131,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      * @param  array  $rule
      * @return array [field, operator, value]
      */
-    protected function expandRule($rule)
+    protected function expandRule(array $rule): array
     {
         $field = $rule['field'];
         if (Str::startsWith($field, 'macros.')) {
@@ -172,7 +172,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      *
      * @return $this
      */
-    public function generateJoins()
+    public function generateJoins(): static
     {
         $joins = [];
         foreach ($this->generateGlue() as $glue) {

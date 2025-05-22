@@ -51,7 +51,7 @@ class Graph
      * @param  int  $flags
      * @return string
      */
-    public static function getImageData($vars, int $flags = 0): string
+    public static function getImageData(array $vars, int $flags = 0): string
     {
         if ($flags & self::IMAGE_PNG) {
             $vars['graph_type'] = 'png';

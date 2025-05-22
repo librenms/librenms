@@ -28,8 +28,8 @@ namespace App\Polling\Measure;
 
 class Measurement
 {
-    private $start;
-    private $type;
+    private float $start;
+    private string $type;
     private $duration;
 
     private function __construct(string $type, ?float $duration = null)

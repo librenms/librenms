@@ -39,7 +39,7 @@ function prep_snmp_setting($device, $setting)
  *
  * @deprecated Please use SnmpQuery instead
  */
-function get_mib_dir($device)
+function get_mib_dir($device): array
 {
     $dirs = [];
 
@@ -79,7 +79,7 @@ function get_mib_dir($device)
  *
  * @deprecated Please use SnmpQuery instead
  */
-function mibdir($mibdir = null, $device = null)
+function mibdir($mibdir = null, $device = null): string
 {
     $dirs = is_array($device) ? get_mib_dir($device) : [];
 
@@ -199,7 +199,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
 /**
  * @deprecated Please use SnmpQuery instead
  */
-function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
+function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, array $array = []): array
 {
     $measure = Measurement::start('snmpget');
 
@@ -240,11 +240,11 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 
     return $array;
 }//end snmp_get_multi()
-
 /**
  * @deprecated Please use SnmpQuery instead
+ * @return mixed[]
  */
-function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
+function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null): array
 {
     $measure = Measurement::start('snmpget');
     $oid_limit = get_device_oid_limit($device);
@@ -389,7 +389,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 /**
  * @deprecated Please use SnmpQuery instead
  */
-function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+function snmpwalk_cache_oid($device, $oid, array $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs'): array
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
@@ -445,7 +445,7 @@ function snmpwalk_cache_oid_num($device, $oid, $array = [], $mib = null, $mibdir
 /**
  * @deprecated Please use SnmpQuery instead
  */
-function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+function snmpwalk_cache_multi_oid(array $device, $oid, array $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
     global $cache;
 
@@ -550,7 +550,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 /**
  * @deprecated Please use SnmpQuery instead
  */
-function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
+function snmpwalk_cache_twopart_oid($device, $oid, array $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs'): array
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
     $data = trim(external_exec($cmd));

@@ -13,7 +13,7 @@ class ArrisDsr4410md extends OS implements
     WirelessSnrDiscovery,
     WirelessQualityDiscovery
 {
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.1166.1.621.11.9.0';
 
@@ -30,7 +30,7 @@ class ArrisDsr4410md extends OS implements
         ];
     }
 
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oid = '.1.3.6.1.4.1.1166.1.621.16.6.8.0';
 
@@ -47,7 +47,7 @@ class ArrisDsr4410md extends OS implements
         ];
     }
 
-    public function discoverWirelessQuality()
+    public function discoverWirelessQuality(): array
     {
         $oid = '.1.3.6.1.4.1.1166.1.621.11.8.0';
 

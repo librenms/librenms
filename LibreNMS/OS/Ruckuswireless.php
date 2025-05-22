@@ -11,7 +11,10 @@ class Ruckuswireless extends OS implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
-    public function discoverWirelessClients()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessClients(): array
     {
         // Find Per SSID Client Count
         $sensors = [];

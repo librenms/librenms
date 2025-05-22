@@ -49,7 +49,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $sensors = [];
 
@@ -75,7 +75,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $sensors = [];
 
@@ -103,7 +103,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessRsrq()
+    public function discoverWirelessRsrq(): array
     {
         $sensors = [];
 
@@ -131,7 +131,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessRsrp()
+    public function discoverWirelessRsrp(): array
     {
         $sensors = [];
 
@@ -157,7 +157,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessChannel()
+    public function discoverWirelessChannel(): array
     {
         $sensors = [];
 
@@ -183,7 +183,7 @@ trait CiscoCellular
      *
      * @return array
      */
-    public function discoverWirelessCell()
+    public function discoverWirelessCell(): array
     {
         $sensors = [];
 

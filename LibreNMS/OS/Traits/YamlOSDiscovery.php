@@ -130,7 +130,7 @@ trait YamlOSDiscovery
         return null;
     }
 
-    private function parseRegex($regexes, $subject)
+    private function parseRegex($regexes, $subject): void
     {
         $device = $this->getDevice();
 

@@ -97,7 +97,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         ]);
     }
 
-    public function migrate(Request $request)
+    public function migrate(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $response = new StreamedResponse(function () {
             try {

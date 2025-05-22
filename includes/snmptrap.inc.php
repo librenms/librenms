@@ -2,7 +2,7 @@
 
 use LibreNMS\Config;
 
-function process_trap($device, $entry)
+function process_trap($device, $entry): void
 {
     $oid = trim(strstr($entry[3], ' '));
     $oid = str_replace('::', '', strstr($oid, '::'));

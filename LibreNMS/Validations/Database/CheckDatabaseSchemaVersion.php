@@ -34,8 +34,7 @@ use LibreNMS\ValidationResult;
 
 class CheckDatabaseSchemaVersion implements Validation, ValidationFixer
 {
-    /** @var bool|null */
-    private static $current = null;
+    private static ?bool $current = null;
 
     /**
      * @inheritDoc

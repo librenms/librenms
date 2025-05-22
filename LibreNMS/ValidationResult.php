@@ -35,18 +35,12 @@ class ValidationResult
     public const SUCCESS = 2;
     public const INFO = 3;
 
-    /** @var string */
-    private $message;
-    /** @var int */
-    private $status;
-    /** @var string */
-    private $list_description = '';
-    /** @var array */
-    private $list;
-    /** @var string|null */
-    private $fix;
-    /** @var string|null */
-    private $fixer;
+    private string $message;
+    private int $status;
+    private string $list_description = '';
+    private ?array $list = null;
+    private ?string $fix;
+    private ?string $fixer = null;
 
     /**
      * ValidationResult constructor.

@@ -24,7 +24,7 @@ $img['his'] .= '" style="margin: 15px 5px 25px 5px;" />';
 
 <?php
 
-function showDetails($bill_id, $imgtype, $bill_hist_id)
+function showDetails($bill_id, $imgtype, $bill_hist_id): string
 {
     $res = '<img src="graph.php?id=' . $bill_id;
 

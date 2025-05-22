@@ -39,7 +39,7 @@ class CienaCesPortNotificationTrapTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testCienaCesPortDownNotification()
+    public function testCienaCesPortDownNotification(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */
@@ -69,7 +69,7 @@ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortDesc $port->ifDescr",
         $this->assertEquals($port->ifOperStatus, 'down');
     }
 
-    public function testCienaCesPortUpNotification()
+    public function testCienaCesPortUpNotification(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */

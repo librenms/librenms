@@ -56,7 +56,7 @@ class Programs extends BaseValidation
         }
     }
 
-    public function checkFping6(Validator $validator, $fping)
+    public function checkFping6(Validator $validator, $fping): void
     {
         $fping6 = $this->findExecutable('fping6');
         $fping6 = (! is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
@@ -85,7 +85,7 @@ class Programs extends BaseValidation
         }
     }
 
-    public function extraFpingChecks(Validator $validator, $cmd)
+    public function extraFpingChecks(Validator $validator, $cmd): void
     {
         $validator->execAsUser("$cmd 127.0.0.1 2>&1", $output, $return);
         $output = implode(' ', $output);
@@ -97,7 +97,7 @@ class Programs extends BaseValidation
         $this->failFping($validator, $cmd, $output);
     }
 
-    private function failFping($validator, $cmd, $output)
+    private function failFping(\LibreNMS\Validator $validator, $cmd, string $output): void
     {
         $validator->info('fping FAILURES can be ignored if running LibreNMS in a jail without ::1. You may want to test it manually: fping ::1');
         $validator->fail(

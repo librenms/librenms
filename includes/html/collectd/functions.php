@@ -52,7 +52,7 @@ function read_var($name, &$array, $default = null)
  * Alphabetically compare host names, comparing label
  * from tld to node name
  */
-function collectd_compare_host($a, $b)
+function collectd_compare_host($a, $b): int
 {
     $ea = explode('.', $a);
     $eb = explode('.', $b);
@@ -72,7 +72,7 @@ function collectd_compare_host($a, $b)
  *
  * @return array Sorted list of hosts (sorted by label from rigth to left)
  */
-function collectd_list_hosts()
+function collectd_list_hosts(): array
 {
     $hosts = [];
     foreach (Config::get('datadirs') as $datadir) {
@@ -99,7 +99,7 @@ function collectd_list_hosts()
  * @param  string  $arg_host  Name of host for which to return plugins
  * @return array Sorted list of plugins (sorted alphabetically)
  */
-function collectd_list_plugins($arg_host)
+function collectd_list_plugins($arg_host): array
 {
     $plugins = [];
     foreach (Config::get('datadirs') as $datadir) {
@@ -131,7 +131,7 @@ function collectd_list_plugins($arg_host)
  * @param  string  $arg_plugin  Name of plugin
  * @return array Sorted list of plugin instances (sorted alphabetically)
  */
-function collectd_list_pinsts($arg_host, $arg_plugin)
+function collectd_list_pinsts($arg_host, $arg_plugin): array
 {
     $pinsts = [];
     foreach (Config::get('datadirs') as $datadir) {
@@ -173,7 +173,7 @@ function collectd_list_pinsts($arg_host, $arg_plugin)
  *
  * @return array Sorted list of types (sorted alphabetically)
  */
-function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
+function collectd_list_types($arg_host, $arg_plugin, $arg_pinst): array
 {
     $types = [];
     $my_plugin = $arg_plugin . (strlen($arg_pinst) ? '-' . $arg_pinst : '');
@@ -217,7 +217,7 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
  *
  * @return array Sorted list of type instances (sorted alphabetically)
  */
-function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
+function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type): array
 {
     $tinsts = [];
     $my_plugin = $arg_plugin . (strlen($arg_pinst) ? '-' . $arg_pinst : '');
@@ -267,7 +267,7 @@ function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
  * @param  string  $tinst  Type instance
  * @return string Identifier that collectd's FLUSH command understands
  */
-function collectd_identifier($host, $plugin, $type, $pinst, $tinst)
+function collectd_identifier($host, $plugin, $type, $pinst, $tinst): string
 {
     $rrd_realpath = null;
     $orig_identifier = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, strlen($pinst) ? '-' : '', $pinst, $type, strlen($tinst) ? '-' : '', $tinst);
@@ -302,7 +302,7 @@ function collectd_identifier($host, $plugin, $type, $pinst, $tinst)
  * @param  string  $identifier
  * @return bool
  */
-function collectd_flush($identifier)
+function collectd_flush($identifier): bool
 {
     if (! Config::get('collectd_sock')) {
         return false;
@@ -370,7 +370,7 @@ function rrd_strip_quotes($str)
  * @param  string  $file  Name of RRD file to analyse
  * @return array Array describing the RRD file
  */
-function _rrd_info($file)
+function _rrd_info($file): array
 {
     $info = ['filename' => $file];
 
@@ -429,7 +429,7 @@ function _rrd_info($file)
     return $info;
 }//end _rrd_info()
 
-function rrd_get_color($code, $line = true)
+function rrd_get_color($code, $line = true): mixed
 {
     $name = ($line ? 'f_' : 'h_') . $code;
     if (! Config::has("rrd_colors.$name")) {
@@ -454,7 +454,7 @@ function rrd_get_color($code, $line = true)
  * @param  array  $opts
  * @return string|false Commandline to call RRDGraph in order to generate the final graph* @internal param $
  */
-function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, $opts = [])
+function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, array $opts = [])
 {
     $timespan_def = null;
     $timespans = Config::get('timespan');

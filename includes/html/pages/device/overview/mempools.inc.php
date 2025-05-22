@@ -10,7 +10,7 @@ $graph_type = 'mempool_usage';
 
 $mempools = \DeviceCache::getPrimary()->mempools;
 
-function print_mempool_percent_bar($mempool)
+function print_mempool_percent_bar($mempool): void
 {
 }
 

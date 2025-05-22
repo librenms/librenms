@@ -63,7 +63,7 @@ function parse_modules($type, $options)
     return $override;
 }
 
-function logfile($string)
+function logfile($string): void
 {
     $file = Config::get('log_file');
     $fd = fopen($file, 'a');
@@ -78,7 +78,7 @@ function logfile($string)
     fclose($fd);
 }
 
-function renamehost($id, $new, $source = 'console')
+function renamehost($id, $new, $source = 'console'): string
 {
     $host = gethostbyid($id);
     $new_rrd_dir = Rrd::dirFromHost($new);
@@ -101,7 +101,7 @@ function renamehost($id, $new, $source = 'console')
     return "Renaming of $host failed\n";
 }
 
-function device_discovery_trigger($id)
+function device_discovery_trigger($id): array
 {
     if (App::runningInConsole() === false) {
         ignore_user_abort(true);
@@ -118,7 +118,7 @@ function device_discovery_trigger($id)
     return ['status' => $update, 'message' => $message];
 }
 
-function delete_device($id)
+function delete_device($id): string
 {
     $device = DeviceCache::get($id);
     if (! $device->exists) {
@@ -175,7 +175,7 @@ function match_network($nets, $ip, $first = false)
 }
 
 // FIXME port to LibreNMS\Util\IPv6 class
-function snmp2ipv6($ipv6_snmp)
+function snmp2ipv6($ipv6_snmp): string
 {
     // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
@@ -192,7 +192,7 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function hex2str($hex)
+function hex2str($hex): string
 {
     $string = '';
 
@@ -217,7 +217,7 @@ function snmp_hexstring($hex)
  * @param  array  $device
  * @return bool
  */
-function is_port_valid($port, $device)
+function is_port_valid($port, array $device): bool
 {
     // check empty values first
     if (empty($port['ifDescr'])) {
@@ -305,7 +305,7 @@ function is_port_valid($port, $device)
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing_and_trim(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device): void
 {
     $port['ifDescr'] = isset($port['ifDescr']) ? trim($port['ifDescr']) : null;
     $port['ifAlias'] = isset($port['ifAlias']) ? trim($port['ifAlias']) : null;
@@ -349,7 +349,7 @@ function convert_delay($delay)
     return $delay === '' ? 0 : 300;
 }
 
-function normalize_snmp_ip_address($data)
+function normalize_snmp_ip_address($data): ?string
 {
     // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
     // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
@@ -388,7 +388,7 @@ function host_exists(string $hostname, ?string $sysName = null): bool
  * @return string ip
  *
  **/
-function dnslookup($device, $type = false, $return = false)
+function dnslookup(array $device, $type = false, $return = false)
 {
     if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
         return false;
@@ -423,7 +423,7 @@ function dnslookup($device, $type = false, $return = false)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(function (array $state) {
         return new StateTranslation([
             'state_descr' => $state['descr'],
             'state_draw_graph' => $state['graph'],
@@ -433,17 +433,17 @@ function create_state_index($state_name, $states = []): void
     }, $states));
 }
 
-function delta_to_bits($delta, $period)
+function delta_to_bits($delta, $period): float
 {
     return round($delta * 8 / $period, 2);
 }
 
-function report_this($message)
+function report_this($message): string
 {
     return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
 }//end report_this()
 
-function hytera_h2f($number, $nd)
+function hytera_h2f($number, $nd): string
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
         $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
@@ -505,7 +505,10 @@ function hytera_h2f($number, $nd)
     return number_format($floatfinal, $nd, '.', '');
 }
 
-function q_bridge_bits2indices($hex_data)
+/**
+ * @return list<int<1, max>>
+ */
+function q_bridge_bits2indices($hex_data): array
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
@@ -535,7 +538,7 @@ function q_bridge_bits2indices($hex_data)
 /**
  * Function to generate PeeringDB Cache
  */
-function cache_peeringdb()
+function cache_peeringdb(): void
 {
     if (Config::get('peeringdb.enabled') === true) {
         $peeringdb_url = 'https://peeringdb.com/api';
@@ -657,7 +660,7 @@ function get_device_oid_limit($device)
  * @param  string  $sql
  * @return int exit code
  */
-function lock_and_purge($table, $sql)
+function lock_and_purge($table, $sql): int
 {
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
@@ -686,7 +689,7 @@ function lock_and_purge($table, $sql)
  * @param  string  $msg
  * @return int exit code
  */
-function lock_and_purge_query($table, $sql, $msg)
+function lock_and_purge_query($table, $sql, $msg): int
 {
     $purge_name = $table . '_purge';
 
@@ -715,7 +718,7 @@ function lock_and_purge_query($table, $sql, $msg)
  * @param  array  $device
  * @return bool
  */
-function is_disk_valid($disk, $device)
+function is_disk_valid(array $disk, array $device): bool
 {
     foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
         if (preg_match($bir . 'i', $disk['diskIODevice'])) {

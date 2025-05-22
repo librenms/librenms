@@ -41,21 +41,21 @@ use LibreNMS\Exceptions\InvalidModuleException;
 class ModuleTestHelper
 {
     private $quiet = false;
-    private $modules;
+    private array $modules;
     private $variant;
-    private $snmprec_file;
-    private $json_file;
-    private $snmprec_dir;
-    private $json_dir;
+    private string $snmprec_file;
+    private string $json_file;
+    private string $snmprec_dir;
+    private string $json_dir;
     private $file_name;
     private $discovery_module_output = [];
     private $poller_module_output = [];
-    private $discovery_output;
-    private $poller_output;
+    private string|bool|null $discovery_output = null;
+    private string|bool|null $poller_output = null;
 
     // Definitions
     // ignore these when dumping all modules
-    private $exclude_from_all = ['arp-table', 'availability', 'fdb-table'];
+    private array $exclude_from_all = ['arp-table', 'availability', 'fdb-table'];
 
     /**
      * ModuleTester constructor.
@@ -91,7 +91,7 @@ class ModuleTestHelper
         Config::set('prometheus.enable', false);
     }
 
-    private static function compareOid($a, $b)
+    private static function compareOid($a, $b): int
     {
         $a_oid = explode('.', $a);
         $b_oid = explode('.', $b);
@@ -112,17 +112,17 @@ class ModuleTestHelper
         return 0;
     }
 
-    public function setQuiet($quiet = true)
+    public function setQuiet($quiet = true): void
     {
         $this->quiet = $quiet;
     }
 
-    public function setSnmprecSavePath($path)
+    public function setSnmprecSavePath($path): void
     {
         $this->snmprec_file = $path;
     }
 
-    public function setJsonSavePath($path)
+    public function setJsonSavePath($path): void
     {
         $this->json_file = $path;
     }
@@ -165,7 +165,10 @@ class ModuleTestHelper
         }
     }
 
-    private function collectOids($device_id)
+    /**
+     * @return non-empty-array<string, non-empty-array<non-falsy-string, array{oid: string, mib: (non-empty-string | null), mibdir?: non-empty-string, method: ('get' | 'getnext' | 'walk')}>>
+     */
+    private function collectOids(int $device_id): array
     {
         global $device;
 
@@ -240,7 +243,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], ?string $os_filter = null)
+    public static function findOsWithData($modules = [], ?string $os_filter = null): array
     {
         $os_list = [];
 
@@ -338,7 +341,7 @@ class ModuleTestHelper
         return $full_list;
     }
 
-    private function parseArgs($type)
+    private function parseArgs(string $type)
     {
         if (empty($this->modules)) {
             return false;
@@ -347,7 +350,7 @@ class ModuleTestHelper
         return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
     }
 
-    private function qPrint($var)
+    private function qPrint(string $var): void
     {
         if ($this->quiet) {
             return;
@@ -420,7 +423,7 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function getSnmprecType($text)
+    private function getSnmprecType(string $text): string
     {
         $snmpTypes = [
             'STRING' => '4',
@@ -489,7 +492,10 @@ class ModuleTestHelper
         return $output;
     }
 
-    private function indexSnmprec(array $snmprec_data)
+    /**
+     * @return mixed[]
+     */
+    private function indexSnmprec(array $snmprec_data): array
     {
         $result = [];
 
@@ -503,7 +509,7 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function cleanSnmprecData(&$data)
+    private function cleanSnmprecData(array &$data): void
     {
         $private_oid = [
             '1.3.6.1.2.1.1.6.0',
@@ -689,7 +695,7 @@ class ModuleTestHelper
      * @param  string  $type  poller|disco identified by "#### Load disco module" string
      * @return array
      */
-    private function extractModuleOutput($output, $type)
+    private function extractModuleOutput(string|bool $output, string $type): array
     {
         $module_output = [];
         $module_start = "#### Load $type module ";
@@ -722,7 +728,7 @@ class ModuleTestHelper
      * @param  string  $type  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $modules, $type)
+    public function dumpDb($device_id, $modules, string $type): array
     {
         $data = [];
 
@@ -746,7 +752,7 @@ class ModuleTestHelper
      * @param  array|\Illuminate\Support\Collection|\stdClass  $data
      * @return array
      */
-    private function dumpToArray($data): array
+    private function dumpToArray(array $data): array
     {
         $output = [];
 
@@ -801,7 +807,7 @@ class ModuleTestHelper
         return $this->poller_output;
     }
 
-    public function getTestData()
+    public function getTestData(): mixed
     {
         return json_decode(file_get_contents($this->json_file), true);
     }

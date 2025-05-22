@@ -48,12 +48,12 @@ class Config extends BaseModel
 
     // ---- Accessors/Mutators ----
 
-    public function getConfigValueAttribute($value)
+    public function getConfigValueAttribute($value): mixed
     {
         return json_decode($value, true);
     }
 
-    public function setConfigValueAttribute($value)
+    public function setConfigValueAttribute($value): void
     {
         $this->attributes['config_value'] = json_encode($value, JSON_UNESCAPED_SLASHES);
     }

@@ -52,7 +52,7 @@ class TwoFactor
     /**
      * Base32 Decoding dictionary
      */
-    private static $base32 = [
+    private static array $base32 = [
         'A' => 0,
         'B' => 1,
         'C' => 2,
@@ -90,14 +90,14 @@ class TwoFactor
     /**
      * Base32 Encoding dictionary
      */
-    private static $base32_enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    private static string $base32_enc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
     /**
      * Generate Secret Key
      *
      * @return string
      */
-    public static function genKey()
+    public static function genKey(): string
     {
         // RFC 4226 recommends 160bits Secret Keys, that's 20 Bytes for the lazy ones.
         $crypto = false;
@@ -169,7 +169,7 @@ class TwoFactor
      * @param  int|bool  $counter  Optional Counter, Defaults to Timestamp
      * @return string
      */
-    private static function oathHOTP($key, $counter = false)
+    private static function oathHOTP($key, $counter = false): string
     {
         if ($counter === false) {
             $counter = floor(microtime(true) / self::KEY_INTERVAL);
@@ -206,7 +206,7 @@ class TwoFactor
      * @param  bool  $counter  if type is counter (false for time based)
      * @return string
      */
-    public static function generateUri($username, $key, $counter = false)
+    public static function generateUri($username, $key, $counter = false): string
     {
         $title = 'LibreNMS:' . urlencode($username);
 

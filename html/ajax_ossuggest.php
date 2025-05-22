@@ -34,7 +34,7 @@ Debug::set($_REQUEST['debug']);
  * @param  array  $obj  Object to sort
  * @return array
  */
-function levsortos($base, $obj, $keys)
+function levsortos($base, $obj, $keys): array
 {
     $ret = [];
     foreach ($obj as $elem) {

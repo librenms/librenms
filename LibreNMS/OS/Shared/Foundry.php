@@ -42,7 +42,7 @@ class Foundry extends OS implements ProcessorDiscovery
     {
         $module_descriptions = $this->getCacheByIndex('snAgentConfigModuleDescription', 'FOUNDRY-SN-AGENT-MIB');
 
-        return \SnmpQuery::walk('FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilTable')->mapTable(function ($entry, $slot, $cpu, $interval) use ($module_descriptions) {
+        return \SnmpQuery::walk('FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilTable')->mapTable(function (array $entry, $slot, $cpu, $interval) use ($module_descriptions) {
             // only discover 5min
             if ($interval == 300) {
                 $module_description = '';

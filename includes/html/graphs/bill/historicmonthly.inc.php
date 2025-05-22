@@ -56,7 +56,7 @@ $graph->xaxis->SetTickLabels($graph_data['ticklabels']);
 $graph->xgrid->Show(true, true);
 $graph->xgrid->SetColor('#e0e0e0', '#efefef');
 
-function YCallback($value)
+function YCallback($value): string
 {
     return Number::formatBase($value, \LibreNMS\Config::get('billing.base'), 1, 0);
 }

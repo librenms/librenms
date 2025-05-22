@@ -30,7 +30,7 @@ use App\Models\PortGroup;
 
 class PortGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['name'];
     }
@@ -43,7 +43,7 @@ class PortGroupController extends SelectController
     /**
      * @param  PortGroup  $port_group
      */
-    public function formatItem($port_group)
+    public function formatItem($port_group): array
     {
         return [
             'id' => $port_group->id,

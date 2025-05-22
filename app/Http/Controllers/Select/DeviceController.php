@@ -32,7 +32,7 @@ class DeviceController extends SelectController
 {
     private $id = 'device_id';
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'access' => 'nullable|in:normal,inverted',
@@ -41,7 +41,7 @@ class DeviceController extends SelectController
         ];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['hostname', 'sysName'];
     }
@@ -68,7 +68,7 @@ class DeviceController extends SelectController
             ->orderBy('hostname');
     }
 
-    public function formatItem($device)
+    public function formatItem($device): array
     {
         /** @var Device $device */
         return [

@@ -57,7 +57,7 @@ class IPv6 extends IP
      * @return string Empty if not valid.
      */
     // Fuction is from https://php.net/manual/en/function.inet-ntop.php
-    public static function ntop($ip)
+    public static function ntop($ip): string|false
     {
         $len = strlen($ip);
         if ($len == 16) {
@@ -74,7 +74,7 @@ class IPv6 extends IP
      * @param  bool  $exclude_reserved  Exclude reserved IP ranges.
      * @return bool
      */
-    public static function isValid($ipv6, $exclude_reserved = false)
+    public static function isValid($ipv6, $exclude_reserved = false): bool
     {
         $filter = FILTER_FLAG_IPV6;
         if ($exclude_reserved) {
@@ -87,7 +87,7 @@ class IPv6 extends IP
     /**
      * @return bool
      */
-    public function isLinkLocal()
+    public function isLinkLocal(): bool
     {
         return substr($this->uncompressed(), 0, 20) == 'fe80:0000:0000:0000:';
     }
@@ -134,7 +134,7 @@ class IPv6 extends IP
      * @param  string  $network  should be in cidr format.
      * @return mixed
      */
-    public function inNetwork($network)
+    public function inNetwork($network): bool
     {
         [$net, $cidr] = $this->extractCidr($network);
 
@@ -210,7 +210,7 @@ class IPv6 extends IP
      *
      * @return string
      */
-    public function toSnmpIndex()
+    public function toSnmpIndex(): string
     {
         $ipv6_split = str_split(str_replace(':', '', $this->uncompressed()), 2);
 

@@ -42,12 +42,10 @@ use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
 {
-    private $disabled = false;
+    private bool $disabled = false;
 
-    /** @var Proc */
-    private $sync_process;
-    /** @var Proc */
-    private $async_process;
+    private ?\LibreNMS\Proc $sync_process = null;
+    private ?\LibreNMS\Proc $async_process = null;
     /** @var string */
     private $rrd_dir;
     /** @var string */
@@ -68,12 +66,12 @@ class Rrd extends BaseDatastore
         $this->init();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'RRD';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): mixed
     {
         return Config::get('rrd.enable', true);
     }
@@ -130,12 +128,12 @@ class Rrd extends BaseDatastore
         }
     }
 
-    public function isSyncRunning()
+    public function isSyncRunning(): bool
     {
         return isset($this->sync_process) && $this->sync_process->isRunning();
     }
 
-    public function isAsyncRunning()
+    public function isAsyncRunning(): bool
     {
         return isset($this->async_process) && $this->async_process->isRunning();
     }
@@ -144,7 +142,7 @@ class Rrd extends BaseDatastore
      * Close all open rrdtool processes.
      * This should be done before exiting
      */
-    public function close()
+    public function close(): void
     {
         if ($this->isSyncRunning()) {
             $this->sync_process->close('quit');
@@ -168,7 +166,7 @@ class Rrd extends BaseDatastore
      * @param  array  $tags  tags to pass additional info to rrdtool
      * @param  array  $fields  data values to update
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function put($device, $measurement, $tags, $fields): void
     {
         $rrd_name = isset($tags['rrd_name']) ? $tags['rrd_name'] : $measurement;
         $step = isset($tags['rrd_step']) ? $tags['rrd_step'] : $this->step;
@@ -264,7 +262,7 @@ class Rrd extends BaseDatastore
      * @param  int  $max  the new max value
      * @return bool
      */
-    public function tune($type, $filename, $max)
+    public function tune($type, $filename, $max): bool
     {
         $fields = [];
         if ($type === 'port') {
@@ -308,7 +306,7 @@ class Rrd extends BaseDatastore
      * @param  string  $vmport
      * @return string full path to the rrd.
      */
-    public function proxmoxName($pmxcluster, $vmid, $vmport)
+    public function proxmoxName($pmxcluster, $vmid, $vmport): string
     {
         $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
         // this is not needed for remote rrdcached
@@ -326,7 +324,7 @@ class Rrd extends BaseDatastore
      * @param  string  $suffix
      * @return string
      */
-    public function portName($port_id, $suffix = null)
+    public function portName($port_id, $suffix = null): string
     {
         return "port-id$port_id" . (empty($suffix) ? '' : '-' . $suffix);
     }
@@ -339,7 +337,7 @@ class Rrd extends BaseDatastore
      * @param  string|array  $newname  RRD name array as used with rrd_name()
      * @return bool indicating rename success or failure
      */
-    public function renameFile($device, $oldname, $newname)
+    public function renameFile(array $device, $oldname, $newname): bool
     {
         $oldrrd = self::name($device['hostname'], $oldname);
         $newrrd = self::name($device['hostname'], $newname);
@@ -367,7 +365,7 @@ class Rrd extends BaseDatastore
      * @param  string  $extension  File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = '.rrd')
+    public function name($host, $extra, $extension = '.rrd'): string
     {
         $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
@@ -380,7 +378,7 @@ class Rrd extends BaseDatastore
      * @param  string  $host  Host name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host)
+    public function dirFromHost($host): string
     {
         $host = self::safeName(trim($host, '[]'));
 
@@ -399,7 +397,7 @@ class Rrd extends BaseDatastore
      *
      * @throws \Exception thrown when the rrdtool process(s) cannot be started
      */
-    private function command($command, $filename, $options)
+    private function command(string $command, $filename, string $options)
     {
         $stat = Measurement::start($this->coalesceStatisticType($command));
         $output = null;
@@ -495,7 +493,7 @@ class Rrd extends BaseDatastore
      * @param  array  $device  device for which we get the rrd's
      * @return array array of rrd files for this host
      */
-    public function getRrdFiles($device)
+    public function getRrdFiles(array $device)
     {
         if ($this->rrdcached) {
             $filename = sprintf('/%s', self::safeName($device['hostname']));
@@ -524,7 +522,7 @@ class Rrd extends BaseDatastore
      * @param  string  $category  which category of graphs are searched
      * @return array array of rrd files for this host
      */
-    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
+    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null): array
     {
         $entries = [];
         $separator = '-';
@@ -559,7 +557,7 @@ class Rrd extends BaseDatastore
      * @param  string  $filename  full path to the rrd file
      * @return bool whether or not the passed rrd file exists
      */
-    public function checkRrdExists($filename)
+    public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $check_output = implode($this->command('last', $filename, ''));
@@ -577,7 +575,7 @@ class Rrd extends BaseDatastore
      * @param  string  $hostname  rrd subfolder (hostname)
      * @param  string  $prefix  start of rrd file name all files matching will be deleted
      */
-    public function purge($hostname, $prefix)
+    public function purge($hostname, $prefix): void
     {
         if (empty($hostname)) {
             Log::error("Could not purge rrd $prefix, empty hostname");

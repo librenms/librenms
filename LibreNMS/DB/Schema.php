@@ -35,13 +35,13 @@ use Symfony\Component\Yaml\Yaml;
 
 class Schema
 {
-    private static $relationship_blacklist = [
+    private static array $relationship_blacklist = [
         'devices_perms',
         'bill_perms',
         'ports_perms',
     ];
 
-    private $relationships;
+    private ?array $relationships = null;
     private $schema;
 
     /**
@@ -95,7 +95,7 @@ class Schema
      * @param  string  $table
      * @return string if a single column just the name is returned, otherwise the first column listed will be returned
      */
-    public function getPrimaryKey($table)
+    public function getPrimaryKey($table): mixed
     {
         $schema = $this->getSchema();
         $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
@@ -129,7 +129,7 @@ class Schema
      * @param  string  $table
      * @return array
      */
-    public function getColumns($table)
+    public function getColumns($table): array
     {
         $schema = $this->getSchema();
 
@@ -255,7 +255,7 @@ class Schema
         if (! isset($this->relationships)) {
             $schema = $this->getSchema();
 
-            $relations = array_column(array_map(function ($table, $data) {
+            $relations = array_column(array_map(function ($table, array $data) {
                 $columns = array_column($data['Columns'], 'Field');
 
                 $related = array_filter(array_map(function ($column) use ($table) {
@@ -280,7 +280,7 @@ class Schema
         return $this->relationships;
     }
 
-    public function getTableFromKey($key)
+    public function getTableFromKey($key): ?string
     {
         if (Str::endsWith($key, '_id')) {
             // hardcoded
@@ -307,7 +307,7 @@ class Schema
         return null;
     }
 
-    public function columnExists($table, $column)
+    public function columnExists($table, $column): bool
     {
         return in_array($column, $this->getColumns($table));
     }
@@ -323,7 +323,7 @@ class Schema
      * @param  string  $connection  use a specific connection
      * @return array
      */
-    public static function dump($connection = null)
+    public static function dump($connection = null): array
     {
         $output = [];
         $db_name = DB::connection($connection)->getDatabaseName();

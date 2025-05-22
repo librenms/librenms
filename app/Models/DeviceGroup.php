@@ -36,7 +36,7 @@ class DeviceGroup extends BaseModel
     public $timestamps = false;
     protected $fillable = ['name', 'desc', 'type'];
 
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 
@@ -72,7 +72,7 @@ class DeviceGroup extends BaseModel
     /**
      * Update devices included in this group (dynamic only)
      */
-    public function updateDevices()
+    public function updateDevices(): void
     {
         if ($this->type == 'dynamic') {
             $this->devices()->sync(QueryBuilderFluentParser::fromJson($this->rules)->toQuery()

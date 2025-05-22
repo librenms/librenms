@@ -38,7 +38,10 @@ use App\Models\Eventlog;
 //SNMP input example STRING: '1/0/1-2,1/0/4-6,1/0/25,LAG1-3,LAG5'
 
 if (! function_exists('jetstreamExpand')) {
-    function jetstreamExpand($var)
+    /**
+     * @return list<\non-falsy-string>
+     */
+    function jetstreamExpand($var): array
     {
         $result = [];
 

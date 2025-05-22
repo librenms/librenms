@@ -50,7 +50,7 @@ class AlertSchedule extends Model
     protected $fillable = ['title', 'notes', 'recurring'];
 
     private $timezone;
-    private $days = [
+    private array $days = [
         'Mo' => 1,
         'Tu' => 2,
         'We' => 3,
@@ -73,7 +73,7 @@ class AlertSchedule extends Model
         return explode(',', str_replace(array_values($this->days), array_keys($this->days), $this->attributes['recurring_day']));
     }
 
-    public function setRecurringDayAttribute($days)
+    public function setRecurringDayAttribute($days): void
     {
         $this->attributes['recurring_day'] = is_array($days) ? implode(',', $days) : $days;
     }
@@ -83,7 +83,7 @@ class AlertSchedule extends Model
         return Date::parse($this->attributes['start'], 'UTC')->tz($this->timezone);
     }
 
-    public function setStartAttribute($start)
+    public function setStartAttribute($start): void
     {
         $this->attributes['start'] = $this->fromDateTime(Date::parse($start)->tz('UTC'));
     }
@@ -93,7 +93,7 @@ class AlertSchedule extends Model
         return Date::parse($this->attributes['end'], 'UTC')->tz($this->timezone);
     }
 
-    public function setEndAttribute($end)
+    public function setEndAttribute($end): void
     {
         $this->attributes['end'] = $this->fromDateTime(Date::parse($end)->tz('UTC'));
     }
@@ -120,22 +120,22 @@ class AlertSchedule extends Model
         return $this->end->toTimeString('minute');
     }
 
-    public function setStartRecurringDtAttribute($date)
+    public function setStartRecurringDtAttribute($date): void
     {
         $this->start = $this->start->setDateFrom(Date::parse($date, $this->timezone));
     }
 
-    public function setStartRecurringHrAttribute($time)
+    public function setStartRecurringHrAttribute($time): void
     {
         $this->start = $this->start->setTimeFrom(Date::parse($time, $this->timezone));
     }
 
-    public function setEndRecurringDtAttribute($date)
+    public function setEndRecurringDtAttribute($date): void
     {
         $this->end = $this->end->setDateFrom(Date::parse($date ?: '9000-09-09', $this->timezone));
     }
 
-    public function setEndRecurringHrAttribute($time)
+    public function setEndRecurringHrAttribute($time): void
     {
         $this->end = $this->end->setTimeFrom(Date::parse($time, $this->timezone));
     }
@@ -143,7 +143,7 @@ class AlertSchedule extends Model
     /**
      * @return int \LibreNMS\Enum\AlertScheduleStatus
      */
-    public function getStatusAttribute()
+    public function getStatusAttribute(): int
     {
         $now = Carbon::now();
 
@@ -232,7 +232,7 @@ class AlertSchedule extends Model
         return $this->morphedByMany(Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return ($this->recurring ?
             'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ' :

@@ -30,7 +30,7 @@ use App\Models\EntPhysical;
 
 class InventoryController extends SelectController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:name,model,descr,class',
@@ -38,12 +38,12 @@ class InventoryController extends SelectController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return ['device_id'];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return [$this->fieldToColumn($request->get('field'))];
     }

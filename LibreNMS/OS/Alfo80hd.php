@@ -15,7 +15,7 @@ class Alfo80hd extends OS implements
     WirelessPowerDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.12.1';
 
@@ -24,7 +24,7 @@ class Alfo80hd extends OS implements
         ];
     }
 
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.2.1';
 
@@ -33,7 +33,7 @@ class Alfo80hd extends OS implements
         ];
     }
 
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $oid = '.1.3.6.1.4.1.3373.1103.39.2.1.13.1';
 
@@ -42,7 +42,7 @@ class Alfo80hd extends OS implements
         ];
     }
 
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $oid = '.1.3.6.1.4.1.3373.1103.15.4.1.';
 

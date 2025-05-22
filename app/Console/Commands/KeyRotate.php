@@ -20,14 +20,8 @@ class KeyRotate extends LnmsCommand
      */
     protected $signature = 'key:rotate';
 
-    /**
-     * @var Encrypter
-     */
-    private $decrypt;
-    /**
-     * @var Encrypter
-     */
-    private $encrypt;
+    private ?\Illuminate\Encryption\Encrypter $decrypt = null;
+    private ?\Illuminate\Encryption\Encrypter $encrypt = null;
 
     /**
      * Create a new command instance.

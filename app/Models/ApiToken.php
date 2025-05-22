@@ -63,7 +63,7 @@ class ApiToken extends BaseModel
         return User::find(self::idFromToken($token));
     }
 
-    public static function generateToken(User $user, $description = '')
+    public static function generateToken(User $user, $description = ''): static
     {
         $token = new static;
         $token->user_id = $user->user_id;

@@ -44,7 +44,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     protected static $CAN_UPDATE_PASSWORDS = false;
     protected static $AUTH_IS_EXTERNAL = true;
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         if (empty($credentials['username'])) {
             throw new AuthenticationException('\'sso.user_attr\' config setting was not found or was empty');
@@ -111,7 +111,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @return bool
      */
-    public function authSSOProxyTrusted()
+    public function authSSOProxyTrusted(): bool
     {
         // We assume IP is used - if anyone is using a non-ip transport, support will need to be added
         if (Config::get('sso.trusted_proxies')) {
@@ -193,7 +193,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @return int
      */
-    public function authSSOParseGroups()
+    public function authSSOParseGroups(): int
     {
         // Parse a delimited group list
         $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')) ?? '');

@@ -27,7 +27,7 @@ if (is_file('definitions.local.php')) {
     require_once 'definitions.local.php';
 }
 
-function load_graph_definitions($logarithmic = false, $tinylegend = false)
+function load_graph_definitions($logarithmic = false, $tinylegend = false): void
 {
     global $GraphDefs, $MetaGraphDefs;
 
@@ -1665,7 +1665,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
     }
 }
 
-function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1700,7 +1700,7 @@ function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_i
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1735,7 +1735,7 @@ function meta_graph_files_size($host, $plugin, $plugin_instance, $type, $type_in
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1775,7 +1775,7 @@ function meta_graph_cpu($host, $plugin, $plugin_instance, $type, $type_instances
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1813,7 +1813,7 @@ function meta_graph_memory($host, $plugin, $plugin_instance, $type, $type_instan
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1850,7 +1850,7 @@ function meta_graph_vs_threads($host, $plugin, $plugin_instance, $type, $type_in
     return collectd_draw_meta_line($opts, $sources);
 }
 
-function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1887,7 +1887,7 @@ function meta_graph_vs_memory($host, $plugin, $plugin_instance, $type, $type_ins
     return collectd_draw_meta_line($opts, $sources);
 }
 
-function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1916,7 +1916,7 @@ function meta_graph_if_rx_errors($host, $plugin, $plugin_instance, $type, $type_
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1945,7 +1945,7 @@ function meta_graph_mysql_commands($host, $plugin, $plugin_instance, $type, $typ
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -1974,7 +1974,7 @@ function meta_graph_nfs_procedure($host, $plugin, $plugin_instance, $type, $type
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -2012,7 +2012,7 @@ function meta_graph_ps_state($host, $plugin, $plugin_instance, $type, $type_inst
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -2048,7 +2048,7 @@ function meta_graph_swap($host, $plugin, $plugin_instance, $type, $type_instance
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 
@@ -2092,7 +2092,7 @@ function meta_graph_apache_scoreboard($host, $plugin, $plugin_instance, $type, $
     return collectd_draw_meta_stack($opts, $sources);
 }
 
-function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_tcp_connections($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 

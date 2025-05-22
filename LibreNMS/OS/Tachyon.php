@@ -43,8 +43,9 @@ class Tachyon extends OS implements
 {
     /**
      * Discover wireless clients.
+     * @return list<\LibreNMS\Device\WirelessSensor>
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
         $oid = '.1.3.6.1.4.1.57344.1.2.5.0';
@@ -66,8 +67,9 @@ class Tachyon extends OS implements
 
     /**
      * Discover wireless frequency.
+     * @return list<\LibreNMS\Device\WirelessSensor>
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
@@ -97,7 +99,7 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
@@ -127,7 +129,7 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
@@ -158,7 +160,7 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
@@ -203,7 +205,7 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessDistance()
+    public function discoverWirelessDistance(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
@@ -234,7 +236,7 @@ class Tachyon extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');

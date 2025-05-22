@@ -32,7 +32,7 @@ class SyslogTest extends TestCase
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
     // There add an IP for each OS you want to test and use that in the input file
 
-    private function fillLine($line)
+    private function fillLine($line): array
     {
         $entry = [];
         [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim($line));
@@ -40,7 +40,7 @@ class SyslogTest extends TestCase
         return $entry;
     }
 
-    private function createData($line, $resultDelta)
+    private function createData($line, $resultDelta): array
     {
         $entry = $this->fillLine($line);
         $data = [];
@@ -57,7 +57,7 @@ class SyslogTest extends TestCase
      * @param  string  $inputline  The line from the syslog daemon including the ||'s
      * @param  array  $modified  of the modified fields, most likely containging the keys program and msg
      */
-    private function checkSyslog($inputline, $modified)
+    private function checkSyslog(string $inputline, array $modified): void
     {
         $data = $this->createData($inputline, $modified);
         $res = process_syslog($data['input'], 0);

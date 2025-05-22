@@ -70,7 +70,7 @@ class ShowConfigController extends Controller implements DeviceTab
         ];
     }
 
-    private function oxidizedEnabled(Device $device)
+    private function oxidizedEnabled(Device $device): bool
     {
         return Config::get('oxidized.enabled') === true
                 && Config::has('oxidized.url')

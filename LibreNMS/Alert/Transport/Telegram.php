@@ -35,7 +35,7 @@ class Telegram extends Transport
 {
     private  const BASE_URL = 'https://api.telegram.org/bot';
 
-    private $message = [];
+    private array $message = [];
 
     public function deliverAlert(array $alert_data): bool
     {
@@ -110,7 +110,7 @@ class Telegram extends Transport
     {
         $regex = '#<img class="librenms-graph" src="(.*?)"\s*/>#';
 
-        $this->message['text'] = preg_replace_callback($regex, function ($match) {
+        $this->message['text'] = preg_replace_callback($regex, function (array $match) {
             $this->message['images'][] = Graph::getImage($match[1]);
 
             return '';

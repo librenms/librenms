@@ -33,8 +33,7 @@ class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    /** @var string */
-    private $hostName = 'testHost';
+    private string $hostName = 'testHost';
 
     public function testCLIsnmpV1(): void
     {

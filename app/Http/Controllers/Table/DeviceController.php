@@ -39,9 +39,9 @@ use LibreNMS\Util\Url;
 
 class DeviceController extends TableController
 {
-    private $detailed; // display format is detailed
+    private ?bool $detailed = null; // display format is detailed
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'format' => 'nullable|in:list_basic,list_detail',
@@ -61,17 +61,17 @@ class DeviceController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location', 'device_id' => 'device_id'];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location', 'purpose', 'notes'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'status' => 'status',
@@ -147,7 +147,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
      */
-    public function formatItem($device)
+    public function formatItem($device): array
     {
         return [
             'extra' => $this->getLabel($device),
@@ -171,7 +171,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getStatus($device)
+    private function getStatus($device): string
     {
         if ($device->disabled == 1) {
             return 'disabled';
@@ -188,7 +188,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getLabel($device)
+    private function getLabel($device): string
     {
         if ($device->disabled == 1) {
             return 'blackbg';
@@ -212,7 +212,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getHostname($device)
+    private function getHostname($device): string
     {
         return (string) view('device.list.hostname', [
             'device' => $device,
@@ -224,7 +224,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getOsText($device)
+    private function getOsText(\App\Models\Device $device): string
     {
         $os_text = htmlspecialchars(Config::getOsSetting($device->os, 'text'));
 
@@ -239,7 +239,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getMetrics($device)
+    private function getMetrics($device): string
     {
         $port_count = $device->ports_count;
         $sensor_count = $device->sensors_count;
@@ -271,7 +271,7 @@ class DeviceController extends TableController
      * @param  mixed  $icon
      * @return string
      */
-    private function formatMetric($device, $count, $tab, $icon)
+    private function formatMetric($device, $count, string $tab, string $icon): string
     {
         $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
@@ -284,7 +284,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getLocation($device)
+    private function getLocation(\App\Models\Device $device): string
     {
         $location = $device->location ?? '';
 
@@ -364,7 +364,7 @@ class DeviceController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device ID',
@@ -388,7 +388,7 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return array
      */
-    protected function formatExportRow($device)
+    protected function formatExportRow($device): array
     {
         $status = $device->status ? 'Up' : 'Down';
         if ($device->disabled) {

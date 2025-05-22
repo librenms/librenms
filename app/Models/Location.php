@@ -44,8 +44,8 @@ class Location extends Model
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
 
-    private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
-    private $location_ignore_regex = '/\(.*?\)/';
+    private string $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
+    private string $location_ignore_regex = '/\(.*?\)/';
 
     /**
      * @return array{lat: 'float', lng: 'float', fixed_coordinates: 'bool'}
@@ -66,7 +66,7 @@ class Location extends Model
      *
      * @return bool
      */
-    public function hasCoordinates()
+    public function hasCoordinates(): bool
     {
         return ! (is_null($this->lat) || is_null($this->lng));
     }
@@ -75,7 +75,7 @@ class Location extends Model
      * Check if the coordinates are valid
      * Even though 0,0 is a valid coordinate, we consider it invalid for ease
      */
-    public function coordinatesValid()
+    public function coordinatesValid(): bool
     {
         return $this->lat && $this->lng &&
             abs($this->lat) <= 90 && abs($this->lng) <= 180;
@@ -118,13 +118,13 @@ class Location extends Model
      * @param  bool  $withCoords
      * @return string
      */
-    public function display($withCoords = false)
+    public function display($withCoords = false): string
     {
         return (trim(preg_replace($this->location_regex, '', $this->location)) ?: $this->location)
             . ($withCoords && $this->coordinatesValid() ? " [$this->lat,$this->lng]" : '');
     }
 
-    protected function parseCoordinates()
+    protected function parseCoordinates(): bool
     {
         if (preg_match($this->location_regex, $this->location, $parsed)) {
             $this->fill($parsed);
@@ -135,7 +135,7 @@ class Location extends Model
         return false;
     }
 
-    protected function fetchCoordinates()
+    protected function fetchCoordinates(): bool
     {
         try {
             /** @var \LibreNMS\Interfaces\Geocoder $api */
@@ -189,7 +189,7 @@ class Location extends Model
         return $this->hasMany(Device::class, 'location_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->location;
     }

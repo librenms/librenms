@@ -9,6 +9,9 @@ use Illuminate\Queue\SerializesModels;
 class UserCreated
 {
     use Dispatchable, SerializesModels;
+    /**
+     * @var \App\Models\User
+     */
     public $user;
 
     /**

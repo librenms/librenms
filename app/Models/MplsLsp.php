@@ -41,7 +41,7 @@ class MplsLsp extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->vrf_oid . '-' . $this->lsp_oid;
     }

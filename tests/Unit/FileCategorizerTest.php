@@ -208,7 +208,7 @@ class FileCategorizerTest extends TestCase
         ]);
     }
 
-    private function assertCategorized($expected, $input = null, $message = '')
+    private function assertCategorized(array $expected, $input = null, string $message = ''): void
     {
         $files = $input ?? array_unique(Arr::flatten(Arr::except($expected, ['os']))); // os is a virtual category
         $expected = array_merge($this->getCategorySkeleton(), $expected);
@@ -216,7 +216,7 @@ class FileCategorizerTest extends TestCase
         $this->assertEquals($expected, (new FileCategorizer($files))->categorize(), $message);
     }
 
-    private function getCategorySkeleton()
+    private function getCategorySkeleton(): array
     {
         return [
             'php' => [],

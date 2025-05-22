@@ -27,13 +27,13 @@
 [$groups, $g_more] = include 'groups.inc.php';
 [$locations, $l_more] = include 'locations.inc.php';
 
-$locations = array_map(function ($location) {
+$locations = array_map(function (array $location) {
     $location['id'] = 'l' . $location['id'];
 
     return $location;
 }, $locations);
 
-$groups = array_map(function ($group) {
+$groups = array_map(function (array $group) {
     $group['id'] = 'g' . $group['id'];
 
     return $group;

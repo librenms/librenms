@@ -30,26 +30,14 @@ use LibreNMS\Util\StringHelpers;
 
 class SimpleTemplate
 {
-    /**
-     * @var string
-     */
-    private $template;
-    /**
-     * @var array
-     */
-    private $variables;
-    /**
-     * @var string
-     */
-    private $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+) }}/';
+    private string $template;
+    private array $variables;
+    private string $regex = '/{{ \$?([a-zA-Z0-9\-_.:]+) }}/';
     /**
      * @var callable
      */
     private $callback;
-    /**
-     * @var bool
-     */
-    private $keepEmpty = false;
+    private bool $keepEmpty = false;
 
     public function __construct(string $template, array $variables = [])
     {
@@ -100,7 +88,7 @@ class SimpleTemplate
         return (string) new static($template, $variables);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
             $replacement = $this->variables[$matches[1]] ?? ($this->keepEmpty ? $matches[0] : '');

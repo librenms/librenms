@@ -119,7 +119,7 @@ class SafCfm extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return [
             // SAF-MPMUX-MIB::cfml4radioTxFrequency
@@ -166,7 +166,7 @@ class SafCfm extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         return [
             // SAF-MPMUX-MIB::rf1TxLevel
@@ -214,7 +214,7 @@ class SafCfm extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         return [
             // SAF-MPMUX-MIB::termFrameErrors

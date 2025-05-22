@@ -51,17 +51,15 @@ class Plugins
 {
     /**
      * Array of plugin hooks
-     *
-     * @var array|null
      */
-    private static $plugins = null;
+    private static ?array $plugins = null;
 
     /**
      * Start loading active plugins
      *
      * @return bool
      */
-    public static function start()
+    public static function start(): bool
     {
         if (! is_null(self::$plugins)) {
             return false;
@@ -129,7 +127,7 @@ class Plugins
      * @param  string  $pluginName
      * @return object|null
      */
-    private static function getInstance($file, $pluginName)
+    private static function getInstance($file, $pluginName): ?object
     {
         $ns_prefix = 'LibreNMS\\Plugins\\';
         $ns_psr4 = $ns_prefix . $pluginName . '\\' . $pluginName;
@@ -216,14 +214,14 @@ class Plugins
      *
      * @return int
      */
-    public static function count()
+    public static function count(): int
     {
         self::start();
 
         return count(self::$plugins);
     }
 
-    public static function scanNew()
+    public static function scanNew(): int
     {
         $countInstalled = 0;
 
@@ -242,7 +240,7 @@ class Plugins
         return $countInstalled;
     }
 
-    public static function scanRemoved()
+    public static function scanRemoved(): int
     {
         $countRemoved = 0;
 

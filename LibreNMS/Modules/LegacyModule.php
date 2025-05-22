@@ -40,8 +40,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module
 {
-    /** @var array */
-    private $module_deps = [
+    private array $module_deps = [
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'cisco-mac-accounting' => ['ports'],
@@ -58,10 +57,7 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     public function __construct(string $name)
     {
@@ -219,7 +215,7 @@ class LegacyModule implements Module
     private function collectComponents(int $device_id): array
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, function ($item) {
+        $components = Arr::sort($components, function (array $item) {
             return $item['type'] . $item['label'];
         });
 

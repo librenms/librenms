@@ -35,7 +35,7 @@ if (! function_exists('d_echo')) {
      * @param  string|array|float|int  $text  The error message or array to print
      * @param  string  $no_debug_text  Text to print if debug is disabled
      */
-    function d_echo($text, $no_debug_text = null)
+    function d_echo($text, $no_debug_text = null): void
     {
         if (Laravel::isBooted()) {
             \Log::debug(is_string($text) ? rtrim($text) : $text);
@@ -57,7 +57,7 @@ if (! function_exists('array_pairs')) {
      * @param  array  $array
      * @return array
      */
-    function array_pairs($array)
+    function array_pairs(array $array): array
     {
         $pairs = [];
 
@@ -93,7 +93,7 @@ if (! function_exists('preg_match_any')) {
      * @param  array|string  $regexes  an array of regexes or single regex to check
      * @return bool if any of the regexes matched, return true
      */
-    function preg_match_any($subject, $regexes)
+    function preg_match_any($subject, $regexes): bool
     {
         foreach ((array) $regexes as $regex) {
             if (preg_match($regex, $subject)) {

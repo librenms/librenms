@@ -36,9 +36,9 @@ class SmokepingGenerateCommand extends LnmsCommand
     protected $name = 'smokeping:generate';
     protected $dnsLookup = true;
 
-    private $ip4count = 0;
-    private $ip6count = 0;
-    private $warnings = [];
+    private int $ip4count = 0;
+    private int $ip6count = 0;
+    private array $warnings = [];
 
     const IP4PROBE = 'lnmsFPing-';
     const IP6PROBE = 'lnmsFPing6-';
@@ -145,7 +145,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return void
      */
-    public function setWarning($warning)
+    public function setWarning($warning): void
     {
         $this->warnings[] = sprintf('# %s', $warning);
     }
@@ -156,7 +156,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  int  $probeCount  Number of processes to create
      * @return array
      */
-    public function assembleProbes($probeCount)
+    public function assembleProbes($probeCount): array
     {
         if ($probeCount < 1) {
             return [];
@@ -178,7 +178,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  int  $probeCount  Number of processes to create
      * @return array
      */
-    public function buildProbes($module, $defaultProbe, $probe, $binary, $probeCount)
+    public function buildProbes($module, $defaultProbe, $probe, $binary, $probeCount): array
     {
         $lines = [];
 
@@ -201,7 +201,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return array
      */
-    public function buildHeader($noHeader, $compat)
+    public function buildHeader($noHeader, $compat): array
     {
         $lines = [];
 
@@ -229,7 +229,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  array  $smokelist  A list of devices to create a a config block for
      * @return array
      */
-    public function buildTargets($smokelist, $probeCount, $singleProcess)
+    public function buildTargets($smokelist, $probeCount, $singleProcess): array
     {
         $lines = [];
 
@@ -255,7 +255,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return bool
      */
-    private function validateOptions()
+    private function validateOptions(): bool
     {
         if (! Config::has('smokeping.probes') ||
             ! Config::has('fping') ||
@@ -297,7 +297,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  array  ...$blocks  Blocks of smokeping configuration arranged in arrays of strings
      * @return int
      */
-    private function render(...$blocks)
+    private function render(...$blocks): int
     {
         foreach (array_merge(...$blocks) as $line) {
             $this->line($line);
@@ -312,7 +312,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  array  $devices  A list of devices to create a a config block for
      * @return array
      */
-    private function buildDevices($devices, $probeCount, $singleProcess)
+    private function buildDevices($devices, $probeCount, $singleProcess): array
     {
         $lines = [];
 
@@ -340,7 +340,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  string  $hostname  Hostname to be checked
      * @return bool
      */
-    private function deviceIsResolvable($hostname)
+    private function deviceIsResolvable($hostname): bool
     {
         if (empty($hostname)) {
             return false;
@@ -362,7 +362,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  string  $entry  The LibreNMS device hostname to rewrite
      * @return string
      */
-    private function buildMenuEntry($entry)
+    private function buildMenuEntry($entry): string
     {
         return str_replace(['.', ' '], '_', $entry);
     }
@@ -373,7 +373,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param  string  $transport  The transport (udp or udp6) as per the device database entry
      * @return string
      */
-    private function balanceProbes($transport, $probeCount)
+    private function balanceProbes($transport, $probeCount): string
     {
         if ($transport === 'udp' || $transport === 'tcp') {
             if ($probeCount === $this->ip4count) {

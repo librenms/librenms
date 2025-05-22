@@ -35,7 +35,7 @@ class PortFieldController extends SelectController
      *
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:ifType',
@@ -49,7 +49,7 @@ class PortFieldController extends SelectController
      * @param  $request
      * @return string[]
      */
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'device_id' => 'device',
@@ -62,7 +62,7 @@ class PortFieldController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return [$request->get('field')];
     }

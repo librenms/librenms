@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 
 class EditPortsController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'required|int',
@@ -37,12 +37,12 @@ class EditPortsController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields($request): array
     {
         return ['ifName', 'ifAlias', 'ifDescr'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['ifIndex', 'ifName', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifAlias'];
     }
@@ -57,7 +57,7 @@ class EditPortsController extends TableController
      * @param  \App\Models\Port  $port
      * @return array
      */
-    public function formatItem($port)
+    public function formatItem($port): array
     {
         $is_port_bad = $port->ifAdminStatus != 'down' && $port->ifOperStatus != 'up';
         $do_we_care = ($port->ignore || $port->disabled) ? false : $is_port_bad;

@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Html;
 
-function printEntPhysical($device, $ent, $level, $class)
+function printEntPhysical(array $device, array $ent, $level, $class): void
 {
     $ents = dbFetchRows('SELECT * FROM `entPhysical` WHERE device_id = ? AND entPhysicalContainedIn = ? ORDER BY entPhysicalContainedIn,entPhysicalIndex', [$device['device_id'], $ent]);
 

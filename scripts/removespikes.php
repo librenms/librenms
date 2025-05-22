@@ -418,7 +418,7 @@ if ($html) {
 }
 
 /* All Functions */
-function createRRDFileFromXML($xmlfile, $rrdfile)
+function createRRDFileFromXML($xmlfile, $rrdfile): void
 {
     global $using_cacti, $html;
 
@@ -434,12 +434,12 @@ function createRRDFileFromXML($xmlfile, $rrdfile)
     }
 }
 
-function writeXMLFile($output, $xmlfile)
+function writeXMLFile($output, $xmlfile): int|false
 {
     return file_put_contents($xmlfile, $output);
 }
 
-function backupRRDFile($rrdfile)
+function backupRRDFile($rrdfile): bool
 {
     global $using_cacti, $tempdir, $seed, $html;
 
@@ -464,7 +464,7 @@ function backupRRDFile($rrdfile)
     return copy($rrdfile, $backupdir . '/' . $newfile);
 }
 
-function calculateVarianceAverages(&$rra, &$samples)
+function calculateVarianceAverages(array &$rra, &$samples): void
 {
     global $outliers;
 
@@ -489,7 +489,7 @@ function calculateVarianceAverages(&$rra, &$samples)
     }
 }
 
-function calculateOverallStatistics(&$rra, &$samples)
+function calculateOverallStatistics(&$rra, &$samples): void
 {
     global $percent, $stddev, $ds_min, $ds_max, $var_kills, $std_kills;
 
@@ -577,7 +577,7 @@ function calculateOverallStatistics(&$rra, &$samples)
     }
 }
 
-function outputStatistics($rra)
+function outputStatistics($rra): void
 {
     global $rra_cf, $rra_name, $ds_name, $rra_pdp, $html;
 
@@ -711,7 +711,10 @@ function outputStatistics($rra)
     }
 }
 
-function updateXML(&$output, &$rra)
+/**
+ * @return list
+ */
+function updateXML(&$output, &$rra): array
 {
     global $numspike, $percent, $avgnan, $method, $total_kills;
     $new_array = [];
@@ -823,7 +826,7 @@ function removeComments(&$output)
     }
 }
 
-function displayTime($pdp)
+function displayTime($pdp): string
 {
     global $step;
 
@@ -850,7 +853,7 @@ function displayTime($pdp)
     }
 }
 
-function debug($string)
+function debug($string): void
 {
     global $debug;
 
@@ -859,7 +862,7 @@ function debug($string)
     }
 }
 
-function standard_deviation($samples)
+function standard_deviation($samples): float
 {
     $sample_count = count($samples);
     $sample_square = [];
@@ -872,7 +875,7 @@ function standard_deviation($samples)
 }
 
 /* display_help - displays the usage of the function */
-function display_help()
+function display_help(): void
 {
     global $using_cacti;
 

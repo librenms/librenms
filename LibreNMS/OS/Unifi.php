@@ -53,7 +53,7 @@ class Unifi extends OS implements
         Traits\FrogfootResources::discoverProcessors as discoverFrogfootProcessors;
     }
 
-    private $ccqDivisor = 10;
+    private int $ccqDivisor = 10;
 
     public function discoverOS(Device $device): void
     {
@@ -89,7 +89,7 @@ class Unifi extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $client_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiVapNumStations', [], 'UBNT-UniFi-MIB');
         if (empty($client_oids)) {
@@ -168,7 +168,7 @@ class Unifi extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessCcq()
+    public function discoverWirelessCcq(): array
     {
         $ccq_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiVapCcq', [], 'UBNT-UniFi-MIB');
         if (empty($ccq_oids)) {
@@ -204,7 +204,7 @@ class Unifi extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessCcq(array $sensors)
+    public function pollWirelessCcq(array $sensors): array
     {
         if (empty($sensors)) {
             return [];
@@ -227,7 +227,7 @@ class Unifi extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiVapChannel', [], 'UBNT-UniFi-MIB');
         $vap_radios = $this->getCacheByIndex('unifiVapRadio', 'UBNT-UniFi-MIB');
@@ -270,7 +270,7 @@ class Unifi extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $power_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiVapTxPower', [], 'UBNT-UniFi-MIB');
         if (empty($power_oids)) {
@@ -304,7 +304,7 @@ class Unifi extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         $util_oids = snmpwalk_cache_oid($this->getDeviceArray(), 'unifiRadioCuTotal', [], 'UBNT-UniFi-MIB');
         if (empty($util_oids)) {

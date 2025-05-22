@@ -8,7 +8,7 @@ abstract class TestCase extends BaseTestCase
 {
     use SnmpsimHelpers;
 
-    public function dbSetUp()
+    public function dbSetUp(): void
     {
         if (getenv('DBTEST')) {
             \LibreNMS\DB\Eloquent::DB()->beginTransaction();
@@ -17,7 +17,7 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    public function dbTearDown()
+    public function dbTearDown(): void
     {
         if (getenv('DBTEST')) {
             try {

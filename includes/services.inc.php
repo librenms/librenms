@@ -9,7 +9,10 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 
-function get_service_status($device = null)
+/**
+ * @return mixed[]
+ */
+function get_service_status($device = null): array
 {
     $sql_query = 'SELECT service_status, count(service_status) as count FROM services WHERE';
     $sql_param = [];
@@ -110,7 +113,7 @@ function delete_service($service = null)
     return dbDelete('services', '`service_id` =  ?', [$service]);
 }
 
-function discover_service($device, $service)
+function discover_service(array $device, $service): void
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
@@ -120,7 +123,7 @@ function discover_service($device, $service)
     echo "$service ";
 }
 
-function poll_service($service)
+function poll_service(array $service): bool
 {
     $update = [];
     $old_status = $service['service_status'];
@@ -223,7 +226,7 @@ function poll_service($service)
     return true;
 }
 
-function check_service($command)
+function check_service($command): array
 {
     // This array is used to test for valid UOM's to be used for graphing.
     // Valid values from: https://nagios-plugins.org/doc/guidelines.html#AEN200

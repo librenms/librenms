@@ -23,7 +23,7 @@ require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';
 require 'includes/html/collectd/definitions.php';
 
-function makeTextBlock($text, $fontfile, $fontsize, $width)
+function makeTextBlock($text, $fontfile, $fontsize, $width): string
 {
     // TODO: handle explicit line-break!
     $words = explode(' ', $text);
@@ -55,7 +55,7 @@ function makeTextBlock($text, $fontfile, $fontsize, $width)
  *
  * @msg Complete error message to display in place of graph content
  */
-function error($code, $code_msg, $title, $msg)
+function error($code, $code_msg, $title, $msg): void
 {
     header(sprintf('HTTP/1.0 %d %s', $code, $code_msg));
     header('Pragma: no-cache');

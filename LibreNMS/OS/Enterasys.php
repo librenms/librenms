@@ -34,7 +34,7 @@ use SnmpQuery;
 
 class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
 {
-    public function discoverMempools()
+    public function discoverMempools(): \Illuminate\Support\Collection
     {
         $mempools = new Collection();
         $mem = snmpwalk_group($this->getDeviceArray(), 'etsysResourceStorageTable', 'ENTERASYS-RESOURCE-UTILIZATION-MIB', 3);

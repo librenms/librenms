@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-function load_graph_definitions_local($logarithmic = false, $tinylegend = false)
+function load_graph_definitions_local($logarithmic = false, $tinylegend = false): void
 {
     global $GraphDefs, $MetaGraphDefs;
 
@@ -40,7 +40,7 @@ function load_graph_definitions_local($logarithmic = false, $tinylegend = false)
     $MetaGraphDefs['local_meta'] = 'meta_graph_local';
 }
 
-function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instances, $opts = [])
+function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instances, array $opts = [])
 {
     $sources = [];
 

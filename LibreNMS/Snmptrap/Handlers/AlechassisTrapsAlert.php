@@ -45,7 +45,7 @@ class AlechassisTrapsAlert implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $descr_aos6 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr'));
         $descr_aos7 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr.0'));

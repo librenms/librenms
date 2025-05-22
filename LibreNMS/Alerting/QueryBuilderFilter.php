@@ -32,14 +32,14 @@ use LibreNMS\DB\Schema;
 
 class QueryBuilderFilter implements \JsonSerializable
 {
-    private static $table_blacklist = [
+    private static array $table_blacklist = [
         'device_group_device',
         'alerts',
         'alert_log',
     ];
 
-    private $filter = [];
-    private $schema;
+    private array $filter = [];
+    private \LibreNMS\DB\Schema $schema;
 
     /**
      * QueryBuilderFilter constructor.
@@ -59,7 +59,7 @@ class QueryBuilderFilter implements \JsonSerializable
         $this->generateTableFilter();
     }
 
-    private function generateMacroFilter($config_location)
+    private function generateMacroFilter(string $config_location): void
     {
         $macros = Config::get($config_location, []);
         krsort($macros);
@@ -88,7 +88,7 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-    private function generateTableFilter()
+    private function generateTableFilter(): void
     {
         $db_schema = $this->schema->getSchema();
         $valid_tables = array_diff(array_keys($this->schema->getAllRelationshipPaths()), self::$table_blacklist);
@@ -144,7 +144,7 @@ class QueryBuilderFilter implements \JsonSerializable
         }
     }
 
-    private function getColumnType($type)
+    private function getColumnType($type): ?string
     {
         if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';

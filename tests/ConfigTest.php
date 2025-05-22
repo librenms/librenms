@@ -54,7 +54,7 @@ class ConfigTest extends TestCase
 
     public function testGet(): void
     {
-        $this->setConfig(function (&$config) {
+        $this->setConfig(function (array &$config) {
             $config['one']['two']['three'] = 'easy';
         });
 
@@ -64,7 +64,7 @@ class ConfigTest extends TestCase
     public function testGetDeviceSetting(): void
     {
         $device = ['set' => true, 'null' => null];
-        $this->setConfig(function (&$config) {
+        $this->setConfig(function (array &$config) {
             $config['null'] = 'notnull!';
             $config['noprefix'] = true;
             $config['prefix']['global'] = true;
@@ -91,7 +91,7 @@ class ConfigTest extends TestCase
 
     public function testGetOsSetting(): void
     {
-        $this->setConfig(function (&$config) {
+        $this->setConfig(function (array &$config) {
             $config['os']['nullos']['fancy'] = true;
             $config['fallback'] = true;
         });
@@ -109,7 +109,7 @@ class ConfigTest extends TestCase
 
     public function testGetCombined(): void
     {
-        $this->setConfig(function (&$config) {
+        $this->setConfig(function (array &$config) {
             $config['num'] = ['one', 'two'];
             $config['withprefix']['num'] = ['four', 'five'];
             $config['os']['nullos']['num'] = ['two', 'three'];
@@ -211,7 +211,7 @@ class ConfigTest extends TestCase
      *
      * @param  callable  $function
      */
-    private function setConfig($function)
+    private function setConfig(\Closure $function): void
     {
         $instance = $this->app->make('librenms-config');
         $config = $this->config->getValue($instance);

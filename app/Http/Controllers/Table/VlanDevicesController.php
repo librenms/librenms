@@ -9,7 +9,7 @@ use LibreNMS\Util\Url;
 
 class VlanDevicesController extends TableController
 {
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'device' => 'device_id',

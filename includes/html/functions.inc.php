@@ -19,7 +19,10 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
-function toner2colour($descr, $percent)
+/**
+ * @return mixed[]
+ */
+function toner2colour($descr, $percent): array
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
@@ -51,7 +54,7 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-function generate_link($text, $vars, $new_vars = [])
+function generate_link($text, $vars, $new_vars = []): string
 {
     return '<a href="' . Url::generate($vars, $new_vars) . '">' . $text . '</a>';
 }//end generate_link()
@@ -61,7 +64,7 @@ function escape_quotes($text)
     return str_replace('"', "\'", str_replace("'", "\'", $text));
 }//end escape_quotes()
 
-function generate_overlib_content($graph_array, $text)
+function generate_overlib_content(array $graph_array, $text): string
 {
     $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
@@ -74,7 +77,7 @@ function generate_overlib_content($graph_array, $text)
     return $overlib_content;
 }//end generate_overlib_content()
 
-function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+function generate_device_link(array $device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
     $deviceModel = DeviceCache::get((int) $device['device_id']);
 
@@ -112,7 +115,7 @@ function device_permitted($device_id)
     return \Permissions::canAccessDevice($device_id, Auth::id());
 }
 
-function alert_layout($severity)
+function alert_layout($severity): array
 {
     switch ($severity) {
         case 'critical':
@@ -141,7 +144,7 @@ function alert_layout($severity)
         'background_color' => $background, ];
 }
 
-function generate_dynamic_graph_tag($args)
+function generate_dynamic_graph_tag($args): string
 {
     $urlargs = [];
     $width = 0;
@@ -167,7 +170,7 @@ function generate_dynamic_graph_tag($args)
     return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
-function generate_dynamic_graph_js($args)
+function generate_dynamic_graph_js(array $args): string
 {
     $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
     $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
@@ -195,7 +198,7 @@ function generate_dynamic_graph_js($args)
     return $output;
 }//end generate_dynamic_graph_js()
 
-function generate_graph_js_state($args)
+function generate_graph_js_state($args): string
 {
     // we are going to assume we know roughly what the graph url looks like here.
     // TODO: Add sensible defaults
@@ -218,7 +221,7 @@ STATE;
     return $state;
 }//end generate_graph_js_state()
 
-function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
+function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background): string
 {
     return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
         'left' => $left_background,
@@ -288,7 +291,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
 }//end generate_port_link()
 
-function generate_sensor_link($args, $text = null, $type = null)
+function generate_sensor_link($args, $text = null, $type = null): string
 {
     if (! $text) {
         $text = $args['sensor_descr'];
@@ -334,12 +337,12 @@ function generate_sensor_link($args, $text = null, $type = null)
     return Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
 
-function generate_port_url($port, $vars = [])
+function generate_port_url(array $port, $vars = []): string
 {
     return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
 }//end generate_port_url()
 
-function generate_sap_url($sap, $vars = [])
+function generate_sap_url(array $sap, $vars = [])
 {
     // Overwrite special QinQ sap identifiers
     if ($sap['sapEncapValue'] == '*') {
@@ -349,7 +352,7 @@ function generate_sap_url($sap, $vars = [])
     return Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
-function generate_port_image($args)
+function generate_port_image(array $args): string
 {
     if (! $args['bg']) {
         $args['bg'] = 'FFFFFF00';
@@ -364,18 +367,18 @@ function generate_port_image($args)
  * @param  string  $text
  * @param  int[]  $color
  */
-function graph_error($text, $short = null, $color = [128, 0, 0])
+function graph_error($text, $short = null, $color = [128, 0, 0]): void
 {
     header('Content-Type: ' . ImageFormat::forGraph()->contentType());
     echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
-function print_port_thumbnail($args)
+function print_port_thumbnail($args): void
 {
     echo generate_port_link($args, generate_port_image($args));
 }//end print_port_thumbnail()
 
-function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
+function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5): void
 {
     echo '
         <div class="panel panel-default">
@@ -383,7 +386,7 @@ function print_optionbar_start($height = 0, $width = 0, $marginbottom = 5)
         ';
 }//end print_optionbar_start()
 
-function print_optionbar_end()
+function print_optionbar_end(): void
 {
     echo '
         </div>
@@ -397,7 +400,7 @@ function print_optionbar_end()
  * @param  string  $path
  * @return array [size, file count]
  */
-function foldersize($path)
+function foldersize($path): array
 {
     $total_size = 0;
     $total_files = 0;
@@ -466,12 +469,12 @@ function generate_ap_link($args, $text = null, $type = null)
     }
 }//end generate_ap_link()
 
-function generate_ap_url($ap, $vars = [])
+function generate_ap_url(array $ap, $vars = []): string
 {
     return Url::generate(['page' => 'device', 'device' => $ap['device_id'], 'tab' => 'accesspoints', 'ap' => $ap['accesspoint_id']], $vars);
 }//end generate_ap_url()
 
-function generate_pagination($count, $limit, $page, $links = 2)
+function generate_pagination($count, $limit, $page, $links = 2): string
 {
     $end_page = ceil($count / $limit);
     $start = (($page - $links) > 0) ? ($page - $links) : 1;
@@ -504,7 +507,7 @@ function generate_pagination($count, $limit, $page, $links = 2)
     return $return;
 }//end generate_pagination()
 
-function demo_account()
+function demo_account(): void
 {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 }//end demo_account()
@@ -520,7 +523,7 @@ function get_client_ip()
     return $client_ip;
 }//end get_client_ip()
 
-function clean_bootgrid($string)
+function clean_bootgrid($string): string
 {
     $output = str_replace(["\r", "\n"], '', $string);
     $output = addslashes($output);
@@ -528,7 +531,7 @@ function clean_bootgrid($string)
     return $output;
 }//end clean_bootgrid()
 
-function get_url()
+function get_url(): string
 {
     // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
     // http://stackoverflow.com/users/184600/ma%C4%8Dek
@@ -540,7 +543,7 @@ function get_url()
     );
 }//end get_url()
 
-function alert_details($details)
+function alert_details($details): array
 {
     if (is_string($details)) {
         $details = json_decode(gzuncompress($details), true);
@@ -587,7 +590,7 @@ function alert_details($details)
     return [$all_fault_detail, $max_row_length];
 }//end alert_details()
 
-function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
+function format_alert_details($alert_idx, $tmp_alerts, $type_info = null): string
 {
     $fault_detail = '';
     $fallback = true;
@@ -742,7 +745,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     return $fault_detail;
 }
 
-function dynamic_override_config($type, $name, $device)
+function dynamic_override_config($type, $name, array $device)
 {
     $attrib_val = get_dev_attrib($device, $name);
     if ($attrib_val == 'true') {
@@ -817,7 +820,7 @@ function get_ports_from_type($given_types)
  * @param  $filename
  * @param  $content
  */
-function file_download($filename, $content)
+function file_download($filename, $content): void
 {
     $length = strlen($content);
     header('Content-Description: File Transfer');
@@ -831,7 +834,7 @@ function file_download($filename, $content)
     echo $content;
 }
 
-function get_rules_from_json()
+function get_rules_from_json(): mixed
 {
     return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
@@ -878,7 +881,7 @@ function search_oxidized_config($search_in_conf_textbox)
  * @param  int  $eventlog_severity
  * @return string $eventlog_severity_icon
  */
-function eventlog_severity($eventlog_severity)
+function eventlog_severity($eventlog_severity): string
 {
     switch ($eventlog_severity) {
         case 1:
@@ -896,7 +899,7 @@ function eventlog_severity($eventlog_severity)
     }
 } // end eventlog_severity
 
-function get_oxidized_nodes_list()
+function get_oxidized_nodes_list(): void
 {
     $context = stream_context_create([
         'http' => [

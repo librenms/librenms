@@ -138,7 +138,7 @@ class Mempools implements Module
      * @param  Collection  $mempools
      * @return Collection
      */
-    private function defaultPolling($os, $mempools)
+    private function defaultPolling(\LibreNMS\OS $os, $mempools)
     {
         // fetch all data
         $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])

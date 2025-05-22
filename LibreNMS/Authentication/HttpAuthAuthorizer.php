@@ -12,7 +12,7 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
     protected static $CAN_UPDATE_PASSWORDS = false;
     protected static $AUTH_IS_EXTERNAL = true;
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         if (isset($credentials['username']) && $this->userExists($credentials['username'])) {
             return true;
@@ -21,7 +21,7 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
         throw new AuthenticationException('No matching user found and http_auth_guest is not set');
     }
 
-    public function userExists($username, $throw_exception = false)
+    public function userExists($username, $throw_exception = false): bool
     {
         if (parent::userExists($username)) {
             return true;

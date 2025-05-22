@@ -66,7 +66,7 @@ class Number
         return $round;
     }
 
-    public static function formatSi($value, $round = 2, $sf = 0, $suffix = 'B'): string
+    public static function formatSi($value, $round = 2, int $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;
@@ -100,7 +100,7 @@ class Number
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
     }
 
-    public static function formatBi($value, $round = 2, $sf = 0, $suffix = 'B'): string
+    public static function formatBi($value, $round = 2, int $sf = 0, $suffix = 'B'): string
     {
         $value = (float) $value;
         $neg = $value < 0;

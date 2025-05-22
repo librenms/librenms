@@ -326,7 +326,7 @@ function dbFetchColumn($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbHandleException(QueryException $exception)
+function dbHandleException(QueryException $exception): void
 {
     $message = $exception->getMessage();
 
@@ -364,7 +364,7 @@ function dbHandleException(QueryException $exception)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbPlaceHolders(&$values)
+function dbPlaceHolders(array &$values): array
 {
     $data = [];
     foreach ($values as $key => $value) {
@@ -392,7 +392,7 @@ function dbPlaceHolders(&$values)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbGenPlaceholders($count)
+function dbGenPlaceholders($count): string
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
 }
@@ -410,7 +410,7 @@ function dbGenPlaceholders($count)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null): array
 {
     $inserted = 0;
 

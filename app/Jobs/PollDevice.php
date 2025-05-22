@@ -33,7 +33,7 @@ class PollDevice implements ShouldQueue
     /**
      * @var OS|OS\Generic
      */
-    private $os;
+    private ?\LibreNMS\OS $os = null;
 
     /**
      * @param  int  $device_id

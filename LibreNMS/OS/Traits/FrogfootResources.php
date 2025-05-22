@@ -36,7 +36,7 @@ trait FrogfootResources
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         return [
             Processor::discover(

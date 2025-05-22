@@ -37,12 +37,12 @@ class LocationController extends TableController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function searchFields($request)
+    public function searchFields($request): array
     {
         return ['location'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['location', 'devices', 'down'];
     }
@@ -74,7 +74,7 @@ class LocationController extends TableController
      * @param  Location  $location
      * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
      */
-    public function formatItem($location)
+    public function formatItem($location): array
     {
         return [
             'id' => $location->id,
@@ -86,7 +86,7 @@ class LocationController extends TableController
         ];
     }
 
-    private function getJoinQuery($field)
+    private function getJoinQuery(int|string|null $field): ?\Closure
     {
         switch ($field) {
             case 'devices':

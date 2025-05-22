@@ -112,7 +112,7 @@ class TopDevicesController extends WidgetController
      * @param  Collection  $rows
      * @return array
      */
-    private function formatData($headers, $rows)
+    private function formatData(string|array $headers, $rows): array
     {
         return [
             'headers' => (array) $headers,
@@ -163,7 +163,7 @@ class TopDevicesController extends WidgetController
      * @param  array  $graph_params
      * @return array
      */
-    private function standardRow($device, $graph_type, $graph_params = [])
+    private function standardRow($device, string $graph_type, array $graph_params = []): array
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),

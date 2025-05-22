@@ -181,7 +181,7 @@ Example:
     exit(1);
 }
 
-function get_user_input($msg)
+function get_user_input($msg): string
 {
     c_echo($msg . ' ');
     $handle = fopen('php://stdin', 'r');

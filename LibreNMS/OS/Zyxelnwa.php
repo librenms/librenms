@@ -26,7 +26,10 @@ use LibreNMS\OS\Shared\Zyxel;
 
 class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, WirelessFrequencyDiscovery, WirelessFrequencyPolling
 {
-    public function discoverWirelessClients()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
         $base_oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.2.'; // ZYXEL-ES-WIRELESS::wlanStationCount
@@ -44,7 +47,10 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessFrequency(): array
     {
         $sensors = [];
         $base_oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.6.'; // ZYXEL-ES-WIRELESS::wlanChannel
