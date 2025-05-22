@@ -1,4 +1,4 @@
-FROM squidfunk/mkdocs-material:9.5.20
+FROM squidfunk/mkdocs-material:9.6.14
 
 RUN \
   pip install --no-cache-dir \
