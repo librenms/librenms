@@ -553,7 +553,12 @@ class Service:
             logger.debug("Prometheus metrics init")
             try:
                 from prometheus_client import Gauge, MetricsHandler
-
+            except ImportError:
+                logger.info(
+                    "Prometheus client is not available. Metrics will be disabled."
+                )
+                prom_metrics = None
+            else:
                 class ServiceMetricsHandler(MetricsHandler):
                     def do_GET(self):
                         if self.path in ["/health", "/healthz"]:
@@ -566,63 +571,57 @@ class Service:
                         else:
                             # default /metrics handling
                             super().do_GET()
-
                 from http.server import HTTPServer
-
-                httpd = HTTPServer(
-                    ("", self.config.metricsendpoint_port), ServiceMetricsHandler
-                )
-                thread = threading.Thread(target=httpd.serve_forever)
-                thread.daemon = True
-                thread.start()
-
-                logger.info(
-                    "Prometheus metrics available on http://localhost:{}/metrics".format(
-                        self.config.metricsendpoint_port
+                try:
+                    httpd = HTTPServer(("", self.config.metricsendpoint_port), ServiceMetricsHandler)
+                    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+                except OSError as e:
+                    logger.error("Metrics endpoint bind failed on port %d: %s. Disabling metrics.",
+                        port, e)
+                    self.config.metricsendpoint = False
+                    self.prom_metrics = None
+                else:
+                    logger.info(
+                        "Prometheus metrics available on http://localhost:{}/metrics".format(
+                            self.config.metricsendpoint_port
+                        )
                     )
-                )
 
-                # Initialize the dictionary to hold our metrics
-                prom_metrics = {}
+                    # Initialize the dictionary to hold our metrics
+                    prom_metrics = {}
 
-                # Create Gauge metrics with a label for poller_type
-                prom_metrics["dispatcher_depth"] = Gauge(
-                    "librenms_dispatcher_depth",
-                    "Dispatcher depth metric for various pollers",
-                    ["poller_type"],
-                )
-                prom_metrics["dispatcher_devices"] = Gauge(
-                    "librenms_dispatcher_devices",
-                    "Dispatcher devices count for various pollers",
-                    ["poller_type"],
-                )
-                prom_metrics["dispatcher_workers"] = Gauge(
-                    "librenms_dispatcher_workers",
-                    "Number of workers for various pollers",
-                    ["poller_type"],
-                )
-                prom_metrics["dispatcher_worker_seconds"] = Gauge(
-                    "librenms_dispatcher_worker_seconds",
-                    "Worker seconds for various pollers",
-                    ["poller_type"],
-                )
-                prom_metrics["dispatcher_frequency"] = Gauge(
-                    "librenms_dispatcher_frequency",
-                    "Dispatcher frequency for various pollers",
-                    ["poller_type"],
-                )
-                prom_metrics["node_master"] = Gauge(
-                    "librenms_node_master",
-                    "Indicates if the node is the current leader (1 for master, 0 for non-master)",
-                )
-                logger.info("Prometheus metrics initialized.")
-            except ImportError:
-                logger.info(
-                    "Prometheus client is not available. Metrics will be disabled."
-                )
-                # Disable metrics if the module is not installed.
-                prom_metrics = None
-            self.prom_metrics = prom_metrics
+                    # Create Gauge metrics with a label for poller_type
+                    prom_metrics["dispatcher_depth"] = Gauge(
+                        "librenms_dispatcher_depth",
+                        "Dispatcher depth metric for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_devices"] = Gauge(
+                        "librenms_dispatcher_devices",
+                        "Dispatcher devices count for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_workers"] = Gauge(
+                        "librenms_dispatcher_workers",
+                        "Number of workers for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_worker_seconds"] = Gauge(
+                        "librenms_dispatcher_worker_seconds",
+                        "Worker seconds for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_frequency"] = Gauge(
+                        "librenms_dispatcher_frequency",
+                        "Dispatcher frequency for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["node_master"] = Gauge(
+                        "librenms_node_master",
+                        "Indicates if the node is the current leader (1 for master, 0 for non-master)",
+                    )
+                    self.prom_metrics = prom_metrics
+                    logger.info("Prometheus metrics initialized.")
         else:
             logger.info("Prometheus metrics not enabled in config.")
 
