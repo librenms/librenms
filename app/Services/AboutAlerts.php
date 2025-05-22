@@ -26,9 +26,7 @@
 
 namespace App\Services;
 
-use App\Models\AlertLog;
 use App\Models\AlertRule;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class AboutAlerts
@@ -49,7 +47,7 @@ class AboutAlerts
     /**
      * @return array<string,int> rule_name => count in last 5m, zero if none
      */
-     public function raisedLast5m(): array
+    public function raisedLast5m(): array
     {
         return Cache::remember('alerts_raised_last_5m', 60, function () {
             // grab all enabled rule names
@@ -67,8 +65,8 @@ class AboutAlerts
 
             // zero–fill any rule with no recent alerts
             return $rules
-                ->mapWithKeys(fn($ruleName) => [
-                    $ruleName => $counts[$ruleName] ?? 0
+                ->mapWithKeys(fn ($ruleName) => [
+                    $ruleName => $counts[$ruleName] ?? 0,
                 ])
                 ->toArray();
         });

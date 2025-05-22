@@ -75,12 +75,13 @@ class Alert extends Model
      * Scope to only alerts logged in the last N minutes.
      *
      * @param  Builder<Alert>  $query
-     * @param  int            $minutes
+     * @param  int  $minutes
      * @return Builder<Alert>
      */
     public function scopeRecent(Builder $query, int $minutes): Builder
     {
         $cutoff = Carbon::now()->subMinutes($minutes);
+
         return $query->where('timestamp', '>', $cutoff);
     }
 
