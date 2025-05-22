@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -60,7 +61,7 @@ class Alert extends Model
     }
 
     /**
-     * Only select active alerts
+     * Only select acknowledged alerts
      *
      * @param  Builder  $query
      * @return Builder
@@ -68,6 +69,19 @@ class Alert extends Model
     public function scopeAcknowledged($query)
     {
         return $query->where('state', '=', AlertState::ACKNOWLEDGED);
+    }
+
+    /**
+     * Scope to only alerts logged in the last N minutes.
+     *
+     * @param  Builder<Alert>  $query
+     * @param  int            $minutes
+     * @return Builder<Alert>
+     */
+    public function scopeRecent(Builder $query, int $minutes): Builder
+    {
+        $cutoff = Carbon::now()->subMinutes($minutes);
+        return $query->where('timestamp', '>', $cutoff);
     }
 
     // ---- Define Relationships ----

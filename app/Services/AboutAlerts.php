@@ -39,13 +39,9 @@ class AboutAlerts
     public function active(): array
     {
         return Cache::remember('alerts_active', 60, function () {
-            // return zero for rules with no active alerts
-            return AlertRule::where('disabled', 0)
-                ->withCount(['alerts as open_count' => function ($q) {
-                    $q->where('state', '>', 0)
-                      ->where('open', 1);
-                }])
-                ->pluck('open_count', 'name')
+            return AlertRule::enabled()
+                ->withCount('openAlerts')
+                ->pluck('open_alerts_count', 'name')
                 ->toArray();
         });
     }
@@ -53,27 +49,28 @@ class AboutAlerts
     /**
      * @return array<string,int> rule_name => count in last 5m, zero if none
      */
-    public function raisedLast5m(): array
+     public function raisedLast5m(): array
     {
         return Cache::remember('alerts_raised_last_5m', 60, function () {
-            $cutoff = Carbon::now()->subMinutes(5);
+            // grab all enabled rule names
+            $rules = AlertRule::enabled()
+                              ->pluck('name');
 
-            $rules = AlertRule::where('disabled', 0)
-                ->pluck('name');
-
-            $counts = AlertLog::selectRaw('r.name AS rule_name, COUNT(*) AS cnt')
-                ->join('alert_rules AS r', 'r.id', '=', 'alert_log.rule_id')
-                ->whereRaw('r.disabled = ?', [0])
-                ->where('alert_log.state', '>', 0)
-                ->where('alert_log.time_logged', '>', $cutoff)
-                ->groupBy('r.name')
-                ->pluck('cnt', 'rule_name')
+            // count only active alerts logged in the last 5 minutes
+            $counts = AlertRule::enabled()
+                ->withCount(['alerts as recent_count' => function ($q) {
+                    $q->active()
+                      ->recent(5);
+                }])
+                ->pluck('recent_count', 'name')
                 ->toArray();
 
-            // zero-fill any rules that had no rows in the last 5m
-            return $rules->mapWithKeys(function ($ruleName) use ($counts) {
-                return [$ruleName => $counts[$ruleName] ?? 0];
-            })->toArray();
+            // zero–fill any rule with no recent alerts
+            return $rules
+                ->mapWithKeys(fn($ruleName) => [
+                    $ruleName => $counts[$ruleName] ?? 0
+                ])
+                ->toArray();
         });
     }
 }
