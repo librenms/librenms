@@ -99,7 +99,6 @@ modules:
                   low_warn_limit: PDU2-MIB::externalSensorLowerWarningThreshold
                   warn_limit: PDU2-MIB::externalSensorUpperWarningThreshold
                   high_limit: PDU2-MIB::externalSensorUpperCriticalThreshold
-                  divisor: 10
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='
