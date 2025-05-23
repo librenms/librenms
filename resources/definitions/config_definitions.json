@@ -1873,6 +1873,16 @@
             "order": 5,
             "type": "integer"
         },
+        "distributed_poller_memorylimit": {
+            "default": null,
+            "group": "poller",
+            "section": "distributed",
+            "order": 6,
+            "type": "integer",
+            "validate": {
+                "value": "int|nullable|between:1,99"
+            }            
+        },
         "graphing.availability": {
             "group": "poller",
             "section": "availability",

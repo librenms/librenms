@@ -110,6 +110,8 @@ class ServiceConfig(DBConfig):
     metricsendpoint = False
     metricsendpoint_port = 8080
 
+    memorylimit = None
+
     def populate(self):
         config = LibreNMS.get_config_data(self.BASE_DIR)
 
@@ -290,6 +292,7 @@ class ServiceConfig(DBConfig):
             "distributed_poller_metricsendpoint_port",
             ServiceConfig.metricsendpoint_port,
         )
+        self.memorylimit = config.get("distributed_poller_memorylimit", ServiceConfig.memorylimit )
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -490,69 +493,10 @@ class Service:
             raise RuntimeWarning("Not allowed to start Poller twice")
         self._started = True
 
-        logger.debug("Starting up queue managers...")
-
-        # initialize and start the worker pools
-        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
-        self.queue_managers["poller"] = self.poller_manager
-        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
-        self.queue_managers["discovery"] = self.discovery_manager
-        self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
-            self.config, self._lm
-        )
-        self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
-            self.config, self._lm
-        )
-        self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
-            self.config, self._lm
-        )
-        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
-
-        if self.config.update_enabled:
-            self.daily_timer.start()
-        self.stats_timer.start()
-        self.systemd_watchdog_timer.start()
-        if self.config.watchdog_enabled:
-            self.watchdog_timer.start()
-
-        logger.info("LibreNMS Service: {} started!".format(self.config.unique_name))
-        logger.info(
-            "Poller group {}. Using Python {} and {} locks and queues".format(
-                "0 (default)" if self.config.group == [0] else self.config.group,
-                python_version(),
-                "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
-            )
-        )
-        logger.info(
-            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-                self.config.discovery.workers
-                if self.config.discovery.enabled
-                else "disabled",
-                self.config.poller.workers
-                if self.config.poller.enabled
-                else "disabled",
-                self.config.services.workers
-                if self.config.services.enabled
-                else "disabled",
-                "enabled" if self.config.alerting.enabled else "disabled",
-                "enabled" if self.config.billing.enabled else "disabled",
-                "enabled" if self.config.ping.enabled else "disabled",
-            )
-        )
-
-        if self.config.update_enabled:
-            logger.info(
-                "Maintenance tasks will be run every {}".format(
-                    timedelta(seconds=self.config.update_frequency)
-                )
-            )
-        else:
-            logger.warning("Maintenance tasks are disabled.")
-
         if self.config.metricsendpoint:
             logger.debug("Prometheus metrics init")
             try:
-                from prometheus_client import Gauge, MetricsHandler
+                from prometheus_client import Gauge, Counter, MetricsHandler
             except ImportError:
                 logger.info(
                     "Prometheus client is not available. Metrics will be disabled."
@@ -620,10 +564,87 @@ class Service:
                         "librenms_node_master",
                         "Indicates if the node is the current leader (1 for master, 0 for non-master)",
                     )
+
+                    if self.config.memorylimit :
+                        prom_metrics["memory_paused"] = Gauge(
+                            "librenms_memory_paused",
+                            "Whether this dispatcher thread is currently paused due to memory pressure",
+                            ["poller_type"],
+                        )
+                        prom_metrics["memory_pause_events"] = Counter(
+                            "librenms_memory_pause_events_total",
+                            "Total number of times dispatchers paused intake due to memory pressure",
+                            ["poller_type"],
+                        )
+                        prom_metrics["memory_pause_seconds"] = Counter(
+                            "librenms_memory_pause_seconds_total",
+                            "Cumulative seconds dispatchers have spent paused due to memory pressure",
+                            ["poller_type"],
+                        )                        
+
                     self.prom_metrics = prom_metrics
                     logger.info("Prometheus metrics initialized.")
         else:
             logger.info("Prometheus metrics not enabled in config.")
+
+        logger.debug("Starting up queue managers...")
+
+        # initialize and start the worker pools
+        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm, self.prom_metrics)
+        self.queue_managers["poller"] = self.poller_manager
+        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm, self.prom_metrics)
+        self.queue_managers["discovery"] = self.discovery_manager
+        self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
+        self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
+        self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
+        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm, self.prom_metrics)
+
+        if self.config.update_enabled:
+            self.daily_timer.start()
+        self.stats_timer.start()
+        self.systemd_watchdog_timer.start()
+        if self.config.watchdog_enabled:
+            self.watchdog_timer.start()
+
+        logger.info("LibreNMS Service: {} started!".format(self.config.unique_name))
+        logger.info(
+            "Poller group {}. Using Python {} and {} locks and queues".format(
+                "0 (default)" if self.config.group == [0] else self.config.group,
+                python_version(),
+                "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
+            )
+        )
+        logger.info(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
+                "enabled" if self.config.alerting.enabled else "disabled",
+                "enabled" if self.config.billing.enabled else "disabled",
+                "enabled" if self.config.ping.enabled else "disabled",
+            )
+        )
+
+        if self.config.update_enabled:
+            logger.info(
+                "Maintenance tasks will be run every {}".format(
+                    timedelta(seconds=self.config.update_frequency)
+                )
+            )
+        else:
+            logger.warning("Maintenance tasks are disabled.")
 
         # Main dispatcher loop
         try:
