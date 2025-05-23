@@ -34,8 +34,7 @@ if (in_array(explode('-', $device['hardware'], 2)[0], ['GS1900'])) {
         $vlan = $indexes[0]; //1st element
         $mac_address = Mac::parse((string) implode(':', array_map('dechex', array_splice($indexes, -6, 6))))->hex(); //last 6 elements
 
-        $port = get_port_by_index_cache($device['device_id'], $port_data['Q-BRIDGE-MIB::dot1qTpFdbPort']);
-        $port_id = $port && $port['port_id'] ? $port['port_id'] : 0;
+        $port_id = PortCache::getIdFromIfIndex($port_data['Q-BRIDGE-MIB::dot1qTpFdbPort'], $device['device_id']);
 
         $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
 
