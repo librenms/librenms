@@ -521,7 +521,7 @@ class Service:
                     threading.Thread(target=httpd.serve_forever, daemon=True).start()
                 except OSError as e:
                     logger.error("Metrics endpoint bind failed on port %d: %s. Disabling metrics.",
-                        port, e)
+                        self.config.metricsendpoint_port, e)
                     self.config.metricsendpoint = False
                     self.prom_metrics = None
                 else:
