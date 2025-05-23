@@ -37,55 +37,103 @@ use Prometheus\RenderTextFormat;
 class MetricsController extends Controller
 {
     /**
-     * Expose Prometheus metrics on port 9100 only.
+     * Expose Prometheus metrics if enabled, and on configured port only (if port is configured)
      */
-    public function index(Request $request, AboutMetrics $aboutMetrics, AlertMetrics $alertMetrics, CollectorRegistry $registry)
-    {
+    public function index(
+        Request $request,
+        AboutMetrics $aboutMetrics,
+        AlertMetrics $alertMetrics,
+        CollectorRegistry $registry
+    ) {
         if (! Config::get('prometheus_metrics.enable')) {
             abort(404);
         }
 
-        $port = Config::get('prometheus_metrics.port');
-        if ($port) {
-            if ($request->getPort() !== $port) {
-                abort(404, 'Metrics exposed on ' . $port);
-            }
-        }
-
-        $stats = Cache::remember('about_metrics', 300, fn () => $aboutMetrics->collect());
-        foreach ($stats as $stat => $val) {
-            $g = $registry->getOrRegisterGauge('librenms', 'qty_' . preg_replace('/^stat_/', '', $stat), '', []);
-            $g->set($val);
-        }
+        $this->authorizePort($request);
+        $this->registerGeneralMetrics($registry, $aboutMetrics);
 
         if (Config::get('prometheus_metrics.alerts', false)) {
-            //  active alerts
-            foreach ($alertMetrics->active() as $ruleName => $openCount) {
-                $g = $registry->getOrRegisterGauge(
-                    'librenms',
-                    'alerts_active',
-                    'Number of currently open alerts',
-                    ['rule']
-                );
-                $g->set($openCount, [$ruleName]);
-            }
-
-            foreach ($alertMetrics->raisedLast5m() as $ruleName => $raisedCnt) {
-                $g = $registry->getOrRegisterGauge(
-                    'librenms',
-                    'alerts_raised_last_5m',
-                    'Alerts that changed to active in the past 5 minutes',
-                    ['rule']
-                );
-                $g->set($raisedCnt, [$ruleName]);
-            }
+            $this->registerActiveAlertMetrics($registry, $alertMetrics);
+            $this->registerRaisedAlertMetrics($registry, $alertMetrics);
         }
 
-        // Render Prometheus text format
+        return $this->renderMetrics($registry);
+    }
+
+    /**
+     * Ensure request port matches configured metrics port
+     */
+    private function authorizePort(Request $request): void
+    {
+        $port = Config::get('prometheus_metrics.port');
+        if ($port && $request->getPort() !== $port) {
+            abort(404, 'Metrics exposed on ' . $port);
+        }
+    }
+
+    /**
+     * Register general application metrics - qty of Devices, Ports, etc
+     */
+    private function registerGeneralMetrics(
+        CollectorRegistry $registry,
+        AboutMetrics $aboutMetrics
+    ): void {
+        $stats = Cache::remember('about_metrics', 300, fn() => $aboutMetrics->collect());
+        foreach ($stats as $stat => $val) {
+            $gauge = $registry->getOrRegisterGauge(
+                'librenms',
+                'qty_' . preg_replace('/^stat_/', '', $stat),
+                '',
+                []
+            );
+            $gauge->set($val);
+        }
+    }
+
+    /**
+     * Register metrics for currently active/open alerts
+     */
+    private function registerActiveAlertMetrics(
+        CollectorRegistry $registry,
+        AlertMetrics $alertMetrics
+    ): void {
+        $gauge = $registry->getOrRegisterGauge(
+            'librenms',
+            'alerts_active',
+            'Number of currently open alerts',
+            ['rule']
+        );
+        foreach ($alertMetrics->active() as $rule => $count) {
+            $gauge->set($count, [$rule]);
+        }
+    }
+
+    /**
+     * Register metrics for alerts raised in the last 5 minutes
+     */
+    private function registerRaisedAlertMetrics(
+        CollectorRegistry $registry,
+        AlertMetrics $alertMetrics
+    ): void {
+        $gauge = $registry->getOrRegisterGauge(
+            'librenms',
+            'alerts_raised_last_5m',
+            'Alerts that changed to active in the past 5 minutes',
+            ['rule']
+        );
+        foreach ($alertMetrics->raisedLast5m() as $rule => $count) {
+            $gauge->set($count, [$rule]);
+        }
+    }
+
+    /**
+     * Render the metrics in Prometheus text format
+     */
+    private function renderMetrics(CollectorRegistry $registry)
+    {
         $renderer = new RenderTextFormat();
-        $body = $renderer->render($registry->getMetricFamilySamples());
+        $body     = $renderer->render($registry->getMetricFamilySamples());
 
         return response($body, 200)
             ->header('Content-Type', RenderTextFormat::MIME_TYPE);
     }
-}
