@@ -26,7 +26,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AboutAlerts;
+use App\Services\AlertMetrics;
 use App\Services\AboutMetrics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -39,7 +39,7 @@ class MetricsController extends Controller
     /**
      * Expose Prometheus metrics on port 9100 only.
      */
-    public function index(Request $request, AboutMetrics $aboutMetrics, AboutAlerts $aboutAlerts, CollectorRegistry $registry)
+    public function index(Request $request, AboutMetrics $aboutMetrics, AlertMetrics $alertMetrics, CollectorRegistry $registry)
     {
         if (! Config::get('prometheus_metrics.enable')) {
             abort(404);
@@ -60,7 +60,7 @@ class MetricsController extends Controller
 
         if (Config::get('prometheus_metrics.alerts', false)) {
             //  active alerts
-            foreach ($aboutAlerts->active() as $ruleName => $openCount) {
+            foreach ($alertMetrics->active() as $ruleName => $openCount) {
                 $g = $registry->getOrRegisterGauge(
                     'librenms',
                     'alerts_active',
@@ -70,7 +70,7 @@ class MetricsController extends Controller
                 $g->set($openCount, [$ruleName]);
             }
 
-            foreach ($aboutAlerts->raisedLast5m() as $ruleName => $raisedCnt) {
+            foreach ($alertMetrics->raisedLast5m() as $ruleName => $raisedCnt) {
                 $g = $registry->getOrRegisterGauge(
                     'librenms',
                     'alerts_raised_last_5m',

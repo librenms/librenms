@@ -1,7 +1,7 @@
 <?php
 
 /*
- * AboutAlerts.php
+ * AlertMetrics.php
  *
  * -Description-
  *
@@ -29,7 +29,7 @@ namespace App\Services;
 use App\Models\AlertRule;
 use Illuminate\Support\Facades\Cache;
 
-class AboutAlerts
+class AlertMetrics
 {
     /**
      * @return array<string,int> rule_name => open_count
