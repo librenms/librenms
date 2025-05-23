@@ -26,8 +26,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AlertMetrics;
 use App\Services\AboutMetrics;
+use App\Services\AlertMetrics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Config;
