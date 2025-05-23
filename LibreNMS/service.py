@@ -247,9 +247,11 @@ class ServiceConfig(DBConfig):
         self.redis_timeout = int(
             os.getenv(
                 "REDIS_TIMEOUT",
-                self.alerting.frequency
-                if self.alerting.frequency != 0
-                else self.redis_timeout,
+                (
+                    self.alerting.frequency
+                    if self.alerting.frequency != 0
+                    else self.redis_timeout
+                ),
             )
         )
 
@@ -292,7 +294,9 @@ class ServiceConfig(DBConfig):
             "distributed_poller_metricsendpoint_port",
             ServiceConfig.metricsendpoint_port,
         )
-        self.memorylimit = config.get("distributed_poller_memorylimit", ServiceConfig.memorylimit )
+        self.memorylimit = config.get(
+            "distributed_poller_memorylimit", ServiceConfig.memorylimit
+        )
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -503,6 +507,7 @@ class Service:
                 )
                 prom_metrics = None
             else:
+
                 class ServiceMetricsHandler(MetricsHandler):
                     def do_GET(self):
                         if self.path in ["/health", "/healthz"]:
@@ -515,13 +520,20 @@ class Service:
                         else:
                             # default /metrics handling
                             super().do_GET()
+
                 from http.server import HTTPServer
+
                 try:
-                    httpd = HTTPServer(("", self.config.metricsendpoint_port), ServiceMetricsHandler)
+                    httpd = HTTPServer(
+                        ("", self.config.metricsendpoint_port), ServiceMetricsHandler
+                    )
                     threading.Thread(target=httpd.serve_forever, daemon=True).start()
                 except OSError as e:
-                    logger.error("Metrics endpoint bind failed on port %d: %s. Disabling metrics.",
-                        self.config.metricsendpoint_port, e)
+                    logger.error(
+                        "Metrics endpoint bind failed on port %d: %s. Disabling metrics.",
+                        self.config.metricsendpoint_port,
+                        e,
+                    )
                     self.config.metricsendpoint = False
                     self.prom_metrics = None
                 else:
@@ -565,7 +577,7 @@ class Service:
                         "Indicates if the node is the current leader (1 for master, 0 for non-master)",
                     )
 
-                    if self.config.memorylimit :
+                    if self.config.memorylimit:
                         prom_metrics["memory_paused"] = Gauge(
                             "librenms_memory_paused",
                             "Whether this dispatcher thread is currently paused due to memory pressure",
@@ -580,7 +592,7 @@ class Service:
                             "librenms_memory_pause_seconds_total",
                             "Cumulative seconds dispatchers have spent paused due to memory pressure",
                             ["poller_type"],
-                        )                        
+                        )
 
                     self.prom_metrics = prom_metrics
                     logger.info("Prometheus metrics initialized.")
@@ -590,9 +602,13 @@ class Service:
         logger.debug("Starting up queue managers...")
 
         # initialize and start the worker pools
-        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm, self.prom_metrics)
+        self.poller_manager = LibreNMS.PollerQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
         self.queue_managers["poller"] = self.poller_manager
-        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm, self.prom_metrics)
+        self.discovery_manager = LibreNMS.DiscoveryQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
         self.queue_managers["discovery"] = self.discovery_manager
         self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
             self.config, self._lm, self.prom_metrics
@@ -603,7 +619,9 @@ class Service:
         self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
             self.config, self._lm, self.prom_metrics
         )
-        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm, self.prom_metrics)
+        self.queue_managers["ping"] = LibreNMS.PingQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
 
         if self.config.update_enabled:
             self.daily_timer.start()
@@ -622,15 +640,21 @@ class Service:
         )
         logger.info(
             "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-                self.config.discovery.workers
-                if self.config.discovery.enabled
-                else "disabled",
-                self.config.poller.workers
-                if self.config.poller.enabled
-                else "disabled",
-                self.config.services.workers
-                if self.config.services.enabled
-                else "disabled",
+                (
+                    self.config.discovery.workers
+                    if self.config.discovery.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.poller.workers
+                    if self.config.poller.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.services.workers
+                    if self.config.services.enabled
+                    else "disabled"
+                ),
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",
