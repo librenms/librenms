@@ -78,7 +78,7 @@ class MetricsController extends Controller
         CollectorRegistry $registry,
         AboutMetrics $aboutMetrics
     ): void {
-        $stats = Cache::remember('about_metrics', 300, fn() => $aboutMetrics->collect());
+        $stats = Cache::remember('about_metrics', 300, fn () => $aboutMetrics->collect());
         foreach ($stats as $stat => $val) {
             $gauge = $registry->getOrRegisterGauge(
                 'librenms',
@@ -132,7 +132,7 @@ class MetricsController extends Controller
     private function renderMetrics(CollectorRegistry $registry)
     {
         $renderer = new RenderTextFormat();
-        $body     = $renderer->render($registry->getMetricFamilySamples());
+        $body = $renderer->render($registry->getMetricFamilySamples());
 
         return response($body, 200)
             ->header('Content-Type', RenderTextFormat::MIME_TYPE);
