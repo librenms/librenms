@@ -137,3 +137,4 @@ class MetricsController extends Controller
         return response($body, 200)
             ->header('Content-Type', RenderTextFormat::MIME_TYPE);
     }
+}
