@@ -90,7 +90,7 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, static>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
      *
      * All the active/open alerts belonging to this rule.
      */
