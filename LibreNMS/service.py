@@ -909,7 +909,8 @@ class Service:
         :param flag: Flags accompanying signal
         """
         logger.warning(
-            "Received signal SIGUP on thread %s, handling", threading.current_thread().name
+            "Received signal SIGUP on thread %s, handling",
+            threading.current_thread().name,
         )
         self.reload_flag = True
 
@@ -920,7 +921,8 @@ class Service:
         :param flag: Flags accompanying signal
         """
         logger.warning(
-            "Received signal SIGTERM on thread %s, handling", threading.current_thread().name
+            "Received signal SIGTERM on thread %s, handling",
+            threading.current_thread().name,
         )
         self.terminate_flag = True
 

@@ -21,12 +21,8 @@ if __name__ == "__main__":
         type=int,
         help="Set the poller group for this poller",
     )
-    parser.add_argument(
-        "-v", "--verbose", action="count", help="Show verbose output."
-    )
-    parser.add_argument(
-        "-d", "--debug", action="store_true", help="Show debug output."
-    )
+    parser.add_argument("-v", "--verbose", action="count", help="Show verbose output.")
+    parser.add_argument("-d", "--debug", action="store_true", help="Show debug output.")
     parser.add_argument(
         "-o",
         "--log-output",
@@ -66,9 +62,9 @@ if __name__ == "__main__":
 
     elif args.log_format == "kv":
         kv_fmt = (
-            'ts=%(asctime)s '
-            'level=%(levelname)s '
-            'thread=%(threadName)s '
+            "ts=%(asctime)s "
+            "level=%(levelname)s "
+            "thread=%(threadName)s "
             'msg="%(message)s"'
         )
         handler.setFormatter(logging.Formatter(kv_fmt, "%Y-%m-%dT%H:%M:%S%z"))
@@ -116,7 +112,9 @@ if __name__ == "__main__":
     service.config.log_output = args.log_output
 
     if args.group:
-        service.config.group = args.group if isinstance(args.group, list) else [args.group]
+        service.config.group = (
+            args.group if isinstance(args.group, list) else [args.group]
+        )
 
     logger.info(
         "Entering main LibreNMS service loop on {}/{}...".format(
