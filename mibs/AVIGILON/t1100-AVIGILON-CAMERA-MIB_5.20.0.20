@@ -1,0 +1,374 @@
+AVIGILON-CAMERA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	avigCommonMIB
+		FROM AVIGILON-ROOT-MIB
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF			-- RFC 2580
+	Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+	Unsigned32, TimeTicks, Counter64, Gauge32
+		FROM SNMPv2-SMI				-- RFC 2578
+;
+
+-- Module: IP Camera MIB		
+		
+cameraMIB MODULE-IDENTITY
+	LAST-UPDATED "201611221000Z"
+	ORGANIZATION
+		"Avigilon Corporation"
+	CONTACT-INFO
+		"Postal:  Avigilon Corporation
+				  Box 378
+				  #101-1001 West Broadway
+				  Vancouver, British Columbia
+				  V6H 4E4
+				  Canada
+				  Phone: +1 604 629 5182
+				  Fax:	 +1 604 629 5183
+				  E-Mail: 
+				  Web: www.avigilon.com"
+	DESCRIPTION
+		"The Avigilon camera MIB defines sensors for camera state and traps
+		for event notifications. Copyright (C) 2015-2016."
+	REVISION	 "201611221000Z"
+	DESCRIPTION
+		"Update document for conformance and clarity. This revision contains no OID changes."
+	REVISION	 "201508251000Z"
+	DESCRIPTION
+		"The initial draft. Copyright (C) 2015-2016"
+	::= { avigCommonMIB 1 }
+
+cameraSensors  OBJECT IDENTIFIER ::= { cameraMIB 1 }
+cameraNotifications  OBJECT IDENTIFIER ::= { cameraMIB 2 }
+
+-- Group Definitions
+
+temperatureSensorsGroup OBJECT-GROUP
+	OBJECTS {	tempSensorStatus,
+				tempSensorValue }
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects relating to temperature status."
+	::= { cameraMIB 3 }
+			
+ifSensorsGroup OBJECT-GROUP
+	OBJECTS {	ifOutBytes,
+				ifInBytes,
+				ifInBandwidth,
+				ifOutBandwidth,
+				ifUtilization,
+				ifLineSpeed }
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects relating to the camera's network interface."
+	::= { cameraMIB 4 }
+			
+notificationDescriptionGroup OBJECT-GROUP
+	OBJECTS {	alarmID,
+				alarmName,
+				alarmText }
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects that describe properties of a notification."		
+	::= { cameraMIB 5 }			   
+
+uptimeSensorsGroup OBJECT-GROUP
+	OBJECTS {	bootCount,
+				uptime }
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects that describe camera uptime and boot count."
+	::= { cameraMIB 6 }
+	
+storageSensorsGroup OBJECT-GROUP
+	OBJECTS { storageState }
+	STATUS	current
+	DESCRIPTION
+			"A collection of objects that describe the state of the SD card on the camera."
+	::= { cameraMIB 7 }
+
+cameraNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {	alarmNew,
+					alarmCleared,
+					alarmSingle }
+	STATUS current
+	DESCRIPTION
+			" A collection of notifications that describe the type of event that occurred."
+	::= { cameraMIB 8 }
+	
+-- Module Compliance
+
+mandatorySensorGroups MODULE-COMPLIANCE
+	STATUS	current
+	DESCRIPTION
+			"This list of objects is guaranteed to be implemented for every camera."
+	MODULE
+		MANDATORY-GROUPS {	uptimeSensorsGroup,
+							notificationDescriptionGroup,
+							ifSensorsGroup,
+							memorySensorsGroup }
+	::= { cameraMIB 9 }
+	
+optionalSensorGroups MODULE-COMPLIANCE
+	STATUS	current
+	DESCRIPTION
+			"This list of objects is implemented only for some cameras."
+	MODULE
+		GROUP	storageSensorsGroup
+		DESCRIPTION
+			"If a camera has SD card support, this group will be enabled."
+			
+		GROUP	temperatureSensorsGroup
+		DESCRIPTION
+			"If a camera has one or more temperature sensors, this group will be enabled."
+
+		GROUP	irIlluminatorStateGroup
+		DESCRIPTION
+			"If a camera has ir illuminator, this group will be enabled."
+
+	::= { cameraMIB 10 }
+
+mandatoryNotificationGroups MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+			"This list of notifications is guaranteed to be implemented for every camera."
+	MODULE
+		MANDATORY-GROUPS { cameraNotificationsGroup }
+	::= { cameraMIB 11 }
+
+memorySensorsGroup OBJECT-GROUP
+		OBJECTS {	memAvailable }
+		STATUS	current
+		DESCRIPTION
+				"A collection of objects that describe camera system memory availability."
+		::= { cameraMIB 12 }
+
+irIlluminatorStateGroup OBJECT-GROUP
+		OBJECTS {	irIlluminatorState }
+		STATUS	current
+		DESCRIPTION
+				"A collection of objects that describe the state of ir illuminator."
+		::= { cameraMIB 13 }
+
+-- Temperature Sensors
+tempSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF TempSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table of temperature sensors located on this camera."
+	::= { cameraSensors 1 }
+
+tempSensorEntry OBJECT-TYPE
+	SYNTAX		TempSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry for a temperature sensor. The temperature sensor is
+		indexed by its ID."
+	INDEX { tempSensorId }
+	::= { tempSensorTable 1 }
+
+TempSensorEntry ::= SEQUENCE {
+	tempSensorType		INTEGER,
+	tempSensorId		Unsigned32,
+	tempSensorStatus	INTEGER,
+	tempSensorValue		Integer32
+}
+
+tempSensorType OBJECT-TYPE
+	SYNTAX		INTEGER { mainSensor(1) }
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The type of a temperature sensor, i.e. where it is mounted."
+	::= { tempSensorEntry 1 }
+
+tempSensorId OBJECT-TYPE
+	SYNTAX		Unsigned32 (1..128)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The unique identifier for a temperature sensor."
+	::= { tempSensorEntry 2 }
+
+tempSensorStatus OBJECT-TYPE
+	SYNTAX		INTEGER { ok(1), failure(2), outOfBoundary(3) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The status of a temperature sensor."
+	::= { tempSensorEntry 3 }
+
+tempSensorValue OBJECT-TYPE
+	SYNTAX		Integer32 (-176..150)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The temperature as measured in degrees Celsius."
+	::= { tempSensorEntry 4 }
+
+-- Boot Count
+bootCount OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of times the camera has rebooted since the last
+		factory reset."
+	::= { cameraSensors 2 }
+
+-- Uptime
+uptime OBJECT-TYPE
+	SYNTAX		TimeTicks
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The amount of time the camera has been operating for since the last reboot 
+		measured in Timeticks."
+	::= { cameraSensors 3 }
+
+-- Network Interface
+
+ifEntry OBJECT IDENTIFIER ::= { cameraSensors 4 }
+
+-- if Out Bytes
+ifOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of octets transmitted."
+	::= { ifEntry 1 }
+
+-- if In Bytes
+ifInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total number of octets received."
+	::= { ifEntry 2 }
+
+-- if In Bandwidth
+ifInBandwidth OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The current bandwidth being transmitted in bits per second."
+	::= { ifEntry 3 }
+	
+-- if Out Bandwidth
+ifOutBandwidth OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The current bandwidth being received in bits per second."
+	::= { ifEntry 4 }
+
+-- if Utilization
+ifUtilization OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The percentage utilization of the network interface."
+	::= { ifEntry 5 }
+	
+-- if Line Speed
+ifLineSpeed OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The maximum speed of the network interface in bits per second."
+	::= { ifEntry 6 }
+
+-- Storage State
+storageState OBJECT-TYPE
+	SYNTAX		INTEGER { mediaNotPresent(1), mediaDetected(2), 
+				existingDataOnMediaDetected(3), mediaFormatting(4), 
+				scanningForRecordings(5), readOnly(6), readyToRecord(7), 
+				recording(8), errorFormatting(9), errorWriting(10),
+				insufficientMediaCapacity(11), insufficientMediaSpeed(12),
+				error(13) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Describes the current state of the SD card."
+	::= { cameraSensors 5 }
+
+-- Memory Utilization
+memAvailable OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Total system memory available on a device."
+	::= { cameraSensors 6 }
+
+-- IR Illuminator state
+irIlluminatorState OBJECT-TYPE
+	SYNTAX		INTEGER { unplugged(1), unverified(2), working(3), broken(4) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Describes the current state of the IR illuminator"
+	::= { cameraSensors 7 }
+
+-- Camera Traps
+
+cameraNotificationPrefix OBJECT IDENTIFIER
+	::= { cameraNotifications 0 }
+
+alarmID OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"This object is used to uniquely identify alarms."
+	::= { cameraNotifications 1 }
+
+alarmName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"A string that identifies the type of alarm."
+	::= { cameraNotifications 2 }
+
+alarmText OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"Additional information regarding the alarm."
+	::= { cameraNotifications 3 }
+	
+alarmNew NOTIFICATION-TYPE
+	OBJECTS		{ alarmID, alarmName, alarmText }
+	STATUS		current
+	DESCRIPTION
+		"This notification indicates a new alarm has occurred 
+		that has a corresponding cleared state. This alarm will
+		not be sent again until this alarm has been cleared." 
+	::= { cameraNotificationPrefix 1 }
+
+alarmCleared NOTIFICATION-TYPE
+	OBJECTS		{ alarmID, alarmName, alarmText }
+	STATUS		current
+	DESCRIPTION
+		"This notification indicates that a previously sent 
+		new alarm has been cleared."
+	::= { cameraNotificationPrefix 2 }
+
+alarmSingle NOTIFICATION-TYPE
+	OBJECTS		{ alarmID, alarmName, alarmText }
+	STATUS		current
+	DESCRIPTION
+		"This notification indicates that this alarm has no state."
+	::= { cameraNotificationPrefix 3 }
+	
+END
