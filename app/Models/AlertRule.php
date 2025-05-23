@@ -89,11 +89,11 @@ class AlertRule extends BaseModel
         return $this->hasMany(Alert::class, 'rule_id');
     }
 
-   /**
- * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, \App\Models\AlertRule>
- *
- * All the active/open alerts belonging to this rule.
- */
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, \App\Models\AlertRule>
+     *
+     * All the active/open alerts belonging to this rule.
+     */
     public function openAlerts(): HasMany
     {
         return $this->alerts()->active();
