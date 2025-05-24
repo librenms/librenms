@@ -255,7 +255,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
-            Route::post('device', Table\DeviceController::class);
+            Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class);
@@ -266,7 +266,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('location', Table\LocationController::class);
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
-            Route::post('outages', Table\OutagesController::class);
+            Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
             Route::post('port-stp', Table\PortStpController::class);
