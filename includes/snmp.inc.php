@@ -242,6 +242,7 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
 }//end snmp_get_multi()
 /**
  * @deprecated Please use SnmpQuery instead
+ *
  * @return mixed[]
  */
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null): array

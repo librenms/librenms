@@ -43,6 +43,7 @@ class Tachyon extends OS implements
 {
     /**
      * Discover wireless clients.
+     *
      * @return list<\LibreNMS\Device\WirelessSensor>
      */
     public function discoverWirelessClients(): array
@@ -67,6 +68,7 @@ class Tachyon extends OS implements
 
     /**
      * Discover wireless frequency.
+     *
      * @return list<\LibreNMS\Device\WirelessSensor>
      */
     public function discoverWirelessFrequency(): array

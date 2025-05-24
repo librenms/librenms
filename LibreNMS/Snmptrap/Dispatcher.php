@@ -39,7 +39,7 @@ class Dispatcher
      */
     public static function handle(Trap $trap): bool
     {
-        if (!$trap->getDevice() instanceof \App\Models\Device) {
+        if (! $trap->getDevice() instanceof \App\Models\Device) {
             Log::warning('Could not find device for trap', ['trap_text' => $trap->raw]);
 
             return false;
