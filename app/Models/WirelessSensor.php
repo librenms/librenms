@@ -77,7 +77,7 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
 
     public function classDescr()
     {
-        return __('sensors.' . $this->sensor_class . '.short');
+        return __('wireless.' . $this->sensor_class . '.short');
     }
 
     public function icon(): string
