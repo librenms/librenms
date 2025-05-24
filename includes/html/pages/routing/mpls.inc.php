@@ -464,6 +464,11 @@ if ($vars['view'] == 'saps') {
         $port = cleanPort($port);
 
         $device = device_by_id_cache($sap['device_id']);
+
+        if ($device['disabled'] == 1) {
+            continue;
+        }
+    
         if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
