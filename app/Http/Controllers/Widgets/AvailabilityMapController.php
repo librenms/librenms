@@ -164,7 +164,7 @@ class AvailabilityMapController extends WidgetController
                 'status' => $service->service_status,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
-                'label' => $this->getServiceLabel($service, $state_name),
+                'label' => $this->getServiceLabel($service),
                 'labelClass' => $class,
             ];
         }
@@ -210,7 +210,7 @@ class AvailabilityMapController extends WidgetController
         }
     }
 
-    private function getServiceLabel(Service $service, string $state_name): string
+    private function getServiceLabel(Service $service): string
     {
         if ($this->getSettings()['color_only_select'] == 1) {
             return '';
