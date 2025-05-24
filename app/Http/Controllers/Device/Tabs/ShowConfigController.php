@@ -88,7 +88,7 @@ class ShowConfigController extends Controller implements DeviceTab
         return $this->rancidPath;
     }
 
-    private function getRancidConfigFile()
+    private function getRancidConfigFile(): bool|string
     {
         if (is_null($this->rancidFile)) {
             $this->rancidFile = $this->findRancidConfigFile();

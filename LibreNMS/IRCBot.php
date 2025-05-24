@@ -507,7 +507,7 @@ class IRCBot
 
     //end respond()
 
-    private function getChan($param): string
+    private function getChan(string $param): string
     {
         $data = explode('PRIVMSG ', $this->data, 3);
         $data = explode(' ', $data[1], 2);
@@ -517,7 +517,7 @@ class IRCBot
 
     //end getChan()
 
-    private function getUser($param): string
+    private function getUser(string $param): string
     {
         $arrData = explode('!', $param, 2);
 
@@ -526,7 +526,7 @@ class IRCBot
 
     //end getUser()
 
-    private function getUserHost($param): string
+    private function getUserHost(string $param): string
     {
         $arrData = explode(' ', $param, 2);
 
@@ -687,7 +687,7 @@ class IRCBot
 
     //end irc_raw()
 
-    private function _auth($params)
+    private function _auth($params): int|false
     {
         global $authorizer;
         $params = explode(' ', $params, 2);
@@ -746,7 +746,7 @@ class IRCBot
 
     //end _reload()
 
-    private function _join($params)
+    private function _join($params): bool|int
     {
         if ($this->user['user']->can('irc.join')) {
             return $this->joinChan($params);
@@ -770,7 +770,7 @@ class IRCBot
 
     //end _quit()
 
-    private function _help($params)
+    private function _help($params): int|false
     {
         $msg = implode(', ', $this->commands);
         if (count($this->external) > 0) {
@@ -782,7 +782,7 @@ class IRCBot
 
     //end _help()
 
-    private function _version($params)
+    private function _version($params): int|false
     {
         $version = Version::get();
 
@@ -851,7 +851,7 @@ class IRCBot
 
     //end _log()
 
-    private function _down($params)
+    private function _down($params): int|false
     {
         $devices = Device::hasAccess($this->user['user'])->isDown()
             ->select(['device_id', 'hostname', 'sysName', 'display', 'ip'])->get();
@@ -863,7 +863,7 @@ class IRCBot
 
     //end _down()
 
-    private function _device($params)
+    private function _device($params): int|false
     {
         $params = explode(' ', $params);
         $hostname = $params[0];
@@ -881,7 +881,7 @@ class IRCBot
 
     //end _device()
 
-    private function _port($params)
+    private function _port($params): int|false
     {
         $params = explode(' ', $params);
         $hostname = $params[0];
@@ -910,7 +910,7 @@ class IRCBot
 
     //end _port()
 
-    private function _listdevices($params)
+    private function _listdevices($params): int|false
     {
         $devices = Device::hasAccess($this->user['user'])->pluck('hostname');
 
@@ -921,7 +921,7 @@ class IRCBot
 
     //end _listdevices()
 
-    private function _status($params)
+    private function _status($params): int|false
     {
         $params = explode(' ', $params);
         $statustype = $params[0];

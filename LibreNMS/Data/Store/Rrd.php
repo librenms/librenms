@@ -229,7 +229,7 @@ class Rrd extends BaseDatastore
      * @param  array  $data
      * @return array|string
      */
-    public function update($filename, $data)
+    public function update($filename, $data): array|null|string
     {
         $values = [];
         // Do some sanitation on the data if passed as an array.

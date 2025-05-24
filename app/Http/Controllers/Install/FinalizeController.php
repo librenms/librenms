@@ -102,7 +102,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         ]);
     }
 
-    private function writeEnvFile()
+    private function writeEnvFile(): string
     {
         $env = EnvHelper::writeEnv(
             $this->envVars(),
