@@ -26,12 +26,16 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Traits\HasThresholds;
 use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 class WirelessSensor extends DeviceRelatedModel implements Keyable
 {
+    use HasThresholds;
+
     const CREATED_AT = null;
     const UPDATED_AT = 'lastupdate';
     protected $primaryKey = 'sensor_id';
@@ -73,14 +77,46 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
 
     public function classDescr()
     {
-        return __("wireless.$this->sensor_class.short");
+        return __('sensors.' . $this->sensor_class . '.short');
     }
 
-    public function icon()
+    public function icon(): string
     {
         return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
             ->get($this->sensor_class, []))
             ->get('icon', 'signal');
+    }
+
+    public function unit(): string
+    {
+        return __('wireless.' . $this->sensor_class . '.unit');
+    }
+
+    public function getGraphType(): string
+    {
+        return 'wireless_' . $this->sensor_class;
+    }
+
+    public function formatValue($field = 'sensor_current'): string
+    {
+        $value = $this->$field;
+
+        if ($value === null) {
+            return $field == 'sensor_current' ? 'NaN' : '-';
+        }
+
+        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
+        }
+
+        return match ($this->sensor_class) {
+            'power', 'rate' => Number::formatSi($value, 3, 0, $this->unit()),
+            'frequency' => Number::formatSi($value * 1000000, 3, 0, 'Hz'),
+            'distance' => Number::formatSi($value * 1000, 2, 3, 'm'),
+            'dbm' => round($value, 3) . ' ' . $this->unit(),
+            default => $value . ' ' . $this->unit(),
+        };
     }
 
     public function getCompositeKey(): string

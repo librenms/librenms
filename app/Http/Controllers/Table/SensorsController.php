@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Sensor;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -21,7 +22,7 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(Sensor::getTypes()),
+            'class' => Rule::in(\LibreNMS\Enum\Sensor::values()),
         ];
     }
 
@@ -62,15 +63,14 @@ class SensorsController extends TableController
     }
 
     /**
-     * @param  Sensor  $sensor
+     * @param  Sensor|WirelessSensor  $sensor
      */
     public function formatItem($sensor): array
     {
         $request = \Illuminate\Support\Facades\Request::instance();
-        $graph_type = 'sensor_' . $request->input('class');
         $graph_array = [
-            'type' => $graph_type,
-            'popup_title' => htmlentities(strip_tags($sensor->device->displayName() . ': ' . $sensor->sensor_descr)),
+            'type' => $sensor->getGraphType(),
+            'popup_title' => htmlentities(strip_tags($sensor->device?->displayName() . ': ' . $sensor->sensor_descr)),
             'id' => $sensor->sensor_id,
             'from' => '-1d',
             'height' => 20,

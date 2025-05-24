@@ -34,6 +34,7 @@ use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\Select;
+use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Table;
@@ -42,6 +43,7 @@ use App\Http\Controllers\UserPreferencesController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
+use App\Http\Controllers\WirelessSensorController;
 use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
@@ -184,6 +186,9 @@ Route::middleware(['auth'])->group(function () {
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
+    Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
+    Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
+
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
 
@@ -249,6 +254,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('table')->group(function () {
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
+            Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class);
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
@@ -258,7 +264,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
             Route::post('location', Table\LocationController::class);
-            Route::post('mempools', Table\MempoolsController::class);
+            Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class);
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
@@ -270,11 +276,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('processors/export', [Table\ProcessorsController::class, 'export']);
             Route::post('routes', Table\RoutesTablesController::class);
             Route::post('sensors', Table\SensorsController::class)->name('table.sensors');
-            Route::get('sensors/{class?}/export', [Table\SensorsController::class, 'export']);
+            Route::get('sensors/export', [Table\SensorsController::class, 'export']);
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
             Route::post('syslog', Table\SyslogController::class);
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
+            Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
             Route::post('vminfo', Table\VminfoController::class);
