@@ -88,7 +88,7 @@ class XirrusAos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
 
@@ -103,7 +103,7 @@ class XirrusAos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return $this->discoverSensor('frequency', 'realtimeMonitorChannel', '.1.3.6.1.4.1.21013.1.2.24.7.1.3.');
     }
@@ -115,7 +115,7 @@ class XirrusAos extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors);
     }
@@ -125,7 +125,7 @@ class XirrusAos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         return $this->discoverSensor('noise-floor', 'realtimeMonitorNoiseFloor', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
     }
@@ -136,7 +136,7 @@ class XirrusAos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         return $this->discoverSensor('rate', 'realtimeMonitorAverageDataRate', '.1.3.6.1.4.1.21013.1.2.24.7.1.7.');
     }
@@ -147,7 +147,7 @@ class XirrusAos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         return $this->discoverSensor('rssi', 'realtimeMonitorAverageRSSI', '.1.3.6.1.4.1.21013.1.2.24.7.1.8.');
     }
@@ -159,7 +159,7 @@ class XirrusAos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         return $this->discoverSensor('snr', 'realtimeMonitorSignalToNoiseRatio', '.1.3.6.1.4.1.21013.1.2.24.7.1.9.');
     }
@@ -170,12 +170,15 @@ class XirrusAos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         return $this->discoverSensor('utilization', 'realtimeMonitorDot11Busy', '.1.3.6.1.4.1.21013.1.2.24.7.1.11.');
     }
 
-    private function discoverSensor($type, $oid, $oid_num_prefix)
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    private function discoverSensor(string $type, string $oid, string $oid_num_prefix): array
     {
         $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
         $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');

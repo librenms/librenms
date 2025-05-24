@@ -38,7 +38,7 @@ class PollerGroup extends Model
     /**
      * Initialize this class
      */
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 

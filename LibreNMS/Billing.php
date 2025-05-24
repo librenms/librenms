@@ -75,7 +75,7 @@ class Billing
         return $cur_used / $since * $total;
     }
 
-    public static function getValue($host, $port, $id, $inout): int
+    public static function getValue($host, $port, string $id, string $inout): int
     {
         $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
         $device = dbFetchRow('SELECT * from `devices` WHERE `hostname` = ? LIMIT 1', [$host]);
@@ -205,7 +205,7 @@ class Billing
         return $data;
     }
 
-    private static function getSum($bill_id, $datefrom, $dateto)
+    private static function getSum($bill_id, $datefrom, $dateto): ?array
     {
         $sum = dbFetchRow('SELECT SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 

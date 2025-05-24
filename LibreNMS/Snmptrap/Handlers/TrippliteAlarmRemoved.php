@@ -32,7 +32,7 @@ use LibreNMS\Snmptrap\Trap;
 
 class TrippliteAlarmRemoved extends Tripplite implements SnmptrapHandler
 {
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $trap->log($this->describe($trap), $this->getSeverity($trap));
     }

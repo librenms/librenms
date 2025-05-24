@@ -124,7 +124,7 @@ class CustomMapNodeImageController extends Controller
                   ->header('Content-Type', 'text/plain');
     }
 
-    private function updateImage(FormRequest $request, CustomMapNodeImage $image)
+    private function updateImage(FormRequest $request, CustomMapNodeImage $image): void
     {
         if ($request->has('image')) {
             $image_content = $request->image->getContent();

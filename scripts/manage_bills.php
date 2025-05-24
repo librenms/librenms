@@ -29,7 +29,7 @@ function list_bills($bill_name)
 }
 
 // Create a new bill.
-function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
+function create_bill(string $bill_name, string $bill_type, string $bill_cdr, $bill_day): string|false|null
 {
     /** create_bill
      * Note:
@@ -52,7 +52,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
 }
 
 // This will get an array of devices we are interested in from the CLI glob
-function get_devices($host_glob, $nameType)
+function get_devices($host_glob, string $nameType)
 {
     return dbFetchRows('SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `' . $nameType . '` LIKE ?', ["%$host_glob%"]);
 }
@@ -65,7 +65,7 @@ function flush_bill($id)
     return dbDelete('bill_ports', '`bill_id` = ?', [$id]);
 }
 
-function add_ports_to_bill($devs, $intf_glob, $id)
+function add_ports_to_bill($devs, $intf_glob, $id): bool
 {
     // Abort mission if no bill id is passed.
     if (empty($id)) {
@@ -94,7 +94,7 @@ function add_ports_to_bill($devs, $intf_glob, $id)
     return true;
 }
 
-function print_help()
+function print_help(): void
 {
     echo "Usage:\n";
     echo "Updating bills\n";

@@ -36,7 +36,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 class ShowConfigController extends Controller implements DeviceTab
 {
     private $rancidPath;
-    private $rancidFile;
+    private string|bool|null $rancidFile = null;
 
     public function visible(Device $device): bool
     {
@@ -70,7 +70,7 @@ class ShowConfigController extends Controller implements DeviceTab
         ];
     }
 
-    private function oxidizedEnabled(Device $device)
+    private function oxidizedEnabled(Device $device): bool
     {
         return Config::get('oxidized.enabled') === true
                 && Config::has('oxidized.url')
@@ -88,7 +88,7 @@ class ShowConfigController extends Controller implements DeviceTab
         return $this->rancidPath;
     }
 
-    private function getRancidConfigFile()
+    private function getRancidConfigFile(): bool|string
     {
         if (is_null($this->rancidFile)) {
             $this->rancidFile = $this->findRancidConfigFile();
@@ -97,7 +97,7 @@ class ShowConfigController extends Controller implements DeviceTab
         return $this->rancidFile;
     }
 
-    private function findRancidConfigFile()
+    private function findRancidConfigFile(): string|false
     {
         if (Config::has('rancid_configs') && ! is_array(Config::get('rancid_configs'))) {
             Config::set('rancid_configs', (array) Config::get('rancid_configs', []));

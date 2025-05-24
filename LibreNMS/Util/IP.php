@@ -257,7 +257,7 @@ abstract class IP
         return $this->host_bits == 32 ? 'ipv4' : 'ipv6';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->cidr == $this->host_bits) {
             return $this->compressed();

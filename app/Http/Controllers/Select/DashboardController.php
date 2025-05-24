@@ -30,7 +30,7 @@ use App\Models\Dashboard;
 
 class DashboardController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['dashboard_name', 'username'];
     }

@@ -39,7 +39,7 @@ class Dnos extends OS implements ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDeviceArray();
         $processors = [];
@@ -103,7 +103,7 @@ class Dnos extends OS implements ProcessorDiscovery
      * @param  string  $name  Name prefix to display to user
      * @param  string  $type  custom type (if there are multiple in one chassis)
      */
-    private function findProcessors(&$processors, $oid, $mib, $num_oid, $name, $type = null)
+    private function findProcessors(array &$processors, string $oid, string $mib, string $num_oid, string $name, $type = null): void
     {
         $data = $this->getCacheByIndex($oid, $mib);
         foreach ($data as $index => $usage) {

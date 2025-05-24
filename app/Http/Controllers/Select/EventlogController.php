@@ -37,7 +37,7 @@ class EventlogController extends SelectController
      *
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:type',
@@ -51,7 +51,7 @@ class EventlogController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['type'];
     }
@@ -62,7 +62,7 @@ class EventlogController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return [$request->get('field')];
     }

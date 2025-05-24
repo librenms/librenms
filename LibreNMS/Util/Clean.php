@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
 use Mews\Purifier\Facades\Purifier;
 
 class Clean
@@ -38,7 +37,7 @@ class Clean
      * @param  string  $file
      * @return string|string[]|null
      */
-    public static function fileName($file)
+    public static function fileName($file): ?string
     {
         return preg_replace('/[^a-zA-Z0-9\-._]/', '', $file ?? '');
     }
@@ -49,7 +48,7 @@ class Clean
      * @param  string  $string
      * @return string
      */
-    public static function alphaDash($string)
+    public static function alphaDash($string): ?string
     {
         return preg_replace('/[^a-zA-Z0-9\-_]/', '', $string);
     }

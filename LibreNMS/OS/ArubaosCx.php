@@ -36,7 +36,7 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
 {
     protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
 
-    public function pollNac()
+    public function pollNac(): \Illuminate\Support\Collection
     {
         $nac = new Collection();
 

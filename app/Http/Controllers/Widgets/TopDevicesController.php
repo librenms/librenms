@@ -112,7 +112,7 @@ class TopDevicesController extends WidgetController
      * @param  Collection  $rows
      * @return array
      */
-    private function formatData($headers, $rows)
+    private function formatData(string|array $headers, $rows): array
     {
         return [
             'headers' => (array) $headers,
@@ -163,7 +163,7 @@ class TopDevicesController extends WidgetController
      * @param  array  $graph_params
      * @return array
      */
-    private function standardRow($device, $graph_type, $graph_params = [])
+    private function standardRow($device, string $graph_type, array $graph_params = []): array
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
@@ -179,7 +179,7 @@ class TopDevicesController extends WidgetController
         ];
     }
 
-    private function getTrafficData($sort)
+    private function getTrafficData(string $sort): array
     {
         $settings = $this->getSettings();
 
@@ -205,7 +205,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('Traffic', $results);
     }
 
-    private function getUptimeData($sort)
+    private function getUptimeData($sort): array
     {
         $settings = $this->getSettings();
 
@@ -220,7 +220,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('Uptime', $results);
     }
 
-    private function getPingData($sort)
+    private function getPingData($sort): array
     {
         $settings = $this->getSettings();
 
@@ -235,7 +235,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('Response time', $results);
     }
 
-    private function getProcessorData($sort)
+    private function getProcessorData(string $sort): array
     {
         $settings = $this->getSettings();
 
@@ -251,7 +251,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('CPU Load', $results);
     }
 
-    private function getMemoryData($sort)
+    private function getMemoryData($sort): array
     {
         $settings = $this->getSettings();
 
@@ -267,7 +267,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('Memory usage', $results);
     }
 
-    private function getPollerData($sort)
+    private function getPollerData($sort): array
     {
         $settings = $this->getSettings();
 
@@ -281,7 +281,7 @@ class TopDevicesController extends WidgetController
         return $this->formatData('Poller duration', $results);
     }
 
-    private function getStorageData($sort)
+    private function getStorageData($sort): array
     {
         $settings = $this->getSettings();
 

@@ -31,7 +31,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class DocsTest extends TestCase
 {
-    private $hidden_pages = [
+    private array $hidden_pages = [
     ];
 
     #[Group('docs')]

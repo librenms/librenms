@@ -50,7 +50,7 @@ trait VminfoVmware
 
         $vm_info = \SnmpQuery::hideMib()->walk('VMWARE-VMINFO-MIB::vmwVmTable');
 
-        return $vm_info->mapTable(function ($data, $vmwVmVMID) {
+        return $vm_info->mapTable(function (array $data, $vmwVmVMID) {
             $data['vm_type'] = 'vmware';
             $data['vmwVmVMID'] = $vmwVmVMID;
             $data['vmwVmState'] = PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN;

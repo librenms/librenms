@@ -32,7 +32,7 @@ use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -45,12 +45,12 @@ class SyslogController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields($request): array
     {
         return ['msg'];
     }
 
-    public function filterFields($request)
+    public function filterFields($request): array
     {
         return [
             'device_id' => 'device',
@@ -59,7 +59,7 @@ class SyslogController extends TableController
         ];
     }
 
-    public function sortFields($request)
+    public function sortFields($request): array
     {
         return ['label', 'timestamp', 'level', 'device_id', 'program', 'msg', 'priority'];
     }
@@ -96,7 +96,7 @@ class SyslogController extends TableController
     /**
      * @param  Syslog  $syslog
      */
-    public function formatItem($syslog)
+    public function formatItem($syslog): array
     {
         return [
             'label' => $this->setLabel($syslog),
@@ -109,7 +109,7 @@ class SyslogController extends TableController
         ];
     }
 
-    private function setLabel($syslog)
+    private function setLabel($syslog): string
     {
         $output = "<span class='alert-status ";
         $output .= $this->priorityLabel($syslog->priority);
@@ -123,7 +123,7 @@ class SyslogController extends TableController
      * @param  int  $syslog_priority
      * @return string
      */
-    private function priorityLabel($syslog_priority)
+    private function priorityLabel($syslog_priority): string
     {
         switch ($syslog_priority) {
             case 'debug':

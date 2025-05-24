@@ -100,7 +100,7 @@ trait HostResources
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         Log::info('Host Resources: ');
         $processors = [];

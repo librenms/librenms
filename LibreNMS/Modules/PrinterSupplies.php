@@ -161,7 +161,7 @@ class PrinterSupplies implements Module
         ];
     }
 
-    private function discoveryLevels($device): Collection
+    private function discoveryLevels(array $device): Collection
     {
         $levels = new Collection();
 
@@ -230,7 +230,7 @@ class PrinterSupplies implements Module
         return $levels;
     }
 
-    private function discoveryPapers($device): Collection
+    private function discoveryPapers(array $device): Collection
     {
         Log::info('Tray Paper Level: ');
         $papers = new Collection();
@@ -279,7 +279,7 @@ class PrinterSupplies implements Module
      * @param  int  $capacity  the normalized capacity
      * @return int|float|bool the toner level as a percentage
      */
-    private static function getTonerLevel($device, $raw_value, $capacity)
+    private static function getTonerLevel(?array $device, $raw_value, $capacity): int|false|float
     {
         // -3 means some toner is left
         if ($raw_value == '-3') {

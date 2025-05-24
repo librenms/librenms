@@ -34,8 +34,6 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
 
-use function PHPUnit\Framework\assertEquals;
-
 class DiscordTest extends TestCase
 {
     public function testDiscordNoConfigDelivery(): void
@@ -56,10 +54,10 @@ class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('', $request->url());
-            assertEquals('POST', $request->method());
-            assertEquals('application/json', $request->header('Content-Type')[0]);
-            assertEquals(
+            $this->assertEquals('', $request->url());
+            $this->assertEquals('POST', $request->method());
+            $this->assertEquals('application/json', $request->header('Content-Type')[0]);
+            $this->assertEquals(
                 [
                     'embeds' => [
                         [
@@ -98,10 +96,10 @@ class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
-            assertEquals('POST', $request->method());
-            assertEquals('application/json', $request->header('Content-Type')[0]);
-            assertEquals(
+            $this->assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
+            $this->assertEquals('POST', $request->method());
+            $this->assertEquals('application/json', $request->header('Content-Type')[0]);
+            $this->assertEquals(
                 [
                     'embeds' => [
                         [
@@ -140,10 +138,10 @@ class DiscordTest extends TestCase
         $transport->deliverAlert(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
-            assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
-            assertEquals('POST', $request->method());
-            assertEquals('application/json', $request->header('Content-Type')[0]);
-            assertEquals(
+            $this->assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
+            $this->assertEquals('POST', $request->method());
+            $this->assertEquals('application/json', $request->header('Content-Type')[0]);
+            $this->assertEquals(
                 [
                     'embeds' => [
                         [
@@ -191,10 +189,10 @@ class DiscordTest extends TestCase
         $transport->deliverAlert($alert_data);
 
         Http::assertSent(function (Request $request) {
-            assertEquals($request->url(), 'https://discord.com/api/webhooks/number/id');
-            assertEquals($request->method(), 'POST');
-            assertEquals($request->header('Content-Type')[0], 'application/json');
-            assertEquals(
+            $this->assertEquals($request->url(), 'https://discord.com/api/webhooks/number/id');
+            $this->assertEquals($request->method(), 'POST');
+            $this->assertEquals($request->header('Content-Type')[0], 'application/json');
+            $this->assertEquals(
                 [
                     'tts' => 'true',
                     'content' => 'This is a text',

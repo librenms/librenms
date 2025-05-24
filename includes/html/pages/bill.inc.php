@@ -70,7 +70,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         $vars['view'] = 'quick';
     }
 
-    function print_port_list($ports)
+    function print_port_list($ports): void
     {
         echo '<div class="panel panel-default">
             <div class="panel-heading">

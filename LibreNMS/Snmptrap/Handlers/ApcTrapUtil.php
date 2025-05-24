@@ -39,7 +39,7 @@ class ApcTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getPduIdentName($trap)
+    public static function getPduIdentName($trap): string
     {
         return $trap->getOidData($trap->findOid('PowerNet-MIB::rPDUIdentName'));
     }
@@ -50,7 +50,7 @@ class ApcTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getPduPhaseNum($trap)
+    public static function getPduPhaseNum($trap): string
     {
         return $trap->getOidData($trap->findOid('PowerNet-MIB::rPDULoadStatusPhaseNumber'));
     }
@@ -61,7 +61,7 @@ class ApcTrapUtil
      * @param  Trap  $trap
      * @return string
      */
-    public static function getApcTrapString($trap)
+    public static function getApcTrapString($trap): string
     {
         return $trap->getOidData($trap->findOid('PowerNet-MIB::mtrapargsString'));
     }

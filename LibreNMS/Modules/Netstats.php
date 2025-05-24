@@ -53,7 +53,7 @@ class Netstats implements Module
     /**
      * @var string[][]
      */
-    private $oids = [
+    private array $oids = [
         'icmp' => [
             'IP-MIB::icmpInMsgs.0',
             'IP-MIB::icmpOutMsgs.0',
@@ -157,7 +157,7 @@ class Netstats implements Module
     /**
      * @var string[][]
      */
-    private $graphs = [
+    private array $graphs = [
         'icmp' => ['netstat_icmp', 'netstat_icmp_info'],
         'ip' => ['netstat_ip', 'netstat_ip_frag'],
         'ip_forward' => ['netstat_ip_forward'],
@@ -169,7 +169,7 @@ class Netstats implements Module
     /**
      * @var string[]
      */
-    private $types = [
+    private array $types = [
         'icmp' => IcmpNetstatsPolling::class,
         'ip' => IpNetstatsPolling::class,
         'ip_forward' => IpForwardNetstatsPolling::class,

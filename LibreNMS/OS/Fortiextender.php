@@ -39,7 +39,10 @@ class Fortiextender extends Fortinet implements
     WirelessRsrqDiscovery,
     WirelessRssiDiscovery
 {
-    public function discoverWirelessSinr()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessSinr(): array
     {
         $sinr_group = snmpwalk_group($this->getDeviceArray(), 'fextInfoModemStatusSINR', 'FORTINET-FORTIEXTENDER-MIB', 1);
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.28.';
@@ -52,7 +55,10 @@ class Fortiextender extends Fortinet implements
         return $sinr;
     }
 
-    public function discoverWirelessRsrp()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRsrp(): array
     {
         $rsrp_group = snmpwalk_group($this->getDeviceArray(), 'fextInfoModemStatusSINR', 'FORTINET-FORTIEXTENDER-MIB', 1);
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.29.';
@@ -65,7 +71,10 @@ class Fortiextender extends Fortinet implements
         return $rsrp;
     }
 
-    public function discoverWirelessRsrq()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRsrq(): array
     {
         $rsrq_group = snmpwalk_group($this->getDeviceArray(), 'fextInfoModemStatusRSRQ', 'FORTINET-FORTIEXTENDER-MIB', 1);
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.30.';
@@ -78,7 +87,10 @@ class Fortiextender extends Fortinet implements
         return $rsrq;
     }
 
-    public function discoverWirelessRssi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRssi(): array
     {
         $rsrq_group = snmpwalk_group($this->getDeviceArray(), 'fextInfoModemStatusRSSI', 'FORTINET-FORTIEXTENDER-MIB', 1);
         $oid = '.1.3.6.1.4.1.12356.121.21.3.1.1.22.';

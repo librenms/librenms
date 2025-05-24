@@ -31,16 +31,16 @@ use LibreNMS\Exceptions\InvalidRrdTypeException;
 
 class RrdDefinition
 {
-    private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
-    private $dataSets = [];
-    private $sources = [];
-    private $invalid_source = [];
-    private $skipNameCheck = false;
+    private static array $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
+    private array $dataSets = [];
+    private array $sources = [];
+    private array $invalid_source = [];
+    private bool $skipNameCheck = false;
 
     /**
      * Make a new empty RrdDefinition
      */
-    public static function make()
+    public static function make(): self
     {
         return new self();
     }
@@ -58,7 +58,7 @@ class RrdDefinition
      * @param  string  $source_file  File to copy data from (may be ommitted copy from the current file)
      * @return RrdDefinition
      */
-    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_ds = null, $source_file = null)
+    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_ds = null, $source_file = null): static
     {
         if (empty($name)) {
             d_echo('DS must be set to a non-empty string.');
@@ -83,9 +83,9 @@ class RrdDefinition
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        $def = array_reduce($this->dataSets, function ($carry, $ds) {
+        $def = array_reduce($this->dataSets, function ($carry, array $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
 
             return $carry . "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']} ";
@@ -101,7 +101,7 @@ class RrdDefinition
      * @param  string  $name
      * @return bool
      */
-    public function isValidDataset($name)
+    public function isValidDataset($name): bool
     {
         return $this->skipNameCheck || isset($this->dataSets[$this->escapeName($name)]);
     }
@@ -112,7 +112,7 @@ class RrdDefinition
      *
      * @return $this
      */
-    public function disableNameChecking()
+    public function disableNameChecking(): static
     {
         $this->skipNameCheck = true;
 
@@ -175,7 +175,7 @@ class RrdDefinition
      * @param  string  $name
      * @return string
      */
-    private function escapeName($name)
+    private function escapeName($name): string
     {
         $name = preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
 

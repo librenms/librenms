@@ -53,7 +53,7 @@ if (! empty($_REQUEST['limit'])) {
 $sql = "SELECT `transport_group_id` AS `id`, `transport_group_name` AS `text` FROM `alert_transport_groups` $query";
 $groups = dbFetchRows($sql, $params);
 $more = ($offset + count($groups)) < $total;
-$groups = array_map(function ($group) {
+$groups = array_map(function (array $group) {
     $group['text'] = 'Group: ' . $group['text'];
     $group['id'] = 'g' . $group['id'];
 

@@ -38,7 +38,7 @@ class RoutesTablesController extends TableController
 {
     protected $ipCache = [];
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -46,7 +46,7 @@ class RoutesTablesController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'route.context_name' => 'context_name',
@@ -54,7 +54,7 @@ class RoutesTablesController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'context_name',
@@ -170,7 +170,7 @@ class RoutesTablesController extends TableController
     /**
      * @param  Route  $route_entry
      */
-    public function formatItem($route_entry)
+    public function formatItem($route_entry): array
     {
         $item = [
             'updated_at' => $route_entry->updated_at ? $route_entry->updated_at->diffForHumans() : $route_entry->updated_at,

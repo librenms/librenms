@@ -576,7 +576,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         return SnmpQuery::hideMib()->enumStrings()->abortOnFailure()->walk([
             'TIMETRA-SAP-MIB::sapBaseInfoTable',
             'TIMETRA-SAP-MIB::sapBaseStatsTable',
-        ])->mapTable(function ($value, $svcId, $sapPortId, $sapEncapValue) use ($svcs, $ifIndexNames) {
+        ])->mapTable(function ($value, string $svcId, string $sapPortId, $sapEncapValue) use ($svcs, $ifIndexNames) {
             // Workaround, there are some oids not covered by actual MIB, try to filter them
             // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
             if (! isset($value['sapDescription'])) {

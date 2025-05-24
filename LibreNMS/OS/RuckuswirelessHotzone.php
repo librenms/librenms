@@ -15,7 +15,7 @@ class RuckuswirelessHotzone extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessErrorsDiscovery
 {
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $clients_2 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.2.1'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         $clients_5 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.2.2'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
@@ -26,7 +26,7 @@ class RuckuswirelessHotzone extends OS implements
         ];
     }
 
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         $utilization_2 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.50.1'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         $utilization_5 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.50.2'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
@@ -37,7 +37,7 @@ class RuckuswirelessHotzone extends OS implements
         ];
     }
 
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         $noise_floor_2 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.2.1.8.1'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         $noise_floor_5 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.2.1.8.2'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
@@ -48,7 +48,7 @@ class RuckuswirelessHotzone extends OS implements
         ];
     }
 
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         $errors_2 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.21.1'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0
         $errors_5 = '.1.3.6.1.4.1.25053.1.1.12.1.1.1.3.1.21.2'; //RUCKUS-ZD-SYSTEM-MIB::ruckusZDSystemStatsNumSta.0

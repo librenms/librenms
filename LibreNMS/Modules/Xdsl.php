@@ -48,11 +48,11 @@ class Xdsl implements Module
     use SyncsModels;
 
     /** @var string[] */
-    private $trimAdminString = ['adslAtucInvVendorID', 'adslAturInvVendorID', 'adslAturInvVersionNumber', 'adslAtucInvVersionNumber'];
+    private array $trimAdminString = ['adslAtucInvVendorID', 'adslAturInvVendorID', 'adslAturInvVersionNumber', 'adslAtucInvVersionNumber'];
     /** @var string[] */
-    private $adslTenthValues = ['adslAtucCurrSnrMgn', 'adslAtucCurrAtn', 'adslAtucCurrOutputPwr', 'adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr'];
+    private array $adslTenthValues = ['adslAtucCurrSnrMgn', 'adslAtucCurrAtn', 'adslAtucCurrOutputPwr', 'adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr'];
     /** @var string[] */
-    private $vdslTenthValues = ['xdsl2LineStatusActAtpDs', 'xdsl2LineStatusActAtpUs'];
+    private array $vdslTenthValues = ['xdsl2LineStatusActAtpDs', 'xdsl2LineStatusActAtpUs'];
     /** @var string[] */
     private $ifNameMap;
 

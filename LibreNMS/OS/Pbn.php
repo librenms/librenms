@@ -32,7 +32,7 @@ use LibreNMS\OS;
 
 class Pbn extends OS implements ProcessorDiscovery
 {
-    public function __construct(&$device)
+    public function __construct(array &$device)
     {
         parent::__construct($device);
 

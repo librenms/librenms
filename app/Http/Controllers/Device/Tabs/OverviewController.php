@@ -58,7 +58,7 @@ class OverviewController implements DeviceTab
         return [];
     }
 
-    public static function setGraphWidth($graph = [])
+    public static function setGraphWidth(array $graph = [])
     {
         // possibly the wrong spot for this
         if ($screen_width = Session::get('screen_width')) {

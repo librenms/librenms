@@ -13,7 +13,7 @@ foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc
 $enabled_apps = array_reduce(dbFetchRows(
     'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? AND deleted_at IS NULL ORDER BY `app_type`',
     [$device['device_id']]
-), function ($result, $app) {
+), function (array $result, array $app) {
     $result[$app['app_type']] = $app['discovered'];
 
     return $result;

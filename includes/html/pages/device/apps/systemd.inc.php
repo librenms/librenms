@@ -12,11 +12,11 @@ require_once 'includes/systemd-shared.inc.php';
  * @return $graphs
  */
 function systemd_graph_builder(
-    $state_type,
+    string $state_type,
     $systemd_mapper,
     $state_type_ternary_depth,
-    $graphs
-) {
+    array $graphs
+): array {
     $graph_name = 'systemd_' . $state_type;
     $graphs[$graph_name]['type'] = $state_type;
 
@@ -52,11 +52,11 @@ function systemd_graph_builder(
  * @param  string  $graph_desc
  */
 function systemd_graph_printer(
-    $state_type,
+    string $state_type,
     $app_id,
     $sub_state_type,
-    $graph_desc
-) {
+    string $graph_desc
+): void {
     $graph_type = $state_type;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';

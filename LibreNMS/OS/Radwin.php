@@ -43,7 +43,7 @@ class Radwin extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessDistance()
+    public function discoverWirelessDistance(): array
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.5.29.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirLinkDistance.0
 
@@ -58,7 +58,7 @@ class Radwin extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $transmit = '.1.3.6.1.4.1.4458.1000.1.5.4.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirTxPower.0
         $receive = '.1.3.6.1.4.1.4458.1000.1.5.9.1.0'; //RADWIN-MIB-WINLINK1000::winlink1000OduAirRxPower.0
@@ -75,7 +75,7 @@ class Radwin extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.4458.1000.1.1.51.7.0'; // RADWIN-MIB-WINLINK1000::winlink1000OduAdmWifiRssi.0
 

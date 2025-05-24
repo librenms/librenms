@@ -40,7 +40,7 @@ class DynamicConfig
         $config = [];
         @include base_path('config.php');
 
-        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
+        $this->definitions = collect(Config::getDefinitions())->map(function (array $item, $key) use ($config) {
             $item['overridden'] = Arr::has($config, $key);
 
             return new DynamicConfigItem($key, $item);
@@ -53,7 +53,7 @@ class DynamicConfig
      * @param  string  $name
      * @return bool
      */
-    public function isValidSetting($name)
+    public function isValidSetting($name): bool
     {
         return $this->definitions->has($name) && $this->definitions->get($name)->isValid();
     }

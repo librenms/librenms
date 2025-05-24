@@ -39,7 +39,7 @@ class Symbol extends OS implements WirelessClientsDiscovery
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $device = $this->getDeviceArray();
 

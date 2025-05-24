@@ -50,7 +50,7 @@ class Php extends BaseValidation
         $this->checkTimezone($validator);
     }
 
-    private function checkVersion(Validator $validator)
+    private function checkVersion(Validator $validator): void
     {
         // if update is not set to false and version is min or newer
         if (LibrenmsConfig::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
@@ -64,7 +64,7 @@ class Php extends BaseValidation
         }
     }
 
-    private function checkExtensions(Validator $validator)
+    private function checkExtensions(Validator $validator): void
     {
         $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
@@ -88,7 +88,7 @@ class Php extends BaseValidation
         }
     }
 
-    private function checkFunctions(Validator $validator)
+    private function checkFunctions(Validator $validator): void
     {
         $disabled_functions = explode(',', ini_get('disable_functions'));
         $required_functions = [
@@ -116,7 +116,7 @@ class Php extends BaseValidation
         }
     }
 
-    private function checkTimezone(Validator $validator)
+    private function checkTimezone(Validator $validator): void
     {
         // collect data
         $ini_tz = ini_get('date.timezone');

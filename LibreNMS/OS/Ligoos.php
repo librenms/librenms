@@ -37,7 +37,10 @@ class Ligoos extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessQualityDiscovery
 {
-    public function discoverWirelessClients()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
@@ -58,7 +61,10 @@ class Ligoos extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessFrequency(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
@@ -79,7 +85,10 @@ class Ligoos extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessNoiseFloor()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessNoiseFloor(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
@@ -100,7 +109,10 @@ class Ligoos extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessQuality()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessQuality(): array
     {
         $sensors = [];
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');

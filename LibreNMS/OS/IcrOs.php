@@ -59,7 +59,7 @@ class IcrOs extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $miboid = '.1.3.6.1.4.1.30140.4';
         $what = 'RSSI';
@@ -68,7 +68,7 @@ class IcrOs extends OS implements
         return $this->runWirelessSensor($miboid, $what, $nums);
     }
 
-    public function discoverWirelessRsrp()
+    public function discoverWirelessRsrp(): array
     {
         $miboid = '.1.3.6.1.4.1.30140.4';
         $what = 'RSRP';
@@ -77,7 +77,7 @@ class IcrOs extends OS implements
         return $this->runWirelessSensor($miboid, $what, $nums);
     }
 
-    public function discoverWirelessRsrq()
+    public function discoverWirelessRsrq(): array
     {
         $miboid = '.1.3.6.1.4.1.30140.4';
         $what = 'RSRQ';
@@ -86,7 +86,7 @@ class IcrOs extends OS implements
         return $this->runWirelessSensor($miboid, $what, $nums);
     }
 
-    public function discoverWirelessSinr()
+    public function discoverWirelessSinr(): array
     {
         $miboid = '.1.3.6.1.4.1.30140.4';
         $what = 'SINR';

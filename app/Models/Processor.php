@@ -14,7 +14,7 @@ class Processor extends DeviceRelatedModel
      *
      * @return string
      */
-    public function getFormattedDescription()
+    public function getFormattedDescription(): string|array
     {
         $bad_descr = [
             'GenuineIntel:',

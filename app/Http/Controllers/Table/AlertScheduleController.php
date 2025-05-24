@@ -39,12 +39,12 @@ class AlertScheduleController extends TableController
         return AlertSchedule::query();
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return['title', 'start', 'end'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'start_recurring_dt' => DB::raw('DATE(`start`)'),
@@ -63,7 +63,7 @@ class AlertScheduleController extends TableController
      * @param  AlertSchedule  $schedule
      * @return array
      */
-    public function formatItem($schedule)
+    public function formatItem($schedule): array
     {
         return [
             'title' => htmlentities($schedule->title),

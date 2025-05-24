@@ -28,7 +28,10 @@ class SmOs extends OS implements
     private $radioLabels;
     private $linkLabels;
 
-    public function discoverWirelessRate()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRate(): array
     {
         $oids = snmpwalk_group($this->getDeviceArray(), 'linkTxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2);
         $oids = snmpwalk_group($this->getDeviceArray(), 'linkRxETHCapacity', 'SIAE-RADIO-SYSTEM-MIB', 2, $oids);
@@ -138,7 +141,10 @@ class SmOs extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessPower()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessPower(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioPrx', [], 'SIAE-RADIO-SYSTEM-MIB');
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioPtx', $oids, 'SIAE-RADIO-SYSTEM-MIB');
@@ -172,7 +178,10 @@ class SmOs extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessFrequency()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessFrequency(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioTxFrequency', [], 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
@@ -206,7 +215,10 @@ class SmOs extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessMse()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessMse(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'radioNormalizedMse', [], 'SIAE-RADIO-SYSTEM-MIB');
         $sensors = [];
@@ -232,7 +244,7 @@ class SmOs extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $radioStatusTable = SnmpQuery::hideMib()->walk('SIAE-RADIO-SYSTEM-MIB::radioStatusTable')->table(1);
         $sensors = [];

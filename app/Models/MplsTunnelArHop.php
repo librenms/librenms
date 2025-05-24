@@ -34,7 +34,7 @@ class MplsTunnelArHop extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->mplsTunnelARHopListIndex . '-' . $this->mplsTunnelARHopIndex;
     }

@@ -38,7 +38,7 @@ $n = count($graph_data['ticks']);
 $xmin = $graph_data['ticks'][0];
 $xmax = $graph_data['ticks'][$n - 1];
 
-function TimeCallback($aVal)
+function TimeCallback($aVal): string
 {
     global $dur;
 
@@ -51,12 +51,12 @@ function TimeCallback($aVal)
     }
 }//end TimeCallback()
 
-function InvertCallback($x)
+function InvertCallback($x): int|float
 {
     return $x * -1;
 }//end InvertCallback
 
-function YCallback($y)
+function YCallback($y): string
 {
     return \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
 }

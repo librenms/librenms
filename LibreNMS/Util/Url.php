@@ -49,7 +49,7 @@ class Url
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink($device, $text = '', array $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1): string
     {
         if (! $device instanceof Device || ! $device->hostname) {
             return $escape_text ? htmlentities($text) : (string) $text;
@@ -194,7 +194,7 @@ class Url
      * @param  bool  $single_graph
      * @return mixed|string
      */
-    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
+    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
@@ -238,7 +238,7 @@ class Url
      * @param  array  $vars
      * @return string
      */
-    public static function deviceUrl($device, $vars = [])
+    public static function deviceUrl($device, array $vars = []): string
     {
         $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
         if (isset($vars['tab'])) {
@@ -249,12 +249,12 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl($port, $vars = [])
+    public static function portUrl($port, $vars = []): string
     {
         return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
     }
 
-    public static function sensorUrl($sensor, $vars = [])
+    public static function sensorUrl($sensor, $vars = []): string
     {
         return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
     }
@@ -263,7 +263,7 @@ class Url
      * @param  Port  $port
      * @return string
      */
-    public static function portThumbnail($port)
+    public static function portThumbnail($port): string
     {
         $graph_array = [
             'port_id' => $port->port_id,
@@ -281,7 +281,7 @@ class Url
      * @param  Port  $port
      * @return string
      */
-    public static function portErrorsThumbnail($port)
+    public static function portErrorsThumbnail($port): string
     {
         $graph_array = [
             'port_id' => $port->port_id,
@@ -295,7 +295,7 @@ class Url
         return self::portImage($graph_array);
     }
 
-    public static function portImage($args)
+    public static function portImage($args): string
     {
         if (empty($args['bg'])) {
             $args['bg'] = 'FFFFFF00';
@@ -304,7 +304,7 @@ class Url
         return '<img src="graph-image ' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
     }
 
-    public static function generate($vars, $new_vars = [])
+    public static function generate($vars, $new_vars = []): string
     {
         $vars = array_merge($vars, $new_vars);
 
@@ -322,7 +322,7 @@ class Url
      * @param  string  $prefix
      * @return string
      */
-    private static function urlParams($vars, $prefix = '/')
+    private static function urlParams(array $vars, $prefix = '/')
     {
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
@@ -352,7 +352,7 @@ class Url
      * @param  array  $args
      * @return string
      */
-    public static function graphTag($args)
+    public static function graphTag($args): string
     {
         $urlargs = [];
         foreach ($args as $key => $arg) {
@@ -362,7 +362,7 @@ class Url
         return '<img class="graph-image" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
-    public static function graphPopup($args, $content = null, $link = null)
+    public static function graphPopup(array $args, $content = null, $link = null): string
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
         $original_from = $args['from'];
@@ -391,7 +391,7 @@ class Url
         return self::overlibLink($args['link'], $graph, $popup, null);
     }
 
-    public static function lazyGraphTag($args)
+    public static function lazyGraphTag($args): string
     {
         $urlargs = [];
 
@@ -408,7 +408,7 @@ class Url
         return $tag . ' />';
     }
 
-    public static function overlibLink($url, $text, $contents, $class = null)
+    public static function overlibLink(string $url, string $text, $contents, $class = null): string
     {
         $contents = "<div class=\'overlib-contents\'>" . $contents . '</div>';
         $contents = str_replace('"', "\'", $contents);
@@ -430,7 +430,7 @@ class Url
         return $output;
     }
 
-    public static function overlibContent($graph_array, $text)
+    public static function overlibContent(array $graph_array, string $text): string
     {
         $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
 
@@ -461,7 +461,7 @@ class Url
      * @param  int  $absolute_size
      * @return string
      */
-    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
+    public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', string $class = 'minigraph-image', $absolute_size = 0): string
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
 
@@ -472,7 +472,7 @@ class Url
      * @param  Device  $device
      * @return string
      */
-    private static function deviceLinkDisplayClass($device)
+    private static function deviceLinkDisplayClass(\App\Models\Device $device): string
     {
         if ($device->disabled) {
             return 'list-device-disabled';
@@ -491,7 +491,7 @@ class Url
      * @param  Port  $port
      * @return string
      */
-    public static function portLinkDisplayClass($port)
+    public static function portLinkDisplayClass($port): string
     {
         if ($port->ifAdminStatus == 'down') {
             return 'interface-admindown';
@@ -510,7 +510,7 @@ class Url
      * @param  \App\Models\Sensor  $sensor
      * @return string
      */
-    public static function sensorLinkDisplayClass($sensor)
+    public static function sensorLinkDisplayClass($sensor): string
     {
         if ($sensor->sensor_current > $sensor->sensor_limit) {
             return 'sensor-high';
@@ -570,7 +570,7 @@ class Url
      * @param  string  $path
      * @return ParameterBag
      */
-    public static function parseLegacyPath($path)
+    public static function parseLegacyPath($path): \Symfony\Component\HttpFoundation\ParameterBag
     {
         $parts = array_filter(explode('/', $path), function ($part) {
             return Str::contains($part, '=');
@@ -659,7 +659,7 @@ class Url
         return $vars;
     }
 
-    private static function escapeBothQuotes($string)
+    private static function escapeBothQuotes(string $string): string
     {
         return str_replace(["'", '"'], "\'", $string);
     }

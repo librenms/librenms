@@ -25,7 +25,7 @@ class AirosAf60 extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oid = '.1.3.6.1.4.1.41112.1.11.1.1.2.1'; // UI-AF60-MIB::af60Frequency.1
 
@@ -34,7 +34,10 @@ class AirosAf60 extends OS implements
         ];
     }
 
-    public function discoverWirelessDistance()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessDistance(): array
     {
         $sensors = [];
 
@@ -47,7 +50,10 @@ class AirosAf60 extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRate()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRate(): array
     {
         $sensors = [];
 
@@ -62,7 +68,10 @@ class AirosAf60 extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRssi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRssi(): array
     {
         $sensors = [];
 
@@ -77,7 +86,10 @@ class AirosAf60 extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessSnr()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessSnr(): array
     {
         $sensors = [];
 

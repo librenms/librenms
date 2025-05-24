@@ -52,7 +52,7 @@ class Ios extends Cisco implements
     /**
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $device = $this->getDeviceArray();
 

@@ -41,7 +41,7 @@ class Aos7stpRootPortChange implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $trap->log('SNMP Trap: A root port has changed for a spanning tree bridge. The root port is the port that offers the lowest cost path from this bridge to the root bridge.', Severity::Notice, 'stp');
     }

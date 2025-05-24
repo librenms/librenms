@@ -230,7 +230,7 @@ class GraphController extends WidgetController
         return view('widgets.graph', $data);
     }
 
-    private function getGraphType($summarize = true)
+    private function getGraphType(bool $summarize = true): string
     {
         $type = explode('_', $this->getSettings()['graph_type'], 2)[0];
 
@@ -282,7 +282,7 @@ class GraphController extends WidgetController
         return $this->settings;
     }
 
-    private function convertLegacySettingId($setting, $key)
+    private function convertLegacySettingId($setting, string $key)
     {
         if ($setting && ! is_numeric($setting)) {
             $data = json_decode($setting, true);

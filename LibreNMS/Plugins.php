@@ -51,17 +51,15 @@ class Plugins
 {
     /**
      * Array of plugin hooks
-     *
-     * @var array|null
      */
-    private static $plugins = null;
+    private static ?array $plugins = null;
 
     /**
      * Start loading active plugins
      *
      * @return bool
      */
-    public static function start()
+    public static function start(): bool
     {
         if (! is_null(self::$plugins)) {
             return false;
@@ -100,7 +98,7 @@ class Plugins
      * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
-    public static function load($file, $pluginName)
+    public static function load($file, string $pluginName): ?object
     {
         chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
@@ -129,7 +127,7 @@ class Plugins
      * @param  string  $pluginName
      * @return object|null
      */
-    private static function getInstance($file, $pluginName)
+    private static function getInstance($file, string $pluginName): ?object
     {
         $ns_prefix = 'LibreNMS\\Plugins\\';
         $ns_psr4 = $ns_prefix . $pluginName . '\\' . $pluginName;
@@ -160,7 +158,7 @@ class Plugins
      * @param  string  $hook  Name of the hook to get count for
      * @return int|bool
      */
-    public static function countHooks($hook)
+    public static function countHooks($hook): int|false
     {
         // count all plugins implementing a specific hook
         self::start();
@@ -178,7 +176,7 @@ class Plugins
      * @param  array|false  $params  Optional array of parameters for hook
      * @return string
      */
-    public static function call($hook, $params = false)
+    public static function call($hook, $params = false): string|false
     {
         chdir(Config::get('install_dir') . '/html');
         self::start();
@@ -216,14 +214,14 @@ class Plugins
      *
      * @return int
      */
-    public static function count()
+    public static function count(): int
     {
         self::start();
 
         return count(self::$plugins);
     }
 
-    public static function scanNew()
+    public static function scanNew(): int
     {
         $countInstalled = 0;
 
@@ -242,7 +240,7 @@ class Plugins
         return $countInstalled;
     }
 
-    public static function scanRemoved()
+    public static function scanRemoved(): int
     {
         $countRemoved = 0;
 

@@ -30,7 +30,7 @@ class MplsTunnelCHop extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->mplsTunnelCHopListIndex . '-' . $this->mplsTunnelCHopIndex;
     }

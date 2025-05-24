@@ -36,7 +36,7 @@ trait ActiveDirectoryCommon
         return preg_replace('/.*-(\d+)$/', '$1', $sid);
     }
 
-    protected function sidFromLdap($sid)
+    protected function sidFromLdap($sid): string
     {
         $sidUnpacked = unpack('H*hex', $sid);
         $sidHex = array_shift($sidUnpacked);
@@ -54,7 +54,7 @@ trait ActiveDirectoryCommon
         return 'S-' . $revLevel . '-' . $authIdent . '-' . implode('-', $subAuths);
     }
 
-    protected function getCn($dn)
+    protected function getCn($dn): string
     {
         $dn = str_replace('\\,', '~C0mmA~', $dn);
         preg_match('/[^,]*/', $dn, $matches, PREG_OFFSET_CAPTURE, 3);
@@ -80,7 +80,7 @@ trait ActiveDirectoryCommon
         }
     }
 
-    protected function userFilter($username)
+    protected function userFilter($username): string
     {
         // don't return disabled users
         $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
@@ -94,7 +94,7 @@ trait ActiveDirectoryCommon
         return $user_filter;
     }
 
-    protected function groupFilter($groupname)
+    protected function groupFilter($groupname): string
     {
         $group_filter = "(samaccountname=$groupname)";
 
@@ -126,7 +126,10 @@ trait ActiveDirectoryCommon
         return $membername;
     }
 
-    public function getGroupList()
+    /**
+     * @return list
+     */
+    public function getGroupList(): array
     {
         $ldap_groups = [];
 
@@ -159,7 +162,7 @@ trait ActiveDirectoryCommon
      * @param  array  $entry
      * @return array
      */
-    protected function userFromAd($entry)
+    protected function userFromAd(array $entry): array
     {
         return [
             'user_id' => $this->getUseridFromSid($this->sidFromLdap($entry['objectsid'][0])),

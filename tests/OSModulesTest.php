@@ -44,8 +44,8 @@ class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    private $discoveryModules;
-    private $pollerModules;
+    private mixed $discoveryModules;
+    private mixed $pollerModules;
 
     protected function setUp(): void
     {
@@ -89,7 +89,7 @@ class OSModulesTest extends DBTestCase
      */
     #[Group('os')]
     #[DataProvider('dumpedDataProvider')]
-    public function testOS($os, $variant, $modules): void
+    public function testOS(string $os, $variant, $modules): void
     {
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));

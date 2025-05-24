@@ -28,14 +28,11 @@ namespace App\Logging;
 
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
-    /**
-     * @var \Console_Color2
-     */
-    private $console_color;
+    private \Console_Color2 $console_color;
 
     protected bool $console;
 
-    public function __construct($format = "%message% %context% %extra%\n", $dateFormat = null, $allowInlineLineBreaks = true, $ignoreEmptyContextAndExtra = true)
+    public function __construct(?string $format = "%message% %context% %extra%\n", ?string $dateFormat = null, bool $allowInlineLineBreaks = true, bool $ignoreEmptyContextAndExtra = true)
     {
         parent::__construct(
             $format,

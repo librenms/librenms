@@ -35,7 +35,7 @@ class LegacyApiController
      * @param  array  $arguments
      * @return mixed
      */
-    public function __call($method_name, $arguments)
+    public function __call($method_name, array $arguments)
     {
         $init_modules = ['web', 'alerts'];
         require base_path('/includes/init.php');

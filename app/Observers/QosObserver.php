@@ -12,7 +12,7 @@ class QosObserver
      * @param  Qos  $qos
      * @return void
      */
-    public function updating(Qos $qos)
+    public function updating(Qos $qos): void
     {
         if ($qos->isDirty('last_polled')) {
             $poll_interval = $qos->last_polled - $qos->getOriginal('last_polled');

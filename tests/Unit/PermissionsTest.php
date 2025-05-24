@@ -34,7 +34,7 @@ use LibreNMS\Tests\TestCase;
 
 class PermissionsTest extends TestCase
 {
-    private function devicePermissionData($user)
+    private function devicePermissionData($user): \Illuminate\Support\Collection
     {
         $user_id = $user instanceof User ? $user->user_id : (is_numeric($user) ? (int) $user : \Auth::id());
 

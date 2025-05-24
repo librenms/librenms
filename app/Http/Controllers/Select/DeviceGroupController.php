@@ -30,14 +30,14 @@ use App\Models\DeviceGroup;
 
 class DeviceGroupController extends SelectController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'type' => 'nullable|in:static,dynamic',
         ];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['name'];
     }
@@ -52,7 +52,7 @@ class DeviceGroupController extends SelectController
     /**
      * @param  DeviceGroup  $device_group
      */
-    public function formatItem($device_group)
+    public function formatItem($device_group): array
     {
         return [
             'id' => $device_group->id,

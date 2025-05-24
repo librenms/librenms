@@ -44,7 +44,7 @@ class RuckusSzApConf implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $location = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation'));
         $configId = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID'));

@@ -41,7 +41,7 @@ class Checks
     /**
      * Post boot Toast messages
      */
-    public static function postAuth()
+    public static function postAuth(): void
     {
         // limit popup messages frequency
         if (! Auth::check() || Cache::get('checks_popup_timeout')) {
@@ -88,7 +88,7 @@ class Checks
     /**
      * Check the script is running as the right user (works before config is available)
      */
-    public static function runningUser()
+    public static function runningUser(): void
     {
         if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
             if (get_current_user() == 'root') {
@@ -107,7 +107,7 @@ class Checks
         }
     }
 
-    private static function printMessage($title, $content, $exit = false)
+    private static function printMessage(string $title, $content, bool $exit = false): void
     {
         $content = (array) $content;
 

@@ -34,7 +34,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class InventoryController implements DeviceTab
 {
-    private $type = null;
+    private ?string $type = null;
 
     public function __construct()
     {

@@ -5,7 +5,7 @@ use LibreNMS\Config;
 if ($int_colour) {
     $row_colour = $int_colour;
 } else {
-    if (! is_integer($i / 2)) {
+    if (! is_int($i / 2)) {
         $row_colour = Config::get('list_colour.even');
     } else {
         $row_colour = Config::get('list_colour.odd');

@@ -93,7 +93,7 @@ class SmokepingCliTest extends DBTestCase
         ],
     ];
 
-    private $instance = null;
+    private ?\App\Console\Commands\SmokepingGenerateCommand $instance = null;
 
     protected function setUp(): void
     {
@@ -361,7 +361,7 @@ class SmokepingCliTest extends DBTestCase
         $this->assertEquals($this->canonicalise($new), $this->canonicalise($old));
     }
 
-    public function legacyAlgo($data)
+    public function legacyAlgo($data): string
     {
         // This is the code taken from the old gen_smokeping script, with echos and sql queries replaced
         $lines = [];
@@ -387,7 +387,7 @@ class SmokepingCliTest extends DBTestCase
         return implode('', $lines);
     }
 
-    public function canonicalise($input)
+    public function canonicalise($input): string
     {
         $input = explode(PHP_EOL, $input);
 

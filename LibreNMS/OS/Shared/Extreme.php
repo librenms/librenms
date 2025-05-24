@@ -36,7 +36,7 @@ class Extreme extends \LibreNMS\OS
         $device->hardware = $this->getHardware() ?: $device->hardware;
     }
 
-    protected function getHardware()
+    protected function getHardware(): ?string
     {
         $hardware = [
             '.1.3.6.1.4.1.1916.2.1' => 'Summit 1',

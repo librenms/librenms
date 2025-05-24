@@ -130,7 +130,7 @@ class Discord extends Transport
         $regex = '#<img class="librenms-graph" src="(.*?)"\s*/>#';
         $count = 1;
 
-        $this->discord_message['embeds'][0]['description'] = preg_replace_callback($regex, function ($match) use (&$count) {
+        $this->discord_message['embeds'][0]['description'] = preg_replace_callback($regex, function (array $match) use (&$count) {
             $this->discord_message['embeds'][] = [
                 'image' => [
                     'url' => $match[1],

@@ -81,7 +81,7 @@ class LegacyController extends Controller
         ]);
     }
 
-    public function dummy()
+    public function dummy(): string
     {
         return 'Dummy page';
     }

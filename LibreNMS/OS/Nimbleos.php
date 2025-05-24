@@ -13,7 +13,7 @@ class Nimbleos extends OS implements StoragePolling
     public function discoverStorage(): Collection
     {
         return SnmpQuery::walk('NIMBLE-MIB::volTable')
-            ->mapTable(function ($data, $volIndex) {
+            ->mapTable(function (array $data, $volIndex) {
                 //nimble uses a high 32bit counter and a low 32bit counter to make a 64bit counter
                 $used = ($data['NIMBLE-MIB::volUsageHigh'] << 32) + $data['NIMBLE-MIB::volUsageLow'];
                 $size = ($data['NIMBLE-MIB::volSizeHigh'] << 32) + $data['NIMBLE-MIB::volSizeLow'];

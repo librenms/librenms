@@ -41,22 +41,10 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    /**
-     * @var Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $force;
-    /**
-     * @var bool
-     */
-    private $ping_fallback;
-    /**
-     * @var \LibreNMS\Polling\ConnectivityHelper
-     */
-    private $connectivity;
+    private \App\Models\Device $device;
+    private bool $force;
+    private bool $ping_fallback;
+    private \LibreNMS\Polling\ConnectivityHelper $connectivity;
 
     public function __construct(Device $device, bool $force = false, bool $ping_fallback = false)
     {
@@ -242,7 +230,7 @@ class ValidateDeviceAndCreate
         }
 
         if (Device::where('sysName', $this->device->sysName)
-            ->when(Config::get('mydomain'), function ($query, $domain) {
+            ->when(Config::get('mydomain'), function ($query, string $domain) {
                 $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
             })->exists()) {
             throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);

@@ -41,7 +41,7 @@ trait UcdResources
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         Log::info('UCD Resources: ');
 
@@ -57,7 +57,7 @@ trait UcdResources
         ];
     }
 
-    public function discoverMempools()
+    public function discoverMempools(): \Illuminate\Support\Collection
     {
         $mempools = new Collection();
         $data = snmp_get_multi($this->getDeviceArray(), [
@@ -160,7 +160,7 @@ trait UcdResources
         });
     }
 
-    private function oidValid($data, $oid)
+    private function oidValid($data, $oid): bool
     {
         return isset($data[0][$oid]) && $data[0][$oid] !== 'NULL';
     }

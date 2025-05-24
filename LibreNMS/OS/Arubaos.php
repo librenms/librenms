@@ -69,7 +69,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
 
@@ -132,7 +132,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         // instant
         return $this->discoverInstantRadio('frequency', 'aiRadioChannel');
@@ -144,7 +144,7 @@ class Arubaos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         // instant
         return $this->discoverInstantRadio('noise-floor', 'aiRadioNoiseFloor');
@@ -156,18 +156,21 @@ class Arubaos extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         // instant
         return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
-    protected function decodeChannel($channel)
+    protected function decodeChannel($channel): int
     {
         return Number::cast($channel) & 255; // mask off the channel width information
     }
 
-    private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    private function discoverInstantRadio(string $type, string $oid, string $desc = 'Radio %s'): array
     {
         $data = SnmpQuery::numeric()->walk("AI-AP-MIB::$oid")->groupByIndex(1); // group by radio index
 
@@ -200,7 +203,7 @@ class Arubaos extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         // instant
         return $this->discoverInstantRadio('utilization', 'aiRadioUtilization64');
@@ -213,7 +216,7 @@ class Arubaos extends OS implements
      * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
-    public function pollWirelessFrequency(array $sensors)
+    public function pollWirelessFrequency(array $sensors): array
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }

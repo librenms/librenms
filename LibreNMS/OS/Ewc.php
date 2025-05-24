@@ -53,7 +53,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessApCount()
+    public function discoverWirelessApCount(): array
     {
         $oids = [
             'HIPATH-WIRELESS-HWC-MIB::apCount.0',
@@ -94,7 +94,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $sensors = [
             new WirelessSensor(
@@ -148,7 +148,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessErrors()
+    public function discoverWirelessErrors(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioPktRetx', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
@@ -175,7 +175,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apRadioStatusChannel', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
@@ -202,7 +202,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'dot11ExtRadioMaxNfCount', [], 'HIPATH-WIRELESS-DOT11-EXTNS-MIB');
         $ap_interfaces = $this->getCacheByIndex('ifName', 'IF-MIB');
@@ -236,7 +236,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentRSS', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
@@ -263,7 +263,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentSNR', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');
@@ -290,7 +290,7 @@ class Ewc extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessUtilization()
+    public function discoverWirelessUtilization(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'apPerfRadioCurrentChannelUtilization', [], 'HIPATH-WIRELESS-HWC-MIB');
         $ap_interfaces = $this->getCacheByIndex('apName', 'HIPATH-WIRELESS-HWC-MIB');

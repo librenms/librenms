@@ -30,7 +30,7 @@ class HostUnreachableException extends \Exception
 {
     protected $reasons = [];
 
-    public function __toString()
+    public function __toString(): string
     {
         $string = __CLASS__ . ": [{$this->code}]: {$this->message}\n";
         foreach ($this->reasons as $reason) {
@@ -46,7 +46,7 @@ class HostUnreachableException extends \Exception
      * @param  string  $snmpVersion
      * @param  string  $credentials
      */
-    public function addReason(string $snmpVersion, string $credentials)
+    public function addReason(string $snmpVersion, string $credentials): void
     {
         $vars = [
             'version' => $snmpVersion,

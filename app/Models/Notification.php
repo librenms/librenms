@@ -37,7 +37,7 @@ class Notification extends Model
         'datetime',
     ];
 
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 
@@ -73,7 +73,7 @@ class Notification extends Model
      * @param  bool  $enabled
      * @return bool
      */
-    private function setAttrib($name, bool $enabled): bool
+    private function setAttrib(string $name, bool $enabled): bool
     {
         if ($enabled === true) {
             $read = new NotificationAttrib;
@@ -110,7 +110,7 @@ class Notification extends Model
      *
      * @param  Builder<Notification>  $query
      */
-    public function scopeIsSticky(Builder $query)
+    public function scopeIsSticky(Builder $query): void
     {
         $query->leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', 'notifications.notifications_id')
             ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);

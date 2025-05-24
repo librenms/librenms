@@ -89,7 +89,7 @@ if (isset($_POST['editing'])) {
                 }
 
                 $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
-                
+
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
                 if ($form_value != $get_devices_attrib && $form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {

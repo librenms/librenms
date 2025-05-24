@@ -60,7 +60,7 @@ class Siklu extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
 
@@ -75,7 +75,7 @@ class Siklu extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.42.1'; // RADIO-BRIDGE-MIB::rfTxPower.1
 
@@ -90,7 +90,7 @@ class Siklu extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.19.1'; // RADIO-BRIDGE-MIB::rfAverageRssi.1
 
@@ -105,7 +105,7 @@ class Siklu extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
 

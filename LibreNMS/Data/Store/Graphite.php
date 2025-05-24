@@ -60,12 +60,12 @@ class Graphite extends BaseDatastore
         $this->prefix = Config::get('graphite.prefix', '');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Graphite';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): mixed
     {
         return Config::get('graphite.enable', false);
     }
@@ -85,7 +85,7 @@ class Graphite extends BaseDatastore
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
      *                               single values are allowed and will be paired with $measurement
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function put($device, $measurement, $tags, $fields): void
     {
         if (! $this->connection) {
             d_echo("Graphite Error: not connected\n");
@@ -127,7 +127,7 @@ class Graphite extends BaseDatastore
      * @param  mixed  $value
      * @param  mixed  $timestamp
      */
-    private function writeData($metric, $value, $timestamp)
+    private function writeData(string $metric, $value, $timestamp): void
     {
         try {
             $stat = Measurement::start('write');

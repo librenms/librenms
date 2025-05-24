@@ -37,8 +37,8 @@ use LibreNMS\Config;
 
 class GraylogController extends SimpleTableController
 {
-    private $timezone;
-    private $deviceLinkCache = [];
+    private ?\DateTimeZone $timezone;
+    private array $deviceLinkCache = [];
 
     public function __construct()
     {
@@ -100,7 +100,7 @@ class GraylogController extends SimpleTableController
         ], 500);
     }
 
-    private function formatMessage($message)
+    private function formatMessage(array $message): array
     {
         if ($this->timezone) {
             $graylogTime = new DateTime($message['message']['timestamp']);
@@ -127,7 +127,7 @@ class GraylogController extends SimpleTableController
         ];
     }
 
-    private function severityLabel($severity)
+    private function severityLabel($severity): string
     {
         $map = [
             '0' => 'label-danger',

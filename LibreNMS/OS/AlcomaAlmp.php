@@ -45,7 +45,7 @@ class AlcomaAlmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return [
             // ALCOMA-MIB::alMPTuneTX.0
@@ -61,7 +61,7 @@ class AlcomaAlmp extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         return [
             // ALCOMA-MIB::alMPTX-PWR.0
@@ -77,7 +77,7 @@ class AlcomaAlmp extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.12140.2.3.4.0'; // ALCOMA-MIB::alMPRX-Level.0
 
@@ -92,7 +92,7 @@ class AlcomaAlmp extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oid = '.1.3.6.1.4.1.12140.2.4.2.0'; // ALCOMA-MIB::alMPSNR.0
 

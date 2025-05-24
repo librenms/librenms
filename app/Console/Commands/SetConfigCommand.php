@@ -154,7 +154,7 @@ class SetConfigCommand extends LnmsCommand
         return null;
     }
 
-    private function erase($setting, $parent = null)
+    private function erase($setting, ?string $parent = null): bool|int
     {
         if ($parent) {
             $data = Config::get($parent);
@@ -189,7 +189,7 @@ class SetConfigCommand extends LnmsCommand
         return array_keys($array) === range(0, count($array) - 1);
     }
 
-    private function forgetWithIndex(&$data, $matches)
+    private function forgetWithIndex(&$data, string $matches): void
     {
         // detect sequentially numeric indexed array so we can re-index the array
         if ($this->hasSequentialIndex($data)) {
@@ -206,7 +206,7 @@ class SetConfigCommand extends LnmsCommand
      *
      * @throws ValidationException
      */
-    private function validateOsSetting(string $os, string $setting, $value)
+    private function validateOsSetting(string $os, string $setting, $value): void
     {
         // prep data to be validated
         $os_data = Config::get("os.$os");
@@ -235,7 +235,7 @@ class SetConfigCommand extends LnmsCommand
 
         $code = 0;
 
-        $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
+        $errors = collect($validator->getErrors())->filter(function (array $error) use ($value, &$code) {
             if ($error['constraint']['name'] == 'additionalProp') {
                 $code = 1;
 

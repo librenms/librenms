@@ -163,7 +163,7 @@ class Stats
         // sanitize sysDescr
         return $device_info->map(function ($entry) {
             // remove hostnames from linux, macosx, and SunOS
-            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
+            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function (array $matches) {
                 return $matches[1] . 'hostname ' . $matches[2];
             }, $entry->sysDescr);
 
@@ -172,7 +172,7 @@ class Stats
             $sn_replacements = ['A', 'a', '0'];
             $entry->sysDescr = preg_replace_callback(
                 '/((s\/?n|serial num(ber)?)[:=]? ?)([a-z0-9.\-]{4,16})/i',
-                function ($matches) use ($sn_patterns, $sn_replacements) {
+                function (array $matches) use ($sn_patterns, $sn_replacements) {
                     return $matches[1] . preg_replace($sn_patterns, $sn_replacements, $matches[4]);
                 },
                 $entry->sysDescr

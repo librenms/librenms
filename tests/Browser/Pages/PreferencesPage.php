@@ -46,7 +46,7 @@ class PreferencesPage extends Page
      * @param  Browser  $browser
      * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->assertPathIs($this->url());
     }

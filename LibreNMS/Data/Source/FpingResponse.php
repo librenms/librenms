@@ -127,7 +127,7 @@ class FpingResponse
         return $this->exit_code == 0 && $this->loss < 100;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $str = "$this->host : xmt/rcv/%loss = $this->transmitted/$this->received/$this->loss%";
 

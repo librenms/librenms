@@ -35,7 +35,7 @@ class InventoryController extends TableController
 {
     protected $model = EntPhysical::class;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -45,19 +45,19 @@ class InventoryController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'device_id' => 'device',
         ];
     }
 
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['entPhysicalDescr', 'entPhysicalModelName', 'entPhysicalSerialNum'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'device' => 'device_id',
@@ -86,7 +86,7 @@ class InventoryController extends TableController
      * @param  EntPhysical  $entPhysical
      * @return array|Model|Collection
      */
-    public function formatItem($entPhysical)
+    public function formatItem($entPhysical): array
     {
         return [
             'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $entPhysical->device]),
@@ -102,7 +102,7 @@ class InventoryController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device',
@@ -119,7 +119,7 @@ class InventoryController extends TableController
      * @param  EntPhysical  $entPhysical
      * @return array
      */
-    protected function formatExportRow($entPhysical)
+    protected function formatExportRow($entPhysical): array
     {
         return [
             $entPhysical->device ? $entPhysical->device->displayName() : '',

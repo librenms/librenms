@@ -34,8 +34,7 @@ use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 {
-    /** @var bool */
-    private $could_not_check_cron = false;
+    private bool $could_not_check_cron = false;
 
     /**
      * @inheritDoc

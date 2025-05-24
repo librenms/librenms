@@ -36,7 +36,7 @@ use LibreNMS\Util\Rewrite;
 
 class PortsController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -54,7 +54,7 @@ class PortsController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'ports.device_id' => 'device_id',
@@ -79,7 +79,7 @@ class PortsController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'hostname',
@@ -146,7 +146,7 @@ class PortsController extends TableController
      * @param  Port  $port
      * @return array
      */
-    public function formatItem($port)
+    public function formatItem($port): array
     {
         $status = $port->ifOperStatus == 'down'
             ? ($port->ifAdminStatus == 'up' ? 'label-danger' : 'label-warning')
@@ -179,7 +179,7 @@ class PortsController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device ID',
@@ -209,7 +209,7 @@ class PortsController extends TableController
      * @param  Port  $port
      * @return array
      */
-    protected function formatExportRow($port)
+    protected function formatExportRow($port): array
     {
         $status = $port->ifOperStatus;
         $adminStatus = $port->ifAdminStatus;

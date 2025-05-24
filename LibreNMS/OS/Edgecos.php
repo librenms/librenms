@@ -38,7 +38,7 @@ use LibreNMS\Util\Oid;
 
 class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
 {
-    public function discoverMempools()
+    public function discoverMempools(): \Illuminate\Support\Collection
     {
         $mib = $this->findMib();
         $data = snmp_get_multi_oid($this->getDeviceArray(), ['memoryTotal.0', 'memoryFreed.0', 'memoryAllocated.0'], '-OUQs', $mib);
@@ -83,7 +83,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDevice();
 

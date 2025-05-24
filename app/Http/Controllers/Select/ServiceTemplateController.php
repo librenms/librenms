@@ -30,7 +30,7 @@ use App\Models\ServiceTemplate;
 
 class ServiceTemplateController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return ['name'];
     }
@@ -43,7 +43,7 @@ class ServiceTemplateController extends SelectController
     /**
      * @param  ServiceTemplate  $template
      */
-    public function formatItem($template)
+    public function formatItem($template): array
     {
         return [
             'id' => $template->id,

@@ -32,7 +32,7 @@ abstract class Model
      * @param  array  $unique_fields  fields to search for an existing entry
      * @param  array  $ignored_update_fields  Don't compare these field when updating
      */
-    final public static function sync($device_id, array $models, $unique_fields = [], $ignored_update_fields = [])
+    final public static function sync($device_id, array $models, $unique_fields = [], $ignored_update_fields = []): void
     {
         // save and collect valid ids
         $valid_ids = [];
@@ -172,7 +172,7 @@ abstract class Model
     /**
      * @param  static  $model
      */
-    public static function onDelete($model)
+    public static function onDelete($model): void
     {
         if (\App::runningInConsole()) {
             echo '-';
@@ -182,7 +182,7 @@ abstract class Model
     /**
      * @param  static  $model
      */
-    public static function onCreate($model)
+    public static function onCreate($model): void
     {
         if (\App::runningInConsole()) {
             echo '+';
@@ -192,14 +192,14 @@ abstract class Model
     /**
      * @param  static  $model
      */
-    public static function onUpdate($model)
+    public static function onUpdate($model): void
     {
         if (\App::runningInConsole()) {
             echo 'U';
         }
     }
 
-    public static function onNoUpdate()
+    public static function onNoUpdate(): void
     {
         if (\App::runningInConsole()) {
             echo '.';

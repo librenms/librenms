@@ -75,7 +75,7 @@ class CollectdColor
 
     //end __construct()
 
-    public function randomize()
+    public function randomize(): void
     {
         $this->r = (rand(0, 255) / 255.0);
         $this->g = (rand(0, 255) / 255.0);
@@ -94,7 +94,7 @@ class CollectdColor
 
     //end randomize()
 
-    public function fade($bkgnd = null, $alpha = 0.25)
+    public function fade($bkgnd = null, $alpha = 0.25): void
     {
         if (is_null($bkgnd) || ! is_a($bkgnd, 'CollectdColor')) {
             $bg_r = 1.0;
@@ -113,7 +113,7 @@ class CollectdColor
 
     //end fade()
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'r' => $this->r,
@@ -124,7 +124,7 @@ class CollectdColor
 
     //end as_array()
 
-    public function toString()
+    public function toString(): string
     {
         $r = (int) ($this->r * 255);
         $g = (int) ($this->g * 255);

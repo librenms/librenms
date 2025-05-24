@@ -40,7 +40,7 @@ class OspfTxRetransmit implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $ospfRouterId = $trap->getOidData($trap->findOid('OSPF-MIB::ospfRouterId'));
         $ospfPacketType = $trap->getOidData($trap->findOid('OSPF-TRAP-MIB::ospfPacketType'));

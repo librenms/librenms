@@ -125,7 +125,7 @@ class Mac
     /**
      * Reformat the MAC to a nice readable format 00:0a:1f:a3:cc:14
      */
-    public function readable()
+    public function readable(): string
     {
         return implode(':', $this->mac);
     }

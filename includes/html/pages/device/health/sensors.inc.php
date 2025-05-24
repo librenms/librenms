@@ -10,7 +10,7 @@ $graph_type = $graph_type ?? 'sensor_' . $class;
 $sensors = \App\Models\Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();
 
 foreach ($sensors as $sensor) {
-    if (! is_integer($row++ / 2)) {
+    if (! is_int($row++ / 2)) {
         $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
         $row_colour = \LibreNMS\Config::get('list_colour.odd');

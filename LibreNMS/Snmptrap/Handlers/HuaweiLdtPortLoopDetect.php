@@ -40,7 +40,7 @@ class HuaweiLdtPortLoopDetect implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $trap->log('Loop Detected ' . $trap->getOidData($trap->findOid('HUAWEI-LDT-MIB::hwLPortLoopDetectIfName')) . ' (Status ' . $trap->getOidData($trap->findOid('HUAWEI-LDT-MIB::hwPortLoopDetectStatus')) . ', possible VLANs ' . $trap->getOidData($trap->findOid('HUAWEI-LDT-MIB::hwLdtPortLoopDetectVlanList')) . ', auto VLANs ' . $trap->getOidData($trap->findOid('HUAWEI-LDT-MIB::hwLdtPortLoopAutoTrapVlanList')) . ')', Severity::Warning, 'loop', $trap->getOidData($trap->findOid('HUAWEI-LDT-MIB::hwLPortLoopDetectIfName')));
     }

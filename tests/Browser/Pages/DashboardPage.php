@@ -22,7 +22,7 @@ class DashboardPage extends Page
      * @param  Browser  $browser
      * @return void
      */
-    public function assert(Browser $browser)
+    public function assert(Browser $browser): void
     {
         $browser->waitFor('@editor')
             ->assertPathIs($this->url());

@@ -322,7 +322,7 @@ class CiHelper
      * @param  string  $type  type of check lint, style, or unit
      * @return int the return value from the check (0 = success)
      */
-    private function runCheck($type): int
+    private function runCheck(int|string $type): int
     {
         if ($method = $this->canCheck($type)) {
             $ret = $this->$method();
@@ -342,7 +342,7 @@ class CiHelper
      * @param  string  $type
      * @return false|string the method name to run
      */
-    private function canCheck($type)
+    private function canCheck(string|int $type): false|string
     {
         if ($this->flags["{$type}_skip"] || $this->completedChecks[$type]) {
             return false;
@@ -365,7 +365,7 @@ class CiHelper
      * @param  array  $env  environment to set
      * @return int
      */
-    private function execute(string $name, $command, $silence = false, $env = null): int
+    private function execute(string $name, array $command, bool $silence = false, $env = null): int
     {
         $start = microtime(true);
         $proc = new Process($command, null, $env);

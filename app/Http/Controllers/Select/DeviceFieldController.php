@@ -36,7 +36,7 @@ class DeviceFieldController extends SelectController
      *
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:features,hardware,os,type,version',
@@ -49,7 +49,7 @@ class DeviceFieldController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return [$request->get('field')];
     }
@@ -77,7 +77,7 @@ class DeviceFieldController extends SelectController
      * @param  Device  $device
      * @return array
      */
-    public function formatItem($device)
+    public function formatItem($device): array
     {
         $field = \Request::get('field');
 

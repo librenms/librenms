@@ -63,7 +63,7 @@ d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 [$enabled_apps, $discovered_apps] = array_reduce(dbFetchRows(
     'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? AND deleted_at IS NULL ORDER BY `app_type`',
     [$device['device_id']]
-), function ($result, $app) {
+), function ($result, array $app) {
     $result[0][] = $app['app_type'];
     if ($app['discovered']) {
         $result[1][] = $app['app_type'];

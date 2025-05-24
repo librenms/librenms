@@ -57,7 +57,7 @@ class FsSwitch extends OS
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $processors = [];
 

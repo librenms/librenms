@@ -35,7 +35,7 @@ use LibreNMS\Util\Url;
 
 class EventlogController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -44,12 +44,12 @@ class EventlogController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields($request): array
     {
         return ['message'];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'device_id' => 'device',
@@ -57,7 +57,7 @@ class EventlogController extends TableController
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['datetime', 'type', 'device_id', 'message', 'username'];
     }
@@ -80,7 +80,7 @@ class EventlogController extends TableController
     /**
      * @param  Eventlog  $eventlog
      */
-    public function formatItem($eventlog)
+    public function formatItem($eventlog): array
     {
         return [
             'datetime' => $this->formatDatetime($eventlog),
@@ -114,7 +114,7 @@ class EventlogController extends TableController
         return htmlspecialchars($eventlog->type);
     }
 
-    private function formatDatetime($eventlog)
+    private function formatDatetime($eventlog): string
     {
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
@@ -129,7 +129,7 @@ class EventlogController extends TableController
      * @param  Severity  $eventlog_severity
      * @return string $eventlog_severity_icon
      */
-    private function severityLabel($eventlog_severity)
+    private function severityLabel($eventlog_severity): string
     {
         return match ($eventlog_severity) {
             Severity::Ok => 'label-success',

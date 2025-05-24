@@ -29,7 +29,7 @@ if (! function_exists('ss_data_update_helper')) {
      * @param  string  $gen_type
      * @return $metrics
      */
-    function ss_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type)
+    function ss_data_update_helper($device, $app_id, $fields, array $metrics, $name, $polling_type, $rrd_def, $gen_type): array
     {
         $rrd_name = [$polling_type, $name, $app_id, $gen_type];
         $metrics[$gen_type] = $fields;

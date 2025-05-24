@@ -15,7 +15,7 @@ class StpObserver
      * @param  Stp  $stp
      * @return void
      */
-    public function updating(Stp $stp)
+    public function updating(Stp $stp): void
     {
         if ($stp->isDirty('designatedRoot')) {
             Eventlog::log('STP designated root changed: ' . $stp->getOriginal('designatedRoot') . ' > ' . $stp->designatedRoot, $stp->device_id, 'stp', Severity::Warning);

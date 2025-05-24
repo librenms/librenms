@@ -17,7 +17,10 @@ class HorizonQuantum extends OS implements
     WirelessErrorsDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverWirelessSnr()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessSnr(): array
     {
         $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemSNR', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
@@ -41,7 +44,10 @@ class HorizonQuantum extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessPower()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessPower(): array
     {
         $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmRadioIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmRadioActualTransmitPowerdBm', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
@@ -65,7 +71,10 @@ class HorizonQuantum extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRssi()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRssi(): array
     {
         $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemChannelizedRSL', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
@@ -89,7 +98,10 @@ class HorizonQuantum extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessErrors()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessErrors(): array
     {
         $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmWirelessEnetPortIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
         $data = snmpwalk_group($this->getDeviceArray(), 'hzQtmWirelessEnetPortRxFramesErrors', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');
@@ -110,7 +122,10 @@ class HorizonQuantum extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRate()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessRate(): array
     {
         $sensors = [];
         $index = snmpwalk_group($this->getDeviceArray(), 'hzQtmModemIndex', 'DRAGONWAVE-HORIZON-QUANTUM-MIB');

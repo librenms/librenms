@@ -60,7 +60,7 @@ if (! empty($_REQUEST['limit'])) {
 }
 
 $sql = "SELECT `device_id`, `hostname`, `sysName`, `display` FROM `devices` $query";
-$devices = array_map(function ($device) {
+$devices = array_map(function (array $device) {
     return [
         'id' => $device['device_id'],
         'text' => format_hostname($device),

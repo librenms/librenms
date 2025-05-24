@@ -49,7 +49,7 @@ class EricssonMl extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return [
             // PT-RADIOLINK-MIB::txFrequency.0
@@ -65,7 +65,7 @@ class EricssonMl extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         return [
             // PT-RADIOLINK-MIB::actualOutputPower.0
@@ -79,7 +79,7 @@ class EricssonMl extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $oid = '.1.3.6.1.4.1.193.223.2.7.1.1.1.110101'; // PT-RADIOLINK-MIB::actualInputPower.0
 
@@ -94,7 +94,7 @@ class EricssonMl extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessSnr()
+    public function discoverWirelessSnr(): array
     {
         $oid = '.1.3.6.1.4.1.193.223.2.7.1.1.43.110101'; //PT-RADIOLINK-MIB::actualSnir.0
 
@@ -109,7 +109,7 @@ class EricssonMl extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $oid_bitrate = '.1.3.6.1.4.1.193.223.2.7.1.1.46.110101'; // PT-RADIOLINK-MIB::actualTxCapacity.0
 

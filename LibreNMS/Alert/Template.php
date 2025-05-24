@@ -56,12 +56,12 @@ class Template
         return $this->template;
     }
 
-    public function getTitle($data)
+    public function getTitle(array $data)
     {
         return $this->bladeTitle($data);
     }
 
-    public function getBody($data)
+    public function getBody(array $data)
     {
         return $this->bladeBody($data);
     }
@@ -72,7 +72,7 @@ class Template
      * @param  array  $data
      * @return string
      */
-    public function bladeBody($data)
+    public function bladeBody(array $data)
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
@@ -88,7 +88,7 @@ class Template
      * @param  array  $data
      * @return string
      */
-    public function bladeTitle($data)
+    public function bladeTitle(array $data)
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {

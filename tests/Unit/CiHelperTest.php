@@ -260,7 +260,7 @@ class CiHelperTest extends TestCase
         ]);
     }
 
-    private function assertFlagsSet(CiHelper $helper, $flags = [])
+    private function assertFlagsSet(CiHelper $helper, array $flags = []): void
     {
         $full = $this->getDefaultFlags();
         foreach ($flags as $name => $value) {
@@ -271,7 +271,7 @@ class CiHelperTest extends TestCase
         $this->assertEquals($full, $helper->getFlags());
     }
 
-    private function getDefaultFlags()
+    private function getDefaultFlags(): array
     {
         return [
             'lint_enable' => true,

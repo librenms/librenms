@@ -37,10 +37,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class CheckSchemaStructure implements Validation, ValidationFixer
 {
-    /** @var array */
-    private $descriptions = [];
-    /** @var array */
-    private $schema_update = [];
+    private array $descriptions = [];
+    private array $schema_update = [];
     /** @var string */
     private $schema_file;
 
@@ -103,7 +101,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
                 $this->descriptions[] = "Database: missing table ($table)";
                 $this->schema_update[] = $this->addTableSql($table, $data);
             } else {
-                $current_columns = array_reduce($current_schema[$table]['Columns'], function ($array, $item) {
+                $current_columns = array_reduce($current_schema[$table]['Columns'], function (array $array, array $item) {
                     $array[$item['Field']] = $item;
 
                     return $array;

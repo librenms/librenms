@@ -30,7 +30,7 @@ use LibreNMS\DB\Schema;
 
 class SchemaTest extends TestCase
 {
-    private $mock_schema = [
+    private array $mock_schema = [
         'bills' => [
             'Columns' => [
                 ['Field' => 'bill_id', 'Type' => 'int(11)', 'Null' => false, 'Extra' => 'auto_increment'],
@@ -110,7 +110,7 @@ class SchemaTest extends TestCase
     /**
      * @return Schema
      */
-    private function getSchemaMock()
+    private function getSchemaMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         // use a Mock so we don't have to rely on the schema being stable.
         $schema = $this->getMockBuilder(Schema::class)

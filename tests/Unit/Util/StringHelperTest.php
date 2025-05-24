@@ -64,7 +64,7 @@ class StringHelperTest extends TestCase
 
         $stringable = new class
         {
-            public function __toString()
+            public function __toString(): string
             {
                 return '';
             }

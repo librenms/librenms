@@ -51,7 +51,7 @@ class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         return [
             Processor::discover(

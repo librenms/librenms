@@ -56,14 +56,14 @@ class Python extends BaseValidation
         $this->checkExtensions($validator);
     }
 
-    private function checkVersion(Validator $validator, $version)
+    private function checkVersion(Validator $validator, string $version): void
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
             $validator->warn("Python version $version too old.", 'Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
         }
     }
 
-    private function checkPipVersion(Validator $validator, $version)
+    private function checkPipVersion(Validator $validator, string $version): void
     {
         preg_match('/\(python ([0-9.]+)\)/', `pip3 --version 2>/dev/null`, $matches);
         $pip = $matches[1];
@@ -73,7 +73,7 @@ class Python extends BaseValidation
         }
     }
 
-    private function checkExtensions(Validator $validator)
+    private function checkExtensions(Validator $validator): void
     {
         $pythonExtensions = '/scripts/dynamic_check_requirements.py';
         $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);

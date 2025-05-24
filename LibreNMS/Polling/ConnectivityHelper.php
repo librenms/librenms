@@ -38,18 +38,9 @@ use Symfony\Component\Process\Process;
 
 class ConnectivityHelper
 {
-    /**
-     * @var Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $saveMetrics = false;
-    /**
-     * @var string
-     */
-    private $family;
+    private \App\Models\Device $device;
+    private bool $saveMetrics = false;
+    private ?string $family = null;
     /**
      * @var string
      */

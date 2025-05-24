@@ -12,7 +12,7 @@ class MysqlAuthorizer extends AuthorizerBase
     protected static $CAN_UPDATE_USER = true;
     protected static $CAN_UPDATE_PASSWORDS = true;
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;

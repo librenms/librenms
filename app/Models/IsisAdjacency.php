@@ -62,7 +62,7 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
         return $this->belongsTo(Port::class, 'device_id');
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->ifIndex . $this->index;
     }

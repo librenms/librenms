@@ -9,7 +9,7 @@ class ComponentPref extends Model
     public $timestamps = false;
     protected $fillable = ['component', 'attribute', 'value'];
 
-    public function setValueAttribute($value)
+    public function setValueAttribute($value): void
     {
         $this->attributes['value'] = is_array($value) ? json_encode($value) : (string) $value;
     }

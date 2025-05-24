@@ -73,7 +73,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $data = snmpwalk_group($this->getDeviceArray(), 's5ChasUtilCPUUsageLast10Minutes', 'S5-CHASSIS-MIB');
 

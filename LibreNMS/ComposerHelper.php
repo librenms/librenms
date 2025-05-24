@@ -33,7 +33,7 @@ use Minishlink\WebPush\VAPID;
 
 class ComposerHelper
 {
-    public static function postRootPackageInstall(Event $event)
+    public static function postRootPackageInstall(Event $event): void
     {
         if (! file_exists('.env')) {
             self::setPermissions();
@@ -41,7 +41,7 @@ class ComposerHelper
         }
     }
 
-    public static function postInstall(Event $event)
+    public static function postInstall(Event $event): void
     {
         if (! file_exists('.env')) {
             self::setPermissions();
@@ -50,7 +50,7 @@ class ComposerHelper
         self::populateEnv();
     }
 
-    public static function preUpdate(Event $event)
+    public static function preUpdate(Event $event): void
     {
         if (! getenv('FORCE')) {
             echo "Running composer update is not advisable.  Please run composer install to update instead.\n";
@@ -119,7 +119,7 @@ class ComposerHelper
     /**
      * Initially populate .env file
      */
-    private static function populateEnv()
+    private static function populateEnv(): void
     {
         $config = [
             'db_host' => '',
@@ -161,7 +161,7 @@ class ComposerHelper
         }
     }
 
-    private static function setPermissions()
+    private static function setPermissions(): void
     {
         $permissions_cmds = [
             'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
@@ -176,7 +176,7 @@ class ComposerHelper
      *
      * @param  string|array  $cmds
      */
-    private static function exec($cmds): int
+    private static function exec(array $cmds): int
     {
         $cmd = "set -v\n" . implode(PHP_EOL, (array) $cmds);
         passthru($cmd, $result_code);

@@ -36,7 +36,7 @@ use LibreNMS\Util\Mac;
 
 class PortNacController extends TableController
 {
-    public function rules()
+    public function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
@@ -44,12 +44,12 @@ class PortNacController extends TableController
         ];
     }
 
-    public function searchFields($request)
+    public function searchFields($request): array
     {
         return ['username', 'ip_address', 'mac_address'];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'device_id',

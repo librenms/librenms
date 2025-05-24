@@ -275,7 +275,7 @@ class Device extends BaseModel
      * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
-    public function shortDisplayName($length = 12)
+    public function shortDisplayName($length = 12): string
     {
         $name = $this->displayName();
 
@@ -337,7 +337,7 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatDownUptime($short = false): string
+    public function formatDownUptime(bool $short = false): string
     {
         $time = ($this->status == 1) ? $this->uptime : (int) $this->last_polled?->diffInSeconds(null, true);
 
@@ -372,7 +372,7 @@ class Device extends BaseModel
      *
      * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
      */
-    public function updateMaxDepth($exclude = null)
+    public function updateMaxDepth($exclude = null): void
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
@@ -401,7 +401,7 @@ class Device extends BaseModel
      *
      * Only checks on root nodes (where max_depth is 1 or 0)
      */
-    public function validateStandalone()
+    public function validateStandalone(): void
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
             $this->max_depth = 1; // has children
@@ -417,7 +417,7 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
-    public function setAttrib($name, $value)
+    public function setAttrib($name, $value): bool
     {
         $attrib = $this->attribs->first(function ($item) use ($name) {
             return $item->attrib_type === $name;
@@ -462,7 +462,7 @@ class Device extends BaseModel
      * @param  Location|string  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
      */
-    public function setLocation($new_location, bool $doLookup = false)
+    public function setLocation($new_location, bool $doLookup = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;

@@ -32,7 +32,7 @@ if (! function_exists('proxmox_vm_exists')) {
      * @param  array  $pmxcache  Reference to the Proxmox VM Cache
      * @return bool true if the VM exists, false if it doesn't
      */
-    function proxmox_vm_exists($i, $c, &$pmxcache)
+    function proxmox_vm_exists($i, $c, array &$pmxcache): bool
     {
         if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
             return true;

@@ -7,7 +7,7 @@ $graph_type = 'storage_usage';
 $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY storage_descr', [$device['device_id']]) as $drive) {
-    if (is_integer($row / 2)) {
+    if (is_int($row / 2)) {
         $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
         $row_colour = \LibreNMS\Config::get('list_colour.odd');

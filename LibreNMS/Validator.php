@@ -34,12 +34,10 @@ use ReflectionException;
 
 class Validator
 {
-    /** @var array */
-    private $validation_groups = [];
-    /** @var array */
-    private $results = [];
+    private array $validation_groups = [];
+    private array $results = [];
     /** @var string|null */
-    private $username;
+    private string|array|bool|null $username = null;
 
     /**
      * Validator constructor.

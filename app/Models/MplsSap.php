@@ -32,7 +32,7 @@ class MplsSap extends DeviceRelatedModel implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->svc_oid . '-' . $this->sapPortId . '-' . $this->sapEncapValue;
     }

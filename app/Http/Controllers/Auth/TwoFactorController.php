@@ -157,7 +157,7 @@ class TwoFactorController extends Controller
      *
      * @throws AuthenticationException
      */
-    private function checkToken($user, $token, ToastInterface $toast)
+    private function checkToken(\App\Models\User $user, $token, ToastInterface $toast): bool
     {
         if (! $token) {
             throw new AuthenticationException(__('No Two-Factor Token entered.'));

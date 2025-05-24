@@ -134,9 +134,9 @@ class DynamicConfigItem implements \ArrayAccess
         return $this->value;
     }
 
-    public function getOptions()
+    public function getOptions(): mixed
     {
-        return array_reduce($this->options, function ($result, $option) {
+        return array_reduce($this->options, function (array $result, $option) {
             $key = $this->optionTranslationKey($option);
             $trans = __($key);
             $result[$option] = ($trans === $key ? $option : $trans);
@@ -160,21 +160,21 @@ class DynamicConfigItem implements \ArrayAccess
         return $this->type;
     }
 
-    public function hasDescription()
+    public function hasDescription(): bool
     {
         $key = $this->descriptionTranslationKey();
 
         return __($key) !== $key;
     }
 
-    public function hasHelp()
+    public function hasHelp(): bool
     {
         $key = $this->helpTranslationKey();
 
         return __($key) !== $key;
     }
 
-    public function hasUnits()
+    public function hasUnits(): bool
     {
         return isset($this->units);
     }
@@ -197,7 +197,10 @@ class DynamicConfigItem implements \ArrayAccess
         return __($this->helpTranslationKey());
     }
 
-    public function only($fields = [])
+    /**
+     * @return mixed[]
+     */
+    public function only($fields = []): array
     {
         $array = [];
 
@@ -208,12 +211,12 @@ class DynamicConfigItem implements \ArrayAccess
         return $array;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return get_object_vars($this);
     }
 
-    public function isValid()
+    public function isValid(): bool
     {
         return ($this->group == '' || $this->type) && ! $this->hidden && ! $this->disabled;
     }
@@ -256,17 +259,17 @@ class DynamicConfigItem implements \ArrayAccess
         return $this->name;
     }
 
-    private function descriptionTranslationKey()
+    private function descriptionTranslationKey(): string
     {
         return "settings.settings.$this->name.description";
     }
 
-    private function helpTranslationKey()
+    private function helpTranslationKey(): string
     {
         return "settings.settings.$this->name.help";
     }
 
-    private function optionTranslationKey($option)
+    private function optionTranslationKey($option): string
     {
         return "settings.settings.$this->name.options.$option";
     }

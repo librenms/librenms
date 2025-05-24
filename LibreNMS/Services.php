@@ -33,7 +33,7 @@ class Services
      *
      * @return array
      */
-    public static function list()
+    public static function list(): array
     {
         $services = [];
         if (is_dir(Config::get('nagios_plugins'))) {

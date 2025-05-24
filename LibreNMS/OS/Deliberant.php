@@ -38,7 +38,7 @@ class Deliberant extends OS implements WirelessClientsDiscovery
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $device = $this->getDeviceArray();
         $clients_data = snmpwalk_cache_oid($device, 'dlbDot11IfAssocNodeCount', [], 'DLB-802DOT11-EXT-MIB');

@@ -58,7 +58,7 @@ function dbQuery($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbInsert($data, $table)
+function dbInsert($data, string $table): string|false|null
 {
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
@@ -131,7 +131,7 @@ function dbBulkInsert($data, $table)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbUpdate($data, $table, $where = null, $parameters = [])
+function dbUpdate($data, string $table, $where = null, $parameters = [])
 {
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
@@ -172,7 +172,7 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
  * @see https://laravel.com/docs/eloquent#deleting-models
  */
-function dbDelete($table, $where = null, $parameters = [])
+function dbDelete(string $table, $where = null, $parameters = [])
 {
     $sql = 'DELETE FROM `' . $table . '`';
     if ($where) {
@@ -326,7 +326,7 @@ function dbFetchColumn($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbHandleException(QueryException $exception)
+function dbHandleException(QueryException $exception): void
 {
     $message = $exception->getMessage();
 
@@ -364,7 +364,7 @@ function dbHandleException(QueryException $exception)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbPlaceHolders(&$values)
+function dbPlaceHolders(array &$values): array
 {
     $data = [];
     foreach ($values as $key => $value) {
@@ -392,7 +392,7 @@ function dbPlaceHolders(&$values)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbGenPlaceholders($count)
+function dbGenPlaceholders($count): string
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
 }
@@ -410,7 +410,7 @@ function dbGenPlaceholders($count)
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
-function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
+function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null): array
 {
     $inserted = 0;
 

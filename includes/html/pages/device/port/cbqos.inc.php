@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-function find_child($components, $parent, $level)
+function find_child(array $components, $parent, $level): void
 {
     global $vars;
 

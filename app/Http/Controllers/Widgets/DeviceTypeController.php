@@ -72,11 +72,11 @@ class DeviceTypeController extends WidgetController
         }
 
         if ($data['sort_order'] == 'name') {
-            usort($device_types, function ($item1, $item2) {
+            usort($device_types, function (array $item1, array $item2) {
                 return $item1['type'] <=> $item2['type'];
             });
         } else {
-            usort($device_types, function ($item1, $item2) {
+            usort($device_types, function (array $item1, array $item2) {
                 return $item2['count'] <=> $item1['count'];
             });
         }

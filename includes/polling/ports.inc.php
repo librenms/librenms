@@ -222,7 +222,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $fetched_data_string .= '(Selected ports polling): ';
 
         // remove the deleted and disabled ports and mark them skipped
-        $polled_ports = array_filter($ports, function ($port) use ($ports) {
+        $polled_ports = array_filter($ports, function (array $port) use ($ports) {
             $ports[$port['ifIndex']]['skipped'] = true;
 
             return ! ($port['deleted'] || $port['disabled']);

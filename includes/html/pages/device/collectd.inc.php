@@ -30,7 +30,7 @@ load_graph_definitions();
  * @param  array  $items  Array of options values to return to browser
  * @param  string  $method  Name of Javascript method that will be called to process data
  */
-function dhtml_response_list(&$items, $method)
+function dhtml_response_list(&$items, $method): void
 {
     header('Content-Type: text/xml');
 
@@ -92,7 +92,7 @@ foreach ($pinsts as &$instance) {
 
         foreach ($typeinstances as &$tinst) {
             $i++;
-            if (! is_integer($i / 2)) {
+            if (! is_int($i / 2)) {
                 $row_colour = \LibreNMS\Config::get('list_colour.even');
             } else {
                 $row_colour = \LibreNMS\Config::get('list_colour.odd');

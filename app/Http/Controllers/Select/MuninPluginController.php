@@ -48,7 +48,7 @@ class MuninPluginController extends SelectController
     /**
      * @param  MuninPlugin  $munin_plugin
      */
-    public function formatItem($munin_plugin)
+    public function formatItem($munin_plugin): array
     {
         return [
             'id' => $munin_plugin->mplug_id,

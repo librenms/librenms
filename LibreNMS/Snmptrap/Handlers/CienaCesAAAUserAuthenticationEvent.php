@@ -44,7 +44,7 @@ class CienaCesAAAUserAuthenticationEvent implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $user = $trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserName'));
         $message = $trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationDescription'));

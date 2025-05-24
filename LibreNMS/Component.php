@@ -40,7 +40,7 @@ class Component
      * so that they can be modified but they can not be set as user attributes. We
      * also set their default values.
      */
-    private $reserved = [
+    private array $reserved = [
         'type' => '',
         'label' => '',
         'status' => 0,
@@ -58,7 +58,7 @@ class Component
         return $counts->isEmpty() ? false : $counts->all();
     }
 
-    public function getComponentType($TYPE = null)
+    public function getComponentType($TYPE = null): false|array
     {
         if (is_null($TYPE)) {
             $SQL = 'SELECT DISTINCT `type` as `name` FROM `component` ORDER BY `name`';
@@ -77,7 +77,7 @@ class Component
         }
     }
 
-    public function getComponents($device_id = null, $options = [])
+    public function getComponents($device_id = null, array $options = [])
     {
         $query = \App\Models\Component::query()
             ->with('prefs');
@@ -123,7 +123,10 @@ class Component
         })->toArray();
     }
 
-    public function getComponentStatus($device = null)
+    /**
+     * @return mixed[]
+     */
+    public function getComponentStatus($device = null): array
     {
         $sql_query = 'SELECT status, count(status) as count FROM component WHERE';
         $sql_param = [];
@@ -158,7 +161,7 @@ class Component
         return $count;
     }
 
-    public function getComponentStatusLog($component_id, $start, $end)
+    public function getComponentStatusLog(string $component_id, string $start, string $end): false|array
     {
         if (($component_id == null) || ($start == null) || ($end == null)) {
             // Error...
@@ -190,7 +193,7 @@ class Component
         return $return;
     }
 
-    public function createComponent($device_id, $type)
+    public function createComponent($device_id, $type): array
     {
         $component = \App\Models\Component::create(['device_id' => $device_id, 'type' => $type]);
 
@@ -218,7 +221,7 @@ class Component
         return \App\Models\Component::destroy($id);
     }
 
-    public function setComponentPrefs($device_id, $updated)
+    public function setComponentPrefs(\App\Models\Device|int|null $device_id, $updated): bool
     {
         $updated = Arr::wrap($updated);
         \App\Models\Component::whereIntegerInRaw('id', array_keys($updated))

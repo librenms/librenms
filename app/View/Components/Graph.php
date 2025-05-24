@@ -49,10 +49,7 @@ class Graph extends Component
      * @var bool
      */
     private $link;
-    /**
-     * @var bool
-     */
-    private $popup;
+    private bool $popup;
     /**
      * @var string
      */
@@ -85,7 +82,7 @@ class Graph extends Component
         int $absolute_size = 0,
         $link = true,
         $popup = false,
-        $popupTitle = '',
+        mixed $popupTitle = '',
         $device = null,
         $port = null
     ) {

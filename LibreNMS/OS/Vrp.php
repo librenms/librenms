@@ -200,7 +200,7 @@ class Vrp extends OS implements
         })->filter();  // Filter out null values
     }
 
-    public function discoverMempools()
+    public function discoverMempools(): \Illuminate\Support\Collection
     {
         $mempools = new Collection();
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
@@ -418,7 +418,7 @@ class Vrp extends OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $device = $this->getDeviceArray();
 
@@ -462,7 +462,7 @@ class Vrp extends OS implements
     /**
      * Discover the Network Access Control informations (dot1X etc etc)
      */
-    public function pollNac()
+    public function pollNac(): \Illuminate\Support\Collection
     {
         $nac = new Collection();
         // We collect the first table
@@ -520,7 +520,10 @@ class Vrp extends OS implements
         return $nac;
     }
 
-    public function discoverWirelessApCount()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessApCount(): array
     {
         $sensors = [];
         $ap_number = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanCurJointApNum.0', [], 'HUAWEI-WLAN-GLOBAL-MIB');
@@ -538,7 +541,10 @@ class Vrp extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessClients()
+    /**
+     * @return list<\LibreNMS\Device\WirelessSensor>
+     */
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
 

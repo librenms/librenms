@@ -42,7 +42,7 @@ class JnxLdpSesDown implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $state = $trap->getOidData($trap->findOid('JUNIPER-MPLS-LDP-MIB::jnxMplsLdpSesState'));
         $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpSesDownReason'));

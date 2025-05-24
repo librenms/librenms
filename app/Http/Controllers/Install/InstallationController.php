@@ -60,7 +60,7 @@ class InstallationController extends Controller
         return redirect()->route('install.checks');
     }
 
-    public function invalid()
+    public function invalid(): void
     {
         abort(404);
     }
@@ -75,7 +75,7 @@ class InstallationController extends Controller
      *
      * @return bool if all previous steps have been completed
      */
-    final protected function initInstallStep()
+    final protected function initInstallStep(): bool
     {
         $this->filterActiveSteps();
         $this->configureDatabase();
@@ -101,12 +101,12 @@ class InstallationController extends Controller
         }
     }
 
-    final protected function stepCompleted(string $step)
+    final protected function stepCompleted(string $step): bool
     {
         return (bool) session("install.$step");
     }
 
-    final protected function formatData($data = [])
+    final protected function formatData(array $data = []): array
     {
         $data['steps'] = $this->hydrateControllers();
         $data['step'] = $this->step;
@@ -149,7 +149,7 @@ class InstallationController extends Controller
         return $this->steps;
     }
 
-    private function stepStatus()
+    private function stepStatus(): array
     {
         $this->hydrateControllers();
 

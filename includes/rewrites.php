@@ -2,7 +2,7 @@
 
 use LibreNMS\Config;
 
-function rewrite_entity_descr($descr)
+function rewrite_entity_descr($descr): string
 {
     $descr = str_replace('Distributed Forwarding Card', 'DFC', $descr);
     $descr = preg_replace('/7600 Series SPA Interface Processor-/', '7600 SIP-', $descr);
@@ -101,7 +101,7 @@ function rewrite_generic_hardware($hardware)
     return str_replace(array_keys($rewrite_GenericHW), array_values($rewrite_GenericHW), $hardware);
 }
 
-function short_hrDeviceDescr($dev)
+function short_hrDeviceDescr($dev): string
 {
     $rewrite_hrDevice = [
         'GenuineIntel:' => '',
@@ -119,7 +119,7 @@ function short_hrDeviceDescr($dev)
     return $dev;
 }
 
-function short_port_descr($desc)
+function short_port_descr($desc): string
 {
     [$desc] = explode('(', $desc);
     [$desc] = explode('[', $desc);
@@ -131,7 +131,7 @@ function short_port_descr($desc)
     return $desc;
 }
 
-function rewrite_adslLineType($adslLineType)
+function rewrite_adslLineType($adslLineType): string
 {
     return \LibreNMS\Util\Rewrite::dslLineType($adslLineType);
 }
@@ -177,7 +177,7 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
  * @param  $descr
  * @return int
  */
-function get_nagios_state($descr)
+function get_nagios_state($descr): int
 {
     switch ($descr) {
         case 'On':
@@ -218,7 +218,10 @@ function apc_relay_state($state)
     }
 }
 
-function parse_entity_state($state, $value)
+/**
+ * @return 'default'[]|'success'[]
+ */
+function parse_entity_state($state, $value): array
 {
     $data = [
         'entStateOper' => [
@@ -254,7 +257,7 @@ function parse_entity_state($state, $value)
     return ['text' => 'na', 'color' => 'default'];
 }
 
-function parse_entity_state_alarm($bits)
+function parse_entity_state_alarm($bits): array
 {
     // not sure if this is correct
     $data = [

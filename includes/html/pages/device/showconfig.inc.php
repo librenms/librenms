@@ -157,7 +157,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
             }
 
-            $text = join("\n", $lines);
+            $text = implode("\n", $lines);
         }
     } elseif (Config::get('oxidized.enabled') === true && Config::has('oxidized.url')) {
         // Try with hostname as set in librenms first

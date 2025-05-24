@@ -32,10 +32,7 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    /**
-     * @var Device
-     */
-    private $device;
+    private \App\Models\Device $device;
 
     public function __construct(Device $device)
     {

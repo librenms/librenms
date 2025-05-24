@@ -55,7 +55,7 @@ class ServiceTemplate extends BaseModel
         'disabled' => '0',
     ];
 
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 
@@ -94,7 +94,7 @@ class ServiceTemplate extends BaseModel
     /**
      * Update devices included in this template (dynamic only)
      */
-    public function updateDevices()
+    public function updateDevices(): void
     {
         if ($this->type == 'dynamic') {
             $this->devices()->sync(QueryBuilderFluentParser::fromJson($this->rules)->toQuery()
@@ -186,7 +186,7 @@ class ServiceTemplate extends BaseModel
      *
      * @return QueryBuilderFluentParser
      */
-    public function getDeviceParser()
+    public function getDeviceParser(): \LibreNMS\Alerting\QueryBuilderParser
     {
         return QueryBuilderFluentParser::fromJson($this->rules);
     }

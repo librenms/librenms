@@ -45,7 +45,7 @@ class YamlDiscovery
      * @param  array  $yaml_data
      * @return array
      */
-    public static function discover(OS $os, $class, $yaml_data)
+    public static function discover(OS $os, $class, $yaml_data): array
     {
         $pre_cache = $os->preCache();
         $device = $os->getDeviceArray();
@@ -322,7 +322,10 @@ class YamlDiscovery
         return $default;
     }
 
-    public static function preCache(OS $os)
+    /**
+     * @return mixed[]
+     */
+    public static function preCache(OS $os): array
     {
         // Pre-cache data for later use
         $pre_cache = [];

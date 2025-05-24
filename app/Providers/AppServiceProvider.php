@@ -132,7 +132,7 @@ class AppServiceProvider extends ServiceProvider
         ], $sensor_types));
     }
 
-    private function registerGeocoder()
+    private function registerGeocoder(): void
     {
         $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
@@ -160,7 +160,7 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function bootObservers()
+    private function bootObservers(): void
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Mempool::observe(\App\Observers\MempoolObserver::class);
@@ -175,7 +175,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
 
-    private function bootCustomValidators()
+    private function bootCustomValidators(): void
     {
         Validator::extend('alpha_space', function ($attribute, $value) {
             return preg_match('/^[\w\s]+$/u', $value);

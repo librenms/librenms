@@ -54,7 +54,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         }
     }
 
-    public function authenticate($credentials)
+    public function authenticate($credentials): bool
     {
         if (isset($credentials['username']) && $this->userExists($credentials['username'])) {
             return true;
@@ -67,7 +67,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         throw new AuthenticationException();
     }
 
-    public function userExists($username, $throw_exception = false)
+    public function userExists($username, $throw_exception = false): bool
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
             return true;

@@ -8,7 +8,7 @@ use LibreNMS\Interfaces\Authentication\Authorizer;
 class LegacyAuth
 {
     protected static $_instance;
-    private static $configToClassMap = [
+    private static array $configToClassMap = [
         'mysql' => 'LibreNMS\Authentication\MysqlAuthorizer',
         'active_directory' => 'LibreNMS\Authentication\ActiveDirectoryAuthorizer',
         'ldap' => 'LibreNMS\Authentication\LdapAuthorizer',
@@ -39,7 +39,7 @@ class LegacyAuth
      *
      * @return mixed
      */
-    public static function getType()
+    public static function getType(): mixed
     {
         return Config::get('auth_mechanism');
     }

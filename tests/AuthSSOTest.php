@@ -36,8 +36,8 @@ class AuthSSOTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    private $original_auth_mech = null;
-    private $server;
+    private mixed $original_auth_mech = null;
+    private array $server;
 
     protected function setUp(): void
     {
@@ -50,7 +50,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Set up an SSO config for tests
-    public function basicConfig()
+    public function basicConfig(): void
     {
         Config::set('sso.mode', 'env');
         Config::set('sso.create_users', true);
@@ -70,7 +70,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Set up $_SERVER in env mode
-    public function basicEnvironmentEnv()
+    public function basicEnvironmentEnv(): void
     {
         unset($_SERVER);
 
@@ -84,7 +84,7 @@ class AuthSSOTest extends DBTestCase
     }
 
     // Set up $_SERVER in header mode
-    public function basicEnvironmentHeader()
+    public function basicEnvironmentHeader(): void
     {
         unset($_SERVER);
 

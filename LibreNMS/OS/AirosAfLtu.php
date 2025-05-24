@@ -25,7 +25,7 @@ class AirosAfLtu extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         $oid = '.1.3.6.1.4.1.41112.1.10.1.2.2.0'; //UBNT-AFLTU-MIB::afLTUFrequency.1
 
@@ -40,7 +40,7 @@ class AirosAfLtu extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessDistance()
+    public function discoverWirelessDistance(): array
     {
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'afLTUStaRemoteDistance', [], 'UBNT-AFLTU-MIB', null, '-OteQUsb');
 
@@ -59,7 +59,7 @@ class AirosAfLtu extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $sensors = [];
 
@@ -89,7 +89,7 @@ class AirosAfLtu extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessQuality()
+    public function discoverWirelessQuality(): array
     {
         $sensors = [];
 
@@ -111,7 +111,7 @@ class AirosAfLtu extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $sensors = [];
 

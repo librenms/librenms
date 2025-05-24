@@ -31,12 +31,9 @@ use Log;
 
 class Debug
 {
-    /** @var bool */
-    private static $debug = false;
-    /** @var bool */
-    private static $verbose = false;
-    /** @var bool */
-    private static $sql_debug_enabled = false;
+    private static bool $debug = false;
+    private static bool $verbose = false;
+    private static bool $sql_debug_enabled = false;
 
     /**
      * Enable/disable debug output

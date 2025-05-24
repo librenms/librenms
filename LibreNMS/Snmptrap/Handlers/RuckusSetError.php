@@ -43,7 +43,7 @@ class RuckusSetError implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $errorOidDirty = $trap->getOidData($trap->findOid('RUCKUS-EVENT-MIB::ruckusEventSetErrorOID'));
         $errorOid = substr($errorOidDirty, 43);

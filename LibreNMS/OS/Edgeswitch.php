@@ -42,7 +42,7 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
     public function discoverArpTable(): Collection
     {
         return \SnmpQuery::walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
-            ->mapTable(function ($data) {
+            ->mapTable(function (array $data) {
                 return new Ipv4Mac([
                     'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDevice()),
                     'mac_address' => Mac::parse($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'])->hex(),

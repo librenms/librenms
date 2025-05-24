@@ -30,7 +30,7 @@ use App\Models\Application;
 
 class ApplicationController extends SelectController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'type' => 'nullable|string',
@@ -59,7 +59,7 @@ class ApplicationController extends SelectController
     /**
      * @param  Application  $app
      */
-    public function formatItem($app)
+    public function formatItem($app): array
     {
         return [
             'id' => $app->app_id,

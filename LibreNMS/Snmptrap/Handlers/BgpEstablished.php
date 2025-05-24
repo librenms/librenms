@@ -43,7 +43,7 @@ class BgpEstablished implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $state_oid = $trap->findOid('BGP4-MIB::bgpPeerState');
         $bgpPeerIp = substr($state_oid, 23);

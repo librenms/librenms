@@ -41,7 +41,7 @@ class CiscoMacViolation implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
         $mac = $trap->getOidData($trap->findOid('CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress'));

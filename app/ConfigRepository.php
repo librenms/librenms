@@ -83,7 +83,7 @@ class ConfigRepository
      *
      * @param  array  $config  (this should be $this->config)
      */
-    private function loadUserConfigFile(&$config): void
+    private function loadUserConfigFile(array &$config): void
     {
         // Load user config file
         $file = $this->get('install_dir') . '/config.php';
@@ -341,7 +341,7 @@ class ConfigRepository
         $this->loadGraphsFromDb($this->config);
     }
 
-    private function loadGraphsFromDb(&$config): void
+    private function loadGraphsFromDb(array &$config): void
     {
         try {
             $graph_types = GraphType::all()->toArray();
@@ -489,7 +489,7 @@ class ConfigRepository
      * @param  string  $value  value to set to key or vsprintf() format string for values below
      * @param  array  $format_values  array of keys to send to vsprintf()
      */
-    private function setDefault($key, $value, $format_values = []): void
+    private function setDefault(string $key, string $value, array $format_values = []): void
     {
         if (! $this->has($key)) {
             if (is_string($value)) {
@@ -507,7 +507,7 @@ class ConfigRepository
      * @param  string  $old
      * @param  string  $new
      */
-    private function deprecatedVariable($old, $new): void
+    private function deprecatedVariable(string $old, string $new): void
     {
         if ($this->has($old)) {
             if (Debug::isEnabled()) {

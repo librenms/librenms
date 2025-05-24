@@ -46,7 +46,7 @@ class LoadUserPreferences
      * @param  Request  $request
      * @param  array  $preferences
      */
-    private function loadPreferences($request, $preferences)
+    private function loadPreferences(\Illuminate\Http\Request $request, array $preferences): void
     {
         if (! $request->session()->has('preferences') && ! is_null($request->user())) {
             $loaded = $request->user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
@@ -59,7 +59,7 @@ class LoadUserPreferences
      * @param  string  $pref
      * @param  callable  $callable
      */
-    private function setPreference($request, $pref, $callable)
+    private function setPreference(\Illuminate\Http\Request $request, string $pref, \Closure $callable): void
     {
         $value = $request->session()->get("preferences.$pref");
         if ($value !== null) {

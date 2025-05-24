@@ -43,12 +43,12 @@ class Proc
     /**
      * @var bool if this process is synchronous (waits for output)
      */
-    private $_synchronous;
+    private bool $_synchronous;
 
     /**
      * @var int|null hold the exit code, we can only get this on the first process_status after exit
      */
-    private $_exitcode = null;
+    private ?int $_exitcode = null;
 
     /**
      * Create and run a new process
@@ -116,7 +116,7 @@ class Proc
      * @param  string  $command
      * @return array
      */
-    public function sendCommand($command)
+    public function sendCommand(string $command): array
     {
         $this->sendInput($this->checkAddEOL($command));
 
@@ -128,7 +128,7 @@ class Proc
      *
      * @param  string  $data  the string to send
      */
-    public function sendInput($data)
+    public function sendInput($data): void
     {
         fwrite($this->_pipes[0], $data);
     }
@@ -140,7 +140,7 @@ class Proc
      * @param  int  $timeout  time to wait for output, only applies if this process is synchronous
      * @return array [stdout, stderr]
      */
-    public function getOutput($timeout = 15)
+    public function getOutput($timeout = 15): array
     {
         if ($this->_synchronous) {
             $pipes = [$this->_pipes[1], $this->_pipes[2]];
@@ -156,7 +156,7 @@ class Proc
     /**
      * Close all pipes for this process
      */
-    private function closePipes()
+    private function closePipes(): void
     {
         foreach ($this->_pipes as $pipe) {
             if (is_resource($pipe)) {
@@ -176,7 +176,7 @@ class Proc
      * @param  string  $command  the final command to send (appends newline if one is ommited)
      * @return int the exit status of this process (-1 means error)
      */
-    public function close($command = null)
+    public function close($command = null): int
     {
         if (isset($command)) {
             try {
@@ -203,7 +203,7 @@ class Proc
      *
      * @throws Exception
      */
-    public function terminate($timeout = 3000, $signal = 15)
+    public function terminate($timeout = 3000, $signal = 15): void
     {
         $status = $this->getStatus();
 
@@ -243,7 +243,7 @@ class Proc
      *
      * @return array status array
      */
-    public function getStatus()
+    public function getStatus(): array
     {
         $status = proc_get_status($this->_process);
 
@@ -275,7 +275,7 @@ class Proc
      *
      * @return int|null
      */
-    public function getExitCode()
+    public function getExitCode(): ?int
     {
         return $this->_exitcode;
     }
@@ -285,7 +285,7 @@ class Proc
      *
      * @return bool
      */
-    public function isSynchronous()
+    public function isSynchronous(): bool
     {
         return $this->_synchronous;
     }
@@ -297,7 +297,7 @@ class Proc
      *
      * @param  bool  $synchronous
      */
-    public function setSynchronous($synchronous)
+    public function setSynchronous(bool $synchronous): void
     {
         $this->_synchronous = $synchronous;
     }
@@ -309,7 +309,7 @@ class Proc
      * @param  string  $string
      * @return string
      */
-    private function checkAddEOL($string)
+    private function checkAddEOL(string $string): string
     {
         if (! Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;

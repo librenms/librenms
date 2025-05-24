@@ -31,14 +31,14 @@ use Illuminate\Http\Request;
 
 class TnmsneController extends TableController
 {
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'device_id' => 'nullable|integer',
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'neName',
@@ -50,7 +50,7 @@ class TnmsneController extends TableController
         ];
     }
 
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return [
             'neName',
@@ -62,7 +62,7 @@ class TnmsneController extends TableController
         ];
     }
 
-    protected function filterFields(Request $request)
+    protected function filterFields(Request $request): array
     {
         return ['device_id'];
     }
@@ -79,7 +79,7 @@ class TnmsneController extends TableController
      * @param  TnmsneInfo  $tnmsne
      * @return array
      */
-    public function formatItem($tnmsne)
+    public function formatItem($tnmsne): array
     {
         $neOp = $tnmsne->neOpMode == 'operation'
             ? '<span style="min-width:40px;" class="label label-success">operation</span>'

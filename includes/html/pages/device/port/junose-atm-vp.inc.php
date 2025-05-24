@@ -13,7 +13,7 @@ if (! $graph_type) {
 echo '<table cellspacing="0" cellpadding="5" border="0">';
 
 foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', [$interface['port_id']]) as $vp) {
-    if (is_integer($row / 2)) {
+    if (is_int($row / 2)) {
         $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {
         $row_colour = \LibreNMS\Config::get('list_colour.odd');

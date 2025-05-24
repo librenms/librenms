@@ -51,7 +51,7 @@ class Teldat extends OS implements
      * @param  int  $ifIndex
      * @return string with Short Interface Name
      */
-    public function shortIfName($ifName, $ifIndex)
+    public function shortIfName($ifName, $ifIndex): string|array|null
     {
         $device = ($ifName == '' ? strval($ifIndex) : preg_replace('/cellular/', 'Ce', $ifName));
 
@@ -61,7 +61,7 @@ class Teldat extends OS implements
     /**
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         $sensors = [];
 
@@ -108,7 +108,7 @@ class Teldat extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $sensors = [];
 
@@ -144,7 +144,7 @@ class Teldat extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessSinr()
+    public function discoverWirelessSinr(): array
     {
         $sensors = [];
 
@@ -180,7 +180,7 @@ class Teldat extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRsrq()
+    public function discoverWirelessRsrq(): array
     {
         $sensors = [];
 
@@ -216,7 +216,7 @@ class Teldat extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRsrp()
+    public function discoverWirelessRsrp(): array
     {
         $sensors = [];
 
@@ -253,7 +253,7 @@ class Teldat extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessCell()
+    public function discoverWirelessCell(): array
     {
         $sensors = [];
         $ifNames = [];

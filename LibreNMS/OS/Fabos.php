@@ -41,7 +41,7 @@ class Fabos extends OS implements OSDiscovery
         $device->hardware = $this->fcSwitchModelToName($revboard);
     }
 
-    protected function fcSwitchModelToName($model)
+    protected function fcSwitchModelToName($model): string
     {
         $models = [
             '1' => 'Brocade 1000 Switch',

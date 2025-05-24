@@ -54,7 +54,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $processors = [];
         $procdata = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtCpuUsage', 'HH3C-ENTITY-EXT-MIB');

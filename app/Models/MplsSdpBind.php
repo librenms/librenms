@@ -36,7 +36,7 @@ class MplsSdpBind extends Model implements Keyable
      *
      * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->sdp_oid . '-' . $this->svc_oid;
     }

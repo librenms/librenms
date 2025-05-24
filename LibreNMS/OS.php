@@ -97,10 +97,10 @@ class OS implements
      * @var float|null
      */
     public $stpTimeFactor; // for stp time quirks
-    private $device; // annoying use of references to make sure this is in sync with global $device variable
-    private $graphs; // stores device graphs
+    private ?array $device = null; // annoying use of references to make sure this is in sync with global $device variable
+    private array $graphs; // stores device graphs
     private $cache; // data cache
-    private $pre_cache; // pre-fetch data cache
+    private ?array $pre_cache = null; // pre-fetch data cache
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -118,7 +118,7 @@ class OS implements
      *
      * @return array
      */
-    public function &getDeviceArray()
+    public function &getDeviceArray(): ?array
     {
         return $this->device;
     }
@@ -128,7 +128,7 @@ class OS implements
      *
      * @return int
      */
-    public function getDeviceId()
+    public function getDeviceId(): int
     {
         return (int) $this->device['device_id'];
     }
@@ -148,7 +148,7 @@ class OS implements
      *
      * @param  string  $name
      */
-    public function enableGraph($name)
+    public function enableGraph($name): void
     {
         $this->graphs[$name] = true;
     }
@@ -169,7 +169,7 @@ class OS implements
         }));
     }
 
-    public function preCache()
+    public function preCache(): array
     {
         if (is_null($this->pre_cache)) {
             $this->pre_cache = YamlDiscovery::preCache($this);
@@ -235,7 +235,7 @@ class OS implements
      * @param  string  $oid
      * @return bool
      */
-    public function isCached($oid)
+    public function isCached($oid): bool
     {
         return isset($this->cache['cache_oid'][$oid]);
     }
@@ -296,7 +296,7 @@ class OS implements
      * @param  callable  $callback  Function to modify the value before converting it to a frequency
      * @return array
      */
-    protected function pollWirelessChannelAsFrequency($sensors, $callback = null)
+    protected function pollWirelessChannelAsFrequency($sensors, $callback = null): array
     {
         if (empty($sensors)) {
             return [];
@@ -329,7 +329,7 @@ class OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
         $processors = $this->discoverHrProcessors();
 

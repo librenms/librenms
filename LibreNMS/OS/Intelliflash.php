@@ -13,7 +13,7 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
 {
     public function discoverStorage(): Collection
     {
-        $pools = SnmpQuery::walk('TEGILE-MIB::poolTable')->mapTable(function ($data, $poolIndex) {
+        $pools = SnmpQuery::walk('TEGILE-MIB::poolTable')->mapTable(function (array $data, $poolIndex) {
             $size = ($data['TEGILE-MIB::poolSizeHigh'] << 32) + $data['TEGILE-MIB::poolSizeLow'];
             $used = ($data['TEGILE-MIB::poolUsedSizeHigh'] << 32) + $data['TEGILE-MIB::poolUsedSizeLow'];
 
@@ -28,7 +28,7 @@ class Intelliflash extends OS implements StorageDiscovery, StoragePolling
             ]))->fillUsage($used, $size);
         });
 
-        $projects = SnmpQuery::walk('TEGILE-MIB::projectTable')->mapTable(function ($data, $poolIndex, $projectIndex) {
+        $projects = SnmpQuery::walk('TEGILE-MIB::projectTable')->mapTable(function (array $data, $poolIndex, $projectIndex) {
             $used = ($data['TEGILE-MIB::projectDataSizeHigh'] << 32) + $data['TEGILE-MIB::projectDataSizeLow'];
             $free = ($data['TEGILE-MIB::projectFreeSizeHigh'] << 32) + $data['TEGILE-MIB::projectFreeSizeLow'];
 

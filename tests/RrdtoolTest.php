@@ -95,7 +95,7 @@ class RrdtoolTest extends TestCase
         $this->buildCommandProxy('create', __FILE__, 'o');
     }
 
-    private function buildCommandProxy($command, $filename, $options)
+    private function buildCommandProxy(string $command, string $filename, string $options)
     {
         $mock = $this->mock(Rrd::class)->makePartial(); // avoid constructor
         // @phpstan-ignore method.protected

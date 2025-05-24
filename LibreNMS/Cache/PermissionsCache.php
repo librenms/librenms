@@ -35,10 +35,10 @@ use LibreNMS\Config;
 
 class PermissionsCache
 {
-    private $devicePermissions;
+    private ?array $devicePermissions = null;
     private $portPermissions;
     private $billPermissions;
-    private $deviceGroupMap;
+    private ?array $deviceGroupMap = null;
 
     /**
      * Check if a device can be accessed by user (non-global read/admin)

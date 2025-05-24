@@ -82,7 +82,7 @@ class ProcessorsController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -97,7 +97,7 @@ class ProcessorsController extends TableController
      * @param  Processor  $processor
      * @return array
      */
-    protected function formatExportRow($processor)
+    protected function formatExportRow($processor): array
     {
         return [
             $processor->device ? $processor->device->displayName() : '',

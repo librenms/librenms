@@ -25,7 +25,7 @@ class VminfoObserver
      * @param  Vminfo  $vminfo
      * @return void
      */
-    public function updating(Vminfo $vminfo)
+    public function updating(Vminfo $vminfo): void
     {
         foreach ($vminfo->getDirty() as $field => $value) {
             Eventlog::log($vminfo->vmwVmDisplayName . ' (' . preg_replace('/^vmwVm/', '', $field) . ') -> ' . $value, $vminfo->device_id, 'vm');

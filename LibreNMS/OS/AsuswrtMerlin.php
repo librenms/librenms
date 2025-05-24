@@ -56,7 +56,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array Interfaces
      */
-    private function getInterfaces()
+    private function getInterfaces(): array
     {
         // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
         $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
@@ -79,7 +79,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array Sensors
      */
-    private function getSensorData($type, $query = '', $system = false, $stats = false)
+    private function getSensorData(string $type, string $query = '', bool $system = false, bool $stats = false): array
     {
         // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
         $sensors = [];
@@ -117,7 +117,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         return $this->getSensorData('clients', '', true, false);
     }
@@ -128,7 +128,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return $this->getSensorData('frequency', '', false, false);
     }
@@ -139,7 +139,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array Sensors
      */
-    public function discoverWirelessNoiseFloor()
+    public function discoverWirelessNoiseFloor(): array
     {
         return $this->getSensorData('noise-floor', '', false, false);
     }
@@ -150,7 +150,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
@@ -164,7 +164,7 @@ class AsuswrtMerlin extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessSNR()
+    public function discoverWirelessSNR(): array
     {
         return $this->getSensorData('snr', '', false, true);
     }

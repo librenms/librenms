@@ -37,7 +37,7 @@ class Hpmsm extends OS implements WirelessClientsDiscovery
      *
      * @return array Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
         return [
             new WirelessSensor(

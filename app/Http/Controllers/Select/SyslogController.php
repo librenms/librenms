@@ -33,7 +33,7 @@ class SyslogController extends SelectController
      *
      * @return array
      */
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'field' => 'required|in:program,priority',
@@ -47,7 +47,7 @@ class SyslogController extends SelectController
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
         return [$request->get('field')];
     }

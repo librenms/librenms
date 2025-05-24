@@ -54,7 +54,7 @@ class AvailabilityMapController extends Controller
      * @param  string  $key
      * @return \Illuminate\Http\JsonResponse
      */
-    private function setSessionValue($request, $key)
+    private function setSessionValue(\Illuminate\Http\Request $request, string $key)
     {
         $value = $request->get($key);
         $request->session()->put($key, $value);

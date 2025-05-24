@@ -32,12 +32,9 @@ use LibreNMS\Validator;
 
 class WebServer extends BaseValidation
 {
-    /** @var string */
-    private $http_regex = '#(http://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::80)?/#';
-    /** @var string */
-    private $https_regex = '#(https://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::443)?/#';
-    /** @var string */
-    private $host_regex = '#://([^/:\[]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+])#';
+    private string $http_regex = '#(http://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::80)?/#';
+    private string $https_regex = '#(https://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::443)?/#';
+    private string $host_regex = '#://([^/:\[]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+])#';
 
     /**
      * @inheritDoc

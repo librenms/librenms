@@ -135,7 +135,7 @@ class CienaSds extends OS
             'CIENA-CES-MODULE-MIB::cienaCesModuleTable',
             'CIENA-CES-MODULE-MIB::cienaCesModuleDescriptionTable',
             'CIENA-CES-MODULE-MIB::cienaCesModuleSwTable',
-        ])->mapTable(function ($contents, $chassisIndex, $shelfIndex, $slotIndex) {
+        ])->mapTable(function ($contents, string $chassisIndex, $shelfIndex, $slotIndex) {
             $descr = $contents['cienaCesModuleDescription'];
             $release = $contents['cienaCesModuleSwRunningRelease'] ?? null;
             if ($release) {

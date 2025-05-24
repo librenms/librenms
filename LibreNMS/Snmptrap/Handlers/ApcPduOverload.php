@@ -46,7 +46,7 @@ class ApcPduOverload implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         //Get the PDU's name, affected phase, and the alarm string
         $pdu_id = ApcTrapUtil::getPduIdentName($trap);

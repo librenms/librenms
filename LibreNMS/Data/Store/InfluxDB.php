@@ -36,8 +36,7 @@ use Log;
 
 class InfluxDB extends BaseDatastore
 {
-    /** @var Database */
-    private $connection;
+    private \InfluxDB\Database $connection;
 
     public function __construct(Database $influx)
     {
@@ -54,12 +53,12 @@ class InfluxDB extends BaseDatastore
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'InfluxDB';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): mixed
     {
         return Config::get('influxdb.enable', false);
     }
@@ -79,7 +78,7 @@ class InfluxDB extends BaseDatastore
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
      *                               single values are allowed and will be paired with $measurement
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function put($device, $measurement, $tags, $fields): void
     {
         $stat = Measurement::start('write');
         $tmp_fields = [];
@@ -176,7 +175,7 @@ class InfluxDB extends BaseDatastore
      *
      * @return bool
      */
-    public function wantsRrdTags()
+    public function wantsRrdTags(): bool
     {
         return false;
     }

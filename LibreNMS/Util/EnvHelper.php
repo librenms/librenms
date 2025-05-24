@@ -44,7 +44,7 @@ class EnvHelper
      *
      * @throws FileWriteFailedException
      */
-    public static function writeEnv($settings, $unset = [], $file = '.env')
+    public static function writeEnv($settings, $unset = [], $file = '.env'): string
     {
         try {
             $original_content = file_get_contents($file);
@@ -73,7 +73,7 @@ class EnvHelper
      * @param  array  $unset  Remove the given KEYS from the config
      * @return string
      */
-    public static function setEnv($content, $settings, $unset = [])
+    public static function setEnv($content, $settings, $unset = []): string
     {
         // ensure trailing line return
         if (substr($content, -1) !== PHP_EOL) {
@@ -114,7 +114,7 @@ class EnvHelper
      *
      * @throws FileWriteFailedException
      */
-    public static function init()
+    public static function init(): string|null|false
     {
         $env_file = base_path('.env');
         try {
@@ -159,7 +159,7 @@ class EnvHelper
      * @param  string  $dotenv
      * @return string
      */
-    private static function fixComments($dotenv)
+    private static function fixComments($dotenv): string
     {
         return implode(PHP_EOL, array_map(function ($line) {
             $parts = explode('=', $line, 2);
@@ -216,7 +216,7 @@ class EnvHelper
      *
      * @return bool
      */
-    public static function librenmsDocker()
+    public static function librenmsDocker(): bool
     {
         return getenv('LIBRENMS_DOCKER') === '1';
     }

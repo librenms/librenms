@@ -33,7 +33,7 @@ trait ServerHardware
         $this->discoverDellHardware() || $this->discoverHpHardware() || $this->discoverSupermicroHardware();
     }
 
-    protected function discoverDellHardware()
+    protected function discoverDellHardware(): bool
     {
         // Detect Dell hardware via OpenManage SNMP
         $hw = snmp_get_multi_oid($this->getDeviceArray(), [
@@ -55,7 +55,7 @@ trait ServerHardware
         return true;
     }
 
-    protected function discoverHpHardware()
+    protected function discoverHpHardware(): bool
     {
         $hw = snmp_get_multi_oid($this->getDeviceArray(), [
             'CPQSINFO-MIB::cpqSiProductName.0',
@@ -73,7 +73,7 @@ trait ServerHardware
         return true;
     }
 
-    protected function discoverSupermicroHardware()
+    protected function discoverSupermicroHardware(): bool
     {
         // Detect Supermicro hardware via Supermicro SuperDoctor 5
         $hw = snmp_get_multi_oid($this->getDeviceArray(), [

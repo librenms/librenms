@@ -34,7 +34,7 @@ class ModuleModelObserver
      *
      * @param  string|Eloquent  $model  The model name including namespace
      */
-    public static function observe($model)
+    public static function observe($model): void
     {
         static $observed_models = []; // keep track of observed models so we don't duplicate output
         $class = ltrim($model, '\\');
@@ -48,7 +48,7 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
-    public function saving($model)
+    public function saving($model): void
     {
         if (! $model->isDirty()) {
             echo '.';

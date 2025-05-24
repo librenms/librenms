@@ -290,7 +290,7 @@ $ds_name = [];
    4) Build both the rra and sample arrays
    5) Get each ds' min and max values
 */
-if (sizeof($output)) {
+if (count($output)) {
     foreach ($output as $line) {
         if (substr_count($line, '<v>')) {
             $linearray = explode('<v>', $line);
@@ -418,7 +418,7 @@ if ($html) {
 }
 
 /* All Functions */
-function createRRDFileFromXML($xmlfile, $rrdfile)
+function createRRDFileFromXML($xmlfile, $rrdfile): void
 {
     global $using_cacti, $html;
 
@@ -434,12 +434,12 @@ function createRRDFileFromXML($xmlfile, $rrdfile)
     }
 }
 
-function writeXMLFile($output, $xmlfile)
+function writeXMLFile($output, $xmlfile): int|false
 {
     return file_put_contents($xmlfile, $output);
 }
 
-function backupRRDFile($rrdfile)
+function backupRRDFile($rrdfile): bool
 {
     global $using_cacti, $tempdir, $seed, $html;
 
@@ -464,15 +464,15 @@ function backupRRDFile($rrdfile)
     return copy($rrdfile, $backupdir . '/' . $newfile);
 }
 
-function calculateVarianceAverages(&$rra, &$samples)
+function calculateVarianceAverages(array &$rra, &$samples): void
 {
     global $outliers;
 
-    if (sizeof($samples)) {
+    if (count($samples)) {
         foreach ($samples as $rra_num => $dses) {
-            if (sizeof($dses)) {
+            if (count($dses)) {
                 foreach ($dses as $ds_num => $ds) {
-                    if (sizeof($ds) < $outliers * 3) {
+                    if (count($ds) < $outliers * 3) {
                         $rra[$rra_num][$ds_num]['variance_avg'] = 'NAN';
                     } else {
                         rsort($ds, SORT_NUMERIC);
@@ -481,7 +481,7 @@ function calculateVarianceAverages(&$rra, &$samples)
                         sort($ds, SORT_NUMERIC);
                         $ds = array_slice($ds, $outliers);
 
-                        $rra[$rra_num][$ds_num]['variance_avg'] = array_sum($ds) / sizeof($ds);
+                        $rra[$rra_num][$ds_num]['variance_avg'] = array_sum($ds) / count($ds);
                     }
                 }
             }
@@ -489,16 +489,16 @@ function calculateVarianceAverages(&$rra, &$samples)
     }
 }
 
-function calculateOverallStatistics(&$rra, &$samples)
+function calculateOverallStatistics(&$rra, &$samples): void
 {
     global $percent, $stddev, $ds_min, $ds_max, $var_kills, $std_kills;
 
     $rra_num = 0;
-    if (sizeof($rra)) {
+    if (count($rra)) {
         foreach ($rra as $dses) {
             $ds_num = 0;
 
-            if (sizeof($dses)) {
+            if (count($dses)) {
                 foreach ($dses as $ds) {
                     if (isset($samples[$rra_num][$ds_num])) {
                         $rra[$rra_num][$ds_num]['standard_deviation'] = standard_deviation($samples[$rra_num][$ds_num]);
@@ -525,7 +525,7 @@ function calculateOverallStatistics(&$rra, &$samples)
                         $rra[$rra_num][$ds_num]['stddev_killed'] = 0;
                         $rra[$rra_num][$ds_num]['variance_killed'] = 0;
 
-                        if (sizeof($samples[$rra_num][$ds_num])) {
+                        if (count($samples[$rra_num][$ds_num])) {
                             foreach ($samples[$rra_num][$ds_num] as $sample) {
                                 if (($sample > $rra[$rra_num][$ds_num]['max_cutoff']) ||
                                     ($sample < $rra[$rra_num][$ds_num]['min_cutoff'])) {
@@ -577,11 +577,11 @@ function calculateOverallStatistics(&$rra, &$samples)
     }
 }
 
-function outputStatistics($rra)
+function outputStatistics($rra): void
 {
     global $rra_cf, $rra_name, $ds_name, $rra_pdp, $html;
 
-    if (sizeof($rra)) {
+    if (count($rra)) {
         if (! $html) {
             echo "\n";
             printf(
@@ -621,7 +621,7 @@ function outputStatistics($rra)
                 '----------'
             );
             foreach ($rra as $rra_key => $dses) {
-                if (sizeof($dses)) {
+                if (count($dses)) {
                     foreach ($dses as $dskey => $ds) {
                         printf(
                             '%10s %16s %10s %7s %7s ' .
@@ -675,7 +675,7 @@ function outputStatistics($rra)
                 'VarAvg'
             );
             foreach ($rra as $rra_key => $dses) {
-                if (sizeof($dses)) {
+                if (count($dses)) {
                     foreach ($dses as $dskey => $ds) {
                         printf(
                             '<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>' .
@@ -711,7 +711,10 @@ function outputStatistics($rra)
     }
 }
 
-function updateXML(&$output, &$rra)
+/**
+ * @return list
+ */
+function updateXML(&$output, &$rra): array
 {
     global $numspike, $percent, $avgnan, $method, $total_kills;
     $new_array = [];
@@ -721,7 +724,7 @@ function updateXML(&$output, &$rra)
     $ds_num = 0;
     $kills = 0;
 
-    if (sizeof($output)) {
+    if (count($output)) {
         foreach ($output as $line) {
             if (substr_count($line, '<v>')) {
                 $linearray = explode('<v>', $line);
@@ -793,7 +796,7 @@ function updateXML(&$output, &$rra)
 function removeComments(&$output)
 {
     $new_array = [];
-    if (sizeof($output)) {
+    if (count($output)) {
         foreach ($output as $line) {
             $line = trim($line);
             if ($line == '') {
@@ -823,7 +826,7 @@ function removeComments(&$output)
     }
 }
 
-function displayTime($pdp)
+function displayTime($pdp): string
 {
     global $step;
 
@@ -850,7 +853,7 @@ function displayTime($pdp)
     }
 }
 
-function debug($string)
+function debug(string $string): void
 {
     global $debug;
 
@@ -859,7 +862,7 @@ function debug($string)
     }
 }
 
-function standard_deviation($samples)
+function standard_deviation($samples): float
 {
     $sample_count = count($samples);
     $sample_square = [];
@@ -872,7 +875,7 @@ function standard_deviation($samples)
 }
 
 /* display_help - displays the usage of the function */
-function display_help()
+function display_help(): void
 {
     global $using_cacti;
 
