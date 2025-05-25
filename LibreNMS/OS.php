@@ -374,7 +374,7 @@ class OS implements
     public function getDiscovery($module = null)
     {
         if (! array_key_exists('dynamic_discovery', $this->device)) {
-            $file = base_path('/includes/definitions/discovery/' . $this->getName() . '.yaml');
+            $file = resource_path('definitions/os_discovery/' . $this->getName() . '.yaml');
             if (file_exists($file)) {
                 $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
             }

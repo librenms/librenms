@@ -29,7 +29,7 @@ If you are unsure of whether your device is supported or not, feel free to ask u
 
 Generate this list with:
 
-rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/definitions/*yaml| sort --ignore-case --unique | awk '{\
+rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/definitions/os_detection/*yaml| sort --ignore-case --unique | awk '{\
   if (last != tolower(substr($0, 0, 1))) {\
     print "\n### "toupper(substr($0,0,1))"\n* "$0; last = tolower(substr($1, 0, 1))\
   } else {\

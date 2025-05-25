@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Sensor;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -13,13 +14,15 @@ use LibreNMS\Util\Url;
 
 class SensorsController extends TableController
 {
+    protected $model = Sensor::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'sensor_descr' => 'asc'];
 
     protected function rules(): array
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(Sensor::getTypes()),
+            'class' => Rule::in(\LibreNMS\Enum\Sensor::values()),
         ];
     }
 
@@ -60,15 +63,14 @@ class SensorsController extends TableController
     }
 
     /**
-     * @param  Sensor  $sensor
+     * @param  Sensor|WirelessSensor  $sensor
      */
     public function formatItem($sensor): array
     {
         $request = \Illuminate\Support\Facades\Request::instance();
-        $graph_type = 'sensor_' . $request->input('class');
         $graph_array = [
-            'type' => $graph_type,
-            'popup_title' => htmlentities(strip_tags($sensor->device->displayName() . ': ' . $sensor->sensor_descr)),
+            'type' => $sensor->getGraphType(),
+            'popup_title' => htmlentities(strip_tags($sensor->device?->displayName() . ': ' . $sensor->sensor_descr)),
             'id' => $sensor->sensor_id,
             'from' => '-1d',
             'height' => 20,
@@ -78,7 +80,7 @@ class SensorsController extends TableController
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $sensor->device]);
         $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor->sensor_class]);
         $descr = Url::graphPopup($graph_array, $sensor->sensor_descr, $link);
-        $mini_graph = Url::graphPopup($graph_array, null, $link);
+        $mini_graph = Url::graphPopup($graph_array);
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
         $alert = $sensor->currentStatus() == Severity::Error ? '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>' : '';
 
@@ -100,5 +102,60 @@ class SensorsController extends TableController
             'sensor_limit_low' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit_low')),
             'sensor_limit' => Html::severityToLabel(Severity::Unknown, $sensor->formatValue('sensor_limit')),
         ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Sensor',
+            'Current',
+            'Limit Low',
+            'Limit High',
+            'Sensor Class',
+            'Sensor Type',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Sensor  $sensor
+     * @return array
+     */
+    protected function formatExportRow($sensor)
+    {
+        return [
+            $sensor->device ? $sensor->device->displayName() : '',
+            $sensor->sensor_descr,
+            $sensor->formatValue(),
+            $sensor->formatValue('sensor_limit_low'),
+            $sensor->formatValue('sensor_limit'),
+            $sensor->sensor_class,
+            $sensor->sensor_type,
+        ];
+    }
+
+    /**
+     * Export data as CSV with sensor class filter
+     *
+     * @param  Request  $request
+     * @param  string|null  $class
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function export(Request $request, $class = null)
+    {
+        if ($class) {
+            $request->merge(['class' => $class]);
+        }
+
+        $this->validate($request, $this->rules());
+
+        return parent::export($request);
     }
 }
