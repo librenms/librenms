@@ -109,18 +109,18 @@ class Routes implements Module
                 return null;
             }
 
-            if ($prefix == '' && $dstType == 'ipv4') { //try to guess netmask
-                $out = [];
+            if ($prefix == '' && $dstType == 'ipv4') { //Computing Classfull Netmask
                 $tmp = explode('.', $dst);
-                foreach ($tmp as $tmpdata) {
-                    if (is_numeric($tmpdata) && $tmpdata == '0') {
-                        $out[] = '0';
-                    } elseif (is_numeric($tmpdata) && $tmpdata != '0') {
-                        $out[] = '255';
-                    }
+                if ($tmp[0] < 128) {
+                    $prefix = '255.0.0.0';
                 }
-                $prefix = implode('.', $out);
-                Log::info('netmask from RFC: ' . $dst . ' - ' . $hop . ' - ' . $prefix);
+                if ($tmp[0] > 128 && $tmp[0] < 192) {
+                    $prefix = '255.255.0.0';
+                }
+                if ($tmp[0] > 192 && $tmp[0] < 224) {
+                    $prefix = '255.255.255.0';
+                }
+                Log::info('Classfull netmask from RFC: ' . $dst . ' - ' . $hop . ' - ' . $prefix);
             }
 
             try {
