@@ -397,7 +397,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\Ipv4Mac, $this>
      */
     public function macLinkedPorts(): HasManyThrough
     {
