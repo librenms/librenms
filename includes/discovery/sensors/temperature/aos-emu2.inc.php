@@ -26,22 +26,22 @@
  */
 
 //pre-cache
-$oids = SnmpQuery::cache()->hideMib()->walk([
+$oids = SnmpQuery::cache()->walk([
     'PowerNet-MIB::emsProbeStatusEntry',
 ])->table(1);
 
 $scale = SnmpQuery::enumStrings()->get('PowerNet-MIB::emsStatusSysTempUnits.0')->value();
 
 foreach ($oids as $id => $temp) {
-    if (isset($temp['emsProbeStatusProbeTemperature']) && $temp['emsProbeStatusProbeTemperature'] > 0) {
-        $index = $temp['emsProbeStatusProbeIndex'];
+    if (isset($temp['PowerNet-MIB::emsProbeStatusProbeTemperature']) && $temp['PowerNet-MIB::emsProbeStatusProbeTemperature'] > 0) {
+        $index = $temp['PowerNet-MIB::emsProbeStatusProbeIndex'];
         $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.3.' . $index;
-        $descr = $temp['emsProbeStatusProbeName'];
-        $low_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeMinTempThresh'], $scale);
-        $low_warn_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeLowTempThresh'], $scale);
-        $high_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeMaxTempThresh'], $scale);
-        $high_warn_limit = fahrenheit_to_celsius($temp['emsProbeStatusProbeHighTempThresh'], $scale);
-        $value = fahrenheit_to_celsius($temp['emsProbeStatusProbeTemperature'], $scale);
+        $descr = $temp['PowerNet-MIB::emsProbeStatusProbeName'];
+        $low_limit = fahrenheit_to_celsius($temp['PowerNet-MIB::emsProbeStatusProbeMinTempThresh'], $scale);
+        $low_warn_limit = fahrenheit_to_celsius($temp['PowerNet-MIB::emsProbeStatusProbeLowTempThresh'], $scale);
+        $high_limit = fahrenheit_to_celsius($temp['PowerNet-MIB::emsProbeStatusProbeMaxTempThresh'], $scale);
+        $high_warn_limit = fahrenheit_to_celsius($temp['PowerNet-MIB::emsProbeStatusProbeHighTempThresh'], $scale);
+        $value = fahrenheit_to_celsius($temp['PowerNet-MIB::emsProbeStatusProbeTemperature'], $scale);
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',

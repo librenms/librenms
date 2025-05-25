@@ -26,20 +26,20 @@
  */
 
 //pre-cache
-$oids = SnmpQuery::cache()->hideMib()->walk([
+$oids = SnmpQuery::cache()->walk([
     'PowerNet-MIB::emsProbeStatusEntry',
 ])->table(1);
 
 foreach ($oids as $id => $temp) {
-    if (isset($temp['emsProbeStatusProbeHumidity']) && $temp['emsProbeStatusProbeHumidity'] > 0) {
-        $index = $temp['emsProbeStatusProbeIndex'];
+    if (isset($temp['PowerNet-MIB::emsProbeStatusProbeHumidity']) && $temp['PowerNet-MIB::emsProbeStatusProbeHumidity'] > 0) {
+        $index = $temp['PowerNet-MIB::emsProbeStatusProbeIndex'];
         $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;
-        $descr = $temp['emsProbeStatusProbeName'];
-        $low_limit = $temp['emsProbeStatusProbeMinHumidityThresh'];
-        $low_warn_limit = $temp['emsProbeStatusProbeLowHumidityThresh'];
-        $high_limit = $temp['emsProbeStatusProbeMaxHumidityThresh'];
-        $high_warn_limit = $temp['emsProbeStatusProbeHighHumidityThresh'];
-        $value = $temp['emsProbeStatusProbeHumidity'];
+        $descr = $temp['PowerNet-MIB::emsProbeStatusProbeName'];
+        $low_limit = $temp['PowerNet-MIB::emsProbeStatusProbeMinHumidityThresh'];
+        $low_warn_limit = $temp['PowerNet-MIB::emsProbeStatusProbeLowHumidityThresh'];
+        $high_limit = $temp['PowerNet-MIB::emsProbeStatusProbeMaxHumidityThresh'];
+        $high_warn_limit = $temp['PowerNet-MIB::emsProbeStatusProbeHighHumidityThresh'];
+        $value = $temp['PowerNet-MIB::emsProbeStatusProbeHumidity'];
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',

@@ -26,16 +26,16 @@
  */
 
 // Input Contact discovery
-$oids = SnmpQuery::hideMib()->walk([
+$oids = SnmpQuery::walk([
     'PowerNet-MIB::emsInputContactStatusEntry',
 ])->table(1);
 
 foreach ($oids as $id => $contact) {
-    $index = $contact['emsInputContactStatusInputContactIndex'];
+    $index = $contact['PowerNet-MIB::emsInputContactStatusInputContactIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
-    $descr = $contact['emsInputContactStatusInputContactName'];
-    $currentstate = $contact['emsInputContactStatusInputContactState'];
-    $normalstate = $contact['emsInputContactStatusInputContactNormalState'];
+    $descr = $contact['PowerNet-MIB::emsInputContactStatusInputContactName'];
+    $currentstate = $contact['PowerNet-MIB::emsInputContactStatusInputContactState'];
+    $normalstate = $contact['PowerNet-MIB::emsInputContactStatusInputContactNormalState'];
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsInputContactNormalState_NC';
         $states = [
@@ -74,16 +74,16 @@ foreach ($oids as $id => $contact) {
 }
 
 // Output Relay discovery
-$oids = SnmpQuery::hideMib()->walk([
+$oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutputRelayStatusEntry',
 ])->table(1);
 
 foreach ($oids as $id => $relay) {
-    $index = $relay['emsOutputRelayStatusOutputRelayIndex'];
+    $index = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
-    $descr = $relay['emsOutputRelayStatusOutputRelayName'];
-    $currentstate = $relay['emsOutputRelayStatusOutputRelayState'];
-    $normalstate = $relay['emsOutputRelayStatusOutputRelayNormalState'];
+    $descr = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayName'];
+    $currentstate = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayState'];
+    $normalstate = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayNormalState'];
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutputRelayNormalState_NC';
         $states = [
@@ -122,16 +122,16 @@ foreach ($oids as $id => $relay) {
 }
 
 // Outlet discovery
-$oids = SnmpQuery::hideMib()->walk([
+$oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutletStatusEntry',
 ])->table(1);
 
 foreach ($oids as $id => $outlet) {
-    $index = $outlet['emsOutletStatusOutletIndex'];
+    $index = $outlet['PowerNet-MIB::emsOutletStatusOutletIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
-    $descr = $outlet['emsOutletStatusOutletName'];
-    $currentstate = $outlet['emsOutletStatusOutletState'];
-    $normalstate = $outlet['emsOutletStatusOutletNormalState'];
+    $descr = $outlet['PowerNet-MIB::emsOutletStatusOutletName'];
+    $currentstate = $outlet['PowerNet-MIB::emsOutletStatusOutletState'];
+    $normalstate = $outlet['PowerNet-MIB::emsOutletStatusOutletNormalState'];
     if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutletNormalState_ON';
         $states = [
