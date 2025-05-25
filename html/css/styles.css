@@ -1828,6 +1828,20 @@ label {
   background-color: #36393D;
 }
 
+.availability-map-oldview-box-ignored-up {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #5CB85C;
+}
+
+.availability-map-oldview-box-ignored-down {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #36393D;
+}
+
 .availability-map-widget-header {
   line-height:34px;
 }
