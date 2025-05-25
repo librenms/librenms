@@ -35,7 +35,7 @@ if (isset($vars['errors'])) {
     </div>
     <div class="table-responsive">
         <table id="ports" class="table table-condensed table-hover table-striped"
-            data-ajaxurl="<?php echo route('table.ports'); ?>">
+            data-url="<?php echo route('table.ports'); ?>">
             <thead>
                 <tr>
                     <th data-column-id="hostname" data-formatter="device">Device</th>
@@ -136,7 +136,6 @@ if (isset($vars['errors'])) {
                 devicegroup: '<?php echo htmlspecialchars($vars['devicegroup'] ?? ''); ?>',
             };
         },
-        url: '<?php echo route('table.ports') ?>'
     });
 
     $(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
