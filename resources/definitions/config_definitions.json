@@ -6356,6 +6356,16 @@
                 "fdb": "FDB"
             }
         },
+        "ports_ipv4_neighbours": {
+            "default": "subnet",
+            "type": "select",
+            "group": "webui",
+            "section": "device",
+            "options":{
+                "subnet": "Subnet",
+                "arp": "ARP"
+            }
+        },
         "ports_purge": {
             "group": "system",
             "section": "cleanup",

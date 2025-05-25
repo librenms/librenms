@@ -1848,6 +1848,10 @@ return [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'ports_ipv4_neighbours' => [
+            'description' => 'Port IPv4 neighbour lookup method',
+            'help' => 'Method to use for looking up IPv4 neighours when viewing port details.  ARP will use the ARP table to find devices with matching IP and MAC addresses.  Subnet will just look for devices with IP addresses in the same subnet.',
+        ],
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
