@@ -199,7 +199,7 @@ class DashboardController extends Controller
     {
         $validated = $this->validate($request, [
             'dashboard_name' => 'string|max:255',
-            'access' => 'int|in:0,1,2',
+            'access' => 'int|in:0,1,2,3',
         ]);
 
         $dashboard->fill($validated);
