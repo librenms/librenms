@@ -3,7 +3,7 @@
 /**
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$oids = SnmpQuery::hideMib()->walk([
+$oids = SnmpQuery::walk([
     'CADANT-CMTS-EQUIPMENT-MIB::cardTemperature',
     'CADANT-CMTS-EQUIPMENT-MIB::cardName',
     'CADANT-CMTS-EQUIPMENT-MIB::cardTemperatureHighWarn',
@@ -12,12 +12,12 @@ $oids = SnmpQuery::hideMib()->walk([
 
 foreach ($oids as $unit => $tmp) {
     foreach ($tmp as $index => $entry) {
-        $value = $entry['cardTemperature'];
+        $value = $entry['CADANT-CMTS-EQUIPMENT-MIB::cardTemperature'];
         if ($value !== '999') {
             $oid = '.1.3.6.1.4.1.4998.1.1.10.1.4.2.1.29.' . $unit . '.' . $index;
-            $descr = $entry['cardName'];
-            $warnlimit = $entry['cardTemperatureHighWarn'];
-            $limit = $entry['cardTemperatureHighError'];
+            $descr = $entry['CADANT-CMTS-EQUIPMENT-MIB::cardName'];
+            $warnlimit = $entry['CADANT-CMTS-EQUIPMENT-MIB::cardTemperatureHighWarn'];
+            $limit = $entry['CADANT-CMTS-EQUIPMENT-MIB::cardTemperatureHighError'];
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',

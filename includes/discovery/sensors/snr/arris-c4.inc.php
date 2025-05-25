@@ -27,17 +27,17 @@
  */
 
 //pre-cache
-$oids = SnmpQuery::hideMib()->walk([
+$oids = SnmpQuery::walk([
     'DOCS-IF-MIB::docsIfSignalQualityTable',
 ])->table(1);
 
 foreach ($oids as $index => $data) {
-    if (is_numeric($data['docsIfSigQSignalNoise'])) {
+    if (is_numeric($data['DOCS-IF-MIB::docsIfSigQSignalNoise'])) {
         $port = PortCache::getByIfIndex($index, $device['device_id']);
         $descr = 'Channel ' . $port?->ifAlias . ' - ' . $port?->ifName;
         $oid = '.1.3.6.1.2.1.10.127.1.1.4.1.5.' . $index;
         $divisor = 10;
-        $value = $data['docsIfSigQSignalNoise'];
+        $value = $data['DOCS-IF-MIB::docsIfSigQSignalNoise'];
         if (preg_match('/.0$/', $port?->ifName)) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
