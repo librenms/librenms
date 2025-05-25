@@ -2238,6 +2238,8 @@
             "type": "boolean"
         },
         "enable_ports_etherlike": {
+            "group": "webui",
+            "section": "device",
             "default": false,
             "type": "boolean"
         },
@@ -6186,11 +6188,23 @@
         "ports_page_default": {
             "default": "details",
             "type": "select",
+            "group": "webui",
+            "section": "device",
             "options":{
                 "basic": "Basic",
                 "details": "Details",
                 "arp": "ARP",
                 "fdb": "FDB"
+            }
+        },
+        "ports_ipv4_neighbours": {
+            "default": "subnet",
+            "type": "select",
+            "group": "webui",
+            "section": "device",
+            "options":{
+                "subnet": "Subnet",
+                "arp": "ARP"
             }
         },
         "ports_purge": {
