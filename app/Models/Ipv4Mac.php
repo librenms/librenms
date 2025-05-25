@@ -39,7 +39,7 @@ class Ipv4Mac extends PortRelatedModel implements Keyable
     // This can match multiple ports if you have multiple sub-interfaces with the same
     // IP address (e.g. different VRFs, or mutiple point to point links on Mikrotik)
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, App\Models\Ipv4Mac, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, Ipv4Mac, $this>
      */
     public function remote_ports_maybe(): HasManyThrough
     {
