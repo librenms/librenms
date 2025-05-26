@@ -4850,7 +4850,7 @@
                     "ifAlias": "LJO-172.29.254.56/100G-1_*Adyl/Unifique*",
                     "ifPhysAddress": "205383adb582",
                     "ifLastChange": 604609637,
-                    "ifVlan": null,
+                    "ifVlan": "1",
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
@@ -4950,7 +4950,7 @@
                     "ifAlias": "AOI-172.29.254.12/40G-2_*Adyl/Unifique*",
                     "ifPhysAddress": "205383adb582",
                     "ifLastChange": 1876502082,
-                    "ifVlan": null,
+                    "ifVlan": "1",
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
@@ -7450,7 +7450,7 @@
                     "ifAlias": "100GE1/0/32",
                     "ifPhysAddress": "205383adb581",
                     "ifLastChange": 0,
-                    "ifVlan": null,
+                    "ifVlan": "1",
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
@@ -7550,7 +7550,7 @@
                     "ifAlias": "LACP-53/to-172.29.255.53/100G-3-0",
                     "ifPhysAddress": "205383adb581",
                     "ifLastChange": 365711,
-                    "ifVlan": null,
+                    "ifVlan": "1",
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
@@ -7750,7 +7750,7 @@
                     "ifAlias": "100GE1/0/35",
                     "ifPhysAddress": "205383adb581",
                     "ifLastChange": 0,
-                    "ifVlan": null,
+                    "ifVlan": "1",
                     "ifTrunk": null,
                     "ignore": 0,
                     "disabled": 0,
@@ -8639,8 +8639,23 @@
                     "ifStackStatus": "active"
                 },
                 {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 44,
+                    "ifStackStatus": "active"
+                },
+                {
                     "high_ifIndex": 3,
                     "low_ifIndex": 43,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 44,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 44,
                     "ifStackStatus": "active"
                 },
                 {
@@ -8650,12 +8665,27 @@
                 },
                 {
                     "high_ifIndex": 5,
+                    "low_ifIndex": 44,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
                     "low_ifIndex": 45,
                     "ifStackStatus": "active"
                 },
                 {
                     "high_ifIndex": 6,
+                    "low_ifIndex": 44,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
                     "low_ifIndex": 50,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 44,
                     "ifStackStatus": "active"
                 },
                 {
@@ -8671,6 +8701,66 @@
                 {
                     "high_ifIndex": 9,
                     "low_ifIndex": 53,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 46,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 48,
                     "ifStackStatus": "active"
                 },
                 {
@@ -8694,13 +8784,28 @@
                     "ifStackStatus": "active"
                 },
                 {
+                    "high_ifIndex": 44,
+                    "low_ifIndex": 45,
+                    "ifStackStatus": "active"
+                },
+                {
                     "high_ifIndex": 45,
                     "low_ifIndex": 46,
                     "ifStackStatus": "active"
                 },
                 {
+                    "high_ifIndex": 46,
+                    "low_ifIndex": 47,
+                    "ifStackStatus": "active"
+                },
+                {
                     "high_ifIndex": 47,
                     "low_ifIndex": 48,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 48,
+                    "low_ifIndex": 49,
                     "ifStackStatus": "active"
                 }
             ]
