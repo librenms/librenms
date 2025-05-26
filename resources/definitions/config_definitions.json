@@ -6361,6 +6361,7 @@
             "type": "select",
             "group": "webui",
             "section": "device",
+            "order": 22,
             "options":{
                 "subnet": "Subnet",
                 "arp": "ARP"
