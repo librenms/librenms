@@ -18,6 +18,7 @@
     <div class="form-group">
         <label for="unit">Display Unit</label>
         <select name="unit" class="form-control">
+            <option value="AUTO" {{ $unit == 'AUTO' ? 'selected' : '' }}>AUTO</option>
             <option value="MB" {{ $unit == 'MB' ? 'selected' : '' }}>MB</option>
             <option value="GB" {{ $unit == 'GB' ? 'selected' : '' }}>GB</option>
             <option value="TB" {{ $unit == 'TB' ? 'selected' : '' }}>TB</option>
