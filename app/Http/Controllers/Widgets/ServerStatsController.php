@@ -39,7 +39,7 @@ class ServerStatsController extends WidgetController
         'cpu' => 0,
         'mempools' => [],
         'disks' => [],
-        'unit' => 'MB',
+        'unit' => 'AUTO',
     ];
 
     public function title(Request $request)
@@ -57,10 +57,10 @@ class ServerStatsController extends WidgetController
         return $this->title;
     }
 
-     public function getView(Request $request)
+    public function getView(Request $request)
     {
         $data = $this->getSettings();
-        $data['unit'] = $data['unit'] ?? 'MB';
+        $data['unit'] = $data['unit'] ?? 'AUTO';
 
         if (is_null($data['device'])) {
             return $this->getSettingsView($request);
@@ -70,17 +70,34 @@ class ServerStatsController extends WidgetController
         if ($device) {
             $data['cpu'] = $device->processors()->avg('processor_usage');
 
-            switch (strtoupper($data['unit'])) {
-                case 'GB':
-                    $factor = 1024;
-                    break;
-                case 'TB':
+            $maxMem = $device->mempools()->max('mempool_total');
+            $maxDisk = $device->storage()->max('storage_size');
+            $maxValue = max($maxMem, $maxDisk);
+
+            if (strtoupper($data['unit']) === 'AUTO') {
+                if ($maxValue > 1024 ** 4) {
+                    $data['unit'] = 'TB';
                     $factor = 1024 * 1024;
-                    break;
-                case 'MB':
-                default:
+                } elseif ($maxValue > 1024 ** 3) {
+                    $data['unit'] = 'GB';
+                    $factor = 1024;
+                } else {
+                    $data['unit'] = 'MB';
                     $factor = 1;
-                    break;
+                }
+            } else {
+                switch (strtoupper($data['unit'])) {
+                    case 'GB':
+                        $factor = 1024;
+                        break;
+                    case 'TB':
+                        $factor = 1024 * 1024;
+                        break;
+                    case 'MB':
+                    default:
+                        $factor = 1;
+                        break;
+                }
             }
 
             $data['mempools'] = $device->mempools()->select(\DB::raw("
@@ -103,8 +120,8 @@ class ServerStatsController extends WidgetController
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
-        $settings['unit'] = $settings['unit'] ?? 'MB';
-        
+        $settings['unit'] = $settings['unit'] ?? AUTO';
+
         return view('widgets.settings.server-stats', $settings);
     }
 
