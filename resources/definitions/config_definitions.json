@@ -846,6 +846,7 @@
             "section": "autodiscovery",
             "order": 7,
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -890,6 +891,7 @@
             "section": "autodiscovery",
             "order": 6,
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -900,6 +902,7 @@
             "section": "autodiscovery",
             "order": 5,
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -907,6 +910,7 @@
             "default": null,
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -954,6 +958,29 @@
                 "/^sl[0-9]/"
             ],
             "validate": {
+                "value": "array",
+                "value.*": "is_regex"
+            }
+        },
+        "bad_ifalias_regexp": {
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 6,
+            "default": [],
+            "validate": {
+                "value": "array",
+                "value.*": "is_regex"
+            }
+        },
+        "bad_ifname_regexp": {
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 7,
+            "default": [],
+            "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -1058,11 +1085,6 @@
             "group": "webui",
             "section": "custom-map",
             "order": 100,
-            "options": {
-                "Streets":  "Streets",
-                "Sattelite": "Sattelite",
-                "Topography":  "Topography"
-            },
             "when": {
                 "setting": "custom_map.background_type",
                 "operator": "equals",
@@ -1458,6 +1480,7 @@
             "default": null,
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -4387,6 +4410,7 @@
             ],
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "is_regex"
             }
         },
@@ -4757,6 +4781,7 @@
             "default": null,
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "string"
             }
         },
@@ -4764,6 +4789,7 @@
             "default": null,
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "string"
             }
         },
@@ -4771,6 +4797,7 @@
             "default": null,
             "type": "array",
             "validate": {
+                "value": "array",
                 "value.*": "string"
             }
         },
@@ -5220,6 +5247,7 @@
             "section": "oxidized",
             "order": 7,
             "validate": {
+                "value": "array",
                 "value.*": "exists:devices,os"
             }
         },
@@ -5230,6 +5258,7 @@
             "section": "oxidized",
             "order": 8,
             "validate": {
+                "value": "array",
                 "value.*": "exists:devices,type"
             }
         },
@@ -6243,7 +6272,7 @@
             "group": "poller",
             "section": "distributed",
             "order": 29,
-            "type": "string"
+            "type": "text"
         },
         "service_watchdog_enabled": {
             "default": false,
@@ -6398,6 +6427,7 @@
                 }
             ],
             "validate": {
+                "value": "array",
                 "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
                 "value.*.cryptoalgo": "in:AES,AES-192,AES-256,AES-256-C,DES"
             }
@@ -6413,6 +6443,7 @@
                 "v1"
             ],
             "validate": {
+                "value": "array",
                 "value.*": "in:v1,v2c,v3"
             }
         },

@@ -871,7 +871,7 @@ bad_if\* entries in a default array, unsetting a default array and
 customizing it, or creating an OS specific array. The preferred method
 for ignoring interfaces is to use an OS specific array. The default
 arrays can be found in resources/definitions/config_definitions.json. OS specific
-definitions (includes/definitions/\_specific_os_.yaml) can contain
+definitions (resources/definitions/os_detection/\_specific_os_.yaml) can contain
 bad_if\* arrays, but should only be modified via pull-request as
 manipulation of the definition files will block updating:
 
