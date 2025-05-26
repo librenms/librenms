@@ -117,10 +117,10 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function configureMorphAliases()
+    private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (Sensor::getTypes() as $sensor_type) {
+        foreach (\LibreNMS\Enum\Sensor::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([

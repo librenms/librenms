@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
         "os": {
@@ -32,17 +32,17 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "sysObjectID": {"$ref": "#/definitions/oid_group"},
-                    "sysObjectID_except":  {"$ref": "#/definitions/oid_group"},
-                    "sysObjectID_regex": {"$ref": "#/definitions/regex_group"},
-                    "sysObjectID_regex_except": {"$ref": "#/definitions/regex_group"},
-                    "sysDescr": {"$ref": "#/definitions/string_group"},
-                    "sysDescr_except":  {"$ref": "#/definitions/string_group"},
-                    "sysDescr_regex": {"$ref": "#/definitions/regex_group"},
-                    "sysDescr_regex_except": {"$ref": "#/definitions/regex_group"},
-                    "snmpget": {"$ref": "#/definitions/snmpget"},
-                    "snmpget_except": {"$ref": "#/definitions/snmpget"},
-                    "snmpwalk": {"$ref": "#/definitions/snmpget"}
+                    "sysObjectID": {"$ref": "#/$defs/oid_group"},
+                    "sysObjectID_except":  {"$ref": "#/$defs/oid_group"},
+                    "sysObjectID_regex": {"$ref": "#/$defs/regex_group"},
+                    "sysObjectID_regex_except": {"$ref": "#/$defs/regex_group"},
+                    "sysDescr": {"$ref": "#/$defs/string_group"},
+                    "sysDescr_except":  {"$ref": "#/$defs/string_group"},
+                    "sysDescr_regex": {"$ref": "#/$defs/regex_group"},
+                    "sysDescr_regex_except": {"$ref": "#/$defs/regex_group"},
+                    "snmpget": {"$ref": "#/$defs/snmpget"},
+                    "snmpget_except": {"$ref": "#/$defs/snmpget"},
+                    "snmpwalk": {"$ref": "#/$defs/snmpget"}
                 },
                 "minProperties": 1,
                 "additionalProperties": false
@@ -413,7 +413,7 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
-        "bad_entity_sensor_regex": {"$ref": "#/definitions/regex_group"},
+        "bad_entity_sensor_regex": {"$ref": "#/$defs/regex_group"},
         "bad_if": {
             "type": "array",
             "items": {
@@ -447,9 +447,9 @@
                 ".": {"type": "boolean"}
             }
         },
-        "disabled_sensors_regex": {"$ref": "#/definitions/regex_group"},
-        "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
-        "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
+        "disabled_sensors_regex": {"$ref": "#/$defs/regex_group"},
+        "bad_ifname_regexp": {"$ref": "#/$defs/regex_group"},
+        "bad_if_regexp": {"$ref": "#/$defs/regex_group"},
         "bad_snmpEngineTime": {
             "type": "boolean"
         },
@@ -491,7 +491,7 @@
         "type",
         "discovery"
     ],
-    "definitions": {
+    "$defs": {
         "string_group": {
             "oneOf": [
                 {
@@ -540,7 +540,7 @@
                     "type": "string"
                 },
                 "op": {
-                    "$ref": "#/definitions/comparison"
+                    "$ref": "#/$defs/comparison"
                 },
                 "value": {
                     "anyOf": [

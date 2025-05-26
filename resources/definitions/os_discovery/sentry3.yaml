@@ -65,4 +65,47 @@ modules:
                   num_oid: '.1.3.6.1.4.1.1718.3.1.10.{{ $index }}'
                   descr: 'System Power Factor'
                   group: 'Configured Power Factor'
-
+        humidity:
+            data:
+                -
+                    oid: Sentry3-MIB::tempHumidSensorTable
+                    value: Sentry3-MIB::tempHumidSensorHumidValue
+                    num_oid: '.1.3.6.1.4.1.1718.3.2.5.1.10.{{ $index }}'
+                    descr: 'Removable Sensor {{ $Sentry3-MIB::tempHumidSensorID }}'
+                    index: 'tempHumidSensorHumidValue1.{{ $subindex1 }}'
+                    high_limit: Sentry3-MIB::tempHumidSensorHumidHighThresh
+                    low_limit: Sentry3-MIB::tempHumidSensorHumidLowThresh
+                    skip_value_lt: 0
+        temperature:
+            data:
+                -
+                    oid: Sentry3-MIB::tempHumidSensorTable
+                    value: Sentry3-MIB::tempHumidSensorTempValue
+                    num_oid: '.1.3.6.1.4.1.1718.3.2.5.1.6.{{ $index }}'
+                    descr: 'Removable Sensor {{ $Sentry3-MIB::tempHumidSensorID }}'
+                    index: 'tempHumidSensorTempValue1.{{ $subindex1 }}'
+                    divisor: 10
+                    high_limit: Sentry3-MIB::tempHumidSensorTempHighThresh
+                    low_limit: Sentry3-MIB::tempHumidSensorTempLowThresh
+                    skip_value_lt: 0
+                    skip_values:
+                        -
+                            oid: Sentry3-MIB::tempHumidSensorTempScale
+                            op: '=='
+                            value: '1'
+                -
+                    oid: Sentry3-MIB::tempHumidSensorTable
+                    value: Sentry3-MIB::tempHumidSensorTempValue
+                    num_oid: '.1.3.6.1.4.1.1718.3.2.5.1.6.{{ $index }}'
+                    descr: 'Removable Sensor {{ $Sentry3-MIB::tempHumidSensorID }}'
+                    index: 'tempHumidSensorTempValue1.{{ $subindex1 }}'
+                    divisor: 10
+                    high_limit: Sentry3-MIB::tempHumidSensorTempHighThresh
+                    low_limit: Sentry3-MIB::tempHumidSensorTempLowThresh
+                    user_func: fahrenheit_to_celsius
+                    skip_value_lt: 0
+                    skip_values:
+                        -
+                            oid: Sentry3-MIB::tempHumidSensorTempScale
+                            op: '!='
+                            value: '1'

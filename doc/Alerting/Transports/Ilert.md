@@ -1,8 +1,6 @@
 ## Ilert
-This integration uses the [ilert Event API](https://api.ilert.com/api-docs/#tag/events) 
+This integration uses the [ilert LibreNMS integration](https://docs.ilert.com/integrations/inbound-integrations/librenms) 
 which allows you to use all available ilert parameters such as links, images, comments, etc.
-
-To create an API Alert source, navigate to Alert Sources -> Alerts Sources -> Create a new alert source. Follow the on screen instructions and at the end, you will be able view the integration key which you will need to input into LibreNMS.
 
 This transport will send over the following fields:
 

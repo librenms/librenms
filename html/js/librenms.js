@@ -240,15 +240,16 @@ $(document).ready(function () {
 });
 
 // Add export button to bootgrid tables
-$(document).on('initialized.rs.jquery.bootgrid', function (e) {
+$(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
     var grid = $(e.target);
     var tableId = grid.attr('id');
 
     if ($('#' + tableId + '-export-button').length === 0) {
-        var ajaxUrl = grid.data('ajaxurl');
+        var ajaxUrl = grid.data('url');
+        var params = grid.data('params');
 
         if (ajaxUrl) {
-            var exportUrl = ajaxUrl + '/export';
+            var exportUrl = ajaxUrl + '/export' + (params ? '?' + params : '');
             var actionsContainer = null;
 
             var panel = grid.closest('div.panel');

@@ -150,6 +150,12 @@ return [
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
     ],
+    'toner' => [
+        'short' => 'Toner',
+        'long' => 'Toner',
+        'unit' => '%',
+        'unit_long' => 'Percent',
+    ],
     'bitrate' => [
         'short' => 'Bitrate',
         'long' => 'Bitrate',

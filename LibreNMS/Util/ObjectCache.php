@@ -43,6 +43,7 @@ use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
 {
@@ -104,7 +105,7 @@ class ObjectCache
 
                 $sensor_menu[$group][] = [
                     'class' => $class,
-                    'icon' => $sensor_model->icon(),
+                    'icon' => SensorEnum::from($class)->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }

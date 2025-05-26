@@ -1,20 +1,44 @@
 <?php
 
+/*
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+
+// pre-cache
+$oidsEnv = SnmpQuery::cache()->enumStrings()->hideMib()->walk([
+    'IPOMANII-MIB::ipmEnvEmd',
+])->table(1);
+
 // FIXME: EMD "stack" support?
 // FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigTempOffset.0 ?
-echo ' IPOMANII-MIB ';
-$emd_installed = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusEmdType.0', '-Oqv');
+if ($oidsEnv[0]['ipmEnvEmdStatusEmdType'] != 'disabled') {
+    $descr = $oidsEnv[0]['ipmEnvEmdConfigTempName'];
+    $value = $oidsEnv[0]['ipmEnvEmdStatusTemperature'] / 10;
+    $high_limit = $oidsEnv[0]['ipmEnvEmdConfigTempHighSetPoint'];
+    $low_limit = $oidsEnv[0]['ipmEnvEmdConfigTempLowSetPoint'];
 
-if ($emd_installed != 'disabled') {
-    $descr = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdConfigTempName.0', '-Oqv');
-    $current = (snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusTemperature.0', '-Oqv') / 10);
-    $high_limit = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdConfigTempHighSetPoint.0', '-Oqv');
-    $low_limit = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdConfigTempLowSetPoint.0', '-Oqv');
-
-    if ($descr != '' && is_numeric($current) && $current > '0') {
-        $current_oid = '.1.3.6.1.4.1.2468.1.4.2.1.5.1.1.2.0';
+    if ($descr != '' && is_numeric($value) && $value > '0') {
+        $oid = '.1.3.6.1.4.1.2468.1.4.2.1.5.1.1.2.0';
         $descr = trim(str_replace('"', '', $descr));
 
-        discover_sensor(null, 'temperature', $device, $current_oid, '1', 'ipoman', $descr, '10', '1', $low_limit, null, null, $high_limit, $current);
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'temperature',
+            'sensor_oid' => $oid,
+            'sensor_index' => 1,
+            'sensor_type' => 'ipoman',
+            'sensor_descr' => $descr,
+            'sensor_divisor' => 10,
+            'sensor_multiplier' => 1,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => null,
+            'sensor_limit_warn' => null,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => null,
+            'entPhysicalIndex_measured' => null,
+            'user_func' => null,
+            'group' => null,
+        ]));
     }
 }
