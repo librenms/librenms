@@ -11925,8 +11925,7 @@
                     "inetCidrRoutePfxLen": 30
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "stp": {
         "discovery": {
