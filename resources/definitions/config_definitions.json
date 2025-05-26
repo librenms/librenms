@@ -2141,6 +2141,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
+            "order": 23,
             "default": false,
             "type": "boolean"
         },
@@ -5814,6 +5815,7 @@
             "type": "select",
             "group": "webui",
             "section": "device",
+            "order": 21,
             "options":{
                 "basic": "Basic",
                 "details": "Details",
@@ -5826,6 +5828,7 @@
             "type": "select",
             "group": "webui",
             "section": "device",
+            "order": 22,
             "options":{
                 "subnet": "Subnet",
                 "arp": "ARP"
