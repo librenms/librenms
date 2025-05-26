@@ -29,16 +29,6 @@ Artisan::command('device:rename
     ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
-Artisan::command('device:remove
-    {device spec : ' . __('Hostname, IP, or device id to remove') . '}
-', function () {
-    /** @var Illuminate\Console\Command $this */
-    (new Process([
-        base_path('delhost.php'),
-        $this->argument('device spec'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose('Remove a device');
-
 Artisan::command('update', function () {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));

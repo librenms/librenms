@@ -129,6 +129,9 @@ return [
         ],
         'polled' => 'Polled :count devices in :time',
     ],
+    'device:remove' => [
+        'doesnt_exists' => 'No such device: :device',
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
         'arguments' => [
