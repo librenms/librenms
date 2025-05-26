@@ -14,6 +14,7 @@ foreach ($bgpPeers as $bgpPeer) {
     $bgpLocalAs = \SnmpQuery::hideMib()->get("CUMULUS-BGPVRF-MIB::bgpLocalAs.{$bgpPeer['vrfId']}")->value();
     $astext = \LibreNMS\Util\AutonomousSystem::get($bgpPeer['bgpPeerRemoteAs'])->name();
     echo "AS$bgpLocalAs \n";
+    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier'];// bgpPeerIdentifier is not unique.
     echo "BGP Peer {$bgpPeer['bgpPeerIdentifier']} ";
 
     $vrf = $vrfs->where('vrf_oid', $bgpPeer['vrfId'])->first();
@@ -52,10 +53,9 @@ foreach ($bgpPeers as $bgpPeer) {
             'astext' => $astext,
         ];
         $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeer_id', $bgpPeer['bgpPeerIdentifier'])->update($peers);
-        $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $bgpPeer['bgpPeerIdentifier'])->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
         echo str_repeat('.', $affected);
     }
-
+    $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $bgpPeer['bgpPeerIdentifier'])->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
 }
 
 if (! is_null($seenPeerID)) {
