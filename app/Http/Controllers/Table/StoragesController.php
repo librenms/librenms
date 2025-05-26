@@ -110,7 +110,7 @@ class StoragesController extends TableController
     protected function formatExportRow($storage)
     {
         return [
-            $storage->device ? $storage->device->displayName() : '',
+            $storage->device ? $storage->device?->displayName() : '',
             $storage->storage_descr,
             Number::formatBi($storage->storage_used),
             Number::formatBi($storage->storage_free),
