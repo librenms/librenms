@@ -8105,6 +8105,7 @@
                     "ifStackStatus": "active"
                 }
             ]
+        }
     },
     "ipv4-addresses": {
         "discovery": {
