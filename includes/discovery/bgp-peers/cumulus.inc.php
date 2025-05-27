@@ -1,12 +1,12 @@
 <?php
 
-$bgpPeers = \SnmpQuery::enumStrings()->hideMib()->walk("CUMULUS-BGPVRF-MIB::bgpPeerTable")->mapTable(
+$bgpPeers = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable')->mapTable(
     function ($data, $vrfId, $peerIdType, $ifFace) {
-        $data['vrfId' ] = $vrfId;
+        $data['vrfId'] = $vrfId;
         $data['peerIdType'] = $peerIdType;
         $data['ifIndex'] = explode('.', $ifFace)[4];
         return $data;
-});
+    });
 
 $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_oid')->get();
 $seenPeerID = null;
@@ -15,7 +15,7 @@ foreach ($bgpPeers as $bgpPeer) {
     $bgpLocalAs = \SnmpQuery::hideMib()->get("CUMULUS-BGPVRF-MIB::bgpLocalAs.{$bgpPeer['vrfId']}")->value();
     $astext = \LibreNMS\Util\AutonomousSystem::get($bgpPeer['bgpPeerRemoteAs'])->name();
     echo "AS$bgpLocalAs \n";
-    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier'];// bgpPeerIdentifier is not unique.
+    $bgpPeer['bgpPeerIdentifier'] = $bgpPeer['bgpPeerRemoteAddr'] ?? $bgpPeer['bgpPeerIdentifier']; // bgpPeerIdentifier is not unique.
     echo "BGP Peer {$bgpPeer['bgpPeerIdentifier']} ";
 
     $vrf = $vrfs->where('vrf_oid', $bgpPeer['vrfId'])->first();

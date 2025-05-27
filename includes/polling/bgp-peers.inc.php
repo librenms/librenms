@@ -65,14 +65,14 @@ if (! empty($peers)) {
     } elseif ($device['os'] == 'cumulus') {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         if (empty($peer_data_check)) {
-            $peer_data_check = \SnmpQuery::enumStrings()->hideMib()->walk("CUMULUS-BGPVRF-MIB::bgpPeerTable")->mapTable(
+            $peer_data_check = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable')->mapTable(
                 $peer_data_check = function ($data, $vrfId, $peerIdType, $ifFace) {
-                    $data['vrfId' ] = $vrfId;
+                    $data['vrfId'] = $vrfId;
                     $data['peerIdType'] = $peerIdType;
                     $data['ifIndex'] = explode('.', $ifFace)[4];
                     $peer[$data['bgpPeerIdentifier']] = $data;
                     return $peer;
-            });
+                });
             $cumulus_vrf = true;
         }
     } else {
@@ -412,7 +412,7 @@ if (! empty($peers)) {
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
                         if ($cumulus_vrf) {
-                            $bgp_peers = array_filter($peer_data_check->toArray(), function($peer) use ($peer_identifier) {
+                            $bgp_peers = array_filter($peer_data_check->toArray(), function ($peer) use ($peer_identifier) {
                                 return isset($peer[$peer_identifier]) ? $peer[$peer_identifier] : [];
                             });
                             $tmp_data = array_pop($bgp_peers)[$peer_identifier];

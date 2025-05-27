@@ -261,10 +261,10 @@ if (Config::get('enable_vrfs')) {
         }
     } elseif ($device['os'] == 'cumulus') {
         // Cumulus Linux
-        $vrf_table = \SnmpQuery::hideMib()->walk(["CUMULUS-BGPVRF-MIB::bgpVrfId", "CUMULUS-BGPVRF-MIB::bgpVrfName"])->table(1);
+        $vrf_table = \SnmpQuery::hideMib()->walk(['CUMULUS-BGPVRF-MIB::bgpVrfId', 'CUMULUS-BGPVRF-MIB::bgpVrfName'])->table(1);
         foreach ($vrf_table as $vrf_oid => $vrf_data) {
             $vrf_name = $vrf_data['bgpVrfName'];
-            
+
             $vrfs = [
                 'vrf_oid' => $vrf_oid,
                 'vrf_name' => $vrf_name,
@@ -280,7 +280,6 @@ if (Config::get('enable_vrfs')) {
             $vrf_id = DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->value('vrf_id');
             $valid_vrf[$vrf_id] = 1;
             $valid_vrf_if[$vrf_id][$vrf_data['bgpVrfId']] = 0;
-
         } //end foreach
     } //end if
 

@@ -32,7 +32,7 @@ class Vrf extends DeviceRelatedModel
     protected $table = 'vrfs';
     protected $primaryKey = 'vrf_id';
     protected $fillable = [
-            'vrf_oid',
-            'vrf_name',
+        'vrf_oid',
+        'vrf_name',
     ];
 }
