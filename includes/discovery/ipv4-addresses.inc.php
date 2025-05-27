@@ -24,7 +24,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         include Config::get('install_dir') . "/includes/discovery/ipv4-addresses/{$device['os']}.inc.php";
     } else {
         unset($valid_v4);
-        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAdEntIfIndex')->table(1);
+        $oids = SnmpQuery::context($context_name)->hideMib()->walk('IP-MIB::ipAdEntIfIndex')->table(1);
         foreach ($oids as $ipv4_address => $indexArray) {
             $ifIndex = intval($indexArray['ipAdEntIfIndex']);
             $mask = SnmpQuery::get('IP-MIB::ipAdEntNetMask.' . $ipv4_address)->value();
