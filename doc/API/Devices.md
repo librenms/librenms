@@ -1168,6 +1168,7 @@ Input:
   - device_id: exact match by device-id
   - type: search by device type
 - query: If searching by, then this will be used as the input.
+- columns: only return requested columns.
 
 Example:
 
