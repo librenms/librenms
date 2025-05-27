@@ -25,9 +25,10 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     } else {
         unset($valid_v4);
         $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAdEntIfIndex')->table(1);
+        $masks = SnmpQuery::hideMib()->walk('IP-MIB::ipAdEntNetMask')->table(1);
         foreach ($oids as $ipv4_address => $indexArray) {
             $ifIndex = intval($indexArray['ipAdEntIfIndex']);
-            $mask = SnmpQuery::get('IP-MIB::ipAdEntNetMask.' . $ipv4_address)->value();
+            $mask = $masks[$ipv4_address]['ipAdEntNetMask'];
             discover_process_ipv4($valid_v4, $device, $ifIndex, $ipv4_address, $mask, $context_name);
         }
     } // if [custom / standard]
