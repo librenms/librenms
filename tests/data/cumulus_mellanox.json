@@ -14062,6 +14062,20 @@
                     "context_name": "",
                     "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "172.17.0.0/16",
+                    "ifIndex": 70
+                },
+                {
+                    "ipv4_address": "192.168.21.223",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.21.0/24",
+                    "ifIndex": 2
                 }
             ]
         }

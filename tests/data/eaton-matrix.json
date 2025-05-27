@@ -1728,6 +1728,13 @@
                     "context_name": "",
                     "ipv4_network": null,
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.0.2.10",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.0.2.0/24",
+                    "ifIndex": 2
                 }
             ]
         }

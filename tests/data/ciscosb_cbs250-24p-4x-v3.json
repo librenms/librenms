@@ -11498,6 +11498,13 @@
                     "context_name": "",
                     "ipv4_network": "169.254.0.0/24",
                     "ifIndex": 8000
+                },
+                {
+                    "ipv4_address": "192.168.177.41",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.177.0/24",
+                    "ifIndex": 100000
                 }
             ]
         }

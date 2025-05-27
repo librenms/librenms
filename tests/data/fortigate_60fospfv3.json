@@ -8339,7 +8339,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.0.11.4",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -8353,7 +8353,7 @@
                     "inetCidrRouteDest": "10.150.1.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8367,7 +8367,7 @@
                     "inetCidrRouteDest": "10.150.12.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8381,7 +8381,7 @@
                     "inetCidrRouteDest": "10.150.13.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8395,7 +8395,7 @@
                     "inetCidrRouteDest": "10.150.14.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8409,7 +8409,7 @@
                     "inetCidrRouteDest": "10.150.2.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8423,7 +8423,7 @@
                     "inetCidrRouteDest": "10.150.3.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8437,7 +8437,7 @@
                     "inetCidrRouteDest": "10.150.4.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8451,7 +8451,7 @@
                     "inetCidrRouteDest": "10.150.5.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8465,7 +8465,7 @@
                     "inetCidrRouteDest": "10.150.6.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8479,7 +8479,7 @@
                     "inetCidrRouteDest": "10.150.7.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8493,7 +8493,7 @@
                     "inetCidrRouteDest": "10.150.8.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -8507,7 +8507,7 @@
                     "inetCidrRouteDest": "10.150.9.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.0",
                     "inetCidrRoutePfxLen": 24
                 }
             ]

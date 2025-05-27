@@ -140,4 +140,27 @@ class IPv4 extends IP
     {
         return (string) $this->ip;
     }
+
+    /**
+     * Calculate missing prefix from IPv4 according to RFC
+     *
+     * @return string
+     */
+    public static function classfullNetmaskFromRfc($ipv4 = '')
+    {
+        $prefix = '';
+        if (preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $ipv4, $tmp)) {
+            if ($tmp[0] < 128) { // class A
+                $prefix = '255.0.0.0';
+            }
+            if ($tmp[0] > 128 && $tmp[0] < 192) { // class B
+                $prefix = '255.255.0.0';
+            }
+            if ($tmp[0] > 192 && $tmp[0] < 224) { // class C
+                $prefix = '255.255.255.0';
+            }
+        }
+
+        return $prefix;
+    }
 }

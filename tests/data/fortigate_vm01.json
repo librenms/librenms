@@ -4185,6 +4185,34 @@
                     "context_name": "",
                     "ipv4_network": "10.10.1.0/24",
                     "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "10.10.2.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/8",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "10.217.0.161",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.1.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/16",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "192.168.199.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.199.0/24",
+                    "ifIndex": 2
                 }
             ]
         }

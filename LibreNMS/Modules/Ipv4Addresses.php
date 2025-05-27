@@ -89,10 +89,9 @@ class Ipv4Addresses implements Module
             $context = trim(str_replace('"', '', $data->context_name ?? ''));
             $prefix = trim($data->ipv4_prefixlen ?? '');
 
-            if ($addr == '' || $prefix == '') {
-                Log::info('incomplete: ' . $addr . ' - ' . $prefix);
-
-                return null;
+            if ($prefix == '') {
+                $prefix = IPv4::classfullNetmaskFromRfc($addr);
+                Log::info('Classfull netmask from RFC: ' . $addr . ' - ' . $prefix);
             }
 
             try {

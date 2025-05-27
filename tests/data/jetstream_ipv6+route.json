@@ -4114,25 +4114,5 @@
                 }
             ]
         }
-    },
-    "ipv4-addresses": {
-        "discovery": {
-            "ipv4_addresses": [
-                {
-                    "ipv4_address": "169.254.102.26",
-                    "ipv4_prefixlen": 24,
-                    "context_name": "",
-                    "ipv4_network": "169.254.102.0/24",
-                    "ifIndex": 254
-                },
-                {
-                    "ipv4_address": "169.254.2.26",
-                    "ipv4_prefixlen": 24,
-                    "context_name": "",
-                    "ipv4_network": "169.254.2.0/24",
-                    "ifIndex": 1
-                }
-            ]
-        }
     }
 }

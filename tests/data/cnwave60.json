@@ -9818,6 +9818,13 @@
                     "context_name": "",
                     "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.1.255",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/16",
+                    "ifIndex": 10
                 }
             ]
         }

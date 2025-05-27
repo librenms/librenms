@@ -946,6 +946,13 @@
                     "context_name": "",
                     "ipv4_network": null,
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.101.9",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.101.0/24",
+                    "ifIndex": 2
                 }
             ]
         }

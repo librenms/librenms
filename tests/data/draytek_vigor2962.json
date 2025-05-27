@@ -6279,6 +6279,20 @@
         "discovery": {
             "ipv4_addresses": [
                 {
+                    "ipv4_address": "169.254.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/16",
+                    "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "192.168.42.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.42.0/24",
+                    "ifIndex": 1
+                },
+                {
                     "ipv4_address": "81.157.60.26",
                     "ipv4_prefixlen": 0,
                     "context_name": "",

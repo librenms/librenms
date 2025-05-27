@@ -11882,6 +11882,13 @@
         "discovery": {
             "ipv4_addresses": [
                 {
+                    "ipv4_address": "10.16.100.23",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/8",
+                    "ifIndex": 5
+                },
+                {
                     "ipv4_address": "10.207.2.2",
                     "ipv4_prefixlen": 24,
                     "context_name": "",

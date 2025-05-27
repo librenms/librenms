@@ -2932,6 +2932,13 @@
                     "context_name": "",
                     "ipv4_network": "10.20.5.0/24",
                     "ifIndex": 6
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
                 }
             ]
         }

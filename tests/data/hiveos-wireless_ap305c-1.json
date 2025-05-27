@@ -3439,6 +3439,13 @@
                     "context_name": "",
                     "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "139.174.115.20",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "139.174.0.0/16",
+                    "ifIndex": 16
                 }
             ]
         }
