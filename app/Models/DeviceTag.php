@@ -51,4 +51,20 @@ class DeviceTag extends Model implements Keyable
     {
         return $this->device_id . ':' . $this->tag_key_id;
     }
+
+    /**
+     * Set the value attribute, validating against the tag key type.
+     *
+     * @param  mixed  $value
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setValueAttribute($value)
+    {
+        $tagKey = $this->tagKey;
+        if (! $tagKey->validateValue($value)) {
+            throw new \InvalidArgumentException("Value for tag '{$this->tagKey?->key}' does not match type '{$this->tagKey?->type}'");
+        }
+        $this->attributes['value'] = $value;
+    }
 }
