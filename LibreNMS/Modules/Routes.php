@@ -166,7 +166,7 @@ class Routes implements Module
 
         ModuleModelObserver::observe(Route::class);
 
-        $routesExisting = $os->getDevice()->routes()->get()->filter(function ($row) {
+        $routesExisting = $os->getDevice()->routes()->get()->transform(function ($row) {
             unset($row->route_id);
 
             return $row;
