@@ -166,9 +166,10 @@ class Routes implements Module
 
         ModuleModelObserver::observe(Route::class);
 
-        $routesExisting = $os->getDevice()->routes()->get()->filter(function ($data) {
-            unset($data->route_id);
-            return $data;
+        $routesExisting = $os->getDevice()->routes()->get()->filter(function ($row) {
+            unset($row->route_id);
+            
+            return $row;
         });
         $this->syncModels($os->getDevice(), 'routes', $this->fillNew($routesExisting, $routes));
         // We add (or update) routes, but old ones are kept for history
