@@ -9,6 +9,7 @@ $bgpPeers = \SnmpQuery::enumStrings()->hideMib()->walk("CUMULUS-BGPVRF-MIB::bgpP
 });
 
 $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_oid')->get();
+$seenPeerID = null;
 
 foreach ($bgpPeers as $bgpPeer) {
     $bgpLocalAs = \SnmpQuery::hideMib()->get("CUMULUS-BGPVRF-MIB::bgpLocalAs.{$bgpPeer['vrfId']}")->value();
@@ -18,6 +19,10 @@ foreach ($bgpPeers as $bgpPeer) {
     echo "BGP Peer {$bgpPeer['bgpPeerIdentifier']} ";
 
     $vrf = $vrfs->where('vrf_oid', $bgpPeer['vrfId'])->first();
+    if (is_null($vrf)) {
+        echo "VRF {$bgpPeer['vrfId']} not found, skipping peer discovery.\n";
+        continue;
+    }
     $vrfId = $vrf->vrf_id;
 
     if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $bgpPeer['bgpPeerIdentifier'])->where('vrf_id', $vrfId)->exists()) {
