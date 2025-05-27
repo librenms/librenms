@@ -398,6 +398,19 @@ if (! empty($peers)) {
                     } elseif ($device['os'] == 'cumulus') {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
                         $mib = 'CUMULUS-BGPUN-MIB';
+                        $oid_map = [
+                            'bgpPeerState' => 'bgpPeerState',
+                            'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                            'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                            'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                            'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                            'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                            'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                            'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                            'bgpPeerLocalAddr' => 'bgpLocalAddr',
+                            'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                            'bgpPeerIface' => 'bgpPeerIface',
+                        ];
                         if ($cumulus_vrf) {
                             $bgp_peers = array_filter($peer_data_check->toArray(), function($peer) use ($peer_identifier) {
                                 return isset($peer[$peer_identifier]) ? $peer[$peer_identifier] : [];
