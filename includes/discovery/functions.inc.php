@@ -351,7 +351,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
             $dbIpv4Net = Ipv4Network::updateOrCreate([
                 'ipv4_network' => $ipv4_network,
             ], [
-                'context_name' => '',
+                'context_name' => $device['context_name'],
             ]);
 
             if (! $dbIpv4Net->wasRecentlyCreated && $dbIpv4Net->wasChanged()) {
