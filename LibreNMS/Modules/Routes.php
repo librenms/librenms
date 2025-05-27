@@ -168,7 +168,7 @@ class Routes implements Module
 
         $routesExisting = $os->getDevice()->routes()->get()->filter(function ($row) {
             unset($row->route_id);
-            
+
             return $row;
         });
         $this->syncModels($os->getDevice(), 'routes', $this->fillNew($routesExisting, $routes));
