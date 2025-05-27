@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->unsignedFloat('last_ping_loss')->nullable()->after('last_ping_timetaken');
+            $table->decimal('last_ping_loss', 8, 2)->nullable()->after('last_ping_timetaken');
         });
     }
 
