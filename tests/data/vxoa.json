@@ -3445,7 +3445,7 @@
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
                     "inetCidrRoutePolicy": "",
-                    "inetCidrRoutePfxLen": 0
+                    "inetCidrRoutePfxLen": 8
                 }
             ]
         }

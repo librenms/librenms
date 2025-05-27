@@ -734,6 +734,20 @@
                 },
                 {
                     "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 3,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
                     "inetCidrRouteIfIndex": 1,
                     "inetCidrRouteType": 3,
                     "inetCidrRouteProto": 2,

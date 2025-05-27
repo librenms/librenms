@@ -397,11 +397,16 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\Ipv4Mac, $this>
      */
-    public function macLinkedPorts(): BelongsToMany
+    public function macLinkedPorts(): HasManyThrough
     {
-        return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
+        return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'port_id', 'ifPhysAddress', 'port_id', 'mac_address')
+            ->join('ipv4_addresses', function ($j) {
+                $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
+                $j->on('ports.port_id', 'ipv4_addresses.port_id');
+            })
+            ->whereNotIn('mac_address', ['000000000000', 'ffffffffffff']);
     }
 
     /**
@@ -490,6 +495,14 @@ class Port extends DeviceRelatedModel
     public function qos(): HasMany
     {
         return $this->hasMany(Qos::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class, 'port_id');
     }
 
     /**
