@@ -507,7 +507,7 @@ class Device extends BaseModel
             return $tags->all();
         }
 
-        return $tags->only(is_array($key) ? $key : [$key]);
+        return $tags->only(is_array($key) ? $key : [$key])->all();
     }
 
     /**
