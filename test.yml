@@ -1,0 +1,78 @@
+---
+- name: Configure VLAN on Network Device
+  hosts: alphabridge_devices
+  gather_facts: no
+  become: true
+  become_method: sudo
+  tasks:
+    - name: Create Telnet script for VLAN
+      ansible.builtin.copy:
+        dest: "/opt/librenms/librenms-ansible-inventory-plugin/tmp/vlan_script.py"
+        mode: '0755'
+        content: |
+          import telnetlib
+          import time
+
+          HOST = "{{ ansible_host }}"
+          USER = "{{ ansible_user }}"
+          PASSWORD = "{{ ansible_password }}"
+          VLAN_ID = "{{ vlan_id }}"
+          MODE = "{{ mode | default('') }}"
+          INTERFACE = "{{ interface | default('') }}"
+          PVID = "{{ pvid | default('') }}"
+          try:
+              tn = telnetlib.Telnet(HOST, timeout=10)
+
+              tn.read_until(b"Username:")
+              tn.write(USER.encode('ascii') + b"\n")
+
+              tn.read_until(b"Password:")
+              tn.write(PASSWORD.encode('ascii') + b"\n")
+
+              tn.read_until(b">")
+              tn.write(b"enable\n")
+
+              tn.read_until(b"#")
+              tn.write(b"config\n")
+
+              tn.read_until(b"#")
+              tn.write(f"vlan { VLAN_ID }\n".encode('ascii'))
+
+              tn.read_until(b"#")
+              tn.write(b"exit\n")
+
+              if INTERFACE:
+                  tn.read_until(b"#")
+                  tn.write(f"interface {INTERFACE}\n".encode('ascii'))
+
+                  if MODE == "access":
+                      tn.read_until(b"#")
+                      tn.write(f"switchport mode access\n".encode('ascii'))
+                      tn.read_until(b"#")
+                      tn.write(f"switchport pvid {PVID}\n".encode('ascii'))
+
+                  elif MODE == "trunk":
+                      tn.read_until(b"#")
+                      tn.write(f"switchport mode trunk\n".encode('ascii'))
+                      tn.read_until(b"#")
+                      tn.write(f"switchport trunk vlan-allowed {PVID}\n".encode('ascii'))
+
+                  tn.read_until(b"#")
+                  tn.write(b"exit\n")
+              tn.write(b"exit\n")
+              tn.close()
+
+          except Exception as e:
+              with open("/opt/librenms/librenms-ansible-inventory-plugin/tmp/vlan_error.txt", "w") as f:
+                  f.write("Error: " + str(e))
+
+    - name: Execute Telnet script
+      ansible.builtin.command: python3 /opt/librenms/librenms-ansible-inventory-plugin/tmp/vlan_script.py
+      register: output
+      changed_when: false
+
+    - name: Fetch error log if exists
+      ansible.builtin.fetch:
+        src: "/opt/librenms/librenms-ansible-inventory-plugin/tmp/vlan_error.txt"
+        dest: "./vlan_error.txt"
+        flat: yes

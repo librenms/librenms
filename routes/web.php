@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Device\Tabs\alphabridgeController;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
@@ -41,6 +42,26 @@ Route::get('graph/{path?}', GraphController::class)
 
 // WebUI
 Route::middleware(['auth'])->group(function () {
+    //kunal route
+    //genrate file 
+
+
+    Route::post('/run-ansible', [alphabridgeController::class, 'runPlaybook'])->name('run.ansible');
+    Route::post('/vlan-config', [alphabridgeController::class, 'configureVlan'])->name('vlan.configure');
+    Route::get('/ansible-log', function () {
+        $logFile = "/opt/librenms/librenms-ansible-inventory-plugin/ansible_log.txt";
+    
+        if (!file_exists($logFile)) {
+            return response()->json(['message' => 'No logs available yet.'], 404);
+        }
+    
+        return response()->json(['log' => file_get_contents($logFile)]);
+    });
+    
+
+
+
+
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');

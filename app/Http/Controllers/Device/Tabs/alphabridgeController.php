@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LatencyController.php
  *
@@ -32,9 +33,182 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
 use App\Models\PortVlan;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Device\Tabs\PortsController;
+use App\Models\Port;
 
 class alphabridgeController implements DeviceTab
 {
+
+    protected $PortsController;
+
+    public function __construct(PortsController $PortsController)
+    {
+        $this->PortsController = $PortsController;
+    }
+    // public function someMethod()
+    // {
+    //     $data = $this->someController->getData();
+    //     return response()->json($data);
+    // }
+
+    public function configureVlan(Request $request)
+    {
+        
+        $request->validate([
+            'host' => 'nullable|string',
+            'mode'=>'nullable|string',
+            'vlan_id' => 'nullable',
+            'interface' => 'nullable|string',
+            'pvid' => 'nullable',
+        ]);
+
+        $device = $request->host;
+        $mode = $request->mode;
+        $vlanId = $request->vlan_id;
+        $interface = $request->interface;
+        $pvid = $request->pvid;
+
+        // Define the Ansible command properly
+        $process = new Process([
+            'ansible-playbook',
+            '-i', '/opt/librenms/librenms-ansible-inventory-plugin/hosts.yml',
+            '/opt/librenms/librenms-ansible-inventory-plugin/vlan_config.yml',
+            '-e', "vlan_id=$vlanId mode=$mode interface=$interface pvid=$pvid","-vvv"
+        ]);
+
+        // Set timeout to prevent hanging
+        $process->setTimeout(300); // 5 minutes
+
+        try {
+            $process->run();
+
+            // Check if execution failed
+            if (!$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            return back()->with('success', "VLAN $vlanId created on $interface pvid $pvid is applied for $device.");
+        } catch (ProcessFailedException $e) {
+            return back()->with('error', 'Failed to configure VLAN. ' . $e->getMessage());
+        }
+    }
+
+
+    // public function runPlaybook(Request $request)
+    // {
+    //     $host = $request->input('host'); 
+    //     $username = $request->input('username'); 
+    //     $password = $request->input('password'); 
+    //     $cmd = $request->input('cmd');  
+
+    //     // Ansible command to run playbook dynamically
+    //     $command = "ansible-playbook -i /opt/librenms/librenms-ansible-inventory-plugin/alphabridge1_config.yml \
+    //                 --inventory=/opt/librenms/librenms-ansible-inventory-plugin/hosts.yml \
+    //                 -e 'ansible_host={$host} ansible_user={$username} ansible_password={$password} command_to_run=\"{$cmd}\"'";
+
+    //     // Execute and get output
+    //     $output = shell_exec($command);
+
+    //     return response()->json(['output' => nl2br($output)]);
+    // }
+
+
+    // public function runPlaybook(Request $request)
+    // {
+
+    //     // $user = shell_exec('whoami');
+    //     // return response()->json(['php_user' => trim($user)]);
+
+    //     //working 
+    //     $command="ansible-playbook -i /opt/librenms/librenms-ansible-inventory-plugin/hosts.yml /opt/librenms/librenms-ansible-inventory-plugin/alphabridge_config.yml -vvv";
+    //     $output = shell_exec($command);
+    //     return response()->json(['message' => 'Ansible playbook started.', 'output' => $output]);
+    //     //close
+
+
+
+
+
+    //     // $request->validate([
+    //     //     'host'     => 'required|ip',
+    //     //     'username' => 'required|string',
+    //     //     'password' => 'required|string',
+    //     //     'cmd'      => 'required|string',
+    //     // ]);
+
+    //     // $hostsFilePath = "/opt/librenms/librenms-ansible-inventory-plugin/hosts.yml";
+    //     // $playbookPath = "/opt/librenms/librenms-ansible-inventory-plugin/alphabridge_config.yml";
+
+    //     // if (!File::exists($hostsFilePath) || !File::exists($playbookPath)) {
+    //     //     return response()->json(['error' => 'Required files not found'], 404);
+    //     // }
+
+    //     // // Set correct permissions
+    //     // // Set correct permissions (without world-writable issue)
+    //     // shell_exec("sudo find /opt/librenms/librenms-ansible-inventory-plugin -type d -exec chmod 755 {} +");
+    //     // shell_exec("sudo find /opt/librenms/librenms-ansible-inventory-plugin -type f -exec chmod 644 {} +");
+    //     // shell_exec("sudo chown -R www-data:www-data /opt/librenms/librenms-ansible-inventory-plugin");
+
+    //     // // Run Ansible Playbook
+    //     // $process = new Process([
+    //     //     'sudo',
+    //     //     '-u',
+    //     //     'www-data',
+    //     //     'ansible-playbook',
+    //     //     '-i',
+    //     //     '/opt/librenms/librenms-ansible-inventory-plugin/hosts.yml',
+    //     //     '/opt/librenms/librenms-ansible-inventory-plugin/alphabridge_config.yml',
+    //     //     '-vvv'
+    //     // ]);
+
+    //     // $process->setWorkingDirectory('/opt/librenms/librenms-ansible-inventory-plugin');
+    //     // $process->run();
+
+    //     // // Capture and log outputs
+    //     // Log::error("STDOUT: " . $process->getOutput());
+    //     // Log::error("STDERR: " . $process->getErrorOutput());
+
+    //     // if (!$process->isSuccessful()) {
+    //     //     return response()->json([
+    //     //         'error' => 'Playbook execution failed!',
+    //     //         'output' => $process->getErrorOutput() ?: 'No error details captured.',
+    //     //     ], 500);
+    //     // }
+
+    //     // return response()->json([
+    //     //     'success' => 'Playbook executed successfully!',
+    //     //     'output' => $process->getOutput(),
+    //     // ]);
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // close
+
     public function visible(Device $device): bool
     {
         return $device->vlans()->exists();
@@ -57,32 +231,15 @@ class alphabridgeController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        // dd($device);
+        
+        $ports=Port::where('device_id',$device->device_id)->get();
+        // dd($device->hostname);
         return [
             'vlans' => self::getVlans($device),
-            'submenualphabridge' => [
-                'L2 Configuration' => [
-                    ['name' => 'Bits', 'url' => 'bits'],
-                    ['name' => 'GVRP Configuration', 'url' => 'gvrp_config'],
-                    ['name' => 'STP Configuration', 'url' => 'stp_config'],
-                    ['name' => 'Basic ARP', 'url' => 'basic_arp'],
-                    ['name' => 'VLAN Configuration', 'url' => 'vlan_config'],
-                    ['name' => 'IGMP Snooping', 'url' => 'igmp_snooping'],
-                    ['name' => 'LLDP Configuration', 'url' => 'lldp_config'],
-                    ['name' => 'DDM Configuration', 'url' => 'ddm_config'],
-                ],
-                'L3 Configuration' => [
-                    ['name' => 'VLAN Interfaces and IP Addresses', 'url' => 'vlan-ips'],
-                    ['name' => 'DHCP Client Configuration', 'url' => 'dhcp-client'],
-                    ['name' => 'DHCP Server Configuration', 'url' => 'dhcp-server'],
-                    ['name' => 'Static Routing', 'url' => 'static-routing'],
-                    ['name' => 'VLAN Interface IPv6 Configuration', 'url' => 'vlan-ipv6'],
-                    ['name' => 'IPv6 DHCP Client Configuration', 'url' => 'ipv6-dhcp-client'],
-                    ['name' => 'IPv6 DHCP Server Configuration', 'url' => 'ipv6-dhcp-server'],
-                    ['name' => 'IPv6 Route Configuration', 'url' => 'ipv6-route'],
-                    ['name' => 'OSPF Route Configuration', 'url' => 'ospf-route'],
-                    ['name' => 'IGMP Proxy', 'url' => 'igmp-proxy'],
-                ],
-            ],
+            'hostname' => $device->hostname,
+            'device' => $device,
+            'ports' => $ports,
         ];
     }
 
@@ -92,12 +249,12 @@ class alphabridgeController implements DeviceTab
         $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
             ->join('vlans', function ($join) {
                 $join
-                ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
-                ->on('vlans.device_id', 'ports_vlans.device_id');
+                    ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
+                    ->on('vlans.device_id', 'ports_vlans.device_id');
             })
             ->join('ports', function ($join) {
                 $join
-                ->on('ports_vlans.port_id', 'ports.port_id');
+                    ->on('ports_vlans.port_id', 'ports.port_id');
             })
             ->with(['port.device'])
             ->select('ports_vlans.*', 'vlans.vlan_name')->orderBy('vlan_vlan')->orderBy('ports.ifName')->orderBy('ports.ifDescr')

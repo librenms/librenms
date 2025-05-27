@@ -316,12 +316,26 @@ if (Auth::user()->hasGlobalAdmin()) {
     ';
     
     // Print "demo1" if the current configuration is gvrp_config
-            if ($current_config === "gvrp_config") {
-                echo "<div class='config'>gvrp config</div>";
+         $include_path = __DIR__ . '/ab_config/'.$current_config.'.php';
+
+        //  dd(__DIR__ );
+
+         if (file_exists($include_path)) {
+
+            if ($current_config) {
+                include $include_path;
             }
             if ($current_config === "stp_config") {
                 echo "stp config";
             }
+
+            
+
+        } else {
+            echo "<p>Error:file not found.</p>";
+        }
+
+            
 
     echo '
         </div>
