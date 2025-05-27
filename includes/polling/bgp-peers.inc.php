@@ -71,6 +71,7 @@ if (! empty($peers)) {
                     $data['peerIdType'] = $peerIdType;
                     $data['ifIndex'] = explode('.', $ifFace)[4];
                     $peer[$data['bgpPeerIdentifier']] = $data;
+
                     return $peer;
                 });
             $cumulus_vrf = true;

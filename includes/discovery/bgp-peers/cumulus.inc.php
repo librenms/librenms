@@ -5,6 +5,7 @@ $bgpPeers = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpP
         $data['vrfId'] = $vrfId;
         $data['peerIdType'] = $peerIdType;
         $data['ifIndex'] = explode('.', $ifFace)[4];
+
         return $data;
     });
 
