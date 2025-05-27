@@ -11907,21 +11907,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.0.41",
-                    "inetCidrRoutePolicy": "ccitt.0",
-                    "inetCidrRoutePfxLen": 0
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 13072,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 3,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 1,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "0.0.0.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "10.200.0.41",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -11935,26 +11921,11 @@
                     "inetCidrRouteDest": "10.200.0.40",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0",
-                    "inetCidrRoutePfxLen": 30
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 13072,
-                    "inetCidrRouteType": 3,
-                    "inetCidrRouteProto": 2,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "10.200.0.40",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 30
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "stp": {
         "discovery": {
