@@ -1103,9 +1103,9 @@
                 },
                 {
                     "ipv4_address": "3.0.0.0",
-                    "ipv4_prefixlen": 0,
+                    "ipv4_prefixlen": 8,
                     "context_name": "",
-                    "ipv4_network": null,
+                    "ipv4_network": "3.0.0.0/8",
                     "ifIndex": 3
                 }
             ]

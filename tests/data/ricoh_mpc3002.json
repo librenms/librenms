@@ -979,13 +979,6 @@
         "discovery": {
             "ipv4_addresses": [
                 {
-                    "ipv4_address": "0.0.0.0",
-                    "ipv4_prefixlen": 0,
-                    "context_name": "",
-                    "ipv4_network": null,
-                    "ifIndex": 3
-                },
-                {
                     "ipv4_address": "10.0.0.36",
                     "ipv4_prefixlen": 24,
                     "context_name": "",
@@ -994,9 +987,9 @@
                 },
                 {
                     "ipv4_address": "127.0.0.1",
-                    "ipv4_prefixlen": 0,
+                    "ipv4_prefixlen": 8,
                     "context_name": "",
-                    "ipv4_network": null,
+                    "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 2
                 }
             ]

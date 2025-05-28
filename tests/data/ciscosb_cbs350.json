@@ -8327,9 +8327,9 @@
             "ipv4_addresses": [
                 {
                     "ipv4_address": "127.0.0.1",
-                    "ipv4_prefixlen": 0,
+                    "ipv4_prefixlen": 8,
                     "context_name": "",
-                    "ipv4_network": null,
+                    "ipv4_network": "127.0.0.0/8",
                     "ifIndex": 20000
                 },
                 {
@@ -8345,6 +8345,54 @@
                     "context_name": "",
                     "ipv4_network": "192.168.1.0/29",
                     "ifIndex": 100009
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100000,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 3,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 4,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.41.142.57",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100009,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.41.130.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 24
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100000,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.41.142.56",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 29
                 }
             ]
         }

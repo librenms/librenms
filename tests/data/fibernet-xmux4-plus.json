@@ -1986,13 +1986,6 @@
         "discovery": {
             "ipv4_addresses": [
                 {
-                    "ipv4_address": "0.0.0.0",
-                    "ipv4_prefixlen": 0,
-                    "context_name": "",
-                    "ipv4_network": null,
-                    "ifIndex": 3
-                },
-                {
                     "ipv4_address": "10.1.16.108",
                     "ipv4_prefixlen": 24,
                     "context_name": "",

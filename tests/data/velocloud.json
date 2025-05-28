@@ -2454,18 +2454,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "ipv4-addresses": {
-        "discovery": {
-            "ipv4_addresses": [
-                {
-                    "ipv4_address": "0.0.0.0",
-                    "ipv4_prefixlen": 32,
-                    "context_name": "",
-                    "ipv4_network": null,
-                    "ifIndex": 16777216
-                }
-            ]
-        }
     }
 }

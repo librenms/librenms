@@ -22791,13 +22791,6 @@
         "discovery": {
             "ipv4_addresses": [
                 {
-                    "ipv4_address": "0.0.0.0",
-                    "ipv4_prefixlen": 22,
-                    "context_name": "",
-                    "ipv4_network": "0.0.0.0/22",
-                    "ifIndex": 1277
-                },
-                {
                     "ipv4_address": "10.1.1.1",
                     "ipv4_prefixlen": 22,
                     "context_name": "",

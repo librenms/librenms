@@ -6294,9 +6294,9 @@
                 },
                 {
                     "ipv4_address": "81.157.60.26",
-                    "ipv4_prefixlen": 0,
+                    "ipv4_prefixlen": 8,
                     "context_name": "",
-                    "ipv4_network": null,
+                    "ipv4_network": "81.0.0.0/8",
                     "ifIndex": 4
                 }
             ]

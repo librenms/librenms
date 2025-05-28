@@ -14996,9 +14996,9 @@
             "ipv4_addresses": [
                 {
                     "ipv4_address": "0.255.255.1",
-                    "ipv4_prefixlen": 0,
+                    "ipv4_prefixlen": 8,
                     "context_name": "",
-                    "ipv4_network": null,
+                    "ipv4_network": "0.0.0.0/8",
                     "ifIndex": 9000
                 },
                 {
