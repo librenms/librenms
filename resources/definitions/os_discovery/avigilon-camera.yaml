@@ -1,0 +1,46 @@
+mib: AVIGILON-CAMERA-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: AVIGILON-CAMERA-MIB::tempSensorTable
+                    value: tempSensorValue
+                    num_oid: '.1.3.6.1.4.1.46202.1.1.1.1.1.4.{{ $index }}'
+                    descr: A collection of objects relating to temperature status.
+                    multiplier: 1
+                    divisor: 1
+                    mib: AVIGILON-CAMERA-MIB
+        state:
+            data:
+                -
+                    oid: AVIGILON-CAMERA-MIB::tempSensorStatus
+                    value: tempSensorStatus
+                    num_oid: '.1.3.6.1.4.1.46202.1.1.1.1.1.3.{{ $index }}'
+                    descr: Temperature Sensor Status {{ $index }}
+                    index: tempSensorId
+                    states:
+                      - { value: 1, generic: 0, graph: 0, descr: ok }
+                      - { value: 2, generic: 2, graph: 0, descr: failure }
+                      - { value: 3, generic: 1, graph: 0, descr: outOfBoundary }
+        storage:
+            data:
+                -
+                    oid: AVIGILON-CAMERA-MIB::storageState
+                    value: storageState
+                    num_oid: '.1.3.6.1.4.1.46202.1.1.1.5.0'
+                    descr: SD Card Storage State
+                    states:
+                      - { value: 1, generic: 3, graph: 0, descr: mediaNotPresent }
+                      - { value: 2, generic: 0, graph: 0, descr: mediaDetected }
+                      - { value: 3, generic: 1, graph: 0, descr: existingDataOnMediaDetected }
+                      - { value: 4, generic: 1, graph: 0, descr: mediaFormatting }
+                      - { value: 5, generic: 1, graph: 0, descr: scanningForRecordings }
+                      - { value: 6, generic: 2, graph: 0, descr: readOnly }
+                      - { value: 7, generic: 0, graph: 0, descr: readyToRecord }
+                      - { value: 8, generic: 0, graph: 0, descr: recording }
+                      - { value: 9, generic: 2, graph: 0, descr: errorFormatting }
+                      - { value: 10, generic: 2, graph: 0, descr: errorWriting" }
+                      - { value: 11, generic: 2, graph: 0, descr: insufficientMediaCapacity }
+                      - { value: 12, generic: 2, graph: 0, descr: insufficientMediaSpeed }
+                      - { value: 13, generic: 2, graph: 0, descr: error }
