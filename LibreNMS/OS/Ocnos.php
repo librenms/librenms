@@ -172,9 +172,12 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
         };
 
         return match ($this->getDevice()->hardware) {
+            'Ufi Space S9600-32X-B' => $prefix . $cmmTransIndex,
             'Ufi Space S9600-32X-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9510-28DC-B' => $prefix . ($cmmTransIndex - 1),
+            'Ufi Space S9610-36D-R' => 'cd' . $cmmTransIndex . '/1',
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
+            'Ufi Space S9600-72XC-R' => $prefix . $cmmTransIndex,
             'Edgecore 7316-26XB-O-48V-F' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 1 : $cmmTransIndex - 3),
             'Edgecore 5912-54X-O-AC-F' => $prefix . $cmmTransIndex,
             'Edgecore 7712-32X-O-AC-F' => $prefix . $cmmTransIndex . '/1',
