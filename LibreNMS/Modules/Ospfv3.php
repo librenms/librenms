@@ -42,6 +42,7 @@ use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 use SnmpQuery;
 
 class Ospfv3 implements Module
@@ -79,7 +80,12 @@ class Ospfv3 implements Module
             }
 
             // record instance data
-            $ospf_group['router_id'] = long2ip($ospf_group['ospfv3RouterId']);
+            $ospf_group['router_id'] = IPv4::isValid($ospf_group['ospfv3RouterId']) ? $ospf_group['ospfv3RouterId'] : long2ip($ospf_group['ospfv3RouterId']);
+
+            if ($ospf_group['router_id'] === '0.0.0.0') {
+                continue; //rfc5340 says this should not be used as a router ID
+            }
+
             $instances->push(Ospfv3Instance::updateOrCreate([
                 'device_id' => $os->getDeviceId(),
                 'context_name' => $context_name,
