@@ -143,7 +143,7 @@ class FpingResponse implements \Stringable
 
     public function saveStats(Device $device): void
     {
-        if($device->stats) {
+        if ($device->stats) {
             $stats = $device->stats;
             $stats->ping_last_timestamp = Carbon::now();
             // Only update the latency if we have data
