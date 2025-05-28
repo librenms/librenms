@@ -1447,6 +1447,16 @@
                 "{{ $ip }}":  "ip"
             }
         },
+        "device_stats_avg_factor": {
+            "default": 0.05,
+            "group": "poller",
+            "section": "ping",
+            "order": 4,
+            "type": "float",
+            "validate": {
+                "value": "numeric|between:0.000001,0.9"
+            }
+        },
         "device_traffic_descr": {
             "default": [
                 "/loopback/",
