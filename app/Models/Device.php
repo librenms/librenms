@@ -687,6 +687,21 @@ class Device extends BaseModel
         return $query->where('hostname', $deviceSpec);
     }
 
+    public function scopeAreParentsDown(): bool
+        {
+            $parent_count = $this->parents()->count();
+            if ($parent_count == 0) {
+                return false;
+            }
+        
+            $down_parent_count = $this->parents()->isDown()->canPing()->count();
+            if ($down_parent_count == $parent_count) {
+                return true;
+            }
+        
+            return false;
+        }
+
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AccessPoint, $this>

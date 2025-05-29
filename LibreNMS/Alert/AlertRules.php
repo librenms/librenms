@@ -34,7 +34,6 @@ namespace LibreNMS\Alert;
 
 use App\Models\Alert;
 use App\Models\AlertLog;
-use App\Models\AlertRule;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
