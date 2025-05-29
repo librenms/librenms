@@ -35,15 +35,19 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
+use PDO;
 
 class RunAlerts
 {
@@ -164,23 +168,30 @@ class RunAlerts
             }
         } elseif ($alert['state'] == AlertState::RECOVERED) {
             // Alert is now cleared
-            $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != ? && alert_log.state != ? && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', [AlertState::ACKNOWLEDGED, AlertState::RECOVERED, $alert['rule_id'], $alert['device_id'], $alert['id']]);
-            if (empty($id['id'])) {
+            $id = AlertLog::where('state', '!=', AlertState::ACKNOWLEDGED)
+                ->where('state', '!=', AlertState::RECOVERED)
+                ->where('rule_id', $alert['rule_id'])
+                ->where('device_id', $alert['device_id'])
+                ->where('id', '<', $alert['id'])
+                ->orderBy('id', 'desc')
+                ->first(['id', 'time_logged', 'details']);
+            if (empty($id->id)) {
                 return false;
             }
 
             $extra = [];
-            if (! empty($id['details'])) {
-                $extra = json_decode(gzuncompress($id['details']), true);
+            if (! empty($id->details)) {
+                $extra = json_decode(gzuncompress($id->details), true);
             }
 
             // Reset count to 0 so alerts will continue
             $extra['count'] = 0;
-            dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
+            AlertLog::where('id', $alert['id'])
+                ->update(['details' => gzcompress(json_encode($id->details), 9)]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
-            $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id['time_logged']), true) ?: 'none';
-            $obj['id'] = $id['id'];
+            $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id->time_logged), true) ?: 'none';
+            $obj['id'] = $id->id;
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
@@ -259,8 +270,17 @@ class RunAlerts
             if (empty($alert['query'])) {
                 $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
-            $sql = $alert['query'];
-            $qry = dbFetchRows($sql, [$alert['device_id']]);
+
+            try {
+                $query = DB::connection()->getPdo()->prepare($alert['query']);
+                $query->execute([$alert['device_id']]);
+                $qry = $query->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
+                Eventlog::log("Error in alert rule {$alert['name']}: " . $e->getMessage(), $alert['device_id'], 'alert', Severity::Error);
+                continue;
+            }
+
             $alert['details']['contacts'] = AlertUtil::getContacts($qry);
         }
 
@@ -293,7 +313,9 @@ class RunAlerts
             if ($rextra['acknowledgement']) {
                 // Rule is set to send an acknowledgement alert
                 $this->issueAlert($alert);
-                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                Alert::where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->update(['open' => AlertState::CLEAR]);
             }
         }
     }
@@ -315,7 +337,17 @@ class RunAlerts
                 if (empty($alert['query'])) {
                     $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
-                $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
+
+                try {
+                    $query = DB::connection()->getPdo()->prepare($alert['query']);
+                    $query->execute([$alert['device_id']]);
+                    $chk = $query->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {
+                    c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
+                    Eventlog::log("Error in alert rule {$alert['name']}: " . $e->getMessage(), $alert['device_id'], 'alert', Severity::Error);
+                    continue;
+                }
+
                 //make sure we can json_encode all the datas later
                 $current_alert_count = count($chk);
                 for ($i = 0; $i < $current_alert_count; $i++) {
@@ -357,13 +389,15 @@ class RunAlerts
 
                 if ($state > AlertState::CLEAR && $current_alert_count > 0) {
                     $alert['details']['rule'] = $chk;
-                    if (dbInsert([
+                    if (AlertLog::insert([
                         'state' => $state,
                         'device_id' => $alert['device_id'],
                         'rule_id' => $alert['rule_id'],
                         'details' => gzcompress(json_encode($alert['details']), 9),
-                    ], 'alert_log')) {
-                        dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                    ])) {
+                        Alert::where('rule_id', $alert['rule_id'])
+                            ->where('device_id', $alert['device_id'])
+                            ->update(['state' => $state, 'open' => 1, 'alerted' => 1]);
                     }
 
                     echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
@@ -457,7 +491,9 @@ class RunAlerts
             if (empty($alert['rule_id']) || ! $this->isRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
                 echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
                 // Alert-Rule does not exist anymore, let's remove the alert-state.
-                dbDelete('alerts', 'rule_id = ? && device_id = ?', [$alert_status['rule_id'], $alert_status['device_id']]);
+                Alert::where('rule_id', $alert_status['rule_id'])
+                    ->where('device_id', $alert_status['device_id'])
+                    ->delete();
             } else {
                 $alert['state'] = $alert_status['state'];
                 $alert['alerted'] = $alert_status['alerted'];
@@ -481,6 +517,8 @@ class RunAlerts
     public function runAlerts()
     {
         foreach ($this->loadAlerts('alerts.state != ' . AlertState::ACKNOWLEDGED . ' && alerts.open = 1') as $alert) {
+            $device = DeviceCache::get($alert['device_id']);
+
             $noiss = false;
             $noacc = false;
             $updet = false;
@@ -495,9 +533,13 @@ class RunAlerts
                 $alert['details']['count'] = 0;
             }
 
-            $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
+            $chk = Alert::join('devices', 'alerts.device_id', '=', 'devices.device_id')
+                ->where('alerts.device_id', $alert['device_id'])
+                ->where('alerts.rule_id', $alert['rule_id'])
+                ->select(['alerts.alerted', 'devices.ignore', 'devices.disabled'])
+                ->first();
 
-            if ($chk['alerted'] == $alert['state']) {
+            if ($chk->alerted == $alert['state']) {
                 $noiss = true;
             }
 
@@ -547,7 +589,7 @@ class RunAlerts
                     $noiss = false;
                 }
             }
-            if ($chk['ignore'] == 1 || $chk['disabled'] == 1) {
+            if ($chk->ignore == 1 || $chk->disabled == 1) {
                 $noiss = true;
                 $updet = false;
                 $noacc = false;
@@ -559,7 +601,8 @@ class RunAlerts
             }
 
             if ($updet) {
-                dbUpdate(['details' => gzcompress(json_encode($alert['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
+                AlertLog::where('id', $alert['id'])
+                    ->update(['details' => gzcompress(json_encode($alert['details']), 9)]);
             }
 
             if (! empty($rextra['mute'])) {
@@ -567,7 +610,7 @@ class RunAlerts
                 $noiss = true;
             }
 
-            if ($this->isParentDown($alert['device_id'])) {
+            if ($device->areParentsDown()) {
                 $noiss = true;
                 Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
             }
@@ -579,11 +622,15 @@ class RunAlerts
 
             if (! $noiss) {
                 $this->issueAlert($alert);
-                dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                Alert::where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->update(['alerted' => $alert['state']]);
             }
 
             if (! $noacc) {
-                dbUpdate(['open' => 0], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                Alert::where('rule_id', $alert['rule_id'])
+                    ->where('device_id', $alert['device_id'])
+                    ->update(['open' => 0]);
             }
         }
     }
@@ -675,27 +722,5 @@ class RunAlerts
             echo "ERROR: $result\r\n";
             Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Severity::Error);
         }
-    }
-
-    /**
-     * Check if a device's all parent are down
-     * Returns true if all parents are down
-     *
-     * @param  int  $device  Device-ID
-     * @return bool
-     */
-    public function isParentDown($device)
-    {
-        $parent_count = dbFetchCell('SELECT count(*) from `device_relationships` WHERE `child_device_id` = ?', [$device]);
-        if (! $parent_count) {
-            return false;
-        }
-
-        $down_parent_count = dbFetchCell("SELECT count(*) from devices as d LEFT JOIN devices_attribs as a ON d.device_id=a.device_id LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=? AND (d.status_reason='icmp' OR (a.attrib_type='override_icmp_disable' AND a.attrib_value=true))", [$device]);
-        if ($down_parent_count == $parent_count) {
-            return true;
-        }
-
-        return false;
     }
 }
