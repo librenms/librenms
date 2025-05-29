@@ -265,7 +265,7 @@ if ($vars['view'] == 'sdps') {
             $operstate_status_color = 'danger';
         }
 
-        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$sdp['sdpFarEndInetAddress']]);
+        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id AND D.disabled = 0', [$sdp['sdpFarEndInetAddress']]);
         $destination = $sdp['sdpFarEndInetAddress'];
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
@@ -388,6 +388,10 @@ vprn services are up when the service is administratively up however routing fun
 
     foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
         $device = device_by_id_cache($svc['device_id']);
+        if ($device['disabled'] == 1) {
+            continue;
+        }
+
         if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
@@ -460,6 +464,11 @@ if ($vars['view'] == 'saps') {
         $port = cleanPort($port);
 
         $device = device_by_id_cache($sap['device_id']);
+
+        if ($device['disabled'] == 1) {
+            continue;
+        }
+    
         if (! is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
