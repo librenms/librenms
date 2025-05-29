@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="page-availability-title-left">
                     <span class="page-availability-title">Availability map for</span>
-                    <select id="show_items" class="page-availability-report-select" name="show_items" onchange="refreshMap()">
+                    <select id="show_items" class="form-control" name="show_items" onchange="refreshMap()">
                         <option value="0" selected>only devices</option>
 @if($services)
                         <option value="1" >only services</option>
@@ -72,6 +72,7 @@
         }
 
         if ($("#show_items").val() == 0 || $("#show_items").val() == 2) {
+            
             $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: null, group: group})
                 .done(function( data ) {
                     var host_warn_count = 0;
@@ -258,7 +259,7 @@
                 });
         } else {
             $("#service-list").html("");
-            $("#service-summary").hide();
+            $("#services-summary").hide();
         }
     }
 
