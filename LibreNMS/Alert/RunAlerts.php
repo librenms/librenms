@@ -34,6 +34,7 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Models\Alert;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -210,11 +211,15 @@ class RunAlerts
 
     public function clearStaleAlerts()
     {
-        $sql = 'SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=' . AlertState::CLEAR . ' AND `devices`.`hostname` IS NULL';
-        foreach (dbFetchRows($sql) as $alert) {
-            if (empty($alert['hostname']) && isset($alert['alert_id'])) {
-                dbDelete('alerts', '`id` = ?', [$alert['alert_id']]);
-                echo "Stale-alert: #{$alert['alert_id']}" . PHP_EOL;
+        $alerts = Alert::leftJoin('devices', 'alerts.device_id', 'devices.device_id')
+            ->rightJoin('alert_rules', 'alerts.rule_id', 'alert_rules.id')
+            ->where('alerts.state', '!=', AlertState::CLEAR)
+            ->whereNull('devices.hostname')
+            ->get(['alerts.id as alert_id']);
+        foreach ($alerts as $alert) {
+            if (empty($alert->hostname) && isset($alert->alert_id)) {
+                Alert::where('id', $alert->alert_id)->delete();
+                echo "Stale-alert: #{$alert->alert_id}" . PHP_EOL;
             }
         }
     }
