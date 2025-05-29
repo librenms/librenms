@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Models\TagKey;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -38,7 +39,7 @@ class DeviceTagsDefine extends LnmsCommand
 
         $result = [];
         foreach ($tags as $tag) {
-            $tagKey = \App\Models\DeviceTagKey::updateOrCreate(
+            $tagKey = TagKey::updateOrCreate(
                 ['key' => $tag],
                 ['type' => $type, 'visible' => ! $hidden]
             );

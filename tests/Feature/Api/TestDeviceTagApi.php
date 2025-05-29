@@ -3,6 +3,8 @@
 namespace LibreNMS\Tests\Feature\Api;
 
 use App\Models\Device;
+use App\Models\Tag;
+use App\Models\TagKey;
 use App\Models\User;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
@@ -38,7 +40,7 @@ class TestDeviceTagApi extends InMemoryDbTestCase
         ]);
         $response->assertStatus(200)
             ->assertJsonFragment(['hiddenapi' => 'secret']);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'hiddenapi')->first();
+        $tagKey = TagKey::where('key', 'hiddenapi')->first();
         $this->assertNotNull($tagKey);
         $this->assertFalse($tagKey->visible);
 
@@ -60,19 +62,19 @@ class TestDeviceTagApi extends InMemoryDbTestCase
             ->assertJsonMissing(['apiowner' => 'bob']);
 
         // Set and get typed tags
-        \App\Models\DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
         $response = $this->postJson("/api/v0/devices/{$device->hostname}/tags", [
             'tags' => ['email_tag' => 'user@example.com'],
         ]);
         $response->assertStatus(200)
             ->assertJsonFragment(['email_tag' => 'user@example.com']);
-        \App\Models\DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
         $response = $this->postJson("/api/v0/devices/{$device->hostname}/tags", [
             'tags' => ['int_tag' => 123],
         ]);
         $response->assertStatus(200)
             ->assertJsonFragment(['int_tag' => 123]);
-        \App\Models\DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
         $response = $this->postJson("/api/v0/devices/{$device->hostname}/tags", [
             'tags' => ['url_tag' => 'https://example.com'],
         ]);
@@ -84,10 +86,10 @@ class TestDeviceTagApi extends InMemoryDbTestCase
     {
         $device = Device::factory()->create(['hostname' => 'apitest2']);
         $this->actingAsAdmin();
-        \App\Models\DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
+        TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        TagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
 
         $response = $this->postJson("/api/v0/devices/{$device->hostname}/tags", [
             'tags' => ['email_tag' => 'not-an-email'],
@@ -116,7 +118,7 @@ class TestDeviceTagApi extends InMemoryDbTestCase
             'type' => 'string',
         ]);
         $response->assertStatus(200);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'mytag')->first();
+        $tagKey = TagKey::where('key', 'mytag')->first();
         $this->assertNotNull($tagKey);
         $this->assertEquals('string', $tagKey->type);
         $this->assertTrue($tagKey->visible);
@@ -128,7 +130,7 @@ class TestDeviceTagApi extends InMemoryDbTestCase
             'visible' => false,
         ]);
         $response->assertStatus(200);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'hiddenint')->first();
+        $tagKey = TagKey::where('key', 'hiddenint')->first();
         $this->assertNotNull($tagKey);
         $this->assertEquals('integer', $tagKey->type);
         $this->assertFalse($tagKey->visible);
@@ -139,8 +141,8 @@ class TestDeviceTagApi extends InMemoryDbTestCase
             'type' => 'email',
         ]);
         $response->assertStatus(200);
-        $tag1 = \App\Models\DeviceTagKey::where('key', 'tag1')->first();
-        $tag2 = \App\Models\DeviceTagKey::where('key', 'tag2')->first();
+        $tag1 = TagKey::where('key', 'tag1')->first();
+        $tag2 = TagKey::where('key', 'tag2')->first();
         $this->assertNotNull($tag1);
         $this->assertNotNull($tag2);
         $this->assertEquals('email', $tag1->type);

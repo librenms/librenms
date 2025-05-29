@@ -3,10 +3,11 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
-use App\Models\DeviceTagKey;
+use App\Models\Tag;
+use App\Models\TagKey;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
-class DeviceTagTest extends InMemoryDbTestCase
+class TagTest extends InMemoryDbTestCase
 {
     public function test_set_and_get_tags_various_types()
     {
@@ -30,25 +31,25 @@ class DeviceTagTest extends InMemoryDbTestCase
         $this->assertEquals(['role' => 'switch'], $device->getTag('role'));
 
         // Set tag with email type
-        $d = DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        $d = TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
         $device->setTag(['email_tag' => 'user@example.com']);
         $this->assertEquals(['email_tag' => 'user@example.com'], $device->getTag('email_tag'));
         $this->assertEquals($d->type, 'email');
 
         // Set tag with integer type
-        $d = DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        $d = TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
         $device->setTag(['int_tag' => 123]);
         $this->assertEquals(['int_tag' => 123], $device->getTag('int_tag'));
         $this->assertEquals($d->type, 'integer');
 
         // Set tag with url type
-        $d = DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        $d = TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
         $device->setTag(['url_tag' => 'https://example.com']);
         $this->assertEquals(['url_tag' => 'https://example.com'], $device->getTag('url_tag'));
         $this->assertEquals($d->type, 'url');
 
         // Set tag with timestamp type
-        $d = DeviceTagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
+        $d = TagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
         $device->setTag(['timestamp_tag' => 123456789]);
         $this->assertEquals(['timestamp_tag' => 123456789], $device->getTag('timestamp_tag'));
         $this->assertEquals($d->type, 'timestamp');
@@ -57,10 +58,10 @@ class DeviceTagTest extends InMemoryDbTestCase
     public function test_set_tag_invalid_types_throw_exception()
     {
         $device = Device::factory()->create();
-        DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
-        DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
-        DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
-        DeviceTagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
+        TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        TagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
 
         // Email type
         try {
