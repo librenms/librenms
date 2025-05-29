@@ -3,6 +3,8 @@
 namespace LibreNMS\Tests\Feature\Commands;
 
 use App\Models\Device;
+use App\Models\Tag;
+use App\Models\TagKey;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestDeviceTagCommand extends InMemoryDbTestCase
@@ -30,7 +32,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             'tags' => ['hiddencli=secret'],
             '--json' => true,
         ])->assertExitCode(0);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'hiddencli')->first();
+        $tagKey = TagKey::where('key', 'hiddencli')->first();
         $this->assertNotNull($tagKey);
         $this->assertFalse($tagKey->visible);
 
@@ -47,7 +49,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
         ])->expectsOutput('cliowner=(not set)')->assertExitCode(0);
 
         // Set and get typed tags
-        \App\Models\DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
         $this->artisan('device:tags', [
             'action' => 'set',
             'device_id' => $device->device_id,
@@ -58,7 +60,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             'device_id' => $device->device_id,
             'tags' => ['email_tag'],
         ])->expectsOutput('email_tag=user@example.com')->assertExitCode(0);
-        \App\Models\DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
         $this->artisan('device:tags', [
             'action' => 'set',
             'device_id' => $device->device_id,
@@ -69,7 +71,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             'device_id' => $device->device_id,
             'tags' => ['int_tag'],
         ])->expectsOutput('int_tag=123')->assertExitCode(0);
-        \App\Models\DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
         $this->artisan('device:tags', [
             'action' => 'set',
             'device_id' => $device->device_id,
@@ -85,10 +87,10 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
     public function test_cli_set_tag_invalid_types_fail()
     {
         $device = Device::factory()->create();
-        \App\Models\DeviceTagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
-        \App\Models\DeviceTagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
+        TagKey::create(['key' => 'email_tag', 'type' => 'email', 'visible' => true]);
+        TagKey::create(['key' => 'int_tag', 'type' => 'integer', 'visible' => true]);
+        TagKey::create(['key' => 'url_tag', 'type' => 'url', 'visible' => true]);
+        TagKey::create(['key' => 'timestamp_tag', 'type' => 'timestamp', 'visible' => true]);
 
         $this->artisan('device:tags', [
             'action' => 'set',
@@ -119,7 +121,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             'tags' => ['mytag'],
             '--type' => 'string',
         ])->assertExitCode(0);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'mytag')->first();
+        $tagKey = TagKey::where('key', 'mytag')->first();
         $this->assertNotNull($tagKey);
         $this->assertEquals('string', $tagKey->type);
         $this->assertTrue($tagKey->visible);
@@ -130,7 +132,7 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             '--type' => 'integer',
             '--hidden' => true,
         ])->assertExitCode(0);
-        $tagKey = \App\Models\DeviceTagKey::where('key', 'hiddenint')->first();
+        $tagKey = TagKey::where('key', 'hiddenint')->first();
         $this->assertNotNull($tagKey);
         $this->assertEquals('integer', $tagKey->type);
         $this->assertFalse($tagKey->visible);
@@ -140,8 +142,8 @@ class TestDeviceTagCommand extends InMemoryDbTestCase
             'tags' => ['tag1', 'tag2'],
             '--type' => 'email',
         ])->assertExitCode(0);
-        $tag1 = \App\Models\DeviceTagKey::where('key', 'tag1')->first();
-        $tag2 = \App\Models\DeviceTagKey::where('key', 'tag2')->first();
+        $tag1 = TagKey::where('key', 'tag1')->first();
+        $tag2 = TagKey::where('key', 'tag2')->first();
         $this->assertNotNull($tag1);
         $this->assertNotNull($tag2);
         $this->assertEquals('email', $tag1->type);
