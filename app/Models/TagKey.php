@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class DeviceTagKey extends Model implements Keyable
+class TagKey extends Model implements Keyable
 {
     protected $table = 'tag_keys';
     protected $primaryKey = 'tag_key_id';
@@ -34,11 +34,11 @@ class DeviceTagKey extends Model implements Keyable
     }
 
     /**
-     * Relation to DeviceTag
+     * Relation to Tag
      */
     public function tags()
     {
-        return $this->hasMany(DeviceTag::class, 'tag_key_id');
+        return $this->hasMany(Tag::class, 'tag_key_id');
     }
 
     /**

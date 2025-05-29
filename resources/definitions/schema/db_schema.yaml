@@ -2351,7 +2351,8 @@ syslog:
 tags:
   Columns:
     - { Field: tag_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: object_type, Type: 'varchar(256)', 'Null': false, Extra: '' }
+    - { Field: object_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: tag_key_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: value, Type: varchar(256), 'Null': true, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }

@@ -18,14 +18,14 @@ return new class extends Migration
 
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('tag_id');
-            $table->unsignedInteger('device_id');
+            $table->string('object_type', 256);
+            $table->unsignedInteger('object_id');
             $table->unsignedInteger('tag_key_id');
             $table->string('value', 256)->nullable();
             $table->timestamps();
 
-            $table->index('device_id');
+            $table->index(['object_type', 'object_id']);
             $table->index('tag_key_id');
-            $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('cascade');
             $table->foreign('tag_key_id')->references('tag_key_id')->on('tag_keys')->onDelete('cascade');
         });
     }

@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class DeviceTag extends Model implements Keyable
+class Tag extends Model implements Keyable
 {
     protected $table = 'tags';
     protected $primaryKey = 'tag_id';
     public $timestamps = false;
 
     protected $fillable = [
-        'device_id',
+        'object_type',
+        'object_id',
         'tag_key_id',
         'value',
         'updated_at',
@@ -29,17 +30,17 @@ class DeviceTag extends Model implements Keyable
      */
     public function parentDevice(): HasOne
     {
-        return $this->hasOne(Device::class, 'device_id', 'device_id');
+        return $this->hasOne(Device::class, 'device_id', 'object_id');
     }
 
     /**
      * Tag key relation.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\DeviceTagKey, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\TagKey, $this>
      */
     public function tagKey(): BelongsTo
     {
-        return $this->belongsTo(DeviceTagKey::class, 'tag_key_id');
+        return $this->belongsTo(TagKey::class, 'tag_key_id');
     }
 
     /**
@@ -49,7 +50,7 @@ class DeviceTag extends Model implements Keyable
      */
     public function getCompositeKey()
     {
-        return $this->device_id . ':' . $this->tag_key_id;
+        return $this->object_type . ':' . $this->object_id . ':' . $this->tag_key_id;
     }
 
     /**
