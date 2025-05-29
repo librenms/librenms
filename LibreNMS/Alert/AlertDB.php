@@ -35,7 +35,9 @@
 
 namespace LibreNMS\Alert;
 
+use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Enum\Severity;
 
 class AlertDB
 {
@@ -49,6 +51,8 @@ class AlertDB
         if ($query_builder) {
             return QueryBuilderParser::fromJson($query_builder)->toSql();
         } else {
+            Eventlog::log("Legacy alert rule detected, please convert your alert rule to new format ({$rule})", null, 'error', Severity::Error);
+
             return self::genSQLOld($rule);
         }
     }
