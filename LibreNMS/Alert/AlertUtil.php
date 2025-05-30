@@ -41,17 +41,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 class AlertUtil
 {
     /**
-     * Get the rule_id for a specific alert
-     *
-     * @param  int  $alert_id
-     * @return mixed|null
-     */
-    private static function getRuleId($alert_id)
-    {
-        return Alert::find($alert_id)->rule_id ?? null;
-    }
-
-    /**
      * Get the transport for a given alert_id
      *
      * @param  int  $alert_id
@@ -62,12 +51,12 @@ class AlertUtil
         $first = AlertTransportMap::leftJoin('alert_transport_groups as b', 'alert_transport_map.transport_or_group_id', '=', 'b.transport_group_id')
         ->leftJoin('transport_group_transport as c', 'c.transport_group_id', '=', 'b.transport_group_id')
             ->leftJoin('alert_transports as d', 'c.transport_id', '=', 'd.transport_id')
-            ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
+            ->where('alert_transport_map.rule_id', Alert::find($alert_id)->rule_id ?? null)
             ->where('alert_transport_map.target_type', 'group')
             ->select('d.transport_id', 'd.transport_type', 'd.transport_name');
 
         return AlertTransportMap::leftJoin('alert_transports as b', 'b.transport_id', '=', 'alert_transport_map.transport_or_group_id')
-            ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
+            ->where('alert_transport_map.rule_id', Alert::find($alert_id)->rule_id ?? null)
             ->where('alert_transport_map.target_type', 'single')
             ->select('b.transport_id', 'b.transport_type', 'b.transport_name')
             ->union($first)
@@ -211,7 +200,7 @@ class AlertUtil
         )';
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
 
-        return array_map(fn($item) => (array) $item, DB::select($query, $params));
+        return array_map(fn ($item) => (array) $item, DB::select($query, $params));
     }
 
     /**
