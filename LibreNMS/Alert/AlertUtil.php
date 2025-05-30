@@ -211,7 +211,7 @@ class AlertUtil
         )';
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
 
-        return json_decode(json_encode(DB::select($query, $params)), true);
+        return array_map(fn($item) => (array) $item, DB::select($query, $params));
     }
 
     /**

@@ -176,7 +176,7 @@ class RunAlerts
                 ->where('id', '<', $alert['id'])
                 ->orderBy('id', 'desc')
                 ->first(['id', 'time_logged', 'details']);
-            if (empty($id->id)) {
+            if ($id === null || empty($id->id)) {
                 return false;
             }
 
