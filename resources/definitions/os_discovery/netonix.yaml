@@ -1,4 +1,3 @@
-mib: NETONIX-SWITCH-MIB
 modules:
     os:
         sysDescr_regex: '/Netonix (?<hardware>.*)/'
@@ -8,8 +7,8 @@ modules:
         state:
             data:
                 -
-                    oid: poeStatusTable
-                    value: poeStatus
+                    oid: NETONIX-SWITCH-MIB::poeStatusTable
+                    value: NETONIX-SWITCH-MIB::poeStatus
                     num_oid: '.1.3.6.1.4.1.46242.5.1.2.{{ $index }}'
                     descr: Port {{ $index }} PoE
                     index: '{{ $index }}'
@@ -23,26 +22,26 @@ modules:
         voltage:
             data:
                 -
-                    oid: voltageTable
-                    value: voltage
+                    oid: NETONIX-SWITCH-MIB::voltageTable
+                    value: NETONIX-SWITCH-MIB::voltage
                     num_oid: '.1.3.6.1.4.1.46242.4.1.3.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: '{{ $voltageDescription }}'
+                    descr: '{{ $NETONIX-SWITCH-MIB::voltageDescription }}'
                     divisor: 100
         temperature:
             data:
                 -
-                    oid: tempTable
-                    value: temp
+                    oid: NETONIX-SWITCH-MIB::tempTable
+                    value: NETONIX-SWITCH-MIB::temp
                     num_oid: '.1.3.6.1.4.1.46242.3.1.3.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: '{{ $tempDescription }}'
+                    descr: '{{ $NETONIX-SWITCH-MIB::tempDescription }}'
                     divisor: 1
         fanspeed:
             data:
                 -
-                    oid: fanTable
-                    value: fanSpeed
+                    oid: NETONIX-SWITCH-MIB::fanTable
+                    value: NETONIX-SWITCH-MIB::fanSpeed
                     num_oid: '.1.3.6.1.4.1.46242.2.1.2.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -54,7 +53,7 @@ modules:
         power:
             data:
                 -
-                    oid: totalPowerConsumption
+                    oid: NETONIX-SWITCH-MIB::totalPowerConsumption
                     num_oid: '.1.3.6.1.4.1.46242.6.0'
                     index: '0'
                     descr: 'Total Consumption'
@@ -62,7 +61,7 @@ modules:
         current:
             data:
                 -
-                    oid: dcdcInputCurrent
+                    oid: NETONIX-SWITCH-MIB::dcdcInputCurrent
                     num_oid: '.1.3.6.1.4.1.46242.7.0'
                     index: '0'
                     descr: 'DC Input Current'
