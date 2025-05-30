@@ -112,4 +112,13 @@ class AlertRule extends BaseModel
     {
         return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');
     }
+
+    // ---- Define Relationships ----
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTransportMap, $this>
+     */
+    public function transports(): HasMany
+    {
+        return $this->hasMany(AlertTransportMap::class, 'rule_id');
+    }
 }

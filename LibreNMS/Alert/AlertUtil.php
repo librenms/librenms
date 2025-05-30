@@ -27,8 +27,12 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Alert;
+use App\Models\AlertTransport;
+use App\Models\AlertTransportMap;
 use App\Models\Device;
 use App\Models\User;
+use DB;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -44,9 +48,7 @@ class AlertUtil
      */
     private static function getRuleId($alert_id)
     {
-        $query = 'SELECT `rule_id` FROM `alerts` WHERE `id`=?';
-
-        return dbFetchCell($query, [$alert_id]);
+        return Alert::find($alert_id)->rule_id ?? null;
     }
 
     /**
@@ -57,10 +59,20 @@ class AlertUtil
      */
     public static function getAlertTransports($alert_id)
     {
-        $query = "SELECT b.transport_id, b.transport_type, b.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type, d.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?";
-        $rule_id = self::getRuleId($alert_id);
-
-        return dbFetchRows($query, [$rule_id, $rule_id]);
+        $first = AlertTransportMap::leftJoin('alert_transport_groups as b', 'alert_transport_map.transport_or_group_id', '=', 'b.transport_group_id')
+            ->leftJoin('transport_group_transport as c', 'c.transport_group_id', '=', 'b.transport_group_id') 
+            ->leftJoin('alert_transports as d', 'c.transport_id', '=', 'd.transport_id')
+            ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
+            ->where('alert_transport_map.target_type', 'group')
+            ->select('d.transport_id', 'd.transport_type', 'd.transport_name');
+        return AlertTransportMap::leftJoin('alert_transports as b', 'b.transport_id', '=', 'alert_transport_map.transport_or_group_id')
+            ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
+            ->where('alert_transport_map.target_type', 'single')
+            ->select('b.transport_id', 'b.transport_type', 'b.transport_name')
+            ->union($first)
+            ->distinct()
+            ->get()
+            ->toArray();
     }
 
     /**
@@ -70,9 +82,10 @@ class AlertUtil
      */
     public static function getDefaultAlertTransports()
     {
-        $query = 'SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true';
-
-        return dbFetchRows($query);
+        return AlertTransport::where('is_default', true)
+            ->select('transport_id', 'transport_type', 'transport_name')
+            ->get()
+            ->toArray();
     }
 
     /**
@@ -195,10 +208,9 @@ class AlertUtil
             OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=? OR ld.device_id=?))
             OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL) AND (ld.device_id != ? OR ld.device_id IS NULL))
         )';
-
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
 
-        return dbFetchRows($query, $params);
+        return json_decode(json_encode(DB::select($query, $params)), true);
     }
 
     /**
