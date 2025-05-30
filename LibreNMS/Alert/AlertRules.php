@@ -150,7 +150,7 @@ class AlertRules
                                 'rule_id' => $rule['id'],
                                 'open' => 1,
                                 'alerted' => 0,
-                                'details' => $extra,
+                                'info' => '',
                             ]);
                         } else {
                             Alert::where('device_id', $device_id)
