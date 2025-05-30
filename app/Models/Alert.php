@@ -32,6 +32,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Enum\AlertState;
 
+/**
+ * @property int|null $disabled
+ * @property int|null $ignore
+ */
+
 class Alert extends Model
 {
     public $timestamps = false;

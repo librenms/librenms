@@ -179,15 +179,11 @@ class RunAlerts
             }
 
             $extra = ! empty($id->details) ? $id->details : [];
-            // Reset count to 0 so alerts will continue
-            $extra->count = 0;
-            AlertLog::where('id', $alert['id'])
-                ->update(['details' => $id->details]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id->time_logged), true) ?: 'none';
             $obj['id'] = $id->id;
-            foreach ($extra->rule as $incident) {
+            foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
                 $obj['faults'][$i]['string'] = '';
@@ -207,7 +203,7 @@ class RunAlerts
         $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
-        $obj['contacts'] = $extra->contacts;
+        $obj['contacts'] = $extra['contacts'];
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
         $obj['template'] = $template;
@@ -532,7 +528,7 @@ class RunAlerts
             $chk = Alert::join('devices', 'alerts.device_id', '=', 'devices.device_id')
                 ->where('alerts.device_id', $alert['device_id'])
                 ->where('alerts.rule_id', $alert['rule_id'])
-                ->select(['alerts.alerted as alerted', 'devices.ignore as ignore', 'devices.disabled as disabled'])
+                ->select(['alerts.alerted', 'devices.ignore', 'devices.disabled'])
                 ->first();
 
             if ($chk->alerted == $alert['state']) {
