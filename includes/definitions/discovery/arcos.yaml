@@ -1,0 +1,36 @@
+mib: ARRCUS-ENTITY-SENSOR-MIB:ARRCUS-IF-MIB:ARRCUS-HARDWARE-UTILIZATION-MIB
+modules:
+    os:
+        sysDescr_regex:
+            -  '/ArcOS - (?<hardware>.*) - (?<version>\d+\.\d+\.\d+[A-Z]\.[A-Z]\d+) Copyright/'
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.169856
+        hardware:
+            - ENTITY-MIB::entPhysicalModelName.169856
+            - ENTITY-MIB::entPhysicalMfgName.169856
+        serial: 
+            - ENTITY-MIB::entPhysicalSerialNum.169856
+        hardware_template: '{{ ENTITY-MIB::entPhysicalMfgName.169856 }} {{ ENTITY-MIB::entPhysicalModelName.169856 }}'
+    pre-cache:
+        data:
+            - oid: entPhysicalDescr
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ENTITY-SENSOR-MIB::entPhySensorTable
+                    value: ENTITY-SENSOR-MIB::entPhySensorValue
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.4.{{ $index }}'
+                    descr: '{{ $entPhysicalDescr }}'
+                    divisor: 1000
+                    warn_limit: 80000
+                    high_limit: 85000
+                    skip_values:
+                      -
+                            oid: entPhysicalDescr
+                            op: 'not_contains'
+                            value: 'Temperature'
+                      -
+                            oid: entPhysicalDescr
+                            op: 'contains'
+                            value: 'Threshold'
