@@ -1,0 +1,10 @@
+os: AVIGILON
+text: 'Avigilon-Camera'
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+discovery:
+    -
+        sysObjectID_except:
+            - .1.3.6.1.4.1.46202 #AVIGILON
