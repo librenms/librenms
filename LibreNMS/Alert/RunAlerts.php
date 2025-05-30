@@ -278,7 +278,6 @@ class RunAlerts
             } catch (PDOException $e) {
                 c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
                 Eventlog::log("Error in alert rule {$alert['name']}: " . $e->getMessage(), $alert['device_id'], 'alert', Severity::Error);
-                continue;
             }
 
             $alert['details']['contacts'] = AlertUtil::getContacts($qry);
