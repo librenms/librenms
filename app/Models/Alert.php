@@ -36,7 +36,6 @@ use LibreNMS\Enum\AlertState;
  * @property int|null $disabled
  * @property int|null $ignore
  */
-
 class Alert extends Model
 {
     public $timestamps = false;
