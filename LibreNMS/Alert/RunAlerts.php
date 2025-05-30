@@ -180,14 +180,11 @@ class RunAlerts
             }
 
             $extra = [];
-            if (! empty($id->details)) {
-                $extra = json_decode(gzuncompress($id->details), true);
-            }
 
             // Reset count to 0 so alerts will continue
             $extra['count'] = 0;
             AlertLog::where('id', $alert['id'])
-                ->update(['details' => gzcompress(json_encode($id->details), 9)]);
+                ->update(['details' => $id->details]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id->time_logged), true) ?: 'none';

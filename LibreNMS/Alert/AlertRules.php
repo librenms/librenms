@@ -128,12 +128,8 @@ class AlertRules
                         ->orderBy('alert_log.id', 'desc')
                         ->first(['alert_log.id', 'alert_log.details']);
                     $details = [];
-                    if (! empty($alert_log->details)) {
-                        $details = json_decode(gzuncompress($alert_log->details), true);
-                    }
                     $details['contacts'] = AlertUtil::getContacts($qry);
                     $details['rule'] = $qry;
-                    $details = gzcompress(json_encode($details), 9);
                     AlertLog::where('id', $alert_log->id)
                         ->update(['details' => $details]);
                 } else {
