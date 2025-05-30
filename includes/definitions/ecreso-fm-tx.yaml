@@ -1,0 +1,28 @@
+os: worldcastsystems
+text: "Ecreso FM Transmitter"
+type: transmitter
+group: ecreso
+icon: worldcastsystems_square
+over:
+  - { graph: device_power, text: Power }
+  - { graph: device_voltage, text: Voltage }
+  - { graph: device_count, text: Count }
+discovery:
+  - sysObjectID:
+      - .1.3.6.1.4.1.8072.3.2.10
+
+discovery_modules:
+  storage: false
+  memory: false
+  ports: false
+  processors: false
+  mempools: false
+  sensors: true
+
+poller_modules:
+  storage: false
+  memory: false
+  ports: false
+  processors: false
+  mempools: false
+  sensors: true
