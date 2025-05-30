@@ -180,7 +180,7 @@ class RunAlerts
                 return false;
             }
 
-            $extra = !empty($id->details) ? $id->details : [];
+            $extra = ! empty($id->details) ? $id->details : [];
             // Reset count to 0 so alerts will continue
             $extra->count = 0;
             AlertLog::where('id', $alert['id'])
@@ -277,7 +277,7 @@ class RunAlerts
                 Eventlog::log("Error in alert rule {$alert['name']}: " . $e->getMessage(), $alert['device_id'], 'alert', Severity::Error);
             }
 
-            if (!empty($qry)) {
+            if (! empty($qry)) {
                 $alert['details']['contacts'] = AlertUtil::getContacts($qry);
             }
         }
@@ -534,7 +534,7 @@ class RunAlerts
             $chk = Alert::join('devices', 'alerts.device_id', '=', 'devices.device_id')
                 ->where('alerts.device_id', $alert['device_id'])
                 ->where('alerts.rule_id', $alert['rule_id'])
-                ->select(['alerts.alerted', 'devices.ignore', 'devices.disabled'])
+                ->select(['alerts.alerted as alerted', 'devices.ignore as ignore', 'devices.disabled as disabled'])
                 ->first();
 
             if ($chk->alerted == $alert['state']) {
