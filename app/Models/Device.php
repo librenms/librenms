@@ -30,6 +30,7 @@ use Permissions;
  * @property-read int|null $ports_count
  * @property-read int|null $sensors_count
  * @property-read int|null $wirelessSensors_count
+ * 
  *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
