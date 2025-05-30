@@ -48,6 +48,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use PDO;
+use PDOException;
 
 class RunAlerts
 {
@@ -179,17 +180,16 @@ class RunAlerts
                 return false;
             }
 
-            $extra = [];
-
+            $extra = !empty($id->details) ? $id->details : [];
             // Reset count to 0 so alerts will continue
-            $extra['count'] = 0;
+            $extra->count = 0;
             AlertLog::where('id', $alert['id'])
                 ->update(['details' => $id->details]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id->time_logged), true) ?: 'none';
             $obj['id'] = $id->id;
-            foreach ($extra['rule'] as $incident) {
+            foreach ($extra->rule as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
                 $obj['faults'][$i]['string'] = '';
@@ -209,7 +209,7 @@ class RunAlerts
         $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
-        $obj['contacts'] = $extra['contacts'];
+        $obj['contacts'] = $extra->contacts;
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
         $obj['template'] = $template;
@@ -277,7 +277,9 @@ class RunAlerts
                 Eventlog::log("Error in alert rule {$alert['name']}: " . $e->getMessage(), $alert['device_id'], 'alert', Severity::Error);
             }
 
-            $alert['details']['contacts'] = AlertUtil::getContacts($qry);
+            if (!empty($qry)) {
+                $alert['details']['contacts'] = AlertUtil::getContacts($qry);
+            }
         }
 
         $obj = $this->describeAlert($alert);
