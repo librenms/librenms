@@ -60,11 +60,12 @@ class AlertUtil
     public static function getAlertTransports($alert_id)
     {
         $first = AlertTransportMap::leftJoin('alert_transport_groups as b', 'alert_transport_map.transport_or_group_id', '=', 'b.transport_group_id')
-            ->leftJoin('transport_group_transport as c', 'c.transport_group_id', '=', 'b.transport_group_id') 
+        ->leftJoin('transport_group_transport as c', 'c.transport_group_id', '=', 'b.transport_group_id')
             ->leftJoin('alert_transports as d', 'c.transport_id', '=', 'd.transport_id')
             ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
             ->where('alert_transport_map.target_type', 'group')
             ->select('d.transport_id', 'd.transport_type', 'd.transport_name');
+
         return AlertTransportMap::leftJoin('alert_transports as b', 'b.transport_id', '=', 'alert_transport_map.transport_or_group_id')
             ->where('alert_transport_map.rule_id', self::getRuleId($alert_id))
             ->where('alert_transport_map.target_type', 'single')

@@ -32,7 +32,7 @@ class AlertTransportMap extends BaseModel
 {
     protected $table = 'alert_transport_map';
     public $timestamps = false;
-    
+
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertRule, $this>
