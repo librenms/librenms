@@ -9272,5 +9272,46 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "1.2.3.22",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "1.2.3.16/29",
+                    "ifIndex": 26
+                },
+                {
+                    "ipv4_address": "1.2.3.30",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "1.2.3.24/29",
+                    "ifIndex": 31
+                },
+                {
+                    "ipv4_address": "1.2.3.38",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "1.2.3.32/29",
+                    "ifIndex": 33
+                },
+                {
+                    "ipv4_address": "1.2.3.46",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "1.2.3.40/29",
+                    "ifIndex": 32
+                },
+                {
+                    "ipv4_address": "192.168.231.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.231.0/24",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }
