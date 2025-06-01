@@ -93,3 +93,10 @@ modules:
                     descr: 'Output Phase #{{ $index }} Volt'
                     index: 'xupsOutputVoltage.{{ $index }}'
                     divisor: 1
+                -
+                    oid: XUPS-MIB::xupsBypassTable
+                    value: XUPS-MIB::xupsBypassVoltage
+                    num_oid: '.1.3.6.1.4.1.534.1.5.3.1.2.{{ $index }}'
+                    descr: 'Bypass Phase #{{ $index }} Volt'
+                    index: 'xupsBypassVoltage.{{ $index }}'
+                    divisor: 1
