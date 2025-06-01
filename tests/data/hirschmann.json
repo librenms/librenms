@@ -4483,5 +4483,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "1.1.1.12",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "1.1.1.0/28",
+                    "ifIndex": 53
+                }
+            ]
+        }
     }
 }
