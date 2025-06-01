@@ -111,3 +111,26 @@ modules:
                     divisor: 1
                     low_warn_limit: 10
                     low_limit: 0
+        frequency:
+            data:
+                -
+                    oid: XUPS-MIB::xupsInput
+                    value: XUPS-MIB::xupsInputFrequency 
+                    num_oid: '.1.3.6.1.4.1.534.1.3.1.{{ $index }}'
+                    descr: 'Input Phase #{{ $index }}'
+                    index: 'xupsInputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: XUPS-MIB::xupsOutput
+                    value: XUPS-MIB::xupsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.534.1.4.2.{{ $index }}'
+                    descr: 'Output Phase #{{ $index }}'
+                    index: 'xupsOutputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: XUPS-MIB::xupsBypass
+                    value: XUPS-MIB::xupsBypassFrequency
+                    num_oid: '.1.3.6.1.4.1.534.1.5.1{{ $index }}'
+                    descr: 'Bypass Phase #{{ $index }}'
+                    index: 'xupsBypassFrequency.{{ $index }}'
+                    divisor: 10
