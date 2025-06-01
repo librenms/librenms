@@ -3544,5 +3544,60 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "0.2.0.2",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "0.2.0.0/30",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "169.254.0.9",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/27",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "169.254.255.9",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "169.254.255.0/27",
+                    "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "169.254.9.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.9.0/24",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "185.6.188.48",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "185.6.188.32/27",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "192.168.51.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.51.0/24",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "198.18.9.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "198.18.9.0/24",
+                    "ifIndex": 12
+                }
+            ]
+        }
     }
 }

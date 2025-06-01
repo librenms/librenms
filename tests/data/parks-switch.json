@@ -2581,5 +2581,46 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.16.100.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.100.0/24",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "192.168.202.123",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "192.168.200.0/22",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "192.168.99.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.99.0/24",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "6.6.6.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "6.6.6.0/24",
+                    "ifIndex": 6
+                }
+            ]
+        }
     }
 }
