@@ -9137,5 +9137,18 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "100.67.221.13",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.67.221.0/24",
+                    "ifIndex": 10
+                }
+            ]
+        }
     }
 }

@@ -737,8 +737,8 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -837,8 +837,8 @@
                     "ifName": "mcmc",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1041,6 +1041,33 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 7
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.150.21.30",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.150.21.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.255.3",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/16",
+                    "ifIndex": 5
                 }
             ]
         }
