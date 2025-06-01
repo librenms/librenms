@@ -2,6 +2,7 @@
 
 echo 'XUPS-MIB ';
 
+/*
 // XUPS-MIB::xupsBatVoltage.0 = INTEGER: 51
 $oids = snmpwalk_cache_oid($device, 'xupsBatVoltage', [], 'XUPS-MIB');
 
@@ -15,6 +16,7 @@ foreach ($oids as $volt_id => $data) {
 
     discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }
+*/
 
 // XUPS-MIB::xupsInputVoltage.1 = INTEGER: 228
 $oids = snmpwalk_cache_oid($device, 'xupsInputVoltage', [], 'XUPS-MIB');
