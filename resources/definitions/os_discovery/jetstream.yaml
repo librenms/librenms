@@ -1,4 +1,3 @@
-mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB:TPLINK-DDMBIASCURTHRESHOLD-MIB:TPLINK-DDMTEMPTHRESHOLD-MIB:TPLINK-DDMVOLTHRESHOLD-MIB:TPLINK-DDMRXPOWTHRESHOLD-MIB:TPLINK-DDMTXPOWTHRESHOLD-MIB:TPLINK-POWER-OVER-ETHERNET-MIB
 modules:
     os:
         hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
@@ -12,7 +11,7 @@ modules:
     processors:
         data:
             -
-                oid: tpSysMonitorCpu5Seconds
+                oid:  TPLINK-SYSMONITOR-MIB::tpSysMonitorCpu5Seconds
                 num_oid: '.1.3.6.1.4.1.11863.6.4.1.1.1.1.2.{{ $index }}'
                 index: '{{ $index }}'
                 descr: 'Proc #{{ $index }}'
@@ -42,6 +41,7 @@ modules:
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowWarn
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighAlarm
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighWarn
+                        - LLDP-MIB::lldpLocPortTable
         current:
             data:
                 -
@@ -91,25 +91,25 @@ modules:
         power:
             data:
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.{{ $index }}'
-                    value: tpSystemPowerConsumption
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerConsumption
                     descr: 'Power Consumption'
                     divisor: 10
                     index: tpSystemPowerConsumption
                     group: PoE
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.{{ $index }}'
-                    value: tpSystemPowerRemain
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerRemain
                     descr: 'Power Remaining'
                     divisor: 10
                     index: tpSystemPowerRemain
                     group: PoE
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.{{ $index }}'
-                    value: tpSystemPowerLimit
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerLimit
                     descr: 'Power Limit'
                     divisor: 10
                     index: tpSystemPowerLimit
