@@ -1,46 +1,64 @@
 # Configuration Docs
 
-LibreNMS configuration is a set of key/value pairs.
-
 ## Configuration location
+
 Configuration is stored in one of two places:
-Database: This applies to all pollers and can be set with either `lnms config:set` 
-or in the Web UI. Database config takes precedence over `config.php`.
-`config.php`: This applies to the local poller only.  Configs set here will be 
-disabled in the Web UI to prevent unexpected behaviour.
+
+- Database: This applies to all pollers and can be set with either
+`lnms config:set <setting> <value>` or in the Web UI. Database config
+takes precedence over `config.php` and is the favoured option.
+
+- `config.php`: This applies to the local poller only. Configs set here
+will disable in the Web UI to prevent unexpected behaviour.
 
 ## Configuration format
+
 For configuration stored within the database, LibreNMS uses dot notation for config
-items. For `config.php` this is  stored as a php array under `$config`, some snmp 
-configuration as an example:
+items. For `config.php` this is stored as a php array under `$config`, let's
+use some snmp configuration as an example:
 
-| Database | config.php |
-| -------- | ---------- |
-| `snmp.community` | `$config['snmp']['community']` |
-| `snmp.community.+` | `$config['snmp']['community'][]` |
-| `snmp.v3.0.authalgo` | `$config['snmp']['v3'][0]['authalgo']` |
+=== "Database"
+    `snmp.community`
 
-> Not all documentation has been updated to reflect using `lnms config:set` to
-> set configuration items, but it will work and is the preferred option over `config.php`.
-> Not all configuration settings have been defined in LibreNMS, they can still be 
-> set with the `--ignore-checks` option.  Without that option input is checked for 
-> validity, that does not mean it is not possible to set bad values. 
-> Please report missing settings.
+    `snmp.community.+`
+
+    `snmp.v3.0.authalgo`
+
+=== "config.php"
+    `$config['snmp']['community']`
+
+    `$config['snmp']['community'][]`
+
+    `$config['snmp']['v3'][0]['authalgo']`
+
+!!! note
+    Not all documentation has been updated to reflect using `lnms config:set` to
+    set configuration items, but it will work and is the preferred option over `config.php`.
+
+    Not all configuration settings have been defined in LibreNMS, they can still be 
+    set with the `--ignore-checks` option. Without that option input is checked for 
+    validity, please be careful of inputting bad values when using `--ignore-checks`. 
+
+    Please report missing settings.
 
 ## CLI
-`lnms config:get` will fetch the current config settings (composite of database, config.php, and defaults).  
-`lnms config:set` will set the config setting in the database.
-Calling `lnms config:set` on a setting with no value will reset it to the default value.
+`lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
+`lnms config:set <setting> <value>` will set the config setting in the database.
+Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
+it to it's default.
 
 If you set up bash completion, you can use tab completion to find config settings.
 
 ### Getting a list of all current values
 
-To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`.
+To get a complete list of all the current values, you can use the command `lnms config:get --dump`.
+To improve the readability of the output you can use the `jq` package to pretty print it:
+`lnms config:get --dump | jq`.
 
 Example output:
-```
-librenms@librenms:~$ lnms config:get --dump | jq 
+
+```bash
+lnms config:get --dump | jq 
 {
   "install_dir": "/opt/librenms",
   "active_directory": {
@@ -68,12 +86,13 @@ librenms@librenms:~$ lnms config:get --dump | jq
 
 ### Examples
 
+Below are some examples to get you started:
+
 ```bash
 lnms config:get snmp.community
   [
       "public"
   ]
-
 
 lnms config:set snmp.community.+ testing
 
@@ -116,6 +135,7 @@ lnms config:get snmp.community
 ```
 
 Multi-line configuration items above can be collapsed in to a single line using `| jq -c` to assist with set commands, for example:
+
 ```bash
 lnms config:get snmp.community | jq -c
 ["public","testing"]
@@ -138,7 +158,8 @@ This feature is primarily for docker images and other automation.
 When installing LibreNMS for the first time with a new database you can place yaml key value files
 in `database/seeders/config` to pre-populate the config database.
 
-Example snmp.yaml
+Example snmp.yaml:
+
 ```yaml
 snmp.community:
     - public
@@ -146,10 +167,11 @@ snmp.community:
 snmp.max_repeaters: 30
 ```
 
-**CAUTION**: The above example uses the correct, flattened notation whereas you might be tempted to create a
-block for `snmp` with sub-keys `community` and `max_repeaters`.  Do **NOT** do this as the whole `snmp`
-block will be overwritten, replaced with only those two sub-keys.  The config keys in your `seeders` file
-must match those specified in `resources/definitions/config_definitions.json`.
+!!! danger
+    The above example uses the correct, flattened notation whereas you might be tempted to create a
+    block for `snmp` with sub-keys `community` and `max_repeaters`.  Do **NOT** do this as the whole `snmp`
+    block will be overwritten, replaced with only those two sub-keys.  The config keys in your `seeders` file
+    must match those specified in `resources/definitions/config_definitions.json`.
 
 ## Directories
 
@@ -206,10 +228,7 @@ be linked to rather than having the config provided.
 
 #### RRDTool
 
-> You can configure these options within the WebUI now, please avoid
-> setting these options within config.php
->
-> Settings -> External Settings -> RRDTool Setup
+You can configure these options within the WebUI now:
 
 !!! setting "external/binaries"
     ```bash
@@ -246,19 +265,20 @@ configuring your install to record data more frequently.
   waits between successive packets to an individual target.
 * `tos` (`fping`parameter `-O`): Set the type of service flag (TOS). Value can be either decimal or hexadecimal (0xh) format. Can be used to ensure that ping packets are queued in following QOS mecanisms in the network. Table is accessible in the [TOS Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service).
 
-> NOTE: Setting a higher timeout value than the interval value can
-> lead to slowing down poller. Example:
->
-> timeout: 3000
->
-> count: 3
->
-> interval: 500
->
-> In this example, interval will be overwritten by the timeout value
-> of 3000 which is 3 seconds. As we send three icmp packets (count:
-> 3), each one is delayed by 3 seconds which will result in fping
-> taking > 6 seconds to return results.
+!!! note
+    Setting a higher timeout value than the interval value can
+    lead to slowing down poller. Example:
+
+    timeout: 3000
+
+    count: 3
+
+    interval: 500
+
+    In this example, interval will be overwritten by the timeout value
+    of 3000 which is 3 seconds. As we send three icmp packets (count:
+    3), each one is delayed by 3 seconds which will result in fping
+    taking > 6 seconds to return results.
 
 You can disable the fping / icmp check that is done for a device to be
 determined to be up on a global or per device basis. **We don't advise
@@ -269,9 +289,10 @@ to timeout.**
 
 Globally disable fping / icmp check:
 
-```bash
-lnms config:set icmp_check false
-```
+!!! setting "poller/ping"
+    ```bash
+    lnms config:set icmp_check false
+    ```
 
 If you would like to do this on a per device basis then you can do so
 under Device -> Edit -> Misc -> Disable ICMP Test? On
@@ -291,17 +312,17 @@ SNMP program locations.
 
 #### Misc binaries
 !!! setting "external/binaries"
-```bash
-lnms config:set whois /usr/bin/whois
-lnms config:set ping /bin/ping
-lnms config:set mtr /usr/bin/mtr
-lnms config:set nmap /usr/bin/nmap
-lnms config:set nagios_plugins /usr/lib/nagios/plugins
-lnms config:set ipmitool /usr/bin/ipmitool
-lnms config:set virsh /usr/bin/virsh
-lnms config:set dot /usr/bin/dot
-lnms config:set sfdp /usr/bin/sfdp
-```
+    ```bash
+    lnms config:set whois /usr/bin/whois
+    lnms config:set ping /bin/ping
+    lnms config:set mtr /usr/bin/mtr
+    lnms config:set nmap /usr/bin/nmap
+    lnms config:set nagios_plugins /usr/lib/nagios/plugins
+    lnms config:set ipmitool /usr/bin/ipmitool
+    lnms config:set virsh /usr/bin/virsh
+    lnms config:set dot /usr/bin/dot
+    lnms config:set sfdp /usr/bin/sfdp
+    ```
 
 ## Authentication
 
@@ -309,9 +330,10 @@ Generic Authentication settings.
 
 Password minimum length for auth that allows user creation
 
-```bash
-lnms config:set password.min_length 8
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set password.min_length 8
+    ```
 
 ## Proxy support
 
@@ -337,9 +359,10 @@ Please refer to [RRDCached](../Extensions/RRDCached.md)
 
 ## WebUI Settings
 
-```bash
-lnms config:set base_url http://demo.librenms.org
-```
+!!! setting "system/server"
+    ```bash
+    lnms config:set base_url http://demo.librenms.org
+    ```
 
 LibreNMS will attempt to detect the URL you are using but you can override that here.
 
@@ -349,11 +372,7 @@ LibreNMS will attempt to detect the URL you are using but you can override that 
     ```
 
 Currently we have a number of styles which can be set which will alter
-the navigation bar look. dark, light and mono with light being the default.
-
-```bash
-lnms config:set webui.custom_css.+ css/custom/styles.css
-```
+the navigation bar look. device, blue, dark, light and mono with light being the default.
 
 You can override a large number of visual elements by creating your
 own css stylesheet and referencing it here, place any custom css files
@@ -363,68 +382,84 @@ your config will be the order they are loaded in the browser.
 
 !!! setting "webui/style"
     ```bash
-    lnms config:set title_image images/custom/yourlogo.png
+    lnms config:set webui.custom_css.+ css/custom/styles.css
     ```
 
 You can override the default logo with yours, place any custom images
 files into `html/images/custom` so they will be ignored by auto updates.
 
-```bash
-lnms config:set page_refresh 300
-```
+!!! setting "webui/style"
+    ```bash
+    lnms config:set title_image images/custom/yourlogo.png
+    ```
 
 Set how often pages are refreshed in seconds. The default is every 5
 minutes. Some pages don't refresh at all by design.
 
-```bash
-lnms config:set front_page default
-```
+!!! setting "webui/general"
+    ```bash
+    lnms config:set page_refresh 300
+    ```
 
 You can create your own front page by adding a blade file in `resources/views/overview/custom/`
 and setting `front_page` to it's name.
 For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
+
+!!! setting "webui/front-page"
+```bash
+lnms config:set front_page default
+```
+
+Set a global default dashboard page for any user who has not set one in their user
+preferences.  Should be set to dashboard_id of an existing dashboard that is Shared,
+Shared(read) or Shared (Admin RW). Otherwise, the system will automatically create
+each user an empty dashboard called `Default` on their first login.
 
 !!! setting "webui/dashboard"
     ```bash
     lnms config:set webui.default_dashboard_id 0
     ```
 
-Allows the specification of a global default dashboard page for any user who
-has not set one in their user preferences.  Should be set to dashboard_id of an
-existing dashboard that is shared or shared(read).  Otherwise, the system will
-automatically create each user an empty dashboard called `Default` on their
-first login.
-
-```bash
-lnms config:set login_message "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
-```
-
 This is the default message on the login page displayed to users.
 
-```bash
-lnms config:set public_status true
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set login_message "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution."
+    ```
 
 If this is set to true then an overview will be shown on the login page of devices and the status.
 
-```bash
-lnms config:set show_locations true  # Enable Locations on menu
-lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
-lnms config:set show_services false  # Disable Services on menu
-lnms config:set int_customers true  # Enable Customer Port Parsing
-lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
-lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
-lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
-lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
-lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
-lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
-lnms config:set int_transit true  # Enable Transit Types
-lnms config:set int_peering true  # Enable Peering Types
-lnms config:set int_core true  # Enable Core Port Types
-lnms config:set int_l2tp false  # Disable L2TP Port Types
-```
+!!! setting "auth/general"
+    ```bash
+    lnms config:set public_status true
+    ```
 
 Enable / disable certain menus from being shown in the WebUI.
+
+!!! setting "webui/menu"
+    ```bash
+    lnms config:set show_locations true  # Enable Locations on menu
+    lnms config:set show_locations_dropdown true  # Enable Locations dropdown on menu
+    lnms config:set show_services false  # Disable Services on menu
+    lnms config:set int_customers true  # Enable Customer Port Parsing
+    lnms config:set int_transit true  # Enable Transit Types
+    lnms config:set int_peering true  # Enable Peering Types
+    lnms config:set int_core true  # Enable Core Port Types
+    lnms config:set int_l2tp false  # Disable L2TP Port Types
+    ```
+
+!!! setting "webui/dashboard"
+    ```bash
+    lnms config:set summary_errors false  # Show Errored ports in summary boxes on the dashboard
+    ```
+
+!!! setting "webui/port-descr"
+    lnms config:set customers_descr '["cust"]'  # The description to look for in ifDescr. Can have multiple '["cust","cid"]'
+    lnms config:set transit_descr '["transit"]'  # Add custom transit descriptions (array)
+    lnms config:set peering_descr '["peering"]'  # Add custom peering descriptions (array)
+    lnms config:set core_descr '["core"]'  # Add custom core descriptions  (array)
+    lnms config:set custom_descr '["This is Custom"]'  # Add custom interface descriptions (array)
+    ```
 
 You are able to adjust the number and time frames of the quick select
 time options for graphs and the mini graphs shown per row.
@@ -468,31 +503,29 @@ lnms config:set graphs.row.normal '{
 }'
 ```
 
-```bash
-lnms config:set web_mouseover true
-```
-
 You can disable the mouseover popover for mini graphs by setting this to false.
 
-```bash
-lnms config:set enable_lazy_load true
-```
+!!! setting "webui/general"
+    ```bash
+    lnms config:set web_mouseover true
+    ```
 
 You can disable image lazy loading by setting this to false.
 
-```bash
-lnms config:set overview_show_sysDescr true
-```
+!!! setting "webui/general"
+    ```bash
+    lnms config:set enable_lazy_load true
+    ```
 
 Enable or disable the sysDescr output for a device.
 
-!!! setting "webui/device"
+!!! setting "webui/general"
     ```bash
-    lnms config:set device_display_default '{{ $hostname }}'
+    lnms config:set overview_show_sysDescr true
     ```
 
 This is a simple template to control the display of device names by default.
-You can override this setting per-device.
+You can override this setting per-device by editing the device within the WebUI.
 
 You may enter any free-form text including one or more of the following template replacements:
 
@@ -505,51 +538,58 @@ You may enter any free-form text including one or more of the following template
 
 For example, `{{ $sysName_fallback }} ({{ $ip }})` will display something like `server (192.168.1.1)`
 
-```bash
-lnms config:set device_traffic_iftype.+ '/loopback/'
-```
+!!! setting "webui/device"
+    ```bash
+    lnms config:set device_display_default '{{ $hostname }}'
+    ```
 
-Interface types that aren't graphed in the WebUI. The default array
+Interface types that aren't show in graphs in the WebUI. The default array
 contains more items, please see resources/definitions/config_definitions.json for the full list.
 
-```bash
-lnms config:set enable_clear_discovery true
-```
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set device_traffic_iftype.+ '/loopback/'
+    ```
 
 Administrators are able to clear the last discovered time of a device
-which will force a full discovery run within the configured 5 minute cron window.
+which will force a full discovery run within the configured time window.
 
-```bash
-lnms config:set enable_footer true
-```
+!!! setting "webui/device"
+    ```bash
+    lnms config:set enable_clear_discovery true
+    ```
 
 Disable the footer of the WebUI by setting `enable_footer` to 0.
 
-You can enable the old style network map (only available for
-individual devices with links discovered via xDP) by setting:
-
-```bash
-lnms config:set gui.network-map.style old
-```
-
-```bash
-lnms config:set percentile_value 90
-```
+!!! setting "webui/general"
+    ```bash
+    lnms config:set enable_footer true
+    ```
 
 Show the `X`th percentile in the graph instead of the default 95th percentile.
+
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set percentile_value 90
+    ```
+
+The target maximum hostname length when applying the shorthost() function.
+You can increase this if you want to try and fit more of the hostname in graph titles.
+The default value is 12. However, this can possibly break graph
+generation if this is very long.
 
 !!! setting "webui/graph"
     ```bash
     lnms config:set shorthost_target_length 15
     ```
 
-The target maximum hostname length when applying the shorthost() function.
-You can increase this if you want to try and fit more of the hostname in graph titles.
-The default value is 12 However, this can possibly break graph
-generation if this is very long.
+You can enable dynamic graphs which allow you to zoom in/out and scroll through
+the timeline of the graphs quite easiy.
 
-You can enable dynamic graphs within the WebUI under Global Settings
--> Webui Settings -> Graph Settings.
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set webui.dynamic_graphs true
+    ```
 
 Graphs will be movable/scalable without reloading the page:
 ![Example dynamic graph usage](img/dynamic-graph-usage.gif)
@@ -557,8 +597,12 @@ Graphs will be movable/scalable without reloading the page:
 ## Stacked Graphs
 
 You can enable stacked graphs instead of the default inverted
-graphs. Enabling them is possible via webui Global Settings -> Webui
-Settings -> Graph settings -> Use stacked graphs
+graphs.
+
+!!! setting "webui/graph"
+    ```bash
+    lnms config:set webui.graph_stacked true
+    ```
 
 ## Add host settings
 
@@ -569,10 +613,11 @@ by hostname this check is not performed.  If the setting is true
 hostnames are resolved and the check is also performed.  This helps
 prevents accidental duplicate hosts.
 
-```bash
-lnms config:set addhost_alwayscheckip false # true - check for duplicate ips even when adding host by name.
-                                            # false- only check when adding host by ip.
-```
+!!! setting "discovery/general"
+    ```bash
+    lnms config:set addhost_alwayscheckip false # true - check for duplicate ips even when adding host by name.
+                                                # false- only check when adding host by ip.
+    ```
 
 By default we allow hosts to be added with duplicate sysName's, you
 can disable this with the following config:
@@ -586,25 +631,31 @@ lnms config:set allow_duplicate_sysName false
 
 Enable or disable discovery or poller modules.
 
-This setting has an order of precedence Device > OS > Global.
+This setting has an order of precedence. Device settings override
+per OS settings which override Global settings. (Device -> OS -> Global).
+
 So if the module is set at a more specific level, it will override the
 less specific settings.
 
 Global:
 
-```bash
-lnms config:set discovery_modules.arp-table false
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.arp-table false
+    lnms config:set discovery_modules.entity-state true
+    ```
 
-lnms config:set discovery_modules.entity-state true
-lnms config:set poller_modules.entity-state true
-```
+!!! setting "poller/poller_modules"
+    ```bash
+    lnms config:set poller_modules.entity-state true
+    ```
 
 Per OS:
 
 ```bash
 lnms config:set os.ios.discovery_modules.arp-table false
-
 lnms config:set os.ios.discovery_modules.entity-state true
+
 lnms config:set os.ios.poller_modules.entity-state true
 ```
 
@@ -634,7 +685,9 @@ with `[1]`, `[2]`, `[3]`, etc.
     lnms config:set snmp.community.0 public
     ```
 
->NOTE: This list of SNMP communities is used for auto discovery, and as a default set for any manually added device.
+!!! note
+    This list of SNMP communities is used for auto discovery if enabled,
+    and as a default set for any manually added device.
 
 The default v3 snmp details to use, you can expand this array with
 `[1]`, `[2]`, `[3]`, etc.
@@ -666,9 +719,6 @@ Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
 ## Email configuration
 
-> You can configure these options within the WebUI now, please avoid
-> setting these options within config.php
-
 !!! setting "alerting/email"
     ```bash
     lnms config:set email_backend mail
@@ -689,10 +739,12 @@ options for `email_backend` are mail, sendmail or smtp. The varying
 options after that are to support the different transports.
 
 For security reasons, the SMTP server connection via TLS will try to verify the validity of the certificate. If for some reason you need to disable verification, you can use the email_smtp_verifypeer option (true by default) and email_smtp_allowselfsigned (false by default).
-```bash
-    lnms config:set email_smtp_verifypeer false
-    lnms config:set email_smtp_allowselfsigned true
-```
+
+!!! setting "alerting/email"
+    ```bash
+        lnms config:set email_smtp_verifypeer false
+        lnms config:set email_smtp_allowselfsigned true
+    ```
 
 ## Alerting
 
@@ -704,10 +756,14 @@ Please refer to [Billing](../Extensions/Billing-Module.md)
 
 ## Global module support
 
+!!! setting "webui/menu"
+    ```bash
+    lnms config:set enable_syslog false # Enable Syslog
+    lnms config:set enable_inventory true # Enable Inventory
+    lnms config:set enable_pseudowires true # Enable Pseudowires
+    ```
+
 ```bash
-lnms config:set enable_syslog false # Enable Syslog
-lnms config:set enable_inventory true # Enable Inventory
-lnms config:set enable_pseudowires true # Enable Pseudowires
 lnms config:set enable_vrfs true # Enable VRFs
 ```
 
@@ -715,20 +771,20 @@ lnms config:set enable_vrfs true # Enable VRFs
 
 Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md)
 
+Enable / disable additional port statistics.
+
 ```bash
 lnms config:set enable_ports_etherlike false
 lnms config:set enable_ports_junoseatmvp false
 lnms config:set enable_ports_poe false
 ```
 
-Enable / disable additional port statistics.
-
 ## Port Group
 
 Assign a new discovered Port automatically to Port Group with this Port Group ID
 (0 means no Port Group assignment)
 
-!!! setting "discovery/networks"
+!!! setting "discovery/ports"
     ```bash
     lnms config:set default_port_group 0
     ```

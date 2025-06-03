@@ -11,7 +11,9 @@
         },
         "addhost_alwayscheckip": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general"
         },
         "alert.ack_until_clear": {
             "default": false,
@@ -1020,6 +1022,13 @@
             "order": 5,
             "type": "text"
         },
+        "billing.95th_default_agg": {
+            "default": false,
+            "type": "boolean",
+            "group": "system",
+            "section": "billing",
+            "order": 0
+        },
         "billing.base": {
             "default": 1000,
             "type": "integer"
@@ -1065,7 +1074,10 @@
         },
         "custom_descr": {
             "default": [""],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 4
         },
         "custom_map.background_type": {
             "default": "none",
@@ -1405,7 +1417,9 @@
                 "/l2vlan/",
                 "/ppp/"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "graph"
         },
         "device_types": {
             "default": [
@@ -2108,23 +2122,33 @@
         },
         "enable_billing": {
             "default": false,
+            "group": "system",
+            "section": "billing",
             "type": "boolean"
         },
         "enable_clear_discovery": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "device"
         },
         "enable_footer": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general"
         },
         "enable_inventory": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu"
         },
         "enable_lazy_load": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general"
         },
         "enable_libvirt": {
             "default": false,
@@ -2152,11 +2176,15 @@
         },
         "enable_pseudowires": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu"
         },
         "enable_syslog": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu"
         },
         "enable_syslog_hooks": {
             "default": false,
@@ -2228,19 +2256,36 @@
         },
         "front_page": {
             "default": "default",
+            "group": "webui",
+            "section": "front-page",
             "type": "text"
         },
         "front_page_down_box_limit": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            }
         },
         "front_page_settings.top.devices": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            }
         },
         "front_page_settings.top.ports": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            }
         },
         "gateone.server": {
             "default": null,
@@ -4346,6 +4391,9 @@
         },
         "icmp_check": {
             "default": true,
+            "group": "poller",
+            "section": "ping",
+            "order": 4,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -4618,22 +4666,32 @@
         },
         "int_core": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "int_customers": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "int_l2tp": {
             "default": false,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "int_peering": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "int_transit": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "ipmi.type": {
@@ -5196,7 +5254,9 @@
         },
         "overview_show_sysDescr": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general"
         },
         "own_hostname": {
             "default": "localhost",
@@ -5367,6 +5427,8 @@
         },
         "page_refresh": {
             "default": 300,
+            "group": "webui",
+            "section": "general",
             "type": "integer",
             "units": "seconds"
         },
@@ -5403,6 +5465,8 @@
         "percentile_value": {
             "default": 95,
             "type": "integer",
+            "group": "webui",
+            "section": "graph",
             "validate": {
                 "value": "integer|between:0,100"
             }
@@ -6297,14 +6361,20 @@
         },
         "show_locations": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "show_locations_dropdown": {
             "default": true,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "show_services": {
             "default": false,
+            "group": "webui",
+            "section": "menu",
             "type": "boolean"
         },
         "site_style": {
@@ -6660,6 +6730,8 @@
         },
         "web_mouseover": {
             "default": true,
+            "group": "webui",
+            "section": "general",
             "type": "boolean"
         },
         "webui.availability_map_box_size": {
@@ -6692,6 +6764,8 @@
         },
         "webui.custom_css": {
             "default": [],
+            "group": "webui",
+            "section": "style",
             "type": "array"
         },
         "webui.default_dashboard_id": {

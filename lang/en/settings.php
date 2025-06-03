@@ -72,6 +72,7 @@ return [
             'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [
+            'billing' => ['name' => 'Billing'],
             'cleanup' => ['name' => 'Cleanup'],
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Updates'],
@@ -89,6 +90,9 @@ return [
             'style' => ['name' => 'Style'],
             'device' => ['name' => 'Device Settings'],
             'worldmap' => ['name' => 'World Map Settings'],
+            'general' => ['name' => 'General Web UI Settings'],
+            'front-page' => ['name' => 'Front Page Settings'],
+            'menu' => ['name' => 'Menu Settings'],
         ],
     ],
     'settings' => [
@@ -500,6 +504,16 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'billing' => [
+            '95th_default_agg' => [
+                'description' => 'Default 95th Percentile Aggregation',
+                'help' => 'Set default option for 95th percentile calculation as aggregate.',
+            ],
+        ],
+        'enable_billing' => [
+            'description' => 'Enable Billing',
+            'help' => 'Enable billing module, this allows you to monitor port usage.',
+        ],
         'peering_descr' => [
             'description' => 'Peering Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
@@ -511,6 +525,10 @@ return [
         'core_descr' => [
             'description' => 'Core Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'custom_descr' => [
+            'description' => 'Custom Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the custom ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'custom_map' => [
             'background_type' => [
@@ -605,7 +623,7 @@ return [
             'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
         ],
         'base_url' => [
-            'description' => 'Specific URL',
+            'description' => 'Base URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'discovery_modules' => [
@@ -749,6 +767,10 @@ return [
             'description' => 'Default Poller Group',
             'help' => 'The default poller group all pollers should poll if none is set in config.php',
         ],
+        'device_traffic_iftype' => [
+            'description' => 'Device Traffic Interface Types',
+            'help' => 'Interface types to be excluded from device graphs.',
+        ],
         'distributed_poller_memcached_host' => [
             'description' => 'Memcached host',
             'help' => 'The hostname or ip for the memcached server. This is required for poller_wrapper.py and daily.sh locking.',
@@ -825,6 +847,30 @@ return [
             'description' => 'From name',
             'help' => 'Name used as part of the from address',
         ],
+        'enable_clear_discovery' => [
+            'description' => 'Enable Clear Discovery',
+            'help' => 'Enables the ability to clear discovery date and time for a device. This will force a rediscovery of the device.',
+        ],
+        'enable_footer' => [
+            'description' => 'Enable Footer',
+            'help' => 'Enables the footer on all pages.',
+        ],
+        'enable_inventory' => [
+            'description' => 'Enable Inventory',
+            'help' => 'Enables the inventory page, which shows the hardware inventory of devices.',
+        ],
+        'enable_lazy_load' => [
+            'description' => 'Enable Lazy Loading',
+            'help' => 'Lazy loading is used to speed up the loading of pages by only loading the data that is needed at the time. This can be disabled if you have issues with it.',
+        ],
+        'enable_pseudowires' => [
+            'description' => 'Enable Pseudowires',
+            'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
+        ],
+        'enable_syslog' => [
+            'description' => 'Enable Syslog',
+            'help' => 'Enables visibility for syslog within the WebUI.',
+        ],
         'eventlog_purge' => [
             'description' => 'Event log entries older than',
             'help' => 'Cleanup done by daily.sh',
@@ -832,6 +878,24 @@ return [
         'favicon' => [
             'description' => 'Favicon',
             'help' => 'Overrides the default favicon.',
+        ],
+        'front_page' => [
+            'description' => 'Front Page',
+            'help' => 'Set a custom front page, this is the page you see when you first log in. For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`',
+        ],
+        'front_page_down_box_limit' => [
+            'description' => 'Down Devices Limit',
+            'help' => 'Number of devices to show in the down box on the front page',
+        ],
+        'front_page_settings' => [
+            'top_devices' => [
+                'description' => 'Top Devices',
+                'help' => 'Number of top devices to show on the front page',
+            ],
+            'top_ports' => [
+                'description' => 'Top Ports',
+                'help' => 'Number of top ports to show on the front page',
+            ],
         ],
         'fping' => [
             'description' => 'Path to fping',
@@ -990,6 +1054,10 @@ return [
             'description' => 'HTTPS Proxy',
             'help' => 'Set this as a fallback if https_proxy environment variable is not available.',
         ],
+        'icmp_check' => [
+            'description' => 'ICMP Check',
+            'help' => 'Enable ICMP check for all devices globally, this will ping devices to check if they are up or down. Disabling this could lead to polling not completing in time.',
+        ],
         'ignore_mount' => [
             'description' => 'Mountpoints to be ignored',
             'help' => 'Don\'t monitor Disc Usage of this Mountpoints',
@@ -1123,6 +1191,26 @@ return [
                 'help' => 'How many reties we should try',
             ],
         ],
+        'int_core' => [
+            'description' => 'Enable Core Ports menu',
+            'help' => 'Enable core ports menu in the web interface',
+        ],
+        'int_customers' => [
+            'description' => 'Enable Customers Ports menu',
+            'help' => 'Enable customers ports menu in the web interface',
+        ],
+        'int_peering' => [
+            'description' => 'Enable Peering Ports menu',
+            'help' => 'Enable peering ports menu in the web interface',
+        ],
+        'int_transit' => [
+            'description' => 'Enable Transit Ports menu',
+            'help' => 'Enable transit ports menu in the web interface',
+        ],
+        'int_l2tp' => [
+            'description' => 'Enable L2TP Ports menu',
+            'help' => 'Enable L2TP ports menu in the web interface',
+        ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
         ],
@@ -1228,6 +1316,10 @@ return [
                 'help' => 'The port to use to connect to the OpenTSDB server',
             ],
         ],
+        'overview_show_sysDescr' => [
+            'description' => 'Show sysDescr on device overview',
+            'help' => 'Show the sysDescr on the device overview page',
+        ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
             'help' => 'Should be set to the hostname/ip the librenms server is added as',
@@ -1272,6 +1364,10 @@ return [
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)',
             ],
         ],
+        'page_refresh' => [
+            'description' => 'Page Refresh',
+            'help' => 'How often to refresh the page in seconds. Set to 0 to disable.',
+        ],
         'password' => [
             'min_length' => [
                 'description' => 'Minimum password length',
@@ -1283,6 +1379,10 @@ return [
                 'description' => 'Enable PeeringDB lookup',
                 'help' => 'Enable PeeringDB lookup (data is downloaded with daily.sh)',
             ],
+        ],
+        'percentile_value' => [
+            'description' => 'Percentile Value',
+            'help' => 'The percentile value to use for traffic graphs. 0 means disabled.',
         ],
         'permission' => [
             'device_group' => [
@@ -1749,6 +1849,18 @@ return [
             'description' => 'Shortened hostname maximum length',
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
         ],
+        'show_locations' => [
+            'description' => 'Show locations in navigation',
+            'help' => 'Show the location in the navigation bar',
+        ],
+        'show_locations_dropdown' => [
+            'description' => 'Show locations in dropdown',
+            'help' => 'Show the location in the dropdown menu',
+        ],
+        'show_services' => [
+            'description' => 'Show services in navigation',
+            'help' => 'Show the services in the navigation bar',
+        ],
         'site_style' => [
             'description' => 'Default Theme',
             'options' => [
@@ -1897,6 +2009,10 @@ return [
         'virsh' => [
             'description' => 'Path to virsh',
         ],
+        'web_mouseover' => [
+            'description' => 'Enable mouseover',
+            'help' => 'Enables the mouseover graphs in the web interface',
+        ],
         'webui' => [
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
@@ -1913,6 +2029,10 @@ return [
             'availability_map_use_device_groups' => [
                 'description' => 'Use device groups filter',
                 'help' => 'Enable usage of device groups filter',
+            ],
+            'custom_css' => [
+                'description' => 'Custom CSS',
+                'help' => 'Add custom CSS to the web interface',
             ],
             'default_dashboard_id' => [
                 'description' => 'Default dashboard',
