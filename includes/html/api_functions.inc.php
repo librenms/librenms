@@ -2898,7 +2898,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
         ->where('mac_address', $macAddress->hex())
         ->orderBy('ports_fdb.updated_at', 'desc')
-        ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at')
+        ->select('devices.hostname', 'devices.sysName', 'ports.ifName', 'ports.ifAlias', 'ports.ifDescr', 'ports_fdb.updated_at')
         ->limit(1000)->get();
 
     if ($fdb->isEmpty()) {
