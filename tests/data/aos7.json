@@ -76241,7 +76241,7 @@
                     "entPhysicalName": "1/SLOT-1",
                     "entPhysicalHardwareRev": "13",
                     "entPhysicalFirmwareRev": "0.20",
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76336,7 +76336,7 @@
                     "entPhysicalName": "1/CMM-A",
                     "entPhysicalHardwareRev": "13",
                     "entPhysicalFirmwareRev": "0.20",
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76430,7 +76430,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-2",
                     "entPhysicalHardwareRev": "01",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76449,7 +76449,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-3",
                     "entPhysicalHardwareRev": "03",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76468,7 +76468,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-4",
                     "entPhysicalHardwareRev": "03",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76638,9 +76638,9 @@
                     "entPhysicalDescr": "",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "1/FANTRAY-1",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76657,9 +76657,9 @@
                     "entPhysicalDescr": "",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "2/FANTRAY-1",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76673,59 +76673,59 @@
                 },
                 {
                     "entPhysicalIndex": 453,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "2/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 455,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "3/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 457,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "4/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
                     "ifIndex": null
                 },
                 {
@@ -78125,6 +78125,666 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-10",
+                    "remote_port": "1026 (2cfaa2d8dfec)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/10",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/10",
+                    "ifName": "1/1/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ProCurve Switch 2520-24-PoE",
+                    "remote_port": "28 (c091347e5880)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J9138A Switch 2520-24-PoE, revision S.14.03, ROM S.14.03 (/sw/code/build/elmo(t4b_release))",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/11",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/11",
+                    "ifName": "1/1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-23",
+                    "remote_port": "1050 (e8e7325f9ff8)",
+                    "remote_platform": null,
+                    "remote_version": "Alcatel-Lucent Enterprise OS6450-P48 6.7.2.122.R08 GA, September 04, 2020.",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/11",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/11",
+                    "ifName": "1/1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ProCurve Switch 2520-24-PoE",
+                    "remote_port": "28 (c091347eb780)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J9138A Switch 2520-24-PoE, revision S.14.03, ROM S.14.03 (/sw/code/build/elmo(t4b_release))",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/13",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/13",
+                    "ifName": "1/1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ProCurve Switch 2520-24-PoE",
+                    "remote_port": "28 (c091347ea6c0)",
+                    "remote_platform": null,
+                    "remote_version": "ProCurve J9138A Switch 2520-24-PoE, revision S.14.03, ROM S.14.03 (/sw/code/build/elmo(t4b_release))",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/14",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/14",
+                    "ifName": "1/1/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-15",
+                    "remote_port": "2025 (2cfaa2d8d7b8)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/15",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/15",
+                    "ifName": "1/1/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "HP-2530-24G",
+                    "remote_port": "24 (5065f3a4d000)",
+                    "remote_platform": null,
+                    "remote_version": "HP J9776A 2530-24G Switch, revision YA.15.15.0008, ROM YA.15.17 (/ws/swbuildm/rel_nashville_qaoff/code/build/lakes(swbuildm_rel_nashville_qaoff_rel_nashville))",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifName": "1/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-19",
+                    "remote_port": "1050 (2cfaa2575a8c)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifName": "1/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-19",
+                    "remote_port": "1050 (741ff4000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/19",
+                    "ifName": "1/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-24",
+                    "remote_port": "2049 (2cfaa2202a18)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/24",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/24",
+                    "ifName": "1/1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-26",
+                    "remote_port": "1049 (2cfaa25759bc)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/26",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/26",
+                    "ifName": "1/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-26",
+                    "remote_port": "1049 (934db0000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/26",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/26",
+                    "ifName": "1/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-27",
+                    "remote_port": "1025 (2cfaa2d8e442)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/27",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/27",
+                    "ifName": "1/1/27"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-28",
+                    "remote_port": "1049 (2cfaa2911e7e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/28",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/28",
+                    "ifName": "1/1/28"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-22",
+                    "remote_port": "1049 (2cfaa2fe9820)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/35",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/35",
+                    "ifName": "1/1/35"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-20",
+                    "remote_port": "2025 (2cfaa2d8e0dc)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/36",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/36",
+                    "ifName": "1/1/36"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-21",
+                    "remote_port": "1051 (004521c40000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/37",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/37",
+                    "ifName": "1/1/37"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-21",
+                    "remote_port": "1051 (9424e12e8e7c)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/37",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/37",
+                    "ifName": "1/1/37"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-12",
+                    "remote_port": "2049 (2cfaa2d7fdf2)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/38",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/38",
+                    "ifName": "1/1/38"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-12",
+                    "remote_port": "2049 (519df4000009)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/38",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/38",
+                    "ifName": "1/1/38"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-14",
+                    "remote_port": "2025 (2cfaa2d8e028)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/6",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/6",
+                    "ifName": "1/1/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-13",
+                    "remote_port": "1025 (2cfaa2d8dcfe)",
+                    "remote_platform": null,
+                    "remote_version": "Alcatel-Lucent Enterprise OS6350-P24 6.7.2.122.R08 GA, September 04, 2020.",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/7",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/7",
+                    "ifName": "1/1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-timi5-1-vl245",
+                    "remote_port": "1008 (2cfaa2dee0ed)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/7",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/7",
+                    "ifName": "1/1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-timi5-1-vl245",
+                    "remote_port": "1007 (2cfaa2dee0ed)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/8",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/8",
+                    "ifName": "1/1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-16",
+                    "remote_port": "1025 (2cfaa2d8d740)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 1/1/9",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 1/1/9",
+                    "ifName": "1/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-10",
+                    "remote_port": "1025 (2cfaa2d8dfec)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/10",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/10",
+                    "ifName": "2/1/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-11",
+                    "remote_port": "1049 (2cfaa2d492b0)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/11",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/11",
+                    "ifName": "2/1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-11",
+                    "remote_port": "1049 (896430000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/11",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/11",
+                    "ifName": "2/1/11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-12",
+                    "remote_port": "1049 (2cfaa2d7fdf2)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/12",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/12",
+                    "ifName": "2/1/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-12",
+                    "remote_port": "1049 (98437c000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/12",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/12",
+                    "ifName": "2/1/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-14",
+                    "remote_port": "1025 (2cfaa2d8e028)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/14",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/14",
+                    "ifName": "2/1/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-15",
+                    "remote_port": "1025 (2cfaa2d8d7b8)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/15",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/15",
+                    "ifName": "2/1/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-19",
+                    "remote_port": "4050 (2cfaa2575a8c)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/19",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/19",
+                    "ifName": "2/1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi05.hro.hella.com",
+                    "remote_port": "Gi0 (00fec8206430)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/21",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/21",
+                    "ifName": "2/1/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-23",
+                    "remote_port": "1049 (e8e7325f9ff8)",
+                    "remote_platform": null,
+                    "remote_version": "Alcatel-Lucent Enterprise OS6450-P48 6.7.2.122.R08 GA, September 04, 2020.",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/23",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/23",
+                    "ifName": "2/1/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-24",
+                    "remote_port": "1049 (2cfaa2202a18)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/24",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/24",
+                    "ifName": "2/1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-26",
+                    "remote_port": "2049 (2cfaa25759bc)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/26",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/26",
+                    "ifName": "2/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-26",
+                    "remote_port": "2049 (513820000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/26",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/26",
+                    "ifName": "2/1/26"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-27",
+                    "remote_port": "2025 (2cfaa2d8e442)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/27",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/27",
+                    "ifName": "2/1/27"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-28",
+                    "remote_port": "3049 (2cfaa2911e7e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/28",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/28",
+                    "ifName": "2/1/28"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi01.hro.hella.com",
+                    "remote_port": "Gi0 (00fec8150990)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/29",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/29",
+                    "ifName": "2/1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-29",
+                    "remote_port": "2049 (2cfaa291201e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/29",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/29",
+                    "ifName": "2/1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-25",
+                    "remote_port": "2025 (2cfaa2d56ca6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/32",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/32",
+                    "ifName": "2/1/32"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-22",
+                    "remote_port": "2049 (2cfaa2fe9820)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/35",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/35",
+                    "ifName": "2/1/35"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-20",
+                    "remote_port": "1025 (2cfaa2d8e0dc)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/36",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/36",
+                    "ifName": "2/1/36"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-21",
+                    "remote_port": "2051 (9424e12e8e7c)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/37",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/37",
+                    "ifName": "2/1/37"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi01.hro.hella.com",
+                    "remote_port": "Gi0 (00fec8150990)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/7",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/7",
+                    "ifName": "2/1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-16",
+                    "remote_port": "2025 (2cfaa2d8d740)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 2/1/9",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 2/1/9",
+                    "ifName": "2/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi03.hro.hella.com",
+                    "remote_port": "Gi0 (00fec800c6f0)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 3/1/13",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 3/1/13",
+                    "ifName": "3/1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi04.hro.hella.com",
+                    "remote_port": "Gi0 (00fec8176260)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 3/1/30",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 3/1/30",
+                    "ifName": "3/1/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi02.hro.hella.com",
+                    "remote_port": "Gi0 (cc46d6ff5000)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 3/1/33",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 3/1/33",
+                    "ifName": "3/1/33"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi04.hro.hella.com",
+                    "remote_port": "Gi0 (00fec8176260)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 3/1/40",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 3/1/40",
+                    "ifName": "3/1/40"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "roahroddtimi03.hro.hella.com",
+                    "remote_port": "Gi0 (00fec800c6f0)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C2700 Software (AP3G2-K9W8-M), Version 15.3(3)JF10, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Thu 13-Jun-19 18:51 by prod_rel_team",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 3/1/6",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 3/1/6",
+                    "ifName": "3/1/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Polycom SoundStation IP 7000",
+                    "remote_port": "00:04:f2:ef:d9:f8 (0004f2efd9f8)",
+                    "remote_platform": null,
+                    "remote_version": "Polycom;SoundStationIP-SSIP_7000;3111-40000-001,1;SIP/3.3.3.0069/02-Nov-11 13:54;BR/4.3.1.0887/25-Oct-11 14:53;",
+                    "ifAlias": "Alcatel-Lucent OS6860 GNI 4/1/12",
+                    "ifDescr": "Alcatel-Lucent OS6860 GNI 4/1/12",
+                    "ifName": "4/1/12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-29",
+                    "remote_port": "1049 (2cfaa291201e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 1/1/29",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 1/1/29",
+                    "ifName": "1/1/29"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-11",
+                    "remote_port": "3049 (2cfaa2d492b0)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 1/1/31",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 1/1/31",
+                    "ifName": "1/1/31"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-11",
+                    "remote_port": "3049 (53fe28000000)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 1/1/31",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 1/1/31",
+                    "ifName": "1/1/31"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-lugoj-25",
+                    "remote_port": "1025 (2cfaa2d56ca6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 1/1/32",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 1/1/32",
+                    "ifName": "1/1/32"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-timi5-10",
+                    "remote_port": "1051 (9424e1283237)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 1/1/51",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 1/1/51",
+                    "ifName": "1/1/51"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "rox-timi5-10",
+                    "remote_port": "101051 (9424e1283237)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent OS6860 XNI 3/1/51",
+                    "ifDescr": "Alcatel-Lucent OS6860 XNI 3/1/51",
+                    "ifName": "3/1/51"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "rox-lugoj-30",
                     "remote_port": "2010 (2cfaa2bce2f6)",
                     "remote_platform": null,
@@ -78638,6 +79298,962 @@
                     "context_name": "",
                     "ipv4_network": "172.31.128.0/24",
                     "ifIndex": 13600004
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "00:15:17:d9:ee:c8",
+                    "ipv6_address": "2001:0720:101c:0234:010a:e237:1b5e:5b33",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:a9:9f:fa",
+                    "ipv6_address": "2001:0720:101c:0234:01ce:7059:b828:4e9f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:61:8f:ed",
+                    "ipv6_address": "2001:0720:101c:0234:0509:e933:a797:b2c4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:5f:e3:4c",
+                    "ipv6_address": "2001:0720:101c:0234:08b4:6fb4:6ddf:15c3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:22:b0:77",
+                    "ipv6_address": "2001:0720:101c:0234:092d:5c9d:4c1e:364b",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "08:00:27:97:11:3d",
+                    "ipv6_address": "2001:0720:101c:0234:0a00:27ff:fe97:113d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:64:ee:01",
+                    "ipv6_address": "2001:0720:101c:0234:0c05:9749:6e73:e6db",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:22:a3:2a",
+                    "ipv6_address": "2001:0720:101c:0234:0c13:ec42:4ba6:a177",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:5f:e3:4c",
+                    "ipv6_address": "2001:0720:101c:0234:0ca1:83f9:b5c1:6893",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:57:14",
+                    "ipv6_address": "2001:0720:101c:0234:0d23:8362:f593:9170",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:e7:d1:c2:95:55",
+                    "ipv6_address": "2001:0720:101c:0234:0df4:21d3:4a09:f05a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:58:0f",
+                    "ipv6_address": "2001:0720:101c:0234:1069:4f5c:b064:1f6a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:dd:87:bb",
+                    "ipv6_address": "2001:0720:101c:0234:1433:dae4:b4bc:e182",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:22:b0:77",
+                    "ipv6_address": "2001:0720:101c:0234:1472:19ee:4448:f64c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "50:e5:49:e6:af:98",
+                    "ipv6_address": "2001:0720:101c:0234:14e4:9806:f9bb:0209",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "3c:d9:2b:51:53:a0",
+                    "ipv6_address": "2001:0720:101c:0234:150d:21a9:9efc:edbd",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:e7:d1:c2:94:76",
+                    "ipv6_address": "2001:0720:101c:0234:1522:d172:6c9b:b715",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:81:69",
+                    "ipv6_address": "2001:0720:101c:0234:1852:6f7b:8104:7964",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:77:27",
+                    "ipv6_address": "2001:0720:101c:0234:1888:7b5f:12ec:8e9d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:7d",
+                    "ipv6_address": "2001:0720:101c:0234:1d3e:6a8f:7205:b4f1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:eb",
+                    "ipv6_address": "2001:0720:101c:0234:1de9:e4a4:c2ac:93ef",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:57:2d",
+                    "ipv6_address": "2001:0720:101c:0234:257d:a8ca:00c0:c90f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:57:2d",
+                    "ipv6_address": "2001:0720:101c:0234:284d:4a12:9fb2:0c39",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:18:9d",
+                    "ipv6_address": "2001:0720:101c:0234:3169:3add:3f68:1165",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:de:80:de:10:9a",
+                    "ipv6_address": "2001:0720:101c:0234:34c4:a4c3:0859:3385",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:c6:a1:ec",
+                    "ipv6_address": "2001:0720:101c:0234:35ad:53d6:8ffa:d5a7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:4c",
+                    "ipv6_address": "2001:0720:101c:0234:35dc:e5ab:584f:6f33",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:95:3d",
+                    "ipv6_address": "2001:0720:101c:0234:3c6c:c7ea:e3d8:4f1f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:7c",
+                    "ipv6_address": "2001:0720:101c:0234:3d87:f92e:d773:0831",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:a4:b8",
+                    "ipv6_address": "2001:0720:101c:0234:3db6:0408:d8ef:7f57",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:04:5f",
+                    "ipv6_address": "2001:0720:101c:0234:41eb:6694:1061:eccd",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:2b:92:60",
+                    "ipv6_address": "2001:0720:101c:0234:41eb:eb6a:2459:4a54",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:51:8e:70",
+                    "ipv6_address": "2001:0720:101c:0234:4933:7ee3:17e1:987e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2a:1a:cc",
+                    "ipv6_address": "2001:0720:101c:0234:50bd:48ca:f3c2:9502",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2a:1b:09",
+                    "ipv6_address": "2001:0720:101c:0234:5160:e798:33e3:9cf9",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:58:14",
+                    "ipv6_address": "2001:0720:101c:0234:51d2:cdf4:f200:eda5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:39:09:04:84:f7",
+                    "ipv6_address": "2001:0720:101c:0234:5442:f7cb:78e7:abb1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:0b:c1",
+                    "ipv6_address": "2001:0720:101c:0234:5550:a726:b0da:72a8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:81:dc",
+                    "ipv6_address": "2001:0720:101c:0234:58e6:3c9b:ea2a:e537",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:ec",
+                    "ipv6_address": "2001:0720:101c:0234:59f3:28c0:41dc:9144",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:98:b6",
+                    "ipv6_address": "2001:0720:101c:0234:5d42:4e95:33a4:7d94",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:35:8d:99",
+                    "ipv6_address": "2001:0720:101c:0234:6047:7e6d:d9af:1843",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:26:f2:9c",
+                    "ipv6_address": "2001:0720:101c:0234:6184:9000:5250:25bc",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "d4:85:64:a6:84:d7",
+                    "ipv6_address": "2001:0720:101c:0234:64bc:2775:7f58:65c4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:a4:0a",
+                    "ipv6_address": "2001:0720:101c:0234:6893:22c6:d359:2136",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:77:27",
+                    "ipv6_address": "2001:0720:101c:0234:6c80:d1eb:1e6c:e391",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:e1:ca:48",
+                    "ipv6_address": "2001:0720:101c:0234:6cea:831b:2ff8:d3da",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:61:53:11",
+                    "ipv6_address": "2001:0720:101c:0234:701f:8f2b:d298:b387",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:98:b6",
+                    "ipv6_address": "2001:0720:101c:0234:70bb:9747:d813:5eba",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "40:8d:5c:72:74:f9",
+                    "ipv6_address": "2001:0720:101c:0234:717d:8698:fba8:c1dc",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:25:f1:a9",
+                    "ipv6_address": "2001:0720:101c:0234:7525:9c21:d6ba:cfad",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:0f:7e",
+                    "ipv6_address": "2001:0720:101c:0234:7872:4064:fed3:9978",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "d4:85:64:a6:84:ef",
+                    "ipv6_address": "2001:0720:101c:0234:78c4:1066:6f54:9f5d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "2001:0720:101c:0234:7975:b6df:751a:1239",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:25:f1:a9",
+                    "ipv6_address": "2001:0720:101c:0234:7cd5:17ec:1f89:b3d5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:27:87:54",
+                    "ipv6_address": "2001:0720:101c:0234:80ac:fe63:4cfb:907c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:a4:b8",
+                    "ipv6_address": "2001:0720:101c:0234:8112:c6ac:97b5:3497",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:d7:77",
+                    "ipv6_address": "2001:0720:101c:0234:8829:7dce:4642:dd52",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:95:3d",
+                    "ipv6_address": "2001:0720:101c:0234:887c:fbd7:0c0a:a109",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:b4:25",
+                    "ipv6_address": "2001:0720:101c:0234:90f2:20e3:20d9:77ac",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "bc:5f:f4:09:26:23",
+                    "ipv6_address": "2001:0720:101c:0234:91e2:4922:020b:b24d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:55:b8",
+                    "ipv6_address": "2001:0720:101c:0234:941c:aee3:e158:0462",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:2b:92:60",
+                    "ipv6_address": "2001:0720:101c:0234:95ee:8222:44dc:3300",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:26:f1:03",
+                    "ipv6_address": "2001:0720:101c:0234:98f7:707b:ef51:c473",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2a:1a:cc",
+                    "ipv6_address": "2001:0720:101c:0234:9928:0dd7:ba58:e053",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2b:be:00",
+                    "ipv6_address": "2001:0720:101c:0234:994a:8ea0:ef68:5aa3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:57:14",
+                    "ipv6_address": "2001:0720:101c:0234:999f:d40c:2cec:da1c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:81:d8",
+                    "ipv6_address": "2001:0720:101c:0234:9c96:425f:e3c1:66e6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:5f:e3:4c",
+                    "ipv6_address": "2001:0720:101c:0234:9d79:e7ff:5ae9:2558",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:22:b0:77",
+                    "ipv6_address": "2001:0720:101c:0234:a499:06c0:01b3:a83f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:22:b0:77",
+                    "ipv6_address": "2001:0720:101c:0234:a58b:6761:46c6:872e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:81:69",
+                    "ipv6_address": "2001:0720:101c:0234:a93a:07f9:87d4:221a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:2b:df:f7",
+                    "ipv6_address": "2001:0720:101c:0234:ad11:e9d7:2432:4ade",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:4c",
+                    "ipv6_address": "2001:0720:101c:0234:ad48:d389:f4ea:5ae6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:21:02",
+                    "ipv6_address": "2001:0720:101c:0234:b00c:40a0:52e5:d13f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:e1:ca:48",
+                    "ipv6_address": "2001:0720:101c:0234:b15f:6e16:fc43:bdb6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:f9",
+                    "ipv6_address": "2001:0720:101c:0234:b410:8d9a:08d3:0753",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:7d",
+                    "ipv6_address": "2001:0720:101c:0234:b59c:3469:3175:4ca7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:6e",
+                    "ipv6_address": "2001:0720:101c:0234:b850:122a:182a:20eb",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:e7:d1:c2:94:80",
+                    "ipv6_address": "2001:0720:101c:0234:bc9d:3fab:de88:3fac",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:25:f2:fc",
+                    "ipv6_address": "2001:0720:101c:0234:bd90:e118:4e44:98ab",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "94:de:80:70:95:6c",
+                    "ipv6_address": "2001:0720:101c:0234:bded:496b:a9b2:029b",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:25:f1:ab",
+                    "ipv6_address": "2001:0720:101c:0234:c16a:eb3b:dc60:d9de",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:ad:b3:29",
+                    "ipv6_address": "2001:0720:101c:0234:c1f0:c41c:9035:03ac",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:ad:b3:29",
+                    "ipv6_address": "2001:0720:101c:0234:c40b:2219:b16c:e185",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:dd:87:bb",
+                    "ipv6_address": "2001:0720:101c:0234:cd15:4709:b665:0746",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "1c:1b:0d:35:8d:99",
+                    "ipv6_address": "2001:0720:101c:0234:cda5:1627:b98f:3b9b",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2a:20:ee",
+                    "ipv6_address": "2001:0720:101c:0234:d069:5d91:d4b4:b53c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:a9:a0:da",
+                    "ipv6_address": "2001:0720:101c:0234:d4e5:6dd1:a5f5:da4f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:61:53:11",
+                    "ipv6_address": "2001:0720:101c:0234:d58f:1a2a:30a7:7082",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:e7:d1:c2:95:55",
+                    "ipv6_address": "2001:0720:101c:0234:d5ac:45b2:c7ef:dd31",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "c8:1f:66:24:f8:20",
+                    "ipv6_address": "2001:0720:101c:0234:d5e6:75fc:2a2a:445c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2b:b6:33",
+                    "ipv6_address": "2001:0720:101c:0234:d9e1:7c4c:0b6a:dbc8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:24:8c:3b:5e:36",
+                    "ipv6_address": "2001:0720:101c:0234:dc45:f290:d0df:88cc",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:d4:bf",
+                    "ipv6_address": "2001:0720:101c:0234:dce9:b7e8:03ee:20cd",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "2001:0720:101c:0234:e44a:9ef3:deed:da3f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:03:73:4f:a4:0a",
+                    "ipv6_address": "2001:0720:101c:0234:e57a:3589:a2d5:4230",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:04:7f",
+                    "ipv6_address": "2001:0720:101c:0234:e5b3:ae23:3317:90eb",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "2001:0720:101c:0234:e82a:7080:3258:acb1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:57:14",
+                    "ipv6_address": "2001:0720:101c:0234:e888:c792:aacc:494a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:93:92",
+                    "ipv6_address": "2001:0720:101c:0234:e89a:bd9f:0128:1535",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:26:f0:e2",
+                    "ipv6_address": "2001:0720:101c:0234:ec0e:df17:2e3a:5291",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:c6:a1:ec",
+                    "ipv6_address": "2001:0720:101c:0234:f13e:4159:94f2:9a12",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "78:45:c4:2a:1b:09",
+                    "ipv6_address": "2001:0720:101c:0234:f56d:58f7:4a0e:58de",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:85:c0:30",
+                    "ipv6_address": "2001:0720:101c:0234:fcb7:aff5:7f28:e93d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:1e:3d:ba",
+                    "ipv6_address": "2001:0720:101c:0252:0510:c005:b375:bc02",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:82:10",
+                    "ipv6_address": "2001:0720:101c:0252:0d7a:bf6c:1c04:5e16",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:90:24",
+                    "ipv6_address": "2001:0720:101c:0252:109e:7859:23f6:9008",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "68:5b:35:a7:2d:c4",
+                    "ipv6_address": "2001:0720:101c:0252:1409:73ef:3120:2dee",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:82",
+                    "ipv6_address": "2001:0720:101c:0252:14c5:f533:5163:b2f8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:51:8e:47",
+                    "ipv6_address": "2001:0720:101c:0252:1913:9fc2:0484:097c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:5c",
+                    "ipv6_address": "2001:0720:101c:0252:191d:9592:1530:aad4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:40",
+                    "ipv6_address": "2001:0720:101c:0252:19fb:d78a:21df:f7a8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:1e:3d:7d",
+                    "ipv6_address": "2001:0720:101c:0252:19fe:904b:3bf9:4919",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:85:c0:74",
+                    "ipv6_address": "2001:0720:101c:0252:1cd9:d3ec:7321:78ab",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3c:44:f5",
+                    "ipv6_address": "2001:0720:101c:0252:202d:df42:07ca:adb0",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:0f:0b",
+                    "ipv6_address": "2001:0720:101c:0252:205a:e025:8791:bb03",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:d2",
+                    "ipv6_address": "2001:0720:101c:0252:20d2:e1c9:67d5:7320",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:0f:0b",
+                    "ipv6_address": "2001:0720:101c:0252:2493:4bc6:910b:53a8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:6a",
+                    "ipv6_address": "2001:0720:101c:0252:259a:0b6f:a814:9016",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:89:ec",
+                    "ipv6_address": "2001:0720:101c:0252:28a1:20e4:c584:ceef",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:60:73:bb",
+                    "ipv6_address": "2001:0720:101c:0252:2c12:d5ae:3147:6507",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:1c",
+                    "ipv6_address": "2001:0720:101c:0252:2c8c:66c9:a554:4d8d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:1e:3d:7d",
+                    "ipv6_address": "2001:0720:101c:0252:34da:50a0:e4cf:ab57",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3c:44:f5",
+                    "ipv6_address": "2001:0720:101c:0252:39d8:65a3:a287:c763",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:dd:e6",
+                    "ipv6_address": "2001:0720:101c:0252:3cc0:cf7f:ec02:c2d8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:1c",
+                    "ipv6_address": "2001:0720:101c:0252:3d2f:9f58:6b63:3d12",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:dd:e6",
+                    "ipv6_address": "2001:0720:101c:0252:44a2:52b2:f8af:3db7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:6a",
+                    "ipv6_address": "2001:0720:101c:0252:45eb:17b6:a956:3831",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:51:94:0b",
+                    "ipv6_address": "2001:0720:101c:0252:4801:bee1:56d7:6e8a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:51:94:0b",
+                    "ipv6_address": "2001:0720:101c:0252:4874:201f:3ab7:f71c",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:04:58",
+                    "ipv6_address": "2001:0720:101c:0252:49ea:ae93:3cfb:fc81",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:9f",
+                    "ipv6_address": "2001:0720:101c:0252:4c16:97aa:2898:2f60",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f4:6d:04:90:e7:da",
+                    "ipv6_address": "2001:0720:101c:0252:4cfd:ff4f:572d:d83a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a8:20:66:12:39:77",
+                    "ipv6_address": "2001:0720:101c:0252:4db8:2e66:a083:6cb8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:c1",
+                    "ipv6_address": "2001:0720:101c:0252:4eed:0173:cbe0:04e1",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:06",
+                    "ipv6_address": "2001:0720:101c:0252:5033:65f8:ee3f:0605",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "c8:1f:66:0c:7c:12",
+                    "ipv6_address": "2001:0720:101c:0252:518e:8163:fa34:8978",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:da:24",
+                    "ipv6_address": "2001:0720:101c:0252:51ab:3f9e:3a47:a6d7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "c8:1f:66:25:46:b6",
+                    "ipv6_address": "2001:0720:101c:0252:584f:5ba3:99aa:68b7",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:06:fe",
+                    "ipv6_address": "2001:0720:101c:0252:60af:9cb4:025d:4f09",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:85:c0:6f",
+                    "ipv6_address": "2001:0720:101c:0252:6c17:c32e:f00d:dd22",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f0:18:98:ee:b4:2f",
+                    "ipv6_address": "2001:0720:101c:0252:7089:3fe0:9db0:52e8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:9f",
+                    "ipv6_address": "2001:0720:101c:0252:70a7:fe35:a53b:da51",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:82:10",
+                    "ipv6_address": "2001:0720:101c:0252:70e2:2c8b:a458:2616",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:17",
+                    "ipv6_address": "2001:0720:101c:0252:725a:0fff:fe3a:8d17",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:d2",
+                    "ipv6_address": "2001:0720:101c:0252:74ba:4b93:5fdd:5440",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:60:73:bb",
+                    "ipv6_address": "2001:0720:101c:0252:7587:c248:b7ee:b686",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:06",
+                    "ipv6_address": "2001:0720:101c:0252:7983:da5b:ecd6:4cd4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:85:c0:6f",
+                    "ipv6_address": "2001:0720:101c:0252:79d1:f543:4b26:1b0e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:d2:5b",
+                    "ipv6_address": "2001:0720:101c:0252:7c45:2ffc:5e98:d331",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:1c",
+                    "ipv6_address": "2001:0720:101c:0252:7c76:d199:9826:0ac6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:89:ec",
+                    "ipv6_address": "2001:0720:101c:0252:7cf4:75d3:8f78:393e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:62:29:1c",
+                    "ipv6_address": "2001:0720:101c:0252:7dfb:558b:55ca:4218",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:90:24",
+                    "ipv6_address": "2001:0720:101c:0252:8816:eb70:475b:fd69",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "c8:1f:66:25:46:b6",
+                    "ipv6_address": "2001:0720:101c:0252:8c18:8907:2e46:f4d6",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:0f:0b",
+                    "ipv6_address": "2001:0720:101c:0252:8ddb:2ae7:0d29:e27f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:40",
+                    "ipv6_address": "2001:0720:101c:0252:90e3:cadc:1a55:5631",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "c8:1f:66:25:45:a7",
+                    "ipv6_address": "2001:0720:101c:0252:9512:48c5:e1b1:7500",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:91:0f:82",
+                    "ipv6_address": "2001:0720:101c:0252:95bd:59b2:5300:2ceb",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b8:27:eb:a7:22:2f",
+                    "ipv6_address": "2001:0720:101c:0252:9741:1cce:2597:62cf",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "f0:18:98:ee:b4:2f",
+                    "ipv6_address": "2001:0720:101c:0252:9c68:bea9:a9f4:03d5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:19:99:51:94:0b",
+                    "ipv6_address": "2001:0720:101c:0252:9c76:43fc:4836:f05e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:15:f6",
+                    "ipv6_address": "2001:0720:101c:0252:9df4:b1ba:10a1:62e3",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:98:b3",
+                    "ipv6_address": "2001:0720:101c:0252:a1d5:c3e4:6830:efe8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "2c:44:fd:26:f2:99",
+                    "ipv6_address": "2001:0720:101c:0252:a5ad:74a4:19bd:57cc",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:92:24:9a",
+                    "ipv6_address": "2001:0720:101c:0252:ad8b:6a51:1f46:d513",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:aa:84",
+                    "ipv6_address": "2001:0720:101c:0252:b582:1ee2:5b19:2511",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:98:b3",
+                    "ipv6_address": "2001:0720:101c:0252:b5b2:7511:f612:9861",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:9f",
+                    "ipv6_address": "2001:0720:101c:0252:c179:9ee9:23c0:def2",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:79:da:24",
+                    "ipv6_address": "2001:0720:101c:0252:c42f:8031:634c:2718",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "2001:0720:101c:0252:c50c:0fc6:97fa:d347",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:c6:56:9f",
+                    "ipv6_address": "2001:0720:101c:0252:c841:e29e:0163:4b36",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:63:15:f6",
+                    "ipv6_address": "2001:0720:101c:0252:c8aa:af0f:02ee:4d6a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:32:36:98",
+                    "ipv6_address": "2001:0720:101c:0252:c962:f42e:8344:7cce",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a8:20:66:12:39:77",
+                    "ipv6_address": "2001:0720:101c:0252:c9fa:7441:143a:520f",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3c:44:f5",
+                    "ipv6_address": "2001:0720:101c:0252:cc46:20f7:af27:8313",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:04:58",
+                    "ipv6_address": "2001:0720:101c:0252:cd2d:6949:0f6c:2a61",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "",
+                    "ipv6_address": "2001:0720:101c:0252:cd88:4b3f:2db6:81e4",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "68:5b:35:a7:2d:c4",
+                    "ipv6_address": "2001:0720:101c:0252:d4c3:e41a:2e44:4d3b",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:5c",
+                    "ipv6_address": "2001:0720:101c:0252:dd01:1b8e:af1d:cd22",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:90:24",
+                    "ipv6_address": "2001:0720:101c:0252:e009:2665:9b72:d90e",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:3a:8d:5c",
+                    "ipv6_address": "2001:0720:101c:0252:e1f2:2290:5233:3871",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "b0:83:fe:60:73:bb",
+                    "ipv6_address": "2001:0720:101c:0252:e545:0c24:58d0:f34d",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:ad",
+                    "ipv6_address": "2001:0720:101c:0252:e830:8924:cc03:679a",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "a4:1f:72:92:24:9a",
+                    "ipv6_address": "2001:0720:101c:0252:e889:1132:5427:f4ee",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "4c:cc:6a:eb:8f:40",
+                    "ipv6_address": "2001:0720:101c:0252:f12b:d6e4:ba1c:8db5",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "70:5a:0f:39:d2:5b",
+                    "ipv6_address": "2001:0720:101c:0252:f1ae:96a8:d4c5:baa2",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "90:1b:0e:85:c0:74",
+                    "ipv6_address": "2001:0720:101c:0252:f8b9:f1ee:ea7a:7770",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:23:24:da:06:fe",
+                    "ipv6_address": "2001:0720:101c:0252:fca7:616b:c306:d42b",
+                    "context_name": ""
                 }
             ]
         }
