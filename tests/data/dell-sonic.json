@@ -13605,9 +13605,9 @@
                     "remote_port": "Gi1/0/44 (28f10efb09d8)",
                     "remote_platform": null,
                     "remote_version": "",
-                    "ifAlias": "Eth1/48",
-                    "ifDescr": "Eth1/48",
-                    "ifName": "Eth1/48"
+                    "ifAlias": "Eth1/49",
+                    "ifDescr": "Eth1/49",
+                    "ifName": "Eth1/49"
                 },
                 {
                     "active": 1,

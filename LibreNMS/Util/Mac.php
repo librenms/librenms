@@ -36,7 +36,7 @@ class Mac
 
     public function __construct(string $mac)
     {
-        $mac = strtolower(trim($mac));
+        $mac = str_replace(' ', ':', strtolower(trim($mac)));
 
         if (preg_match('/^([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})$/', $mac, $matches)) {
             // strings without delimiters must have 12 characters
@@ -62,6 +62,7 @@ class Mac
      *  001234-ABCDEF
      *  0012.34AB.CDEF
      *  00:02:04:0B:0D:0F
+     *  00 02 04 0B 0D 0F
      *  0:2:4:B:D:F
      */
     public static function parse(?string $mac): static

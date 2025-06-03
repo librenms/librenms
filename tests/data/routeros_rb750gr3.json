@@ -3599,5 +3599,33 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw11.mzmol",
+                    "remote_port": "trunk: Up (p24)",
+                    "remote_platform": null,
+                    "remote_version": "MES2324B 28-port 1G/10G Managed Switch, Software version: 4.0.24.1",
+                    "ifAlias": "trunk: Down (eth5)",
+                    "ifDescr": "trunk: Down (eth5)",
+                    "ifName": "trunk: Down (eth5)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "r1.soada",
+                    "remote_port": "trunk: MzMol (eoip1)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 7.19.1 (stable) 2025-05-23 14:27:17 RB5009UG+S+",
+                    "ifAlias": "trunk: SoAda (eoip1)",
+                    "ifDescr": "trunk: SoAda (eoip1)",
+                    "ifName": "trunk: SoAda (eoip1)"
+                }
+            ]
+        }
     }
 }

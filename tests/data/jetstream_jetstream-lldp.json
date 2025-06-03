@@ -6714,5 +6714,66 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SoAda-WR10",
+                    "remote_port": "eth0.1 (b04e265e0e98)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWrt 19.07.7",
+                    "ifAlias": "Trunk-AP10",
+                    "ifDescr": "gigabitEthernet 1/0/20",
+                    "ifName": "gigabitEthernet 1/0/20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SoAda-WR11",
+                    "remote_port": "eth0.1 (1c3bf3a9a490)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWrt 19.07.7",
+                    "ifAlias": "Trunk-AP11",
+                    "ifDescr": "gigabitEthernet 1/0/21",
+                    "ifName": "gigabitEthernet 1/0/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SoAda-WR35",
+                    "remote_port": "eth1 (60e32723ebd9)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWrt 19.07.7",
+                    "ifAlias": "Trunk-AP35",
+                    "ifDescr": "gigabitEthernet 1/0/24",
+                    "ifName": "gigabitEthernet 1/0/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SoAda-WR49",
+                    "remote_port": "eth1 (c4e9847e9d4b)",
+                    "remote_platform": null,
+                    "remote_version": "OpenWrt 19.07.7",
+                    "ifAlias": "Trunk-AP49",
+                    "ifDescr": "gigabitEthernet 1/0/23",
+                    "ifName": "gigabitEthernet 1/0/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw22",
+                    "remote_port": "gi1/0/1 (e828c126b9c0)",
+                    "remote_platform": null,
+                    "remote_version": "28-port 1G/10G Managed Switch",
+                    "ifAlias": "Trunk-UP",
+                    "ifDescr": "gigabitEthernet 1/0/28",
+                    "ifName": "gigabitEthernet 1/0/28"
+                }
+            ]
+        }
     }
 }

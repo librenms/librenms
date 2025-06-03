@@ -13048,7 +13048,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "soada-mkt",
-                    "remote_port": "BR-Switch/Bond-SW22/eth1-Bond-SW22 (cc2de03db618)",
+                    "remote_port": "eth1-Bond-SW22 (cc2de03db618)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 7.1 (testing) Dec/01/2021 14:07:27 RB3011UiAS",
                     "ifAlias": "LAG-1-23",
@@ -13059,7 +13059,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "soada-mkt",
-                    "remote_port": "BR-Switch/Bond-SW22/eth2-Bond-SW22 (cc2de03db618)",
+                    "remote_port": "eth2-Bond-SW22 (cc2de03db618)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 7.1 (testing) Dec/01/2021 14:07:27 RB3011UiAS",
                     "ifAlias": "LAG-1-24",
@@ -13135,6 +13135,72 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "soada-sw07",
+                    "remote_port": "gigabitEthernet 1/0/28 (98dac4733a62)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K07-SW",
+                    "ifDescr": "gigabitethernet1/0/3",
+                    "ifName": "gi1/0/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw07.soada",
+                    "remote_port": "gigabitEthernet 1/0/28 (98dac4733a62)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K07-SW",
+                    "ifDescr": "gigabitethernet1/0/3",
+                    "ifName": "gi1/0/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw13",
+                    "remote_port": "gigabitEthernet 1/0/10 (d807b65abcd9)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 8-Port Gigabit L2+ Managed Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K13-SW",
+                    "ifDescr": "gigabitethernet1/0/7",
+                    "ifName": "gi1/0/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw33.soada",
+                    "remote_port": "gigabitEthernet 1/0/16 (ac84c600cbc1)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 16-Port Gigabit Smart Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K13-SW",
+                    "ifDescr": "gigabitethernet1/0/7",
+                    "ifName": "gi1/0/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw17",
+                    "remote_port": "FiberEthernet1/0/18 (68ff7b3e6829)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 16-Port Gigabit Smart Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K17-SW",
+                    "ifDescr": "gigabitethernet1/0/4",
+                    "ifName": "gi1/0/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw17.soada",
+                    "remote_port": "gigabitEthernet 1/0/18 (68ff7b3e6829)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 16-Port Gigabit Smart Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K17-SW",
+                    "ifDescr": "gigabitethernet1/0/4",
+                    "ifName": "gi1/0/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "soada-wr20",
                     "remote_port": "eth0.1 (ac84c625a3e8)",
                     "remote_platform": null,
@@ -13168,6 +13234,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "soada-sw26",
+                    "remote_port": "gigabitEthernet 1/0/25 (98dac4733a5e)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K26-SW",
+                    "ifDescr": "gigabitethernet1/0/6",
+                    "ifName": "gi1/0/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "sw31.soada",
                     "remote_port": "gigabitEthernet 1/0/18 (30de4bf5f7e2)",
                     "remote_platform": null,
@@ -13175,6 +13252,17 @@
                     "ifAlias": "Trunk-K26-SW",
                     "ifDescr": "gigabitethernet1/0/6",
                     "ifName": "gi1/0/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw27",
+                    "remote_port": "gigabitEthernet 1/0/18 (ac84c600cbc1)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 16-Port Gigabit Smart Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K27-SW",
+                    "ifDescr": "gigabitethernet1/0/2",
+                    "ifName": "gi1/0/2"
                 },
                 {
                     "active": 1,
@@ -13208,6 +13296,50 @@
                     "ifAlias": "Trunk-K31-AP",
                     "ifDescr": "gigabitethernet1/0/8",
                     "ifName": "gi1/0/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw35",
+                    "remote_port": "gigabitEthernet 1/0/28 (74da88682ad7)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K35-SW",
+                    "ifDescr": "gigabitethernet1/0/1",
+                    "ifName": "gi1/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw35.soada",
+                    "remote_port": "gigabitEthernet 1/0/28 (74da88682ad7)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K35-SW",
+                    "ifDescr": "gigabitethernet1/0/1",
+                    "ifName": "gi1/0/1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "soada-sw39",
+                    "remote_port": "FiberEthernet1/0/18 (b04e267c45cf)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 16-Port Gigabit L2 Managed Switch with 2 SFP Slots",
+                    "ifAlias": "Trunk-K39-SW",
+                    "ifDescr": "gigabitethernet1/0/5",
+                    "ifName": "gi1/0/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw26.soada",
+                    "remote_port": "gigabitEthernet 1/0/25 (98dac4733a5e)",
+                    "remote_platform": null,
+                    "remote_version": "JetStream 24-Port Gigabit Smart Switch with 4 SFP Slots",
+                    "ifAlias": "Trunk-K39-SW",
+                    "ifDescr": "gigabitethernet1/0/5",
+                    "ifName": "gi1/0/5"
                 },
                 {
                     "active": 1,
@@ -17670,26 +17802,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
-                }
-            ]
-        }
-    },
-    "ipv4-addresses": {
-        "discovery": {
-            "ipv4_addresses": [
-                {
-                    "ipv4_address": "169.254.102.22",
-                    "ipv4_prefixlen": 24,
-                    "context_name": "",
-                    "ipv4_network": "169.254.102.0/24",
-                    "ifIndex": 100253
-                },
-                {
-                    "ipv4_address": "169.254.2.22",
-                    "ipv4_prefixlen": 24,
-                    "context_name": "",
-                    "ipv4_network": "169.254.2.0/24",
-                    "ifIndex": 100000
                 }
             ]
         }

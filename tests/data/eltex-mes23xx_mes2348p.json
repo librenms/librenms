@@ -16785,17 +16785,6 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "bt-stadion-payload-ap-07",
-                    "remote_port": "bridge1/vlan75-payload (2cc81b5ba251)",
-                    "remote_platform": null,
-                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
-                    "ifAlias": "MKT_AP1",
-                    "ifDescr": "gigabitethernet1/0/1",
-                    "ifName": "gi1/0/1"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "bt-stadion-payload-ap-07",
                     "remote_port": "ether1 (2cc81b5ba251)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
@@ -16806,13 +16795,13 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
-                    "remote_hostname": "bt-stadion-payload-ap-05",
-                    "remote_port": "bridge1/vlan75-payload (2cc81b5ba309)",
+                    "remote_hostname": "bt-stadion-payload-ap-07",
+                    "remote_port": "vlan75-payload (2cc81b5ba251)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
-                    "ifAlias": "MKT_AP2",
-                    "ifDescr": "gigabitethernet1/0/2",
-                    "ifName": "gi1/0/2"
+                    "ifAlias": "MKT_AP1",
+                    "ifDescr": "gigabitethernet1/0/1",
+                    "ifName": "gi1/0/1"
                 },
                 {
                     "active": 1,
@@ -16828,8 +16817,19 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "bt-stadion-payload-ap-05",
+                    "remote_port": "vlan75-payload (2cc81b5ba309)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
+                    "ifAlias": "MKT_AP2",
+                    "ifDescr": "gigabitethernet1/0/2",
+                    "ifName": "gi1/0/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "bt-stadion-payload-ap-08",
-                    "remote_port": "bridge1/vlan75 (2cc81b5ba1d5)",
+                    "remote_port": "ether1 (2cc81b5ba1d5)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
                     "ifAlias": "xxx",
@@ -16840,7 +16840,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "bt-stadion-payload-ap-08",
-                    "remote_port": "ether1 (2cc81b5ba1d5)",
+                    "remote_port": "vlan75 (2cc81b5ba1d5)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 6.47.9 (long-term) RBcAPL-2nD",
                     "ifAlias": "xxx",
