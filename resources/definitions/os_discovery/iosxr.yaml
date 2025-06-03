@@ -1,6 +1,15 @@
 mib: CISCO-HSRP-MIB
 modules:
     sensors:
+        count:
+            data:
+                -
+                    oid: CISCO-GNSS-MIB::cGnssModuleSatelliteCount
+                    value:  CISCO-GNSS-MIB::cGnssModuleSatelliteCount
+                    num_oid: '.1.3.6.1.4.1.9.9.862.1.6.{{ $index }}'
+                    group: "GNSS"
+                    descr: "Number of Satellites Tracked"
+                -
         state:
             data:
                 -
@@ -22,3 +31,43 @@ modules:
                           oid: cHsrpGrpVirtualIpAddr
                           op: '='
                           value: '0.0.0.0'
+                -
+                    oid: CISCO-GNSS-MIB::cGnssSatelliteVisibilityStatus
+                    value: CISCO-GNSS-MIB::cGnssSatelliteVisibilityStatus
+                    num_oid: '.1.3.6.1.4.1.9.9.862.1.5.{{ $index }}'
+                    descr: 'GNSS Visibility Status'
+                    index: 0
+                    group: 'GNSS'
+                    states:
+                        - { value:  1, generic: 1, graph: 0, descr: 'bad' }
+                        - { value:  2, generic: 0, graph: 0, descr: 'good' }
+                -
+                    oid: CISCO-GNSS-MIB::cGnssModuleLockStatus
+                    value: CISCO-GNSS-MIB::cGnssModuleLockStatus
+                    num_oid: '.1.3.6.1.4.1.9.9.862.1.1.{{ $index }}'
+                    descr: 'GNSS Module Lock Status'
+                    index: 0
+                    group: 'GNSS'
+                    states:
+                        - { value:  1, generic: 1, graph: 0, descr: 'bad' }
+                        - { value:  2, generic: 0, graph: 0, descr: 'good' }
+                -
+                    oid: CISCO-GNSS-MIB::cGnssModuleSCAlarmStatus
+                    value: CISCO-GNSS-MIB::cGnssModuleSCAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.9.9.862.1.8.{{ $index }}'
+                    descr: 'GNSS Module Short-Circuit Alarm'
+                    index: 0
+                    group: 'GNSS'
+                    states:
+                        - { value:  1, generic: 1, graph: 0, descr: 'alarm' }
+                        - { value:  2, generic: 0, graph: 0, descr: 'clear' }
+                -
+                    oid: CISCO-GNSS-MIB::cGnssModuleOCAlarmStatus
+                    value: CISCO-GNSS-MIB::cGnssModuleOCAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.9.9.862.1.9.{{ $index }}'
+                    descr: 'GNSS Module Open-Circuit Alarm'
+                    index: 0
+                    group: 'GNSS'
+                    states:
+                        - { value:  1, generic: 1, graph: 0, descr: 'alarm' }
+                        - { value:  2, generic: 0, graph: 0, descr: 'clear' }
