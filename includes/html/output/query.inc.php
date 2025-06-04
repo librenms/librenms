@@ -24,7 +24,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Alert\AlertDB;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
@@ -46,7 +45,7 @@ switch ($type) {
         $results = [];
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, [$device_id]);
