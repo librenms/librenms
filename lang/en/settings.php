@@ -56,6 +56,8 @@ return [
             'unix-agent' => ['name' => 'Unix-Agent Integration'],
             'smokeping' => ['name' => 'Smokeping Integration'],
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
+            'rancid' => ['name' => 'RANCID Integration'],
+            'collectd' => ['name' => 'Collectd Integration'],
         ],
         'poller' => [
             'availability' => ['name' => 'Device Availability'],
@@ -504,6 +506,10 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'bad_entity_sensor_regex' => [
+            'description' => 'Bad Entity Sensor Regex',
+            'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
+        ],
         'billing' => [
             '95th_default_agg' => [
                 'description' => 'Default 95th Percentile Aggregation',
@@ -521,6 +527,14 @@ return [
         'transit_descr' => [
             'description' => 'Transit Port Types',
             'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'collectd_dir' => [
+            'description' => 'Collectd Directory',
+            'help' => 'Directory where collectd stores its RRD files.  This is used to display data from collectd into LibreNMS.',
+        ],
+        'collectd_sock' => [
+            'description' => 'Collectd Socket',
+            'help' => 'Socket collectd is listening on.  This is used to display data from collectd into LibreNMS.',
         ],
         'core_descr' => [
             'description' => 'Core Port Types',
@@ -625,6 +639,14 @@ return [
         'base_url' => [
             'description' => 'Base URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
+        ],
+        'disabled_sensors' => [
+            'description' => 'Disabled Sensors',
+            'help' => 'Sensors that should not be polled or displayed in the web interface.',
+        ],
+        'disabled_sensors_regex' => [
+            'description' => 'Disabled Sensors Regex',
+            'help' => 'Sensors that match this regex will not be polled or displayed in the web interface.',
         ],
         'discovery_modules' => [
             'arp-table' => [
@@ -863,9 +885,17 @@ return [
             'description' => 'Enable Lazy Loading',
             'help' => 'Lazy loading is used to speed up the loading of pages by only loading the data that is needed at the time. This can be disabled if you have issues with it.',
         ],
+        'enable_libvirt' => [
+            'description' => 'Enable Libvirt',
+            'help' => 'Enables the libvirt page, which shows the virtual machines of devices.',
+        ],
+        'enable_proxmox' => [
+            'description' => 'Enable Proxmox',
+            'help' => 'Enables the Proxmox page, which shows the virtual machines of devices.',
+        ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
-            'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
+        'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
         ],
         'enable_syslog' => [
             'description' => 'Enable Syslog',
@@ -1213,6 +1243,34 @@ return [
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
+        ],
+        'ipmi.type' => [
+            'description' => 'IPMI Type',
+            'help' => 'Type of IPMI to use, can be `lan`, `lanplus`, `open`, `sol`, `raw` or `shell`',
+        ],
+        'ipmi_unit' => [
+            'description' => 'IPMI Unit',
+            'help' => 'IPMI unit types that can be discovered.',
+        ],
+        'libvirt_protocols' => [
+            'description' => 'Libvirt Protocols',
+            'help' => 'Protocols to use for libvirt connections.',
+        ],
+        'libvirt_username' => [
+            'description' => 'Libvirt Username',
+            'help' => 'Username to use for libvirt connections.',
+        ],
+        'location_map' => [
+            'description' => 'Specific Location Map',
+            'help' => 'Map a sysLocation value to another value.',
+        ],
+        'location_map_regex' => [
+            'description' => 'Specific Location Map using regex',
+            'help' => 'Map a sysLocation value to another value using regex.',
+        ],
+        'location_map_regex_sub' => [
+            'description' => 'Specific Location Map using regex substitution',
+            'help' => 'Substitute the sysLocation value using regex substitution.',
         ],
         'login_message' => [
             'description' => 'Logon Message',
@@ -1660,6 +1718,18 @@ return [
                 'help' => 'If enabled, roles will be set to the ones specified by the Filter-ID attribute or radius.default_roles at login.  Otherwise, they will be set when the user is created and never changed after that.',
             ],
         ],
+        'rancid_configs' => [
+            'description' => 'RANCID Configs',
+            'help' => 'RANCID configs directory, used to display config diffs on device pages',
+        ],
+        'rancid_repo_type' => [
+            'description' => 'RANCID Repository Type',
+            'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
+        ],
+        'rancid_ignorecomments' => [
+            'description' => 'RANCID Ignore Comments',
+            'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
+        ],
         'reporting' => [
             'error' => [
                 'description' => 'Send Error Reports',
@@ -1677,6 +1747,10 @@ return [
                 'description' => 'Throttle Error Reports',
                 'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
             ],
+        ],
+        'rewrite_if' => [
+            'description' => 'Rewrite ifDescr',
+            'help' => 'Rewrite ifDescr to remove the interface type and number, e.g. GigabitEthernet0/1 becomes GigabitEthernet',
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
@@ -1772,6 +1846,12 @@ return [
                     'cron' => 'Cron (check-services.php)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
+            ],
+        ],
+        'sensors' => [
+            'guess_limits' => [
+                'description' => 'Guess sensor limits',
+                'help' => 'If enabled, LibreNMS will try to guess the sensor limits based on the sensor type and value. This is not always accurate and may lead to incorrect limits.',
             ],
         ],
         'service_master_timeout' => [
@@ -1958,6 +2038,10 @@ return [
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
+        'storage_perc_warn' => [
+            'description' => 'Storage Percentage Warning',
+            'help' => 'Percentage of storage used before a warning is raised. 0 disables warning.',
+    ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
         ],

@@ -402,7 +402,9 @@
                 "65332": "Cymru FullBogon Feed",
                 "65333": "Cymru Bogon Feed"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "general"
         },
         "auth.allow_get_login": {
             "group": "auth",
@@ -914,7 +916,9 @@
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
-            }
+            },
+            "group": "discovery",
+            "section": "sensors"
         },
         "bad_disk_regexp": {
             "default": [],
@@ -1055,11 +1059,15 @@
         },
         "collectd_dir": {
             "default": null,
-            "type": "directory"
+            "type": "directory",
+            "group": "external",
+            "section": "collectd"
         },
         "collectd_sock": {
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "external",
+            "section": "collectd"
         },
         "core_descr": {
             "default": ["core"],
@@ -1488,7 +1496,9 @@
         },
         "disabled_sensors": {
             "default": null,
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "sensors"
         },
         "disabled_sensors_regex": {
             "default": null,
@@ -1496,7 +1506,9 @@
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
-            }
+            },
+            "group": "discovery",
+            "section": "sensors"
         },
         "discover_services": {
             "default": false,
@@ -2152,11 +2164,15 @@
         },
         "enable_libvirt": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "virtualization"
         },
         "enable_proxmox": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "virtualization"
         },
         "enable_ports_adsl": {
             "default": true,
@@ -2167,10 +2183,6 @@
             "type": "boolean"
         },
         "enable_ports_junoseatmvp": {
-            "default": false,
-            "type": "boolean"
-        },
-        "enable_proxmox": {
             "default": false,
             "type": "boolean"
         },
@@ -2377,7 +2389,9 @@
         },
         "good_if": {
             "default": null,
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports"
         },
         "graph_stat_percentile_disable": {
             "default": false,
@@ -4701,7 +4715,9 @@
                 "imb",
                 "open"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ipmi"
         },
         "ipmi_unit": {
             "default": {
@@ -4713,7 +4729,9 @@
                 "discrete": "",
                 "percent": "load"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ipmi"
         },
         "ipmitool": {
             "default": "/usr/bin/ipmitool",
@@ -4801,11 +4819,15 @@
                 "qemu+ssh",
                 "xen+ssh"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "virtualization"
         },
         "libvirt_username": {
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "discovery",
+            "section": "virtualization"
         },
         "list_colour.even": {
             "default": "#ffffff",
@@ -4841,7 +4863,9 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device"
         },
         "location_map_regex": {
             "default": null,
@@ -4849,7 +4873,9 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device"
         },
         "location_map_regex_sub": {
             "default": null,
@@ -4857,7 +4883,9 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device"
         },
         "log_dir": {
             "type": "directory"
@@ -5979,11 +6007,15 @@
         },
         "rancid_configs": {
             "default": [],
-            "type": "array"
+            "type": "array",
+            "group": "external",
+            "section": "rancid"
         },
         "rancid_ignorecomments": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "external",
+            "section": "rancid"
         },
         "rancid_repo_type": {
             "default": "svn",
@@ -5991,7 +6023,9 @@
             "options": {
                 "svn": "SVN",
                 "git": "Git"
-            }
+            },
+            "group": "external",
+            "section": "rancid"
         },
         "reporting.error": {
             "group": "system",
@@ -6023,13 +6057,21 @@
             "type": "boolean"
         },
         "rewrite_if": {
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports"
         },
         "rewrite_if_regexp": {
             "default": {
                 "/^cpu interface/": "Mgmt"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "validate": {
+                "value": "array",
+                "value.*": "is_regex"
+            }
         },
         "routes_max_number": {
             "default": 1000,
@@ -6204,7 +6246,9 @@
         },
         "sensors.guess_limits": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "sensors"
         },
         "service_poller_workers": {
             "default": 24,
@@ -6569,7 +6613,9 @@
             "type": "integer",
             "validate": {
                 "value": "integer|between:0,100"
-            }
+            },
+            "group": "discovery",
+            "section": "storage"
         },
         "stylesheet": {
             "default": "css/styles.css",

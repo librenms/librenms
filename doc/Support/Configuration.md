@@ -793,15 +793,16 @@ Assign a new discovered Port automatically to Port Group with this Port Group ID
 
 ### Rancid
 
-```bash
-lnms config:set rancid_configs.+ /var/lib/rancid/network/configs/
-lnms config:set rancid_repo_type svn
-lnms config:set rancid_ignorecomments false
-```
-
 Rancid configuration, `rancid_configs` is an array containing all of
 the locations of your rancid files. Setting `rancid_ignorecomments`
 will disable showing lines that start with #
+
+!!! setting "external/rancid"
+    ```bash
+    lnms config:set rancid_configs.+ /var/lib/rancid/network/configs/
+    lnms config:set rancid_repo_type svn
+    lnms config:set rancid_ignorecomments false
+    ```
 
 ### Oxidized
 
@@ -809,14 +810,16 @@ Please refer to [Oxidized](../Extensions/Oxidized.md)
 
 ### CollectD
 
-```bash
-lnms config:set collectd_dir /var/lib/collectd/rrd
-```
-
 Specify the location of the collectd rrd files. Note that the location
 in LibreNMS should be consistent with the location set in
 /etc/collectd.conf and etc/collectd.d/rrdtool.conf
 
+!!! setting "external/collectd"
+    ```bash
+    lnms config:set collectd_dir /var/lib/collectd/rrd
+    ```
+
+`/etc/collectd.conf`
 ```bash
 <Plugin rrdtool>
         DataDir "/var/lib/collectd/rrd"
@@ -827,8 +830,7 @@ in LibreNMS should be consistent with the location set in
 </Plugin>
 ```
 
-/etc/collectd.conf
-
+`/etc/collectd.d/rrdtool.conf`
 ```bash
 LoadPlugin rrdtool
 <Plugin rrdtool>
@@ -838,15 +840,14 @@ LoadPlugin rrdtool
 </Plugin>
 ```
 
-/etc/collectd.d/rrdtool.conf
-
-```bash
-lnms config:set collectd_sock unix:///var/run/collectd.sock
-```
-
 Specify the location of the collectd unix socket. Using a socket
 allows the collectd graphs to be flushed to disk before being
 drawn. Be sure that your web server has permissions to write to this socket.
+
+!!! setting "external/collectd"
+    ```bash
+    lnms config:set collectd_sock unix:///var/run/collectd.sock
+    ```
 
 ### Smokeping
 
@@ -865,7 +866,8 @@ LibreNMS can interpret sysLocation information and map the device loction based 
   - `()` contains optional information that is ignored during GeoCoding lookups.
 
 
-#### **GeoCoordinates** 
+#### GeoCoordinates
+
 If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
 
 Example:
@@ -873,8 +875,14 @@ Example:
 name_that_can_not_be_looked_up [40.424521, -86.912755]
 ```
 
-#### **GeoCoding**
-Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
+The coordinates will then be set to 40.424521 latitude and -86.912755 longitude.
+
+#### GeoCoding
+
+Next it will attempt to look up the sysLocation with a map engine provided you have configured one under
+`lnms config:get geoloc.engine`. The information has to be accurate or no result is returned, when it
+does it will ignore any information inside parentheses, allowing you to add details that would otherwise
+interfeeer with the lookup.
 
 Example:
 ```bash
@@ -882,11 +890,11 @@ Example:
 Geocoding lookup is:
 1100 Congress Ave, Austin, TX 78701
 ```
-#### **Overrides**
-1. You can overwrite each device sysLocation information in the webGUI under "Device settings".
-2. You can overwrite the location coordinates n in the webGUI under Device>GEO Locations
 
+#### Overrides
 
+1. You can overwrite a devices sysLocation in the WebGui     under "Device settings" for that device.
+2. You can set the location coordinates for a location in the WebGui under Device > Geo Locations -> All Location.
 
 ### Location mapping
 
@@ -894,64 +902,80 @@ If you just want to set GPS coordinates on a location, you should
 visit Devices > Geo Locations > All Locations and edit the coordinates
 there.
 
+However you can replace the sysLocation value that is returned for a single device or many devices.
+
+For example, let's say that you have 100 devices which all contain the sysLocation value of `Under the Sink` which
+isn't the real address, rather than editing each device manually, you can specify a mapping to override the sysLocation
+value.
+
 Exact Matching:
 
-```bash
-lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
-```
+`Under the Sink` Will become `Under The Sink, The Office, London, UK`
+
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
+    ```
 
 Regex Matching:
 
-```bash
-lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
-```
+`Not Under the Sink` Will become `Not Under The Sink, The Office, London, UK`
+
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map_regex '{"/Sink/": "Not Under The Sink, The Office, London, UK"}'
+    ```
 
 Regex Match Substitution:
 
-```bash
-lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
-```
+`Rack10,Rm-314,Sink` Will become `Rack10,Rm-314,Under The Sink, The Office, London, UK [lat, lng]`
 
-If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match
-Substition yields "Rack10,Rm-314,Under The Sink, The Office, London,
-UK [lat, long]". This allows you to keep the SysLocation string short
-and keeps Rack/Room/Building information intact after the substitution.
+!!! setting "webui/device"
+    ```bash
+    lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
+    ```
 
-The above are examples, these will rewrite device snmp locations so
-you don't need to configure full location within snmp.
+The above are examples, these will rewrite device snmp locations so you don't need
+to configure full location within snmp.
 
 ## Interfaces to be ignored
 
 Interfaces can be automatically ignored during discovery by modifying
-bad_if\* entries in a default array, unsetting a default array and
-customizing it, or creating an OS specific array. The preferred method
-for ignoring interfaces is to use an OS specific array. The default
-arrays can be found in resources/definitions/config_definitions.json. OS specific
-definitions (resources/definitions/os_detection/\_specific_os_.yaml) can contain
-bad_if\* arrays, but should only be modified via pull-request as
+various configuration options, unsetting default options and customizing
+it, or creating an OS specific option. The preferred method for ignoring
+interfaces is to use an OS specific option. The default options can be
+found in resources/definitions/config_definitions.json. Default OS specific
+definitions can be found in `resources/definitions/os_detection/\_specific_os_.yaml`
+and can contain bad_if\* options, but should only be modified via pull-request as
 manipulation of the definition files will block updating:
 
 Examples:
 
-**Add entries to default arrays**
-```bash
-lnms config:set bad_if.+ voip-null
-lnms config:set bad_iftype.+ voiceEncap
-lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
-```
+#### Add entries to default option
 
-**Override default bad_if values**
-```bash
-lnms config:set bad_if '["voip-null", "voiceEncap", "voiceFXO"]'
-```
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set bad_if.+ voip-null
+    lnms config:set bad_iftype.+ voiceEncap
+    lnms config:set bad_if_regexp.+ '/^lo[0-9].*/'    # loopback
+    ```
 
-**Create an OS specific array**
-```bash
-lnms config:set os.iosxe.bad_iftype.+ macSecControlledIF
-lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
-```
+#### Override default bad_if values
 
-**Various bad_if\* selection options available**
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set bad_if '["voip-null", "voiceEncap", "voiceFXO"]'
+    ```
+
+#### Create an OS specific array
+
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set os.iosxe.bad_iftype.+ macSecControlledIF
+    lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
+    ```
+
+#### Various bad_if\* selection options available
 
 `bad_if` is matched against the ifDescr value.
 
@@ -965,12 +989,18 @@ lnms config:set os.iosxe.bad_iftype.+ macSecUncontrolledIF
 
 ## Interfaces that shouldn't be ignored
 
-Examples:
+It's also possible to whitelist ports so they are not ignored. `good_if` can
+be configured both globally and per os just like `bad_if`.
 
-```bash
-lnms config:set good_if.+ FastEthernet
-lnms config:set os.ios.good_if.+ FastEthernet
-```
+As an examples, let's say we have `bad_if_regexp` set to ignore `Ethernet` ports
+but realise that we actually still want `FastEthernet` ports but not any others,
+we can add a `good_if` option to white list `FastEthernet`:
+
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set good_if.+ FastEthernet
+    lnms config:set os.ios.good_if.+ FastEthernet
+    ```
 
 `good_if` is matched against ifDescr value. This can be a bad_if value
 as well which would stop that port from being ignored. i.e. if bad_if
@@ -979,63 +1009,82 @@ the ifDescr will be valid.
 
 ## Interfaces to be rewritten
 
-```bash
-lnms config:set rewrite_if '{"cpu": "Management Interface"}'
-lnms config:set rewrite_if_regexp '{"/cpu /": "Management "}'
-```
+You can rewrite the interface label automatically using the following
+options.
 
 Entries defined in `rewrite_if` are being replaced completely.
 Entries defined in `rewrite_if_regexp` only replace the match.
 Matches are compared case-insensitive.
+
+!!! setting "discovery/ports"
+    ```bash
+    lnms config:set rewrite_if '{"cpu": "Management Interface"}'
+    lnms config:set rewrite_if_regexp '{"/cpu /": "Management "}'
+    ```
 
 ## Entity sensors to be ignored
 
 Some devices register bogus sensors as they are returned via SNMP but
 either don't exist or just don't return data. This allows you to
 ignore those based on the descr field in the database. You can either
-ignore globally or on a per os basis.
+ignore globally or on a per os basis (recommended).
 
-```bash
-lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
-lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
+As an example, if you have some sensors which contain the descriptions
+below:
+
+```text
+Physical id 1
+Physical id 2
+...
+Physical id 4
 ```
+
+!!! setting "discovery/sensors"
+    ```bash
+    lnms config:set bad_entity_sensor_regex.+ '/Physical id [0-9]+/'
+    lnms config:set os.ios.bad_entity_sensor_regex '["/Physical id [0-9]+/"]'
+    ```
 
 ## Entity sensors limit values
 
 Vendors may give some limit values (or thresholds) for the discovered
-sensors. By default, when no such value is given, both high and low
-limit values are guessed, based on the value measured during the initial discovery.
+sensors. By default, when no such value is given or LibreNMS doesn't have,
+support for those limits, both high and low limit values are guessed,
+based on the value measured during the initial discovery.
 
 When it is preferred to have no high and/or low limit values at all if
 these are not provided by the vendor, the guess method can be disabled:
 
-```bash
-lnms config:set sensors.guess_limits false
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set sensors.guess_limits false
+    ```
 
 ## Ignoring Health Sensors
 
 It is possible to filter some sensors from the configuration:
 
-* Ignore all temperature sensors
+### Ignore all temperature sensors
 
-```bash
-lnms config:set disabled_sensors.current true
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set disabled_sensors.temperature true
+    ```
 
-* Filter all sensors matching regexp ```'/PEM Iout/'```.
+### Filter all sensors matching regexp ```'/PEM Iout/'```.
 
-```bash
-lnms config:set disabled_sensors_regex.+ '/PEM Iout/'
-```
+!!! settings "discovery/sensors"
+    ```bash
+    lnms config:set disabled_sensors_regex.+ '/PEM Iout/'
+    ```
 
-* Filter all 'current' sensors for Operating System 'vrp'.
+### Filter all 'current' sensors for Operating System 'vrp'.
 
 ```bash
 lnms config:set os.vrp.disabled_sensors.current true
 ```
 
-* Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
+### Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
 ```bash
 lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
@@ -1043,43 +1092,44 @@ lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 
 ## Storage configuration
 
-Mounted storage / mount points to ignore in discovery and polling.
+Storage / mount points to ignore in discovery and polling.
 
 !!! setting "discovery/storage"
+    ```bash
+    lnms config:set ignore_mount_removable true
+    lnms config:set ignore_mount_network true
+    lnms config:set ignore_mount_optical true
 
-```bash
-lnms config:set ignore_mount_removable true
-lnms config:set ignore_mount_network true
-lnms config:set ignore_mount_optical true
+    lnms config:set ignore_mount.+ /kern
+    lnms config:set ignore_mount.+ /mnt/cdrom
+    lnms config:set ignore_mount.+ /proc
+    lnms config:set ignore_mount.+ /dev
 
-lnms config:set ignore_mount.+ /kern
-lnms config:set ignore_mount.+ /mnt/cdrom
-lnms config:set ignore_mount.+ /proc
-lnms config:set ignore_mount.+ /dev
+    lnms config:set ignore_mount_string.+ packages
+    lnms config:set ignore_mount_string.+ devfs
+    lnms config:set ignore_mount_string.+ procfs
+    lnms config:set ignore_mount_string.+ UMA
+    lnms config:set ignore_mount_string.+ MALLOC
 
-lnms config:set ignore_mount_string.+ packages
-lnms config:set ignore_mount_string.+ devfs
-lnms config:set ignore_mount_string.+ procfs
-lnms config:set ignore_mount_string.+ UMA
-lnms config:set ignore_mount_string.+ MALLOC
+    lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
+    lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
+    lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
+    lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
+    lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
+    lnms config:set ignore_mount_regexp.+ '/UMA/'
+    ```
 
-lnms config:set ignore_mount_regexp.+ '/on: \/packages/'
-lnms config:set ignore_mount_regexp.+ '/on: \/dev/'
-lnms config:set ignore_mount_regexp.+ '/on: \/proc/'
-lnms config:set ignore_mount_regexp.+ '/on: \/junos^/'
-lnms config:set ignore_mount_regexp.+ '/on: \/junos\/dev/'
-lnms config:set ignore_mount_regexp.+ '/on: \/jail\/dev/'
-lnms config:set ignore_mount_regexp.+ '/^(dev|proc)fs/'
-lnms config:set ignore_mount_regexp.+ '/^\/dev\/md0/'
-lnms config:set ignore_mount_regexp.+ '/^\/var\/dhcpd\/dev,/'
-lnms config:set ignore_mount_regexp.+ '/UMA/'
-```
+Custom storage warning percentage which will be set when storage information
+is discovered.
 
-Custom storage warning percentage
-
-```bash
-lnms config:set storage_perc_warn 60
-```
+!!! setting "discovery/storage"
+    ```bash
+    lnms config:set storage_perc_warn 60
+    ```
 
 ## IRC Bot
 
@@ -1099,12 +1149,6 @@ Please refer to [Syslog](../Extensions/Syslog.md)
 
 ## Virtualization
 
-```bash
-lnms config:set enable_libvirt true
-lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
-lnms config:set libvirt_username root
-```
-
 Enable this to switch on support for libvirt along with `libvirt_protocols`
 to indicate how you connect to libvirt.  You also need to:
 
@@ -1120,13 +1164,21 @@ to indicate how you connect to libvirt.  You also need to:
 To test your setup, run `virsh -c qemu+ssh://vmhost/system list` or
 `virsh -c xen+ssh://vmhost list` as your librenms polling user.
 
+!!! setting "external/virtualization"
+    ```bash
+    lnms config:set enable_libvirt true
+    lnms config:set libvirt_protocols '["qemu+ssh","xen+ssh"]'
+    lnms config:set libvirt_username root
+    ```
+
 ## BGP Support
 
-```bash
-lnms config:set astext.65332 "Cymru FullBogon Feed"
-```
+You can use this config option to rewrite the description of ASes that you have discovered.
 
-You can use this array to rewrite the description of ASes that you have discovered.
+!!! setting "discovery/general"
+    ```bash
+    lnms config:set astext.65332 "Cymru FullBogon Feed"
+    ```
 
 ## Auto updates
 
@@ -1137,9 +1189,10 @@ Please refer to [Updating](../General/Updating.md)
 Setup the types of IPMI protocols to test a host for and in what
 order. Don't forget to install ipmitool on the monitoring host.
 
-```bash
-lnms config:set ipmi.type '["lanplus", "lan", "imb", "open"]'
-```
+!!! setting "discovery/ipmi"
+    ```bash
+    lnms config:set ipmi.type '["lanplus", "lan", "imb", "open"]'
+    ```
 
 ## Distributed poller settings
 
@@ -1154,15 +1207,16 @@ Please refer to [Distributed Poller](../Extensions/Distributed-Poller.md)
 CORS support for the API is disabled by default. Below you will find
 the standard options, all of which you can configure.
 
-```bash
-lnms config:set api.cors.enabled false
-lnms config:set api.cors.origin '["*"]'
-lnms config:set api.cors.maxage '86400'
-lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
-lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
-lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
-lnms config:set api.cors.allowcredentials false
-```
+!!! setting "api/cors"
+    ```bash
+    lnms config:set api.cors.enabled false
+    lnms config:set api.cors.origin '["*"]'
+    lnms config:set api.cors.maxage '86400'
+    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+    lnms config:set api.cors.allowmethods '["POST", "GET", "PUT", "DELETE", "PATCH"]'
+    lnms config:set api.cors.allowheaders '["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Auth-Token"]'
+    lnms config:set api.cors.exposeheaders '["Cache-Control", "Content-Language", "Content-Type", "Expires", "Last-Modified", "Pragma"]'
+    lnms config:set api.cors.allowcredentials false
+    ```
