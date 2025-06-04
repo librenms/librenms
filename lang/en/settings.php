@@ -895,7 +895,7 @@ return [
         ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
-        'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
+            'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
         ],
         'enable_syslog' => [
             'description' => 'Enable Syslog',
@@ -2041,7 +2041,7 @@ return [
         'storage_perc_warn' => [
             'description' => 'Storage Percentage Warning',
             'help' => 'Percentage of storage used before a warning is raised. 0 disables warning.',
-    ],
+        ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
         ],
