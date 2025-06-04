@@ -51,7 +51,7 @@ class StoragesController extends TableController
         $descr = $storage->storage_descr;
         $graph_array = [
             'type' => 'storage_usage',
-            'popup_title' => htmlentities(strip_tags($storage->device->displayName() . ': ' . $storage->storage_descr)),
+            'popup_title' => htmlentities(strip_tags($storage->device?->displayName() . ': ' . $storage->storage_descr)),
             'id' => $storage->storage_id,
             'from' => '-1d',
             'height' => 20,

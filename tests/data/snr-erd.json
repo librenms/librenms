@@ -244,7 +244,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.8.1",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -258,7 +258,7 @@
                     "inetCidrRouteDest": "10.200.8.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.8.244",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 }
             ]
@@ -614,5 +614,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.200.8.243",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.200.8.0/24",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "10.200.8.244",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.200.8.0/24",
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }
