@@ -5879,6 +5879,13 @@
             "default": true,
             "type": "boolean"
         },
+        "polling.selected_ports": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "ports",
+            "order": 0
+        },
         "port_descr_parser": {
             "default": "includes/port-descr-parser.inc.php",
             "type": "text"

@@ -1620,6 +1620,10 @@ return [
                 'description' => 'Printer Supplies',
             ],
         ],
+        'polling.selected_ports' => [
+            'description' => 'Selected Port Polling',
+            'help' => 'Enable selected port polling to only poll ports that are up and enabled',
+        ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
