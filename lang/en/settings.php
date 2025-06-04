@@ -44,6 +44,9 @@ return [
             'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
+            'ipmi' => ['name' => 'IPMI Module'],
+            'sensors' => ['name' => 'Sensors Module'],
+            'virtualization' => ['name' => 'Virtualization Module'],
         ],
         'external' => [
             'binaries' => ['name' => 'Binary Locations'],
@@ -72,6 +75,7 @@ return [
             'snmp' => ['name' => 'SNMP'],
             'dispatcherservice' => ['name' => 'Dispatcher Service'],
             'poller_modules' => ['name' => 'Poller Modules'],
+            'ports' => ['name' => 'Ports Poller Module'],
         ],
         'system' => [
             'billing' => ['name' => 'Billing'],
