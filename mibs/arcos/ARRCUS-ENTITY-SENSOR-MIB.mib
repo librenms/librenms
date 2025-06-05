@@ -1,0 +1,184 @@
+-- ARRCUS Enterprise MIB for Entity Sensor Information
+
+ARRCUS-ENTITY-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS  
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, Unsigned32, Counter32, Counter64
+            FROM SNMPv2-SMI
+         NOTIFICATION-GROUP                       
+            FROM SNMPv2-CONF
+        entPhysicalDescr, entPhysicalIndex, entPhysicalName  
+            FROM ENTITY-MIB
+        entPhySensorValue, entPhySensorOperStatus
+            FROM ENTITY-SENSOR-MIB;
+
+        arrcusEntitySensor MODULE-IDENTITY
+            LAST-UPDATED "202204270000Z"
+            ORGANIZATION "@ARRCUS"
+            CONTACT-INFO "@arrcus.com"
+            DESCRIPTION "This module defines the model for viewing Arrcus specific entity sensor information"
+            REVISION "202204270000Z"
+            DESCRIPTION "@REVISION-DESCRIPTION"
+            ::= { 1 3 6 1 4 1 51604 3 6 }
+
+        -- Top level components of this MIB module
+
+        -- Notifications
+        arrcusEntitySensorNotifications OBJECT IDENTIFIER ::= { arrcusEntitySensor 1 }
+        arrcusEntitySystemObjects  OBJECT IDENTIFIER ::= { arrcusEntitySensor 2 }
+
+        -- 
+        -- objects
+        --
+
+        arcProcessName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION "The name of the process."
+            ::= { arrcusEntitySystemObjects 1 }
+
+        arcProcessPID OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION "The PID of the process."
+            ::= { arrcusEntitySystemObjects 2}
+
+        arcDiskName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION "The name of the disk."
+            ::= { arrcusEntitySystemObjects 3 }
+
+        arcDiskUsagePercent OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION "Percent usage of the given disk."
+            ::= { arrcusEntitySystemObjects 4}
+
+        --
+        -- Notifications
+        --
+
+        arrcusEntityPSUNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorOperStatus
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when a PSU gets inserted/removed."
+            ::= { arrcusEntitySensorNotifications 1 }
+
+        arrcusEntityTempSensorWarningThresholdExceedNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorValue
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when temperature sensor reaches/exceeds warning threshold."
+            ::= { arrcusEntitySensorNotifications 2 }
+
+        arrcusEntityTempSensorErrThresholdExceedNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorValue
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when temperature sensor reaches/exceeds err threshold."
+            ::= { arrcusEntitySensorNotifications 3 }
+
+        arrcusEntityTempSensorShutdownThresholdExceedNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorValue
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when temperature sensor reaches/exceeds shutdown threshold."
+            ::= { arrcusEntitySensorNotifications 4 }
+
+        arrcusEntityTempSensorThresholdRecoveryNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorValue
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when temperature sensor goes below warning/err/shutdown thresholds."
+            ::= { arrcusEntitySensorNotifications 5 }
+
+        arrcusEntityFanNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhysicalDescr,
+                entPhySensorOperStatus
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when a FAN gets inserted/removed."
+            ::= { arrcusEntitySensorNotifications 6 }
+
+        arrcusEntitySFPNotification NOTIFICATION-TYPE
+            OBJECTS {
+                entPhysicalName,
+                entPhySensorOperStatus
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when a SFP gets inserted/removed."
+            ::= { arrcusEntitySensorNotifications 7 }
+
+        arrcusEntityProcessDownNotification NOTIFICATION-TYPE
+            OBJECTS {
+                arcProcessName,
+                arcProcessPID
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when an arcos process goes down."
+            ::= { arrcusEntitySensorNotifications 8 }
+        
+        arrcusEntityDiskUsageNotification NOTIFICATION-TYPE
+            OBJECTS {
+                arcDiskName,
+                arcDiskUsagePercent
+            }
+            STATUS current
+            DESCRIPTION
+                "Notification generated when disk reaches capacity."
+            ::= { arrcusEntitySensorNotifications 9 }
+        
+        -- conformance information
+
+        arrcusEntitySensorConformance OBJECT IDENTIFIER ::= { arrcusEntitySensor 3 }
+
+        arrcusEntitySensorGroups      OBJECT IDENTIFIER ::= { arrcusEntitySensorConformance 1 }
+
+
+        arrcusEntitySensorNotificationsGroup  NOTIFICATION-GROUP
+            NOTIFICATIONS { arrcusEntityPSUNotification, 
+                            arrcusEntityTempSensorWarningThresholdExceedNotification, 
+                            arrcusEntityTempSensorErrThresholdExceedNotification,
+                            arrcusEntityTempSensorShutdownThresholdExceedNotification,
+                            arrcusEntityTempSensorThresholdRecoveryNotification,
+                            arrcusEntityFanNotification,
+                            arrcusEntitySFPNotification,
+                            arrcusEntityProcessDownNotification,
+                            arrcusEntityDiskUsageNotification }
+            STATUS  current
+            DESCRIPTION
+                "The notifications which indicate status change for sensors (PSU/temperature)."
+            ::= { arrcusEntitySensorGroups 1 }
+END
