@@ -3,6 +3,7 @@ text: 'Tycon Systems TPDIN'
 type: power
 icon: tyconsystems
 mib_dir: tycon
+snmp_bulk: false
 over:
     - { graph: device_voltage, text: 'Device Voltage' }
     - { graph: device_current, text: 'Device Current' }
