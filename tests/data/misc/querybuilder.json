@@ -122,8 +122,8 @@
         "%bills.bill_name = \"Neil's Bill\"",
         {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
         "bills.bill_name = \"Neil's Bill\"",
-        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\"",
-        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `bill_ports` on `ports`.`port_id` = `bill_ports`.`port_id` left join `bills` on `bill_ports`.`bill_id` = `bills`.`bill_id` where (`bills`.`bill_name` = ?)", ["Neil's Bill"]]
+        "SELECT * FROM devices,ports,bill_port_counters,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_port_counters.port_id AND bill_port_counters.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\"",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `bill_port_counters` on `ports`.`port_id` = `bill_port_counters`.`port_id` left join `bills` on `bill_port_counters`.`bill_id` = `bills`.`bill_id` where (`bills`.`bill_name` = ?)", ["Neil's Bill"]]
     ],
     [
         "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
