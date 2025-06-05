@@ -25,6 +25,7 @@ if (! empty($peers)) {
     ];
 
     $generic = false;
+    $cumulus_vrf = false;
     if ($device['os'] == 'junos') {
         $peer_data_check = SnmpQuery::mibDir('junos')
             ->enumStrings()
@@ -63,6 +64,18 @@ if (! empty($peers)) {
         $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
     } elseif ($device['os'] == 'cumulus') {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
+        if (empty($peer_data_check)) {
+            $peer_data_check = \SnmpQuery::enumStrings()->hideMib()->walk('CUMULUS-BGPVRF-MIB::bgpPeerTable')->mapTable(
+                $peer_data_check = function ($data, $vrfId, $peerIdType, $ifFace) {
+                    $data['vrfId'] = $vrfId;
+                    $data['peerIdType'] = $peerIdType;
+                    $data['ifIndex'] = explode('.', $ifFace)[4];
+                    $peer[$data['bgpPeerIdentifier']] = $data;
+
+                    return $peer;
+                });
+            $cumulus_vrf = true;
+        }
     } else {
         $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
     }
@@ -399,6 +412,24 @@ if (! empty($peers)) {
                             'bgpPeerLastError' => 'bgpPeerLastErrorCode',
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
+                        if ($cumulus_vrf) {
+                            $bgp_peers = array_filter($peer_data_check->toArray(), function ($peer) use ($peer_identifier) {
+                                return isset($peer[$peer_identifier]) ? $peer[$peer_identifier] : [];
+                            });
+                            $tmp_data = array_pop($bgp_peers)[$peer_identifier];
+                            $peer_data['bgpPeerDescr'] = $tmp_data['bgpPeerDesc'];
+                            $peer_data['bgpPeerState'] = $tmp_data['bgpPeerState'];
+                            $peer_data['bgpPeerAdminStatus'] = $tmp_data['bgpPeerAdminStatus'];
+                            $peer_data['bgpPeerInUpdates'] = $tmp_data['bgpPeerInUpdates'];
+                            $peer_data['bgpPeerOutUpdates'] = $tmp_data['bgpPeerOutUpdates'];
+                            $peer_data['bgpPeerInTotalMessages'] = $tmp_data['bgpPeerInTotalMessages'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $tmp_data['bgpPeerOutTotalMessages'];
+                            $peer_data['bgpPeerFsmEstablishedTime'] = $tmp_data['bgpPeerFsmEstablishedTime'];
+                            $peer_data['bgpPeerInUpdateElapsedTime'] = $tmp_data['bgpPeerInUpdateElapsedTime'];
+                            [$last_error_code, $last_error_subcode] = explode(' ', $tmp_data['bgpPeerLastError']);
+                            $peer_data['bgpPeerLastErrorCode'] = octdec($last_error_code);
+                            $peer_data['bgpPeerLastErrorSubCode'] = octdec($last_error_subcode);
+                        }
                     } else {
                         $peer_identifier = $peer['bgpPeerIdentifier'];
                         $mib = 'BGP4-MIB';
@@ -455,6 +486,17 @@ if (! empty($peers)) {
                 if (isset($peer_data['bgpPeerIface']) && ! IP::isValid($peer_data['bgpPeerIface'])) {
                     // The column is already filled with the ifName, we change it to ifIndex
                     $peer_data['bgpPeerIface'] = DeviceCache::getPrimary()->ports()->where('ifName', '=', $peer_data['bgpPeerIface'])->value('ifIndex');
+                } elseif (isset($peer_data['bgpPeerIface']) && is_numeric($peer_data['bgpPeerIface'])) {
+                    // The column is already filled with the ifIndex, we leave it as is
+                } elseif (isset($peer_data['bgpPeerLocalAddr']) && IP::isValid($peer_data['bgpPeerLocalAddr'])) {
+                    // else we use the bgpPeerLocalAddr to find ifIndex
+                    try {
+                        $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
+                        $family = $ip_address->getFamily();
+                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
+                    } catch (InvalidIpException $e) {
+                        $peer_data['bgpPeerIface'] = null;
+                    }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
                     // else we use the bgpLocalAddr to find ifIndex
                     try {
