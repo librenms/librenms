@@ -13,7 +13,8 @@
             "default": false,
             "type": "boolean",
             "group": "discovery",
-            "section": "general"
+            "section": "general",
+            "order": 2
         },
         "alert.ack_until_clear": {
             "default": false,
@@ -404,7 +405,8 @@
             },
             "type": "array",
             "group": "discovery",
-            "section": "general"
+            "section": "general",
+            "order": 4
         },
         "auth.allow_get_login": {
             "group": "auth",
@@ -918,7 +920,8 @@
                 "value.*": "is_regex"
             },
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
+            "order": 0
         },
         "bad_disk_regexp": {
             "default": [],
@@ -1061,13 +1064,15 @@
             "default": null,
             "type": "directory",
             "group": "external",
-            "section": "collectd"
+            "section": "collectd",
+            "order": 0
         },
         "collectd_sock": {
             "default": null,
             "type": "text",
             "group": "external",
-            "section": "collectd"
+            "section": "collectd",
+            "order": 1
         },
         "core_descr": {
             "default": ["core"],
@@ -1427,7 +1432,8 @@
             ],
             "type": "array",
             "group": "webui",
-            "section": "graph"
+            "section": "graph",
+            "order": 8
         },
         "device_types": {
             "default": [
@@ -1498,7 +1504,8 @@
             "default": null,
             "type": "array",
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
+            "order": 1
         },
         "disabled_sensors_regex": {
             "default": null,
@@ -1508,7 +1515,8 @@
                 "value.*": "is_regex"
             },
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
+            "order": 2
         },
         "discover_services": {
             "default": false,
@@ -2136,43 +2144,50 @@
             "default": false,
             "group": "system",
             "section": "billing",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 1
         },
         "enable_clear_discovery": {
             "default": true,
             "type": "boolean",
             "group": "webui",
-            "section": "device"
+            "section": "device",
+            "order": 8
         },
         "enable_footer": {
             "default": false,
             "type": "boolean",
             "group": "webui",
-            "section": "general"
+            "section": "general",
+            "order": 0
         },
         "enable_inventory": {
             "default": true,
             "type": "boolean",
             "group": "webui",
-            "section": "menu"
+            "section": "menu",
+            "order": 0
         },
         "enable_lazy_load": {
             "default": true,
             "type": "boolean",
             "group": "webui",
-            "section": "general"
+            "section": "general",
+            "order": 1
         },
         "enable_libvirt": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
-            "section": "virtualization"
+            "section": "virtualization",
+            "order": 0
         },
         "enable_proxmox": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
-            "section": "virtualization"
+            "section": "virtualization",
+            "order": 1
         },
         "enable_ports_adsl": {
             "default": true,
@@ -2190,13 +2205,15 @@
             "default": true,
             "type": "boolean",
             "group": "webui",
-            "section": "menu"
+            "section": "menu",
+            "order": 1
         },
         "enable_syslog": {
             "default": false,
             "type": "boolean",
             "group": "webui",
-            "section": "menu"
+            "section": "menu",
+            "order": 2
         },
         "enable_syslog_hooks": {
             "default": false,
@@ -2270,7 +2287,8 @@
             "default": "default",
             "group": "webui",
             "section": "front-page",
-            "type": "text"
+            "type": "text",
+            "order": 0
         },
         "front_page_down_box_limit": {
             "default": 10,
@@ -2279,7 +2297,8 @@
             "type": "integer",
             "validate": {
                 "value": "integer"
-            }
+            },
+            "order": 1
         },
         "front_page_settings.top.devices": {
             "default": 10,
@@ -2288,7 +2307,8 @@
             "type": "integer",
             "validate": {
                 "value": "integer"
-            }
+            },
+            "order": 2
         },
         "front_page_settings.top.ports": {
             "default": 10,
@@ -2297,7 +2317,8 @@
             "type": "integer",
             "validate": {
                 "value": "integer"
-            }
+            },
+            "order": 3
         },
         "gateone.server": {
             "default": null,
@@ -2391,7 +2412,8 @@
             "default": null,
             "type": "array",
             "group": "discovery",
-            "section": "ports"
+            "section": "ports",
+            "order": 8
         },
         "graph_stat_percentile_disable": {
             "default": false,
@@ -4682,31 +4704,36 @@
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 3
         },
         "int_customers": {
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 4
         },
         "int_l2tp": {
             "default": false,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 5
         },
         "int_peering": {
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 6
         },
         "int_transit": {
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 7
         },
         "ipmi.type": {
             "default": [
@@ -4717,7 +4744,8 @@
             ],
             "type": "array",
             "group": "discovery",
-            "section": "ipmi"
+            "section": "ipmi",
+            "order": 0
         },
         "ipmi_unit": {
             "default": {
@@ -4731,7 +4759,8 @@
             },
             "type": "array",
             "group": "discovery",
-            "section": "ipmi"
+            "section": "ipmi",
+            "order": 1
         },
         "ipmitool": {
             "default": "/usr/bin/ipmitool",
@@ -4821,13 +4850,15 @@
             ],
             "type": "array",
             "group": "discovery",
-            "section": "virtualization"
+            "section": "virtualization",
+            "order": 2
         },
         "libvirt_username": {
             "default": null,
             "type": "text",
             "group": "discovery",
-            "section": "virtualization"
+            "section": "virtualization",
+            "order": 3
         },
         "list_colour.even": {
             "default": "#ffffff",
@@ -4865,7 +4896,8 @@
                 "value.*": "string"
             },
             "group": "webui",
-            "section": "device"
+            "section": "device",
+            "order": 9
         },
         "location_map_regex": {
             "default": null,
@@ -4875,7 +4907,8 @@
                 "value.*": "string"
             },
             "group": "webui",
-            "section": "device"
+            "section": "device",
+            "order": 10
         },
         "location_map_regex_sub": {
             "default": null,
@@ -4885,7 +4918,8 @@
                 "value.*": "string"
             },
             "group": "webui",
-            "section": "device"
+            "section": "device",
+            "order": 11
         },
         "log_dir": {
             "type": "directory"
@@ -5284,7 +5318,8 @@
             "default": true,
             "type": "boolean",
             "group": "webui",
-            "section": "general"
+            "section": "general",
+            "order": 2
         },
         "own_hostname": {
             "default": "localhost",
@@ -5458,7 +5493,8 @@
             "group": "webui",
             "section": "general",
             "type": "integer",
-            "units": "seconds"
+            "units": "seconds",
+            "order": 3
         },
         "page_title_prefix": {
             "default": "",
@@ -5497,7 +5533,8 @@
             "section": "graph",
             "validate": {
                 "value": "integer|between:0,100"
-            }
+            },
+            "order": 8
         },
         "permission.device_group.allow_dynamic": {
             "default": false,
@@ -6016,13 +6053,15 @@
             "default": [],
             "type": "array",
             "group": "external",
-            "section": "rancid"
+            "section": "rancid",
+            "order": 0
         },
         "rancid_ignorecomments": {
             "default": false,
             "type": "boolean",
             "group": "external",
-            "section": "rancid"
+            "section": "rancid",
+            "order": 1
         },
         "rancid_repo_type": {
             "default": "svn",
@@ -6032,7 +6071,8 @@
                 "git": "Git"
             },
             "group": "external",
-            "section": "rancid"
+            "section": "rancid",
+            "order": 2
         },
         "reporting.error": {
             "group": "system",
@@ -6066,7 +6106,8 @@
         "rewrite_if": {
             "type": "array",
             "group": "discovery",
-            "section": "ports"
+            "section": "ports",
+            "order": 9
         },
         "rewrite_if_regexp": {
             "default": {
@@ -6078,7 +6119,8 @@
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
-            }
+            },
+            "order": 10
         },
         "routes_max_number": {
             "default": 1000,
@@ -6255,7 +6297,8 @@
             "default": true,
             "type": "boolean",
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
+            "order": 4
         },
         "service_poller_workers": {
             "default": 24,
@@ -6414,19 +6457,22 @@
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 8
         },
         "show_locations_dropdown": {
             "default": true,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 9
         },
         "show_services": {
             "default": false,
             "group": "webui",
             "section": "menu",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 10
         },
         "site_style": {
             "default": "device",
@@ -6622,7 +6668,8 @@
                 "value": "integer|between:0,100"
             },
             "group": "discovery",
-            "section": "storage"
+            "section": "storage",
+            "order": 8
         },
         "stylesheet": {
             "default": "css/styles.css",
@@ -6785,7 +6832,8 @@
             "default": true,
             "group": "webui",
             "section": "general",
-            "type": "boolean"
+            "type": "boolean",
+            "order": 4
         },
         "webui.availability_map_box_size": {
             "default": 165,
@@ -6819,7 +6867,8 @@
             "default": [],
             "group": "webui",
             "section": "style",
-            "type": "array"
+            "type": "array",
+            "order": 4
         },
         "webui.default_dashboard_id": {
             "default": 0,
