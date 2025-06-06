@@ -82,19 +82,19 @@ HAVING AVG(processors.processor_usage)
 > 10;
 ```
 
-> The 10 would then contain the average CPU usage value, you can
-> change this value to be whatever you like.
-
-- You will to need copy and paste this into the Alert Rule under
-  Advanced then paste into Query box and switch the Override SQL.
+!!! note
+    The 10 would then contain the average CPU usage value, you can
+    change this value to be whatever you like.
+    You will to need copy and paste this into the Alert Rule under
+    Advanced then paste into Query box and switch the Override SQL.
 
 ## Procedure
 
-You can associate a rule to a procedure by giving the URL of the
-procedure when creating the rule. Only links like "http://" are
-supported, otherwise an error will be returned. Once configured,
-procedure can be opened from the Alert widget through the "Open"
-button, which can be shown/hidden from the widget configuration box.
+You can provide procedure URL when creating the rule. Only links
+like "http://" are supported, otherwise an error will be returned.
+Once configured, procedures can be opened from the Alert widget
+through the "Open" button, which can be shown/hidden from the
+widget configuration box.
 
 ## Examples
 
@@ -128,6 +128,6 @@ Alert when:
 
 You can also select Alert Rule from the Alerts Collection. These Alert
 Rules are submitted by users in the community :) If would like to
-submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/resources/definitions/alert_rules.json)
+submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/edit/master/resources/definitions/alert_rules.json)
 
 ![Alert Rules Collection](../img/alert-rules-collection.png)
