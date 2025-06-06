@@ -383,6 +383,9 @@ function list_devices(Illuminate\Http\Request $request)
     } elseif ($type == 'display') {
         $sql = '`d`.`display` LIKE ?';
         $param[] = "%$query%";
+    } elseif (in_array($type, ['serial','version','hardware','features'])) {
+        $sql = "`d`.`$type` LIKE ?";
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
