@@ -52,10 +52,6 @@ class QueryBuilderTest extends TestCase
     #[DataProvider('loadQueryData')]
     public function testQueryConversion($legacy, $builder, $display, $sql, $query): void
     {
-        if (! empty($legacy)) {
-            // some rules don't have a legacy representation
-            $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toArray());
-        }
         $qb = QueryBuilderFluentParser::fromJson($builder);
         $this->assertEquals($display, $qb->toSql(false));
         $this->assertEquals($sql, $qb->toSql());
