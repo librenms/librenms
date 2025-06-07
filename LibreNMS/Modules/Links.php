@@ -190,6 +190,16 @@ class Links implements Module
                     $data['lldpRemIndex'] = $lldpRemIndex;
                     $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
+                    // Fix devices returning lldpRemPortId in HEX (Panos for instances does it)
+                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace([':', '-'], ' ',$data['lldpRemPortId']))) {
+                        $data['lldpRemPortId'] = StringHelpers::hexToAscii($data['lldpRemPortId'], ':');
+                    }
+
+                    // Fix devices returning lldpRemChassisId in HEX (Panos for instances does it)
+                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress' && preg_match('/:3a:/is', $data['lldpRemChassisId'])) {
+                        $data['lldpRemChassisId'] = StringHelpers::hexToAscii($data['lldpRemChassisId'], ':');
+                    }
+
                     // lldpRemLocalPortNum is a local index for LLDP, not an ifIndex
                     // There is no path to ifindex, only to ifName, stored in lldpLocPortId
                     $data['lldpLocPortId'] = $lldpLocPortId[$lldpRemLocalPortNum] ?? null;
@@ -201,11 +211,11 @@ class Links implements Module
                     }
                     if (empty($data['localPortId'])) {
                         $idx = $lldpRemLocalPortNum; // This should not happen, not MIB compliant
-                        $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
+                        $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
-                    if (empty($data['localPortId'])) {
-                        $idx = $bridgeLocPortId[$lldpRemLocalPortNum] ?? 0;
-                        $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
+                    if (empty($data['localPortId']) && !empty ($bridgeLocPortId[$lldpRemLocalPortNum])) {
+                        $idx = $bridgeLocPortId[$lldpRemLocalPortNum];
+                        $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
                     if (empty($data['localPortId']) && ! empty($data['lldpLocPortId'])) {
                         // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
