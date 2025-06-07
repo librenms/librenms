@@ -7610,9 +7610,9 @@
                     "remote_port": "GigabitEthernet2/0/47 (488eef716260)",
                     "remote_platform": null,
                     "remote_version": "S5720-56C-PWR-EI-AC\nHuawei Versatile Routing Platform Software\r\nVRP (R) software, Version 5.170 (S5720 V200R010C00SPC600)\r\nCopyright (C) 2000-2016 HUAWEI TECH CO., LTD",
-                    "ifAlias": "HUAWEI, AC Series, GigabitEthernet0/0/22 Interface",
-                    "ifDescr": "GigabitEthernet0/0/22",
-                    "ifName": "GigabitEthernet0/0/22"
+                    "ifAlias": "HUAWEI, AC Series, GigabitEthernet0/0/24 Interface",
+                    "ifDescr": "GigabitEthernet0/0/24",
+                    "ifName": "GigabitEthernet0/0/24"
                 },
                 {
                     "active": 1,
