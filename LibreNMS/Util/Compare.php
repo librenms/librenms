@@ -79,7 +79,7 @@ class Compare
             case 'not_ends':
                 return ! Str::endsWith($a, $b);
             case 'regex':
-                return (bool) preg_match($b, $a);
+                return (bool) preg_match($b, $a ?? null);
             case 'not_regex':
                 return ! ((bool) preg_match($b, $a));
             case 'in_array':
