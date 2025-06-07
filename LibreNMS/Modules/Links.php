@@ -191,7 +191,7 @@ class Links implements Module
                     $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
                     // Fix devices returning lldpRemPortId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace([':', '-'], ' ',$data['lldpRemPortId']))) {
+                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace([':', '-'], ' ', $data['lldpRemPortId']))) {
                         $data['lldpRemPortId'] = StringHelpers::hexToAscii($data['lldpRemPortId'], ':');
                     }
 
@@ -213,7 +213,7 @@ class Links implements Module
                         $idx = $lldpRemLocalPortNum; // This should not happen, not MIB compliant
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
-                    if (empty($data['localPortId']) && !empty ($bridgeLocPortId[$lldpRemLocalPortNum])) {
+                    if (empty($data['localPortId']) && ! empty ($bridgeLocPortId[$lldpRemLocalPortNum])) {
                         $idx = $bridgeLocPortId[$lldpRemLocalPortNum];
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
