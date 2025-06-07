@@ -200,7 +200,7 @@ function record_sensor_data($device, $all_sensors)
                 'state_value'
             );
 
-            Eventlog::log("$class sensor {$sensor['sensor_descr']} has changed from {" . $trans[$prev_sensor_value] ?? 'null' . "}($prev_sensor_value) to {" . $trans[$sensor_value] ?? 'null' . "} ($sensor_value)", $device['device_id'], $class, Severity::Notice, $sensor['sensor_id']);
+            Eventlog::log('$class sensor ' . $sensor['sensor_descr'] ?? '' . ' has changed from ' . $trans[$prev_sensor_value] ?? '#unamed state#' . "($prev_sensor_value) to " . $trans[$sensor_value] ?? '#unamed state#' . " ($sensor_value)", $device['device_id'], $class, Severity::Notice, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
             dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);
