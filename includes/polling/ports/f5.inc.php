@@ -26,6 +26,7 @@
 $f5_stats = snmpwalk_cache_oid($device, 'sysIfxStat', [], 'F5-BIGIP-SYSTEM-MIB');
 unset($f5_stats[0]);
 
+$tmp_port_stats = [];
 foreach ($ifmib_oids as $oid) {
     echo "$oid ";
     $tmp_port_stats = snmpwalk_cache_oid($device, $oid, $tmp_port_stats, 'IF-MIB', null, '-OQUst');
