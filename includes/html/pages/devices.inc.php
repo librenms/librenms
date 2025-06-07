@@ -338,7 +338,7 @@ if ($format == 'graph') {
                     return "<span title=\"Status: " + row.status + " : " + row.extra.replace(/^label-/,'') + "\" class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                    return "<span class=\"device-table-icon tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2\">" + row.icon + "</span>";
                 },
                 "maintenance": function (column, row) {
                     if (row.maintenance) {
