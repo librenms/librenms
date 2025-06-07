@@ -14018,7 +14018,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "acme-xxx-sr-001",
-                    "remote_port": "31:30:47:45:32:2f:34:2f:30:2f:37 (32303a32383a33653a36653a65333a3131)",
+                    "remote_port": "10GE2/4/0/7 (20283e6ee311)",
                     "remote_platform": null,
                     "remote_version": "Huawei Versatile Routing Platform Software\nVRP (R) software, Version 8.150 (CE12800 V200R002C50SPC800)\r\nCopyright (C) 2012-2017 Huawei Technologies Co., Ltd.\r\nHUAWEI CE12804S",
                     "ifAlias": "ethernet1/12",
