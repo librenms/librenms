@@ -224,7 +224,9 @@ class Links implements Module
                     $data['lldpRemSysName'] = substr($data['lldpRemSysName'], 0, 64);
                     $remoteMac = $remotePortName = '';
 
-                    if ($data['lldpRemPortIdSubtype'] == 'interfaceName' || $data['lldpRemPortIdSubtype'] == 'interfaceAlias') {
+                    if ($data['lldpRemPortIdSubtype'] == 'interfaceName'
+                        || $data['lldpRemPortIdSubtype'] == 'interfaceAlias'
+                        || $data['lldpRemPortIdSubtype'] == 'portComponent') {
                         $tmpName = $data['lldpRemPortDescr'] ?? $data['lldpRemPortId'];
                         $remotePortName = StringHelpers::linksRemPortName($data['lldpRemSysDesc'] ?? '', $tmpName ?? '');
                     }
