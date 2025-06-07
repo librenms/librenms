@@ -213,7 +213,7 @@ class Links implements Module
                         $idx = $lldpRemLocalPortNum; // This should not happen, not MIB compliant
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
-                    if (empty($data['localPortId']) && ! empty ($bridgeLocPortId[$lldpRemLocalPortNum])) {
+                    if (empty($data['localPortId']) && ! empty($bridgeLocPortId[$lldpRemLocalPortNum])) {
                         $idx = $bridgeLocPortId[$lldpRemLocalPortNum];
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device);
                     }
