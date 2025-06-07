@@ -504,12 +504,12 @@ if (! empty($peers)) {
             ->addDataset('bgpPeerInTotal', 'COUNTER', null, 100000000000)
             ->addDataset('bgpPeerEstablished', 'GAUGE', 0);
         // Validate data
-        $peer_data['bgpPeerFsmEstablishedTime'] = set_numeric($peer_data['bgpPeerFsmEstablishedTime']);
-        $peer_data['bgpPeerInUpdates'] = set_numeric($peer_data['bgpPeerInUpdates']);
-        $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates']);
-        $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages']);
-        $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages']);
-        $peer_data['bgpPeerInUpdateElapsedTime'] = set_numeric($peer_data['bgpPeerInUpdateElapsedTime']);
+        $peer_data['bgpPeerFsmEstablishedTime'] = set_numeric($peer_data['bgpPeerFsmEstablishedTime'] ?? 0);
+        $peer_data['bgpPeerInUpdates'] = set_numeric($peer_data['bgpPeerInUpdates'] ?? 0);
+        $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates'] ?? 0);
+        $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages'] ?? 0);
+        $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages'] ?? 0);
+        $peer_data['bgpPeerInUpdateElapsedTime'] = set_numeric($peer_data['bgpPeerInUpdateElapsedTime'] ?? 0);
 
         $fields = [
             'bgpPeerOutUpdates' => $peer_data['bgpPeerOutUpdates'],
