@@ -201,7 +201,7 @@ function record_sensor_data($device, $all_sensors)
             );
 
             $msg = $class . ' sensor ' . $sensor['sensor_descr'] ?? '';
-            $msg.= ' has changed from ' . $trans[$prev_sensor_value] ?? '' . ' (' . $prev_sensor_value . ') to ' . $trans[$sensor_value] ?? '' . ' (' . $sensor_value . ')';
+            $msg .= ' has changed from ' . $trans[$prev_sensor_value] ?? '' . ' (' . $prev_sensor_value . ') to ' . $trans[$sensor_value] ?? '' . ' (' . $sensor_value . ')';
             Eventlog::log($msg, $device['device_id'], $class, Severity::Notice, $sensor['sensor_id'] ?? '');
         }
         if ($sensor_value != $prev_sensor_value) {
