@@ -204,7 +204,7 @@ class Links implements Module
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
                     }
 
-                    if (empty($data['localPortId']) && ! empty ($data['lldpLocPortId'])) {
+                    if (empty($data['localPortId']) && ! empty($data['lldpLocPortId'])) {
                         // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
                         $data['localPortId'] = PortCache::getIdFromIfIndex($data['lldpLocPortId'], $device);
                     }
