@@ -51,6 +51,9 @@ foreach ($tmp_port_stats as $index => $tmp_stats) {
     $port_stats[$index] = $tmp_stats;
     $port_stats[$index]['ifDescr'] = $tmp_stats['ifDescr'];
     foreach ($required as $ifEntry => $IfxStat) {
+        if (! isset($f5_stats[$descr]) || ! isset($f5_stats[$descr][$IfxStat])) {
+            continue;
+        }
         $port_stats[$index][$ifEntry] = $f5_stats[$descr][$IfxStat];
     }
 }
