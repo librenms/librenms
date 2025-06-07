@@ -1,4 +1,4 @@
-os: zxa10-c300
+os: zxa10
 text: 'ZTE ZXA10 c3xx'
 type: network
 icon: zte
