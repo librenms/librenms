@@ -186,9 +186,9 @@ class Links implements Module
                     }
 
                     // fill the $data structure, in case we need to do debugging
-                    $data['lldpRemLocalPortNum']=$lldpRemLocalPortNum;
-                    $data['lldpRemIndex']=$lldpRemIndex;
-                    $data['lldpRemTimeMark']=$lldpRemTimeMark;
+                    $data['lldpRemLocalPortNum'] = $lldpRemLocalPortNum;
+                    $data['lldpRemIndex'] = $lldpRemIndex;
+                    $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
                     // lldpRemLocalPortNum is a local index for LLDP, not an ifIndex
                     // There is no path to ifindex, only to ifName, stored in lldpLocPortId
@@ -204,7 +204,7 @@ class Links implements Module
                         $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
                     }
 
-                    if ( empty($data['localPortId']) && ! empty ($data['lldpLocPortId'])) {
+                    if (empty($data['localPortId']) && ! empty ($data['lldpLocPortId'])) {
                         // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
                         $data['localPortId'] = PortCache::getIdFromIfIndex($data['lldpLocPortId'], $device);
                     }
