@@ -79,7 +79,7 @@ function add_ports_to_bill($devs, $intf_glob, $id)
     $ids = implode(',', $device_ids);
 
     // Find the devices which match the list of IDS and also the interface glob
-    $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ifType = 'ethernetCsmacd' AND ports.ifAlias LIKE '%$intf_glob%' AND ports.device_id in ($ids)";
+    $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ports.ifAlias LIKE '%$intf_glob%' AND ports.device_id in ($ids)";
     echo "Query: $query\n";
     foreach (dbFetchRows($query) as $ports) {
         echo "Inserting {$ports['ifName']} ({$ports['ifAlias']}) into bill $id\n";
