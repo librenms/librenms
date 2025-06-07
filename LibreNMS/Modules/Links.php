@@ -245,6 +245,7 @@ class Links implements Module
                     $remoteDeviceId = find_device_id($remoteSysName, $remoteDeviceIp, $remoteMac);
 
                     $remotePortId = find_port_id($data['lldpRemPortDescr'] ?? null, $data['lldpRemPortId'], $remoteDeviceId);
+                    $remotePortName = (empty($remotePortId)) ? $remotePortName . ' (' . $remoteMac . ')' : $remotePortName;
 
                     if (! empty($data['localPortId']) && (! empty($remoteSysName))) {
                         $suffix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
