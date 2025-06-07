@@ -4,16 +4,21 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
+use App\Models\Link;
 use App\Models\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
+use LibreNMS\Interfaces\Discovery\LinksDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, LinksDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -115,5 +120,49 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
         }));
 
         return $routes->filter();
+    }
+
+    public function discoverLinks(): Collection
+    {
+        $links = new Collection;
+
+        Log::info('JETSTREAM-LLDP MIB:');
+        $oids = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table(2);
+        foreach ($oids as $ifIndex => $tmp) {
+            foreach ($tmp as $tmpkey => $data) { // more than one neighbor on same port??
+                $port = PortCache::getByIfIndex($ifIndex, $this->getDeviceId());
+                $local_port_id = $port?->port_id;
+                $remote_hostname = $data['lldpNeighborDeviceName'] ?? '';
+                $remote_hostname = (empty($remote_hostname) && $data['lldpNeighborChassisIdType'] == 'Locally assigned') ? $data['lldpNeighborChassisId'] : $remote_hostname;
+                $remote_hostname = StringHelpers::linksRemSysName($remote_hostname);
+                $data['lldpNeighborPortDescr'] = StringHelpers::linksRemPortName($data['lldpNeighborDeviceDescr'] ?? '', $data['lldpNeighborPortDescr'] ?? '');
+                $data['lldpNeighborPortIdDescr'] = StringHelpers::linksRemPortName($data['lldpNeighborDeviceDescr'] ?? '', $data['lldpNeighborPortIdDescr'] ?? '');
+                $remote_device_id = find_device_id($data['lldpNeighborDeviceName']);
+                //broadcom based old tp-link ( <= 2)
+                $remote_port_descr = strlen($data['lldpNeighborPortIdDescr']) > 2 ? $data['lldpNeighborPortIdDescr'] ?? '' : $data['lldpNeighborPortDescr'] ?? '';
+                $remote_mac = ($data['lldpNeighborChassisIdType'] == 'MAC address') ? Mac::parse($data['lldpNeighborChassisId'] ?? '')->hex() : '';
+
+                $remote_port_id = PortCache::getIdFromIfName($remote_port_descr, $remote_device_id);
+                $remote_port_id = (empty($remote_port_id)) ? PortCache::getIdFromIfAlias($remote_port_descr, $remote_device_id) : $remote_port_id;
+                $remote_port_id = (empty($remote_port_id)) ? PortCache::getIdFromIfDescr($remote_port_descr, $remote_device_id) : $remote_port_id;
+                $remote_port_id = (empty($remote_port_id)) ? PortCache::getIdFromIfPhysAddress($remote_mac, $remote_device_id) : $remote_port_id;
+                $remote_port_descr = (empty($remote_port_id)) ? $remote_port_descr . ' (' . $remote_mac . ')' : $remote_port_descr;
+
+                $sufix = (! empty($data['lldpNeighborManageIpAddr'])) ? '#' . $data['lldpNeighborManageIpAddr'] : '';
+                $links->push(new Link([
+                    'local_port_id' => $local_port_id,
+                    'remote_hostname' => $remote_hostname,
+                    'remote_device_id' => $remote_device_id,
+                    'remote_port_id' => $remote_port_id ?? 0,
+                    'active' => 1,
+                    'protocol' => 'lldp' . $sufix,
+                    'remote_port' => $remote_port_descr,
+                    'remote_platform' => null,
+                    'remote_version' => $data['lldpNeighborDeviceDescr'] ?? '',
+                ]));
+            }
+        }
+
+        return $links->filter();
     }
 }
