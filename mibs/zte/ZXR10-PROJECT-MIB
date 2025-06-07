@@ -1,0 +1,99 @@
+ZXR10-PROJECT-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Counter32, --Gauge32,
+       TimeTicks, Integer32,enterprises                      
+       FROM SNMPv2-SMI
+        DisplayString   --MacAddress  
+       FROM SNMPv2-TC ;
+        
+   zte MODULE-IDENTITY
+    LAST-UPDATED "201608170000Z"  
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO
+        "ZTE Corporation 
+         Nanjing Institute of ZTE Corporation
+         
+         No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China
+         
+         Tel: +86-25-52870000"
+
+    DESCRIPTION
+        "ZXR10 T8000 ZXR10-PROJECT-MIB"
+       
+    REVISION "201608170000Z"  
+    DESCRIPTION
+       "Initial revision"
+    ::= { enterprises 3902 }    -- assigned by IANA
+
+   zxr10 OBJECT IDENTIFIER ::= { zte 3}
+   zxUPN OBJECT IDENTIFIER ::= { zxr10 6002 }   
+   
+   zxr10-objectID  OBJECT IDENTIFIER  ::= { zxr10 100 }
+
+   zxr10T8000SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 system object id"
+    ::= { zxr10-objectID 6006 }
+
+   zxr10T8000 OBJECT-IDENTITY   
+    STATUS        current
+    DESCRIPTION  "zxr10 system object id"
+    ::= { zxr10T8000SysID 1 }
+  
+   zxr10T8000-8 OBJECT-IDENTITY   
+    STATUS        current
+    DESCRIPTION  "zxr10 system object id"
+    ::= { zxr10T8000SysID 2 }
+
+   zxr10T8000-18 OBJECT-IDENTITY   
+    STATUS        current
+    DESCRIPTION  "zxr10 system object id"
+    ::= { zxr10T8000SysID 3 }
+
+
+       -- Nanjing Institute of Telecom,ZTE Corporation
+       -- Postal: 9F. No.54 Building, 301# East ZhongShan Rd.
+       -- Nan Jing, China
+       -- Tel:    86-25-4826606-3821
+       -- E-Mail: li.xinshuang@mail.zte.com.cn
+       -- DESCRIPTION
+       -- The MIB module which descript the zxr10rack mib
+       -- object which defined in enterprise's ZTE(3902)
+ --  textual conventions
+
+      ShelfType ::= INTEGER
+                       {  
+                         zxctn9000-3E(0)
+                       } 
+
+        BoardType ::=INTEGER
+                  {         
+                     board-MPUF(17), 
+                     board-MPFU(49),   
+                     board-PFUE(32),        
+                     board-GSU(65),              
+                     board-GEBAN(81)
+                  }
+        SubBoardType ::=INTEGER
+                  {
+				     subboard-GFP(177),                     
+                     subboard-GPON(353),                    
+                     subboard-R63E1B(529),
+                     subboard-FEIME(28993),
+                     subboard-P192QA(19025),
+                     subboard-CP3HA(19057),
+                     subboard-A3F(29329),
+                     subboard-CP3BAN(565505), 
+                     subboard-XGE4A(28769), 
+                     subboard-GE48D(28945), 
+                     subboard-CE1TAN(565521),  
+                     subboard-XGE12A(565297), 
+                     subboard-XXVGEI(705)
+                  }       
+        SPboardType ::=INTEGER
+                  {
+                     specialboard-SCG-1(20241)
+                  }           
+
+END

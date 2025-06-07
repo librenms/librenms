@@ -1,0 +1,1569 @@
+ZXR10-SYSTEM-HARDWARE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, 
+       OBJECT-TYPE, OBJECT-IDENTITY, 
+       TimeTicks, Counter32, Integer32,
+       enterprises        
+       FROM SNMPv2-SMI
+       zxr10RackNo, zxr10ShelfNo,zxr10SlotNo, RunStatus
+       FROM ZXR10-RACK-MIB 
+       DisplayString,RowStatus         FROM SNMPv2-TC 
+       zxUPN,BoardType                 FROM ZXR10-PROJECT-MIB;
+
+  zxr10SystemHardwareMIB MODULE-IDENTITY
+            LAST-UPDATED "201802281817Z"  
+            ORGANIZATION "ZTE Corporation"
+            CONTACT-INFO
+            "ZTE Corporation 
+            Nanjing Institute of ZTE Corporation
+         
+            No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China
+         
+            Tel: +86-25-52870000"
+    
+            DESCRIPTION
+                "ZXR10 T8000 ZXR10-SYSTEM-HARDWARE-MIB"
+
+            REVISION "201802281817Z"
+            DESCRIPTION
+            "change the MAX-ACCESS of zxr10EnvironTemperatureHighThreshold1 
+            from read-only to read-write
+             change the SYNTAX of zxr10EnvironTemperatureHighThreshold1
+            from Integer32 to Integer32(45..85)
+             add the DEFVAL of zxr10EnvironTemperatureHighThreshold1"
+            
+            REVISION "201709160000Z"
+            DESCRIPTION
+            "add zxr10CardMgmtObjects."
+            
+            REVISION "201706161017Z"
+            DESCRIPTION
+            "change the MAX-ACCESS of zxr10BoardTempMajorThreshold from
+            read-only to read-write"
+
+            REVISION "201707140000Z"
+            DESCRIPTION
+            "add zxr10SystemMgmtObjects."
+
+            REVISION "201707051352Z"
+            DESCRIPTION
+            "add zxr10FanMgmtObjects."
+
+            REVISION "201706301559Z"  
+            DESCRIPTION
+            "add node zxr10EnvTempOverheatProtectEn in 
+            zxr10ShelfTemperatureTable."
+            
+            REVISION "201706161017Z"
+            DESCRIPTION
+            "change the SYNTAX of zxr10FanRatio from DisplayString to Integer32
+             change the MAX-ACCESS of zxr10FanRatio from read-only to
+            read-write"
+                
+            REVISION "201609020000Z"
+            DESCRIPTION
+            "import zxUPN from ZXR10-PROJECT-MIB and delete zxr10M6000-S
+            OBJECT IDENTIFIER."
+
+    ::= { zxUPN 2 }
+                  
+              
+-- zxr10CpusystemTable
+    zxr10CpusystemTable OBJECT-TYPE
+                  SYNTAX        SEQUENCE OF Zxr10CpusystemEntry
+                  MAX-ACCESS    not-accessible
+                  STATUS        current
+                  DESCRIPTION
+                          "the description of Cpusystem information
+                           in the zxr10 card .
+                           it is a list of Cpusystem entries."
+                   ::= { zxr10SystemHardwareMIB 1 }
+                   
+    zxr10CpusystemEntry  OBJECT-TYPE
+                  SYNTAX        Zxr10CpusystemEntry
+                  MAX-ACCESS    not-accessible
+                  STATUS        current
+                  DESCRIPTION
+                          "A Cpusystem entry containing objects that
+                           descript the Cpusystem information,such as:
+                           zxr10CpuSlotBoardType,zxr10SystemUnitIndex,
+                           zxr10SystemUnitDescription,etc."
+                  INDEX { zxr10RackNo, zxr10ShelfNo,zxr10SlotNo,
+                          zxr10SystemUnitIndex}
+                  ::= { zxr10CpusystemTable 1 }            
+                  
+    Zxr10CpusystemEntry ::=
+        SEQUENCE {            
+            zxr10CpuSlotBoardType
+                BoardType,
+            zxr10SystemUnitIndex
+                INTEGER,
+            zxr10SystemUnitDescription
+                DisplayString,
+            zxr10SystemUnitRunStatus
+                RunStatus,
+            zxr10SystemMemSize
+                Counter32,   
+            zxr10SystemMemUsed
+                INTEGER,    
+            zxr10SystemCpuUtility5s
+                INTEGER,
+            zxr10SystemCpuUtility1m
+                INTEGER,
+            zxr10SystemCpuUtility5m
+                INTEGER,
+            zxr10SystemPeakCpuUtility
+                INTEGER,
+            zxr10SystemUnitUpTime
+                TimeTicks,   
+            zxr10SystemUnitPidNum
+                INTEGER,
+            zxr10SystemOamCpuName
+                DisplayString,
+            zxr10SystemUnitBootVer
+                DisplayString,
+            zxr10SystemCardCpuLoadThreshold
+                Integer32,
+            zxr10SystemCardMemUsageThreshold
+                Integer32
+        }             
+    
+    zxr10CpuSlotBoardType OBJECT-TYPE
+        SYNTAX      BoardType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the slot board type of system Unit."
+        ::= { zxr10CpusystemEntry 1 }
+
+    zxr10SystemUnitIndex OBJECT-TYPE
+        SYNTAX      INTEGER  
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "the index of system Unit."
+        ::= { zxr10CpusystemEntry 2}
+
+    zxr10SystemUnitDescription OBJECT-TYPE
+        SYNTAX      DisplayString  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the description of system Unit. "
+        ::= { zxr10CpusystemEntry 3 }
+
+    zxr10SystemUnitRunStatus OBJECT-TYPE
+        SYNTAX      RunStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the run status of system Unit.
+             1 is running,
+             0 is shutdown."
+        ::= { zxr10CpusystemEntry 4}
+
+    zxr10SystemMemSize OBJECT-TYPE
+        SYNTAX      Counter32 
+        UNITS       "MB"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The memory size of the unit."
+        ::= { zxr10CpusystemEntry 5}    
+
+    zxr10SystemMemUsed OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The memory utilization."
+        ::= { zxr10CpusystemEntry 6 }    
+        
+    zxr10SystemCpuUtility5s OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization (5 seconds)."
+        ::= { zxr10CpusystemEntry 7}
+        
+    zxr10SystemCpuUtility1m OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization (1 minute)"
+        ::= { zxr10CpusystemEntry 8}
+
+    zxr10SystemCpuUtility5m OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The CPU utilization (5 minutes)"
+        ::= { zxr10CpusystemEntry 9}    
+        
+
+    zxr10SystemPeakCpuUtility OBJECT-TYPE
+        SYNTAX      INTEGER  
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak CPU utilization, which is measured in 1 minute."
+        ::= { zxr10CpusystemEntry 10}
+
+
+    zxr10SystemUnitUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the total time of system running."
+        ::= { zxr10CpusystemEntry 11}   
+
+    zxr10SystemUnitPidNum OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the total process running on the unit. Now we don't use it."
+        ::= { zxr10CpusystemEntry 12} 
+
+    zxr10SystemOamCpuName OBJECT-TYPE
+        SYNTAX      DisplayString  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the description of logic cpu name. "
+        ::= { zxr10CpusystemEntry 13 }
+        
+    zxr10SystemUnitBootVer OBJECT-TYPE
+        SYNTAX      DisplayString  
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "the BootVer of the cpu. "
+        ::= { zxr10CpusystemEntry 21 }
+
+    zxr10SystemCardCpuLoadThreshold OBJECT-TYPE
+        SYNTAX      Integer32(0|50..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The CPU load threshold of the card. 
+             0 means unconfigured."
+        DEFVAL { 0 }
+        ::= { zxr10CpusystemEntry 31}
+
+    zxr10SystemCardMemUsageThreshold OBJECT-TYPE
+        SYNTAX      Integer32(0..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The memory usage threshold of the card. 
+             0 means unconfigured."
+        DEFVAL { 0 }
+        ::= { zxr10CpusystemEntry 32}
+        
+---------------------------------------------------fan table
+    zxr10FanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10FanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The description of fan module information."
+        ::= { zxr10SystemHardwareMIB    3 } 
+              
+    zxr10FanEntry  OBJECT-TYPE
+        SYNTAX      Zxr10FanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The description of fan module information."
+        INDEX  { 
+                zxr10FanRackNo,
+                zxr10FanShelfNo,
+                zxr10FanGroupNo,
+                zxr10FanIndex
+             }
+        ::= { zxr10FanTable 1 }
+
+    Zxr10FanEntry ::=
+        SEQUENCE {
+        zxr10FanRackNo
+            Integer32,
+        zxr10FanShelfNo
+            Integer32,
+        zxr10FanGroupNo
+            Integer32,
+        zxr10FanIndex
+            Integer32,
+        zxr10FanPosition
+            INTEGER,
+        zxr10FanType
+            DisplayString,
+        zxr10FanStatus            
+            INTEGER,
+        zxr10FanSpeed
+            Integer32,
+        zxr10FanPartNumber
+            DisplayString,
+        zxr10FanManufactureDate
+            DisplayString,
+        zxr10FanSerialNumber
+            DisplayString,
+        zxr10FanAssemblySerialNo
+            DisplayString,
+        zxr10FanMaximumSpeed
+            INTEGER,
+        zxr10FanRatio
+            Integer32
+        }
+
+    zxr10FanRackNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The rack No."
+        ::= { zxr10FanEntry 1 }
+                                          
+    zxr10FanShelfNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The shelf No."
+        ::= { zxr10FanEntry 2 }
+                           
+    zxr10FanGroupNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The fan tray No."
+        ::= { zxr10FanEntry 3 }
+                           
+    zxr10FanIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The fan No."
+        ::= { zxr10FanEntry 4 }
+
+    zxr10FanPosition OBJECT-TYPE
+        SYNTAX      INTEGER {
+            high(0),       -- ready to pass packets
+            low(1),
+            middle(2),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Fan Position"
+        ::= { zxr10FanEntry 5 }
+
+    zxr10FanType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The fan type."
+        ::= { zxr10FanEntry 6 }
+
+    zxr10FanStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            abnormal(0),
+            normal(1)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The status of the fan."
+        ::= { zxr10FanEntry 7 }
+  
+    zxr10FanSpeed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Fan Speed Level"
+        ::= { zxr10FanEntry 8 }
+
+    zxr10FanPartNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Part Number"
+        ::= { zxr10FanEntry 9 }
+  
+    zxr10FanManufactureDate  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Date of Manufacture"
+        ::= { zxr10FanEntry 10 }
+  
+    zxr10FanSerialNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Serial Number"
+        ::= { zxr10FanEntry 11 }
+  
+    zxr10FanAssemblySerialNo  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Assembly Serial No"
+        ::= { zxr10FanEntry 12 }
+  
+    zxr10FanMaximumSpeed OBJECT-TYPE
+        SYNTAX      INTEGER {
+            maximumspeed-4(4), 
+            maximumspeed-14(14),
+            maximumspeed-16(16), 
+            unknown(0)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The maximum fan speed level in current system."
+        ::= { zxr10FanEntry 13 } 
+              
+    zxr10FanRatio  OBJECT-TYPE
+        SYNTAX      Integer32(5..95)
+        UNITS       "percent"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "Fan Ratio (auto 128)"
+        ::= { zxr10FanEntry 14 }
+              
+--------------------------------------------------------------------------------
+  
+    zxr10ShelfTemperatureTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10ShelfTemperatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of ShelfTemperature information."
+        ::= { zxr10SystemHardwareMIB    4 }
+               
+    zxr10ShelfTemperatureEntry  OBJECT-TYPE
+        SYNTAX      Zxr10ShelfTemperatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of ShelfTemperature information"
+        INDEX{ 
+                zxr10ShelfTemperatureRackNo,
+                zxr10ShelfTemperatureShelfNo
+             }
+        ::= { zxr10ShelfTemperatureTable 1 }              
+
+    Zxr10ShelfTemperatureEntry ::=
+        SEQUENCE {
+        zxr10ShelfTemperatureRackNo
+            Integer32,
+        zxr10ShelfTemperatureShelfNo
+            Integer32,              
+        zxr10EnvironTemperature
+            Integer32,
+        zxr10EnvironTemperatureLowThreshold
+            Integer32,
+        zxr10EnvironTemperatureHighThreshold1
+            Integer32,
+        zxr10EnvironTemperatureHighThreshold2
+            Integer32,
+        zxr10EnvironTemperaturecollectioncycle
+            Integer32, 
+        zxr10EnvTempOverheatProtectEn
+            INTEGER
+        }
+
+    zxr10ShelfTemperatureRackNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The rack No."
+        ::= { zxr10ShelfTemperatureEntry 1 }
+               
+    zxr10ShelfTemperatureShelfNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The shelf No."
+        ::= { zxr10ShelfTemperatureEntry 2 }
+              
+    zxr10EnvironTemperature  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The temperature of the environment."
+        ::= { zxr10ShelfTemperatureEntry 3 }
+              
+    zxr10EnvironTemperatureLowThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The low temperature threshold of the environment."
+        ::= { zxr10ShelfTemperatureEntry 4 }
+              
+    zxr10EnvironTemperatureHighThreshold1  OBJECT-TYPE
+        SYNTAX      Integer32(45..85)
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The warnning temperature threshold of the environment."
+        DEFVAL { 55 }
+        ::= { zxr10ShelfTemperatureEntry 5 }
+              
+    zxr10EnvironTemperatureHighThreshold2  OBJECT-TYPE
+        SYNTAX      Integer32(45..85)
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The high temperature threshold of the environment."
+        DEFVAL { 70 }
+        ::= { zxr10ShelfTemperatureEntry 6 }
+              
+    zxr10EnvironTemperaturecollectioncycle  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Environ Temperature collection cycle."
+        ::= { zxr10ShelfTemperatureEntry 7 }
+
+    zxr10EnvTempOverheatProtectEn OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION   
+            "Enables or disables the overheat protection function."
+        DEFVAL  { enabled }
+        ::= { zxr10ShelfTemperatureEntry  8 }
+                                                                                                                                                                                                                                   
+-----------------------add for brd mib      
+      
+    zxr10BoardTempTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10BoardTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of BoardTemperature information."
+        ::= { zxr10SystemHardwareMIB    5 }
+               
+    zxr10BoardTempEntry  OBJECT-TYPE
+        SYNTAX      Zxr10BoardTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of BoardTemperature information"
+        INDEX  { 
+                zxr10BoardTempRackNo,    
+                zxr10BoardTempShelfNo, 
+                zxr10BoardTempSlotNo,  
+                zxr10BoardTempI2C, 
+                zxr10BoardTempAddr
+             }
+        ::= { zxr10BoardTempTable 1 }              
+
+    Zxr10BoardTempEntry ::=
+        SEQUENCE {
+        zxr10BoardTempRackNo
+            Integer32,
+        zxr10BoardTempShelfNo
+            Integer32,              
+        zxr10BoardTempSlotNo
+            Integer32,
+        zxr10BoardTempI2C
+            Integer32,
+        zxr10BoardTempAddr
+            Integer32,
+        zxr10BoardTempBoard 
+            DisplayString,
+        zxr10BoardTempDescription
+            DisplayString,  
+        zxr10BoardTempStatus  
+            INTEGER, 
+        zxr10BoardTempCurTemp  
+            Integer32,
+        zxr10BoardTempMinorThreshold  
+            Integer32,
+        zxr10BoardTempMajorThreshold  
+            Integer32,
+        zxr10BoardTempCriticalThreshold
+            Integer32,
+        zxr10BoardTempFatalThreshold 
+            Integer32
+        }
+
+    zxr10BoardTempRackNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rack No."
+        ::= { zxr10BoardTempEntry 1 }
+               
+    zxr10BoardTempShelfNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The shelf No."
+        ::= { zxr10BoardTempEntry 2 }
+              
+    zxr10BoardTempSlotNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The slot No."
+        ::= { zxr10BoardTempEntry 3 }
+              
+    zxr10BoardTempI2C  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Board Temperature I2C"
+        ::= { zxr10BoardTempEntry 4 }
+              
+    zxr10BoardTempAddr  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature point of the card."
+        ::= { zxr10BoardTempEntry 5 }
+              
+    zxr10BoardTempBoard  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Board Name"
+        ::= { zxr10BoardTempEntry 6 }
+              
+    zxr10BoardTempDescription  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature point description of the card."
+        ::= { zxr10BoardTempEntry 7 }   
+              
+    zxr10BoardTempStatus  OBJECT-TYPE  
+        SYNTAX      INTEGER {
+            unknown(0),
+            normal(1),      
+            abnormal(2)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature status of the card."
+        ::= { zxr10BoardTempEntry 8 } 
+              
+    zxr10BoardTempCurTemp  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current temperature of the card."
+        ::= { zxr10BoardTempEntry 9 } 
+
+    zxr10BoardTempMinorThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minor temperature threshold of the card."
+        ::= { zxr10BoardTempEntry 10 }  
+              
+    zxr10BoardTempMajorThreshold  OBJECT-TYPE
+        SYNTAX      Integer32(101..108)
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The major temperature threshold of the card."
+        DEFVAL      { 108 }
+        ::= { zxr10BoardTempEntry 11 } 
+    
+    zxr10BoardTempCriticalThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The critical temperature threshold of the card."
+        ::= { zxr10BoardTempEntry 12 } 
+
+    zxr10BoardTempFatalThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The fatal temperature threshold of the card."
+        ::= { zxr10BoardTempEntry 13 } 
+
+--------------------------------------------------------------------------------
+                                                                                                                                                                                                                                   
+    zxr10PowerMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+              "the description of power mib."
+        ::= { zxr10SystemHardwareMIB    6 } 
+    
+    zxr10PowerInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10PowerInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of power information."
+        ::= { zxr10PowerMIB    1 }
+               
+    zxr10PowerInfoEntry  OBJECT-TYPE
+        SYNTAX      Zxr10PowerInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of power information."
+        INDEX  { 
+                zxr10RackNo,
+                zxr10PowerInfoShelfNo
+             }
+        ::= { zxr10PowerInfoTable 1 }
+              
+    Zxr10PowerInfoEntry ::=
+        SEQUENCE {
+        zxr10PowerInfoShelfNo
+            Integer32,
+        zxr10PowerInfoTotalPower
+            DisplayString,
+        zxr10PowerInfoPowerType
+            INTEGER,
+        zxr10PowerInfoModuleNum
+            Integer32,
+        zxr10PowerInfoGroupNum
+            Integer32,
+        zxr10PowerInfoModuleNumPerGroup
+            Integer32,
+        zxr10PowerInfoDivisionNum   
+            Integer32,
+        zxr10PowerInfoTotalCurrent
+            DisplayString
+        }       
+             
+    zxr10PowerInfoShelfNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "shelf no."
+        ::= { zxr10PowerInfoEntry 1 }
+              
+    zxr10PowerInfoTotalPower OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "total power"
+        ::= { zxr10PowerInfoEntry 2 }
+
+    zxr10PowerInfoPowerType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            dc(1),
+            ac(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power type"
+        ::= { zxr10PowerInfoEntry 3 }
+                            
+    zxr10PowerInfoModuleNum OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power module numbers"
+        ::= { zxr10PowerInfoEntry 4 }
+    
+    zxr10PowerInfoGroupNum OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "power group numbers"
+        ::= { zxr10PowerInfoEntry 5 }
+              
+    zxr10PowerInfoModuleNumPerGroup OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power numbers per group"
+        ::= { zxr10PowerInfoEntry 6 }
+    
+    zxr10PowerInfoDivisionNum OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "back board division numbers"
+        ::= { zxr10PowerInfoEntry 7 } 
+        
+    zxr10PowerInfoTotalCurrent OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "total current"
+        ::= { zxr10PowerInfoEntry 8 }
+ ----------------------------------------------------------------------------------------             
+    zxr10PowerModuleTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10PowerModuleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "the description of power module."
+           ::= { zxr10PowerMIB    2 }
+               
+    zxr10PowerModuleEntry  OBJECT-TYPE
+        SYNTAX      Zxr10PowerModuleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of power module."
+        INDEX  { 
+                zxr10RackNo,
+                zxr10PowerModuleShelfNo,
+                zxr10PowerModuleGroupNo,
+                zxr10PowerModuleNo
+             }
+        ::= { zxr10PowerModuleTable 1 } 
+              
+    Zxr10PowerModuleEntry ::=
+          SEQUENCE {
+            zxr10PowerModuleShelfNo
+                Integer32,
+            zxr10PowerModuleGroupNo
+                Integer32,
+            zxr10PowerModuleNo
+                Integer32,
+            zxr10PowerModulePhyStatus
+                INTEGER,
+            zxr10PowerModulePowerStatus
+                INTEGER,
+            zxr10PowerModuleCommStatus
+                INTEGER,
+            zxr10PowerModuleRunStatus
+                INTEGER,
+            zxr10PowerModuleDivisions   
+                Integer32,
+            zxr10PowerModuleSpecial
+                INTEGER,
+            zxr10PowerModulePartNumber
+                DisplayString,
+            zxr10PowerModuleManufactureDate
+                DisplayString,
+            zxr10PowerModuleSerialNumber
+                DisplayString,
+            zxr10PowerModuleName
+                DisplayString,
+            zxr10PowerModulePowerVersion
+                DisplayString,
+            zxr10PowerModuleGroupName
+                DisplayString,
+            zxr10PowerModulePowerCapacity   
+                DisplayString,  
+            zxr10PowerModuleUsedPower   
+                DisplayString,
+            zxr10PowerModulePowerUsedRate   
+                DisplayString,   
+            zxr10PowerModuleCurTemp
+                DisplayString
+              }
+              
+    zxr10PowerModuleShelfNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "shelf no."
+        ::= { zxr10PowerModuleEntry 1 }
+              
+    zxr10PowerModuleGroupNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "group no."
+        ::= { zxr10PowerModuleEntry 2 }
+              
+    zxr10PowerModuleNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power module no."
+        ::= { zxr10PowerModuleEntry 3 }
+              
+    zxr10PowerModulePhyStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            online(1), 
+            offline(2)
+            
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "physical status"
+        ::= { zxr10PowerModuleEntry 4 }
+
+    zxr10PowerModulePowerStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            normal(1), 
+            abnormal(2)
+            
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power status"
+        ::= { zxr10PowerModuleEntry 5 }                 
+
+    zxr10PowerModuleCommStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            normal(1), 
+            abnormal(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "comm status"
+        ::= { zxr10PowerModuleEntry 6 }
+
+    zxr10PowerModuleRunStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            normal(1), 
+            abnormal(2)          
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "run status"
+        ::= { zxr10PowerModuleEntry 7 }
+
+    zxr10PowerModuleDivisions OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power division numbers"
+        ::= { zxr10PowerModuleEntry 8 }
+              
+    zxr10PowerModuleSpecial OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknow(0),
+            special(1), 
+            notSpecial(2)    
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "special flag"
+        ::= { zxr10PowerModuleEntry 9 }
+              
+    zxr10PowerModulePartNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "part number"
+        ::= { zxr10PowerModuleEntry 10 }
+
+    zxr10PowerModuleManufactureDate  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+              "date of manufacture"
+        ::= { zxr10PowerModuleEntry 11 }
+              
+    zxr10PowerModuleSerialNumber  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+              "serial number"
+        ::= { zxr10PowerModuleEntry 12 }
+              
+    zxr10PowerModuleName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power name"
+        ::= { zxr10PowerModuleEntry 13 }
+              
+    zxr10PowerModulePowerVersion  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power version"
+        ::= { zxr10PowerModuleEntry 14 }
+              
+    zxr10PowerModuleGroupName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power group name"
+        ::= { zxr10PowerModuleEntry 15 }   
+              
+    zxr10PowerModulePowerCapacity  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power Capacity"
+        ::= { zxr10PowerModuleEntry 16 }
+              
+    zxr10PowerModuleUsedPower  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Used Power"
+        ::= { zxr10PowerModuleEntry 17 } 
+    
+    zxr10PowerModulePowerUsedRate  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Power Used Rate"
+        ::= { zxr10PowerModuleEntry 18 }           
+              
+    zxr10PowerModuleCurTemp  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "current temperature"
+        ::= { zxr10PowerModuleEntry 19 } 
+ ----------------------------------------------------------------------------------------                 
+    zxr10PowerDivisionTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10PowerDivisionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "the description of power division."
+           ::= { zxr10PowerMIB    3 }
+           
+    zxr10PowerDivisionEntry  OBJECT-TYPE
+        SYNTAX      Zxr10PowerDivisionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "the description of power division."
+        INDEX  { 
+                zxr10RackNo,
+                zxr10PowerDivisionShelfNo,
+                zxr10PowerDivisionGroupNo,
+                zxr10PowerDivisionModuleNo,
+                zxr10PowerDivisionNo
+             }
+        ::= { zxr10PowerDivisionTable 1 }
+
+    Zxr10PowerDivisionEntry ::=
+        SEQUENCE {
+        zxr10PowerDivisionShelfNo
+            Integer32,
+        zxr10PowerDivisionGroupNo
+            Integer32,
+        zxr10PowerDivisionModuleNo
+            Integer32,
+        zxr10PowerDivisionNo
+            Integer32,
+        zxr10PowerDivisionOutputVoltage
+            DisplayString,
+        zxr10PowerDivisionOutputCurrent
+            DisplayString,
+        zxr10PowerDivisionRatingPower
+            DisplayString,
+        zxr10PowerDivisionCurrentPower  
+            DisplayString,
+        zxr10PowerDivisionFreePower
+            DisplayString,
+        zxr10PowerDivisionGroupName
+            DisplayString               
+        }
+              
+    zxr10PowerDivisionShelfNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "shelf no."
+        ::= { zxr10PowerDivisionEntry 1 }
+              
+    zxr10PowerDivisionGroupNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "group no."
+        ::= { zxr10PowerDivisionEntry 2 }
+              
+    zxr10PowerDivisionModuleNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power module no. "
+        ::= { zxr10PowerDivisionEntry 3 }
+    
+    zxr10PowerDivisionNo OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "power division no. "
+        ::= { zxr10PowerDivisionEntry 4 }
+              
+    zxr10PowerDivisionOutputVoltage OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "output votage"
+        ::= { zxr10PowerDivisionEntry 5 }
+              
+    zxr10PowerDivisionOutputCurrent OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "output current"
+        ::= { zxr10PowerDivisionEntry 6 }
+              
+    zxr10PowerDivisionRatingPower OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "rating power"
+        ::= { zxr10PowerDivisionEntry 7 }
+       
+    zxr10PowerDivisionCurrentPower OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "current power"
+        ::= { zxr10PowerDivisionEntry 8 }
+        
+    zxr10PowerDivisionFreePower OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "free power"
+        ::= { zxr10PowerDivisionEntry 9 }
+              
+    zxr10PowerDivisionGroupName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "group name"
+        ::= { zxr10PowerDivisionEntry 10 }
+              
+-----------------------------------------------------------    
+    zxr10BoardPowerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10BoardPowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The description of board power information."
+        ::= { zxr10SystemHardwareMIB    7 }
+               
+    zxr10BoardPowerEntry  OBJECT-TYPE
+        SYNTAX      Zxr10BoardPowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The description of board power information"
+        INDEX  { 
+                zxr10BoardPowerRackNo,
+                zxr10BoardPowerShelfNo,
+                zxr10BoardPowerSlotNo
+             }
+        ::= { zxr10BoardPowerTable 1 }              
+
+    Zxr10BoardPowerEntry ::=
+        SEQUENCE {
+        zxr10BoardPowerRackNo
+            Integer32,
+        zxr10BoardPowerShelfNo
+            Integer32,                
+        zxr10BoardPowerSlotNo
+            Integer32,
+        zxr10BoardPowerOutputVoltage
+            DisplayString,
+        zxr10BoardPowerOutputCurrent
+            DisplayString,
+        zxr10BoardPowerCurrentPower
+            DisplayString
+        }
+
+    zxr10BoardPowerRackNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The rack No."
+        ::= { zxr10BoardPowerEntry 1 }
+               
+    zxr10BoardPowerShelfNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The shelf No."
+        ::= { zxr10BoardPowerEntry 2 }
+              
+    zxr10BoardPowerSlotNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The slot No."
+        ::= { zxr10BoardPowerEntry 3 }
+
+    zxr10BoardPowerOutputVoltage  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The output voltage."
+        ::= { zxr10BoardPowerEntry 4 }
+
+    zxr10BoardPowerOutputCurrent  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The output current."
+        ::= { zxr10BoardPowerEntry 5 }              
+
+    zxr10BoardPowerCurrentPower  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "The current power."
+        ::= { zxr10BoardPowerEntry 6 } 
+
+-- The Fan MIB
+
+    zxr10FanMgmtObjects OBJECT IDENTIFIER  ::= { zxr10SystemHardwareMIB  8}
+
+    zxr10FanSystemTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10FanSystemEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The fan system table."
+        ::= { zxr10FanMgmtObjects  2 } 
+        
+    zxr10FanSystemEntry OBJECT-TYPE   
+        SYNTAX      Zxr10FanSystemEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the fan system table."
+        INDEX {zxr10FanRackNo,
+               zxr10FanShelfNo}
+        ::= { zxr10FanSystemTable 1 } 
+        
+    Zxr10FanSystemEntry ::= SEQUENCE {
+        zxr10FanSysSpeedAdjustStrategy  INTEGER
+        }
+
+    zxr10FanSysSpeedAdjustStrategy OBJECT-TYPE   
+        SYNTAX      INTEGER
+        {
+            pidMode(1),
+            envTempMode(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The fan speed adjustment strategy of the NE shelf."
+        DEFVAL      { pidMode }
+        ::= { zxr10FanSystemEntry 1 }  
+
+-- The System Management MIB
+
+    zxr10SystemMgmtObjects OBJECT IDENTIFIER  ::= { zxr10SystemHardwareMIB  20}
+
+    zxr10SystemCpuLoadThreshTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10SystemCpuLoadThreshEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The system cpu load threshold table."
+        ::= { zxr10SystemMgmtObjects  2 } 
+        
+    zxr10SystemCpuLoadThreshEntry OBJECT-TYPE   
+        SYNTAX      Zxr10SystemCpuLoadThreshEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the system cpu load threshold table."
+        INDEX {zxr10SystemCpuLoadThreshLevel}
+        ::= { zxr10SystemCpuLoadThreshTable 1 } 
+        
+    Zxr10SystemCpuLoadThreshEntry ::= SEQUENCE {
+        zxr10SystemCpuLoadThreshLevel    INTEGER,
+        zxr10SystemCpuLoadThreshold      Integer32,       
+        zxr10SystemCpuLoadThreshRowStaus RowStatus             
+        }
+
+    zxr10SystemCpuLoadThreshLevel OBJECT-TYPE   
+        SYNTAX      INTEGER
+        {
+            low(1),
+            middle(2),
+            high(3)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The level of cpu load threshold."
+        ::= { zxr10SystemCpuLoadThreshEntry 1 }
+        
+    zxr10SystemCpuLoadThreshold OBJECT-TYPE   
+        SYNTAX      Integer32(50..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The CPU load threshold."
+        ::= { zxr10SystemCpuLoadThreshEntry 2 }   
+
+    zxr10SystemCpuLoadThreshRowStaus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row.
+            
+             The supported actions of this conceptual row only include:
+             'createAndGo' and 'destroy'.
+
+             To create a row in this table, a manager must set this object to 
+             createAndGo(4).
+    
+             To delete a row in this table, a manager must set this object to 
+             destroy(6). 
+             
+             To get this object, the agent always returns active(1)."  
+    ::= { zxr10SystemCpuLoadThreshEntry 50 }
+    
+    zxr10SystemMemUsageThreshTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10SystemMemUsageThreshEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The system memory usage threshold table."
+        ::= { zxr10SystemMgmtObjects  3 } 
+        
+    zxr10SystemMemUsageThreshEntry OBJECT-TYPE   
+        SYNTAX      Zxr10SystemMemUsageThreshEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the system memory usage threshold table."
+        INDEX {zxr10SysMemUsageThreshLevel}
+        ::= { zxr10SystemMemUsageThreshTable 1 } 
+        
+    Zxr10SystemMemUsageThreshEntry ::= SEQUENCE {
+        zxr10SysMemUsageThreshLevel    INTEGER,
+        zxr10SysMemUsageThreshold      Integer32,       
+        zxr10SysMemUsageThreshRowStaus RowStatus             
+        }                               
+                              
+    zxr10SysMemUsageThreshLevel OBJECT-TYPE   
+        SYNTAX      INTEGER {
+            low(1), 
+            middle(2), 
+            high(3)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The level of memory usage threshold."
+        ::= { zxr10SystemMemUsageThreshEntry 1 }
+        
+    zxr10SysMemUsageThreshold OBJECT-TYPE   
+        SYNTAX      Integer32(1..100)
+        UNITS       "percent"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The memory usage threshold."
+        ::= { zxr10SystemMemUsageThreshEntry 2 }   
+
+    zxr10SysMemUsageThreshRowStaus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row.
+            
+             The supported actions of this conceptual row only include:
+             'createAndGo' and 'destroy'.
+
+             To create a row in this table, a manager must set this object to 
+             createAndGo(4).
+    
+             To delete a row in this table, a manager must set this object to 
+             destroy(6). 
+             
+             To get this object, the agent always returns active(1)."  
+    ::= { zxr10SystemMemUsageThreshEntry 50 }
+
+
+    zxr10CardMgmtObjects  OBJECT IDENTIFIER  ::= { zxr10SystemHardwareMIB  9}
+
+    zxr10CardPowerSupplyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Zxr10CardPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+              "The card power supply table."
+        ::= { zxr10CardMgmtObjects  1 } 
+        
+    zxr10CardPowerSupplyEntry OBJECT-TYPE   
+        SYNTAX      Zxr10CardPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the zxr10CardPowerSupplyTable."
+        INDEX { zxr10CardPowerSupplyRack, 
+                zxr10CardPowerSupplyShelf, 
+                zxr10CardPowerSupplySlot,
+                zxr10CardPowerSupplySubcard}
+        ::= { zxr10CardPowerSupplyTable 1 } 
+        
+    Zxr10CardPowerSupplyEntry ::= SEQUENCE {
+        zxr10CardPowerSupplyRack       Integer32,
+        zxr10CardPowerSupplyShelf      Integer32,
+        zxr10CardPowerSupplySlot       Integer32,       
+        zxr10CardPowerSupplySubcard    Integer32,
+        zxr10CardPowerSupplyOperation  INTEGER,
+        zxr10CardPowerSupplyStatus     INTEGER
+        }
+
+    zxr10CardPowerSupplyRack OBJECT-TYPE   
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The rack number."
+        ::= { zxr10CardPowerSupplyEntry 1 }
+
+    zxr10CardPowerSupplyShelf OBJECT-TYPE   
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The shelf number."
+        ::= { zxr10CardPowerSupplyEntry 2 }
+
+    zxr10CardPowerSupplySlot OBJECT-TYPE   
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The slot number."
+        ::= { zxr10CardPowerSupplyEntry 3 }
+
+    zxr10CardPowerSupplySubcard OBJECT-TYPE   
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The subcard number.
+             The range of the subcard is 0-3;
+             A special value 255 indicates that there has no subcard in the NE."
+        ::= { zxr10CardPowerSupplyEntry 4 }
+  
+    zxr10CardPowerSupplyOperation OBJECT-TYPE   
+        SYNTAX      INTEGER {
+            on(1), 
+            off(2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Open/close the power supply of the card or subcard."
+        ::= { zxr10CardPowerSupplyEntry 5 }
+
+    zxr10CardPowerSupplyStatus OBJECT-TYPE   
+        SYNTAX      INTEGER {
+            powerSupplyOn(1),      
+            powerSupplyOff(2),
+            duringPowerOn(3),
+            abnormal(4)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The power supply status of the card or subcard."
+        ::= { zxr10CardPowerSupplyEntry 6 }
+END              
