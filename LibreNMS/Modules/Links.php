@@ -185,17 +185,29 @@ class Links implements Module
                         $data[$keyName] = $data[$keyName] ?? '';
                     }
 
-                    $idx = $bridgeLocPortId[$lldpRemLocalPortNum] ?? 0;
-                    $localPortId = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
-                    if (empty($localPortId) && ! empty($lldpLocPortId)) {
-                        $idx = (isset($lldpLocPortId[$lldpRemLocalPortNum]) && is_numeric($lldpLocPortId[$lldpRemLocalPortNum])) ? $lldpLocPortId[$lldpRemLocalPortNum] : 0;
-                        $localPortId = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
+                    // fill the $data structure, in case we need to do debugging
+                    $data['lldpRemLocalPortNum']=$lldpRemLocalPortNum;
+                    $data['lldpRemIndex']=$lldpRemIndex;
+                    $data['lldpRemTimeMark']=$lldpRemTimeMark;
+
+                    // lldpRemLocalPortNum is a local index for LLDP, not an ifIndex
+                    // There is no path to ifindex, only to ifName, stored in lldpLocPortId
+                    $data['lldpLocPortId'] = $lldpLocPortId[$lldpRemLocalPortNum] ?? null;
+                    $data['localPortId'] = null;
+
+                    if (empty($data['localPortId']) && ! empty($data['lldpLocPortId'])) {
+                        // This should be the standard LLDP behaviour
+                        $data['localPortId'] = PortCache::getIdFromIfName($data['lldpLocPortId'], $device);
                     }
-                    if (empty($localPortId)) {
-                        $idx = $lldpRemLocalPortNum;
-                        $localPortId = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
+                    if (empty($data['localPortId'])) {
+                        $idx = $lldpRemLocalPortNum; // This should not happen, not MIB compliant
+                        $data['localPortId'] = PortCache::getIdFromIfIndex($idx, $device) ?? 0;
                     }
 
+                    if ( empty($data['localPortId']) && ! empty ($data['lldpLocPortId'])) {
+                        // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
+                        $data['localPortId'] = PortCache::getIdFromIfIndex($data['lldpLocPortId'], $device);
+                    }
                     $data['lldpRemSysName'] = substr($data['lldpRemSysName'], 0, 64);
                     $remoteMac = $remotePortName = '';
 
@@ -232,21 +244,17 @@ class Links implements Module
                     $remoteDeviceIp = $data['lldpRemManAddr'] ?? '';
                     $remoteDeviceId = find_device_id($remoteSysName, $remoteDeviceIp, $remoteMac);
 
-                    $remotePortId = PortCache::getIdFromIfName($remotePortName, $remoteDeviceId);
-                    $remotePortId = (empty($remotePortId)) ? PortCache::getIdFromIfAlias($remotePortName, $remoteDeviceId) : $remotePortId;
-                    $remotePortId = (empty($remotePortId)) ? PortCache::getIdFromIfDescr($remotePortName, $remoteDeviceId) : $remotePortId;
-                    $remotePortId = (empty($remotePortId)) ? PortCache::getIdFromIfPhysAddress($remoteMac, $remoteDeviceId) : $remotePortId;
-                    $remotePortName = (empty($remotePortId)) ? $remotePortName . ' (' . $remoteMac . ')' : $remotePortName;
+                    $remotePortId = find_port_id($data['lldpRemPortDescr'] ?? null, $data['lldpRemPortId'], $remoteDeviceId);
 
-                    if (! empty($localPortId) && ! empty($remoteSysName)) {
-                        $sufix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
+                    if (! empty($data['localPortId']) && (! empty($remoteSysName))) {
+                        $suffix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
                         $links->push(new Link([
-                            'local_port_id' => $localPortId,
+                            'local_port_id' => $data['localPortId'],
                             'remote_hostname' => $remoteSysName,
                             'remote_device_id' => $remoteDeviceId,
                             'remote_port_id' => $remotePortId ?? 0,
                             'active' => 1,
-                            'protocol' => 'lldp' . $sufix,
+                            'protocol' => 'lldp' . $suffix,
                             'remote_port' => $remotePortName,
                             'remote_platform' => null,
                             'remote_version' => $data['lldpRemSysDesc'] ?? '',
