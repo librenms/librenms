@@ -1,5 +1,7 @@
 <x-panel body-class="{{ $alert_class }}">
-    <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}" class="device-icon-header pull-left" style="max-height: 100px">
+        <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}"
+             class="device-icon-header pull-left tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2"
+             style="max-height: 100px">
     <div class="pull-left" style="margin-top: 5px;">
         @if($parent_id)
             <a href="{{ route('device', $parent_id) }}" title="{{ __('VM Host') }}"><i class="fa fa-server fa-fw fa-lg"></i></a>
