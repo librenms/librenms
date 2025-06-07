@@ -586,14 +586,14 @@ if (! empty($peers)) {
 
                         $key = key($cbgp_data_tmp); // get key of item
                         $cbgp_data = [
-                            'cbgpPeerAcceptedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AcceptedPrefixes'],
-                            'cbgpPeerDeniedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2DeniedPrefixes'],
-                            'cbgpPeerPrefixAdminLimit' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixAdminLimit'],
-                            'cbgpPeerPrefixThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixThreshold'],
-                            'cbgpPeerPrefixClearThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixClearThreshold'],
-                            'cbgpPeerAdvertisedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AdvertisedPrefixes'],
-                            'cbgpPeerSuppressedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2SuppressedPrefixes'],
-                            'cbgpPeerWithdrawnPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2WithdrawnPrefixes'],
+                            'cbgpPeerAcceptedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AcceptedPrefixes'] ?? null,
+                            'cbgpPeerDeniedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2DeniedPrefixes'] ?? null,
+                            'cbgpPeerPrefixAdminLimit' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixAdminLimit'] ?? null,
+                            'cbgpPeerPrefixThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixThreshold'] ?? null,
+                            'cbgpPeerPrefixClearThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixClearThreshold'] ?? null,
+                            'cbgpPeerAdvertisedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AdvertisedPrefixes'] ?? null,
+                            'cbgpPeerSuppressedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2SuppressedPrefixes'] ?? null,
+                            'cbgpPeerWithdrawnPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2WithdrawnPrefixes'] ?? null,
                         ];
                     } else {
                         $cbgp_oids = [
@@ -614,9 +614,9 @@ if (! empty($peers)) {
 
                     $cbgpPeerAcceptedPrefixes = $cbgp_data['cbgpPeerAcceptedPrefixes'];
                     $cbgpPeerDeniedPrefixes = $cbgp_data['cbgpPeerDeniedPrefixes'];
-                    $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'];
-                    $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'];
-                    $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'];
+                    $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'] ?? null;
+                    $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'] ?? null;
+                    $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'] ?? null;
                     $cbgpPeerAdvertisedPrefixes = max(0, $cbgp_data['cbgpPeerAdvertisedPrefixes'] - $cbgp_data['cbgpPeerWithdrawnPrefixes']);
                     $cbgpPeerWithdrawnPrefixes = 0; // no use, it is a gauge32 value, only the difference between cbgpPeerAdvertisedPrefixes  and cbgpPeerWithdrawnPrefixes makes sense.
                     // CF CISCO-BGP4-MIB definition for both
