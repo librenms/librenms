@@ -14,8 +14,7 @@ looking to send data to any other version of Kafka than you should adapt the sou
 ## Requirements
 
 - Extensions FFI and xmlwriter enabled
-- librdkafka
-- librdkafka-dev
+- In case of debian, install at system level the librdkafka-dev package, or equivalent for your OS
 
 The setup of the above is completely out of scope here and we aren't
 really able to provide any help with this side of things.
@@ -30,7 +29,13 @@ continue to function as normal.
 
 ## Configuration
 
-!!! setting "poller/kafka"
+!!! installing required packages
+```bash
+lnms plugin:add idealo/php-rdkafka-ffi
+lnms plugin:add ext-ffi
+```
+
+!!! available setting "poller/kafka"
 ```bash
 lnms config:set kafka.enable true
 lnms config:set kafka.debug false
@@ -49,7 +54,32 @@ lnms config:set kafka.ssl.key.location '/etc/kafka/secrets/cert.key'
 lnms config:set kafka.ssl.key.password 'pass'
 lnms config:set kafka.ssl.keystore.location '/etc/kafka/secrets/keystore.jks'
 lnms config:set kafka.ssl.keystore.password 'pass'
-lnms config:set kafka.flush.timeout 50
+lnms config:set kafka.flush.timeout 1000
+```
+
+!!! setting example with ssl "poller/kafka"
+```bash
+lnms config:set kafka.enable true
+lnms config:set kafka.broker.list 'kafka:9092'
+lnms config:set kafka.idempotence true
+lnms config:set kafka.topic 'librenms'
+lmns config:set kafka.device-fields-exclude "device_id,ip"
+lnms config:set kafka.ssl.enable true
+lnms config:set kafka.ssl.protocol 'ssl'
+lnms config:set kafka.ssl.ca.location '/etc/kafka/secrets/ca-cert'
+lnms config:set kafka.ssl.keystore.location '/etc/kafka/secrets/keystore.jks'
+lnms config:set kafka.ssl.keystore.password 'pass'
+lnms config:set kafka.flush.timeout 1000
+```
+
+!!! setting example without ssl "poller/kafka"
+```bash
+lnms config:set kafka.enable true
+lnms config:set kafka.broker.list 'kafka:9092'
+lnms config:set kafka.idempotence true
+lnms config:set kafka.topic 'librenms'
+lmns config:set kafka.device-fields-exclude "device_id,ip"
+lnms config:set kafka.flush.timeout 1000
 ```
 
 For more information about the configuration, please consult https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md

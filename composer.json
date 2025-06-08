@@ -16,7 +16,6 @@
     "require": {
         "php": "^8.2",
         "ext-curl": "*",
-        "ext-ffi": "*",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -34,7 +33,6 @@
         "enshrined/svg-sanitize": "^0.20.0",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
-        "idealo/php-rdkafka-ffi": "^0.6.0",
         "influxdata/influxdb-client-php": "^3.4",
         "influxdb/influxdb-php": "^1.15",
         "justinrainbow/json-schema": "^5.2",

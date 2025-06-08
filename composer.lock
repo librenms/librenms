@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cba0451949a5dd4c745e85481a15a502",
+    "content-hash": "c7a8181c1fbf2d9c760341e1fc1c3142",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -1944,76 +1944,6 @@
                 }
             ],
             "time": "2025-02-03T10:55:03+00:00"
-        },
-        {
-            "name": "idealo/php-rdkafka-ffi",
-            "version": "v0.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/idealo/php-rdkafka-ffi.git",
-                "reference": "1070e0093aa0d6a41781622c7dcc44a032e35e51"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/idealo/php-rdkafka-ffi/zipball/1070e0093aa0d6a41781622c7dcc44a032e35e51",
-                "reference": "1070e0093aa0d6a41781622c7dcc44a032e35e51",
-                "shasum": ""
-            },
-            "require": {
-                "ext-ffi": "*",
-                "php": "^7.4 || ^8.0"
-            },
-            "conflict": {
-                "ext-rdkafka": "*"
-            },
-            "require-dev": {
-                "composer/semver": "^3.2",
-                "ircmaxell/php-c-parser": "dev-master#fd8f5efefd0fcc6c5119d945694acaa3a6790ada",
-                "klitsche/dog": "^0.4",
-                "klitsche/ffigen": "0.8.1",
-                "phpbench/phpbench": "^1.1",
-                "phpunit/phpunit": "^9.4 || ^10.5",
-                "symfony/css-selector": "^5.1",
-                "symfony/dom-crawler": "^5.1",
-                "symplify/easy-coding-standard": "^12.0"
-            },
-            "suggest": {
-                "ext-pcntl": "*",
-                "ext-zend opcache": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/constants.php",
-                    "src/functions.php"
-                ],
-                "psr-4": {
-                    "": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Dirk Adler",
-                    "email": "dirk.adler@idealo.de"
-                }
-            ],
-            "description": "PHP Kafka client - binding librdkafka via FFI",
-            "keywords": [
-                "client",
-                "ffi",
-                "kafka",
-                "librdkafka",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/idealo/php-rdkafka-ffi/issues",
-                "source": "https://github.com/idealo/php-rdkafka-ffi/tree/v0.6.0"
-            },
-            "time": "2025-01-25T16:18:43+00:00"
         },
         {
             "name": "influxdata/influxdb-client-php",
@@ -14361,7 +14291,6 @@
     "platform": {
         "php": "^8.2",
         "ext-curl": "*",
-        "ext-ffi": "*",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
