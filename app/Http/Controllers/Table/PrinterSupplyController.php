@@ -16,7 +16,6 @@ class PrinterSupplyController extends TableController
 {
     protected $default_sort = ['device_hostname' => 'asc', 'supply_descr' => 'asc'];
 
-
     protected function sortFields($request): array
     {
         return [
