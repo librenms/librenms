@@ -61,7 +61,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
 
         foreach ((array) $tableVrf as $context => $vrf) {
             if (\LibreNMS\Util\Debug::isEnabled()) {
-                echo "\n[DEBUG]\nRelation:t" . $context . 't' . $vrf['intance'] . 't' . $vrf['vrf'] . "\n[/DEBUG]\n";
+                echo "\n[DEBUG]\nRelation:t" . $context . 't' . (array_key_exists('intance_name', $vrf) ? $vrf['intance_name'] : '') . 't' . (array_key_exists('vrf_name', $vrf) ? $vrf['vrf_name'] : '') . "\n[/DEBUG]\n";
             }
 
             $tmpVrf = dbFetchRow('SELECT * FROM vrf_lite_cisco WHERE device_id = ? and context_name=?', [

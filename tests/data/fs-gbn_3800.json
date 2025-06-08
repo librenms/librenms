@@ -22358,5 +22358,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "1.0.0.127",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "2.82.168.192",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "2.82.168.0/24",
+                    "ifIndex": 17825793
+                }
+            ]
+        }
     }
 }

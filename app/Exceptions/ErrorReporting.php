@@ -39,7 +39,6 @@ use Throwable;
 class ErrorReporting
 {
     private ?bool $reportingEnabled = null;
-    private ?bool $dumpErrors = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
         \LibreNMS\Exceptions\DatabaseConnectException::class,
@@ -51,42 +50,33 @@ class ErrorReporting
 
     public function __construct(Exceptions $exceptions)
     {
+        $this->adjustErrorHandlingForAppEnv(app()->environment());
+
+        $exceptions->dontReportDuplicates();
+        $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
+        $exceptions->reportable([$this, 'reportable']);
+        $exceptions->report([$this, 'report']);
+        $exceptions->render([$this, 'render']);
+
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
         });
+    }
 
-        $exceptions->dontReportDuplicates();
-        $exceptions->throttle(function (Throwable $e) {
-            return Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30));
-        });
+    public function reportable(Throwable $e): bool
+    {
+        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
-        app()->booted(function () {
-            $this->dumpErrors = LibrenmsConfig::get('reporting.dump_errors', false);
-            if ($this->dumpErrors) {
-                config([
-                    'logging.deprecations.channel' => 'deprecations_channel',
-                    'logging.deprecations.trace' => true,
-                ]);
-            }
-        });
-
-        // handle exceptions
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        return false; // false = block default log message
     }
 
     public function report(Throwable $e): bool
     {
-        if ($this->dumpErrors) {
-            \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
-        }
-
         if ($this->isReportingEnabled()) {
             Flare::report($e);
         }
 
-        // block logging errors if in a legacy entry point (init.php)
-        return ! defined('IGNORE_ERRORS');
+        return true;
     }
 
     public function render(Throwable $exception, Request $request): ?Response
@@ -133,7 +123,7 @@ class ErrorReporting
 
         // Only run in production
         if (! app()->isProduction()) {
-            \Log::debug('Reporting disabled because app is not in production');
+            \Log::debug('Reporting disabled because app is not in production mode');
 
             return false;
         }
@@ -153,7 +143,7 @@ class ErrorReporting
                 return false;
             }
 
-            if (! $git->isOfficialCommit()) {
+            if (! $git->isOfficialCommits()) {
                 \Log::debug('Reporting disabled due to local modifications');
 
                 return false;
@@ -163,5 +153,31 @@ class ErrorReporting
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    private function adjustErrorHandlingForAppEnv(string $environment): void
+    {
+        // TODO remove APP_DEBUG requirement when issues are cleaned up
+        if ($environment == 'production' || ! config('app.debug')) {
+            // in production, don't halt execution on non-fatal errors
+            set_error_handler(function ($severity, $message, $file, $line) {
+                error_log("PHP Error($severity): $message in $file on line $line");
+
+                // For notices and warnings, prevent conversion to exceptions
+                if (in_array($severity, [E_NOTICE, E_WARNING, E_USER_NOTICE, E_USER_WARNING, E_DEPRECATED])) {
+                    return true; // Prevent the standard error handler from running
+                }
+
+                return false; // For other errors, let Laravel handle them
+            });
+        } else {
+            // non-prod, show deprecations
+            app()->booted(function () {
+                config([
+                    'logging.deprecations.channel' => 'deprecations_channel',
+                    'logging.deprecations.trace' => true,
+                ]);
+            });
+        }
     }
 }

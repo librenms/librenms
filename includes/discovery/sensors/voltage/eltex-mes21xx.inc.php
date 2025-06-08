@@ -1,7 +1,7 @@
 <?php
 
 /*
- * LibreNMS discovery module for Eltex-MES21xx SFP Voltage
+ * LibreNMS discovery module for Eltex-mes21xx SFP Voltage
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,32 +19,42 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2025 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
-$low_limit = $low_warn_limit = 3;
-$high_warn_limit = $high_limit = 4;
 $divisor = 1000000;
+$multiplier = 1;
 
-$oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
-if ($oids) {
-    d_echo('Eltex-MES SFP voltage');
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $ifIndex = explode('.', $split)[13];
-            $type = explode('.', $split)[14];
+$oids = SnmpQuery::cache()->hideMib()->walk('RADLAN-PHY-MIB::rlPhyTestGetResult')->table(1);
 
-            // type6 = voltage
-            if ($type == 6) {
-                $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
-                discover_sensor(
-                    null, 'voltage', $device, $split, 'SfpVolt' . $ifIndex, 'rlPhyTestTableTransceiverSupply', 'SfpVolt-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
-                );
-            }
-        }
+foreach ($oids as $ifIndex => $data) {
+    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableTransceiverSupply'])) {
+        $value = $data['rlPhyTestGetResult']['rlPhyTestTableTransceiverSupply'] / $divisor;
+        $low_limit = $low_warn_limit = 3;
+        $high_warn_limit = $high_limit = 4;
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port?->ifName;
+        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.6';
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'voltage',
+            'sensor_oid' => $oid,
+            'sensor_index' => 'SfpVolt' . $ifIndex,
+            'sensor_type' => 'rlPhyTestTableTransceiverSupply',
+            'sensor_descr' => 'SfpVolt-' . $descr,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => $low_warn_limit,
+            'sensor_limit_warn' => $high_warn_limit,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex_measured' => 'port',
+            'user_func' => null,
+            'group' => 'transceiver',
+        ]));
     }
 }

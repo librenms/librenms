@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "JAE214600ZR",
                     "icon": "cisco.svg"
                 }
             ]
@@ -35808,6 +35808,19 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.88.174.3",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.88.174.0/24",
+                    "ifIndex": 1
                 }
             ]
         }

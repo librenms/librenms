@@ -11090,10 +11090,10 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
-                    "sensor_limit": 101,
-                    "sensor_limit_warn": 100,
-                    "sensor_limit_low": 0,
-                    "sensor_limit_low_warn": 10,
+                    "sensor_limit": 102,
+                    "sensor_limit_warn": 101,
+                    "sensor_limit_low": 10,
+                    "sensor_limit_low_warn": 50,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
@@ -15892,7 +15892,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "169.254.2.1",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -15906,7 +15906,7 @@
                     "inetCidrRouteDest": "169.254.2.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 }
             ]
@@ -17670,6 +17670,26 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "169.254.102.22",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.102.0/24",
+                    "ifIndex": 100253
+                },
+                {
+                    "ipv4_address": "169.254.2.22",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.2.0/24",
+                    "ifIndex": 100000
                 }
             ]
         }
