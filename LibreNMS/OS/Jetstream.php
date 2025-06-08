@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Jetstream.php
  *
@@ -24,16 +23,19 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
 use App\Models\PortVlan;
+use App\Models\PortsFdb;
 use App\Models\Route;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
@@ -42,7 +44,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery, FdbTableDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -206,5 +208,25 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return $result;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $dot1qTpFdbPort = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
+        $dot1qTpFdbPort = $dot1qTpFdbPort['dot1qTpFdbPort'] ?? [];
+
+        foreach ($dot1qTpFdbPort as $realVlan => $macData) {
+            foreach ($macData as $mac_address => $idx) {
+                $fdbt->push(new PortsFdb([
+                    'port_id' => find_port_id('gigabitEthernet 1/0/' . $idx, 'gigabitEthernet1/0/' . $idx, $this->getDeviceId()) ?? 0,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $realVlan,
+                ]));
+            }
+        }
+
+        return $fdbt->filter();
     }
 }

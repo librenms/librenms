@@ -22,20 +22,23 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv4Mac;
+use App\Models\PortsFdb;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
 
-class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery
+class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery, FdbTableDiscovery
 {
     use Traits\VxworksProcessorUsage;
 
@@ -47,5 +50,21 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
                 'mac_address' => Mac::parse($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'])->hex(),
                 'ipv4_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIpAddr'],
             ]));
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $binding = \SnmpQuery::hideMib()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')->table(1);
+        foreach ($binding as $mac_address => $data) {
+            $fdbt->push(new PortsFdb([
+                'port_id' => PortCache::getIdFromIfIndex($data['agentDynamicDsBindingIfIndex'], $this->getDeviceId()) ?? 0,
+                'mac_address' => $mac_address,
+                'vlan_id' => $data['agentDynamicDsBindingVlanId'] ?? 0,
+            ]));
+        }
+
+        return $fdbt->filter();
     }
 }
