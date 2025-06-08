@@ -113,7 +113,7 @@ class ObjectCache
             if (PrinterSupply::hasAccess($user)->exists()) {
                 $sensor_menu[3] = [
                     [
-                        'class' => 'printer',
+                        'class' => 'printer-supply',
                         'icon' => 'print',
                         'descr' => __('sensors.printer-supply.long'),
                     ],
