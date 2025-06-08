@@ -482,6 +482,14 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsFdb, $this>
+     */
+    public function portsFdb(): HasMany
+    {
+        return $this->hasMany(PortsFdb::class, 'port_id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
      */
     public function pseudowires(): HasMany
