@@ -38,7 +38,7 @@ class Wled extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), '', $data);
     }
 
     public static function configTemplate(): array
