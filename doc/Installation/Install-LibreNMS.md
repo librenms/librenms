@@ -28,19 +28,9 @@ Connect to the server command line and follow the instructions below.
     === "NGINX"
         ```
         apt install software-properties-common
-        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
         apt update
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
-        ```
-
-=== "Ubuntu 20.04"
-    === "NGINX"
-        ```
-        apt install software-properties-common
-        add-apt-repository universe
-        LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
-        apt update
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
         ```
 
     === "Apache"
@@ -142,12 +132,6 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
     vi /etc/php/8.3/cli/php.ini
     ```
 
-=== "Ubuntu 20.04"
-    ```bash
-    vi /etc/php/8.3/fpm/php.ini
-    vi /etc/php/8.3/cli/php.ini
-    ```
-
 === "CentOS 8"
     ```
     vi /etc/php.ini
@@ -180,11 +164,6 @@ timedatectl set-timezone Etc/UTC
     ```
 
 === "Ubuntu 22.04"
-    ```
-    vi /etc/mysql/mariadb.conf.d/50-server.cnf
-    ```
-
-=== "Ubuntu 20.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
@@ -241,12 +220,6 @@ exit
     ```
 
 === "Ubuntu 22.04"
-    ```bash
-    cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
-    vi /etc/php/8.3/fpm/pool.d/librenms.conf
-    ```
-
-=== "Ubuntu 20.04"
     ```bash
     cp /etc/php/8.3/fpm/pool.d/www.conf /etc/php/8.3/fpm/pool.d/librenms.conf
     vi /etc/php/8.3/fpm/pool.d/librenms.conf
@@ -364,82 +337,6 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php8.3-fpm
-        ```
-
-=== "Ubuntu 20.04"
-    === "NGINX"
-        ```bash
-        vi /etc/nginx/conf.d/librenms.conf
-        ```
-
-        Add the following config, edit `server_name` as required:
-
-        ```nginx
-        server {
-         listen      80;
-         server_name librenms.example.com;
-         root        /opt/librenms/html;
-         index       index.php;
-
-         charset utf-8;
-         gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
-         location / {
-          try_files $uri $uri/ /index.php?$query_string;
-         }
-         location ~ [^/]\.php(/|$) {
-          fastcgi_pass unix:/run/php-fpm-librenms.sock;
-          fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          include fastcgi.conf;
-         }
-         location ~ /\.(?!well-known).* {
-          deny all;
-         }
-        }
-        ```
-
-        ```bash
-        rm /etc/nginx/sites-enabled/default
-        systemctl restart nginx
-        systemctl restart php8.3-fpm
-        ```
-
-    === "Apache"
-        ```bash
-        vi /etc/apache2/sites-available/librenms.conf
-        ```
-
-        Add the following config, edit `ServerName` as required:
-
-        ```apache
-        <VirtualHost *:80>
-          DocumentRoot /opt/librenms/html/
-          ServerName  librenms.example.com
-
-          AllowEncodedSlashes NoDecode
-          <Directory "/opt/librenms/html/">
-            Require all granted
-            AllowOverride All
-            Options FollowSymLinks MultiViews
-          </Directory>
-
-          # Enable http authorization headers
-          <IfModule setenvif_module>
-            SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
-          </IfModule>
-
-          <FilesMatch ".+\.php$">
-            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
-          </FilesMatch>
-        </VirtualHost>
-        ```
-
-        ```bash
-        a2dissite 000-default
-        a2enmod proxy_fcgi setenvif rewrite
-        a2ensite librenms.conf
-        systemctl restart apache2
         systemctl restart php8.3-fpm
         ```
 
@@ -609,9 +506,6 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 === "Ubuntu 22.04"
     SELinux not enabled by default
 
-=== "Ubuntu 20.04"
-    SELinux not enabled by default
-
 === "CentOS 8"
     Install the policy tool for SELinux:
 
@@ -677,9 +571,6 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     Firewall not enabled by default
 
 === "Ubuntu 22.04"
-    Firewall not enabled by default
-
-=== "Ubuntu 20.04"
     Firewall not enabled by default
 
 === "CentOS 8"

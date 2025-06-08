@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "CAT2223L007",
                     "icon": "cisco.svg"
                 }
             ]
@@ -34938,6 +34938,19 @@
                     "vlan_name": "trnet-default",
                     "vlan_type": "trNet",
                     "vlan_mtu": null
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.82.138.90",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.82.138.88/29",
+                    "ifIndex": 1
                 }
             ]
         }

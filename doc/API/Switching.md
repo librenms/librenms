@@ -262,18 +262,75 @@ Output:
     'ports_fdb': [
         {
             'hostname': 'hq-core1',
+            'sysName': 'hq-core1',
             'ifName': 'ae10',
+            'ifAlias': 'ae10',
+            'ifDescr': 'ae10',
             'last_seen': '2 hours ago',
             'updated_at': '2023-05-17 03:19:15'
         },
         {
             'hostname': 'hq-sw1',
+            'sysName': 'hq-sw1',
             'ifName': 'ge-0/0/0',
+            'ifAlias': 'ge-0/0/0',
+            'ifDescr': 'ge-0/0/0',
             'last_seen': '3 hours ago',
             'updated_at': '2023-05-17 02:02:06'
         },
         ...
     ],
     'status': 'ok'
+}
+```
+
+### `list_nac`
+
+Get a list of all ports NAC.
+
+Route: `/api/v0/resources/nac/:mac`
+
+- mac is the specific MAC address you would like to query
+
+Input:
+
+-
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/nac
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/nac/1aaa2bbb3ccc
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports_nac": [
+        {
+            "ports_nac_id": 1,
+            "auth_id": "0000000000000AAAABBBB8CC",
+            "device_id": 3,
+            "port_id": 6,
+            "domain": "data",
+            "username": "hostname.librenms.org",
+            "mac_address": "1aaa2bbb3ccc",
+            "ip_address": "192.0.2.2",
+            "host_mode": "singleHost",
+            "authz_status": "authorizationSuccess",
+            "authz_by": "Authentication Server",
+            "authc_status": "authcSuccess",
+            "method": "dot1x",
+            "timeout": "0",
+            "time_left": "0",
+            "vlan": 0,
+            "time_elapsed": null,
+            "created_at": "2025-05-08T08:55:06.000000Z",
+            "updated_at": "2025-05-08T08:55:06.000000Z",
+            "historical": 0
+        }
+    ]
 }
 ```

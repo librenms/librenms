@@ -229,21 +229,21 @@ class SetConfigCommand extends LnmsCommand
         $validator = new Validator;
         $validator->validate(
             $os_data,
-            (object) ['$ref' => 'file://' . base_path('/misc/os_schema.json')],
+            (object) ['$ref' => 'file://' . resource_path('definitions/schema/os_schema.json')],
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
         $code = 0;
 
         $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
-            if ($error['constraint'] == 'additionalProp') {
+            if ($error['constraint']['name'] == 'additionalProp') {
                 $code = 1;
 
                 return true;
             }
 
             // only check type if value is set (otherwise we are unsetting it)
-            if (! empty($value) && $error['constraint'] == 'type') {
+            if (! empty($value) && $error['constraint']['name'] == 'type') {
                 if ($code === 0) {
                     $code = 2; // wrong path takes precedence over wrong type
                 }

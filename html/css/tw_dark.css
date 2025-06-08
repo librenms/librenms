@@ -1506,11 +1506,6 @@
     background-color: #2e3338
 }
 
-.dark input,
-.dark textarea {
-    color: #272b30
-}
-
 .dark .has-error .help-block,
 .dark .has-error .control-label,
 .dark .has-error .radio,
@@ -1674,7 +1669,7 @@
     background-color: #353a41;
 }
 
-.dark .bootgrid-table td.loading, .bootgrid-table td.no-results {
+.dark .bootgrid-table td.loading, .dark .bootgrid-table td.no-results {
     background-color: #3e444c;
 }
 

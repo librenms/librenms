@@ -2537,8 +2537,8 @@
                     "ifName": "tunl0",
                     "portName": null,
                     "ifIndex": 13,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -3141,5 +3141,32 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.71.2.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.71.2.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "122.146.181.76",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "122.146.181.64/27",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 12
+                }
+            ]
+        }
     }
 }

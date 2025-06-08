@@ -1413,19 +1413,27 @@ return [
             ],
         ],
         'bad_if' => [
-            'description' => 'Bad Interface Names',
-            'help' => 'Network interface IF-MIB:!:ifName which should be ignored',
+            'description' => 'Bad Interface ifDescr',
+            'help' => 'Network interface IF-MIB:!:ifDescr which should be ignored',
         ],
         'bad_if_regexp' => [
-            'description' => 'Bad Interface Name Regex',
+            'description' => 'Bad Interface ifDescr Regex',
+            'help' => 'Network interface IF-MIB:!:ifDescr which should be ignored using regular expressions',
+        ],
+        'bad_ifalias_regexp' => [
+            'description' => 'Bad Interface ifAlias Regex',
+            'help' => 'Network interface IF-MIB:!:ifAlias which should be ignored using regular expressions',
+        ],
+        'bad_ifname_regexp' => [
+            'description' => 'Bad Interface ifName Regex',
             'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
         ],
         'bad_ifoperstatus' => [
-            'description' => 'Bad Interface Operating Status',
+            'description' => 'Bad Interface ifOperStatus Status',
             'help' => 'Network interface IF-MIB:!:ifOperStatus which should be ignored',
         ],
         'bad_iftype' => [
-            'description' => 'Bad Interface Types',
+            'description' => 'Bad Interface ifType',
             'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
         'ping' => [
