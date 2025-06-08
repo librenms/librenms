@@ -23,15 +23,15 @@ class Wled extends Transport
         }
 
         // if this is not set or blank, it means it is a unsupported state or to be ignored
-        if (!isset($wled_preset) || $wled_preset === '') {
+        if (! isset($wled_preset) || $wled_preset === '') {
             return true;
         }
 
-        $data = [ 'ps' => $wled_preset ];
+        $data = ['ps' => $wled_preset];
         $url = 'http://' . $host . '/json';
 
         $res = Http::client()
-            ->withHeaders(['Content-Type'=> 'application/json'])
+            ->withHeaders(['Content-Type' => 'application/json'])
             ->post($url, $data);
 
         if ($res->successful()) {
