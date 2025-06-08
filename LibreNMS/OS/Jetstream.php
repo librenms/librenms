@@ -1,19 +1,46 @@
 <?php
 
+/**
+ * Jetstream.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
+use App\Models\PortsFdb;
 use App\Models\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
+use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, FdbTableDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -115,5 +142,25 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
         }));
 
         return $routes->filter();
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $dot1qTpFdbPort = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
+        $dot1qTpFdbPort = $dot1qTpFdbPort['dot1qTpFdbPort'] ?? [];
+
+        foreach ($dot1qTpFdbPort as $realVlan => $macData) {
+            foreach ($macData as $mac_address => $idx) {
+                $fdbt->push(new PortsFdb([
+                    'port_id' => find_port_id('gigabitEthernet 1/0/' . $idx, 'gigabitEthernet1/0/' . $idx, $this->getDeviceId()) ?? 0,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $realVlan,
+                ]));
+            }
+        }
+
+        return $fdbt->filter();
     }
 }
