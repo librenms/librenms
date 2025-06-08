@@ -32,6 +32,7 @@ use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Qos;
 use App\Models\Sla;
@@ -41,6 +42,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -60,6 +62,7 @@ use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class Cisco extends OS implements
+    FdbTableDiscovery,
     OSDiscovery,
     SlaDiscovery,
     StpInstanceDiscovery,
@@ -313,7 +316,7 @@ class Cisco extends OS implements
     public function discoverProcessors()
     {
         $processors_data = $this->getCacheTable('cpmCPUTotalTable', 'CISCO-PROCESS-MIB');
-        $processors_data = snmpwalk_group($this->getDeviceArray(), 'cpmCoreTable', 'CISCO-PROCESS-MIB', 1, $processors_data);
+        $processors_data = SnmpQuery::hideMib()->walk('CISCO-PROCESS-MIB::cpmCoreTable')->table(1, $processors_data);
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
@@ -947,5 +950,38 @@ class Cisco extends OS implements
                 d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
             }
         }
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+        $vtpdomains = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::managementDomainName')->table();
+        $vlans = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::vtpVlanEntry')->table(2);
+
+        foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
+            echo "VTP Domain $vtpdomain_id {$vtpdomain['managementDomainName']}> ";
+            foreach ($vlans[$vtpdomain_id] as $vlan_raw => $vlan) {
+                echo "$vlan_raw ";
+                if (($vlan['vtpVlanState'] === '1') && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
+                    $fdbPort_table = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
+
+                    $portid_dict = [];
+                    $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
+                    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+                        $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'], $this->getDeviceId());
+                    }
+
+                    foreach ((array) $fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] as $mac_address => $dot1dBasePort) {
+                        $fdbt->push(new PortsFdb([
+                            'port_id' => $portid_dict[$dot1dBasePort] ?? 0,
+                            'mac_address' => $mac_address,
+                            'vlan_id' => $vlan_raw,
+                        ]));
+                    }
+                }
+            }
+        }
+
+        return $fdbt->filter();
     }
 }
