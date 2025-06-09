@@ -63,7 +63,7 @@ function cleanPort($interface, $device = null)
         } elseif (Config::get("os.$os.ifalias")) {
             $interface['label'] = $interface['ifAlias'];
         } elseif (Config::get("os.$os.ifindex")) {
-            $interface['label'] = $interface['label'].' '.$interface['ifIndex'];
+            $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
 
         if ($os == 'speedtouch') {
