@@ -72,16 +72,16 @@ jobs:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-          
-      -
-        name: Plugins install kafka packages
-        run: |
-          php lnms plugin:add idealo/php-rdkafka-ffi --no-interaction
-          php lnms plugin:add ext-ffi --no-interaction
 
       -
         name: Composer install
         run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
+
+      -
+        name: Plugins install kafka packages
+        run: |
+          composer require idealo/php-rdkafka-ffi --prefer-dist --no-interaction --no-progress --no-scripts
+          composer require ext-ffi --prefer-dist --no-interaction --no-progress --no-scripts
 
       -
         name: Run PHPStan
