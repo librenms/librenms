@@ -8,22 +8,6 @@ use LibreNMS\Tests\TestCase;
 
 class KafkaDBStoreTest extends TestCase
 {
-    private ?\RdKafka\Test\MockCluster $cluster = null;
-
-    private function createMockCluster(): \RdKafka\Test\MockCluster
-    {
-        $clusterConf = new \RdKafka\Conf();
-        $clusterConf->setLogCb(
-            function (\RdKafka\Producer $producer, int $level, string $facility, string $message): void {
-                error_log('KAFKA: ' . $message);
-            }
-        );
-
-        $numberOfBrokers = 1;
-        $cluster = \RdKafka\Test\MockCluster::create($numberOfBrokers, $clusterConf);
-
-        return $cluster;
-    }
 
     protected function setUp(): void
     {
@@ -32,11 +16,12 @@ class KafkaDBStoreTest extends TestCase
         $this->cluster = $this->createMockCluster();
 
         Config::set('kafka.enable', true);
-        Config::set('kafka.broker.list', $this->cluster->getBootstraps());
+        Config::set('kafka.broker.list', 'localhost:9092');
+        Config::set('kafka.topic', 'librenms');
         Config::set('kafka.idempotence', false);
         Config::set('kafka.buffer.max.message', 10);
         Config::set('kafka.batch.max.message', 25);
-        Config::set('kafka.linger.ms', 50);
+        Config::set('kafka.linger.ms', 5000);
         Config::set('kafka.request.required.acks', 0);
     }
 
