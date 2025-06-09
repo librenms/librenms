@@ -12,8 +12,6 @@ class KafkaDBStoreTest extends TestCase
     {
         parent::setUp();
 
-        $this->cluster = $this->createMockCluster();
-
         Config::set('kafka.enable', true);
         Config::set('kafka.broker.list', 'localhost:9092');
         Config::set('kafka.topic', 'librenms');
@@ -43,7 +41,6 @@ class KafkaDBStoreTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->cluster = null;
         Config::set('kafka.enable', false);
         parent::tearDown();
     }
