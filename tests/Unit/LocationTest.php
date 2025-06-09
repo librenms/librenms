@@ -171,6 +171,8 @@ class LocationTest extends TestCase
         $this->mock(Geocoder::class, function (MockInterface $mock) use ($location) {
             $mock->shouldReceive('getCoordinates')->once()->andReturn($location->only(['lat', 'lng']));
         });
+        // Disable DNS lookup since we're not testing that.
+        Config::set('geoloc.dns', false);
 
         Config::set('geoloc.latlng', false);
         $device->setLocation('No API', true);

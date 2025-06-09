@@ -115,7 +115,7 @@ class YamlSchemaTest extends TestCase
             $validator->validate(
                 $data,
                 $schema,
-                Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
+                Constraint::CHECK_MODE_TYPE_CAST | Constraint::CHECK_MODE_VALIDATE_SCHEMA | Constraint::CHECK_MODE_EXCEPTIONS
             );
         } catch (JsonDecodingException $e) {
             // Output the filename so we know what file failed

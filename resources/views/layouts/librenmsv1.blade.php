@@ -113,7 +113,7 @@
 @if(Auth::check())
     <script>
         // only update resolution if it doesn't match what is stored in the session
-        if (document.documentElement.clientWidth !== {{ session('screen_width') }} || document.documentElement.clientHeight !== {{ session('screen_height') }}) {
+        if (document.documentElement.clientWidth !== {{ (int) session('screen_width') }} || document.documentElement.clientHeight !== {{ (int) session('screen_height') }}) {
             updateResolution(false);
         }
     </script>

@@ -608,7 +608,7 @@ foreach ($ports as $port) {
 
         // ifHighSpeed is signed integer, but should be unsigned (Gauge32 in RFC2233). Workaround for some fortinet devices.
         if ($device['os'] == 'fortigate' || $device['os'] == 'fortisandbox') {
-            if ($this_port['ifHighSpeed'] > 2147483647) {
+            if (isset($this_port['ifHighSpeed']) && $this_port['ifHighSpeed'] > 2147483647) {
                 $this_port['ifHighSpeed'] = null;
             }
         }

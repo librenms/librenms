@@ -17,7 +17,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     require 'includes/html/javascript-interfacepicker.inc.php';
 
     $port_device_id = -1;
-    if (is_numeric($vars['port'])) {
+    if (isset($vars['port']) && is_numeric($vars['port'])) {
         $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', [$vars['port']]);
         $bill_data['bill_name'] = $port['port_descr_descr'];
         $bill_data['bill_ref'] = $port['port_descr_circuit'];
@@ -43,7 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <div class="col-sm-8">
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
                         <script type="text/javascript">
-                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
+                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . (isset($device) ? format_hostname($device) : 'No Device') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
                         </script>
                     </div>
                 </div>
@@ -52,7 +52,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <div class="col-sm-8">
                         <select class="form-control input-sm" id="port_id" name="port_id">
                         <?php
-                        if (is_array($port)) {
+                        if (isset($port) && is_array($port)) {
                             // Need to pre-populate port as we've got a port pre-selected
                             foreach (dbFetchRows('SELECT * FROM ports WHERE device_id = ?', [$port_device_id]) as $interface) {
                                 $interface = cleanPort($interface);

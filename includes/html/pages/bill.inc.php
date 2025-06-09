@@ -41,6 +41,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
     $total_data = $bill_data['total_data'];
     $rate_average = $bill_data['rate_average'];
 
+    $paid_kb ??= 0;
     if ($rate_95th > $paid_kb) {
         $over = ($rate_95th - $paid_kb);
         $bill_text = $over . 'Kbit excess.';
