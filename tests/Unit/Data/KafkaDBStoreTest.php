@@ -8,7 +8,6 @@ use LibreNMS\Tests\TestCase;
 
 class KafkaDBStoreTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
