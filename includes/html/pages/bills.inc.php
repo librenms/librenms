@@ -2,7 +2,7 @@
 
 $no_refresh = true;
 
-if ($_POST['addbill'] == 'yes') {
+if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
     if (! Auth::user()->hasGlobalAdmin()) {
         include 'includes/html/error-no-perm.inc.php';
         exit;
