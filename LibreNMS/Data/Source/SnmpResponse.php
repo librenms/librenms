@@ -301,7 +301,7 @@ class SnmpResponse
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
-            '/^.*No Such Instance currently exists.*$/m',
+            '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
             '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
         ], '', $this->raw);
     }
