@@ -1,6 +1,9 @@
 <?php
 
-if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
+$action = $_POST['action'] ?? 'none';
+$confirm = $_POST['confirm'] ?? 'none';
+
+if ($action == 'delete_bill' && $confirm == 'confirm') {
     dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
     dbDelete('bill_ports', '`bill_id` = ?', [$bill_id]);
     dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
@@ -12,13 +15,13 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
     echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
 }
 
-if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
-    if ($_POST['confirm'] == 'mysql') {
+if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
+    if ($confirm == 'mysql') {
         dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
         dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
     }
 
-    if ($_POST['confirm'] == 'rrd') {
+    if ($confirm == 'rrd') {
         // Stil todo
     }
 
@@ -27,15 +30,15 @@ if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['c
     echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
 }
 
-if ($_POST['action'] == 'add_bill_port') {
+if ($action == 'add_bill_port') {
     dbInsert(['bill_id' => $_POST['bill_id'], 'port_id' => $_POST['port_id']], 'bill_ports');
 }
 
-if ($_POST['action'] == 'delete_bill_port') {
+if ($action == 'delete_bill_port') {
     dbDelete('bill_ports', '`bill_id` =  ? AND `port_id` = ?', [$bill_id, $_POST['port_id']]);
 }
 
-if ($_POST['action'] == 'update_bill') {
+if ($action == 'update_bill') {
     if (isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
         if ($_POST['bill_type'] == 'quota') {
             if (isset($_POST['bill_quota_type'])) {

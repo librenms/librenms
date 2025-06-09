@@ -1025,12 +1025,14 @@
             "type": "integer"
         },
         "branding": {
-            "default": null,
-            "type": "text"
-        },
-        "branding.default": {
-            "default": null,
-            "type": "text"
+            "default": {
+                "default": {}
+            },
+            "type": "array",
+            "validaton": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
@@ -5933,13 +5935,6 @@
             "group": "system",
             "section": "reporting",
             "order": 1,
-            "default": false,
-            "type": "boolean"
-        },
-        "reporting.dump_errors": {
-            "group": "system",
-            "section": "reporting",
-            "order": 2,
             "default": false,
             "type": "boolean"
         },

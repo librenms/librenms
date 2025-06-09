@@ -59,6 +59,7 @@ class SensorController
             'processor' => 'sensor.processor',
             'storage' => 'sensor.storage',
             'diskio' => 'sensor.diskio',
+            'printer-supply' => 'sensor.printer-supply',
             default => 'sensor.index',
         };
 
@@ -96,6 +97,11 @@ class SensorController
                 'text' => __('Disk I/O'),
                 'link' => route('sensor.index', $request->all() + ['metric' => 'diskio']),
                 'icon' => 'fa-hdd',
+            ],
+            'printer-supply' => [
+                'text' => __('sensors.printer-supply.long'),
+                'link' => route('sensor.index', $request->all() + ['metric' => 'printer-supply']),
+                'icon' => 'fa-printer',
             ],
         ];
 
