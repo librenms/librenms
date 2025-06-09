@@ -4,6 +4,7 @@ use LibreNMS\Config;
 
 function rewrite_entity_descr($descr)
 {
+    $descr = (string) $descr;
     $descr = str_replace('Distributed Forwarding Card', 'DFC', $descr);
     $descr = preg_replace('/7600 Series SPA Interface Processor-/', '7600 SIP-', $descr);
     $descr = preg_replace('/Rev\.\ [0-9\.]+\ /', '', $descr);
