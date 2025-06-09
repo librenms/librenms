@@ -35,9 +35,14 @@ var grid = $("#fdb-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
+$device_id = (int) ($vars['device_id'] ?? 0);
+$searchby = $vars['searchby'] ?? 'mac';
+$searchPhrase = $vars['searchPhrase'] ?? '';
+
 // Select the devices only with FDB tables
 $sql = 'SELECT D.device_id AS device_id, `hostname`, `sysName`, `display` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 $param = [];
+$where = '';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -48,7 +53,7 @@ if (! Auth::user()->hasGlobalRead()) {
 $sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"' . $data['device_id'] . '\""+';
-    if ($data['device_id'] == $vars['device_id']) {
+    if ($data['device_id'] == $device_id) {
         echo '" selected "+';
     }
 
@@ -61,7 +66,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
                 "<select name=\"searchby\" id=\"searchby\" class=\"form-control input-sm\">"+
                 "<option value=\"mac\" "+
 <?php
-if ($vars['searchby'] == 'mac') {
+if ($searchby == 'mac') {
     echo '" selected "+';
 }
 ?>
@@ -69,7 +74,7 @@ if ($vars['searchby'] == 'mac') {
                 ">MAC Address</option>"+
                 "<option value=\"ip\" "+
 <?php
-if ($vars['searchby'] == 'ip') {
+if ($searchby == 'ip') {
     echo '" selected "+';
 }
 ?>
@@ -77,7 +82,7 @@ if ($vars['searchby'] == 'ip') {
                 ">IP Address</option>"+
                 "<option value=\"dnsname\" "+
 <?php
-if ($vars['searchby'] == 'dnsname') {
+if ($searchby == 'dnsname') {
     echo '" selected "+';
 }
 ?>
@@ -85,7 +90,7 @@ if ($vars['searchby'] == 'dnsname') {
                 ">DNS Name</option>"+
                 "<option value=\"description\" "+
 <?php
-if ($vars['searchby'] == 'description') {
+if ($searchby == 'description') {
     echo '" selected "+';
 }
 ?>
@@ -93,7 +98,7 @@ if ($vars['searchby'] == 'description') {
                 ">Description</option>"+
                 "<option value=\"vendor\" "+
 <?php
-if ($vars['searchby'] == 'vendor') {
+if ($searchby == 'vendor') {
     echo '" selected "+';
 }
 ?>
@@ -101,7 +106,7 @@ if ($vars['searchby'] == 'vendor') {
                 ">Vendor</option>"+
                 "<option value=\"vlan\" "+
 <?php
-if ($vars['searchby'] == 'vlan') {
+if ($searchby == 'vlan') {
     echo '" selected "+';
 }
 ?>
@@ -112,7 +117,7 @@ if ($vars['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"' . htmlspecialchars($vars['searchPhrase']) . '"+';
+echo '"' . htmlspecialchars($searchPhrase) . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+
@@ -124,9 +129,9 @@ echo '"' . htmlspecialchars($vars['searchPhrase']) . '"+';
     post: function ()
     {
         return {
-            device_id: '<?php echo htmlspecialchars($vars['device_id']); ?>',
-            searchby: '<?php echo htmlspecialchars($vars['searchby']); ?>',
-            searchPhrase: '<?php echo htmlspecialchars($vars['searchPhrase']); ?>',
+            device_id: '<?php echo $device_id ?: ''; ?>',
+            searchby: '<?php echo htmlspecialchars($searchby); ?>',
+            searchPhrase: '<?php echo htmlspecialchars($searchPhrase); ?>',
             dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },
