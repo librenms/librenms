@@ -53,25 +53,25 @@ function cleanPort($interface, $device = null)
         $device = device_by_id_cache($interface['device_id']);
     }
 
-    $os = strtolower($device['os']);
+    // set "label"
+    $interface['label'] = $interface['ifDescr'];
+    if (isset($device['os'])) {
+        $os = strtolower($device['os']);
+        if (Config::get("os.$os.ifname")) {
+            $interface['label'] = $interface['ifName'];
 
-    if (Config::get("os.$os.ifname")) {
-        $interface['label'] = $interface['ifName'];
-
-        if ($interface['ifName'] == '') {
-            $interface['label'] = $interface['ifDescr'];
-        }
-    } elseif (Config::get("os.$os.ifalias")) {
-        $interface['label'] = $interface['ifAlias'];
-    } else {
-        $interface['label'] = $interface['ifDescr'];
-        if (Config::get("os.$os.ifindex")) {
+            if ($interface['ifName'] == '') {
+                $interface['label'] = $interface['ifDescr'];
+            }
+        } elseif (Config::get("os.$os.ifalias")) {
+            $interface['label'] = $interface['ifAlias'];
+        } elseif (Config::get("os.$os.ifindex")) {
             $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
-    }
 
-    if ($device['os'] == 'speedtouch') {
-        [$interface['label']] = explode('thomson', $interface['label']);
+        if ($os == 'speedtouch') {
+            [$interface['label']] = explode('thomson', $interface['label']);
+        }
     }
 
     if (is_array(Config::get('rewrite_if'))) {
