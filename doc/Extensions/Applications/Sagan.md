@@ -85,3 +85,10 @@ Any configuration of sagan_stat_check should be done in the cron
 setup. If the default does not work, check the docs for it at
 [MetaCPAN for sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
 
+The Following graphs are available for usage for displaying global
+overall stats on the dashboard.
+
+- application_sagan_global_bytes
+- application_sagan_global_bytes_stacked
+- application_sagan_global_eps
+- application_sagan_global_eps_stacked
