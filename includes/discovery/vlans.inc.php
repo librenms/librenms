@@ -73,7 +73,7 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
 
             echo str_pad($db_a['baseport'], 10);
             echo str_pad($ifIndex, 10);
-            echo str_pad($port?->getLabel() ?? '', 25);
+            $port ? str_pad($port->getLabel(), 25) : '';
             echo str_pad($db_a['priority'], 10);
             echo str_pad($db_a['state'], 15);
             echo str_pad($db_a['cost'], 10);
