@@ -452,7 +452,7 @@ class Billing
             exit("Unknown graph type $imgtype");
         }//end if
 
-        $average = ($average / $ave_count);
+        $average = $ave_count ? ($average / $ave_count) : 0;
         $tot_data_size = count($tot_data);
         for ($x = 0; $x <= $tot_data_size; $x++) {
             array_push($ave_data, $average);
