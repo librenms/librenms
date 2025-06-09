@@ -1029,7 +1029,7 @@
                 "default": {}
             },
             "type": "array",
-            "validaton": {
+            "validate": {
                 "value": "array",
                 "value.*": "array"
             }
