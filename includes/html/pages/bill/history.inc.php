@@ -44,7 +44,7 @@ function showDetails($bill_id, $imgtype, $bill_hist_id)
 }//end showDetails()
 
 // $url        = generate_url($vars, array('detail' => 'yes'));
-$url = $PHP_SELF . '/bill/' . $bill_id . '/history/detail=all/';
+$url = url('/bill/' . $bill_id . '/history/detail=all/');
 
 echo '<table class="table table-striped">
     <thead>
@@ -120,7 +120,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                 </td>
             </tr>';
 
-        if ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == 'all') {
+        if (isset($vars['detail']) && ($vars['detail'] == $history['bill_hist_id'] || $vars['detail'] == 'all')) {
             $img['bitrate'] = showDetails($bill_id, 'bitrate', $history['bill_hist_id']);
             $img['bw_day'] = showDetails($bill_id, 'day', $history['bill_hist_id']);
             $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
