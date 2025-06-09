@@ -1025,12 +1025,14 @@
             "type": "integer"
         },
         "branding": {
-            "default": null,
-            "type": "text"
-        },
-        "branding.default": {
-            "default": null,
-            "type": "text"
+            "default": {
+                "default": {}
+            },
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
@@ -2127,10 +2129,6 @@
             "type": "boolean"
         },
         "enable_libvirt": {
-            "default": false,
-            "type": "boolean"
-        },
-        "enable_proxmox": {
             "default": false,
             "type": "boolean"
         },
