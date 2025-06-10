@@ -2463,7 +2463,7 @@
                     "mempool_used": 34,
                     "mempool_used_oid": null,
                     "mempool_free": 65,
-                    "mempool_free_oid": null",
+                    "mempool_free_oid": null,
                     "mempool_total": 100,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
