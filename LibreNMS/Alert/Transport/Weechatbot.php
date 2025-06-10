@@ -32,20 +32,20 @@ class WeechatBot extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $pre = $this->config['bot-password'] . " ";
+        $pre = $this->config['bot-password'] . ' ';
         if (isset($this->config['irc-server']) && strlen($this->config['irc-server']) !== 0) {
-            $pre = $pre . $this->config['irc-server'] . " ";
+            $pre = $pre . $this->config['irc-server'] . ' ';
         }
-        $pre = $pre . $this->config['irc-channel'] . " ";
+        $pre = $pre . $this->config['irc-channel'] . ' ';
 
-        # https://www.php.net/manual/en/function.fsockopen.php example #2
-        $fp = fsockopen("udp://" . $this->config['bot-hostname'], $this->config['bot-port'], $errno, $errstr);
+        // https://www.php.net/manual/en/function.fsockopen.php example #2
+        $fp = fsockopen('udp://' . $this->config['bot-hostname'], $this->config['bot-port'], $errno, $errstr);
 
-        if (!$fp) {
+        if (! $fp) {
             throw new AlertTransportDeliveryException($alert_data, $errno, $errstr);
         } else {
             fwrite($fp, $pre . $alert_data['title']);
-            foreach(preg_split("/((\r?\n)|(\r\n?))/", $alert_data['msg']) as $line) {;
+            foreach (preg_split('/((\r?\n)|(\r\n?))/', $alert_data['msg']) as $line) {
                 fwrite($fp, $pre . $line);
             }
             fclose($fp);
