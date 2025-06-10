@@ -58,6 +58,12 @@ trait ProcessesDevices
 
         // 0 devices actioned, maybe there were none
         if ($result->hasNoAttempts()) {
+            if ($this->argument('device spec') == 'new') {
+                $this->line(__('commands.errors.no_new_devices'));
+
+                return 0; // no new devices is normal
+            }
+
             $this->error(__('commands.errors.no_devices'));
 
             return 1;

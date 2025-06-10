@@ -694,6 +694,8 @@ class Device extends BaseModel
             return $query;
         } elseif ($deviceSpec == 'all') {
             return $query;
+        } elseif ($deviceSpec == 'new') {
+            return $query->whereNull('last_discovered');
         } elseif ($deviceSpec == 'even') {
             return $query->whereRaw('device_id % 2 = 0');
         } elseif ($deviceSpec == 'odd') {

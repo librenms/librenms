@@ -4,7 +4,8 @@ return [
     'errors' => [
         'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
         'db_auth' => 'Failed to connect to database. Verify credentials: :error',
-        'no_devices' => 'No devices found matching your given device specification.',
+        'no_devices' => 'No devices found matching your given device specification',
+        'no_new_devices' => 'No new devices',
     ],
     'config:clear' => [
         'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
