@@ -131,7 +131,7 @@ return [
             'none_actioned' => 'No devices were discovered.',
         ],
         'actioned' => 'Discovered :count devices in :time',
-        'starting' => 'Starting discovery:'
+        'starting' => 'Starting discovery:',
     ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',

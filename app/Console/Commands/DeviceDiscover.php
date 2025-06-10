@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceDiscover.php
  *
@@ -42,7 +43,6 @@ class DeviceDiscover extends LnmsCommand
 
     protected $name = 'device:discover';
     protected ProcessType $processType = ProcessType::discovery;
-
 
     public function __construct()
     {

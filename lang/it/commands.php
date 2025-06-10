@@ -115,7 +115,7 @@ return [
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
-        ]
+        ],
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',

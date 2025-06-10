@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ProcessType.php
  *
@@ -32,7 +33,7 @@ enum ProcessType
 
     public function verbPast(): string
     {
-        return match($this) {
+        return match ($this) {
             ProcessType::discovery => 'discovered',
             ProcessType::poller => 'polled',
         };
@@ -40,7 +41,7 @@ enum ProcessType
 
     public function verbPresent(): string
     {
-        return match($this) {
+        return match ($this) {
             ProcessType::discovery => 'discovering',
             ProcessType::poller => 'polling',
         };
@@ -48,7 +49,7 @@ enum ProcessType
 
     public function verb(): string
     {
-        return match($this) {
+        return match ($this) {
             ProcessType::discovery => 'discover',
             ProcessType::poller => 'poll',
         };

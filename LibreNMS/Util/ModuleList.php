@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ModuleList.php
  *
@@ -42,7 +43,7 @@ class ModuleList
     ) {
         $this->overrides = $this->parseUserOverrides($overrides);
 
-        $default_modules = match($type) {
+        $default_modules = match ($type) {
             ProcessType::poller => LibrenmsConfig::get('poller_modules', []),
             ProcessType::discovery => LibrenmsConfig::get('discovery_modules', []),
         };
@@ -121,7 +122,7 @@ class ModuleList
                 return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
             }, array_keys($this->overrides), array_values($this->overrides));
 
-            Log::debug(sprintf("Override %s modules: %s", $this->type->name, implode(', ', $modules)));
+            Log::debug(sprintf('Override %s modules: %s', $this->type->name, implode(', ', $modules)));
         }
     }
 }

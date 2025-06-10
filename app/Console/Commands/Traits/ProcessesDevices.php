@@ -40,7 +40,7 @@ trait ProcessesDevices
     protected function processResults(Result $result, MeasurementManager $measurements): int
     {
         $type = $this->processType->verb(); // discover or poll
-        $translation_prefix = 'commands.device:' .$type;
+        $translation_prefix = 'commands.device:' . $type;
 
         if ($result->hasAnyCompleted()) {
             if (! $this->output->isQuiet()) {
