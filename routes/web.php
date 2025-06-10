@@ -21,6 +21,7 @@ use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
+use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\NacController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OverviewController;
@@ -339,6 +340,9 @@ Route::prefix('install')->group(function () {
     Route::get('/ajax/steps', [Install\InstallationController::class, 'stepsCompleted'])->name('install.action.steps');
     Route::any('{path?}', [Install\InstallationController::class, 'invalid'])->where('path', '.*'); // 404
 });
+
+// Metrics route
+Route::get('metrics', [MetricsController::class, 'index'])->name('metrics');
 
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');

@@ -1662,6 +1662,20 @@ return [
                 'help' => 'Optional text to prepend to exported metric names',
             ],
         ],
+        'prometheus_metrics' => [
+            'enable' => [
+                'description' => 'Prometheus Metrics Endpoint',
+                'help' => 'Enable the /metrics endpoint for scraping',
+            ],
+            'alerts' => [
+                'description' => 'Prometheus Metrics for Alerts',
+                'help' => 'Include active alert qty, and raised alert qtys',
+            ],
+            'port' => [
+                'description' => 'Prometheus Metrics Endpoint Port',
+                'help' => 'Which port the /metrics should respond to (requires additional config if not the same as the system)',
+            ],
+        ],
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.',
