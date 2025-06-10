@@ -307,7 +307,7 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
-        <?php show_device_group($vars['group']); ?>
+        <?php show_device_group($vars['group'] ?? 0); ?>
         <table id="devices" class="table table-hover table-condensed table-striped"
                data-url="<?php echo route('table.device') ?>">
             <thead>
