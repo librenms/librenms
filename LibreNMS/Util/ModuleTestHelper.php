@@ -92,13 +92,18 @@ class ModuleTestHelper
         Config::set('prometheus.enable', false);
     }
 
-    private static function compareOid($a, $b)
+    private static function compareOid($a, $b): int
     {
         $a_oid = explode('.', $a);
         $b_oid = explode('.', $b);
 
         foreach ($a_oid as $index => $a_part) {
+            if (! isset($b_oid[$index])) {
+                return 1; // a is higher (b doesn't exist)
+            }
+
             $b_part = $b_oid[$index];
+
             if ($a_part > $b_part) {
                 return 1; // a is higher
             } elseif ($a_part < $b_part) {

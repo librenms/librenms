@@ -22,7 +22,7 @@ print_optionbar_start('', '');
 
 echo '<span style="font-weight: bold;">Search</span> &#187; ';
 
-unset($sep);
+$sep = '';
 foreach ($sections as $type => $texttype) {
     echo $sep;
     if ($vars['search'] == $type) {
@@ -38,8 +38,6 @@ foreach ($sections as $type => $texttype) {
 
     $sep = ' | ';
 }
-
-unset($sep);
 
 print_optionbar_end();
 

@@ -157,8 +157,8 @@ class ErrorReporting
 
     private function adjustErrorHandlingForAppEnv(string $environment): void
     {
-        // TODO remove APP_DEBUG requirement when issues are cleaned up
-        if ($environment == 'production' || ! config('app.debug')) {
+        // TODO remove testing and then APP_DEBUG requirement when issues are cleaned up
+        if ($environment == 'production' || $environment == 'testing' || ! config('app.debug')) {
             // in production, don't halt execution on non-fatal errors
             set_error_handler(function ($severity, $message, $file, $line) {
                 error_log("PHP Error($severity): $message in $file on line $line");
