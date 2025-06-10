@@ -14,7 +14,6 @@ DB_DATABASE=librenms
 DB_USERNAME=librenms
 DB_PASSWORD=
 DB_SOCKET=
-
 ```
 
 ## Trusted Reverse Proxies

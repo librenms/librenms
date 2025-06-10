@@ -148,7 +148,7 @@ return [
                 'warn' => 'Dispatcher Service has been used, but not recently',
             ],
             'CheckLocking' => [
-                'fail' => 'Locking server issue: :message',
+                'fail' => 'Caching server issue: :message',
                 'ok' => 'Locks are functional',
             ],
             'CheckPythonWrapper' => [

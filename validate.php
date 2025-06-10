@@ -148,10 +148,14 @@ $validator->validate($modules, isset($options['s']) || ! empty($modules));
 
 exit($validator->getStatus() ? 0 : 1);
 
-function print_header()
+function print_header(): void
 {
-    $output = ob_get_clean();
-    @ob_end_clean();
+    $output = '';
+
+    if (ob_get_level() > 0) {
+        $output = ob_get_contents();
+        ob_end_clean();
+    }
 
     echo \LibreNMS\Util\Version::get()->header() . PHP_EOL;
     echo $output;

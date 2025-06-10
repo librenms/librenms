@@ -599,7 +599,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
-        if ($tmp_alerts['isisISAdjState']) {
+        if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
             $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);

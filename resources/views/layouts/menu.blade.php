@@ -748,7 +748,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" style="float: left; min-height: 32px; margin-right: 5px;"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" class="tw:h-8 tw:float-left  tw:m-1 tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-1 tw:mr-2"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
             }
         },
         {

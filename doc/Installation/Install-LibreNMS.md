@@ -107,12 +107,15 @@ Then run the composer wrapper script and exit back to the root user:
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
-Sometimes when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
-```
-wget https://getcomposer.org/composer-stable.phar
-mv composer-stable.phar /usr/bin/composer
-chmod +x /usr/bin/composer
-```
+
+!!! note
+    Sometimes when there is a proxy used to gain internet access, the above script may fail.
+    The workaround is to install the `composer` package manually. For a global installation:
+    ```
+    wget https://getcomposer.org/composer-stable.phar
+    mv composer-stable.phar /usr/bin/composer
+    chmod +x /usr/bin/composer
+    ```
 
 ## Set timezone
 
@@ -202,7 +205,8 @@ Start MariaDB client
 mysql -u root
 ```
 
-> NOTE: Change the 'password' below to something secure.
+!!! warning
+    Change the 'password' below to something secure.
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -599,7 +603,9 @@ cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 `lnms config` is the preferred method for [Configuration](../Support/Configuration.md)
 
 
-## Configure snmpd
+## Configure snmpd (v2c)
+
+If you would like to use SNMPv3 then please [see here](../Support/SNMP-Configuration-Examples.md/#linux-snmpd-v3)
 
 ```
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
@@ -624,13 +630,14 @@ systemctl restart snmpd
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
-> NOTE: Keep in mind  that cron, by default, only uses a very limited
-> set of environment variables. You may need to configure proxy
-> variables for the cron invocation. Alternatively adding the proxy
-> settings in config.php is possible too. The config.php file will be
-> created in the upcoming steps. Review the following URL after you
-> finished librenms install steps:
-> <@= config.site_url =@/Support/Configuration/#proxy-support>
+!!! note
+    Keep in mind  that cron, by default, only uses a very limited
+    set of environment variables. You may need to configure proxy
+    variables for the cron invocation. Alternatively adding the proxy
+    settings in config.php is possible too. The config.php file will be
+    created in the upcoming steps. Review the following URL after you
+    finished librenms install steps:
+    <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 ## Enable the scheduler
 
@@ -641,7 +648,7 @@ systemctl enable librenms-scheduler.timer
 systemctl start librenms-scheduler.timer
 ```
 
-## Copy logrotate config
+## Enable logrotate
 
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
 become large and be rotated out.  To rotate out the old logs you can
@@ -670,19 +677,24 @@ chown librenms:librenms /opt/librenms/config.php
 ## Final steps
 
 That's it!  You now should be able to log in to
-<http://librenms.example.com/>.  Please note that we have not covered
- HTTPS setup in this example, so your LibreNMS install is not secure
- by default.  Please do not expose it to the public Internet unless
- you have configured HTTPS and taken appropriate web server hardening
- steps.
+<http://librenms.example.com/>.
+
+!!! danger
+    Please note that we have not covered
+    HTTPS setup in this example, so your LibreNMS install is not secure
+    by default.  Please do not expose it to the public Internet unless
+    you have configured HTTPS and taken appropriate web server hardening
+    steps.
 
 ## Add the first device
 
 We now suggest that you add localhost as your first device from within the WebUI.
+<https://librenms.example.com/addhost>
 
 ## Troubleshooting
 
-If you ever have issues with your install, run validate.php:
+If you ever have issues with your install, you should run validate which will perform
+some base checks and provide the recommended fixes:
 
 ```
 sudo su - librenms

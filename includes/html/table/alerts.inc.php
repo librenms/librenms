@@ -28,35 +28,35 @@ $alert_states = [
 
 $show_recovered = false;
 
-if (is_numeric($vars['rule_id']) && $vars['rule_id'] > 0) {
+if (isset($vars['rule_id']) && is_numeric($vars['rule_id']) && $vars['rule_id'] > 0) {
     $where .= ' AND `alerts`.`rule_id` = ?';
     $param[] = $vars['rule_id'];
 }
 
-if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
+if (isset($vars['alert_id']) && is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
     $where .= ' AND `alerts`.`id` = ?';
     $param[] = $vars['alert_id'];
 }
 
-if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
+if (isset($vars['device_id']) && is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
 
-if (is_numeric($vars['acknowledged'])) {
-    // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
+if (isset($vars['acknowledged']) && is_numeric($vars['acknowledged'])) {
+    // I assume that if we are searching for acknowledged/not, we aren't interested in recovered
     $where .= ' AND `alerts`.`state`' . ($vars['acknowledged'] ? '=' : '!=') . $alert_states['acknowledged'];
 }
 
-if (is_numeric($vars['fired'])) {
+if (isset($vars['fired']) && is_numeric($vars['fired'])) {
     $where .= ' AND `alerts`.`alerted`=' . $alert_states['alerted'];
 }
 
-if (is_numeric($vars['unreachable'])) {
+if (isset($vars['unreachable']) && is_numeric($vars['unreachable'])) {
     // Sub-select to flag if at least one parent is set, and all parents are offline
     $where .= ' AND (SELECT IF(COUNT(`dr`.`parent_device_id`) > 0 AND COUNT(`dr`.`parent_device_id`)=count(`d`.`device_id`),1,0) FROM `device_relationships` `dr` LEFT JOIN `devices` `d` ON `dr`.`parent_device_id`=`d`.`device_id` AND `d`.`status`=0 WHERE `dr`.`child_device_id`=`devices`.`device_id`)=' . $vars['unreachable'];
 }
 
-if (is_numeric($vars['state'])) {
+if (isset($vars['state']) && is_numeric($vars['state'])) {
     $where .= ' AND `alerts`.`state`=' . $vars['state'];
     if ($vars['state'] == $alert_states['recovered']) {
         $show_recovered = true;
@@ -67,7 +67,7 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'alert_rules');
 }
 
-if (is_numeric($vars['group'])) {
+if (isset($vars['group']) && is_numeric($vars['group'])) {
     $where .= ' AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $param[] = $vars['group'];
 }
@@ -76,7 +76,7 @@ if (! $show_recovered) {
     $where .= ' AND `alerts`.`state`!=' . $alert_states['recovered'];
 }
 
-if (isset($searchPhrase) && ! empty($searchPhrase)) {
+if (! empty($searchPhrase)) {
     $where .= ' AND (`alerts`.`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -103,7 +103,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (! isset($vars['sort']) || empty($vars['sort'])) {
+if (empty($vars['sort'])) {
     $sort = 'timestamp DESC';
 } else {
     $sort = '`alert_rules`.`severity` DESC, timestamp DESC';
@@ -128,7 +128,6 @@ if (session('preferences.timezone')) {
 }
 
 $rulei = 0;
-$format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
@@ -160,7 +159,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     }
 
     $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
-    if (is_numeric($vars['uncollapse_key_count'])) {
+    if (isset($vars['uncollapse_key_count']) && is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
         $hostname .= ' class="collapse"';
@@ -184,7 +183,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     if (($proc == '') || ($proc == 'NULL')) {
         $has_proc = '';
     } else {
-        if (! preg_match('/^http[s]*:\/\//', $proc)) {
+        if (! preg_match('#^https?://#', $proc)) {
             $has_proc = '';
         } else {
             $has_proc = '<a href="' . $proc . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
