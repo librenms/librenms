@@ -45,4 +45,12 @@ enum ProcessType
             ProcessType::poller => 'polling',
         };
     }
+
+    public function verb(): string
+    {
+        return match($this) {
+            ProcessType::discovery => 'discover',
+            ProcessType::poller => 'poll',
+        };
+    }
 }

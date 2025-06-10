@@ -25,27 +25,29 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DeviceDiscovered;
-use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
-use LibreNMS\Polling\Result;
-use LibreNMS\Util\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class DeviceDiscover extends LnmsCommand
 {
+    use ProcessesDevices;
+
     protected $name = 'device:discover';
+    protected ProcessType $processType = ProcessType::discovery;
+
 
     public function __construct()
     {
         parent::__construct();
+        $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
     }
@@ -53,42 +55,24 @@ class DeviceDiscover extends LnmsCommand
     public function handle(MeasurementManager $measurements): int
     {
         try {
-            if ($this->getOutput()->isVerbose()) {
-                Log::debug(Version::get()->header());
-                LibrenmsConfig::invalidateAndReload();
-            }
+            $this->handleDebug();
+
             $processor = new PerDeviceProcess(
-                ProcessType::discovery,
+                $this->processType,
                 $this->argument('device spec'),
                 DiscoverDevice::class,
                 DeviceDiscovered::class,
                 explode(',', $this->option('modules') ?? ''),
             );
 
-            $this->line("Starting discovery run:\n");
+            $this->line(__('commands.device:discover.starting'));
+            $this->newLine();
+
             $result = $processor->run();
 
             return $this->processResults($result, $measurements);
         } catch (QueryException $e) {
-            if ($e->getCode() == 2002) {
-                $this->error(trans('commands.device:poll.errors.db_connect')); // FIXME
-
-                return 1;
-            } elseif ($e->getCode() == 1045) {
-                // auth failed, don't need to include the query
-                $this->error(trans('commands.device:poll.errors.db_auth', ['error' => $e->getPrevious()->getMessage()])); // FIXME
-
-                return 1;
-            }
-
-            $this->error($e->getMessage());
-
-            return 1;
+            return $this->handleQueryException($e);
         }
-    }
-
-    private function processResults(Result $result, MeasurementManager $measurements): int
-    {
-        return 0; // TODO
     }
 }

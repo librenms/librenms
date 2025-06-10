@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\ProcessesDevices;
 use App\Console\LnmsCommand;
 use App\Events\DevicePolled;
-use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\PerDeviceProcess;
@@ -12,15 +12,16 @@ use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
-use LibreNMS\Polling\Result;
 use LibreNMS\Util\ModuleList;
-use LibreNMS\Util\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class DevicePoll extends LnmsCommand
 {
+    use ProcessesDevices;
+
     protected $name = 'device:poll';
+    protected ProcessType $processType = ProcessType::poller;
     private ?int $current_device_id = null;
 
     /**
@@ -55,47 +56,31 @@ class DevicePoll extends LnmsCommand
         }
 
         try {
-            if ($this->getOutput()->isVerbose()) {
-                Log::debug(Version::get()->header());
-                LibrenmsConfig::invalidateAndReload();
-            }
+            $this->handleDebug();
 
             $processor = new PerDeviceProcess(
-                ProcessType::poller,
+                $this->processType,
                 $this->argument('device spec'),
                 PollDevice::class,
                 DevicePolled::class,
                 explode(',', $this->option('modules') ?? ''),
             );
 
-            $this->line("Starting polling run:\n");
+            $this->line(__('commands.device:poll.starting'));
+            $this->newLine();
+
             $results = $processor->run();
 
             return $this->processResults($results, $measurements);
          } catch (QueryException $e) {
-            if ($e->getCode() == 2002) {
-                $this->error(trans('commands.device:poll.errors.db_connect'));
-
-                return 1;
-            } elseif ($e->getCode() == 1045) {
-                // auth failed, don't need to include the query
-                $this->error(trans('commands.device:poll.errors.db_auth', ['error' => $e->getPrevious()->getMessage()]));
-
-                return 1;
-            }
-
-            $this->error($e->getMessage());
-
-            return 1;
-        } finally {
-            app('Datastore')->terminate();
+            return $this->handleQueryException($e);
         }
     }
 
     private function dispatchWork(): int
     {
         \Log::setDefaultDriver('stack');
-        $modules = new ModuleList(ProcessType::poller, explode(',', $this->option('modules') ?? ''));
+        $modules = new ModuleList($this->processType, explode(',', $this->option('modules') ?? ''));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 
         if (\config('queue.default') == 'sync') {
@@ -110,40 +95,5 @@ class DevicePoll extends LnmsCommand
         $this->line('Submitted work for ' . $devices->count() . ' devices');
 
         return 0;
-    }
-
-    private function processResults(Result $result, MeasurementManager $measurements): int
-    {
-        if ($result->hasAnyCompleted()) {
-            if (! $this->output->isQuiet()) {
-                if ($result->hasMultipleCompleted()) {
-                    $this->output->newLine();
-                    $time_spent = sprintf('%0.3fs', $measurements->getCategory('device')->getSummary('poll')->getDuration());
-                    $this->line(trans('commands.device:poll.polled', ['count' => $result->getCompleted(), 'time' => $time_spent]));
-                }
-                $this->output->newLine();
-                $measurements->printStats();
-            }
-
-            return 0;
-        }
-
-        // polled 0 devices, maybe there were none to poll
-        if ($result->hasNoAttempts()) {
-            $this->error(trans('commands.device:poll.errors.no_devices'));
-
-            return 1;
-        }
-
-        // attempted some devices, but none were up.
-        if ($result->hasNoCompleted()) {
-            $this->line('<fg=red>' . trans_choice('commands.device:poll.errors.none_up', $result->getAttempted()) . '</>');
-
-            return 6;
-        }
-
-        $this->error(trans('commands.device:poll.errors.none_polled'));
-
-        return 1; // failed to poll
     }
 }

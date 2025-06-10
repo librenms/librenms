@@ -121,8 +121,12 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     $instance->discover($os);
                 }
             } catch (Throwable $e) {
-                // isolate module exceptions so they don't disrupt the polling process
-                Log::error("%rError discovering $module module for {$this->device->hostname}.%n $e", ['color' => true]);
+                // Re-throw exception if we're in running tests
+                if (defined('PHPUNIT_RUNNING')) {
+                    throw $e;
+                }
+
+                // isolate module exceptions so they don't disrupt the discovery process
                 Eventlog::log("Error discovering $module module. Check log file for more details.", $this->device, 'discovery', Severity::Error);
                 report($e);
             }
