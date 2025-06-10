@@ -47,17 +47,17 @@ class HrDevice implements Module
             ->enumStrings()
             ->hideMib()
             ->walk([
-            'HOST-RESOURCES-MIB::hrProcessorLoad',
-            'HOST-RESOURCES-MIB::hrDeviceTable',
-        ])->mapTable(function (array $hrDevice, int $hrDeviceIndex) {
+                'HOST-RESOURCES-MIB::hrProcessorLoad',
+                'HOST-RESOURCES-MIB::hrDeviceTable',
+            ])->mapTable(function (array $hrDevice, int $hrDeviceIndex) {
                 $model = new \App\Models\HrDevice($hrDevice);
                 $model->hrDeviceIndex = $hrDeviceIndex;
 
                 return $model;
-        });
+            });
 
         ModuleModelObserver::observe(\App\Models\HrDevice::class);
-        $this->syncModels($os->getDevice(),'hostResources', $models);
+        $this->syncModels($os->getDevice(), 'hostResources', $models);
     }
 
     /**
