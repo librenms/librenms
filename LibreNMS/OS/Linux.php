@@ -134,7 +134,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
     private function handleHex(string $string): string
     {
         $string = str_replace("\n", '', $string);
-        if (StringHelpers::isHex($string)) {
+        if (StringHelpers::isHexWithWhitespace($string)) {
             $ascii = StringHelpers::hexToAscii($string, ' ');
 
             return preg_split('/[^ -~]/', $ascii)[0] ?? $ascii;

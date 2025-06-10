@@ -194,8 +194,13 @@ class StringHelpers
         return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
     }
 
-    public static function isHex(string $string): bool
+    public static function isHexWithWhitespace(string $string): bool
     {
         return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
+    }
+
+    public static function isHex(string $string): bool
+    {
+        return (bool) preg_match('/^(?:[[:xdigit:]][[:xdigit:]])+$/', trim($string));
     }
 }

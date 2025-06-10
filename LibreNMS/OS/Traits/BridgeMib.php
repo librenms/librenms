@@ -31,6 +31,7 @@ use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 trait BridgeMib
@@ -122,7 +123,7 @@ trait BridgeMib
                         'designatedRoot' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
                         'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
                         'designatedBridge' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
-                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
+                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? '') ?? 0,
                         'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                     ]);
                 })->filter(function (PortStp $port) {
@@ -200,7 +201,7 @@ trait BridgeMib
         return $stpPorts;
     }
 
-    private function designatedPort(string $dp): int
+    private function designatedPort(string $dp): ?int
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
             // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal
@@ -209,6 +210,10 @@ trait BridgeMib
 
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
+
+        if (! is_numeric($dp) && ! StringHelpers::isHex($dp)) {
+            return null;
+        }
 
         return (int) hexdec($dp);
     }
