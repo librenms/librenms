@@ -32,11 +32,11 @@ class WeechatBot extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $pre = $this->config['bot-password'] . ' ';
+        $pre = "{$this->config['bot-password']} ";
         if (isset($this->config['irc-server']) && strlen($this->config['irc-server']) !== 0) {
-            $pre = $pre . $this->config['irc-server'] . ' ';
+            $pre .= "{$this->config['irc-server']} ";
         }
-        $pre = $pre . $this->config['irc-channel'] . ' ';
+        $pre .= "{$this->config['irc-channel']} ";
 
         // https://www.php.net/manual/en/function.fsockopen.php example #2
         $fp = fsockopen('udp://' . $this->config['bot-hostname'], $this->config['bot-port'], $errno, $errstr);
