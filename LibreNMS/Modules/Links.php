@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
@@ -55,7 +55,7 @@ class Links implements Module
     {
         $links = new Collection;
 
-        if ($os instanceof LinksDiscovery) {
+        if ($os instanceof LinkDiscovery) {
             $links = $os->discoverLinks();
         }
 

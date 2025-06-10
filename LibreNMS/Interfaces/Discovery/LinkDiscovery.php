@@ -4,7 +4,7 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use Illuminate\Support\Collection;
 
-interface LinksDiscovery
+interface LinkDiscovery
 {
     /**
      * @return Collection<\App\Models\Link>

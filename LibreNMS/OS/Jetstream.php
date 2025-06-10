@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
@@ -18,7 +18,7 @@ use LibreNMS\Util\Mac;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, LinksDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, LinkDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {

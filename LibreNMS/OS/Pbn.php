@@ -31,12 +31,12 @@ use App\Models\Link;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Pbn extends OS implements ProcessorDiscovery, LinksDiscovery
+class Pbn extends OS implements ProcessorDiscovery, LinkDiscovery
 {
     public function __construct(&$device)
     {
