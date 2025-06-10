@@ -148,6 +148,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3902.3.6002.2.7.1.5.{{ $index }}'
                     descr: "Current Slot {{ $subindex2 }} - {{ $zxAnCardActualType }}"
 
+        count:
+          data:
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portTotalConfiguredTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    descr: "Total Configured ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portCurrentOnlineTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    descr: "Total Online ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
 
 
         state:

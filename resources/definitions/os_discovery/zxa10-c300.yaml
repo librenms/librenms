@@ -140,6 +140,22 @@ modules:
                     skip_value_lt: 0
                     divisor: 1000
 
+        count:
+          data:
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portTotalConfiguredTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    descr: "Total Configured ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portCurrentOnlineTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    descr: "Total Online ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
 
 
         state:
