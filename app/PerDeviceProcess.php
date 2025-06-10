@@ -75,7 +75,7 @@ class PerDeviceProcess
     public function processResults(MeasurementManager $measurements, OutputStyle $output): int
     {
         $type = $this->type->verb(); // discover or poll
-        $translation_prefix = 'commands.device:' .$type;
+        $translation_prefix = 'commands.device:' . $type;
 
         if ($this->results->hasAnyCompleted()) {
             if (! $output->isQuiet()) {
