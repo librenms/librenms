@@ -43,7 +43,7 @@ use App\Models\MplsTunnelCHop;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -58,7 +58,7 @@ use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class Timos extends OS implements
-    LinksDiscovery,
+    LinkDiscovery,
     MplsDiscovery,
     MplsPolling,
     WirelessPowerDiscovery,

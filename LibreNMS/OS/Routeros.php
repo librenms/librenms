@@ -33,7 +33,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -57,7 +57,7 @@ use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Routeros extends OS implements
-    LinksDiscovery,
+    LinkDiscovery,
     OSPolling,
     QosDiscovery,
     QosPolling,

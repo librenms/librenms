@@ -43,7 +43,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -64,7 +64,7 @@ use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Cisco extends OS implements
-    LinksDiscovery,
+    LinkDiscovery,
     OSDiscovery,
     SlaDiscovery,
     StpInstanceDiscovery,

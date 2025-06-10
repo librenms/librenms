@@ -30,11 +30,11 @@ use App\Facades\PortCache;
 use App\Models\Link;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Interfaces\Discovery\LinksDiscovery;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Bdcom extends OS implements LinksDiscovery
+class Bdcom extends OS implements LinkDiscovery
 {
     public function discoverLinks(): Collection
     {
