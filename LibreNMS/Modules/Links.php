@@ -196,7 +196,7 @@ class Links implements Module
                     }
 
                     // Fix devices returning lldpRemChassisId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress' && preg_match('/:3a:/is', $data['lldpRemChassisId'])) {
+                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress' && preg_match('/(:..:3a:..){5}/is', $data['lldpRemChassisId'])) {
                         $data['lldpRemChassisId'] = StringHelpers::hexToAscii($data['lldpRemChassisId'], ':');
                     }
 
