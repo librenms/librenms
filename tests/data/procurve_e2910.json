@@ -8412,7 +8412,7 @@
                     "designatedRoot": "000000000000",
                     "designatedCost": 44000,
                     "designatedBridge": "000000000000",
-                    "designatedPort": 10,
+                    "designatedPort": 0,
                     "forwardTransitions": 2,
                     "ifIndex": 10
                 },
