@@ -1,4 +1,4 @@
-# lnms device:poll
+# Poller Support
 
 This document will explain how to use `lnms device:poll` to debug issues or
 manually running to process data.
@@ -40,7 +40,7 @@ cron.
 ## Poller config
 
 These are the default poller config items. You can globally disable a
-module by setting it to 0. If you just want to
+module by setting it to `false`. If you just want to
 disable it for one device then you can do this within the WebUI Device
 -> Edit -> Modules.
 
@@ -95,11 +95,12 @@ disable it for one device then you can do this within the WebUI Device
 
 ## OS based Poller config
 
-You can enable or disable modules for a specific OS by add
-corresponding line in `config.php` OS based settings have preference
-over global. Device based settings have preference over all others
+You can enable or disable modules for a specific OS by using
+`lnms config:set os.<poller_module> false` OS based settings
+have preference over global. Device based settings have preference
+over all others.
 
-Poller performance improvement can be achieved by deactivating all
+Negligible Poller performance improvements can be achieved by deactivating all
 modules that are not supported by specific OS.
 
 E.g. to deactivate spanning tree but activate unix-agent module for linux OS
@@ -219,7 +220,7 @@ Multiple Modules
 lnms device:poll localhost -m ports,entity-physical -vv
 ```
 
-Using `-vv` shouldn't output much sensitive information, `-vvv` will so
+Using `-vv` shouldn't output much sensitive information, `-vvv` will, so
 it is then advisable to sanitise the output before pasting it
 somewhere as the debug output will contain snmp details amongst other
 items including port descriptions.

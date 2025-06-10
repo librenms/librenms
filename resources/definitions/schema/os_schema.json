@@ -213,6 +213,15 @@
             },
             "additionalProperties": false
         },
+        "polling": {
+            "type": "object",
+            "properties": {
+                "selected_ports": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
         "discovery_modules": {
             "type": "object",
             "properties": {
