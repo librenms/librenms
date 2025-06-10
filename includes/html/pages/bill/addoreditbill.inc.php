@@ -2,7 +2,7 @@
 <div class="form-group">
   <label for="bill_name" class="col-sm-4 control-label">Description</label>
   <div class="col-sm-8">
-    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo htmlentities($bill_data['bill_name']); ?>">
+    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo htmlentities($bill_data['bill_name'] ?? ''); ?>">
   </div>
 </div>
 <div class="form-group">
@@ -30,13 +30,13 @@
   <div id="cdrDiv">
     <label class="col-sm-4 control-label" for="bill_cdr">CDR</label>
     <div class="col-sm-3">
-      <input class="form-control input-sm" type="text" name="bill_cdr" value="<?php echo $cdr['data'] ?>">
+      <input class="form-control input-sm" type="text" name="bill_cdr" value="<?php echo $cdr['data'] ?? '' ?>">
     </div>
     <div class="col-sm-5">
       <select name="bill_cdr_type" class="form-control input-sm">
-        <option <?php echo $cdr['select_kbps'] ?> value="Kbps">Kilobits per second (Kbps)</option>
-        <option <?php echo $cdr['select_mbps'] ?> value="Mbps">Megabits per second (Mbps)</option>
-        <option <?php echo $cdr['select_gbps'] ?> value="Gbps">Gigabits per second (Gbps)</option>
+        <option <?php echo $cdr['select_kbps'] ?? '' ?> value="Kbps">Kilobits per second (Kbps)</option>
+        <option <?php echo $cdr['select_mbps'] ?? '' ?> value="Mbps">Megabits per second (Mbps)</option>
+        <option <?php echo $cdr['select_gbps'] ?? '' ?> value="Gbps">Gigabits per second (Gbps)</option>
       </select>
     </div>
     <label class="col-sm-4 control-label" for="dir_95th">95th Calculation</label>
@@ -66,9 +66,9 @@
     </div>
     <div class="col-sm-5">
       <select name="bill_quota_type" class="form-control input-sm">
-        <option <?php echo $quota['select_mb'] ?> value="MB">Megabytes (MB)</option>
-        <option <?php echo $quota['select_gb'] ?> value="GB">Gigabytes (GB)</option>
-        <option <?php echo $quota['select_tb'] ?> value="TB">Terabytes (TB)</option>
+        <option <?php echo $quota['select_mb'] ?? '' ?> value="MB">Megabytes (MB)</option>
+        <option <?php echo $quota['select_gb'] ?? '' ?> value="GB">Gigabytes (GB)</option>
+        <option <?php echo $quota['select_tb'] ?? '' ?> value="TB">Terabytes (TB)</option>
       </select>
     </div>
   </div>
@@ -78,6 +78,7 @@
   <div class="col-sm-2">
     <select name="bill_day" class="form-control input-sm">
     <?php
+    $bill_data['bill_day'] ??= 0;
     for ($x = 1; $x < 32; $x++) {
         $sel = $bill_data['bill_day'] == $x ? 'selected ' : '';
         echo "<option $sel value='$x'>$x</option>\n";
