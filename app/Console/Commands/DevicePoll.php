@@ -22,7 +22,6 @@ class DevicePoll extends LnmsCommand
 
     protected $name = 'device:poll';
     protected ProcessType $processType = ProcessType::poller;
-    private ?int $current_device_id = null;
 
     /**
      * Create a new command instance.
@@ -69,9 +68,9 @@ class DevicePoll extends LnmsCommand
             $this->line(__('commands.device:poll.starting'));
             $this->newLine();
 
-            $results = $processor->run();
+           $processor->run();
 
-            return $this->processResults($results, $measurements);
+            return $processor->processResults($measurements, $this->getOutput());
         } catch (QueryException $e) {
             return $this->handleQueryException($e);
         }

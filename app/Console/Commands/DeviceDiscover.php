@@ -70,9 +70,9 @@ class DeviceDiscover extends LnmsCommand
             $this->line(__('commands.device:discover.starting'));
             $this->newLine();
 
-            $result = $processor->run();
+            $processor->run();
 
-            return $this->processResults($result, $measurements);
+            return $processor->processResults($measurements, $this->getOutput());
         } catch (QueryException $e) {
             return $this->handleQueryException($e);
         }
