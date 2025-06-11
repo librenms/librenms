@@ -52,10 +52,10 @@ function process_syslog($entry, $update)
         }
     }
 
-    $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
+    $entry['host'] = strtolower(preg_replace('/^::ffff:/', '', $entry['host']));
     $syslog_xlate = Config::get('syslog_xlate');
     if (! empty($syslog_xlate[$entry['host']])) {
-        $entry['host'] = $syslog_xlate[$entry['host']];
+        $entry['host'] = strtolower($syslog_xlate[$entry['host']]);
     }
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
