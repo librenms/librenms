@@ -18,8 +18,8 @@ if (Rrd::checkRrdExists($decoder__event__ltnull__pkt_too_small_rrd_filename)) {
         'filename' => $decoder__event__ltnull__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ltnull__unsupported_type_rrd_filename,
         'descr' => 'Unsup Type',
         'ds' => 'data',

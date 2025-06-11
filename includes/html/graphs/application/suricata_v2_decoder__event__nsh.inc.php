@@ -26,28 +26,28 @@ if (Rrd::checkRrdExists($decoder__event__nsh__bad_header_length_rrd_filename)) {
         'filename' => $decoder__event__nsh__bad_header_length_rrd_filename,
         'descr' => 'Bad Hdr Len',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__nsh__header_too_small_rrd_filename,
         'descr' => 'Hdr Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__nsh__reserved_type_rrd_filename,
         'descr' => 'Reserved Type',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__nsh__unknown_payload_rrd_filename,
         'descr' => 'Unknown Payload',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__nsh__unsupported_type_rrd_filename,
         'descr' => 'Unsup Type',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__nsh__unsupported_version_rrd_filename,
         'descr' => 'Unsup Ver',
         'ds' => 'data',

@@ -16,8 +16,8 @@ $log_files = array_slice(array_keys($log_files_sizes), 0, 12);
 
 $rrd_list = [];
 foreach ($log_files as $index => $log_file) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]);
-    $rrd_list[] = [
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['log_set'] . '_____-_____' . $log_file]),
+[
         'filename' => $rrd_filename,
         'descr' => $log_file,
         'ds' => 'size',

@@ -16,22 +16,20 @@ if (isset($vars['vmif'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
+$rrd_list = [
+[
         'filename' => $rrd_filename,
         'descr' => 'In',
         'ds' => 'ibytes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Out',
         'ds' => 'obytes',
         'invert' => true,
-    ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+    ],
+];
+
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
 //  require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';
