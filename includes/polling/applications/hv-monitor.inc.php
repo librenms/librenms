@@ -153,7 +153,7 @@ foreach ($return_data['VMs'] as $vm => $vm_info) {
     $VMs[] = $vm;
 
     $vm_fields = [];
-    foreach($ds as $key => $_) {
+    foreach ($ds as $key => $_) {
         $vm_fields[$key] = $vm_info[$key] ?? null;
     }
 
