@@ -11,7 +11,7 @@ use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 
 abstract class Transport implements TransportInterface
 {
-    protected ?array $config;
+    protected array $config;
     protected string $name = '';
 
     public static function make(string $type): TransportInterface
@@ -41,7 +41,7 @@ abstract class Transport implements TransportInterface
 
     public function __construct(?AlertTransport $transport = null)
     {
-        $this->config = $transport ? $transport->transport_config : [];
+        $this->config = (array) ($transport ? $transport->transport_config : []);
     }
 
     /**
@@ -114,7 +114,7 @@ abstract class Transport implements TransportInterface
                 continue;
             }
 
-            $val = $this->config[$item['name']];
+            $val = $this->config[$item['name']] ?? '';
             if ($item['type'] == 'password') {
                 $val = '********';
             } elseif ($item['type'] == 'select') {

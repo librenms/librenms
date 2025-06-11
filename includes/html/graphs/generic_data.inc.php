@@ -25,10 +25,8 @@ $multiplier = $multiplier ?? false;
 $format = $format ?? '';
 $previous = $graph_params->visible('previous');
 
-if ($rrd_filename) {
-    $rrd_filename_out = $rrd_filename;
-    $rrd_filename_in = $rrd_filename;
-}
+$rrd_filename_out ??= $rrd_filename ?? '';
+$rrd_filename_in ??= $rrd_filename ?? '';
 
 if ($inverse) {
     $in = 'out';

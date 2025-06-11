@@ -109,7 +109,7 @@ class Rewrite
         return str_ireplace(array_keys($rewrite_ifname), array_values($rewrite_ifname), $name);
     }
 
-    public static function shortenIfName($name)
+    public static function shortenIfName($name): string
     {
         $rewrite_shortif = [
             'hundredgige' => 'Hu',
@@ -135,7 +135,7 @@ class Rewrite
             'bridge-aggregation' => 'BA',
         ];
 
-        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
+        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), (string) $name);
     }
 
     /**

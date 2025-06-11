@@ -16,7 +16,7 @@ try {
 }
 
 // grab the alert here as it is the global one
-$metrics = ['alert' => $suricata['alert']];
+$metrics = ['alert' => $suricata['alert'] ?? null];
 
 // Used by both.
 $instances = [];

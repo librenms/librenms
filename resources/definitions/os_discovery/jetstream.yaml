@@ -1,4 +1,3 @@
-mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB:TPLINK-DDMBIASCURTHRESHOLD-MIB:TPLINK-DDMTEMPTHRESHOLD-MIB:TPLINK-DDMVOLTHRESHOLD-MIB:TPLINK-DDMRXPOWTHRESHOLD-MIB:TPLINK-DDMTXPOWTHRESHOLD-MIB:TPLINK-POWER-OVER-ETHERNET-MIB
 modules:
     os:
         hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
@@ -12,7 +11,7 @@ modules:
     processors:
         data:
             -
-                oid: tpSysMonitorCpu5Seconds
+                oid:  TPLINK-SYSMONITOR-MIB::tpSysMonitorCpu5Seconds
                 num_oid: '.1.3.6.1.4.1.11863.6.4.1.1.1.1.2.{{ $index }}'
                 index: '{{ $index }}'
                 descr: 'Proc #{{ $index }}'
@@ -42,6 +41,7 @@ modules:
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowWarn
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighAlarm
                         - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighWarn
+                        - LLDP-MIB::lldpLocPortTable
         current:
             data:
                 -
@@ -91,29 +91,46 @@ modules:
         power:
             data:
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.{{ $index }}'
-                    value: tpSystemPowerConsumption
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerConsumption
                     descr: 'Power Consumption'
                     divisor: 10
                     index: tpSystemPowerConsumption
                     group: PoE
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.{{ $index }}'
-                    value: tpSystemPowerRemain
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerRemain
                     descr: 'Power Remaining'
                     divisor: 10
                     index: tpSystemPowerRemain
                     group: PoE
                 -
-                    oid: tpPoeGlobal
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoeGlobal
                     num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.{{ $index }}'
-                    value: tpSystemPowerLimit
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpSystemPowerLimit
                     descr: 'Power Limit'
                     divisor: 10
                     index: tpSystemPowerLimit
                     group: PoE
+                -
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePortConfigTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.2.1.1.7.{{ $index }}'
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePower
+                    descr: '{{ $LLDP-MIB::lldpLocPortDesc }}'
+                    divisor: 10
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: PoE_Ports
+                    index: 'tpPoePower.{{ $index }}'
+                    high_limit: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePowerLimit
+                    skip_values:
+                        -
+                            oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePowerStatus
+                            op: '='
+                            value: 0
+
         state:
             data:
                 -
@@ -155,6 +172,27 @@ modules:
                     skip_values: 2
                     states: *ddm_states
                     state_name: ddmStatusTxFault
+                -
+                    oid: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePortConfigTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.2.1.1.11.{{ $index }}'
+                    value: TPLINK-POWER-OVER-ETHERNET-MIB::tpPoePowerStatus
+                    descr: '{{ $LLDP-MIB::lldpLocPortDesc }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: PoE_Ports
+                    index: 'tpPoePowerStatus.{{ $index }}'
+                    states:
+                        - {value: 0, generic: 3, graph: 1, descr: 'Off'}
+                        - {value: 1, generic: 1, graph: 1, descr: 'Turning-on'}
+                        - {value: 2, generic: 0, graph: 1, descr: 'On'}
+                        - {value: 3, generic: 2, graph: 1, descr: 'Overload'}
+                        - {value: 4, generic: 2, graph: 1, descr: 'Short'}
+                        - {value: 5, generic: 1, graph: 1, descr: 'Nonstandard'}
+                        - {value: 6, generic: 2, graph: 1, descr: 'VoltageHigh'}
+                        - {value: 7, generic: 2, graph: 1, descr: 'VoltageLow'}
+                        - {value: 8, generic: 2, graph: 1, descr: 'HardwareFault'}
+                        - {value: 9, generic: 2, graph: 1, descr: 'OverTemperature'}
+                    state_name: tpPoePowerStatus
         temperature:
             data:
                 -
