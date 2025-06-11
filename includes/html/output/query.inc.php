@@ -59,10 +59,8 @@ switch ($type) {
             $extra = json_decode($rule['extra'], true);
             if ($extra['options']['override_query'] === 'on') {
                 $qb = $extra['options']['override_query'];
-            } elseif ($rule['builder']) {
-                $qb = QueryBuilderParser::fromJson($rule['builder']);
             } else {
-                $qb = QueryBuilderParser::fromOld($rule['rule']);
+                $qb = QueryBuilderParser::fromJson($rule['builder'] ?? []);
             }
 
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
