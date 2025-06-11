@@ -75,9 +75,6 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
-                if (! isset($item['name'])) {
-                    dd($transport, $item);
-                }
                 echo '<div class="form-group" title="' . htmlentities($item['descr'] ?? '') . '">';
                 echo '<label for="' . htmlentities($item['name']) . '" class="col-sm-3 col-md-2 control-label">' . htmlentities($item['title']) . ': </label>';
                 if ($item['type'] == 'text' || $item['type'] == 'password') {
