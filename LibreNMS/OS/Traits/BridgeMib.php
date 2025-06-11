@@ -123,7 +123,7 @@ trait BridgeMib
                         'designatedRoot' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
                         'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
                         'designatedBridge' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
-                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? '') ?? 0,
+                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
                         'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                     ]);
                 })->filter(function (PortStp $port) {
@@ -201,7 +201,7 @@ trait BridgeMib
         return $stpPorts;
     }
 
-    private function designatedPort(string $dp): ?int
+    private function designatedPort(string $dp): int
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
             // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal
@@ -212,7 +212,7 @@ trait BridgeMib
         $dp = substr($dp, -2); //discard the first octet (priority part)
 
         if (! is_numeric($dp) && ! StringHelpers::isHex($dp)) {
-            return null;
+            return 0;
         }
 
         return (int) hexdec($dp);
