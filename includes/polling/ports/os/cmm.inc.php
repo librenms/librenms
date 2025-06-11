@@ -41,24 +41,29 @@ $required = [
     'ifOutMulticastPkts' => 'txMulticastPkts',
 ];
 
-foreach ($cmm_stats as $cmm_index => $cmm_port) {
-    foreach ($required as $ifEntry => $IfxStat) {
-        $port_stats[$cmm_index][$ifEntry] = $cmm_port[$IfxStat];
+$cmm_ports = [];
+foreach ($cmm_stats as $index => $cmm_stat) {
+    $cmm_port = array_map(function ($IfxStat) use ($cmm_stat) {
+        return $cmm_stat[$IfxStat];
+    }, $required);
+
+    $cmm_port['ifName'] = 'CMM Port ' . $cmm_stat['portNumber'];
+    $cmm_port['ifDescr'] = 'CMM Port ' . $cmm_stat['portNumber'];
+    $cmm_port['ifType'] = 'ethernetCsmacd';
+
+    if (isset($cmm_stat['duplexStatus'])) {
+        $cmm_port['ifDuplex'] = ($cmm_stat['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
+    }
+    if (isset($cmm_stat['linkSpeed'])) {
+        $cmm_port['ifDuplex'] = ($cmm_stat['linkSpeed'] == 1 ? '100000000' : '10000000');
+    }
+    if (isset($cmm_stat['linkStatus'])) {
+        $cmm_port['ifDuplex'] = ($cmm_stat['linkStatus'] == 1 ? 'up' : 'down');
     }
 
-    $port_stats[$cmm_index]['ifName'] = 'CMM Port ' . $cmm_port['portNumber'];
-    $port_stats[$cmm_index]['ifDescr'] = 'CMM Port ' . $cmm_port['portNumber'];
-    $port_stats[$cmm_index]['ifType'] = 'ethernetCsmacd';
-
-    if (isset($cmm_port['duplexStatus'])) {
-        $port_stats[$cmm_index]['ifDuplex'] = ($cmm_port['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
-    }
-    if (isset($cmm_port['linkSpeed'])) {
-        $port_stats[$cmm_index]['ifSpeed'] = ($cmm_port['linkSpeed'] == 1 ? '100000000' : '10000000');
-    }
-    if (isset($cmm_port['linkStatus'])) {
-        $port_stats[$cmm_index]['ifOperStatus'] = ($cmm_port['linkStatus'] == 1 ? 'up' : 'down');
-    }
+    $cmm_ports[] = $cmm_port;
 }
 
-unset($cmm_stats, $cmm_port, $required);
+$port_stats = array_replace_recursive($cmm_ports, $port_stats);
+
+unset($cmm_stats, $cmm_ports, $cmm_stat, $cmm_port, $required);
