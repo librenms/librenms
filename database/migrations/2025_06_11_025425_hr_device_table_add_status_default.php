@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('hrDevice', function (Blueprint $table) {
-            $table->text('hrDeviceStatus')->default('unknown')->change();
+            $table->string('hrDeviceStatus', 32)->default('unknown')->change();
         });
     }
 
