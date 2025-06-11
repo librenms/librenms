@@ -812,8 +812,8 @@ hrDevice:
     - { Field: hrDevice_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: hrDeviceIndex, Type: int, 'Null': false, Extra: '' }
-    - { Field: hrDeviceDescr, Type: text, 'Null': false, Extra: '' }
-    - { Field: hrDeviceType, Type: text, 'Null': false, Extra: '' }
+    - { Field: hrDeviceDescr, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: hrDeviceType, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: hrDeviceErrors, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: hrDeviceStatus, Type: varchar(32), 'Null': false, Extra: '', Default: unknown }
     - { Field: hrProcessorLoad, Type: tinyint, 'Null': true, Extra: '' }
