@@ -17,18 +17,17 @@ if (isset($vars['vmif'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'In',
         'ds' => 'ierrs',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Out',
         'ds' => 'oerrs',
         'invert' => true,
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

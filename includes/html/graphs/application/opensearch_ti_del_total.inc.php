@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'ti']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Index Deletes',
         'ds' => 'ti_del_total',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

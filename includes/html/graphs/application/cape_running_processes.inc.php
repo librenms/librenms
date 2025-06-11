@@ -17,42 +17,41 @@ if (isset($vars['package'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Min',
         'ds' => 's0running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Max',
         'ds' => 's1running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mean',
         'ds' => 's3running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Median',
         'ds' => 's4running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mode',
         'ds' => 's5running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'StdDev',
         'ds' => 's7running_processes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'StdDevP',
         'ds' => 's9running_processes',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

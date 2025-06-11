@@ -15,32 +15,31 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Flow',
         'ds' => 'f_memuse',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'FTP',
         'ds' => 'ftp_memuse',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'HTTP',
         'ds' => 'http_memuse',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'TCP',
         'ds' => 'tcp_memuse',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'TCP Reass',
         'ds' => 'tcp_reass_memuse',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

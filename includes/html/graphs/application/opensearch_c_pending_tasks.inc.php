@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'c']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Pending Tasks',
         'ds' => 'c_pending_tasks',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

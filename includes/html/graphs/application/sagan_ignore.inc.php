@@ -15,12 +15,11 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Ignored',
         'ds' => 'ignore',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

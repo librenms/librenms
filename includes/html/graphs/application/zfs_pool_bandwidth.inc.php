@@ -11,17 +11,16 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____bandwidth_r']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Read',
         'ds' => 'data',
     ],
-[
+    [
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____bandwidth_w']),
         'descr' => 'Write',
         'ds' => 'data',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

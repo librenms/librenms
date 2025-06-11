@@ -15,8 +15,7 @@ if (isset($vars['vmdisk']) && isset($vars['vm'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-    $descr = 'Flushes';
-    $ds = 'freqs';
-
+$descr = 'Flushes';
+$ds = 'freqs';
 
 require 'includes/html/graphs/generic_stats.inc.php';

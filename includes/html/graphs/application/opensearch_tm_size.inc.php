@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tm']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Merges Size',
         'ds' => 'tm_size',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

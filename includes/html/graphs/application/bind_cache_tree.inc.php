@@ -25,7 +25,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Highest In Use',
         'ds' => 'cthmiu',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

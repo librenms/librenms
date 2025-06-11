@@ -15,8 +15,7 @@ if (isset($vars['vmdisk']) && isset($vars['vm'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-    $descr = 'Flush Time';
-    $ds = 'ftime';
-
+$descr = 'Flush Time';
+$ds = 'ftime';
 
 require 'includes/html/graphs/generic_stats.inc.php';
