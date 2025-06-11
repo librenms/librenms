@@ -54,7 +54,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                         foreach ($alert_rules as $rule) {
                             if (empty($rule['builder'])) {
                                 $rule_display = $rule['rule'];
-                            } elseif ($rule_extra['options']['override_query'] === 'on') {
+                            } elseif (isset($rule_extra['options']['override_query']) && $rule_extra['options']['override_query'] === 'on') {
                                 $rule_display = 'Custom SQL Query';
                             } else {
                                 $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);

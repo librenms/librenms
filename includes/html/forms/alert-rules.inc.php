@@ -40,7 +40,7 @@ $status = 'ok';
 $message = '';
 
 $builder_json = $vars['builder_json'];
-$override_query = $vars['override_query'];
+$override_query = $vars['override_query'] ?? null;
 
 $options = [
     'override_query' => $override_query,
@@ -93,7 +93,7 @@ $extra = [
 
 $extra_json = json_encode($extra);
 
-if (! is_array($vars['maps']) && $invert_map) {
+if (isset($vars['maps']) && ! is_array($vars['maps']) && $invert_map) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'Invert map is on but no selection in devices, groups and locations match list<br />',
@@ -160,7 +160,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
     $locations = [];
-    foreach ((array) $vars['maps'] as $item) {
+    foreach ((array) ($vars['maps'] ?? []) as $item) {
         if (Str::startsWith($item, 'l')) {
             $locations[] = (int) substr($item, 1);
         } elseif (Str::startsWith($item, 'g')) {
@@ -177,7 +177,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     //Update transport groups and transports - can't use dbSyncRelationship
     $transports = [];
     $groups = [];
-    foreach ((array) $vars['transports'] as $item) {
+    foreach ((array) ($vars['transports'] ?? []) as $item) {
         if (Str::startsWith($item, 'g')) {
             $groups[] = (int) substr($item, 1);
         } else {

@@ -76,7 +76,7 @@ function generate_overlib_content($graph_array, $text)
 
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    $deviceModel = DeviceCache::get((int) $device['device_id']);
+    $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
     return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
@@ -230,6 +230,9 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
+    if (is_null($port)) {
+        return (string) $text;
+    }
     $graph_array = [];
 
     if (! $text) {

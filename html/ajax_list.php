@@ -22,7 +22,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-Debug::set($_REQUEST['debug']);
+Debug::set($_REQUEST['debug'] ?? false);
 
 $type = basename($_REQUEST['type']);
 

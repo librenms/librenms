@@ -365,11 +365,12 @@ class Url
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = $args['from'];
+        $original_from = isset($args['from']) ? $args['from'] : '';
+        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
-        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $popup = "<div class='list-large'>$popup_title</div>";
         $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;

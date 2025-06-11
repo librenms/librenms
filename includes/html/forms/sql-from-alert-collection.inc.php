@@ -53,10 +53,10 @@ if (is_numeric($template_id)) {
     $output = [
         'status' => 'ok',
         'name' => $rule['name'],
-        'notes' => $rule['notes'],
-        'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
-        'extra' => array_replace($default_extra, (array) $rule['extra']),
-        'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),
+        'notes' => $rule['notes'] ?? null,
+        'builder' => $rule['builder'] ?? QueryBuilderParser::fromOld($rule['rule'])->toArray(),
+        'extra' => array_replace($default_extra, (array) ($rule['extra'] ?? [])),
+        'severity' => $rule['severity'] ?? Config::get('alert_rule.severity'),
         'invert_map' => Config::get('alert_rule.invert_map'),
     ];
 } else {
