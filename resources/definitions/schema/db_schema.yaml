@@ -815,7 +815,7 @@ hrDevice:
     - { Field: hrDeviceDescr, Type: text, 'Null': false, Extra: '' }
     - { Field: hrDeviceType, Type: text, 'Null': false, Extra: '' }
     - { Field: hrDeviceErrors, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: hrDeviceStatus, Type: text, 'Null': false, Extra: '' }
+    - { Field: hrDeviceStatus, Type: text, 'Null': false, Extra: '', Default: unknown }
     - { Field: hrProcessorLoad, Type: tinyint, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrDevice_id], Unique: true, Type: BTREE }
