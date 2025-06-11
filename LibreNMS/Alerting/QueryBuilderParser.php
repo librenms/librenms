@@ -32,16 +32,6 @@ use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
 {
-    protected static $legacy_operators = [
-        '=' => 'equal',
-        '!=' => 'not_equal',
-        '~' => 'regex',
-        '!~' => 'not_regex',
-        '<' => 'less',
-        '>' => 'greater',
-        '<=' => 'less_or_equal',
-        '>=' => 'greater_or_equal',
-    ];
     protected static $operators = [
         'equal' => '=',
         'not_equal' => '!=',
