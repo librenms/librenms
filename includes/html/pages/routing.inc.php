@@ -2,7 +2,10 @@
 
 $pagetitle[] = 'Routing';
 
-if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
+$optb = isset($_GET['optb']) ? $_GET['optb'] : '';
+$optc = isset($_GET['optc']) ? $_GET['optc'] : '';
+
+if ($optb == 'graphs' || $optc == 'graphs') {
     $graphs = 'graphs';
 } else {
     $graphs = 'nographs';
