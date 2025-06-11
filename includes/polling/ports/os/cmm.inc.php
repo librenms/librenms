@@ -28,7 +28,6 @@ $cmm_stats = SnmpQuery::hideMib()->abortOnFailure()->walk([
     'CMM3-MIB::cmmPortTable',
 ])->table(1);
 
-
 $required = [
     'ifInOctets' => 'rxOctets',
     'ifOutOctets' => 'txOctets',
