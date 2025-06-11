@@ -1,0 +1,2391 @@
+ZXR10-RACK-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Counter32, --Gauge32,
+       TimeTicks, Integer32,enterprises                      
+       FROM SNMPv2-SMI
+        DisplayString   --MacAddress  
+       FROM SNMPv2-TC 
+       zxUPN, ShelfType, BoardType, SubBoardType, SPboardType
+       FROM ZXR10-PROJECT-MIB;     
+    
+    zxr10RackMIB MODULE-IDENTITY
+        LAST-UPDATED "201609020000Z"  
+        ORGANIZATION "ZTE Corporation"
+        CONTACT-INFO
+        "ZTE Corporation 
+         Nanjing Institute of ZTE Corporation
+         
+         No.68 Zijinghua Rd. Yuhuatai District, Nanjing, China
+         
+         Tel: +86-25-52870000"  
+        DESCRIPTION
+        "ZXR10 T8000 ZXR10-RACK-MIB"
+        
+        REVISION "201609220000Z"
+            DESCRIPTION
+            "modify the MAX-ACCESS of zxr10EthPhyPortNegotiation and zxr10EthPhyPortDuplex.
+             add leaf node zxr10EthPhyPortSpeed."
+
+
+        REVISION "201609020000Z"
+            DESCRIPTION
+            "import zxUPN from ZXR10-PROJECT-MIB and delete zxr10M6000-S OBJECT IDENTIFIER."
+
+        REVISION "201406110000Z"  
+            DESCRIPTION
+            "add leaf node zxr10ShelfFiberLength." 
+       
+        REVISION "201311280000Z"  
+            DESCRIPTION
+            "add leaf node zxr10PeripheralFreeVolume." 
+       
+        REVISION "201310240000Z"  
+            DESCRIPTION
+            "modify the spelling mistakes of word information." 
+       
+        REVISION "201310230000Z"  
+            DESCRIPTION
+            "modify PeripheralType enumeration label peripheral to harddisk." 
+       
+        REVISION "201308200000Z"  
+            DESCRIPTION
+            "add PeripheralType enumeration label to zxr10PeripheralType SYNTAX." 
+       
+        REVISION "201308160000Z"  
+            DESCRIPTION
+            "modify the name of node zxr10T8000-16 to zxr10T8000."    
+       
+        REVISION "201308010000Z"  
+            DESCRIPTION
+            "add notsupport type to zxr10EthPhyPortMdixOrMdi SYNTAX."    
+        
+        REVISION "201304150000Z"  
+            DESCRIPTION
+            "add leaf node zxr10EthPhyPortDuplex."
+       
+        REVISION "200908120000Z"  
+            DESCRIPTION
+            "Initial revision"
+                
+    ::= { zxUPN 1 } 
+   
+       -- Nanjing Institute of Telecom,ZTE Corporation
+       -- Postal: 9F. No.54 Building, 301# East ZhongShan Rd.
+       -- Nan Jing, China
+       -- Tel:    86-25-4826606-3821
+       -- E-Mail: li.xinshuang@mail.zte.com.cn
+       -- DESCRIPTION
+       -- The MIB module which descript the zxr10rack mib
+       -- object which defined in enterprise's ZTE(3902)
+ --  textual conventions
+
+
+      AvailStatus ::= INTEGER
+                      {
+                        unavailable(0),
+                        available(1)
+                      }
+
+    
+      OnlineStatus ::= INTEGER
+                      {
+                        down(0),
+                        up(1),
+                        offline(2)
+
+                      }                  
+       PhyStatus ::= INTEGER
+                      {
+                        down(0),
+                        up(1),
+                        offline(2)
+                      }  
+       RunStatus ::= INTEGER
+                      {
+                        down(0),
+                        up(1),
+                        offline(2)
+                      }     
+      PowerStatus ::= INTEGER
+                      {
+                        off(0),
+                        on(1)
+                        
+                      }               
+       PeripheralType::= INTEGER
+                      {
+                        flash(128),
+                        harddisk(131),
+                        cfcard(156),
+                        sdcard(157),
+                        usb1(158),
+                        usb2(159)
+                      } 
+        PeripheralRemoved::= INTEGER
+                      {
+                        cannot(0),
+                        can(1)
+                        
+                      } 
+        PeripheralStaus::= INTEGER
+                      {
+                        down(0),
+                        up(1)
+                      }                  
+                
+      PortProperty ::= INTEGER
+                      {
+                        photo(0),
+                        electricity(1)                       
+                      }                     
+
+      MasterStatus ::= INTEGER
+                       {
+                         master(0),
+                         slave(1),
+                         none(2)                         
+                       }
+                       
+      ShelfAttrib ::= INTEGER
+                       {
+                         cfc(0),
+                         lcc(1)
+                       }     
+
+       PortType ::= INTEGER
+                    {
+                      port-fei(2),
+                      port-gei(131),
+                      port-xgei(132),
+                      port-xgeiw(133),                      
+                      port-cgei(139),
+                      port-xlgei(140),                    
+                      port-cgei-sl(141),                      
+                      port-pos3(260),
+                      port-pos12(261),
+                      port-pos48(262),                    
+                      port-cpos3(263),
+                      port-cpos48(264),  
+                      port-pos192(265),
+                      port-pos768(266),  
+                      port-pos768-sl(267),
+                      port-atm155(389),
+                      port-atm622(390),
+                      port-ce1(535),
+                      port-qx(1230),
+                      port-mng(1292),   
+                      port-timer(1294), 
+                      port-gps(1295),
+                      port-esi(1296),
+                      port-sfi(1297),
+                      port-gpon-olt(1116)
+                    }
+        LightType ::=INTEGER
+                      {
+                         alarm(0),
+                         indication(1)
+                      }
+       LightStatus::=INTEGER
+                      {
+                         down(0),
+                         up(1)
+                      } 
+
+--zxr10RackNo
+  zxr10RackNo OBJECT-TYPE   
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the special rack."
+    ::= { zxr10RackMIB 1 }
+    
+--zxr10ShelfTable
+zxr10ShelfTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10ShelfEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 shelf information,
+                       it is a list of shelf entries."
+               ::= { zxr10RackMIB 2 }
+               
+zxr10ShelfEntry  OBJECT-TYPE
+              SYNTAX  Zxr10ShelfEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A shelf entry containing objects that
+                       descript the shelf information,such as:
+                       zxr10ShelfNo ,zxr10ShelfAttrib,zxr10ShelfAvailStatus."
+              INDEX { zxr10RackNo, zxr10ShelfNo}
+              ::= { zxr10ShelfTable 1 }            
+              
+Zxr10ShelfEntry ::=
+        SEQUENCE {
+            zxr10ShelfNo
+                INTEGER,    
+           zxr10ShelfAttrib
+                ShelfAttrib,
+            zxr10ShelfType
+                ShelfType,
+            zxr10ShelfSlotNumber
+                INTEGER,
+            zxr10ShelfAvailStatus
+                AvailStatus,
+            zxr10ShelfMasterStatus
+                MasterStatus,
+            zxr10ShelfTimeStamp
+                TimeTicks,
+            zxr10ShelfName 
+                DisplayString,
+            zxr10ShelfService
+                Integer32,
+            zxr10ShelfLocation
+                DisplayString,
+            zxr10ShelfMPUFNum
+                INTEGER,
+            zxr10ShelfPFUNum
+                INTEGER,
+            zxr10ShelfPIUNum
+                INTEGER,
+            zxr10ShelfSFUNum  
+                INTEGER,
+            zxr10ShelfCESUNum
+                INTEGER,
+            zxr10ShelfPartNumber    
+                DisplayString,
+            zxr10ShelfManufactureDate
+                DisplayString,
+            zxr10ShelfSerialNumber
+                DisplayString,
+            zxr10ShelfFiberLength
+                INTEGER
+        }             
+
+zxr10ShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the special shelf."
+    ::= { zxr10ShelfEntry 1 }
+    
+zxr10ShelfAttrib OBJECT-TYPE
+    SYNTAX  ShelfAttrib
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the attribute. of the special shelf.
+                eg, if the current shelf is the Central Fabric Chassis in a cluster,
+                we use 0. Else if the shelf is the Line Card Chassis in a cluster or in a no-cluster,
+                we use 1."
+    ::= { zxr10ShelfEntry 2 }
+    
+zxr10ShelfType OBJECT-TYPE
+    SYNTAX  ShelfType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type. of the special shelf.
+         eg,the shelf is M6000-16,we use 0,
+         the shelf is M6000-8,we use 1,
+         the shelf is T8000,we use 8,
+         the shelf is T8000-8,we use 9,
+         the shelf is M6000-16E, we use 16777216,
+         the shelf is M6000-8E, we use 16777217.  "
+    ::= { zxr10ShelfEntry 3 }
+
+zxr10ShelfSlotNumber OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the slot number of the special shelf.
+         eg,the slot number of M6000-16 and T8000-16 and M6000-16E is 23,
+         the slot number of M6000-8 and T8000-08 and M6000-8E is 14."
+    ::= { zxr10ShelfEntry 4 }
+
+zxr10ShelfAvailStatus OBJECT-TYPE
+    SYNTAX  AvailStatus  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the status. of the special shelf.
+                eg ,the current shelf is in use,
+                we use 1,else if the shelf is unuse,
+                we use 0 . "
+    ::= { zxr10ShelfEntry 5 }
+
+zxr10ShelfMasterStatus OBJECT-TYPE
+    SYNTAX  MasterStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the master status. of the special shelf.
+         eg,the current shelf is master,we use 0, 
+         else if the shelf is slave, we use 1,
+         else, we use 2."
+    ::= { zxr10ShelfEntry 6}
+
+zxr10ShelfTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the special shelf changed lastly. "
+    ::= { zxr10ShelfEntry 7 }     
+    
+zxr10ShelfName OBJECT-TYPE
+    SYNTAX  DisplayString  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "we don't use ShelfName to descript Shelf in any equipment, so the Shelf Name is empty. "
+    ::= { zxr10ShelfEntry 8 }     
+    
+zxr10ShelfService OBJECT-TYPE
+    SYNTAX  Integer32  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the server of the special shelf.
+         eg, we use 78.
+         Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 9 }   
+    
+zxr10ShelfLocation OBJECT-TYPE
+    SYNTAX  DisplayString  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the location of the special shelf.
+         eg, we use SysLocation.
+         Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 10 }     
+    
+zxr10ShelfMPUFNum OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the Main Processing Unit of the special shelf.
+         Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 11 }   
+    
+zxr10ShelfPFUNum OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the Packet Forwarding Unit of the special shelf. 
+        Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 12 }     
+    
+zxr10ShelfPIUNum OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the Physical line Interface Unit of the special shelf.
+        Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 13 }   
+    
+zxr10ShelfSFUNum OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the Switch Fabric Unit of the special shelf.
+        Only the equipment supported cluster use this node. "
+    ::= { zxr10ShelfEntry 14 }      
+    
+zxr10ShelfCESUNum OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the Central Ethernet Switch Unit of the special shelf.
+        Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 15 } 
+    
+zxr10ShelfPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the part number of the special shelf. "
+    ::= { zxr10ShelfEntry 16 }  
+    
+zxr10ShelfManufactureDate OBJECT-TYPE
+    SYNTAX  DisplayString  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the manufacture date of the special shelf. "
+    ::= { zxr10ShelfEntry 17 }  
+    
+zxr10ShelfSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the serial number of the special shelf. "
+    ::= { zxr10ShelfEntry 18 }  
+    
+zxr10ShelfFiberLength OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the fiber length of the shelf.
+        Only the equipment supported cluster use this node."
+    ::= { zxr10ShelfEntry 19 }
+    
+-- zxr10SlotBoardTable
+ zxr10SlotBoardTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SlotBoardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 card information,
+                       it is a list of card entries."
+               ::= { zxr10RackMIB 3 }
+               
+zxr10SlotBoardEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SlotBoardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A card entry containing objects that
+                       descript the card information,such as:
+                       zxr10SlotNo,zxr10SlotBoardType,
+                       zxr10SlotSubboardNumber,zxr10SlotPortNumber,
+                       zxr10SlotAvailStatus,etc."
+              INDEX { zxr10RackNo,zxr10SlotBoardShelfNo,zxr10SlotNo}
+              ::= { zxr10SlotBoardTable 1 }            
+              
+Zxr10SlotBoardEntry ::=
+        SEQUENCE {  
+            zxr10SlotNo
+                INTEGER,
+            zxr10SlotBoardType
+                BoardType,
+            zxr10SlotSubboardNumber
+                INTEGER,
+            zxr10SlotONSubboardNumber
+                INTEGER,
+            zxr10SlotPortNumber
+                INTEGER,
+            zxr10SlotMasterStatus
+                MasterStatus,   
+            zxr10SlotOperStatus
+                OnlineStatus,
+            zxr10SlotAvailStatus
+                AvailStatus,
+            zxr10SlotCpuUpTime
+                TimeTicks,
+            zxr10SlotReceiveTick
+                TimeTicks,
+            zxr10SlotELElable
+                DisplayString,
+            zxr10SlotPowerVoltageStatus
+                PowerStatus,
+            zxr10SlotBootVer
+                DisplayString,
+            zxr10SlotSystemVer
+                DisplayString,
+            zxr10SlotPCBVer
+                DisplayString,
+            zxr10SlotBoardName
+                DisplayString,
+            zxr10SlotReload
+                INTEGER,
+            zxr10SlotReloadDesc
+                DisplayString,
+            zxr10SlotCardPowerRatedPower
+                INTEGER, 
+            zxr10SlotLightTotalNum
+                 INTEGER,    
+            zxr10SlotTimeStamp
+                TimeTicks,
+            zxr10SlotBoardShelfNo
+                INTEGER,
+            zxr10SlotEPLD1Ver
+                DisplayString,
+            zxr10SlotEPLD2Ver
+                DisplayString,
+            zxr10SlotEPLD3Ver
+                DisplayString,
+            zxr10SlotEPLD4Ver
+                DisplayString,
+            zxr10SlotPartNumber
+                DisplayString,
+            zxr10SlotManufactureDate
+                DisplayString,
+            zxr10SlotAssemblySerialNo
+                DisplayString           
+        }             
+    
+zxr10SlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special card is inserted."
+    ::= { zxr10SlotBoardEntry 1 }
+    
+zxr10SlotBoardType OBJECT-TYPE
+    SYNTAX  BoardType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the card."
+    ::= { zxr10SlotBoardEntry 2 }
+
+zxr10SlotSubboardNumber OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes how many sub slots which can load the sub card in  the  board. "
+    ::= { zxr10SlotBoardEntry 3 }
+
+zxr10SlotONSubboardNumber OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the number of online subboard in the special card. "
+    ::= { zxr10SlotBoardEntry 4}
+
+zxr10SlotPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes how many ports are in the card."
+    ::= { zxr10SlotBoardEntry 5 }
+
+zxr10SlotMasterStatus OBJECT-TYPE
+    SYNTAX  MasterStatus 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "as for board MPU,
+                master indicates MSC,
+                slave indicates SSC,
+        none indicates no SC.
+                for PFU, SFU and other boards, only one status : master status "
+    ::= { zxr10SlotBoardEntry 6 }   
+
+zxr10SlotOperStatus OBJECT-TYPE
+    SYNTAX  OnlineStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the operstatus. of the special card.
+                eg ,the current card can work, we use 1,
+                else if the card can't,we use 0."
+    ::= { zxr10SlotBoardEntry 7 }
+
+zxr10SlotAvailStatus OBJECT-TYPE
+    SYNTAX  AvailStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the status. of the special card.
+                 eg ,the current card is running,
+                 we use 1,else if the card is down,
+                 we use 0 ."
+    ::= { zxr10SlotBoardEntry 8 }
+
+zxr10SlotCpuUpTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the cpu running time of the special card. "
+    ::= { zxr10SlotBoardEntry 9 }
+
+zxr10SlotReceiveTick OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the last ticks of receiving the board information. "
+    ::= { zxr10SlotBoardEntry 10 }
+
+zxr10SlotELElable OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the electric lable of the special card."
+    ::= { zxr10SlotBoardEntry 11 }
+
+zxr10SlotPowerVoltageStatus OBJECT-TYPE
+    SYNTAX  PowerStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the power voltage status of the special card. "
+    ::= { zxr10SlotBoardEntry 12 }
+
+zxr10SlotBootVer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the bootrom version in the board. "
+    ::= { zxr10SlotBoardEntry 13 }
+
+zxr10SlotSystemVer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the system version in the board. "
+    ::= { zxr10SlotBoardEntry 14 }
+
+zxr10SlotPCBVer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the PCB version in the board. "
+    ::= { zxr10SlotBoardEntry 15 }
+
+zxr10SlotBoardName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the name the  board. "
+    ::= { zxr10SlotBoardEntry 16}
+
+zxr10SlotReload OBJECT-TYPE
+    SYNTAX  INTEGER
+        {
+            forced(1),
+            graceful(2)
+        }    
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Reload the board.
+         forced(1): Reload the board even if the control boards are 
+            asynchronous.
+         graceful(2): Reload the board after synchronization between the 
+            control boards.
+         Only the control boards support forced reloading and graceful 
+         reloading. There is no difference for the other boards."
+    ::= { zxr10SlotBoardEntry 17 }
+
+zxr10SlotReloadDesc OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "the reload description of the board. Now we don't use it."
+    ::= { zxr10SlotBoardEntry 18 }
+
+zxr10SlotCardPowerRatedPower OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the RatedPower of the board. "
+    ::= { zxr10SlotBoardEntry 19 }
+
+zxr10SlotLightTotalNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total number of lights in the board. Now we don't use it."
+    ::= { zxr10SlotBoardEntry 20 } 
+
+zxr10SlotTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the special card changed lastly. "
+    ::= { zxr10SlotBoardEntry 21 } 
+    
+zxr10SlotBoardShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special card is inserted. "
+    ::= { zxr10SlotBoardEntry 22 } 
+    
+zxr10SlotEPLD1Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD1 version of the special card."
+    ::= { zxr10SlotBoardEntry 23 }
+
+zxr10SlotEPLD2Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD2 version of the special card."
+    ::= { zxr10SlotBoardEntry 24 }
+
+zxr10SlotEPLD3Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD3 version of the special card."
+    ::= { zxr10SlotBoardEntry 25 }
+    
+zxr10SlotEPLD4Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD4 version of the special card."
+    ::= { zxr10SlotBoardEntry 26 }
+    
+zxr10SlotPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the part number of the special card."
+    ::= { zxr10SlotBoardEntry 27 }
+    
+zxr10SlotManufactureDate OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the Manufacture Date of the special card."
+    ::= { zxr10SlotBoardEntry 28 }
+    
+zxr10SlotAssemblySerialNo OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the AssemlySnNo of the special card."
+    ::= { zxr10SlotBoardEntry 29 }
+    
+--zxr10SlotSubCardTable
+zxr10SlotSubCardTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SlotSubCardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 subcard information,
+                       it is a list of subcard entries."
+               ::= { zxr10RackMIB 4 }
+               
+zxr10SlotSubCardEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SlotSubCardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A subcard entry containing objects that
+                       descript the subcard information,such as:
+                       zxr10SlotSubCardNo,zxr10SlotSubCardType,
+                       zxr10SlotSubCardPortNumber,zxr10SlotSubCardELElable.etc."
+              INDEX { zxr10RackNo,zxr10SlotSubCardShelfNo,zxr10SlotSubCardSlotNo,zxr10SlotSubCardNo}
+              ::= { zxr10SlotSubCardTable 1 }              
+              
+Zxr10SlotSubCardEntry ::=
+        SEQUENCE {
+            zxr10SlotSubCardNo
+                INTEGER,
+            zxr10SlotSubCardType
+                SubBoardType,
+            zxr10SlotSubCardPortNumber
+                INTEGER,
+            zxr10SlotSubCardCpuUpTime
+                TimeTicks,
+            zxr10SlotSubCardELElable
+                DisplayString,   
+            zxr10SlotSubCardAvailStatus
+                AvailStatus,
+            zxr10SlotSubCardPCBVer
+                DisplayString,
+            zxr10SlotSubCardDescription
+                DisplayString,
+            zxr10SlotSubCardPowerVoltageStatus
+                PowerStatus,
+            zxr10SlotSubCardOperStatus
+                OnlineStatus,
+            zxr10SlotSubCardTimeStamp
+                TimeTicks,
+            zxr10SlotSubCardShelfNo
+                INTEGER,
+            zxr10SlotSubCardSlotNo
+                INTEGER,
+            zxr10SlotSubCardEPLD1Ver
+                DisplayString,
+            zxr10SlotSubCardEPLD2Ver
+                DisplayString,
+            zxr10SlotSubCardEPLD3Ver
+                DisplayString,
+            zxr10SlotSubCardEPLD4Ver
+                DisplayString,
+            zxr10SlotSubCardPartNumber
+                DisplayString,
+            zxr10SlotSubCardManufactureDate
+                DisplayString               
+        }             
+    
+zxr10SlotSubCardNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the subcard where the special subcard is inserted. "
+    ::= { zxr10SlotSubCardEntry 1 }
+
+zxr10SlotSubCardType OBJECT-TYPE
+    SYNTAX  SubBoardType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the subcard. "
+    ::= { zxr10SlotSubCardEntry 2}
+
+zxr10SlotSubCardPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total port number of the special subcard. "
+    ::= { zxr10SlotSubCardEntry 3}
+
+zxr10SlotSubCardCpuUpTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the time how long the special subcard has run. Now we don't use it."
+    ::= { zxr10SlotSubCardEntry 4}
+
+zxr10SlotSubCardELElable OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the electric lable of the special subcard. "
+    ::= { zxr10SlotSubCardEntry 5}  
+
+zxr10SlotSubCardAvailStatus OBJECT-TYPE
+    SYNTAX  AvailStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the status. of the special subcard.
+                 eg ,the current subcard is running,
+                 we use 1,else if the card is down,
+                 we use 0."
+    ::= { zxr10SlotSubCardEntry 6}
+
+zxr10SlotSubCardPCBVer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the PCB version of the subcard. "
+    ::= { zxr10SlotSubCardEntry 7}
+
+zxr10SlotSubCardDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the silk label of the subcard. "
+    ::= { zxr10SlotSubCardEntry 8 }
+
+zxr10SlotSubCardPowerVoltageStatus OBJECT-TYPE
+    SYNTAX  PowerStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the power voltage status of the special subcard. "
+    ::= { zxr10SlotSubCardEntry 9 }
+
+zxr10SlotSubCardOperStatus OBJECT-TYPE
+    SYNTAX  OnlineStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the operstatus. of the special subcard.
+                 eg ,the current subcard  can work, we use 1,
+                 else if the subcard can't,we use 0. "
+    ::= { zxr10SlotSubCardEntry 10 }
+
+zxr10SlotSubCardTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the special subcard changed lastly. "
+    ::= { zxr10SlotSubCardEntry 11 }
+
+zxr10SlotSubCardShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special subcard is inserted. "
+    ::= { zxr10SlotSubCardEntry 12 }
+    
+zxr10SlotSubCardSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special subcard is inserted. "
+    ::= { zxr10SlotSubCardEntry 13 }
+
+zxr10SlotSubCardEPLD1Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD1 version of the special subcard."
+    ::= { zxr10SlotSubCardEntry 14 }
+
+zxr10SlotSubCardEPLD2Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD2 version of the special subcard."
+    ::= { zxr10SlotSubCardEntry 15 }
+
+zxr10SlotSubCardEPLD3Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD3 version of the special subcard."
+    ::= { zxr10SlotSubCardEntry 16 }
+    
+zxr10SlotSubCardEPLD4Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD4 version of the special subcard."
+    ::= { zxr10SlotSubCardEntry 17 }
+
+zxr10SlotSubCardPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the Part Number of the special subcard."
+    ::= { zxr10SlotSubCardEntry 18 }
+    
+zxr10SlotSubCardManufactureDate OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the Manufacture Date of the special subcard."
+    ::= { zxr10SlotSubCardEntry 19 }
+
+    
+--zxr10SlotSpecialSubCardTable
+zxr10SlotSpecialSubCardTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SlotSpecialSubCardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 subcard information,
+                       it is a list of subcard entries."
+               ::= { zxr10RackMIB 15 }
+               
+zxr10SlotSpecialSubCardEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SlotSpecialSubCardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A subcard entry containing objects that
+                       descript the subcard information,such as:
+                       zxr10SlotSpecialSubCardNo,zxr10SlotSpecialSubCardType,
+                       zxr10SlotSpecialSubCardPortNumber,zxr10SlotSpecialSubCardELElable.etc."
+              INDEX { zxr10RackNo,zxr10SlotSpecialSubCardShelfNo,zxr10SlotSpecialSubCardSlotNo,zxr10SlotSpecialSubCardNo}
+              ::= { zxr10SlotSpecialSubCardTable 1 }               
+              
+Zxr10SlotSpecialSubCardEntry ::=
+        SEQUENCE {
+            zxr10SlotSpecialSubCardShelfNo
+                INTEGER,
+            zxr10SlotSpecialSubCardSlotNo
+                INTEGER,
+            zxr10SlotSpecialSubCardNo
+                INTEGER,
+            zxr10SlotSpecialSubCardType
+                SPboardType,
+            zxr10SlotSpecialSubCardPortNumber
+                INTEGER,
+            zxr10SlotSpecialSubCardCpuUpTime
+                TimeTicks,
+            zxr10SlotSpecialSubCardELElable
+                DisplayString,   
+            zxr10SlotSpecialSubCardAvailStatus
+                AvailStatus,
+            zxr10SlotSpecialSubCardPCBVer
+                DisplayString,
+            zxr10SlotSpecialSubCardDescription
+                DisplayString,
+            zxr10SlotSpecialSubCardPowerVoltageStatus
+                PowerStatus,
+            zxr10SlotSpecialSubCardOperStatus
+                OnlineStatus,
+            zxr10SlotSpecialSubCardTimeStamp
+                TimeTicks,
+            zxr10SlotSpecialSubCardEPLD1Ver
+                DisplayString,
+            zxr10SlotSpecialSubCardEPLD2Ver
+                DisplayString,
+            zxr10SlotSpecialSubCardEPLD3Ver
+                DisplayString,
+            zxr10SlotSpecialSubCardEPLD4Ver
+                DisplayString
+                
+        }             
+
+zxr10SlotSpecialSubCardShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special subcard is inserted. "
+    ::= { zxr10SlotSpecialSubCardEntry 1 }
+    
+zxr10SlotSpecialSubCardSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special subcard is inserted. "
+    ::= { zxr10SlotSpecialSubCardEntry 2 }
+    
+zxr10SlotSpecialSubCardNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the subcard where the special subcard is inserted. "
+    ::= { zxr10SlotSpecialSubCardEntry 3 }
+
+zxr10SlotSpecialSubCardType OBJECT-TYPE
+    SYNTAX  SPboardType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 4}
+
+zxr10SlotSpecialSubCardPortNumber OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total port number of the special subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 5}
+
+zxr10SlotSpecialSubCardCpuUpTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the time how long the special subcard has run. "
+    ::= { zxr10SlotSpecialSubCardEntry 6}
+
+zxr10SlotSpecialSubCardELElable OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the electric lable of the special subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 7}   
+
+zxr10SlotSpecialSubCardAvailStatus OBJECT-TYPE
+    SYNTAX  AvailStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the status. of the special subcard.
+                 eg ,the current subcard is running,
+                 we use 1,else if the card is down,
+                 we use 0 ."
+    ::= { zxr10SlotSpecialSubCardEntry 8}
+
+zxr10SlotSpecialSubCardPCBVer OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the PCB version of the subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 9}
+
+zxr10SlotSpecialSubCardDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the silk label of the subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 10 }
+
+zxr10SlotSpecialSubCardPowerVoltageStatus OBJECT-TYPE
+    SYNTAX  PowerStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the power voltage status of the special subcard. "
+    ::= { zxr10SlotSpecialSubCardEntry 11 }
+
+zxr10SlotSpecialSubCardOperStatus OBJECT-TYPE
+    SYNTAX  OnlineStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the operstatus. of the special subcard.
+                 eg ,the current subcard  can work, we use 1,
+                 else if the subcard can't,we use 0. "
+    ::= { zxr10SlotSpecialSubCardEntry 12 }
+
+zxr10SlotSpecialSubCardTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the special subcard changed lastly. "
+    ::= { zxr10SlotSpecialSubCardEntry 13 }
+
+zxr10SlotSpecialSubCardEPLD1Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD1 version of the special subcard."
+    ::= { zxr10SlotSpecialSubCardEntry 14 }
+
+zxr10SlotSpecialSubCardEPLD2Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD2 version of the special subcard."
+    ::= { zxr10SlotSpecialSubCardEntry 15 }
+
+zxr10SlotSpecialSubCardEPLD3Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD3 version of the special subcard."
+    ::= { zxr10SlotSpecialSubCardEntry 16 }
+    
+zxr10SlotSpecialSubCardEPLD4Ver OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the EPLD4 version of the special subcard."
+    ::= { zxr10SlotSpecialSubCardEntry 17 }
+
+--zxr10PortTable--------------------------------------------
+zxr10PortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10PortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of port information
+                       in the zxr10 card .
+                       it is a list of port entries."
+               ::= { zxr10RackMIB 5 }
+               
+zxr10PortEntry  OBJECT-TYPE
+              SYNTAX  Zxr10PortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A port entry containing objects that
+                       descript the port information,such as:
+                       zxr10PortNo
+                       zxr10PortIfIndex
+                       zxr10PortType."
+              INDEX { zxr10RackNo,zxr10PortShelfNo,zxr10PortSlotNo,zxr10PortSubCardNo,zxr10PortNo}                  
+              ::= { zxr10PortTable 1 }             
+              
+Zxr10PortEntry ::=
+        SEQUENCE {
+            zxr10PortNo
+                INTEGER,
+            zxr10PortIfIndex
+                INTEGER,          
+            zxr10PortType
+                PortType,
+            zxr10PortPhyStatus
+                PhyStatus,
+            zxr10PortPhyEOProperty
+                PortProperty,
+            zxr10PortPhyPhyIfSpeed
+                INTEGER,
+            zxr10PortPhyIfMTU
+                INTEGER,
+            zxr10PortName
+                DisplayString,
+            zxr10PortTimeStamp
+                TimeTicks,
+            zxr10PortShelfNo
+                INTEGER,
+            zxr10PortSlotNo
+                INTEGER,
+            zxr10PortSubCardNo
+                INTEGER
+                
+        }             
+
+zxr10PortNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the port on the subcard,
+                 which contains several ports . "
+    ::= { zxr10PortEntry 1 }
+    
+zxr10PortIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the index of the port on the subcard. "
+    ::= { zxr10PortEntry 2 }    
+
+zxr10PortType OBJECT-TYPE
+    SYNTAX  PortType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the port. "
+    ::= { zxr10PortEntry 3 }
+
+
+zxr10PortPhyStatus OBJECT-TYPE
+    SYNTAX  PhyStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the physical status. of the special port. "
+    ::= { zxr10PortEntry 4 }
+
+zxr10PortPhyEOProperty OBJECT-TYPE
+    SYNTAX  PortProperty
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the physical photoelectricity property of the special port. "
+    ::= { zxr10PortEntry 5 }
+
+zxr10PortPhyPhyIfSpeed OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the transmit speed of this port, unit is Mbps. "
+    ::= { zxr10PortEntry 6 }
+
+zxr10PortPhyIfMTU OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the mtu of the 2 layer transmitting ability, unit is BYTES. "
+    ::= { zxr10PortEntry 7 }
+
+zxr10PortName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the name description of the special port. "
+    ::= { zxr10PortEntry 8 }
+
+zxr10PortTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the special port changed lastly.  "
+    ::= { zxr10PortEntry 9 }
+            
+zxr10PortShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special subcard is inserted. "
+    ::= { zxr10PortEntry 10 }
+    
+zxr10PortSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special subcard is inserted."
+    ::= { zxr10PortEntry 11 }
+    
+zxr10PortSubCardNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the subcard where the special subcard is inserted."
+    ::= { zxr10PortEntry 12 }
+            
+--zxr10SpecialPortTable
+zxr10SpecialPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SpecialPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of SpecialPort information
+                       in the zxr10 card .
+                       it is a list of SpecialPort entries."
+               ::= { zxr10RackMIB 7 }
+               
+zxr10SpecialPortEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SpecialPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A SpecialPort entry containing objects that
+                       descript the port information,such as:
+                       zxr10SPSlotBoardType,zxr10SPPortNo,
+                       zxr10SPPortType,zxr10PortRunningStatus."
+              INDEX { zxr10RackNo,zxr10SPShelfNo,zxr10SPSlotNo,zxr10SPPortNo,zxr10SPPortType}
+              ::= { zxr10SpecialPortTable 1 }              
+              
+Zxr10SpecialPortEntry ::=
+        SEQUENCE {
+            zxr10SPSlotBoardType
+                BoardType,
+            zxr10SPPortNo
+                INTEGER,
+            zxr10SPPortType
+                PortType,
+            zxr10PortRunningStatus
+                RunStatus,
+            zxr10SPShelfNo
+                INTEGER,
+            zxr10SPSlotNo
+                INTEGER             
+        }             
+    
+zxr10SPSlotBoardType OBJECT-TYPE
+    SYNTAX  BoardType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of slotboard where the special port located."
+    ::= { zxr10SpecialPortEntry 1 }
+
+zxr10SPPortNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the special port."
+    ::= { zxr10SpecialPortEntry 2 }
+
+zxr10SPPortType OBJECT-TYPE
+    SYNTAX  PortType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the special port."
+    ::= { zxr10SpecialPortEntry 3 }
+
+zxr10PortRunningStatus OBJECT-TYPE
+    SYNTAX  RunStatus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the running status of the special port."
+    ::= { zxr10SpecialPortEntry 4 }
+
+zxr10SPShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special subcard is inserted."
+    ::= { zxr10SpecialPortEntry 5 }
+    
+zxr10SPSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special subcard is inserted."
+    ::= { zxr10SpecialPortEntry 6 }
+
+--zxr10ShelfAbilityTable
+ zxr10ShelfAbilityTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10ShelfAbilityEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of ShelfAbility information
+                       in the zxr10 card .
+                       it is a list of ShelfAbility entries."  
+              ::= { zxr10RackMIB 8 }
+               
+zxr10ShelfAbilityEntry  OBJECT-TYPE
+              SYNTAX  Zxr10ShelfAbilityEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A port entry containing objects that
+                       descript the ShelfAbility information,such as:
+                       zxr10AShelfAttrib,zxr10AShelfType,zxr10AShelfSlotNumber."
+              INDEX {zxr10RackNo,zxr10ShelfNo}            
+              ::= { zxr10ShelfAbilityTable 1 }             
+              
+Zxr10ShelfAbilityEntry ::=
+       SEQUENCE { 
+            zxr10AShelfAttrib
+                ShelfAttrib,
+                zxr10AShelfType
+                ShelfType,  
+            zxr10AShelfSlotNumber
+               INTEGER                              
+       }      
+                      
+zxr10AShelfAttrib OBJECT-TYPE   
+  SYNTAX  ShelfAttrib
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the attrib of the special shelf."
+    ::= { zxr10ShelfAbilityEntry 1 }
+
+zxr10AShelfType OBJECT-TYPE
+    SYNTAX  ShelfType 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the special shelf."
+    ::= { zxr10ShelfAbilityEntry 2 }
+    
+zxr10AShelfSlotNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total slot number of the special shelf."
+    ::= { zxr10ShelfAbilityEntry 3 }
+
+--zxr10PeripheralTable
+zxr10PeripheralTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10PeripheralEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of peripheral information
+                       in the zxr10 card .
+                       it is a list of peripheral entries."
+               ::= { zxr10RackMIB 9 }
+               
+zxr10PeripheralEntry  OBJECT-TYPE
+              SYNTAX  Zxr10PeripheralEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A peripheral entry containing objects that
+                       descript the peripheral information,such as:
+                       zxr10MPUBoardType,zxr10PeripheralNo,etc."
+              INDEX { zxr10RackNo,zxr10PeripheralShelfNo,zxr10PeripheralSlotNo,zxr10PeripheralNo,zxr10PeripheralType}
+              ::= { zxr10PeripheralTable 1 }               
+              
+Zxr10PeripheralEntry ::=
+        SEQUENCE {
+            zxr10MPUBoardType
+                BoardType,
+            zxr10PeripheralNo
+                INTEGER,
+            zxr10PeripheralType
+                PeripheralType,
+            zxr10PeripheralDescription
+                DisplayString,
+            zxr10PeripheralTotalVolume
+                Counter32,   
+            zxr10PeripheralUsedVolume
+                Counter32,
+            zxr10PeripheralPartitionNum
+                INTEGER,
+            zxr10PeripheralCanbeRemoved
+                PeripheralRemoved,
+            zxr10PeripheralStartupTime
+                TimeTicks,
+            zxr10PeripheralStatus
+                PeripheralStaus,
+            zxr10PeripheralShelfNo
+                INTEGER,
+            zxr10PeripheralSlotNo
+                INTEGER,
+            zxr10PeripheralFreeVolume
+                Counter32               
+        }             
+    
+zxr10MPUBoardType OBJECT-TYPE
+    SYNTAX  BoardType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the mpu board. "
+    ::= { zxr10PeripheralEntry 1 }
+
+zxr10PeripheralNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the Peripheral on the special mpu board."
+    ::= { zxr10PeripheralEntry 2 }
+
+zxr10PeripheralType OBJECT-TYPE
+    SYNTAX  PeripheralType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the Peripheral on the special mpu board. 
+        eg, hard disk, flash."
+    ::= { zxr10PeripheralEntry 3 }
+
+zxr10PeripheralDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the description of the Peripheral on the special mpu board. "
+    ::= { zxr10PeripheralEntry 4 }
+
+zxr10PeripheralTotalVolume OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total volume of the special Peripheral. "
+    ::= { zxr10PeripheralEntry 5 }  
+
+zxr10PeripheralUsedVolume OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the used volume of the special Peripheral. include all users. "
+    ::= { zxr10PeripheralEntry 6 }
+
+zxr10PeripheralPartitionNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the partition number of the special Peripheral. "
+    ::= { zxr10PeripheralEntry 7 }
+
+zxr10PeripheralCanbeRemoved OBJECT-TYPE
+    SYNTAX  PeripheralRemoved
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes if the Peripheral can be removed. "
+    ::= { zxr10PeripheralEntry 8}
+
+zxr10PeripheralStartupTime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It describes the time between the Peripheral start up and finish init. "
+    ::= { zxr10PeripheralEntry 9 }
+
+zxr10PeripheralStatus OBJECT-TYPE
+    SYNTAX  PeripheralStaus
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the running status of the Peripheral. 
+        If the status is ok ,we use 1. "
+    ::= { zxr10PeripheralEntry 10 }     
+    
+zxr10PeripheralShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special Peripheral is inserted."
+    ::= { zxr10PeripheralEntry 11 }
+
+zxr10PeripheralSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special Peripheral is inserted."
+    ::= { zxr10PeripheralEntry 12 } 
+    
+zxr10PeripheralFreeVolume OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the free volume of the special Peripheral. only for non-root users. "
+    ::= { zxr10PeripheralEntry 13 }
+
+--zxr10LightTable
+zxr10LightTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10LightEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 light information,
+                       it is a list of light entries."
+               ::= { zxr10RackMIB 10 }
+               
+zxr10LightEntry  OBJECT-TYPE
+              SYNTAX  Zxr10LightEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A light entry containing objects that
+                       descript the light information,such as:
+                       zxr10LBoardType,zxr10LightType,zxr10LightNo,etc."
+              INDEX { zxr10RackNo,zxr10LightShelfNo,zxr10LightSlotNo,zxr10LightNo}
+              ::= { zxr10LightTable 1 }            
+              
+Zxr10LightEntry ::=
+        SEQUENCE {
+            zxr10LBoardType
+                BoardType,
+            zxr10LightType
+                LightType,
+            zxr10LightNo
+                INTEGER,
+            zxr10LightStatus
+                LightStatus,   
+            zxr10LightDescription
+                DisplayString,
+            zxr10LightShelfNo
+                INTEGER,
+            zxr10LightSlotNo
+                INTEGER             
+        }             
+    
+zxr10LBoardType OBJECT-TYPE
+    SYNTAX  BoardType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the board where the light located."
+    ::= { zxr10LightEntry 1 }
+
+zxr10LightType OBJECT-TYPE
+    SYNTAX  LightType  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the light."
+    ::= { zxr10LightEntry 2}
+
+zxr10LightNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the light. Now we don't use it."
+    ::= { zxr10LightEntry 3 }
+
+zxr10LightStatus OBJECT-TYPE
+    SYNTAX  LightStatus 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the status of the light. Now we don't use it."
+    ::= { zxr10LightEntry 4 }   
+
+zxr10LightDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the description of the light. Now we don't use it."
+    ::= { zxr10LightEntry 5}
+
+zxr10LightShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the shelf where the special light is inserted."
+    ::= { zxr10LightEntry 6 }
+    
+zxr10LightSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special light is inserted."
+    ::= { zxr10LightEntry 7 }
+    
+--zxr10LCCNum
+  zxr10LCCNum OBJECT-TYPE   
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the LCC number of the special rack.
+        Only the equipment supported cluster use this node."
+    ::= { zxr10RackMIB 11 }  
+    
+--zxr10CFCNum
+  zxr10CFCNum OBJECT-TYPE   
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the CFC number of the special rack.
+        Only the equipment supported cluster use this node."
+    ::= { zxr10RackMIB 12 }
+
+--zxr10SFLinkTable
+zxr10SFLinkTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SFLinkEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 sf link information,
+                       it is a list of SFLink entries.
+                       Only the equipment supported cluster use this table."
+               ::= { zxr10RackMIB 13 }
+               
+zxr10SFLinkEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SFLinkEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A SFLink entry containing objects that
+                       descript the link information,such as:
+                       zxr10PortPhyStatus,zxr10PortBandwidth,zxr10FEDownSerdes,zxr10PeerPortNo,etc."
+              INDEX { zxr10RackNo,zxr10SFLinkShelfNo,zxr10SFLinkSlotNo,zxr10SFLinkPortNo}
+              ::= { zxr10SFLinkTable 1 }               
+              
+Zxr10SFLinkEntry ::=
+        SEQUENCE {
+            zxr10SFLinkShelfNo
+                INTEGER,
+            zxr10SFLinkSlotNo
+                INTEGER,
+            zxr10SFLinkPortNo
+                INTEGER,
+            zxr10SFLinkPortType
+                INTEGER,
+            zxr10SFLinkPortPhyStatus
+                INTEGER,
+            zxr10SFLinkPortBandwidth
+                INTEGER,   
+            zxr10SFLinkDownSerdes
+                INTEGER,
+            zxr10SFLinkErrSerdes
+                INTEGER,
+            zxr10SFLinkErrSerdestotal
+                INTEGER,
+            zxr10SFLinkPeerRackNo
+                INTEGER,
+            zxr10SFLinkPeerShelfNo
+                INTEGER,
+            zxr10SFLinkPeerSlotNo
+                INTEGER,
+            zxr10SFLinkPeerPortNo
+                INTEGER,
+            zxr10SFLinkPeerPortType
+                INTEGER,
+            zxr10SFLinkCascadeTimeStamp
+                TimeTicks                                    
+        }             
+    
+zxr10SFLinkShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the No. of the shelf where the card is inserted"
+    ::= { zxr10SFLinkEntry 1 }
+
+zxr10SFLinkSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the No. of the slot where the card is inserted"
+    ::= { zxr10SFLinkEntry 2}
+
+zxr10SFLinkPortNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the port. "
+    ::= { zxr10SFLinkEntry 3 }
+
+zxr10SFLinkPortType OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the port."
+    ::= { zxr10SFLinkEntry 4 }  
+
+zxr10SFLinkPortPhyStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the physical status of the port."
+    ::= { zxr10SFLinkEntry 5}   
+    
+zxr10SFLinkPortBandwidth OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the bandwidth of the port."
+    ::= { zxr10SFLinkEntry 6}     
+
+zxr10SFLinkDownSerdes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the number of the serdesdown."
+    ::= { zxr10SFLinkEntry 7}
+
+zxr10SFLinkErrSerdes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the number of the serdeserr."
+    ::= { zxr10SFLinkEntry 8}
+
+zxr10SFLinkErrSerdestotal OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the total number of the serdeserr."
+    ::= { zxr10SFLinkEntry 9}  
+    
+zxr10SFLinkPeerRackNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the rack no. of the peer port."
+    ::= { zxr10SFLinkEntry 10}
+
+zxr10SFLinkPeerShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the shelf no. of the peer port."
+    ::= { zxr10SFLinkEntry 11}
+
+zxr10SFLinkPeerSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the slot no. of the peer port."
+    ::= { zxr10SFLinkEntry 12} 
+    
+zxr10SFLinkPeerPortNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the port no. of the peer port."
+    ::= { zxr10SFLinkEntry 13}
+
+zxr10SFLinkPeerPortType OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the port type of the peer port."
+    ::= { zxr10SFLinkEntry 14} 
+    
+zxr10SFLinkCascadeTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the port changed lastly.."
+    ::= { zxr10SFLinkEntry 15}
+
+--zxr10ESLinkTable
+zxr10ESLinkTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10ESLinkEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 ES link information,
+                       it is a list of ESLink entries.
+                       Only the equipment supported cluster use this table."
+               ::= { zxr10RackMIB 14 }
+               
+zxr10ESLinkEntry  OBJECT-TYPE
+              SYNTAX  Zxr10ESLinkEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A ESLink entry containing objects that
+                       descript the link information,such as:
+                       zxr10PortPhyStatus,zxr10PortBandwidth,zxr10PeerPortNo,etc."
+              INDEX { zxr10RackNo,zxr10ESLinkShelfNo,zxr10ESLinkSlotNo,zxr10ESLinkPortNo}
+              ::= { zxr10ESLinkTable 1 }               
+              
+Zxr10ESLinkEntry ::=
+        SEQUENCE {
+            zxr10ESLinkShelfNo
+                INTEGER,
+            zxr10ESLinkSlotNo
+                INTEGER,
+            zxr10ESLinkPortNo
+                INTEGER,
+            zxr10ESLinkPortType
+                INTEGER,
+            zxr10ESLinkPortPhyStatus
+                INTEGER,
+            zxr10ESLinkPortBandwidth
+                INTEGER,   
+            zxr10ESLinkPeerRackNo
+                INTEGER,
+            zxr10ESLinkPeerShelfNo
+                INTEGER,
+            zxr10ESLinkPeerSlotNo
+                INTEGER,
+            zxr10ESLinkPeerPortNo
+                INTEGER,
+            zxr10ESLinkPeerPortType
+                INTEGER,
+            zxr10ESLinkCascadeTimeStamp
+                TimeTicks                                    
+        }             
+    
+zxr10ESLinkShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the No. of the shelf where the card is inserted"
+    ::= { zxr10ESLinkEntry 1 }
+
+zxr10ESLinkSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER  
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the No. of the slot where the card is inserted"
+    ::= { zxr10ESLinkEntry 2}
+
+zxr10ESLinkPortNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the port. "
+    ::= { zxr10ESLinkEntry 3 }
+
+zxr10ESLinkPortType OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the type of the port."
+    ::= { zxr10ESLinkEntry 4 }  
+    
+zxr10ESLinkPortPhyStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the physical status of the port."
+    ::= { zxr10ESLinkEntry 5}
+
+zxr10ESLinkPortBandwidth OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the bandwidth of the port."
+    ::= { zxr10ESLinkEntry 6}  
+    
+zxr10ESLinkPeerRackNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the rack no. of the peer port."
+    ::= { zxr10ESLinkEntry 7}
+
+zxr10ESLinkPeerShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the shelf no. of the peer port."
+    ::= { zxr10ESLinkEntry 8}
+
+zxr10ESLinkPeerSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the slot no. of the peer port."
+    ::= { zxr10ESLinkEntry 9} 
+    
+zxr10ESLinkPeerPortNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the port no. of the peer port."
+    ::= { zxr10ESLinkEntry 10}
+
+zxr10ESLinkPeerPortType OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the port type of the peer port."
+    ::= { zxr10ESLinkEntry 11} 
+    
+zxr10ESLinkCascadeTimeStamp OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the time of the port changed lastly."
+    ::= { zxr10ESLinkEntry 12}
+
+--zxr10EthPhyPortTable
+zxr10EthPhyPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10EthPhyPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 ethernet physical port information,
+                       it is a list of EthPhyPort entries."
+               ::= { zxr10RackMIB 16 }
+               
+zxr10EthPhyPortEntry  OBJECT-TYPE
+              SYNTAX  Zxr10EthPhyPortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A EthPhyPort entry containing objects that
+                       descript the Ethernet physical port information,such as:
+                       zxr10EthPhyPortNegotiation,zxr10EthPhyPortMdixOrMdi,zxr10EthPhyPortInflowCtrl,etc."
+              INDEX { zxr10EthPhyPortName}
+              ::= { zxr10EthPhyPortTable 1 }               
+              
+Zxr10EthPhyPortEntry ::=
+        SEQUENCE {
+            zxr10EthPhyPortName
+                DisplayString,
+            zxr10EthPhyPortIndex
+                INTEGER,
+            zxr10EthPhyPortFrameType
+                INTEGER,
+            zxr10EthPhyPortNegotiation
+                INTEGER,
+            zxr10EthPhyPortJumbo
+                INTEGER,
+            zxr10EthPhyPortMdixOrMdi
+                INTEGER,   
+            zxr10EthPhyPortIpg
+                Integer32,
+            zxr10EthPhyPortLoopback
+                INTEGER,
+            zxr10EthPhyPortEOProperty
+                INTEGER,
+            zxr10EthPhyPortInflowCtrl
+                INTEGER,
+            zxr10EthPhyPortOutflowCtrl
+                INTEGER,
+            zxr10EthPhyPortDuplex
+                INTEGER,
+            zxr10EthPhyPortSpeed
+                INTEGER                                  
+        }             
+    
+zxr10EthPhyPortName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the name of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 1 }
+
+zxr10EthPhyPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the ifindex of the ether physical port"
+    ::= { zxr10EthPhyPortEntry 2}
+
+zxr10EthPhyPortFrameType OBJECT-TYPE
+    SYNTAX  INTEGER{ethernetII(1)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the frame type of the ether physical port"
+    ::= { zxr10EthPhyPortEntry 3 }
+
+zxr10EthPhyPortNegotiation OBJECT-TYPE
+    SYNTAX  INTEGER{auto(1),noAuto(0),unknown(2)} 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "the negotiation property of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 4 }  
+    
+zxr10EthPhyPortJumbo OBJECT-TYPE
+    SYNTAX  INTEGER{enable(0), disable(1)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the jumbo property of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 5}
+
+zxr10EthPhyPortMdixOrMdi OBJECT-TYPE
+    SYNTAX  INTEGER{auto(0),mdix(1),mdi(2),reserved(3),notsupport(4)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the mid mode of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 6}  
+    
+zxr10EthPhyPortIpg OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the ipg property of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 7}
+
+zxr10EthPhyPortLoopback OBJECT-TYPE
+    SYNTAX  INTEGER{noLoopback(0), loopbackInternal(1), loopbackLine(2), loopbackExternal(3)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the loopback property of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 8}
+
+zxr10EthPhyPortEOProperty OBJECT-TYPE
+    SYNTAX  INTEGER{optical(0), electrical(1), multiplex(2)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the electric or opitical property of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 9} 
+    
+zxr10EthPhyPortInflowCtrl OBJECT-TYPE
+    SYNTAX  INTEGER{nosupport(0), on(1), off(2)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the inflow control of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 10}
+
+zxr10EthPhyPortOutflowCtrl OBJECT-TYPE
+    SYNTAX  INTEGER{nosupport(0), on(1), off(2)}
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the outflow control of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 11} 
+
+zxr10EthPhyPortDuplex OBJECT-TYPE
+    SYNTAX  INTEGER{full(1),half(2),unknown(3)}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "the duplex type of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 12}  
+
+zxr10EthPhyPortSpeed OBJECT-TYPE
+    SYNTAX  INTEGER{speed-10M(1),speed-100M(2),speed-1G(3),speed-10G(4)}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "the speed mode of the ether physical port."
+    ::= { zxr10EthPhyPortEntry 13}  
+
+    
+--zxr10VirtualSubcardTable
+zxr10VirtualSubcardTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10VirtualSubcardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 virtual subcard information,
+                       it is a list of virtual subcard entries."
+               ::= { zxr10RackMIB 17 }
+               
+zxr10VirtualSubcardEntry  OBJECT-TYPE
+              SYNTAX  Zxr10VirtualSubcardEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A virtual subcard entry containing objects that
+                       descript the virtual subcard in MPU, which contains special port in MPU."
+              INDEX { zxr10VirtualSubcardShelfNo, zxr10VirtualSubcardSlotNo, zxr10VirtualSubcardNo}
+              ::= { zxr10VirtualSubcardTable 1 }               
+              
+Zxr10VirtualSubcardEntry ::=
+        SEQUENCE {
+            zxr10VirtualSubcardShelfNo
+                INTEGER,
+            zxr10VirtualSubcardSlotNo
+                INTEGER,
+            zxr10VirtualSubcardNo
+                INTEGER,
+            zxr10VirtualSubcardType
+                INTEGER,
+            zxr10VirtualSubcardPortNum
+                INTEGER                                 
+        }  
+
+zxr10VirtualSubcardShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the shelf no. of the virtual subcard."
+    ::= { zxr10VirtualSubcardEntry 1}
+    
+zxr10VirtualSubcardSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the slot no. of the virtual subcard."
+    ::= { zxr10VirtualSubcardEntry 2}
+    
+zxr10VirtualSubcardNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the subslot no. of the virtual subcard."
+    ::= { zxr10VirtualSubcardEntry 3}
+    
+zxr10VirtualSubcardType OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the subcard type no. of the virtual subcard."
+    ::= { zxr10VirtualSubcardEntry 4}
+    
+zxr10VirtualSubcardPortNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " the port number no. of the virtual subcard."
+    ::= { zxr10VirtualSubcardEntry 5}
+
+-- zxr10SlotFuncTable
+ zxr10SlotFuncTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SlotFuncEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 card's function type information,
+                       it is a list of card entries."
+               ::= { zxr10RackMIB 18 }
+               
+zxr10SlotFuncEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SlotFuncEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A card entry containing objects that
+                       descript the card's function type information,such as:
+                       zxr10SlotFuncShelfNo,zxr10SlotFuncSlotNo,zxr10SlotFuncSubSlotNo,
+                       zxr10SlotFuncType,etc."
+              INDEX { zxr10SlotFuncShelfNo,zxr10SlotFuncSlotNo,zxr10SlotFuncSubSlotNo}
+              ::= { zxr10SlotFuncTable 1 }            
+              
+Zxr10SlotFuncEntry ::=
+        SEQUENCE {  
+            zxr10SlotFuncShelfNo
+                INTEGER,
+            zxr10SlotFuncSlotNo
+                INTEGER,
+            zxr10SlotFuncSubSlotNo
+                INTEGER,
+            zxr10SlotFuncType
+                INTEGER          
+        }             
+    
+zxr10SlotFuncShelfNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the special shelf."
+    ::= { zxr10SlotFuncEntry 1 }
+    
+zxr10SlotFuncSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special card is inserted."
+    ::= { zxr10SlotFuncEntry 2 }
+    
+zxr10SlotFuncSubSlotNo OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the No. of the slot where the special card is inserted."
+    ::= { zxr10SlotFuncEntry 3 }
+    
+zxr10SlotFuncType OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "the function type of the card."
+    ::= { zxr10SlotFuncEntry 4 }
+    
+END
