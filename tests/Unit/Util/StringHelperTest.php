@@ -100,5 +100,4 @@ class StringHelperTest extends TestCase
         $this->assertFalse(StringHelpers::isHex('a5:fj:53', ':'));
         $this->assertFalse(StringHelpers::isHex('a5fe53', ':'));
     }
-
 }
