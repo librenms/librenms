@@ -230,6 +230,9 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
+    if (is_null($port)) {
+        return (string) $text;
+    }
     $graph_array = [];
 
     if (! $text) {
