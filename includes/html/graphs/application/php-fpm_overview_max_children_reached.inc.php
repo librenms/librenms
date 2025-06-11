@@ -11,9 +11,6 @@ $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals_
 if (! Rrd::checkRrdExists($filename)) {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
     $ds = 'mcr';
-    if (! Rrd::checkRrdExists($filename)) {
-        echo 'file missing: ' . $filename;
-    }
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

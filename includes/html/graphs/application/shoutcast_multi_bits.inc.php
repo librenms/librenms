@@ -25,8 +25,8 @@ $rrd_filenames = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app->
 foreach ($rrd_filenames as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);
-    [$host, $port] = explode('_', $hostname, 2),
-[
+    [$host, $port] = explode('_', $hostname, 2);
+    $rrd_list[] = [
         'filename' => $file,
         'descr' => $host . ':' . $port,
         'ds_in' => $ds_in,

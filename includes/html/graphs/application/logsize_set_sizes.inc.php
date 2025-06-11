@@ -24,8 +24,5 @@ foreach ($log_sets as $index => $log_set) {
     }
 }
 
-if (count($rrd_list)) {
-    d_echo('No relevant log set RRDs found');
-}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
