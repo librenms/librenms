@@ -23,8 +23,11 @@
  * @copyright  2018 Paul Heinrichs
  * @author     Paul Heinrichs <pdheinrichs@gmail.com>
  */
-$cmm_stats = snmpwalk_group($device, 'cmmSwitchTable', 'CMM3-MIB');
-$cmm_stats = snmpwalk_group($device, 'cmmPortTable', 'CMM3-MIB', 1, $cmm_stats);
+$cmm_stats = SnmpQuery::hideMib()->abortOnFailure()->walk([
+    'CMM3-MIB::cmmSwitchTable',
+    'CMM3-MIB::cmmPortTable',
+])->table(1);
+
 
 $required = [
     'ifInOctets' => 'rxOctets',
@@ -38,20 +41,25 @@ $required = [
     'ifInMulticastPkts' => 'rxMulticastPkts',
     'ifOutMulticastPkts' => 'txMulticastPkts',
 ];
-$cmm_ports = [];
-foreach ($cmm_stats as $index => $port) {
-    $cmm_port = [];
 
+foreach ($cmm_stats as $cmm_index => $cmm_port) {
     foreach ($required as $ifEntry => $IfxStat) {
-        $cmm_port[$ifEntry] = $cmm_stats[$index][$IfxStat];
+        $port_stats[$cmm_index][$ifEntry] = $cmm_port[$IfxStat];
     }
-    $cmm_port['ifName'] = 'CMM Port ' . $port['portNumber'];
-    $cmm_port['ifDescr'] = 'CMM Port ' . $port['portNumber'];
-    $cmm_port['ifDuplex'] = ($cmm_stats[$index]['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
-    $cmm_port['ifSpeed'] = ($cmm_stats[$index]['linkSpeed'] == 1 ? '100000000' : '10000000');
-    $cmm_port['ifOperStatus'] = ($cmm_stats[$index]['linkStatus'] == 1 ? 'up' : 'down');
-    $cmm_port['ifType'] = 'ethernetCsmacd';
-    array_push($cmm_ports, $cmm_port);
+
+    $port_stats[$cmm_index]['ifName'] = 'CMM Port ' . $cmm_port['portNumber'];
+    $port_stats[$cmm_index]['ifDescr'] = 'CMM Port ' . $cmm_port['portNumber'];
+    $port_stats[$cmm_index]['ifType'] = 'ethernetCsmacd';
+
+    if (isset($cmm_port['duplexStatus'])) {
+        $port_stats[$cmm_index]['ifDuplex'] = ($cmm_port['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
+    }
+    if (isset($cmm_port['linkSpeed'])) {
+        $port_stats[$cmm_index]['ifSpeed'] = ($cmm_port['linkSpeed'] == 1 ? '100000000' : '10000000');
+    }
+    if (isset($cmm_port['linkStatus'])) {
+        $port_stats[$cmm_index]['ifOperStatus'] = ($cmm_port['linkStatus'] == 1 ? 'up' : 'down');
+    }
 }
 
-$port_stats = array_replace_recursive($cmm_ports, $port_stats);
+unset($cmm_stats, $cmm_port, $required);
