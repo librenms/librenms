@@ -64,12 +64,7 @@ if (is_numeric($alert_id) && $alert_id > 0) {
 }
 
 if (is_array($rule)) {
-    if (empty($rule['builder'])) {
-        // convert old rules when editing
-        $builder = QueryBuilderParser::fromOld($rule['rule'])->toArray();
-    } else {
-        $builder = json_decode($rule['builder']);
-    }
+    $builder = json_decode($rule['builder']);
 
     header('Content-type: application/json');
     echo json_encode([
