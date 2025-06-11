@@ -26,7 +26,6 @@ use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
-
 use function sprintf;
 
 class PollDevice implements ShouldQueue
@@ -124,7 +123,7 @@ class PollDevice implements ShouldQueue
 
         $datastore = app('Datastore');
 
-        foreach ($this->moduleList->modulesWithStatus($this->device) as $module => $module_status) {
+        foreach ($this->moduleList->modulesWithStatus(ProcessType::poller, $this->device) as $module => $module_status) {
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);

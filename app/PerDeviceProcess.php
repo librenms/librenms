@@ -48,12 +48,12 @@ class PerDeviceProcess
         array $overrides,
     ) {
         $this->results = new Result;
-        $this->moduleList = new ModuleList($type, $overrides);
+        $this->moduleList = new ModuleList($overrides);
     }
 
     public function run(): Result
     {
-        $this->moduleList->printOverrides();
+        $this->moduleList->printOverrides($this->type);
 
         // listen for the completed events to mark the device completed
         Event::listen($this->completionEvent, function ($event) {

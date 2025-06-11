@@ -24,7 +24,6 @@ use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
-
 use function sprintf;
 
 class DiscoverDevice implements ShouldQueue
@@ -102,7 +101,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
 
-        foreach ($this->moduleList->modulesWithStatus($this->device) as $module => $module_status) {
+        foreach ($this->moduleList->modulesWithStatus(ProcessType::discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);

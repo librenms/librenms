@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
@@ -42,7 +43,7 @@ use LibreNMS\Exceptions\InvalidModuleException;
 class ModuleTestHelper
 {
     private $quiet = false;
-    private $modules;
+    private ModuleList $modules;
     private $variant;
     private $snmprec_file;
     private $json_file;
@@ -61,15 +62,15 @@ class ModuleTestHelper
     /**
      * ModuleTester constructor.
      *
-     * @param  array|string  $modules
+     * @param  string[]|string  $modules
      * @param  string  $os
      * @param  string  $variant
      *
      * @throws InvalidModuleException
      */
-    public function __construct($modules, $os, $variant = '')
+    public function __construct(array|string $modules, string $os, string $variant = '')
     {
-        $this->modules = self::resolveModuleDependencies((array) $modules);
+        $this->modules = new ModuleList((array) $modules);
         $this->variant = strtolower($variant);
 
         // preset the file names
@@ -185,7 +186,7 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose();
-        discover_device($device, $this->parseArgs('discovery'));
+        (new DiscoverDevice($device_id, $this->modules))->handle();
         (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
@@ -343,15 +344,6 @@ class ModuleTestHelper
         }
 
         return $full_list;
-    }
-
-    private function parseArgs($type)
-    {
-        if (empty($this->modules)) {
-            return false;
-        }
-
-        return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
     }
 
     private function qPrint($var)
@@ -604,7 +596,7 @@ class ModuleTestHelper
         }
         ob_start();
 
-        discover_device($device, $this->parseArgs('discovery'));
+        (new DiscoverDevice($device_id, $this->modules))->handle();
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -723,16 +715,16 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param  int  $device_id  The test device id
-     * @param  array  $modules  to capture data for (should be a list of modules that were actually run)
+     * @param  string[]  $modules  to capture data for (should be a list of modules that were actually run)
      * @param  string  $type  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $modules, $type)
+    public function dumpDb(int $device_id, array $modules, string $type): array
     {
         $data = [];
 
         // don't dump some modules by default unless they are manually listed
-        if (empty($this->modules)) {
+        if (! $this->modules->hasOverride()) {
             $modules = array_diff($modules, $this->exclude_from_all);
         }
 

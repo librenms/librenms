@@ -34,23 +34,12 @@ use LibreNMS\Polling\ModuleStatus;
 
 class ModuleList
 {
-    public readonly array $modules;
     public readonly array $overrides;
 
     public function __construct(
-        public readonly ProcessType $type,
         array $overrides = [],
     ) {
         $this->overrides = $this->parseUserOverrides($overrides);
-
-        $default_modules = match ($type) {
-            ProcessType::poller => LibrenmsConfig::get('poller_modules', []),
-            ProcessType::discovery => LibrenmsConfig::get('discovery_modules', []),
-        };
-
-        $this->modules = empty($this->overrides)
-            ? array_keys($default_modules)
-            : array_keys(array_intersect_key($default_modules, $this->overrides)); // ensure order
     }
 
     public function hasOverride(): bool
@@ -63,24 +52,44 @@ class ModuleList
         return isset($this->overrides[$module_name]);
     }
 
+    public function printOverrides(ProcessType $type): void
+    {
+        if ($this->hasOverride()) {
+            $modules = array_map(function ($module, $status) {
+                return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
+            }, array_keys($this->overrides), array_values($this->overrides));
+
+            Log::debug(sprintf('Override %s modules: %s', $type->name, implode(', ', $modules)));
+        }
+    }
+
     /**
      * @return array<string, ModuleStatus>
      */
-    public function modulesWithStatus(Device $device): array
+    public function modulesWithStatus(ProcessType $type, Device $device): array
     {
-        $modules = [];
-        foreach ($this->modules as $module_name) {
-            $modules[$module_name] = $this->moduleStatus($module_name, $device);
+        $default_modules = match ($type) {
+            ProcessType::poller => LibrenmsConfig::get('poller_modules', []),
+            ProcessType::discovery => LibrenmsConfig::get('discovery_modules', []),
+        };
+
+        $modules_with_overrides = empty($this->overrides)
+            ? array_keys($default_modules)
+            : array_keys(array_intersect_key($default_modules, $this->overrides)); // ensure order
+
+        $module_status = [];
+        foreach ($modules_with_overrides as $module_name) {
+            $module_status[$module_name] = $this->moduleStatus($type, $module_name, $device);
         }
 
-        return $modules;
+        return $module_status;
     }
 
-    private function moduleStatus(string $module_name, Device $device): ModuleStatus
+    private function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
     {
         $override = $this->overrides[$module_name] ?? null;
 
-        return match ($this->type) {
+        return match ($type) {
             ProcessType::discovery => new ModuleStatus(
                 LibrenmsConfig::get("discovery_modules.$module_name"),
                 LibrenmsConfig::get("os.{$device->os}.discovery_modules.$module_name"),
@@ -113,16 +122,5 @@ class ModuleList
         }
 
         return $modules;
-    }
-
-    public function printOverrides(): void
-    {
-        if ($this->hasOverride()) {
-            $modules = array_map(function ($module, $status) {
-                return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
-            }, array_keys($this->overrides), array_values($this->overrides));
-
-            Log::debug(sprintf('Override %s modules: %s', $this->type->name, implode(', ', $modules)));
-        }
     }
 }

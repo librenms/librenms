@@ -79,7 +79,7 @@ class DevicePoll extends LnmsCommand
     private function dispatchWork(): int
     {
         \Log::setDefaultDriver('stack');
-        $modules = new ModuleList($this->processType, explode(',', $this->option('modules') ?? ''));
+        $modules = new ModuleList(explode(',', $this->option('modules') ?? ''));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 
         if (\config('queue.default') == 'sync') {
