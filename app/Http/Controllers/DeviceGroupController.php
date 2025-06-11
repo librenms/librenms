@@ -7,7 +7,6 @@ use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Alerting\QueryBuilderFluentParser;
 
 class DeviceGroupController extends Controller
 {
