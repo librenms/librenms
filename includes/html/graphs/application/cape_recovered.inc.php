@@ -11,8 +11,7 @@ $transparency = 15;
 $float_precision = 3;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
-    $descr = 'recovered';
-    $ds = 'recovered';
-
+$descr = 'recovered';
+$ds = 'recovered';
 
 require 'includes/html/graphs/generic_stats.inc.php';

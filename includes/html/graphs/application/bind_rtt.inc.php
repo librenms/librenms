@@ -40,7 +40,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => '>1600',
         'ds' => 'rttg1600',
-        ],
-    ];
+    ],
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -25,43 +25,43 @@ if (isset($vars['package'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Min',
         'ds' => 's0signatures_alert',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Max',
         'ds' => 's1signatures_alert',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mean',
         'ds' => 's3signatures_alert',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Median',
         'ds' => 's4signatures_alert',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mode',
         'ds' => 's5signatures_alert',
     ],
+];
+if (isset($vars['stddev']) && $vars['stddev'] == 'on') {
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => 'StdDev',
+        'ds' => 's7signatures_alert',
     ];
-    if (isset($vars['stddev']) && $vars['stddev'] == 'on') {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => 'StdDev',
-            'ds' => 's7signatures_alert',
-        ];
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => 'StdDevP',
-            'ds' => 's9signatures_alert',
-        ];
-    }
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => 'StdDevP',
+        'ds' => 's9signatures_alert',
+    ];
+}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

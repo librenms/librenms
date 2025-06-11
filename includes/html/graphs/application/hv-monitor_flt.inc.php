@@ -15,17 +15,16 @@ if (isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Major',
         'ds' => 'majflt',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Minor',
         'ds' => 'minflt',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

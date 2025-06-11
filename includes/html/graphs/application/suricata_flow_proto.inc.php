@@ -15,27 +15,26 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'f_icmpv4',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'f_icmpv6',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'TCP',
         'ds' => 'f_tcp',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'UDP',
         'ds' => 'f_udp',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

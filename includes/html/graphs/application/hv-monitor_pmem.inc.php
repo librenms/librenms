@@ -15,12 +15,11 @@ if (isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mem%',
         'ds' => 'pmem',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

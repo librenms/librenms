@@ -15,8 +15,7 @@ if (isset($vars['vmif'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-    $descr = 'Collisions';
-    $ds = 'coll';
-
+$descr = 'Collisions';
+$ds = 'coll';
 
 require 'includes/html/graphs/generic_stats.inc.php';

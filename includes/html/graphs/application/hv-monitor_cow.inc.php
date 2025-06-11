@@ -13,8 +13,7 @@ if (isset($vars['vm'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-    $descr = 'COW';
-    $ds = 'cow';
-
+$descr = 'COW';
+$ds = 'cow';
 
 require 'includes/html/graphs/generic_stats.inc.php';
