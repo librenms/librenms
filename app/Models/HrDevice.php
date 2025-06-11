@@ -17,6 +17,9 @@ class HrDevice extends DeviceRelatedModel implements Keyable
         'hrDeviceStatus',
         'hrProcessorLoad',
     ];
+    protected $attributes = [
+        'hrDeviceType' => 'unknown',
+    ];
 
     public function getCompositeKey()
     {
