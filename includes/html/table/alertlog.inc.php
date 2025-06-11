@@ -26,6 +26,7 @@ $alert_severities = [
 
 $where = 1;
 $param = [];
+$alert_log_id = null;
 
 if (is_numeric($vars['device_id'])) {
     $where .= ' AND E.device_id = ?';
