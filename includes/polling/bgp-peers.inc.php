@@ -704,7 +704,7 @@ if (! empty($peers)) {
                     $safis['multicast'] = 2;
                     $afis['ipv4'] = 1;
                     $afis['ipv6'] = 2;
-                    if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
+                    if (str_contains($peer['bgpPeerIdentifier'], ':')) {
                         $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
                         $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);
                         $tmp_peer = rtrim($tmp_peer, ':');
@@ -714,8 +714,8 @@ if (! empty($peers)) {
                     $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
                     $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
 
-                    $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
-                    $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
+                    $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'] ?? null;
+                    $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'] ?? null;
                 }
 
                 if ($device['os'] == 'dell-os10') {
@@ -723,7 +723,7 @@ if (! empty($peers)) {
                     $safis['multicast'] = 2;
                     $afis['ipv4'] = 1;
                     $afis['ipv6'] = 2;
-                    if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
+                    if (str_contains($peer['bgpPeerIdentifier'], ':')) {
                         $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
                         $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);
                         $tmp_peer = rtrim($tmp_peer, ':');
