@@ -19,8 +19,9 @@ if (! Auth::user()->hasGlobalRead()) {
     $menu_options = ['basic' => 'Basic',
     ];
 
-    $vars['view'] = isset($vars['view']) ? $vars['view'] : 'basic';
-    $vars['graph'] = isset($vars['graph']) ? $vars['graph'] : '';
+    if (! $vars['view']) {
+        $vars['view'] = 'basic';
+    }
 
     $sep = '';
     foreach ($menu_options as $option => $text) {
@@ -47,8 +48,6 @@ if (! Auth::user()->hasGlobalRead()) {
         'errors' => 'Errors',
         'etherlike' => 'Etherlike',
     ];
-
-    $type_sep = '';
 
     foreach ($graph_types as $type => $descr) {
         echo "$type_sep";
