@@ -1,4 +1,4 @@
-mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB
+mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB:ZXAN-GLUE-MIB
 modules:
     mempools:
         pre-cache:
@@ -7,8 +7,9 @@ modules:
         data:
             -
                 total: ZTE-AN-CHASSIS-MIB::zxAnCardMemSize
+                precision: 1048576
                 percent_used: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
-                descr: 'Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}'
+                descr: 'Card {{ $subindex2 }} - {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}'
                 skip_values:
                     -
                         oid: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
@@ -20,31 +21,42 @@ modules:
                 oid: zxAnCardTable
                 value: zxAnCardCpuLoad
                 num_oid: '.1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.{{ $index }}'
-                descr: '{{ $zxAnCardActualType }} Processor'
+                descr: 'Card {{ $subindex2 }} - {{ $zxAnCardActualType }} Processor'
     sensors:
         pre-cache:
             data:
                 -
                     oid:
                         - zxAnCardActualType
-                        - zxAnEnvRack
-                        - zxAnEnvShelf
-                        - zxAnEnvSlot
+                        - ifDescr
         temperature:
             data:
                 -
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardTemp
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2.{{ $index }}'
-                    descr: "Temp Card {{ $zxAnCardActualType }}"
+                    descr: "Temp Card {{ $subindex2 }} - {{ $zxAnCardActualType }}"
+                    skip_value_lt: -273
+                -
+                    oid: zxAnEnvParamEntry
+                    value: zxAnEnvTemp
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.5.1.3.{{ $index }}'
+                    descr: "Temperature Backplane"
+                    index: "zxAnEnvTemp.{{ $index }}"
+                    skip_value_lt: 0
+                    divisor: 1
+
         fanspeed:
             data:
                 -
                     oid: zxAnEnvFanTable
                     value: zxAnEnvFanActualSpeed
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.7.{{ $index }}'
-                    descr: "Fan speed Slot {{ $subindex2 }}"
-                    low_limit: 0
+                    descr: "Fan speed Slot {{ $subindex1 }}.{{ $subindex2 }}"
+                    low_limit: 600
+                    low_warn_limit: 1000
+                    high_warn_limit: 5000
+                    high_limit: 6000
 
         voltage:
             data:
@@ -52,15 +64,31 @@ modules:
                     oid: zxAnPowerSupplyTable
                     value: zxAnPowerSupplyInVoltage
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.3.11.1.2.{{ $index }}'
-                    descr: "DC Input Slot {{ $subindex2 }}"
-                    skip_value_lt: 1
+                    descr: "DC Input Slot {{ $subindex2 }} - {{ $zxAnCardActualType }}"
+                    skip_value_lt: 0
                 -
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardVoltage
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.4.{{ $index }}'
-                    descr: "Voltage Card {{ $zxAnCardActualType }}"
-                    skip_value_lt: 1
+                    descr: "Voltage Slot {{ $subindex2 }} - {{ $zxAnCardActualType }}"
+                    skip_value_lt: 0
                     divisor: 1000
+                -
+                    oid: zxAnEnvParamEntry
+                    value: zxAnEnvShelfVoltage
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.5.1.8.{{ $index }}'
+                    descr: "Voltage Backplane"
+                    index: "zxAnEnvShelfVoltage.{{ $index }}"
+                    divisor: 1000
+                -
+                    oid: zxAnEnvFanTrayEntry
+                    value: zxAnFanTrayVoltage
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.10.1.22.{{ $index }}'
+                    descr: "Voltage FanTray"
+                    index: "zxAnFanTrayVoltage.{{ $index }}"
+                    skip_value_lt: 0
+                    divisor: 1000
+
 
         power:
             data:
@@ -68,18 +96,68 @@ modules:
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardPowerConsumption
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.3.{{ $index }}'
-                    descr: "Power Consumption Card {{ $zxAnCardActualType }}"
-                    skip_value_lt: 1
+                    descr: "Power Slot {{ $subindex2 }} - {{ $zxAnCardActualType }}"
+                    skip_value_lt: 0
                     divisor: 1000
+                -
+                    oid: zxAnEnvParamEntry
+                    value: zxAnEnvShelfPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.5.1.7.{{ $index }}'
+                    descr: "Power Backplane"
+                    index: "zxAnEnvShelfPowerConsumption.{{ $index }}"
+                    divisor: 1000
+                -
+                    oid: zxAnEnvFanTrayEntry
+                    value: zxAnFanTrayPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.10.1.20.{{ $index }}'
+                    descr: "Power FanTray"
+                    index: "zxAnFanTrayPowerConsumption.{{ $index }}"
+                    skip_value_lt: 0
+                    divisor: 1000
+
+
         current:
             data:
                 -
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardCurrent
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.5.{{ $index }}'
-                    descr: "Current Card {{ $zxAnCardActualType }}"
-                    skip_value_lt: 1
+                    descr: "Current Card {{ $subindex2 }} - {{ $zxAnCardActualType }}"
+                    skip_value_lt: 0
                     divisor: 1000
+                -
+                    oid: zxAnEnvParamEntry
+                    value: zxAnEnvShelfCurrent
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.5.1.9.{{ $index }}'
+                    descr: "Current Backplane"
+                    index: "zxAnEnvShelfCurrent.{{ $index }}"
+                    divisor: 1000
+                -
+                    oid: zxAnEnvFanTrayEntry
+                    value: zxAnFanTrayCurrent
+                    num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.10.1.23.{{ $index }}'
+                    descr: "Current FanTray"
+                    index: "zxAnFanTrayCurrent.{{ $index }}"
+                    skip_value_lt: 0
+                    divisor: 1000
+
+        count:
+          data:
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portTotalConfiguredTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.14.{{ $index }}'
+                    descr: "Total Configured ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
+                -
+                    oid: zxAnGluePonPortStats
+                    value: portCurrentOnlineTerminals
+                    num_oid: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    index: '.1.3.6.1.4.1.3902.1082.500.10.2.2.3.1.15.{{ $index }}'
+                    descr: "Total Online ONUs at port {{ $ifDescr }}"
+                    group: PonInterface
+
 
         state:
             data:
@@ -109,7 +187,7 @@ modules:
                     oid: zxAnPowerSupplyTable
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.3.11.1.3.{{ $index }}'
                     index: 'zxAnPowerSupplyInVoltageStatus.{{ $index }}'
-                    descr: "Power Supply {{ $index }} Status"
+                    descr: "Power Supply Slot {{ $index }} - {{ $zxAnCardActualType }} Status"
                     group: Power
                     state_name: zxAnPowerSupplyInVoltageStatus
                     states:
