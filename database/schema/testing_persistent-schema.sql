@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS "alert_log"(
 CREATE INDEX "alert_log_time_logged_index" on "alert_log"("time_logged");
 CREATE TABLE IF NOT EXISTS "alert_rules"(
   "id" integer primary key autoincrement not null,
-  "rule" text not null,
   "severity" varchar check("severity" in('ok', 'warning', 'critical')) not null,
   "extra" varchar not null,
   "disabled" tinyint(1) not null,

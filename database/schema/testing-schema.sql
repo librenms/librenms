@@ -83,7 +83,6 @@ DROP TABLE IF EXISTS `alert_rules`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_rules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `rule` text NOT NULL,
   `severity` enum('ok','warning','critical') NOT NULL,
   `extra` varchar(255) NOT NULL,
   `disabled` tinyint(1) NOT NULL,
