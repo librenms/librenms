@@ -194,13 +194,17 @@ class StringHelpers
         return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
     }
 
-    public static function isHexWithWhitespace(string $string): bool
+    public static function isHex(string $string, string $delimiter = ''): bool
     {
-        return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
-    }
+        $string = trim($string);
 
-    public static function isHex(string $string): bool
-    {
-        return (bool) preg_match('/^(?:[[:xdigit:]][[:xdigit:]])+$/', trim($string));
+        if ($delimiter === '') {
+            return (bool) preg_match('/^(?:[[:xdigit:]]{2})+$/', $string);
+        }
+
+        $escapedDelimiter = preg_quote($delimiter, '/');
+        $pattern = '/^[[:xdigit:]]{2}(?:' . $escapedDelimiter . '[[:xdigit:]]{2})*$/';
+
+        return (bool) preg_match($pattern, $string);
     }
 }

@@ -98,7 +98,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
      */
     protected function normData(string $par = ''): string
     {
-        return StringHelpers::isHexWithWhitespace($par) ? StringHelpers::hexToAscii($par, ' ') : $par;
+        return StringHelpers::isHex($par, ' ') ? StringHelpers::hexToAscii($par, ' ') : $par;
     }
 
     public function discoverIpv6Addresses(): Collection

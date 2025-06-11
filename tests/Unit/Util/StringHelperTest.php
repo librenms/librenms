@@ -75,4 +75,30 @@ class StringHelperTest extends TestCase
         };
         $this->assertFalse(StringHelpers::isStringable($nonstringable));
     }
+
+    public function testIsHexString(): void
+    {
+        $this->assertTrue(StringHelpers::isHex('af'));
+        $this->assertTrue(StringHelpers::isHex('28'));
+        $this->assertTrue(StringHelpers::isHex('aF28'));
+        $this->assertFalse(StringHelpers::isHex('a'));
+        $this->assertFalse(StringHelpers::isHex('aF 28'));
+        $this->assertFalse(StringHelpers::isHex('aF 2'));
+        $this->assertFalse(StringHelpers::isHex('aG'));
+    }
+
+    public function testIsHexWithDelimiters(): void
+    {
+        $this->assertTrue(StringHelpers::isHex('af 28 02', ' '));
+        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE', ' '));
+        $this->assertFalse(StringHelpers::isHex('a5 fj 53', ' '));
+        $this->assertFalse(StringHelpers::isHex('a5fe53', ' '));
+
+        $this->assertFalse(StringHelpers::isHex('af 28 02', ':'));
+        $this->assertTrue(StringHelpers::isHex('af:28:02', ':'));
+        $this->assertTrue(StringHelpers::isHex('aF:28:02:CE', ':'));
+        $this->assertFalse(StringHelpers::isHex('a5:fj:53', ':'));
+        $this->assertFalse(StringHelpers::isHex('a5fe53', ':'));
+    }
+
 }

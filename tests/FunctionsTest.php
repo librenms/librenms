@@ -29,7 +29,6 @@ namespace LibreNMS\Tests;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 class FunctionsTest extends TestCase
 {
@@ -42,25 +41,6 @@ class FunctionsTest extends TestCase
     {
         $input = '4c 61 72 70 69 6e 67 20 34 20 55 00 0a';
         $this->assertEquals("Larping 4 U\n", snmp_hexstring($input));
-    }
-
-    public function testIsHexWhitespaceString(): void
-    {
-        $this->assertTrue(StringHelpers::isHexWithWhitespace('af 28 02'));
-        $this->assertTrue(StringHelpers::isHexWithWhitespace('aF 28 02 CE'));
-        $this->assertFalse(StringHelpers::isHexWithWhitespace('a5 fj 53'));
-        $this->assertFalse(StringHelpers::isHexWithWhitespace('a5fe53'));
-    }
-
-    public function testIsHexString(): void
-    {
-        $this->assertTrue(StringHelpers::isHex('af'));
-        $this->assertTrue(StringHelpers::isHex('28'));
-        $this->assertTrue(StringHelpers::isHex('aF28'));
-        $this->assertFalse(StringHelpers::isHex('a'));
-        $this->assertFalse(StringHelpers::isHex('aF 28'));
-        $this->assertFalse(StringHelpers::isHex('aF 2'));
-        $this->assertFalse(StringHelpers::isHex('aG'));
     }
 
     public function testDynamicDiscoveryGetValue(): void
