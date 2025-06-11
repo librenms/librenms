@@ -1,4 +1,4 @@
-mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB
+mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB:ZXAN-GLUE-MIB
 modules:
     mempools:
         pre-cache:
@@ -28,6 +28,7 @@ modules:
                 -
                     oid:
                         - zxAnCardActualType
+                        - ifDescr
         temperature:
             data:
                 -

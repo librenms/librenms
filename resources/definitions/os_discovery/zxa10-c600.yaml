@@ -1,4 +1,4 @@
-mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB:ZXR10-PROJECT-MIB:ZXR10-RACK-MIB:ZXR10-SYSTEM-HARDWARE-MIB
+mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB:ZXR10-PROJECT-MIB:ZXR10-RACK-MIB:ZXR10-SYSTEM-HARDWARE-MIB:ZXAN-GLUE-MIB
 modules:
     mempools:
         pre-cache:
@@ -62,6 +62,7 @@ modules:
                         - zxr10SystemHardwareMIB
                         - zxr10ShelfPartNumber
                         - zxr10PowerModuleName
+                        - ifDescr
         temperature:
             data:
                 -
