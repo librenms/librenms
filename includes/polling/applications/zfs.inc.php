@@ -82,7 +82,7 @@ $data_sets = [
     'pre_meta_misses_per' => 'GAUGE',
 ];
 
-foreach($data_sets as $ds => $type) {
+foreach ($data_sets as $ds => $type) {
     $rrd_def->addDataset($ds, $type, 0);
     $fields[$ds] = $zfs[$ds] ?? null;
 }
@@ -140,7 +140,7 @@ $data_sets = [
     'l2_writes_sent' => 'DERIVE',
 ];
 
-foreach($data_sets as $ds => $type) {
+foreach ($data_sets as $ds => $type) {
     $rrd_def->addDataset($ds, $type, 0);
     $fields[$ds] = $zfs[$ds] ?? null;
 }
