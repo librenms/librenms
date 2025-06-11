@@ -17,19 +17,18 @@ if (isset($vars['vmif'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'In',
         'ds' => 'ibytes',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Out',
         'ds' => 'obytes',
         'invert' => true,
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
 //  require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

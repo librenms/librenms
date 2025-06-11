@@ -17,18 +17,17 @@ if (isset($vars['vmdisk']) && isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Read',
         'ds' => 'rreqs',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Write',
         'ds' => 'wreqs',
         'invert' => true,
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

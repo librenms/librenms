@@ -37,7 +37,6 @@ foreach ($array as $ds => $var) {
     ];
 }
 
-
 $colours = 'mixed';
 $nototal = 1;
 $unit_text = 'Commands';

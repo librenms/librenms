@@ -15,32 +15,31 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Dropped',
         'ds' => 'dropped',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'If Dropped',
         'ds' => 'ifdropped',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Errors',
         'ds' => 'errors',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Dec Inv.',
         'ds' => 'dec_invalid',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Too Many Layers',
         'ds' => 'dec_too_many_layer',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

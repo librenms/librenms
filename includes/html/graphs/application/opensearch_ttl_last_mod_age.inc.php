@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'ttl']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Last Mod Age',
         'ds' => 'ttl_last_mod_age',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

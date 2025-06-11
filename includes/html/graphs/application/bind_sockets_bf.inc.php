@@ -11,27 +11,26 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'sockets']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'UDP/IPv4',
         'ds' => 'ui4sbf',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'UDP/IPv6',
         'ds' => 'ui6sbf',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'TCP/IPv4',
         'ds' => 'ti4sbf',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'TCP/IPv6',
         'ds' => 'ti6sbf',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

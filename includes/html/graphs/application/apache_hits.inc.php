@@ -6,7 +6,6 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app->app_id]);
 
-
 $ds = 'access';
 
 $colour_area = 'B0C4DE';

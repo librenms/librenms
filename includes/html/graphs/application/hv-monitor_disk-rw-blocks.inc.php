@@ -15,18 +15,17 @@ if (isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Read',
         'ds' => 'inblk',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Write',
         'ds' => 'oublk',
         'invert' => true,
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -15,32 +15,31 @@ if (isset($vars['slug'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Max',
         'ds' => 'size_max',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mean',
         'ds' => 'size_mean',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Median',
         'ds' => 'size_median',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Mode',
         'ds' => 'size_mode',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Min',
         'ds' => 'size_min',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

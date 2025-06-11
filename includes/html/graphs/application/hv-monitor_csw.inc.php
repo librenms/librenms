@@ -15,17 +15,16 @@ if (isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Involuntary',
         'ds' => 'nivcsw',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Voluntary',
         'ds' => 'nvcsw',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

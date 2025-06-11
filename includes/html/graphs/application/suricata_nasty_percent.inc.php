@@ -15,22 +15,21 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Dropped',
         'ds' => 'drop_percent',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'If Dropped',
         'ds' => 'ifdrop_percent',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Error',
         'ds' => 'error_percent',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

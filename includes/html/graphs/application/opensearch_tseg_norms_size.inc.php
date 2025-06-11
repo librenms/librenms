@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tseg']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Seg. Norms Size',
         'ds' => 'tseg_norms_size',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

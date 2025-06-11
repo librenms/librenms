@@ -15,17 +15,16 @@ if (isset($vars['vm'])) {
 }
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Allocated',
         'ds' => 'mem_alloc',
     ],
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'RSS',
         'ds' => 'rss',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

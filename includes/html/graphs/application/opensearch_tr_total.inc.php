@@ -11,12 +11,11 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tr']);
 
 $rrd_list = [
-[
+    [
         'filename' => $rrd_filename,
         'descr' => 'Refreshes',
         'ds' => 'tr_total',
     ],
 ];
-
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
