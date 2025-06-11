@@ -3177,7 +3177,7 @@
                     "hrDeviceDescr": "",
                     "hrDeviceType": "hrDeviceProcessor",
                     "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "",
+                    "hrDeviceStatus": "unknown",
                     "hrProcessorLoad": 15
                 },
                 {
@@ -3289,7 +3289,7 @@
                     "hrDeviceDescr": "Guessing that there's a floating point co-processor",
                     "hrDeviceType": "hrDeviceCoprocessor",
                     "hrDeviceErrors": 0,
-                    "hrDeviceStatus": "",
+                    "hrDeviceStatus": "unknown",
                     "hrProcessorLoad": null
                 }
             ]
