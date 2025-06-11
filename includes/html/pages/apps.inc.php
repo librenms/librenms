@@ -4,7 +4,6 @@ $pagetitle[] = 'Apps';
 
 $selected_app = $vars['app'] ?? null;
 
-
 $graphs['apache'] = [
     'bits',
     'hits',
