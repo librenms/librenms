@@ -15,7 +15,6 @@ $array = [
 ];
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];
@@ -23,8 +22,6 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[$i]['colour'] = \LibreNMS\Config::get("graph_colours.$colours.$i");
         $i++;
     }
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

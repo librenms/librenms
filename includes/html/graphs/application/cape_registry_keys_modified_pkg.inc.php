@@ -16,8 +16,8 @@ $rrd_list = [];
 $packages_int = 0;
 foreach ($packages as $index => $package) {
     $label = preg_filter('/^pkg\-reg\_keys\_mod\_\_\_\-\_\_\_\-/', '', $package);
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $package]);
-    $rrd_list[] = [
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $package]),
+[
         'filename' => $rrd_filename,
         'descr' => $label,
         'ds' => 'reg_keys_mod',
@@ -27,7 +27,7 @@ foreach ($packages as $index => $package) {
 }
 
 if (count($rrd_list)) {
-    d_echo('No relevant package RRDs found');
+    throw new \LibreNMS\Exceptions\RrdGraphException('No relevant package RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

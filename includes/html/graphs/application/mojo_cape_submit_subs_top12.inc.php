@@ -16,8 +16,8 @@ $slugs = array_slice(array_keys($slugs_all), 0, 12);
 
 $rrd_list = [];
 foreach ($slugs as $index => $slug) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'slugs___-___' . $slug]);
-    $rrd_list[] = [
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'slugs___-___' . $slug]),
+[
         'filename' => $rrd_filename,
         'descr' => $slug,
         'ds' => 'sub_count',

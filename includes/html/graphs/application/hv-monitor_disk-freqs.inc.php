@@ -15,13 +15,8 @@ if (isset($vars['vmdisk']) && isset($vars['vm'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
     $descr = 'Flushes';
     $ds = 'freqs';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+
 
 require 'includes/html/graphs/generic_stats.inc.php';

@@ -16,45 +16,43 @@ if (isset($vars['package'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'running_processes']);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
+$rrd_list = [
+[
         'filename' => $rrd_filename,
         'descr' => 'Min',
         'ds' => 's0running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Max',
         'ds' => 's1running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Mean',
         'ds' => 's3running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Median',
         'ds' => 's4running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Mode',
         'ds' => 's5running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'StdDev',
         'ds' => 's7running_processes',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'StdDevP',
         'ds' => 's9running_processes',
-    ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+    ],
+];
+
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

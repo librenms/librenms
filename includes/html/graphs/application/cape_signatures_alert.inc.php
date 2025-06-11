@@ -24,34 +24,34 @@ if (isset($vars['package'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'signatures_alert']);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
+$rrd_list = [
+[
         'filename' => $rrd_filename,
         'descr' => 'Min',
         'ds' => 's0signatures_alert',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Max',
         'ds' => 's1signatures_alert',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Mean',
         'ds' => 's3signatures_alert',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Median',
         'ds' => 's4signatures_alert',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Mode',
         'ds' => 's5signatures_alert',
+    ],
     ];
-    if ($vars['stddev'] == 'on') {
+    if (isset($vars['stddev']) && $vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr' => 'StdDev',
@@ -63,8 +63,5 @@ if (Rrd::checkRrdExists($rrd_filename)) {
             'ds' => 's9signatures_alert',
         ];
     }
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

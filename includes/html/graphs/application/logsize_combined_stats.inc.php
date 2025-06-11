@@ -18,23 +18,23 @@ if (Rrd::checkRrdExists($filename)) {
         'filename' => $filename,
         'descr' => 'Max Size',
         'ds' => 'max_size',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $filename,
         'descr' => 'Mean Size',
         'ds' => 'mean_size',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $filename,
         'descr' => 'Median Size',
         'ds' => 'median_size',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $filename,
         'descr' => 'Mode Size',
         'ds' => 'mode_size',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $filename,
         'descr' => 'Min Size',
         'ds' => 'min_size',
