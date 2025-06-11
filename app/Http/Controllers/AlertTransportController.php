@@ -33,7 +33,7 @@ class AlertTransportController extends Controller
             $result = basename($e->getFile(), '.php') . ':' . $e->getLine() . ' ' . $e->getMessage();
 
             // if non-fatal error, return ok
-            if ($e instanceof \ErrorException && ! Exceptions::isFatalError($e))  {
+            if ($e instanceof \ErrorException && ! Exceptions::isFatalError($e)) {
                 return response()->json([
                     'status' => 'ok',
                     'message' => strip_tags($result),
