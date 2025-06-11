@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alerting\QueryBuilderParser;
-
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     exit('ERROR: You need to be admin');
