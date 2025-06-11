@@ -18,8 +18,10 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$descr_len = $descr_len ?? 12;
-$unitlen = $unitlen ?? 0;
+$descr_len ??= 12;
+$unitlen ??= 0;
+$units ??= '';
+$unit_text ??= '';
 $rrd_optionsb = '';
 
 if ($nototal) {
