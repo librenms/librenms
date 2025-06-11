@@ -269,7 +269,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
     if (isset($disk['exit'])) {
         $metrics['disk_' . $disk_id . '_exit'] = $disk['exit'];
     }
-
 }
 
 // log any disks with failed tests found
