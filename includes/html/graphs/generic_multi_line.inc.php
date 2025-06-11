@@ -32,7 +32,7 @@ $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_te
 $i = 0;
 $iter = 0;
 
-foreach ($rrd_list as $rrd) {
+foreach ($rrd_list ?? [] as $rrd) {
     // get the color for this data set
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
