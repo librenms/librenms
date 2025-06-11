@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use Illuminate\Support\Str;
-
 class Compare
 {
     /**
@@ -35,61 +33,44 @@ class Compare
      * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
      * contains, starts, ends: $a haystack, $b needle(s)
      * regex: $a subject, $b regex
-     *
-     * @param  mixed  $a
-     * @param  mixed  $b
-     * @param  string  $comparison  =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
-     * @return bool
      */
-    public static function values($a, $b, $comparison = '=')
+    public static function values(int|bool|float|string|null $a, int|bool|float|string|array|null $b, string $comparison = '='): bool
     {
+        $result = match ($comparison) {
+            '==' => $a === $b,
+            '!==' => $a !== $b,
+            'contains' => str_contains((string) $a, $b),
+            'not_contains' => ! str_contains((string) $a, $b),
+            'starts' => str_starts_with((string) $a, $b),
+            'not_starts' => ! str_starts_with((string) $a, $b),
+            'ends' => str_ends_with((string) $a, $b),
+            'not_ends' => ! str_ends_with((string) $a, $b),
+            'regex' => (bool) preg_match($b, (string) $a),
+            'not_regex' => ! preg_match($b, (string) $a),
+            'in_array' => in_array($a, $b),
+            'not_in_array' => ! in_array($a, $b),
+            'exists' => isset($a) == $b,
+            default => null,
+        };
+
+        if ($result !== null) {
+            return $result;
+        }
+
         // handle PHP8 change to implicit casting
         if (is_numeric($a) || is_numeric($b)) {
             $a = Number::cast($a);
             $b = is_array($b) ? $b : Number::cast($b);
         }
 
-        switch ($comparison) {
-            case '=':
-                return $a == $b;
-            case '!=':
-                return $a != $b;
-            case '==':
-                return $a === $b;
-            case '!==':
-                return $a !== $b;
-            case '>=':
-                return $a >= $b;
-            case '<=':
-                return $a <= $b;
-            case '>':
-                return $a > $b;
-            case '<':
-                return $a < $b;
-            case 'contains':
-                return Str::contains($a, $b);
-            case 'not_contains':
-                return ! Str::contains($a, $b);
-            case 'starts':
-                return Str::startsWith($a, $b);
-            case 'not_starts':
-                return ! Str::startsWith($a, $b);
-            case 'ends':
-                return Str::endsWith($a, $b);
-            case 'not_ends':
-                return ! Str::endsWith($a, $b);
-            case 'regex':
-                return Str::isMatch($b, $a);
-            case 'not_regex':
-                return ! Str::isMatch($b, $a);
-            case 'in_array':
-                return in_array($a, $b);
-            case 'not_in_array':
-                return ! in_array($a, $b);
-            case 'exists':
-                return isset($a) == $b;
-            default:
-                return false;
-        }
+        return match ($comparison) {
+            '=' => $a == $b,
+            '!=' => $a != $b,
+            '>=' => $a >= $b,
+            '<=' => $a <= $b,
+            '>' => $a > $b,
+            '<' => $a < $b,
+            default => false,
+        };
     }
 }
