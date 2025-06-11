@@ -12,35 +12,30 @@ $float_precision = 3;
 
 require 'logsize-common.inc.php';
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($filename)) {
-    $rrd_list[] = [
-        'filename' => $filename,
-        'descr' => 'Max Size',
-        'ds' => 'max_size',
-    ],
-[
-        'filename' => $filename,
-        'descr' => 'Mean Size',
-        'ds' => 'mean_size',
-    ],
-[
-        'filename' => $filename,
-        'descr' => 'Median Size',
-        'ds' => 'median_size',
-    ],
-[
-        'filename' => $filename,
-        'descr' => 'Mode Size',
-        'ds' => 'mode_size',
-    ],
-[
-        'filename' => $filename,
-        'descr' => 'Min Size',
-        'ds' => 'min_size',
-    ];
-} else {
-    d_echo('RRD "' . $filename . '" not found');
-}
+$rrd_list[] = [
+    'filename' => $filename,
+    'descr' => 'Max Size',
+    'ds' => 'max_size',
+];
+$rrd_list[] = [
+    'filename' => $filename,
+    'descr' => 'Mean Size',
+    'ds' => 'mean_size',
+];
+$rrd_list[] = [
+    'filename' => $filename,
+    'descr' => 'Median Size',
+    'ds' => 'median_size',
+];
+$rrd_list[] = [
+    'filename' => $filename,
+    'descr' => 'Mode Size',
+    'ds' => 'mode_size',
+];
+$rrd_list[] = [
+    'filename' => $filename,
+    'descr' => 'Min Size',
+    'ds' => 'min_size',
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
