@@ -625,6 +625,11 @@ systemctl restart snmpd
 ```
 
 ## Cron job
+=== "Ubuntu 24.04"
+    Cron is not installed by default on minimal server installations, install it with 
+    ```
+    apt install cron
+    ```
 
 ```
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
