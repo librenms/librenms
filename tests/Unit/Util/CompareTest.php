@@ -141,11 +141,33 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('Hello World', 'hello', 'contains'));
 
         // Empty string
-        $this->assertTrue(Compare::values('hello', '', 'contains'));
+        $this->assertFalse(Compare::values('hello', '', 'contains'));
 
         // Numeric values converted to string
         $this->assertTrue(Compare::values('12345', 23, 'contains'));
         $this->assertTrue(Compare::values(12345, '23', 'contains'));
+    }
+
+    /**
+     * Test contains comparison with array of needles
+     */
+    public function testContainsComparisonWithArray()
+    {
+        // Array of needles - should return true if ANY match (OR logic)
+        $this->assertTrue(Compare::values('hello world', ['world', 'xyz'], 'contains'));
+        $this->assertTrue(Compare::values('hello world', ['xyz', 'hello'], 'contains'));
+        $this->assertTrue(Compare::values('hello world', ['hello', 'world'], 'contains'));
+        $this->assertFalse(Compare::values('hello world', ['xyz', 'abc'], 'contains'));
+
+        // Mixed types in array
+        $this->assertTrue(Compare::values('12345', [23, 'xyz'], 'contains'));
+        $this->assertTrue(Compare::values('hello123', ['hello', 456], 'contains'));
+
+        // Empty array
+        $this->assertFalse(Compare::values('hello world', [], 'contains'));
+
+        // Array with empty string
+        $this->assertFalse(Compare::values('hello', [''], 'contains'));
     }
 
     /**
@@ -156,7 +178,24 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('hello world', 'world', 'not_contains'));
         $this->assertTrue(Compare::values('hello world', 'xyz', 'not_contains'));
         $this->assertTrue(Compare::values('Hello World', 'hello', 'not_contains')); // case sensitive
-        $this->assertFalse(Compare::values('hello', '', 'not_contains')); // empty string always contained
+        $this->assertTrue(Compare::values('hello', '', 'not_contains'));
+    }
+
+    /**
+     * Test not_contains comparison with array of needles
+     */
+    public function testNotContainsComparisonWithArray()
+    {
+        // not_contains with array - should return true only if NONE match
+        $this->assertFalse(Compare::values('hello world', ['world', 'xyz'], 'not_contains')); // world matches
+        $this->assertFalse(Compare::values('hello world', ['xyz', 'hello'], 'not_contains')); // hello matches
+        $this->assertTrue(Compare::values('hello world', ['xyz', 'abc'], 'not_contains')); // none match
+
+        // Empty array
+        $this->assertTrue(Compare::values('hello world', [], 'not_contains')); // none to match
+
+        // Array with empty string
+        $this->assertTrue(Compare::values('hello', [''], 'not_contains')); // empty string matches
     }
 
     /**
@@ -170,10 +209,27 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('hello world', 'Hello', 'starts')); // case sensitive
 
         // Empty string
-        $this->assertTrue(Compare::values('hello', '', 'starts'));
+        $this->assertFalse(Compare::values('hello', '', 'starts'));
 
         // Full match
         $this->assertTrue(Compare::values('hello', 'hello', 'starts'));
+    }
+
+    /**
+     * Test starts comparison with array of needles
+     */
+    public function testStartsComparisonWithArray()
+    {
+        // Array of prefixes - should return true if ANY match
+        $this->assertTrue(Compare::values('hello world', ['hello', 'world'], 'starts')); // hello matches
+        $this->assertTrue(Compare::values('hello world', ['world', 'hello'], 'starts')); // hello matches
+        $this->assertFalse(Compare::values('hello world', ['world', 'xyz'], 'starts')); // none match
+
+        // Mixed types
+        $this->assertTrue(Compare::values('123hello', [123, 'world'], 'starts'));
+
+        // Empty array
+        $this->assertFalse(Compare::values('hello world', [], 'starts'));
     }
 
     /**
@@ -184,7 +240,20 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('hello world', 'hello', 'not_starts'));
         $this->assertTrue(Compare::values('hello world', 'world', 'not_starts'));
         $this->assertTrue(Compare::values('hello world', 'Hello', 'not_starts')); // case sensitive
-        $this->assertFalse(Compare::values('hello', '', 'not_starts')); // empty string
+        $this->assertTrue(Compare::values('hello', '', 'not_starts')); // empty string
+    }
+
+    /**
+     * Test not_starts comparison with array of needles
+     */
+    public function testNotStartsComparisonWithArray()
+    {
+        // not_starts with array - should return true only if NONE match
+        $this->assertFalse(Compare::values('hello world', ['hello', 'world'], 'not_starts')); // hello matches
+        $this->assertTrue(Compare::values('hello world', ['world', 'xyz'], 'not_starts')); // none match
+
+        // Empty array
+        $this->assertTrue(Compare::values('hello world', [], 'not_starts')); // none to match
     }
 
     /**
@@ -198,10 +267,27 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('hello world', 'World', 'ends')); // case sensitive
 
         // Empty string
-        $this->assertTrue(Compare::values('hello', '', 'ends'));
+        $this->assertFalse(Compare::values('hello', '', 'ends'));
 
         // Full match
         $this->assertTrue(Compare::values('world', 'world', 'ends'));
+    }
+
+    /**
+     * Test ends comparison with array of needles
+     */
+    public function testEndsComparisonWithArray()
+    {
+        // Array of suffixes - should return true if ANY match
+        $this->assertTrue(Compare::values('hello world', ['world', 'hello'], 'ends')); // world matches
+        $this->assertTrue(Compare::values('hello world', ['hello', 'world'], 'ends')); // world matches
+        $this->assertFalse(Compare::values('hello world', ['hello', 'xyz'], 'ends')); // none match
+
+        // Mixed types
+        $this->assertTrue(Compare::values('hello123', ['123', 'world'], 'ends'));
+
+        // Empty array
+        $this->assertFalse(Compare::values('hello world', [], 'ends'));
     }
 
     /**
@@ -212,7 +298,20 @@ class CompareTest extends TestCase
         $this->assertFalse(Compare::values('hello world', 'world', 'not_ends'));
         $this->assertTrue(Compare::values('hello world', 'hello', 'not_ends'));
         $this->assertTrue(Compare::values('hello world', 'World', 'not_ends')); // case sensitive
-        $this->assertFalse(Compare::values('hello', '', 'not_ends')); // empty string
+        $this->assertTrue(Compare::values('hello', '', 'not_ends')); // empty string
+    }
+
+    /**
+     * Test not_ends comparison with array of needles
+     */
+    public function testNotEndsComparisonWithArray()
+    {
+        // not_ends with array - should return true only if NONE match
+        $this->assertFalse(Compare::values('hello world', ['world', 'hello'], 'not_ends')); // world matches
+        $this->assertTrue(Compare::values('hello world', ['hello', 'xyz'], 'not_ends')); // none match
+
+        // Empty array
+        $this->assertTrue(Compare::values('hello world', [], 'not_ends')); // none to match
     }
 
     /**
@@ -234,6 +333,23 @@ class CompareTest extends TestCase
     }
 
     /**
+     * Test regex comparison with array of patterns
+     */
+    public function testRegexComparisonWithArray()
+    {
+        // Array of regex patterns - should return true if ANY match
+        $this->assertTrue(Compare::values('hello123', ['/\d+/', '/^world/'], 'regex')); // first matches
+        $this->assertTrue(Compare::values('hello123', ['/^world/', '/hello/'], 'regex')); // second matches
+        $this->assertFalse(Compare::values('hello123', ['/^world/', '/xyz$/'], 'regex')); // none match
+
+        // Mixed patterns
+        $this->assertTrue(Compare::values('test@example.com', ['/\d+/', '/[\w\.-]+@[\w\.-]+\.\w+/'], 'regex'));
+
+        // Empty array
+        $this->assertFalse(Compare::values('hello world', [], 'regex'));
+    }
+
+    /**
      * Test not_regex comparison
      */
     public function testNotRegexComparison()
@@ -244,24 +360,32 @@ class CompareTest extends TestCase
         $this->assertTrue(Compare::values('World Hello', '/^Hello/', 'not_regex'));
     }
 
-    // FIXME after exceptions are enabled
-//    public function testRegexWithInvalidPatternThrowsException()
-//    {
-//        $this->expectException(ErrorException::class);
-//        Compare::values('test', '/[/', 'regex'); // unclosed bracket
-//    }
-//
-//    public function testRegexWithInvalidDelimiterThrowsException()
-//    {
-//        $this->expectException(ErrorException::class);
-//        Compare::values('test', 'invalid', 'regex'); // no delimiters
-//    }
-//
-//    public function testNotRegexWithInvalidPatternThrowsException()
-//    {
-//        $this->expectException(ErrorException::class);
-//        Compare::values('test', '/[/', 'not_regex');
-//    }
+    /**
+     * Test not_regex comparison with array of patterns
+     */
+    public function testNotRegexComparisonWithArray()
+    {
+        // not_regex with array - should return true only if NONE match
+        $this->assertFalse(Compare::values('hello123', ['/\d+/', '/^world/'], 'not_regex')); // first matches
+        $this->assertTrue(Compare::values('hello', ['/\d+/', '/^world/'], 'not_regex')); // none match
+
+        // Empty array
+        $this->assertTrue(Compare::values('hello world', [], 'not_regex')); // none to match
+    }
+
+    /**
+     * Test regex with invalid patterns
+     */
+    public function testRegexWithInvalidPattern()
+    {
+        // Invalid regex should return false (preg_match returns false on error)
+        $this->assertFalse(Compare::values('test', '/[/', 'regex')); // unclosed bracket
+        $this->assertTrue(Compare::values('test', '/[/', 'not_regex')); // not_regex should be true when regex fails
+
+        // Test invalid delimiter
+        $this->assertFalse(Compare::values('test', 'invalid', 'regex')); // no delimiters
+        $this->assertTrue(Compare::values('test', 'invalid', 'not_regex'));
+    }
 
     /**
      * Test in_array comparison
@@ -376,7 +500,6 @@ class CompareTest extends TestCase
     {
         $array1 = [1, 2, 3, 'other'];
 
-        // Array as second parameter for in_array
         $this->assertTrue(Compare::values(2, $array1, 'in_array'));
         $this->assertFalse(Compare::values(4, $array1, 'in_array'));
         $this->assertTrue(Compare::values('2', $array1, 'in_array')); // type coercion

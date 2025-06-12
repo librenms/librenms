@@ -26,27 +26,29 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
+
 class Compare
 {
     /**
      * Perform comparison of two items based on give comparison method
      * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
-     * contains, starts, ends: $a haystack, $b needle(s)
-     * regex: $a subject, $b regex
+     * contains, starts, ends: $a haystack, $b needle(s) - if $b is array, checks if any needle matches
+     * regex: $a subject, $b regex(es) - if $b is array, checks if any regex matches
      */
     public static function values(int|bool|float|string|null $a, int|bool|float|string|array|null $b, string $comparison = '='): bool
     {
         $result = match ($comparison) {
             '==' => $a === $b,
             '!==' => $a !== $b,
-            'contains' => str_contains((string) $a, $b),
-            'not_contains' => ! str_contains((string) $a, $b),
-            'starts' => str_starts_with((string) $a, $b),
-            'not_starts' => ! str_starts_with((string) $a, $b),
-            'ends' => str_ends_with((string) $a, $b),
-            'not_ends' => ! str_ends_with((string) $a, $b),
-            'regex' => (bool) preg_match($b, (string) $a),
-            'not_regex' => ! preg_match($b, (string) $a),
+            'contains' => Str::contains((string) $a, $b),
+            'not_contains' => ! Str::contains((string) $a, $b),
+            'starts' => Str::startsWith((string) $a, $b),
+            'not_starts' => ! Str::startsWith((string) $a, $b),
+            'ends' => Str::endsWith((string) $a, $b),
+            'not_ends' => ! Str::endsWith((string) $a, $b),
+            'regex' => Str::isMatch($b, (string) $a),
+            'not_regex' => ! Str::isMatch($b, (string) $a),
             'in_array' => in_array($a, $b),
             'not_in_array' => ! in_array($a, $b),
             'exists' => isset($a) == $b,
