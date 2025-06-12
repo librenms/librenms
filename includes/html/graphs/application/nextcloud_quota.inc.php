@@ -13,5 +13,4 @@ if (isset($vars['nextcloud_user'])) {
 $ds = 'data';
 $filename = $rrd_filename;
 
-
 require 'includes/html/graphs/generic_stats.inc.php';
