@@ -162,7 +162,7 @@ if (Config::get('enable_vrfs')) {
             $vrf_name = $vr['vRtrName'] ?? null;
             $vrf_desc = $vr['vRtrDescription'] ?? null;
             $vrf_as = $vr['vRtrAS4Byte'] ?? null;
-            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? null;
+            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? '';
             // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
             // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
@@ -170,7 +170,7 @@ if (Config::get('enable_vrfs')) {
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
             // FIXME Hardcoded to Type 0
             $vrf_rd = str_replace(' ', '', $vrf_rd);
-            if ($vrf_rd != '000000000000') {
+            if (! empty($vrf_rd) && $vrf_rd != '000000000000') {
                 $vrf_rd_1 = substr($vrf_rd, 4, 4);
                 $vrf_rd_2 = substr($vrf_rd, 8);
                 $vrf_rd = hexdec($vrf_rd_1) . ':' . hexdec($vrf_rd_2);
