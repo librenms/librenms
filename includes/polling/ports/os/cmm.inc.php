@@ -42,7 +42,7 @@ $required = [
 ];
 
 $cmm_ports = [];
-foreach ($cmm_stats as $index => $cmm_stat) {
+foreach ($cmm_stats as $cmm_stat) {
     $cmm_port = array_map(function ($IfxStat) use ($cmm_stat) {
         return $cmm_stat[$IfxStat];
     }, $required);
