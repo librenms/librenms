@@ -55,10 +55,10 @@ foreach ($cmm_stats as $index => $cmm_stat) {
         $cmm_port['ifDuplex'] = ($cmm_stat['duplexStatus'] == 1 ? 'fullDuplex' : 'halfDuplex');
     }
     if (isset($cmm_stat['linkSpeed'])) {
-        $cmm_port['ifDuplex'] = ($cmm_stat['linkSpeed'] == 1 ? '100000000' : '10000000');
+        $cmm_port['ifSpeed'] = ($cmm_stat['linkSpeed'] == 1 ? '100000000' : '10000000');
     }
     if (isset($cmm_stat['linkStatus'])) {
-        $cmm_port['ifDuplex'] = ($cmm_stat['linkStatus'] == 1 ? 'up' : 'down');
+        $cmm_port['ifOperStatus'] = ($cmm_stat['linkStatus'] == 1 ? 'up' : 'down');
     }
 
     $cmm_ports[] = $cmm_port;
