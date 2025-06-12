@@ -8468,7 +8468,7 @@
                     "designatedRoot": "000000000000",
                     "designatedCost": 24000,
                     "designatedBridge": "000000000000",
-                    "designatedPort": 10,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 54
                 }

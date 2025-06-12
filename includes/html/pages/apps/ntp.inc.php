@@ -23,10 +23,6 @@ $view_options = [
     'all'       => 'All',
     'error'     => 'Error',
 ];
-if (! $vars['view']) {
-    $vars['view'] = 'all';
-}
-
 $graph_options = [
     'none'          => 'No Graphs',
     'stratum'       => 'Stratum',
@@ -34,9 +30,9 @@ $graph_options = [
     'delay'         => 'Delay',
     'dispersion'    => 'Dispersion',
 ];
-if (! $vars['graph']) {
-    $vars['graph'] = 'none';
-}
+
+$vars['view'] ??= 'all';
+$vars['graph'] ??= 'none';
 
 echo '<span style="font-weight: bold;">NTP Peers</span> &#187; ';
 

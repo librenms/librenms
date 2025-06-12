@@ -1,6 +1,9 @@
 <?php
 
 $pagetitle[] = 'Apps';
+
+$selected_app = $vars['app'] ?? null;
+
 $graphs['apache'] = [
     'bits',
     'hits',
@@ -635,10 +638,11 @@ echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 unset($sep);
 $link_array = [
     'page' => 'device',
-    'device' => $device['device_id'],
+    'device' => $device['device_id'] ?? 0,
     'tab' => 'apps',
 ];
 
+$sep = '';
 $apps = LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
     $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
@@ -649,20 +653,20 @@ foreach ($apps as $app) {
     }
 
     echo $sep;
-    if ($vars['app'] == $app->app_type) {
+    if ($selected_app == $app->app_type) {
         echo "<span class='pagemenu-selected'>";
     }
     echo $app_state_info;
     echo generate_link(htmlentities($app->displayName()), ['page' => 'apps', 'app' => $app->app_type]);
-    if ($vars['app'] == $app->app_type) {
+    if ($selected_app == $app->app_type) {
         echo '</span>';
     }
     $sep = ' | ';
 }
 echo '</div>';
 echo '<div class="panel-body">';
-if (isset($vars['app'])) {
-    $app = basename($vars['app']);
+if (isset($selected_app)) {
+    $app = basename($selected_app);
     if (is_file("includes/html/pages/apps/$app.inc.php")) {
         include "includes/html/pages/apps/$app.inc.php";
     } else {

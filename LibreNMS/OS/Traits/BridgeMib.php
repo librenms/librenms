@@ -31,6 +31,7 @@ use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 trait BridgeMib
@@ -209,6 +210,10 @@ trait BridgeMib
 
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
+
+        if (! is_numeric($dp) && ! StringHelpers::isHex($dp)) {
+            return 0;
+        }
 
         return (int) hexdec($dp);
     }

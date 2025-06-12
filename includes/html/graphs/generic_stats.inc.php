@@ -17,6 +17,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$filename ??= $rrd_filename; // use $rrd_filename
 
 if (! isset($munge)) {
     $munge = false;
