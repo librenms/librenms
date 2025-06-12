@@ -18,28 +18,28 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Spin Retry Count',
         'ds' => 'id10',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Runtime Bad Block',
         'ds' => 'id183',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'End-to-End Error',
         'ds' => 'id184',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Reall Evnt Cnt',
         'ds' => 'id196',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Crnt Pnd Sct Cnt',
         'ds' => 'id197',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'UDMA CRC Err Count',
         'ds' => 'id199',
