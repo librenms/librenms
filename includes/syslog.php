@@ -130,7 +130,7 @@ function process_syslog($entry, $update)
         } elseif ($os == 'zywall') {
             // Zwwall sends messages without all the fields, so the offset is wrong
             $msg = preg_replace('/" /', '";', stripslashes($entry['program'] . ':' . $entry['msg']));
-            $msg = str_getcsv($msg, ';', escape: "\\");
+            $msg = str_getcsv($msg, ';', escape: '\\');
             $entry['program'] = null;
             foreach ($msg as $param) {
                 [$var, $val] = explode('=', $param);
