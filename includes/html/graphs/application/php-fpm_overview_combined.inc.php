@@ -79,8 +79,6 @@ if (Rrd::checkRrdExists($filename)) {
                 'ds' => 'sr',
             ],
         ];
-    } else {
-        echo 'file missing: ' . $filename;
     }
 }
 

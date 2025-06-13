@@ -24,23 +24,23 @@ if (Rrd::checkRrdExists($decoder__event__icmpv4__ipv4_trunc_pkt_rrd_filename)) {
         'filename' => $decoder__event__icmpv4__ipv4_trunc_pkt_rrd_filename,
         'descr' => 'IPv4 Truunc Pkt',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__icmpv4__ipv4_unknown_ver_rrd_filename,
         'descr' => 'IPv4 Unknown Ver',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__icmpv4__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__icmpv4__unknown_code_rrd_filename,
         'descr' => 'Unknown Code',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__icmpv4__unknown_type_rrd_filename,
         'descr' => 'Unknown Type',
         'ds' => 'data',

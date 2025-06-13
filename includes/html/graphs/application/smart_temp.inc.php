@@ -18,8 +18,8 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Temperature_Celsius',
         'ds' => 'id194',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Airflow_Temperature_Cel',
         'ds' => 'id190',

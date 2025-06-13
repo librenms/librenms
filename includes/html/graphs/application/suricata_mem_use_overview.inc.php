@@ -56,23 +56,23 @@ if (! isset($rrd_file[0]) && Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Flow',
         'ds' => 'f_memuse',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'FTP',
         'ds' => 'ftp_memuse',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'HTTP',
         'ds' => 'http_memuse',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'TCP',
         'ds' => 'tcp_memuse',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'TCP Reass',
         'ds' => 'tcp_reass_memuse',

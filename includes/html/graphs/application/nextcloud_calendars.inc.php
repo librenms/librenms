@@ -12,8 +12,6 @@ if (isset($vars['nextcloud_user'])) {
 if (Rrd::checkRrdExists($uptime_rrd_filename)) {
     $ds = 'data';
     $filename = $rrd_filename;
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+
 
 require 'includes/html/graphs/generic_stats.inc.php';

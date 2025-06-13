@@ -18,8 +18,8 @@ if (Rrd::checkRrdExists($decoder__event__vntag__header_too_small_rrd_filename)) 
         'filename' => $decoder__event__vntag__header_too_small_rrd_filename,
         'descr' => 'Header Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__vntag__unknown_type_rrd_filename,
         'descr' => 'Unknown Type',
         'ds' => 'data',

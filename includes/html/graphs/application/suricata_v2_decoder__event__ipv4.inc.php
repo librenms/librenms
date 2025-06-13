@@ -44,73 +44,73 @@ if (Rrd::checkRrdExists($decoder__event__ipv4__frag_ignored_rrd_filename)) {
         'filename' => $decoder__event__ipv4__frag_ignored_rrd_filename,
         'descr' => 'Frag Ignored',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__frag_overlap_rrd_filename,
         'descr' => 'Frag Overlap',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__frag_pkt_too_large_rrd_filename,
         'descr' => 'Frag Pkt Too Lrg',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__hlen_too_small_rrd_filename,
         'descr' => 'Hlen Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__icmpv6_rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__iplen_smaller_than_hlen_rrd_filename,
         'descr' => 'IPlen < Hlen',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_duplicate_rrd_filename,
         'descr' => 'Opt Dup',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_eol_required_rrd_filename,
         'descr' => 'Opt EOL Required',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_invalid_rrd_filename,
         'descr' => 'Opt Invalid',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_invalid_len_rrd_filename,
         'descr' => 'Opt Invalid Len',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_malformed_rrd_filename,
         'descr' => 'Opt Malformed',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_pad_required_rrd_filename,
         'descr' => 'Opt Pad Required',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__opt_unknown_rrd_filename,
         'descr' => 'Opt Unkown',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ipv4__trunc_pkt_rrd_filename,
         'descr' => 'Trunc Pkt',
         'ds' => 'data',

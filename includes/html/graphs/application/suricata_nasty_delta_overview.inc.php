@@ -40,18 +40,18 @@ if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Packets',
         'ds' => 'packets',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Dec. Packets',
         'ds' => 'dec_packets',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Dropped',
         'ds' => 'dropped',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'If Dropped',
         'ds' => 'ifdropped',

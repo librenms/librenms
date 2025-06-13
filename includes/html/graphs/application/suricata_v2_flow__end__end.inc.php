@@ -42,64 +42,63 @@ if (Rrd::checkRrdExists($flow__end__tcp_liberal_rrd_filename)) {
         'filename' => $flow__end__tcp_liberal_rrd_filename,
         'descr' => 'TCP Liberal',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__close_wait_rrd_filename,
         'descr' => 'TCP Close Wait',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__closed_rrd_filename,
         'descr' => 'TCP Closed',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__closing_rrd_filename,
         'descr' => 'TCP Closing',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__established_rrd_filename,
         'descr' => 'TCP Established',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__fin_wait1_rrd_filename,
         'descr' => 'TCP Fin Wait1',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__fin_wait2_rrd_filename,
         'descr' => 'TCP Fin Wait2',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__last_ack_rrd_filename,
         'descr' => 'TCP Last Act',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__none_rrd_filename,
         'descr' => 'TCP None',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__syn_recv_rrd_filename,
         'descr' => 'TCP Syn Recv',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__syn_sent_rrd_filename,
         'descr' => 'TCP Syn Sent',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__end__tcp_state__time_wait_rrd_filename,
         'descr' => 'TCP Time Wait',
         'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+    ],
+];
+
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -18,18 +18,18 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Extended',
         'ds' => 'extended',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Short',
         'ds' => 'short',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Selective',
         'ds' => 'selective',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Conveyance',
         'ds' => 'conveyance',

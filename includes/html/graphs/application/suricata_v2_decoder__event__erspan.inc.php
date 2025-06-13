@@ -20,13 +20,13 @@ if (Rrd::checkRrdExists($decoder__event__erspan__header_too_small_rrd_filename))
         'filename' => $decoder__event__erspan__header_too_small_rrd_filename,
         'descr' => 'Header Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__erspan__too_many_vlan_layers_rrd_filename,
         'descr' => 'Too Many VLAN Layers',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__erspan__unsupported_version_rrd_filename,
         'descr' => 'Unsupported Ver',
         'ds' => 'data',

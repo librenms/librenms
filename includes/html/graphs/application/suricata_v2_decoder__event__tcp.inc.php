@@ -24,28 +24,28 @@ if (Rrd::checkRrdExists($decoder__event__tcp__hlen_too_small_rrd_filename)) {
         'filename' => $decoder__event__tcp__hlen_too_small_rrd_filename,
         'descr' => 'Hlen too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__tcp__invalid_optlen_rrd_filename,
         'descr' => 'Invalid Opt Len',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__tcp__opt_duplicate_rrd_filename,
         'descr' => 'Opt Dup',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__tcp__invalid_optlen_rrd_filename,
         'descr' => 'Invalid Opt Len',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__tcp__opt_invalid_len_rrd_filename,
         'descr' => 'Opt Invalid Len',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__tcp__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',

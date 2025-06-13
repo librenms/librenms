@@ -20,13 +20,13 @@ if (Rrd::checkRrdExists($decoder__event__vlan__header_too_small_rrd_filename)) {
         'filename' => $decoder__event__vlan__header_too_small_rrd_filename,
         'descr' => 'Header Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__vlan__too_many_layers_rrd_filename,
         'descr' => 'Too Many Layers',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__vlan__unknown_type_rrd_filename,
         'descr' => 'Unkown Type',
         'ds' => 'data',

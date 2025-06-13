@@ -18,18 +18,18 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Completed',
         'ds' => 'completed',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Interrupted',
         'ds' => 'interrupted',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Read Failure',
         'ds' => 'readfailure',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'Unknown Failure',
         'ds' => 'unknownfail',

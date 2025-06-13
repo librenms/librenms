@@ -22,18 +22,18 @@ if (Rrd::checkRrdExists($decoder__event__udp__hlen_invalid_rrd_filename)) {
         'filename' => $decoder__event__udp__hlen_invalid_rrd_filename,
         'descr' => 'Hlen Invalid',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__udp__hlen_too_small_rrd_filename,
         'descr' => 'Hlen Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__udp__len_invalid_rrd_filename,
         'descr' => 'Len Invalid',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__udp__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',

@@ -258,18 +258,18 @@ if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'f_icmpv4',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'f_icmpv6',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'TCP',
         'ds' => 'f_tcp',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $rrd_filename,
         'descr' => 'UDP',
         'ds' => 'f_udp',

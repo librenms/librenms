@@ -26,28 +26,28 @@ if (Rrd::checkRrdExists($decoder__event__ppp__ip4_pkt_too_small_rrd_filename)) {
         'filename' => $decoder__event__ppp__ip4_pkt_too_small_rrd_filename,
         'descr' => 'IPv4 Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ppp__ip6_pkt_too_small_rrd_filename,
         'descr' => 'IPv6 Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ppp__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ppp__unsup_proto_rrd_filename,
         'descr' => 'Unsup Proto',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ppp__vju_pkt_too_small_rrd_filename,
         'descr' => 'Vju Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__ppp__wrong_type_rrd_filename,
         'descr' => 'Wrong Type',
         'ds' => 'data',
