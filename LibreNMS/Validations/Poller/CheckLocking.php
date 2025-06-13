@@ -35,7 +35,8 @@ class CheckLocking implements \LibreNMS\Interfaces\Validation
      */
     public function validate(): ValidationResult
     {
-        set_error_handler(function () {}); // hide connection errors, we will send our own message
+        set_error_handler(function () {
+        }); // hide connection errors, we will send our own message
 
         try {
             $lock = \Cache::lock('dist_test_validation', 5);
