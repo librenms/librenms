@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\StringHelpers;
 
 /**
  * Parse cli discovery or poller modules and set config for this run
@@ -505,7 +506,7 @@ function hytera_h2f($number, $nd)
     return number_format($floatfinal, $nd, '.', '');
 }
 
-function q_bridge_bits2indices($hex_data)
+function q_bridge_bits2indices($hex_data): array
 {
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
@@ -515,6 +516,10 @@ function q_bridge_bits2indices($hex_data)
     // we need an even number of digits for hex2bin
     if (strlen($hex_data) % 2 === 1) {
         $hex_data = '0' . $hex_data;
+    }
+
+    if (! StringHelpers::isHex($hex_data)) {
+        return [];
     }
 
     $value = hex2bin($hex_data);

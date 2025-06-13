@@ -11,6 +11,9 @@
  * the source code distribution for details.
  */
 
+$stype = '';
+$device_id = (int) ($device['device_id'] ?? 0);
+
 if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
     $dir = \LibreNMS\Config::get('nagios_plugins');
@@ -39,7 +42,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <?php echo csrf_field() ?>
                         <input type="hidden" name="service_id" id="service_id" value="">
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
-                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id ?>">
                         <input type="hidden" name="type" id="type" value="create-service">
                         <div class="form-group">
                             <div class="col-sm-12">

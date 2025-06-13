@@ -75943,7 +75943,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 11,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1001
                 },
@@ -75957,7 +75957,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 12,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1002
                 },
@@ -75971,7 +75971,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 14,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1004
                 },
