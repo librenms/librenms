@@ -8,6 +8,8 @@ require 'includes/html/graphs/common.inc.php';
 $multiplier ??= null;
 $divider ??= null;
 $dostack ??= null;
+$printtotal ??= 0;
+$total_units ??= '';
 
 if ($width > '500') {
     $descr_len = $bigdescrlen;
