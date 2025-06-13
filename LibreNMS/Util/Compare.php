@@ -39,8 +39,6 @@ class Compare
     public static function values(int|bool|float|string|null $a, int|bool|float|string|array|null $b, string $comparison = '='): bool
     {
         $result = match ($comparison) {
-            '==' => $a === $b,
-            '!==' => $a !== $b,
             'contains' => Str::contains((string) $a, $b),
             'not_contains' => ! Str::contains((string) $a, $b),
             'starts' => Str::startsWith((string) $a, $b),
@@ -54,7 +52,6 @@ class Compare
         };
 
         if ($result !== null) {
-            dump(json_encode($a) . " $comparison " . json_encode($b) . ' = ' . json_encode($result));
             return $result;
         }
 
@@ -63,7 +60,10 @@ class Compare
             $a = Number::cast($a);
             $b = is_array($b) ? $b : Number::cast($b);
         }
-        $result = match ($comparison) {
+
+        return match ($comparison) {
+            '==' => $a === $b,
+            '!==' => $a !== $b,
             '=' => $a == $b,
             '!=' => $a != $b,
             '>=' => $a >= $b,
@@ -74,7 +74,5 @@ class Compare
             'not_in_array' => !in_array($a, $b),
             default => false,
         };
-        dump(json_encode($a) . " $comparison " . json_encode($b) . ' = ' . json_encode($result));
-        return $result;
     }
 }
