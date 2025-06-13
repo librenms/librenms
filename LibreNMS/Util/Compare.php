@@ -49,13 +49,12 @@ class Compare
             'not_ends' => ! Str::endsWith((string) $a, $b),
             'regex' => Str::isMatch($b, (string) $a),
             'not_regex' => ! Str::isMatch($b, (string) $a),
-            'in_array' => in_array($a, $b),
-            'not_in_array' => ! in_array($a, $b),
             'exists' => isset($a) == $b,
             default => null,
         };
 
         if ($result !== null) {
+            dump(json_encode($a) . " $comparison " . json_encode($b) . ' = ' . json_encode($result));
             return $result;
         }
 
@@ -64,15 +63,18 @@ class Compare
             $a = Number::cast($a);
             $b = is_array($b) ? $b : Number::cast($b);
         }
-
-        return match ($comparison) {
+        $result = match ($comparison) {
             '=' => $a == $b,
             '!=' => $a != $b,
             '>=' => $a >= $b,
             '<=' => $a <= $b,
             '>' => $a > $b,
             '<' => $a < $b,
+            'in_array' => in_array($a, $b),
+            'not_in_array' => !in_array($a, $b),
             default => false,
         };
+        dump(json_encode($a) . " $comparison " . json_encode($b) . ' = ' . json_encode($result));
+        return $result;
     }
 }
