@@ -152,7 +152,7 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($device_id) . '\',
+                device_id: \'' . htmlspecialchars($device_id ?: '') . '\',
                 state: \'' . htmlspecialchars($_POST['state']) . '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };
