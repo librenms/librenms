@@ -71,7 +71,7 @@ class Compare
             '>' => $a > $b,
             '<' => $a < $b,
             'in_array' => in_array($a, $b),
-            'not_in_array' => !in_array($a, $b),
+            'not_in_array' => ! in_array($a, $b),
             default => false,
         };
     }
