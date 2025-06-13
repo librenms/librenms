@@ -68,5 +68,4 @@ foreach ($sensors as $index => $sensor) {
     $rrd_options .= " GPRINT:$output_def$sensor_id:LAST:'$num$unit'";
     $rrd_options .= " GPRINT:$output_def$sensor_id:MIN:'$num$unit'";
     $rrd_options .= " GPRINT:$output_def$sensor_id:MAX:'$num$unit'\\l ";
-    $iter++;
 }//end foreach
