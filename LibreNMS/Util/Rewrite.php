@@ -145,10 +145,10 @@ class Rewrite
      * @param  bool  $short
      * @return string
      */
-    public static function ciscoHardware(&$device, $short = false)
+    public static function ciscoHardware(&$device, bool $short = false): string
     {
         if ($device['os'] == 'ios') {
-            if ($device['hardware']) {
+            if (! empty($device['hardware'])) {
                 if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
                     if (! $short) {
                         $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
@@ -181,7 +181,7 @@ class Rewrite
             }
         }
 
-        return $device['hardware'];
+        return $device['hardware'] ?? '';
     }
 
     public static function location($location)
