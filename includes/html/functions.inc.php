@@ -647,7 +647,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         }
         $details .= implode(', ', $details_a);
 
-        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name'] ?? '') . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -697,11 +697,12 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-        if ($tmp_alerts['error'] == '') {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
-        } else {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
+        $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'];
+        if (! empty($tmp_alerts['error'])) {
+            $fault_detail .= ' - ' . $tmp_alerts['error'];
         }
+        $fault_detail .= ';&nbsp;';
+
         $fallback = false;
     }
 
