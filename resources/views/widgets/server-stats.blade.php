@@ -17,7 +17,7 @@
             class="gauge-{{ $id }} gauge-container"
             data-value="{{ $mem->used}}"
             data-max="{{ $mem->total}}"
-            data-label="Mbytes"
+            data-label="{{ $unit }}"
         ></div>
     </div>
 @endforeach
@@ -30,7 +30,7 @@
             class="gauge-{{ $id }} gauge-container"
             data-value="{{ $disk->used}}"
             data-max="{{ $disk->total}}"
-            data-label="Mbytes"
+            data-label="{{ $unit }}"
         ></div>
     </div>
 @endforeach
