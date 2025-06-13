@@ -12,7 +12,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo "<span style='font-weight: bold;'>Config</span> &#187; ";
 
-        if (! $vars['rev']) {
+        if (empty($vars['rev'])) {
             echo '<span class="pagemenu-selected">';
             echo generate_link('Latest', ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig']);
             echo '</span>';
@@ -284,7 +284,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         } else {
                             echo 'selected>*';
                         }
-                    } elseif ($previous_config['oid'] == $version['oid']) {
+                    } elseif (isset($previous_config['oid']) && $previous_config['oid'] == $version['oid']) {
                         echo '>&nbsp;-';
                     } else {
                         echo '>&nbsp;&nbsp;';
