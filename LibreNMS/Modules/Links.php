@@ -190,9 +190,11 @@ class Links implements Module
                     $data['lldpRemIndex'] = $lldpRemIndex;
                     $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
-                    // Fix devices returning lldpRemPortId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace(['-', ' '], ':', $data['lldpRemPortId']))) {
-                        $data['lldpRemPortId'] = StringHelpers::hexToAscii($data['lldpRemPortId'], ':');
+                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName') {
+                        $tmpPortId = str_replace([':', '-', ' '], '', $data['lldpRemPortId']);
+                        if (StringHelpers::isHex($tmpPortId)) {
+                            $data['lldpRemPortId'] = StringHelpers::hexToAscii($tmpPortId);
+                        }
                     }
 
                     // Fix devices returning lldpRemChassisId in HEX (Panos for instances does it)
