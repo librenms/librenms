@@ -30610,22 +30610,6 @@
             "ports_vlans": [
                 {
                     "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 47,
                     "priority": 0,
                     "state": "unknown",
@@ -30715,6 +30699,46 @@
                 {
                     "vlan": 1,
                     "baseport": 456,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 534,
+                    "baseport": 3,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 534,
+                    "baseport": 4,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 534,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 534,
+                    "baseport": 115,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 534,
+                    "baseport": 116,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,

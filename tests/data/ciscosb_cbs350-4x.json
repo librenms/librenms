@@ -14018,14 +14018,6 @@
                 },
                 {
                     "vlan": 1,
-                    "baseport": 25,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
                     "baseport": 49,
                     "priority": 0,
                     "state": "unknown",
@@ -14273,14 +14265,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 2,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3,
                     "baseport": 7,
                     "priority": 0,
@@ -14327,14 +14311,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 4,
@@ -14431,14 +14407,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 4,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
