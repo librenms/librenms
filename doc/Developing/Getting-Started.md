@@ -60,11 +60,12 @@ DB_TEST_SOCKET=""        # unix socket path
 ### Polling debug output
 
 You can see detailed info by running your polling code in debug
-mode by adding a `-d` flag.
+mode by adding a `-vv` which tries to hide sensitive data `-vvv`
+is full debug output.
 
 ```bash
-./discovery.php -d -h HOSTNAME
-lnms device:poll HOSTNAME -vv
+lnms device:discover -vv HOSTNAME
+lnms device:poll -vv HOSTNAME
 ```
 
 ### Inspecting variables
