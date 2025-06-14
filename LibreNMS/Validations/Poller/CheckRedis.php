@@ -63,12 +63,16 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
 
     private function redisIsAvailable(): bool
     {
+        set_error_handler(null); // hide connection errors, we will send our own message
+
         try {
             Redis::command('ping');
 
             return true;
         } catch (\Exception $e) {
             return false;
+        } finally {
+            restore_error_handler();
         }
     }
 }
