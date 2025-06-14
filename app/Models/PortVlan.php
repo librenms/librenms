@@ -2,11 +2,24 @@
 
 namespace App\Models;
 
-class PortVlan extends PortRelatedModel
+use LibreNMS\Interfaces\Models\Keyable;
+
+class PortVlan extends PortRelatedModel implements Keyable
 {
     protected $table = 'ports_vlans';
     protected $primaryKey = 'port_vlan_id';
     public $timestamps = false;
+    protected $fillable = [
+        'port_vlan_id',
+        'device_id',
+        'port_id',
+        'vlan',
+        'baseport',
+        'priority',
+        'state',
+        'cost',
+        'untagged',
+    ];
 
     public function getUntaggedAttribute($value)
     {
@@ -17,5 +30,10 @@ class PortVlan extends PortRelatedModel
         }
 
         return $value;
+    }
+
+    public function getCompositeKey()
+    {
+        return $this->port_id . $this->vlan;
     }
 }

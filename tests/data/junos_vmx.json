@@ -12929,13 +12929,6 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 0,
-                    "vlan_domain": 1,
-                    "vlan_name": "____juniper_private1____",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Backend",
