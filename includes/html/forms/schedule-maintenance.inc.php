@@ -35,7 +35,7 @@ if ($sub_type == 'new-maintenance') {
 
     $title = $_POST['title'];
     $notes = $_POST['notes'];
-    $recurring = isset($_POST['recurring']) ? 1 : 0;
+    $recurring = empty($_POST['recurring']) ? 0 : 1;
     $start_recurring_dt = $_POST['start_recurring_dt'];
     $end_recurring_dt = $_POST['end_recurring_dt'];
     $start_recurring_hr = $_POST['start_recurring_hr'];
