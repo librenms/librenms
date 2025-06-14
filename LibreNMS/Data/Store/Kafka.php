@@ -75,10 +75,11 @@ class Kafka extends BaseDatastore
         // Change ACK
         $conf->set(
             'request.required.acks',
-            Config::get(
-                'kafka.request.required.acks',
-                Config::get('kafka.idempotence', false) ? 'all' : '1'
-            )
+            // If idempotence is enabled, set to 'all' to ensure all messages are acknowledged
+            // Otherwise, use the configured value or default to '1'
+            // '1' means the leader will acknowledge the message, 'all' means all replicas must acknowledge
+            Config::get('kafka.idempotence', false) ? 'all' :
+                (Config::get('kafka.request.required.acks', "-1"))
         );
 
         // check if debug for ssl was set and enable it

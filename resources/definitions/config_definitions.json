@@ -4816,8 +4816,12 @@
             "order": 20
         },
         "kafka.request.required.acks": {
-            "default": 1,
-            "type": "integer",
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "Dont wait for ack",
+                "all": "Block until ack from all replicas"
+            },
             "group": "poller",
             "section": "kafka",
             "order": 21
