@@ -28,15 +28,11 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
-use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Transceiver;
-use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -50,6 +46,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
@@ -58,12 +55,11 @@ use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Routeros extends OS implements
-    BasicVlanDiscovery,
     OSPolling,
-    PortVlanDiscovery,
     QosDiscovery,
     QosPolling,
     TransceiverDiscovery,
+    VlanDiscovery,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -674,15 +670,18 @@ class Routeros extends OS implements
         });
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans($dot1dBasePortIfIndex): array
     {
-        $ret = new Collection;
+        $vlanData = [];
 
-        $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $scripts = SnmpQuery::walk('MIKROTIK-MIB::mtxrScriptName')->table();
         $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
 
         if (! empty($scriptIndex)) {
-            $data = SnmpQuery::cache()->get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
+            $data = SnmpQuery::get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
+            $ifNames = array_flip($this->getCacheByIndex('ifName', 'IF-MIB'));
             $oldId = 0;
 
             foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
@@ -696,55 +695,25 @@ class Routeros extends OS implements
 
                     if ($oldId != $vlanId) {
                         $oldId = $vlanId;
-                        $ret->push(new Vlan([
+                        $vlanData['basic'][] = [
                             'vlan_vlan' => $vlanId,
                             'vlan_domain' => 1,
                             'vlan_name' => $vlanNames[$vlanId] ?? 'Vlan_' . $vlanId,
-                        ]));
-                    }
-                }
-            }
-        }
-
-        return $ret;
-    }
-
-    public function discoverPortVlanData(): Collection
-    {
-        $ret = new Collection;
-
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
-        $index2base = array_flip($dot1dBasePortIfIndex);
-
-        $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
-        $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
-
-        if (! empty($scriptIndex)) {
-            $data = SnmpQuery::cache()->get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
-            $ifNames = array_flip($this->getCacheByIndex('ifName', 'IF-MIB'));
-            $oldId = 0;
-
-            foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
-                if (! empty($line)) {
-                    [$mtType, $vlanId, $mtData] = array_map('trim', explode(',', $line));
-
-                    if ($mtType == 'N') { // type N is for vlan name, skip it from port/ifindex processing
-                        continue;
+                        ];
                     }
 
                     $ifIndex = $ifNames[$mtData] ?? 0;
                     $baseport = $index2base[$ifIndex] ?? 0;
-                    $ret->push(new PortVlan([
+                    $vlanData['ports'][] = [
                         'vlan' => $vlanId,
                         'baseport' => $baseport,
                         'untagged' => ($mtType == 'U') ? 1 : 0,
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                    ]));
+                        'ifIndex' => $ifIndex,
+                    ];
                 }
             }
         }
 
-        return $ret;
+        return $vlanData;
     }
 }

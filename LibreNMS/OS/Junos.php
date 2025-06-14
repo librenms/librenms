@@ -30,25 +30,22 @@ namespace LibreNMS\OS;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
-use App\Models\PortVlan;
 use App\Models\Sla;
 use App\Models\Transceiver;
-use App\Models\Vlan;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, BasicVlanDiscovery, PortVlanDiscovery
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -389,47 +386,24 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return [];
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans($dot1dBasePortIfIndex): array
     {
-        $ret = new Collection;
+        $vlanVersion = SnmpQuery::get('Q-BRIDGE-MIB::dot1qVlanVersionNumber.0')->value();
 
-        $vlans = SnmpQuery::cache()->hideMib()->walk([
-            'JUNIPER-VLAN-MIB::jnxExVlanName', 'JUNIPER-VLAN-MIB::jnxExVlanTag',
-        ])->table(1);
-        $prefix = 'jnxEx';
-
-        if (empty($vlans)) {
-            $vlans = SnmpQuery::cache()->hideMib()->walk([
-                'JUNIPER-L2ALD-MIB::jnxL2aldVlanName', 'JUNIPER-L2ALD-MIB::jnxL2aldVlanTag',
-            ])->table(1);
-            $prefix = 'jnxL2ald';
+        if ($vlanVersion < 1 || $vlanVersion > 2) {
+            return [];
         }
 
-        foreach ($vlans as $key => $data) {
-            $ret->push(new Vlan([
-                'vlan_vlan' => $data[$prefix . 'VlanTag'],
-                'vlan_domain' => 1,
-                'vlan_name' => $data[$prefix . 'VlanName'],
-            ]));
-        }
-
-        return $ret;
-    }
-
-    public function discoverPortVlanData(): Collection
-    {
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
         $index2base = array_flip($dot1dBasePortIfIndex);
 
-        $ret = new Collection;
+        $vlanData = [];
         $tagness_by_vlan_index = [];
         $vtpdomain_id = '1';
 
-        $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanName')->table(1);
+        $vlans = SnmpQuery::hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanName')->table(1);
 
         if (empty($vlans)) {
-            $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanName')->table(1);
+            $vlans = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanName')->table(1);
             $vlan_tag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->valuesByIndex();
             $untag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')->valuesByIndex();
             $tmp_tag = 'jnxL2aldVlanTag';
@@ -494,22 +468,27 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                 }
             }
         }
-
         foreach ($vlans as $vlan_index => $vlan) {
             $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
+            $vlanData['basic'][] = [
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => $vtpdomain_id,
+                'vlan_name' => $vlan[$tmp_name],
+            ];
+
             if (isset($tagness_by_vlan_index[$vlan_index])) {
                 foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
                     $f_portType = $tag['tag'] ? 'access' : 'trunk';
-                    $ret->push(new PortVlan([
+                    $vlanData['ports'][] = [
                         'vlan' => $vlan_id,
                         'baseport' => $index2base[$ifIndex] ?? 0,
                         'untagged' => $tag['tag'],
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                    ]));
+                        'ifIndex' => $ifIndex,
+                    ];
                 }
             }
         }
 
-        return $ret;
+        return $vlanData;
     }
 }

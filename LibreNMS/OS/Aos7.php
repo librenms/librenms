@@ -20,62 +20,45 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
-use App\Facades\PortCache;
-use App\Models\Device;
-use App\Models\PortVlan;
-use App\Models\Vlan;
-use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Aos7 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
+class Aos7 extends OS implements VlanDiscovery
 {
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans($dot1dBasePortIfIndex): array
     {
-        $ret = new Collection;
+        $vlanData = [];
 
-        $vlans = SnmpQuery::cache()->mibDir('nokia/aos7')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')->table();
-        foreach ($vlans['vlanDescription'] ?? [] as $vlan_id => $vlan_name) {
-            $ret->push(new Vlan([
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $vlans = SnmpQuery::mibDir('nokia/aos7')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')->table();
+
+        foreach ($vlans['vlanDescription'] as $vlan_id => $vlan_name) {
+            $vlanData['basic'][] = [
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan_name,
                 'vlan_domain' => 1,
                 'vlan_type' => null,
-            ]));
+            ];
         }
-
-        return $ret;
-    }
-
-    public function discoverPortVlanData(): Collection
-    {
-        $ret = new Collection;
-
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
-        $index2base = array_flip($dot1dBasePortIfIndex);
-
-        $vlanstype = SnmpQuery::cache()->mibDir('nokia/aos7')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')->table();
+        $vlanstype = $vlans = SnmpQuery::mibDir('nokia/aos7')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')->table();
         foreach ($vlanstype['vpaType'] ?? [] as $vlan_id => $data) {
             foreach ($data as $ifIndex => $porttype) {
-                $baseport = $index2base[$ifIndex] ?? 0;
-                $ret->push(new Portvlan([
+                $vlanData['ports'][] = [
                     'vlan' => $vlan_id,
-                    'baseport' => $baseport,
+                    'baseport' => $index2base[$ifIndex] ?? 0,
                     'untagged' => ($porttype == 1 ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
-                ]));
+                    'ifIndex' => $ifIndex,
+                ];
             }
         }
 
-        return $ret;
+        return $vlanData;
     }
 }
