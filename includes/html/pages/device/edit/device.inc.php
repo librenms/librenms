@@ -263,7 +263,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
     <?php
     foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="' . $group['id'] . '"' .
-        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . $group['group_name'];
+        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . htmlentities($group['group_name']);
         echo \LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)' : '';
         echo '</option>';
     } ?>
