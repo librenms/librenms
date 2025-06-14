@@ -7,15 +7,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: LibreNMS/Alert/AlertDB.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: LibreNMS/Alert/AlertRules.php
 
 		-

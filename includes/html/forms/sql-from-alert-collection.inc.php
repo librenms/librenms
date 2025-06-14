@@ -24,7 +24,6 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 
 header('Content-type: application/json');
@@ -54,7 +53,7 @@ if (is_numeric($template_id)) {
         'status' => 'ok',
         'name' => $rule['name'],
         'notes' => $rule['notes'] ?? null,
-        'builder' => $rule['builder'] ?? QueryBuilderParser::fromOld($rule['rule'])->toArray(),
+        'builder' => $rule['builder'] ?? [],
         'extra' => array_replace($default_extra, (array) ($rule['extra'] ?? [])),
         'severity' => $rule['severity'] ?? Config::get('alert_rule.severity'),
         'invert_map' => Config::get('alert_rule.invert_map'),
