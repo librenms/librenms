@@ -1,5 +1,27 @@
 <?php
 
+/**
+ * Jetstream.php
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link       http://librenms.org
+ *
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
@@ -10,10 +32,12 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
+use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -115,5 +139,61 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
         }));
 
         return $routes->filter();
+    }
+
+    public function discoverVlans($dot1dBasePortIfIndex): array
+    {
+        $vlanData = [];
+
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $vlanConfigTable = SnmpQuery::hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
+        $vlanPortConfigTable = SnmpQuery::hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
+
+        foreach ($vlanPortConfigTable as $ifIndex => $data) {
+            $portConfig[$data['vlanPortNumber']] = $ifIndex;
+        }
+
+        foreach ($vlanConfigTable as $vlan_id => $data) {
+            $vlanData['basic'][] = [
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => 1,
+                'vlan_name' => $data['dot1qVlanDescription'],
+            ];
+
+            $types = ['vlanTagPortMemberAdd' => 0, 'vlanUntagPortMemberAdd' => 1];
+
+            foreach ($types as $type => $tag) {
+                $expand = $this->jetstreamExpand($data[$type] ?? []);
+                foreach ($expand as $key => $port) {
+                    $ifIndex = $portConfig[$port] ?? 0;
+                    $baseport = $index2base[$ifIndex] ?? 0;
+                    $vlanData['ports'][] = [
+                        'vlan' => $vlan_id,
+                        'baseport' => $baseport,
+                        'untagged' => $tag,
+                        'ifIndex' => $ifIndex,
+                    ];
+                }
+            }
+        }
+
+        return $vlanData;
+    }
+
+    private function jetstreamExpand($var): array
+    {
+        $result = [];
+
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
+
+        foreach ($lags[2] as $index => $start) {
+            $end = $lags[3][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
+            }
+        }
+
+        return $result;
     }
 }
