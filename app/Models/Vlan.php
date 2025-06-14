@@ -14,4 +14,9 @@ class Vlan extends DeviceRelatedModel
         'vlan_type',
         'vlan_mtu',
     ];
+
+    public function getCompositeKey()
+    {
+        return $this->vlan_vlan . $this->vlan_domain;
+    }
 }
