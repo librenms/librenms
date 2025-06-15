@@ -15,7 +15,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Frag',
         'ds' => 'frag',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

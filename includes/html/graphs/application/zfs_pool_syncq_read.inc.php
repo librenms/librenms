@@ -20,7 +20,7 @@ $rrd_list = [
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____syncq_read_p']),
         'descr' => 'Pending',
         'ds' => 'data',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

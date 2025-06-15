@@ -30,7 +30,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Expand Size',
         'ds' => 'expandsz',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

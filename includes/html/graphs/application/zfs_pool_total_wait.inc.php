@@ -20,7 +20,7 @@ $rrd_list = [
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____total_wait_r']),
         'descr' => 'Write',
         'ds' => 'data',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

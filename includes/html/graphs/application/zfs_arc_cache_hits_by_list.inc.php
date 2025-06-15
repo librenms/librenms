@@ -35,7 +35,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'MFU Ghost',
         'ds' => 'mfu_ghost_per',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -15,7 +15,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Scrub',
         'ds' => 'data',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

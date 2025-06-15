@@ -25,7 +25,7 @@ $rrd_list = [
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____write_errors']),
         'descr' => 'Write',
         'ds' => 'data',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
