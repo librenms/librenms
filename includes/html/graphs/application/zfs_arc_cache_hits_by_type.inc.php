@@ -11,22 +11,22 @@ $transparency = 15;
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $rrd_list = [
-        [
+    [
         'filename' => $rrd_filename,
         'descr' => 'Demand',
         'ds' => 'demand_hits_per',
     ],
-        [
+    [
         'filename' => $rrd_filename,
         'descr' => 'Prefetch',
         'ds' => 'pre_hits_per',
     ],
-        [
+    [
         'filename' => $rrd_filename,
         'descr' => 'Demand Meta',
         'ds' => 'meta_hits_per',
     ],
-        [
+    [
         'filename' => $rrd_filename,
         'descr' => 'Prefetch Meta',
         'ds' => 'pre_meta_hits_per',
