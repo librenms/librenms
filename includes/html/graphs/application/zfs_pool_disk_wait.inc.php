@@ -16,6 +16,7 @@ $rrd_list = [
         'descr' => 'Read',
         'ds' => 'data',
     ],
+    [
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____disk_wait_r']),
         'descr' => 'Write',
         'ds' => 'data',
