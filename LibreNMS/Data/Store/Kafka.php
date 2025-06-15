@@ -1,5 +1,6 @@
 <?php
 
+
 namespace LibreNMS\Data\Store;
 
 use App\Facades\DeviceCache;
