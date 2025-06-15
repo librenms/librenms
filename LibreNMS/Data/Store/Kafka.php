@@ -280,7 +280,7 @@ class Kafka extends BaseDatastore
 
             $dataArr = json_encode($resultArr);
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
-            
+
             // If debug is enabled, log the total size of the data being sent
             if (Config::get('kafka.debug') === true) {
                 $outQLen = $this->client->getOutQLen();
