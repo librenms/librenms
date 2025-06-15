@@ -10,20 +10,16 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____disk_wait_r']);
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
+$rrd_list = [
+    [
         'filename' => $rrd_filename,
         'descr' => 'Read',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
         'filename' => Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['pool'] . '____disk_wait_r']),
         'descr' => 'Write',
         'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+    ]
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
