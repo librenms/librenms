@@ -30,7 +30,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Data Demand',
         'ds' => 'data_demand_per',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

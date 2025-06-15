@@ -20,7 +20,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Recently Used',
         'ds' => 'p',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -60,7 +60,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'HDR Size',
         'ds' => 'l2_hdr_size',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

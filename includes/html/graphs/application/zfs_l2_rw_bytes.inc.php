@@ -20,7 +20,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'L2 Read',
         'ds' => 'l2_read_bytes',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

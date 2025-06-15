@@ -30,7 +30,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Mutex Skip',
         'ds' => 'mutex_skip',
-    ]
-]
+    ],
+];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

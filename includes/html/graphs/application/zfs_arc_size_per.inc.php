@@ -25,7 +25,7 @@ $rrd_list = [
         'filename' => $rrd_filename,
         'descr' => 'Target Min%',
         'ds' => 'min_size_per',
-    ]
+    ],
 ];
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
