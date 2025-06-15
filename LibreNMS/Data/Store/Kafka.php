@@ -16,7 +16,7 @@ class Kafka extends BaseDatastore
 {
     private $client = null;
     private $device_id = 0;
-    private $kafkaFlushTimeout = 50;
+    private $kafkaFlushTimeout = 1;
 
     public function __construct(Producer $client)
     {
@@ -26,7 +26,7 @@ class Kafka extends BaseDatastore
 
         // Cache the flush timeout value early to avoid Config during shutdown
         if ($this->kafkaFlushTimeout == null) {
-            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 50);
+            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 1);
         }
 
         // Register shutdown function
@@ -67,11 +67,11 @@ class Kafka extends BaseDatastore
         // Set the idempotence
         $conf->set('enable.idempotence', Config::get('kafka.idempotence', false) ? 'true' : 'false');
         // Max queue allowed messages in poller memory
-        $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 100_000));
+        $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 1_000));
         // Num of messages each call to kafka
-        $conf->set('batch.num.messages', Config::get('kafka.batch.max.message', 25));
+        $conf->set('batch.num.messages', Config::get('kafka.batch.max.message', 200));
         // Max wait time to acumulate before sending the batch
-        $conf->set('linger.ms', Config::get('kafka.linger.ms', default: 500));
+        $conf->set('linger.ms', Config::get('kafka.linger.ms', default: 50));
         // Change ACK
         $conf->set(
             'request.required.acks',

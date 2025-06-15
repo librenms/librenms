@@ -4788,28 +4788,28 @@
             "order": 16
         },
         "kafka.flush.timeout": {
-            "default": 50,
+            "default": 1,
             "type": "integer",
             "group": "poller",
             "section": "kafka",
             "order": 17
         },
         "kafka.buffer.max.message": {
-            "default": 100000,
+            "default": 1000,
             "type": "integer",
             "group": "poller",
             "section": "kafka",
             "order": 18
         },
         "kafka.batch.max.message": {
-            "default": 25,
+            "default": 100,
             "type": "integer",
             "group": "poller",
             "section": "kafka",
             "order": 19
         },
         "kafka.linger.ms": {
-            "default": 500,
+            "default": 50,
             "type": "integer",
             "group": "poller",
             "section": "kafka",
