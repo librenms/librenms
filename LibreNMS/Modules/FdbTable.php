@@ -178,6 +178,7 @@ class FdbTable implements Module
         $dot1qVlanFdbId = $dot1qVlanFdbId['dot1qVlanFdbId'] ?? [];
         if (! empty($dot1qVlanFdbId)) {
             $dot1qVlanFdbId = array_shift($dot1qVlanFdbId);
+            $dot1qVlanFdbId = array_flip($dot1qVlanFdbId);
         }
 
         foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
