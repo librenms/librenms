@@ -24,7 +24,7 @@ NODELIST=/tmp/nodelist.txt
 # Enter user and group of LibreNMS installation
 L_USRGRP=librenms
 
-while read line
+while read -r line
 	# Change ownership to LibreNMS user and group
 	chown -R $L_USRGRP:$L_USRGRP .;
 	# Add each host from the node list file to LibreNMS

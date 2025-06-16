@@ -29,7 +29,7 @@ NODELIST=/tmp/nodelist.txt
 L_USRGRP=librenms
 
 # Loop enters RRD directory and then each folder based on contents of node list text file
-while read line
+while read -r line
 	# Enter the directory
 	do cd $L_RRDPATH"${line%/*}"
 		# Convert from XML back to RRD
