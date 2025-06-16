@@ -168,7 +168,7 @@ class ErrorReporting
                     [$file, $line] = self::findFirstNonVendorFrame();
                 }
 
-                //error_log("PHP Error($severity): $message in $file:$line");
+                error_log("PHP Error($severity): $message in $file:$line");
 
                 // For notices and warnings, prevent conversion to exceptions
                 if (in_array($severity, [E_NOTICE, E_WARNING, E_USER_NOTICE, E_USER_WARNING, E_DEPRECATED])) {
