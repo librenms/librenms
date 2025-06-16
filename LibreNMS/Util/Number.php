@@ -150,7 +150,6 @@ class Number
      */
     public static function cast(mixed $number): float|int
     {
-
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
             if (! is_string($number) || ! preg_match('/^\s*-?\d+(\.\d+)?/', $number ?? '', $matches)) {
