@@ -162,7 +162,7 @@ class GraphParameters
 
         // set up scaling scaling
         if ($this->scale_min === null && $this->scale_max === null) {
-            $options[] = '--alt-autoscale-max';
+            $options[] = '--alt-autoscale';
             if ($this->scale_rigid === null) {
                 $this->scale_rigid = true;
             }
