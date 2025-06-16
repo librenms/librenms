@@ -16,8 +16,8 @@ $rrd_list = [];
 $packages_int = 0;
 foreach ($packages as $index => $package) {
     $label = preg_filter('/^pkg\-reg\_keys\_mod\_\_\_\-\_\_\_\-/', '', $package);
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $package]),
-[
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $package]);
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => $label,
         'ds' => 'reg_keys_mod',

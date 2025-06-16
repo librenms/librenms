@@ -48,25 +48,25 @@ if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'f_icmpv4',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'f_icmpv6',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'TCP',
         'ds' => 'f_tcp',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'UDP',
         'ds' => 'f_udp',
     ];
 }
 if (! isset($rrd_list[0])) {
-    d_echo('No RRDs found');
+    throw new \LibreNMS\Exceptions\RrdGraphException('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

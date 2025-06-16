@@ -9,36 +9,35 @@ $addarea = 0;
 $transparency = 15;
 
 if (isset($vars['sinstance'])) {
-    $flow__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__udp']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__udp']);
     $flow__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__tcp']);
     $flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__icmpv4']);
     $flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__icmpv6']);
 } else {
-    $flow__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__udp']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__udp']);
     $flow__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__tcp']);
     $flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv4']);
     $flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv6']);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
-    $rrd_list[] = [
+$rrd_list = [
+    [
         'filename' => $flow__icmpv4_rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'data',
     ],
-[
+    [
         'filename' => $flow__icmpv6_rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'data',
     ],
-[
+    [
         'filename' => $flow__tcp_rrd_filename,
         'descr' => 'TCP',
         'ds' => 'data',
     ],
-[
-        'filename' => $flow__udp_rrd_filename,
+    [
+        'filename' => $rrd_filename,
         'descr' => 'UDP',
         'ds' => 'data',
     ],

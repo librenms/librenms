@@ -10,13 +10,7 @@ $addarea = 0;
 $transparency = 15;
 $float_precision = 3;
 
-if (isset($vars['stddev'])) {
-    if ($vars['stddev'] != 'on' and $vars['stddev'] != 'off') {
-        $vars['stddev'] = 'off';
-    }
-} else {
-    $vars['stddev'] = 'off';
-}
+$vars['stddev'] = ($vars['stddev'] ?? 'off') === 'on' ? 'on' : 'off';
 
 if (isset($vars['package'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-dropped_files___-___', $vars['package']]);
