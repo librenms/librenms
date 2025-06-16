@@ -125,14 +125,14 @@ class Kafka extends BaseDatastore
 
             if ($outQLen > 0) {
                 // During shutdown, Log facades might not work properly, use d_echo as fallback
-                error_log("KAFKA: Flushing {$outQLen} remaining messages");
+                error_log("KAFKA: SafeFlush | Flushing {$outQLen} remaining messages");
 
                 // Use cached timeout value to avoid Config during shutdown
                 $result = $this->client->flush($this->kafkaFlushTimeout);
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
                     $error_msg = sprintf(
-                        'KAFKA: Flush failed. Error: %s, Code: %d, Device ID: %d, Remaining: %d',
+                        'KAFKA: SafeFlush | Flush failed. Error: %s, Code: %d, Device ID: %d, Remaining: %d',
                         Library::rd_kafka_err2str($result),
                         $result,
                         $this->device_id,
@@ -142,8 +142,10 @@ class Kafka extends BaseDatastore
                     error_log($error_msg);
                 }
             }
+
+            $this->client = null; // Clear the client reference to allow garbage collection
         } catch (\Throwable $e) {
-            $error_msg = 'KAFKA: safeFlush failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
+            $error_msg = 'KAFKA: SafeFlush | failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
             error_log($error_msg);
         }
     }
@@ -278,6 +280,17 @@ class Kafka extends BaseDatastore
 
             $dataArr = json_encode($resultArr);
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
+            
+            // If debug is enabled, log the total size of the data being sent
+            if (Config::get('kafka.debug') === true) {
+                $outQLen = $this->client->getOutQLen();
+                Log::debug('KAFKA: Flush | Data size', [
+                    'device_id' => $this->device_id,
+                    'measurement' => $measurement,
+                    'size' => $outQLen,
+                ]);
+            }
+
             $producer->poll(0);
 
             // end

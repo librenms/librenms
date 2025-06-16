@@ -4820,7 +4820,7 @@
             "type": "select",
             "options": {
                 "0": "Dont wait for ack",
-                "all": "Block until ack from all replicas"
+                "all": "Wait for ack from all replicas"
             },
             "group": "poller",
             "section": "kafka",
