@@ -5,7 +5,9 @@ namespace LibreNMS\Tests\Unit\Data;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
+#[Group('external-dependencies')]
 class KafkaDBStoreTest extends TestCase
 {
     protected function setUp(): void

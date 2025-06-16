@@ -89,3 +89,121 @@ recorded. You can then create graphs within Grafana or Kafka to display the
 information you need.
 
 Please note that polling will slow down when the poller isn't able to reach or write data to Kafka.
+
+# Kafka Data Store Testing
+
+This document describes how to test the Kafka data store functionality in LibreNMS.
+
+## Prerequisites
+
+Before running Kafka tests, you need to set up the following components:
+
+### 1. System Dependencies
+
+Install the required system packages:
+
+```bash
+# On Ubuntu/Debian
+sudo apt update
+sudo apt install librdkafka-dev libffi-dev
+```
+
+### 2. Composer Dependencies
+
+Install the required PHP packages:
+
+```bash
+composer require idealo/php-rdkafka-ffi --dev
+composer require ext-ffi --dev
+```
+
+### 3. Kafka Instance
+
+You need a running Kafka instance. The tests expect it to be available at `localhost:9092`.
+
+#### Option A: Using Docker
+
+```bash
+# Start Kafka with Docker Compose
+docker run -d \
+  --name kafka \
+  -p 9092:9092 \
+  -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  confluentinc/cp-kafka:latest
+```
+
+#### Option B: Local Installation
+
+Follow the [Apache Kafka Quickstart Guide](https://kafka.apache.org/quickstart) to install and run Kafka locally.
+
+## Running Kafka Tests
+
+The Kafka tests are tagged with the `external-dependencies` group and are excluded from the default test suite.
+
+### Run Kafka Tests Only
+
+```bash
+# Run only Kafka tests
+./vendor/bin/phpunit --group external-dependencies
+
+# Or specifically target the Kafka test class
+./vendor/bin/phpunit tests/Unit/Data/KafkaDBStoreTest.php
+```
+
+### Run All Tests Including Kafka
+
+```bash
+# Run all tests (including external dependencies)
+./vendor/bin/phpunit --no-exclude-group
+```
+
+## Test Configuration
+
+The tests automatically configure Kafka settings during setup:
+
+- **Broker**: `localhost:9092`
+- **Topic**: `librenms`
+- **Batch settings**: Max 25 messages, buffer max 10 messages
+- **Linger time**: 5000ms
+- **Required acks**: 0 (fire and forget)
+
+## Troubleshooting
+
+### Common Issues
+
+1. **FFI Extension Not Available**
+   ```bash
+   # Verify FFI is enabled
+   php -i | grep ffi
+   ```
+
+2. **Kafka Connection Failed**
+   ```bash
+   # Check if Kafka is running
+   netstat -tlnp | grep :9092
+   
+   # Test Kafka connectivity
+   telnet localhost 9092
+   ```
+
+3. **Missing librdkafka**
+   ```bash
+   # On Ubuntu/Debian
+   # Verify librdkafka is installed
+   apt list --installed | grep librdkafka
+   ```
+
+### Debug Mode
+
+Enable debug logging in your test environment:
+
+```php
+Config::set('kafka.debug', 'all');
+```
+
+## Notes
+
+- Kafka tests use an actual Kafka connection during unit testing
+- The `external-dependencies` group allows you to easily include/exclude these tests
