@@ -61,6 +61,11 @@ class Ios extends Cisco implements
         }
 
         $data = \SnmpQuery::walk('CISCO-DOT11-ASSOCIATION-MIB::cDot11ActiveWirelessClients')->table(1);
+
+        if (empty($data)) {
+            return [];
+        }
+
         $this->mapToEntPhysical($data);
 
         $sensors = [];
