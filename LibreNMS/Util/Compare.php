@@ -56,9 +56,9 @@ class Compare
         }
 
         // handle PHP8 change to implicit casting
-        if (is_numeric($a) || is_numeric($b)) {
-            $a = Number::cast($a);
-            $b = is_array($b) ? $b : Number::cast($b);
+        if (is_numeric($b) && $a !== null && ! is_bool($a) && is_numeric($cast_a = Number::cast($a))) {
+            $a = $cast_a;
+            $b = Number::cast($b);
         }
 
         return match ($comparison) {
