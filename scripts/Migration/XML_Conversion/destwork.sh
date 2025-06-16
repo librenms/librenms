@@ -19,8 +19,6 @@
 
 # Enter path to LibreNMS RRD directories
 L_RRDPATH=/opt/librenms/rrd/
-# Enter path to LibreNMS addhost module
-ADDHOST=/opt/librenms/addhost.php
 # Enter your unique SNMP String
 SNMPSTRING=cisconetwork
 # Enter SNMP version of all clients in nodelist text file
@@ -41,7 +39,7 @@ while read line
 		# Change ownership to LibreNMS user and group
 		chown -R $L_USRGRP:$L_USRGRP .;
 		# Add the host to LibreNMS
-		php $ADDHOST "${line%/*}" $SNMPSTRING $SNMPVERSION;
+		lnms device:add --$SNMPVERSION -c$SNMPSTRING "${line%/*}"
 		# Change back to parent directory
 		cd ..;
 	done < $NODELIST
