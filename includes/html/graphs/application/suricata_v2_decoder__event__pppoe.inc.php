@@ -20,13 +20,13 @@ if (Rrd::checkRrdExists($decoder__event__pppoe__malformed_tags_rrd_filename)) {
         'filename' => $decoder__event__pppoe__malformed_tags_rrd_filename,
         'descr' => 'Malformed Tags',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__pppoe__pkt_too_small_rrd_filename,
         'descr' => 'Pkt Too Small',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $decoder__event__pppoe__wrong_code_rrd_filename,
         'descr' => 'Wrong Code',
         'ds' => 'data',

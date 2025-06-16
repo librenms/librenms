@@ -25,12 +25,7 @@ if (isset($vars['package'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
-    $descr = 'Average';
-    $ds = 's3regkeysmod';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+$descr = 'Average';
+$ds = 's3regkeysmod';
 
 require 'includes/html/graphs/generic_stats.inc.php';

@@ -26,24 +26,23 @@ if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
         'filename' => $flow__icmpv4_rrd_filename,
         'descr' => 'ICMPv4',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__icmpv6_rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__tcp_rrd_filename,
         'descr' => 'TCP',
         'ds' => 'data',
-    ];
-    $rrd_list[] = [
+    ],
+[
         'filename' => $flow__udp_rrd_filename,
         'descr' => 'UDP',
         'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+    ],
+];
+
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

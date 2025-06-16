@@ -24,13 +24,7 @@ if (isset($vars['package'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'dropped_files']);
 }
 
-$rrd_list = [];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
-    $descr = 'Average';
-    $ds = 's3dropped_files';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+$descr = 'Average';
+$ds = 's3dropped_files';
 
 require 'includes/html/graphs/generic_stats.inc.php';
