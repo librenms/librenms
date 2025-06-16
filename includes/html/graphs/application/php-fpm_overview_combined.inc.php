@@ -21,7 +21,6 @@ if (Rrd::checkRrdExists($filename)) {
         'max_listen_queue' => 'Max Listen Queue',
         'listen_queue' => 'Listen Queue',
         'listen_queue_len' => 'Listen Queue Len',
-        'listen_queue' => 'Listen Queue',
     ];
 
     foreach ($proc_stats as $stat => $descr) {

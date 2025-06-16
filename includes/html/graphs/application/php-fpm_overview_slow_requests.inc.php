@@ -7,10 +7,10 @@ $stat = 'slow_requests';
 $unit_text = 'Requests/S';
 $ds = 'data';
 
-$filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___slow_requests']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___slow_requests']);
 
-if (! Rrd::checkRrdExists($filename)) {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
+if (! Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
     $ds = 'sr';
 }
 

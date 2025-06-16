@@ -13,27 +13,27 @@ $float_precision = 3;
 require 'logsize-common.inc.php';
 
 $rrd_list[] = [
-    'filename' => $filename,
+    'filename' => $rrd_filename,
     'descr' => 'Max Size',
     'ds' => 'max_size',
 ];
 $rrd_list[] = [
-    'filename' => $filename,
+    'filename' => $rrd_filename,
     'descr' => 'Mean Size',
     'ds' => 'mean_size',
 ];
 $rrd_list[] = [
-    'filename' => $filename,
+    'filename' => $rrd_filename,
     'descr' => 'Median Size',
     'ds' => 'median_size',
 ];
 $rrd_list[] = [
-    'filename' => $filename,
+    'filename' => $rrd_filename,
     'descr' => 'Mode Size',
     'ds' => 'mode_size',
 ];
 $rrd_list[] = [
-    'filename' => $filename,
+    'filename' => $rrd_filename,
     'descr' => 'Min Size',
     'ds' => 'min_size',
 ];

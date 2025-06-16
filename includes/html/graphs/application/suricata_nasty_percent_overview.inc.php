@@ -11,7 +11,7 @@ if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
     $descr = 'Drop Prct';
     $ds = 'data';
 
-    $filename = $drop_percent_rrd_filename;
+    $rrd_filename = $drop_percent_rrd_filename;
 
     require 'includes/html/graphs/generic_stats.inc.php';
 } elseif (Rrd::checkRrdExists($rrd_filename)) {
@@ -26,17 +26,17 @@ if (Rrd::checkRrdExists($drop_percent_rrd_filename)) {
         'filename' => $rrd_filename,
         'descr' => 'Dropped',
         'ds' => 'drop_percent',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'If Dropped',
         'ds' => 'ifdrop_percent',
-    ],
-[
+    ];
+    $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Error',
         'ds' => 'error_percent',
     ];
 
     require 'includes/html/graphs/generic_multi_line.inc.php';
-
+}
