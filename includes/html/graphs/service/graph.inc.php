@@ -47,7 +47,6 @@ if (is_file($check_script)) {
 }
 
 include 'includes/html/graphs/common.inc.php';
-#$rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
 $rrd_additions = '';
 
