@@ -35,7 +35,7 @@ while read -r line
 		# Convert from XML back to RRD
 		for f in *.xml; do rrdtool restore "${f}" "$(echo "${f}" | cut -f1 -d .)".rrd; done;
 		# Remove leftover XML files
-		rm *.xml;
+		rm ./*.xml;
 		# Change ownership to LibreNMS user and group
 		chown -R $L_USRGRP:$L_USRGRP .;
 		# Add the host to LibreNMS
