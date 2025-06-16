@@ -1,26 +1,32 @@
 <?php
 
+use App\Models\MacAccounting;
+use LibreNMS\Util\Mac;
+
 if ($device['os_group'] == 'cisco') {
-    $datas = SnmpQuery::walk('CISCO-IP-STAT-MIB::cipMacSwitchedBytes')->table(1);
+    $snmpResponse = SnmpQuery::walk('CISCO-IP-STAT-MIB::cipMacSwitchedBytes');
+    $datas = $snmpResponse->table(3);
 
-    foreach ($datas as $data) {
-        dd($data);
-        $oid = str_replace('.1.3.6.1.4.1.9.9.84.1.2.1.1.4.', '', $oid);
-        $mac = \LibreNMS\Util\Mac::parse($oid);
-        dump($oid, $mac);
-        [$if, $direction, $a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode('.', $oid);
-        $port = PortCache::getByIfIndex($if);
-        $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if]);
+    foreach ($datas as $ifIndex => $port_data) {
+        foreach ($port_data as $direction => $direction_data) {
+            foreach ($direction_data as $mac => $data) {
+                $mac = Mac::parse($mac);
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
 
-        if ($interface) {
-            if (dbFetchCell('SELECT COUNT(*) from mac_accounting WHERE port_id = ? AND mac = ?', [$interface['port_id'], $mac])) {
-                echo '.';
-            } else {
-                dbInsert(['port_id' => $interface['port_id'], 'mac' => $mac], 'mac_accounting');
-                echo '+';
+                if ($port_id) {
+                    if (MacAccounting::where('port_id', $port_id)->where('mac', $mac)->exists()) {
+                        echo '.';
+                    } else {
+                        MacAccounting::create([
+                            'port_id' => $port_id,
+                            'mac' => $mac,
+                        ]);
+                        echo '+';
+                    }
+                }
             }
         }
-    }//end foreach
+    }
 
     echo "\n";
 } //end if
