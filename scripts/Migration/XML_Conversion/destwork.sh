@@ -31,9 +31,9 @@ L_USRGRP=librenms
 # Loop enters RRD directory and then each folder based on contents of node list text file
 while read -r line
 	# Enter the directory
-	do cd $L_RRDPATH"${line%/*}"
+	do cd $L_RRDPATH"${line%/*}" || return 1
 		# Convert from XML back to RRD
-		for f in *.xml; do rrdtool restore ${f} `echo ${f} | cut -f1 -d .`.rrd; done;
+		for f in *.xml; do rrdtool restore "${f}" $(echo "${f}" | cut -f1 -d .).rrd; done;
 		# Remove leftover XML files
 		rm *.xml;
 		# Change ownership to LibreNMS user and group
