@@ -12570,7 +12570,7 @@
                     "designatedRoot": "8c85c162c740",
                     "designatedCost": 0,
                     "designatedBridge": "8c85c162c740",
-                    "designatedPort": 12,
+                    "designatedPort": 0,
                     "forwardTransitions": 4222451713,
                     "ifIndex": 815
                 },
