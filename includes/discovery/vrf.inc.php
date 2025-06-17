@@ -162,7 +162,7 @@ if (Config::get('enable_vrfs')) {
             $vrf_name = $vr['vRtrName'] ?? null;
             $vrf_desc = $vr['vRtrDescription'] ?? null;
             $vrf_as = $vr['vRtrAS4Byte'] ?? null;
-            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? null;
+            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? '';
             // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
             // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
@@ -170,7 +170,7 @@ if (Config::get('enable_vrfs')) {
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
             // FIXME Hardcoded to Type 0
             $vrf_rd = str_replace(' ', '', $vrf_rd);
-            if ($vrf_rd != '000000000000') {
+            if (! empty($vrf_rd) && $vrf_rd != '000000000000') {
                 $vrf_rd_1 = substr($vrf_rd, 4, 4);
                 $vrf_rd_2 = substr($vrf_rd, 8);
                 $vrf_rd = hexdec($vrf_rd_1) . ':' . hexdec($vrf_rd_2);
@@ -259,6 +259,28 @@ if (Config::get('enable_vrfs')) {
                 continue;
             }
         }
+    } elseif ($device['os'] == 'cumulus') {
+        // Cumulus Linux
+        $vrf_table = \SnmpQuery::hideMib()->walk(['CUMULUS-BGPVRF-MIB::bgpVrfId', 'CUMULUS-BGPVRF-MIB::bgpVrfName'])->table(1);
+        foreach ($vrf_table as $vrf_oid => $vrf_data) {
+            $vrf_name = $vrf_data['bgpVrfName'];
+
+            $vrfs = [
+                'vrf_oid' => $vrf_oid,
+                'vrf_name' => $vrf_name,
+                'device_id' => $device['device_id'],
+            ];
+
+            if (DeviceCache::getPrimary()->vrfs()->select('vrf_id')->where('vrf_oid', $vrf_oid)->count()) {
+                DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->update($vrfs);
+            } else {
+                DeviceCache::getPrimary()->vrfs()->create($vrfs)->vrf_id;
+            }
+
+            $vrf_id = DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrf_oid)->value('vrf_id');
+            $valid_vrf[$vrf_id] = 1;
+            $valid_vrf_if[$vrf_id][$vrf_data['bgpVrfId']] = 0;
+        } //end foreach
     } //end if
 
     unset(
@@ -272,7 +294,7 @@ if (Config::get('enable_vrfs')) {
         $if = $row['port_id'];
         $vrf_id = $row['ifVrf'];
         if ($row['ifVrf']) {
-            if (! $valid_vrf_if[$vrf_id][$if]) {
+            if (isset($valid_vrf_if[$vrf_id][$if]) && ! $valid_vrf_if[$vrf_id][$if]) {
                 echo '-';
                 dbUpdate(['ifVrf' => 0], 'ports', 'port_id=?', [$if]);
             } else {

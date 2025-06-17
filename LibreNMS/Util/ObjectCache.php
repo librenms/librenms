@@ -43,6 +43,7 @@ use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
 {
@@ -104,7 +105,7 @@ class ObjectCache
 
                 $sensor_menu[$group][] = [
                     'class' => $class,
-                    'icon' => $sensor_model->icon(),
+                    'icon' => SensorEnum::from($class)->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }
@@ -112,9 +113,9 @@ class ObjectCache
             if (PrinterSupply::hasAccess($user)->exists()) {
                 $sensor_menu[3] = [
                     [
-                        'class' => 'toner',
+                        'class' => 'printer-supply',
                         'icon' => 'print',
-                        'descr' => __('Toner'),
+                        'descr' => __('sensors.printer-supply.long'),
                     ],
                 ];
             }

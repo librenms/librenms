@@ -35,6 +35,11 @@ var grid = $("#arp-search").bootgrid({
             // Select the devices only with ARP tables
 $sql = 'SELECT D.device_id AS device_id, `hostname`, `D`.`sysName` AS `sysName` FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D';
 $param = [];
+$where = '';
+
+$device_id = (int) ($_POST['device_id'] ?? 0);
+$searchby = $_POST['searchby'] ?? 'ip';
+$searchPhrase = $_POST['searchPhrase'] ?? '';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -45,7 +50,7 @@ if (! Auth::user()->hasGlobalRead()) {
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname`, `D`.`sysName` ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"' . $data['device_id'] . '\""+';
-    if ($data['device_id'] == $_POST['device_id']) {
+    if ($data['device_id'] == $device_id) {
         echo '" selected "+';
     }
 
@@ -58,7 +63,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
                 "<select name=\"searchby\" id=\"searchby\" class=\"form-control input-sm\">"+
                 "<option value=\"mac\" "+
 <?php
-if ($_POST['searchby'] != 'ip') {
+if ($searchby != 'ip') {
     echo '" selected "+';
 }
 ?>
@@ -66,7 +71,7 @@ if ($_POST['searchby'] != 'ip') {
                 ">MAC Address</option>"+
                 "<option value=\"ip\" "+
 <?php
-if ($_POST['searchby'] == 'ip') {
+if ($searchby == 'ip') {
     echo '" selected "+';
 }
 ?>
@@ -77,7 +82,7 @@ if ($_POST['searchby'] == 'ip') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"' . htmlspecialchars($_POST['searchPhrase']) . '"+';
+echo '"' . htmlspecialchars($searchPhrase) . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Address\" />"+
@@ -90,9 +95,9 @@ echo '"' . htmlspecialchars($_POST['searchPhrase']) . '"+';
     {
         return {
             id: "arp-search",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo htmlspecialchars($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo htmlspecialchars($_POST['searchPhrase']); ?>'
+            device_id: '<?php echo $device_id ?: 'null'; ?>',
+            searchby: '<?php echo htmlspecialchars($searchby); ?>',
+            searchPhrase: '<?php echo htmlspecialchars($searchPhrase); ?>'
         };
     },
     url: "ajax_table.php",

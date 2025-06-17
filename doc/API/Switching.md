@@ -262,13 +262,19 @@ Output:
     'ports_fdb': [
         {
             'hostname': 'hq-core1',
+            'sysName': 'hq-core1',
             'ifName': 'ae10',
+            'ifAlias': 'ae10',
+            'ifDescr': 'ae10',
             'last_seen': '2 hours ago',
             'updated_at': '2023-05-17 03:19:15'
         },
         {
             'hostname': 'hq-sw1',
+            'sysName': 'hq-sw1',
             'ifName': 'ge-0/0/0',
+            'ifAlias': 'ge-0/0/0',
+            'ifDescr': 'ge-0/0/0',
             'last_seen': '3 hours ago',
             'updated_at': '2023-05-17 02:02:06'
         },

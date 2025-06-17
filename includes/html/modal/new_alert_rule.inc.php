@@ -26,6 +26,7 @@ $default_acknowledgement_alerts = Config::get('alert_rule.acknowledgement_alerts
 $default_invert_map = Config::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
+    $device_id = isset($device['device_id']) ? $device['device_id'] : -1;
     $filters = json_encode(new QueryBuilderFilter('alert')); ?>
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
@@ -44,8 +45,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <br />
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
-                        <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(format_hostname($device)); ?>">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">

@@ -150,9 +150,9 @@ return [
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
     ],
-    'toner' => [
-        'short' => 'Toner',
-        'long' => 'Toner',
+    'printer-supply' => [
+        'short' => 'Printer',
+        'long' => 'Printer Supplies',
         'unit' => '%',
         'unit_long' => 'Percent',
     ],

@@ -32,6 +32,11 @@ var grid = $("#mac-search").bootgrid({
 
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
 $param = [];
+$where = '';
+
+$device_id = (int) ($_POST['device_id'] ?? 0);
+$interface = $_POST['interface'] ?? '';
+$address = $_POST['address'] ?? '';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -42,7 +47,7 @@ if (! Auth::user()->hasGlobalRead()) {
 $sql .= " $where ORDER BY `hostname`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"' . $data['device_id'] . '\""+';
-    if ($data['device_id'] == $_POST['device_id']) {
+    if ($data['device_id'] == $device_id) {
         echo '" selected "+';
     }
 
@@ -56,14 +61,14 @@ foreach (dbFetchRows($sql, $param) as $data) {
                "<option value=\"\">All Interfaces</option>"+
                "<option value=\"Loopback%\" "+
 <?php
-if ($_POST['interface'] == 'Loopback%') {
+if ($interface == 'Loopback%') {
     echo '" selected "+';
 }
 ?>
                ">Loopbacks</option>"+
                "<option value=\"Vlan%\""+
 <?php
-if ($_POST['interface'] == 'Vlan%') {
+if ($interface == 'Vlan%') {
     echo '" selected "+';
 }
 ?>
@@ -74,7 +79,7 @@ if ($_POST['interface'] == 'Vlan%') {
                "<div class=\"form-group\">"+
                "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
 <?php
-echo '"' . htmlspecialchars($vars['address']) . '"+';
+echo '"' . htmlspecialchars($address) . '"+';
 ?>
 
                "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+
@@ -88,9 +93,9 @@ echo '"' . htmlspecialchars($vars['address']) . '"+';
         return {
             id: "address-search",
             search_type: "mac",
-            device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            interface: '<?php echo htmlspecialchars($_POST['interface']); ?>',
-            address: '<?php echo htmlspecialchars($vars['address']); ?>'
+            device_id: '<?php echo $device_id ?: 'null'; ?>',
+            interface: '<?php echo htmlspecialchars($interface); ?>',
+            address: '<?php echo htmlspecialchars($address); ?>'
         };
     },
     url: "ajax_table.php",
