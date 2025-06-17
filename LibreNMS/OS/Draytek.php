@@ -31,7 +31,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Draytek extends OS implements WirelessRssiDiscovery {
+class Draytek extends OS implements WirelessRssiDiscovery
+{
 
     /**
      * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
@@ -39,12 +40,13 @@ class Draytek extends OS implements WirelessRssiDiscovery {
      *
      * @return array
      */
-    public function discoverWirelessRssi() {
+    public function discoverWirelessRssi()
+    {
         $lte_modems = SnmpQuery::walk('DRAYTEK-MIB::lterssi')->table(1);
         $oid = '.1.3.6.1.4.1.7367.4.7.'; // DRAYTEK-MIB::lterssi
         $sensors = [];
 
-        foreach($lte_modems as $index => $modem) {
+        foreach ($lte_modems as $index => $modem) {
             $sensors[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $index, 'draytek-lte', $index, 'RSSI', null, 1, 1);
         }
 

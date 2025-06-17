@@ -27,7 +27,7 @@ if ($sensor['sensor_type'] === 'ltemaxchannelratetx' || $sensor['sensor_type'] =
     $sensor_value = preg_replace('/\D/', '', $sensor_value);        // Remove any non-numeric characters
 
     // If non-numeric value, value is zero (eg: "--- Mbps" which the preg_replace replaces to "")
-    if ($sensor_value == "") {
+    if ($sensor_value == '') {
         $sensor_value = 0;
     }
 }

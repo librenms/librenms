@@ -42,35 +42,33 @@ $ltestatus_states = [
     ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'SMS service ready'],
     ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Search Network'],
     ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Registration denied'],
-    ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'Bridged']
+    ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'Bridged'],
 ];
 
 foreach ($lteinfo_objects as $index => $object) {
     if (isset($object['ltestatus'])) {
-        $state_name = "ltestatus";
+        $state_name = 'ltestatus';
         create_state_index($state_name, $ltestatus_states);
         $current = $ltestatus_lookup_table[$object['ltestatus']];
 
         $num_oid = '.1.3.6.1.4.1.7367.4.1.';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
-                    'poller_type' => 'snmp',
-                    'sensor_class' => 'state',
-                    'device_id' => $device['device_id'],
-                    'sensor_oid' => $num_oid . $index,
-                    'sensor_index' => 'ltestatus.' . $index,
-                    'sensor_type' => $state_name,
-                    'sensor_descr' => 'LTE Status modem ' . $index,
-                    'sensor_divisor' => 1,
-                    'sensor_multiplier' => 1,
-                    'sensor_limit' => null,
-                    'sensor_limit_warn' => null,
-                    'sensor_limit_low' => null,
-                    'sensor_limit_low_warn' => null,
-                    'sensor_current' => $current,
-                    'group' => 'Mobile',
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'device_id' => $device['device_id'],
+                'sensor_oid' => $num_oid . $index,
+                'sensor_index' => 'ltestatus.' . $index,
+                'sensor_type' => $state_name,
+                'sensor_descr' => 'LTE Status modem ' . $index,
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_limit' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_current' => $current,
+                'group' => 'Mobile',
         ]));
     }
 }
-                
-
