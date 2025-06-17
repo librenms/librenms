@@ -385,7 +385,7 @@ class Number
             throw new InvalidArgumentException('Current time must be greater than previous time');
         }
 
-        if (!ctype_digit($prevValue) || !ctype_digit($currValue)) {
+        if (! ctype_digit($prevValue) || ! ctype_digit($currValue)) {
             throw new InvalidArgumentException("Counter values must be non-negative integers ($prevValue, $currValue)");
         }
 

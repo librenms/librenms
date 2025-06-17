@@ -1152,7 +1152,7 @@ class Cisco extends OS implements
                     // get existing or add new
                     $key = $current->getCompositeKey();
                     if ($macs->has($key)) {
-                        $current =  $macs->get($key);
+                        $current = $macs->get($key);
                     } else {
                         $macs->put($key, $current);
                     }

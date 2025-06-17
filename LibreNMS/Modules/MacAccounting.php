@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MacAccounting.php
  *
@@ -131,7 +132,7 @@ class MacAccounting implements Module
                 'ifIndex' => $mac->ifIndex,
                 'mac' => $mac->mac,
                 'rrd_name' => ['cip', $mac->ifIndex, $mac->mac],
-                'rrd_def' => $rrd_def
+                'rrd_def' => $rrd_def,
             ];
             $fields = [
                 'IN' => $mac->bytes_in,
