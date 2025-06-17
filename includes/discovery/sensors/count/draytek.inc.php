@@ -29,56 +29,54 @@ foreach ($lteinfo_objects as $index => $object) {
     if (isset($object['ltemaxchannelratetx'])) {
         $current = preg_replace('/\D/', '', $object['ltemaxchannelratetx']);
         if ($current == '') {
-            $current = 0; 
+            $current = 0;
         }
 
         $num_oid = '.1.3.6.1.4.1.7367.4.9.';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
-                'poller_type' => 'snmp',
-                'sensor_class' => 'count',
-                'device_id' => $device['device_id'],
-                'sensor_oid' => $num_oid . $index,
-                'sensor_index' => 'ltemaxchannelratetx.' . $index,
-                'sensor_type' => 'ltemaxchannelratetx',
-                'sensor_descr' => 'LTE Tx Mbps modem ' . $index,
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'sensor_limit' => null,
-                'sensor_limit_warn' => null,
-                'sensor_limit_low' => null,
-                'sensor_limit_low_warn' => null,
-                'sensor_current' => $current,
-                'group' => 'Mobile',
+            'poller_type' => 'snmp',
+            'sensor_class' => 'count',
+            'device_id' => $device['device_id'],
+            'sensor_oid' => $num_oid . $index,
+            'sensor_index' => 'ltemaxchannelratetx.' . $index,
+            'sensor_type' => 'ltemaxchannelratetx',
+            'sensor_descr' => 'LTE Tx Mbps modem ' . $index,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_limit' => null,
+            'sensor_limit_warn' => null,
+            'sensor_limit_low' => null,
+            'sensor_limit_low_warn' => null,
+            'sensor_current' => $current,
+            'group' => 'Mobile',
         ]));
     }
 
     if (isset($object['ltemaxchannelraterx'])) {
         $current = preg_replace('/\D/', '', $object['ltemaxchannelraterx']);
         if ($current == '') {
-            $current = 0; 
+            $current = 0;
         }
 
         $num_oid = '.1.3.6.1.4.1.7367.4.10.';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
-                'poller_type' => 'snmp',
-                'sensor_class' => 'count',
-                'device_id' => $device['device_id'],
-                'sensor_oid' => $num_oid . $index,
-                'sensor_index' => 'ltemaxchannelraterx.' . $index,
-                'sensor_type' => 'ltemaxchannelraterx',
-                'sensor_descr' => 'LTE Rx Mbps modem ' . $index,
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'sensor_limit' => null,
-                'sensor_limit_warn' => null,
-                'sensor_limit_low' => null,
-                'sensor_limit_low_warn' => null,
-                'sensor_current' => $current,
-                'group' => 'Mobile',
+            'poller_type' => 'snmp',
+            'sensor_class' => 'count',
+            'device_id' => $device['device_id'],
+            'sensor_oid' => $num_oid . $index,
+            'sensor_index' => 'ltemaxchannelraterx.' . $index,
+            'sensor_type' => 'ltemaxchannelraterx',
+            'sensor_descr' => 'LTE Rx Mbps modem ' . $index,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_limit' => null,
+            'sensor_limit_warn' => null,
+            'sensor_limit_low' => null,
+            'sensor_limit_low_warn' => null,
+            'sensor_current' => $current,
+            'group' => 'Mobile',
         ]));
-    }    
+    }
 }
-                
-

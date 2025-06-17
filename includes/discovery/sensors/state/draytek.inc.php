@@ -54,21 +54,21 @@ foreach ($lteinfo_objects as $index => $object) {
         $num_oid = '.1.3.6.1.4.1.7367.4.1.';
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
-                'poller_type' => 'snmp',
-                'sensor_class' => 'state',
-                'device_id' => $device['device_id'],
-                'sensor_oid' => $num_oid . $index,
-                'sensor_index' => 'ltestatus.' . $index,
-                'sensor_type' => $state_name,
-                'sensor_descr' => 'LTE Status modem ' . $index,
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'sensor_limit' => null,
-                'sensor_limit_warn' => null,
-                'sensor_limit_low' => null,
-                'sensor_limit_low_warn' => null,
-                'sensor_current' => $current,
-                'group' => 'Mobile',
+            'poller_type' => 'snmp',
+            'sensor_class' => 'state',
+            'device_id' => $device['device_id'],
+            'sensor_oid' => $num_oid . $index,
+            'sensor_index' => 'ltestatus.' . $index,
+            'sensor_type' => $state_name,
+            'sensor_descr' => 'LTE Status modem ' . $index,
+            'sensor_divisor' => 1,
+            'sensor_multiplier' => 1,
+            'sensor_limit' => null,
+            'sensor_limit_warn' => null,
+            'sensor_limit_low' => null,
+            'sensor_limit_low_warn' => null,
+            'sensor_current' => $current,
+            'group' => 'Mobile',
         ]));
     }
 }

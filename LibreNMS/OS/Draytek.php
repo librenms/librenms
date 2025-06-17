@@ -33,7 +33,6 @@ use SnmpQuery;
 
 class Draytek extends OS implements WirelessRssiDiscovery
 {
-
     /**
      * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
