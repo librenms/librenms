@@ -26,41 +26,59 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementCollection;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
 {
-    private $stats;
+    private MeasurementCollection $stats;
+
 
     public function __construct()
     {
         $this->stats = new MeasurementCollection();
     }
 
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
+    public function getStats(): MeasurementCollection
     {
-        return true;
+        return $this->stats;
     }
+
 
     /**
      * Record statistics for operation
      *
      * @param  Measurement  $stat
      */
-    protected function recordStatistic(Measurement $stat)
+    protected function recordStatistic(Measurement $stat): void
     {
         $this->stats->record($stat);
     }
 
-    public function getStats()
+    protected function getDevice(array $meta): Device
     {
-        return $this->stats;
+        if (isset($meta['device']) && $meta['device'] instanceof Device) {
+            return $meta['device'];
+        }
+
+        return DeviceCache::getPrimary();
+    }
+
+    public function startBatch(): void
+    {
+        // do nothing
+    }
+
+    public function commitBatch(): void
+    {
+        // do nothing
+    }
+
+    public function terminate(): void
+    {
+        // do nothing
     }
 }

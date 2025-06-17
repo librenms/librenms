@@ -60,32 +60,21 @@ class Graphite extends BaseDatastore
         $this->prefix = Config::get('graphite.prefix', '');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Graphite';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
         return Config::get('graphite.enable', false);
     }
 
+
     /**
-     * Datastore-independent function which should be used for all polled metrics.
-     *
-     * RRD Tags:
-     *   rrd_def     RrdDefinition
-     *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
-     *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
-     *   rrd_step             int: rrd step, defaults to 300
-     *
-     * @param  array  $device
-     * @param  string  $measurement  Name of this measurement
-     * @param  array  $tags  tags for the data (or to control rrdtool)
-     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
-     *                               single values are allowed and will be paired with $measurement
+     * @inheritDoc
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
     {
         if (! $this->connection) {
             d_echo("Graphite Error: not connected\n");
@@ -99,13 +88,15 @@ class Graphite extends BaseDatastore
             $measurement = 'ports|' . $tags['ifName'];
         }
 
+        $hostname = $this->getDevice($meta)->hostname;
+
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
-        $hostname = preg_replace('/\./', '_', $device['hostname']);
+        $hostname = preg_replace('/\./', '_', $hostname);
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
 
-        $measurement_name = preg_replace('/\./', '_', $tags['rrd_name'] ?? '');
+        $measurement_name = preg_replace('/\./', '_', $meta['rrd_name'] ?? ''); // FIXME don't use rrd_name
         $ms_name = is_array($measurement_name) ? implode('.', $measurement_name) : $measurement_name;
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', $ms_name)) {

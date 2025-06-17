@@ -1,9 +1,8 @@
 <?php
-
 /**
- * Datastore.php
+ * BatchWriteInterface.php
  *
- * Interface for datastores. Will be used to send them data through the put() method
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +19,15 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Interfaces\Data;
 
-use App\Polling\Measure\MeasurementCollection;
-
-interface Datastore extends BatchWriteInterface
+interface BatchWriteInterface extends WriteInterface
 {
-    /**
-     * Check if this is enabled by the configuration
-     *
-     * @return bool
-     */
-    public static function isEnabled(): bool;
+    public function startBatch(): void;
 
-    /**
-     * The name of this datastore
-     *
-     * @return string
-     */
-    public function getName(): string;
-
-    public function getStats(): MeasurementCollection;
-
-    public function terminate(): void;
+    public function commitBatch(): void;
 }

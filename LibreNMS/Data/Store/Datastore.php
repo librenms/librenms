@@ -26,22 +26,29 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\DeviceCache;
+use App\Models\Device;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
+use LibreNMS\Interfaces\Data\WriteInterface;
 
-class Datastore implements DataStorageInterface
+class Datastore implements WriteInterface, DataStorageInterface
 {
-    protected $stores;
+    /**
+     * @var DatastoreContract[]
+     */
+    protected array $stores;
 
     /**
-     * Initialize and create the Datastore(s)
+     * Legacy factory method to initialize and create the Datastore(s)
      *
      * @param  array  $options
      * @return Datastore
      */
-    public static function init($options = [])
+    public static function init(array $options = []): Datastore
     {
         $opts = [
             'r' => 'rrd.enable',
@@ -59,19 +66,21 @@ class Datastore implements DataStorageInterface
         return app('Datastore');
     }
 
-    public static function terminate()
-    {
-        \Rrd::close();
-    }
-
     /**
      * Datastore constructor.
      *
-     * @param  array  $datastores  Implement DatastoreInterface
+     * @param  DatastoreContract[]  $datastores
      */
-    public function __construct($datastores)
+    public function __construct(array $datastores)
     {
         $this->stores = $datastores;
+    }
+
+    public function terminate(): void
+    {
+        foreach($this->stores as $store) {
+            $store->terminate();
+        }
     }
 
     /**
@@ -79,7 +88,7 @@ class Datastore implements DataStorageInterface
      *
      * @param  string  $name
      */
-    public function disable($name)
+    public function disable(string $name): void
     {
         $store = app("LibreNMS\\Data\\Store\\$name");
         $position = array_search($store, $this->stores);
@@ -92,7 +101,7 @@ class Datastore implements DataStorageInterface
     }
 
     /**
-     * Datastore-independent function which should be used for all polled metrics.
+     * Compatability method to support old writes
      *
      * RRD Tags:
      *   rrd_def     RrdDefinition
@@ -106,7 +115,7 @@ class Datastore implements DataStorageInterface
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
      *                               single values are allowed and will be paired with $measurement
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function put($device, $measurement, $tags, $fields): void
     {
         // convenience conversion to allow calling with a single value, so, e.g., these are equivalent:
         // put($device, 'mymeasurement', $tags, 1234);
@@ -116,41 +125,52 @@ class Datastore implements DataStorageInterface
             $fields = [$measurement => $fields];
         }
 
-        foreach ($this->stores as $store) {
-            /** @var DatastoreContract $store */
-            // rrdtool_data_update() will only use the tags it deems relevant, so we pass all of them.
-            // However, influxdb saves all tags, so we filter out the ones beginning with 'rrd_'.
-            $temp_tags = $store->wantsRrdTags() ? $tags : $this->rrdTagFilter($tags);
+        // get the rrd meta data out of the tags array
+        $meta = $this->rrdTagFilter($tags);
 
-            $store->put($device, $measurement, $temp_tags, $fields);
+        // set device if it is not the primary device
+        if (is_array($device) && isset($device['device_id']) && $device['device_id'] !== DeviceCache::getPrimary()->device_id) {
+            $meta['device'] = DeviceCache::get($device['device_id']);
+        } elseif ($device instanceof Device && $device->device_id !== DeviceCache::getPrimary()->device_id) {
+            $meta['device'] = $device;
+        }
+
+        $this->write($measurement, $tags, $fields, $meta);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
+    {
+        foreach ($this->stores as $store) {
+            $store->write($measurement, $fields, $tags, $meta);
         }
     }
 
     /**
      * Filter all elements with keys that start with 'rrd_'
      *
-     * @param  array  $arr  input array
-     * @return array Copy of $arr with all keys beginning with 'rrd_' removed.
+     * @param  array<string, mixed>  $tags  input array
+     * @return array<string, mixed> Copy of $arr with all keys beginning with 'rrd_' removed.
      */
-    private function rrdTagFilter($arr)
+    private function rrdTagFilter(array &$tags): array
     {
-        $result = [];
-        foreach ($arr as $k => $v) {
-            if (strpos($k, 'rrd_') === 0) {
-                continue;
-            }
-            $result[$k] = $v;
-        }
+        [$metaTags, $filteredTags] = Arr::partition($tags, function($value, string $tag) {
+            return str_starts_with($tag, 'rrd_');
+        });
 
-        return $result;
+        $tags = $filteredTags; // Update the original array with remaining tags
+
+        return $metaTags;
     }
 
     /**
      * Get all the active data stores
      *
-     * @return array
+     * @return DatastoreContract[]
      */
-    public function getStores()
+    public function getStores(): array
     {
         return $this->stores;
     }
