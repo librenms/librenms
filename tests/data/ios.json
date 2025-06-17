@@ -12230,7 +12230,7 @@
             ]
         }
     },
-    "cisco-mac-accounting": {
+    "mac-accounting": {
         "discovery": {
             "mac_accounting": [
                 {

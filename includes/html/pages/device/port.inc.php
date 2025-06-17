@@ -57,6 +57,7 @@ echo view('device.tabs.ports.includes.port_row', [
             'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
         ],
+        'tab' => $vars['tab'],
     ],
     'collapsing' => false,
 ]);
@@ -155,9 +156,7 @@ foreach ($menu_options as $option => $text) {
 unset($sep);
 
 if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port->port_id . "'") > '0') {
-    echo generate_link($descr, $link_array, ['view' => 'macaccounting', 'graph' => $type]);
-
-    echo ' | Mac Accounting : ';
+    echo ' | MAC Accounting : ';
     if ($vars['view'] == 'macaccounting' && $vars['graph'] == 'bits' && $vars['subview'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
     }

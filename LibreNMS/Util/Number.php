@@ -373,4 +373,60 @@ class Number
 
         return $percent;
     }
+
+    /**
+     * Calculate a rate from a counter (uint32 or unit64) that could possibly overflow.
+     *
+     * This is using string input for the values to handle possible uint64 values.
+     */
+    public static function calculateRate(string $prevValue, string $currValue, float $prevTime, float $currTime, ?int $bitSize = null): float
+    {
+        if ($currTime <= $prevTime) {
+            throw new InvalidArgumentException('Current time must be greater than previous time');
+        }
+
+        if (!ctype_digit($prevValue) || !ctype_digit($currValue)) {
+            throw new InvalidArgumentException("Counter values must be non-negative integers ($prevValue, $currValue)");
+        }
+
+        // Auto-detect bit size based on both values
+        if ($bitSize === null) {
+            $uint32Max = (string) IntegerType::uint32->maxValue();
+            $bitSize = (strlen($prevValue) > 10 || strcmp($prevValue, $uint32Max) > 0 ||
+                strlen($currValue) > 10 || strcmp($currValue, $uint32Max) > 0) ? 64 : 32;
+        }
+        $maxValue = (string) ($bitSize === 32 ? IntegerType::uint32->maxValue() : IntegerType::uint64->maxValue());
+        $timeInterval = $currTime - $prevTime;
+
+        if (extension_loaded('gmp')) {
+            $prev = gmp_init($prevValue);
+            $curr = gmp_init($currValue);
+            $diff = gmp_cmp($curr, $prev) >= 0
+                ? gmp_sub($curr, $prev)
+                : gmp_add(gmp_sub(gmp_init($maxValue), $prev), gmp_add($curr, 1));
+
+            return (float) gmp_div($diff, $timeInterval);
+        }
+
+        if (extension_loaded('bcmath')) {
+            $diff = bccomp($currValue, $prevValue) >= 0
+                ? bcsub($currValue, $prevValue)
+                : bcadd(bcsub($maxValue, $prevValue), bcadd($currValue, '1'));
+
+            return (float) bcdiv($diff, (string) $timeInterval, 10);
+        }
+
+        // Fallback to float with precision check
+        $prev = (float) $prevValue;
+        $curr = (float) $currValue;
+        $max = (float) $maxValue;
+
+        if ($bitSize === 64 && ($prev > PHP_FLOAT_MAX || $curr > PHP_FLOAT_MAX)) {
+            trigger_error('Possible precision loss with 64-bit counter using float', E_USER_WARNING);
+        }
+
+        $diff = $curr >= $prev ? $curr - $prev : ($max - $prev) + $curr + 1;
+
+        return $diff / $timeInterval;
+    }
 }

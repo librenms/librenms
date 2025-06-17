@@ -33,6 +33,7 @@ use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\MacAccounting;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
@@ -45,6 +46,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -55,6 +57,7 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Polling\MacAccountingPolling;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -72,6 +75,8 @@ class Cisco extends OS implements
     StpInstanceDiscovery,
     ProcessorDiscovery,
     QosDiscovery,
+    MacAccountingDiscovery,
+    MacAccountingPolling,
     MempoolsDiscovery,
     NacPolling,
     QosPolling,
@@ -1092,5 +1097,77 @@ class Cisco extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverMacAccounting(): Collection
+    {
+        return SnmpQuery::walk('CISCO-IP-STAT-MIB::cipMacSwitchedBytes')
+            ->mapTable(function (array $data, int $ifIndex, string $direction, string $mac) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+
+                if ($port_id === null) {
+                    return null;
+                }
+
+                return new MacAccounting([
+                    'port_id' => $port_id,
+                    'mac' => Mac::parse($mac)->hex(),
+                    'ifIndex' => $ifIndex,
+                    'bps_in' => 0,
+                    'bps_out' => 0,
+                ]);
+            })->filter()->unique(fn (MacAccounting $m) => $m->getCompositeKey());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pollMacAccounting(Collection $macs): Collection
+    {
+        $cip_response = SnmpQuery::walk([
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes',
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts',
+        ]);
+        if (! $cip_response->isValid()) {
+            $cip_response = SnmpQuery::walk([
+                'CISCO-IP-STAT-MIB::cipMacSwitchedBytes',
+                'CISCO-IP-STAT-MIB::cipMacSwitchedPkts',
+            ]);
+        }
+
+        foreach ($cip_response->table(3) as $ifIndex => $port_data) {
+            foreach ($port_data as $direction => $dir_data) {
+                foreach ($dir_data as $mac => $mac_data) {
+                    $mac = Mac::parse($mac)->hex();
+                    $current = new MacAccounting([
+                        'mac' => Mac::parse($mac)->hex(),
+                        'ifIndex' => $ifIndex,
+                        'bps_in' => 0,
+                        'bps_out' => 0,
+                    ]);
+
+                    // get existing or add new
+                    $key = $current->getCompositeKey();
+                    if ($macs->has($key)) {
+                        $current =  $macs->get($key);
+                    } else {
+                        $macs->put($key, $current);
+                    }
+
+                    if ($direction == 'input') {
+                        $current->bytes_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    } else {
+                        $current->bytes_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return $macs;
     }
 }

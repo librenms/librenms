@@ -437,6 +437,8 @@ class ConfigRepository
         $this->deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
         $this->deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
         $this->deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
+        $this->deprecatedVariable('discovery_modules.cisco-mac-accounting', 'discovery_modules.mac-accounting');
+        $this->deprecatedVariable('poller_modules.cisco-mac-accounting', 'poller_modules.mac-accounting');
         $this->deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // migrate device display

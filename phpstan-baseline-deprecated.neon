@@ -1874,42 +1874,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/cisco-mac-accounting.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/cisco-mac-accounting.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/cisco-mac-accounting.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_walk\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/cisco-mac-accounting.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_array_num\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -9620,24 +9584,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/cisco-ipsec-flow-monitor.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/polling/cisco-mac-accounting.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/polling/cisco-mac-accounting.inc.php
 
 		-
 			message: '''
