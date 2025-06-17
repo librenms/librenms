@@ -36,11 +36,11 @@ class MacAccounting extends PortRelatedModel implements Keyable
             }
 
             $this->attributes['bps_in'] = Number::calculateRate(
-                    (string) ($this->getAttribute('bytes_in') ?: '0'),
-                    (string) ($value ?: '0'),
-                    $this->last_polled,
-                    time()
-                ) * 8;
+                (string) ($this->getAttribute('bytes_in') ?: '0'),
+                (string) ($value ?: '0'),
+                $this->last_polled,
+                time()
+            ) * 8;
 
             return $value;
         });
@@ -56,11 +56,11 @@ class MacAccounting extends PortRelatedModel implements Keyable
             }
 
             $this->attributes['bps_out'] = Number::calculateRate(
-                    (string) ($this->getAttribute('bytes_in') ?: '0'),
-                    (string) ($value ?: '0'),
-                    $this->last_polled,
-                    time()
-                ) * 8;
+                (string) ($this->getAttribute('bytes_in') ?: '0'),
+                (string) ($value ?: '0'),
+                $this->last_polled,
+                time()
+            ) * 8;
 
             return $value;
         });

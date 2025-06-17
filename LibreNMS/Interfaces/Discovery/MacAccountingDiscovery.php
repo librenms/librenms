@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DiscoverMacAccounting.php
  *
