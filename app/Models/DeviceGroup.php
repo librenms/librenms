@@ -87,9 +87,7 @@ class DeviceGroup extends BaseModel
      */
     public function getParser()
     {
-        return ! empty($this->rules) ?
-            QueryBuilderFluentParser::fromJson($this->rules) :
-            QueryBuilderFluentParser::fromOld($this->pattern);
+        return QueryBuilderFluentParser::fromJson($this->rules ?: []);
     }
 
     // ---- Query Scopes ----
