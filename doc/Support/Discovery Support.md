@@ -85,7 +85,7 @@ Modules.
     lnms config:set discovery_modules.processors true
     lnms config:set discovery_modules.mempools true
     lnms config:set discovery_modules.cisco-vrf-lite true
-    lnms config:set discovery_modules.cisco-mac-accounting false
+    lnms config:set discovery_modules.mac-accounting false
     lnms config:set discovery_modules.cisco-pw false
     lnms config:set discovery_modules.vrf false
     lnms config:set discovery_modules.cisco-cef false
@@ -181,7 +181,7 @@ device, with history data.
 
 `vlans`: VLAN detection and support.
 
-`cisco-mac-accounting`: MAC Address account support.
+`mac-accounting`: MAC Address account support.
 
 `cisco-pw`: Pseudowires wires detection and support.
 
