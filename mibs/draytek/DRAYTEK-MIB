@@ -1,0 +1,536 @@
+DRAYTEK-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+draytekMIB MODULE-IDENTITY
+    LAST-UPDATED "202011270000Z"
+    ORGANIZATION "Draytek Co."
+    CONTACT-INFO ""
+    DESCRIPTION  "MIB Tree for Draytek"
+    REVISION     "202011270000Z"
+    DESCRIPTION  "add router information objects"
+::= { enterprises 7367 }
+
+usbsensorObjects OBJECT IDENTIFIER ::= { draytekMIB 1 }
+vpnconnObjects OBJECT IDENTIFIER ::= { draytekMIB 2 }
+routerinfoObjects OBJECT IDENTIFIER ::= { draytekMIB 3 }
+lteinfoObjects OBJECT IDENTIFIER ::= { draytekMIB 4 }
+
+temperValue OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS   read-only
+    STATUS        current
+    DESCRIPTION   "A value of temperature"
+    ::= { usbsensorObjects 1 }
+	
+humiValue OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "A value off humidity"
+    ::= { usbsensorObjects 2 }
+
+vpnStatus OBJECT IDENTIFIER ::= { vpnconnObjects 1 }
+
+connectedTunnels OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS COUNT."
+    ::= { vpnStatus 1 }
+
+connectedTunnelIdx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS INDEX."
+    ::= { vpnStatus 2 }	
+	
+connectedVPNprofilename OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS Profile Name."
+    ::= { vpnStatus 3 }
+
+connectedVPNType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS Types."
+    ::= { vpnStatus 4 }
+
+connectedVPNClientIP OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN Remote IP Address."
+    ::= { vpnStatus 5 }
+
+connectedVPNWanIntface OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS WAN interface."
+    ::= { vpnStatus 6 }
+
+connectedVPNRemoteSubnet OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS Remote Subnet."
+    ::= { vpnStatus 7 }
+
+connectedVPNTXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS TX Packets."
+    ::= { vpnStatus 8 }
+
+connectedVPNRXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS RX Packets."
+    ::= { vpnStatus 9 }
+
+connectedVPNTXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS TX Rate."
+    ::= { vpnStatus 10 }
+
+connectedVPNRXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS RX Rate."
+    ::= { vpnStatus 11 }
+
+connectedVPNUpTime OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS UpTime."
+    ::= { vpnStatus 12 }
+
+connectedVPNActionDrop OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Connected VPN TUNNELS Manual Drop action."
+    ::= { vpnStatus 13 }
+
+lan2LanProfileStatus OBJECT IDENTIFIER ::= { vpnconnObjects 2 }
+
+connectedL2LTunnels OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS COUNT."
+    ::= { lan2LanProfileStatus 1 }
+
+lan2LanProfileIdx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "L2L Profile INDEX."
+    ::= { lan2LanProfileStatus 2 }	
+	
+lan2LanProfilename OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "L2L Profile Name."
+    ::= { lan2LanProfileStatus 3 }
+
+connectedL2LType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS Types."
+    ::= { lan2LanProfileStatus 4 }
+
+connectedL2LClientIP OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN Remote IP Address."
+    ::= { lan2LanProfileStatus 5 }
+
+connectedL2LWanIntface OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS WAN interface."
+    ::= { lan2LanProfileStatus 6 }
+
+connectedL2LRemoteSubnet OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS Remote Subnet."
+    ::= { lan2LanProfileStatus 7 }
+
+connectedL2LTXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS TX Packets."
+    ::= { lan2LanProfileStatus 8 }
+
+connectedL2LRXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS RX Packets."
+    ::= { lan2LanProfileStatus 9 }
+
+connectedL2LTXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS TX Rate."
+    ::= { lan2LanProfileStatus 10 }
+
+connectedL2LRXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS RX Rate."
+    ::= { lan2LanProfileStatus 11 }
+
+connectedL2LUpTime OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS UpTime."
+    ::= { lan2LanProfileStatus 12 }
+
+connectedL2LActionDrop OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Connected L2L VPN TUNNELS Manual Drop action."
+    ::= { lan2LanProfileStatus 13 }
+
+remoteDialInProfileStatus OBJECT IDENTIFIER ::= { vpnconnObjects 3 }
+
+connectedRDinTunnels OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS COUNT."
+    ::= { remoteDialInProfileStatus 1 }
+
+rDinProfileIdx OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote-Dial-in Profile INDEX."
+    ::= { remoteDialInProfileStatus 2 }	
+	
+rDinProfilename OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote-Dial-in Profile Name."
+    ::= { remoteDialInProfileStatus 3 }
+
+connectedRDinType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS Types."
+    ::= { remoteDialInProfileStatus 4 }
+
+connectedRDinClientIP OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN Remote IP Address."
+    ::= { remoteDialInProfileStatus 5 }
+
+connectedRDinWanIntface OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS WAN interface."
+    ::= { remoteDialInProfileStatus 6 }
+
+connectedRDinRemoteSubnet OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS Remote Subnet."
+    ::= { remoteDialInProfileStatus 7 }
+
+connectedRDinTXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS TX Packets."
+    ::= { remoteDialInProfileStatus 8 }
+
+connectedRDinRXPkts OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS RX Packets."
+    ::= { remoteDialInProfileStatus 9 }
+
+connectedRDinTXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS TX Rate."
+    ::= { remoteDialInProfileStatus 10 }
+
+connectedRDinRXRate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS RX Rate."
+    ::= { remoteDialInProfileStatus 11 }
+
+connectedRDinUpTime OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS UpTime."
+    ::= { remoteDialInProfileStatus 12 }
+
+connectedRDinActionDrop OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Connected Remote-Dial-in VPN TUNNELS Manual Drop action."
+    ::= { remoteDialInProfileStatus 13 }
+
+routerModel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router model"
+    ::= { routerinfoObjects 1 }
+	
+routerRevision OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router revision"
+    ::= { routerinfoObjects 2 }
+
+fwBuildDate OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Firmware build date"
+    ::= { routerinfoObjects 3 }
+	
+dslVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router DSL version"
+    ::= { routerinfoObjects 4 }
+
+countryCode OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router country code"
+    ::= { routerinfoObjects 5 }
+	
+wirelessRegion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router wireless region"
+    ::= { routerinfoObjects 6 }
+
+memoryUsage OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Router memory usage"
+    ::= { routerinfoObjects 7 }
+
+lanMac OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LAN MAC address"
+    ::= { routerinfoObjects 8 }
+
+ltestatus OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LTE Status"
+    ::= { lteinfoObjects 1 }
+	
+lteimei OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "IMEI"
+    ::= { lteinfoObjects 2 }
+
+lteimsi OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "IMSI"
+    ::= { lteinfoObjects 3 }
+	
+lteaccesstech OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Access Tech"
+    ::= { lteinfoObjects 4 }
+
+lteband OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LTE Band"
+    ::= { lteinfoObjects 5 }
+	
+lteispoperator OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "ISP Operator"
+    ::= { lteinfoObjects 6 }
+
+lterssi OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "RSSI Signal"
+    ::= { lteinfoObjects 7 }
+	
+lteactivechannel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Active Channel"
+    ::= { lteinfoObjects 8 }
+
+ltemaxchannelratetx OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Max Channel TX Rate"
+    ::= { lteinfoObjects 9 }
+
+
+ltemaxchannelraterx OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Max Channel RX Rate"
+    ::= { lteinfoObjects 10 }
+	
+ltewanbudget OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LTE WAN Budget"
+    ::= { lteinfoObjects 11 }
+
+ltewanbudgettraffic OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LTE WAN traffic"
+    ::= { lteinfoObjects 12 }
+
+ltersrq OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "RSRQ Signal"
+    ::= { lteinfoObjects 13 }
+
+lteecio OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "ECIO Signal"
+    ::= { lteinfoObjects 14 }
+    
+ltersrp OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "RSRP Signal"
+    ::= { lteinfoObjects 15 }
+    
+lteiccid1 OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "SIM1 ICCID"
+    ::= { lteinfoObjects 16 }
+    
+lteiccid2 OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "SIM2 ICCID"
+    ::= { lteinfoObjects 17 }
+    
+ltemcc OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "MCC"
+    ::= { lteinfoObjects 18 }
+    
+ltemnc OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "MNC"
+    ::= { lteinfoObjects 19 }
+    
+lteplmn OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "PLMN"
+    ::= { lteinfoObjects 20 }
+    
+ltelac OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "LAC"
+    ::= { lteinfoObjects 21 }
+    
+ltecellid OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "CELL ID"
+    ::= { lteinfoObjects 22 }
+    
+lterscp OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "RSCP"
+    ::= { lteinfoObjects 23 }
+END
