@@ -26,9 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use App;
-use Log;
-
 class Debug
 {
     /** @var bool */
@@ -42,10 +39,9 @@ class Debug
      * Enable/disable debug output
      *
      * @param  bool  $debug  whether to enable or disable debug output
-     * @param  bool  $silence  Silence error output or output all errors except notices
      * @return bool returns $debug
      */
-    public static function set($debug = true, bool $silence = false): bool
+    public static function set($debug = true): bool
     {
         self::$debug = (bool) $debug;
 
@@ -54,8 +50,8 @@ class Debug
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            self::disableErrorReporting($silence);
-            self::disableCliDebugOutput($silence);
+            self::disableErrorReporting();
+            self::disableCliDebugOutput();
             self::disableQueryDebug();
         }
 
@@ -92,18 +88,17 @@ class Debug
 
     public static function enableCliDebugOutput(): void
     {
-        if (Laravel::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console_debug');
-        } else {
-            putenv('LOG_CHANNEL=console_debug');
-        }
+        config(['logging.channels.stdout.level' => 'debug']);
     }
 
-    public static function disableCliDebugOutput(bool $silence): void
+    public static function disableCliDebugOutput(): void
     {
-        if (Laravel::isBooted() && Log::getDefaultDriver() !== 'stack') {
-            Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
-        }
+        config(['logging.channels.stdout.level' => 'info']);
+    }
+
+    public static function setCliQuietOutput(): void
+    {
+        config(['logging.channels.stdout.level' => 'emergency']);
     }
 
     public static function enableQueryDebug(): void
@@ -119,7 +114,7 @@ class Debug
     /**
      * Disable error reporting, do not use with new code
      */
-    public static function disableErrorReporting(bool $silence = false): void
+    public static function disableErrorReporting(): void
     {
         ini_set('display_startup_errors', '1');
         ini_set('display_errors', '0');
