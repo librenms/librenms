@@ -83,7 +83,7 @@ class ModuleModelObserver
     {
         if (Debug::isEnabled()) {
             $this->logger->debug('Updated data:   ', ['nlb' => true]);
-            $this->logger->debug($model->getDirty());
+            $this->logger->debug(var_export($model->getDirty(), true));
         } else {
             $this->logger->info('U', ['nlb' => true]);
         }
@@ -96,7 +96,7 @@ class ModuleModelObserver
     {
         if (Debug::isEnabled()) {
             $this->logger->debug('Restored data:   ', ['nlb' => true]);
-            $this->logger->debug($model->getDirty());
+            $this->logger->debug(var_export($model->getDirty(), true));
         } else {
             $this->logger->info('R', ['nlb' => true]);
         }
