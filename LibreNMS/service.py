@@ -5,6 +5,9 @@ import sys
 import threading
 import time
 
+import LibreNMS
+from LibreNMS.config import DBConfig
+
 from datetime import timedelta
 from datetime import datetime
 from platform import python_version
