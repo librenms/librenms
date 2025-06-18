@@ -185,8 +185,8 @@ def normalize_wait(seconds):
 
 
 def reset_signals():
-    #https://bugs.python.org/issue38435
-    #https://bugs.python.org/issue32985
+    # https://bugs.python.org/issue38435
+    # https://bugs.python.org/issue32985
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
 
@@ -210,7 +210,11 @@ def call_script(script, args=()):
     logger.debug("Running {}".format(cmd))
     # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
     return command_runner(
-        cmd, preexec_fn=reset_signals, close_fds=True, start_new_session=True, timeout=DEFAULT_SCRIPT_TIMEOUT
+        cmd,
+        preexec_fn=reset_signals,
+        close_fds=True,
+        start_new_session=True,
+        timeout=DEFAULT_SCRIPT_TIMEOUT,
     )
 
 
