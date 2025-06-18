@@ -28,7 +28,10 @@ $set_rrd_def = RrdDefinition::make()
     ->addDataset('min_size', 'GAUGE')
     ->addDataset('size', 'GAUGE');
 
-$app_data = ['sets' => [], 'no_minus_d' => $data['no_minus_d']];
+$app_data = [
+    'sets' => [],
+    'no_minus_d' => $data['no_minus_d'] ?? false,
+];
 
 $rrd_name = ['app', $name, $app->app_id];
 $fields = [
@@ -56,21 +59,21 @@ foreach ($data['sets'] as $set_name => $set_data) {
         'log_sizes' => [],
     ];
 
-    $metrics['set_' . $set_name . '_max_size'] = $set_data['max'];
-    $metrics['set_' . $set_name . '_mean_size'] = $set_data['mean'];
-    $metrics['set_' . $set_name . '_median_size'] = $set_data['median'];
-    $metrics['set_' . $set_name . '_mode_size'] = $set_data['mode'];
-    $metrics['set_' . $set_name . '_min_size'] = $set_data['min'];
-    $metrics['set_' . $set_name . '_size'] = $set_data['size'];
+    $metrics['set_' . $set_name . '_max_size'] = $set_data['max'] ?? null;
+    $metrics['set_' . $set_name . '_mean_size'] = $set_data['mean'] ?? null;
+    $metrics['set_' . $set_name . '_median_size'] = $set_data['median'] ?? null;
+    $metrics['set_' . $set_name . '_mode_size'] = $set_data['mode'] ?? null;
+    $metrics['set_' . $set_name . '_min_size'] = $set_data['min'] ?? null;
+    $metrics['set_' . $set_name . '_size'] = $set_data['size'] ?? null;
 
     $rrd_name = ['app', $name, $app->app_id, $set_name];
     $fields = [
-        'max_size' => $set_data['max'],
-        'mean_size' => $set_data['mean'],
-        'median_size' => $set_data['median'],
-        'mode_size' => $set_data['mode'],
-        'min_size' => $set_data['min'],
-        'size' => $set_data['size'],
+        'max_size' => $set_data['max'] ?? null,
+        'mean_size' => $set_data['mean'] ?? null,
+        'median_size' => $set_data['median'] ?? null,
+        'mode_size' => $set_data['mode'] ?? null,
+        'min_size' => $set_data['min'] ?? null,
+        'size' => $set_data['size'] ?? null,
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
     app('Datastore')->put($device, 'app', $tags, $fields);
