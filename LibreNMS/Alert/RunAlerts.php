@@ -136,7 +136,7 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
