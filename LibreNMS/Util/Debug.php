@@ -88,17 +88,29 @@ class Debug
 
     public static function enableCliDebugOutput(): void
     {
-        config(['logging.channels.stdout.level' => 'debug']);
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'debug']);
+        } else {
+            putenv('STDOUT_LOG_LEVEL=debug');
+        }
     }
 
     public static function disableCliDebugOutput(): void
     {
-        config(['logging.channels.stdout.level' => 'info']);
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'info']);
+        } else {
+            putenv('STDOUT_LOG_LEVEL=info');
+        }
     }
 
     public static function setCliQuietOutput(): void
     {
-        config(['logging.channels.stdout.level' => 'emergency']);
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'emergency']);
+        } else {
+            putenv('STDOUT_LOG_LEVEL=emergency');
+        }
     }
 
     public static function enableQueryDebug(): void

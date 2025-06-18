@@ -40,15 +40,6 @@ return [
             'replace_placeholders' => true,
         ],
 
-        'daily' => [
-            'driver' => 'daily',
-            'path' => env('APP_LOG', base_path('logs/librenms.log')),
-            'formatter' => App\Logging\NoColorFormatter::class,
-            'level' => env('LOG_LEVEL', 'error'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
-
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
@@ -56,7 +47,7 @@ return [
             'with' => [
                 'stream' => 'php://output',
             ],
-            'level' => 'info',
+            'level' => env('STDOUT_LOG_LEVEL', 'info'),
         ],
 
         'stderr' => [
