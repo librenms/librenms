@@ -449,17 +449,13 @@ class Service:
         # Speed things up by only looking at direct zombie children
         for p in psutil.Process().children(recursive=False):
             try:
-                cmd = (
-                    p.cmdline()
-                )  # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
 
                 if status == psutil.STATUS_ZOMBIE:
                     pid = p.pid
                     r = os.waitpid(p.pid, os.WNOHANG)
                     logger.warning(
-                        'Reaped long running job "%s" in state %s with PID %d - job returned %d',
-                        cmd,
+                        'Reaped long running job in state %s with PID %d - job returned %d',
                         status,
                         r[0],
                         r[1],
