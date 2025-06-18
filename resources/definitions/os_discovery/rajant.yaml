@@ -1,0 +1,4 @@
+mib: RAJANT-BREADCRUMB-MIB
+modules:
+    os:
+        serial: RAJANT-CORPORATION-MIB::serialNumber
