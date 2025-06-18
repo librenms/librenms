@@ -436,6 +436,7 @@ class Service:
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
+
         if "psutil" not in sys.modules:
             logger.warning("psutil is not available, polling gap possible")
         else:
