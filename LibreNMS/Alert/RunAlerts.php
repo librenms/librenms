@@ -35,6 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
@@ -251,7 +252,7 @@ class RunAlerts
     {
         if (Config::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
-                $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
             $sql = $alert['query'];
             $qry = dbFetchRows($sql, [$alert['device_id']]);
@@ -307,7 +308,7 @@ class RunAlerts
                 }
 
                 if (empty($alert['query'])) {
-                    $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                    $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later

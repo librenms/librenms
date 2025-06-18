@@ -17434,5 +17434,32 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.1.0.174",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.1.0.172/30",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "10.1.0.177",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.1.0.176/30",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "172.30.0.30",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

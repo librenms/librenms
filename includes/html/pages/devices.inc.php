@@ -307,8 +307,9 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
-        <?php show_device_group($vars['group']); ?>
-        <table id="devices" class="table table-hover table-condensed table-striped" data-ajaxurl="<?php echo url('/ajax/table/device') ?>">
+        <?php show_device_group($vars['group'] ?? 0); ?>
+        <table id="devices" class="table table-hover table-condensed table-striped"
+               data-url="<?php echo route('table.device') ?>">
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
@@ -337,7 +338,7 @@ if ($format == 'graph') {
                     return "<span title=\"Status: " + row.status + " : " + row.extra.replace(/^label-/,'') + "\" class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                    return "<span class=\"device-table-icon tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2\">" + row.icon + "</span>";
                 },
                 "maintenance": function (column, row) {
                     if (row.maintenance) {
@@ -380,7 +381,6 @@ if ($format == 'graph') {
                     device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 };
             },
-            url: $("#devices").data("ajaxurl"),
         });
 
         <?php

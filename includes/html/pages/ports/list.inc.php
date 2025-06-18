@@ -16,9 +16,9 @@
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || isset($vars['errors']), 1);
 $no_refresh = true;
-$device = DeviceCache::get((int) $vars['device_id']);
+$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
-$location = \App\Models\Location::find((int) $vars['location']);
+$location = \App\Models\Location::find((int) ($vars['location'] ?? 0));
 $location_selected = json_encode(! empty($location) ? ['id' => $location->id, 'text' => $location->location] : '');
 
 if (isset($vars['errors'])) {
@@ -35,7 +35,7 @@ if (isset($vars['errors'])) {
     </div>
     <div class="table-responsive">
         <table id="ports" class="table table-condensed table-hover table-striped"
-            data-ajaxurl="<?php echo route('table.ports'); ?>">
+            data-url="<?php echo route('table.ports'); ?>">
             <thead>
                 <tr>
                     <th data-column-id="hostname" data-formatter="device">Device</th>
@@ -136,7 +136,6 @@ if (isset($vars['errors'])) {
                 devicegroup: '<?php echo htmlspecialchars($vars['devicegroup'] ?? ''); ?>',
             };
         },
-        url: '<?php echo route('table.ports') ?>'
     });
 
     $(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");

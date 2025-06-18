@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
         "Warning!": {
@@ -34,8 +34,7 @@
                     },
                     "validate": {
                         "propertyNames": {
-                            "pattern": "^value",
-                            "type": "string"
+                            "pattern": "^value"
                         },
                         "required": ["value"]
                     },
@@ -134,8 +133,7 @@
                                     "directory"
                                 ]
                             }
-                        },
-                        "not": { "required": ["options"]}
+                        }
                     }
                 ],
                 "dependencies": {

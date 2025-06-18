@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
         "mib": {
@@ -11,7 +11,7 @@
                 "mempools": {
                     "type": "object",
                     "properties": {
-                        "pre-cache": {"$ref": "#/definitions/pre-cache"},
+                        "pre-cache": {"$ref": "#/$defs/pre-cache"},
                         "data": {
                             "type": "array",
                             "items": {
@@ -28,7 +28,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/definitions/oid"},
+                                    "oid": {"$ref": "#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -39,7 +39,7 @@
                                         ]
                                     },
                                     "skip_values": {
-                                        "$ref": "#/definitions/skip_values"
+                                        "$ref": "#/$defs/skip_values"
                                     },
                                     "snmp_flags": {
                                         "type": "string"
@@ -81,13 +81,13 @@
                 "os": {
                     "type": "object",
                     "properties": {
-                        "version": {"$ref": "#/definitions/oids"},
-                        "hardware": {"$ref": "#/definitions/oids"},
-                        "features": {"$ref": "#/definitions/oids"},
-                        "serial": {"$ref": "#/definitions/oids"},
-                        "lat": {"$ref": "#/definitions/oid"},
-                        "location": {"$ref": "#/definitions/oids"},
-                        "long": {"$ref": "#/definitions/oid"},
+                        "version": {"$ref": "#/$defs/oids"},
+                        "hardware": {"$ref": "#/$defs/oids"},
+                        "features": {"$ref": "#/$defs/oids"},
+                        "serial": {"$ref": "#/$defs/oids"},
+                        "lat": {"$ref": "#/$defs/oid"},
+                        "location": {"$ref": "#/$defs/oids"},
+                        "long": {"$ref": "#/$defs/oid"},
                         "sysDescr_regex": {
                             "type": ["string", "array"]
                         },
@@ -124,10 +124,10 @@
                         "location_template": {
                             "type": "string"
                         },
-                        "version_replace": {"$ref": "#/definitions/os_replacements"},
-                        "hardware_replace": {"$ref": "#/definitions/os_replacements"},
-                        "features_replace": {"$ref": "#/definitions/os_replacements"},
-                        "serial_replace": {"$ref": "#/definitions/os_replacements"}
+                        "version_replace": {"$ref": "#/$defs/os_replacements"},
+                        "hardware_replace": {"$ref": "#/$defs/os_replacements"},
+                        "features_replace": {"$ref": "#/$defs/os_replacements"},
+                        "serial_replace": {"$ref": "#/$defs/os_replacements"}
                     },
                     "additionalProperties": false
                 },
@@ -139,7 +139,7 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "oid": {"$ref": "#/definitions/oid"},
+                                    "oid": {"$ref": "#/$defs/oid"},
                                     "num_oid": {
                                         "type": "string"
                                     },
@@ -155,13 +155,13 @@
                                     "precision": {
                                         "type": "integer"
                                     },
-                                    "value": {"$ref": "#/definitions/oid"},
+                                    "value": {"$ref": "#/$defs/oid"},
                                     "type": {
                                         "type": "string",
                                         "maxLength": 16
                                     },
                                     "skip_values": {
-                                        "$ref": "#/definitions/skip_values"
+                                        "$ref": "#/$defs/skip_values"
                                     },
                                     "entPhysicalIndex": {
                                         "type": "string"
@@ -203,7 +203,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {"$ref": "#/definitions/oid"},
+                                            "oid": {"$ref": "#/$defs/oid"},
                                             "value": {
                                                 "type": "string"
                                             },
@@ -275,7 +275,7 @@
                                                 "type": "string"
                                             },
                                             "skip_values": {
-                                                "$ref": "#/definitions/skip_values"
+                                                "$ref": "#/$defs/skip_values"
                                             },
                                             "snmp_flags": {
                                                 "type": [
@@ -306,15 +306,15 @@
                                         ]
                                     }
                                 },
-                                "options": {"$ref": "#/definitions/options"}
+                                "options": {"$ref": "#/$defs/options"}
                             },
                             "required": [
                                 "data"
                             ]
                         },
-                        "voltage": {"$ref": "#/definitions/sensor"},
-                        "fanspeed": {"$ref": "#/definitions/sensor"},
-                        "temperature": {"$ref": "#/definitions/sensor"},
+                        "voltage": {"$ref": "#/$defs/sensor"},
+                        "fanspeed": {"$ref": "#/$defs/sensor"},
+                        "temperature": {"$ref": "#/$defs/sensor"},
                         "pre-cache": {
                             "type": "object",
                             "properties": {
@@ -323,7 +323,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {"$ref": "#/definitions/oids"},
+                                            "oid": {"$ref": "#/$defs/oids"},
                                             "snmp_flags": {
                                                 "type": [
                                                     "string",
@@ -346,23 +346,23 @@
                                 "data"
                             ]
                         },
-                        "humidity": {"$ref": "#/definitions/sensor"},
-                        "airflow": {"$ref": "#/definitions/sensor"},
-                        "current": {"$ref": "#/definitions/sensor"},
-                        "frequency": {"$ref": "#/definitions/sensor"},
-                        "power": {"$ref": "#/definitions/sensor"},
-                        "pressure": {"$ref": "#/definitions/sensor"},
-                        "cooling": {"$ref": "#/definitions/sensor"},
-                        "charge": {"$ref": "#/definitions/sensor"},
-                        "runtime": {"$ref": "#/definitions/sensor"},
-                        "dbm": {"$ref": "#/definitions/sensor"},
-                        "load": {"$ref": "#/definitions/sensor"},
-                        "chromatic_dispersion": {"$ref": "#/definitions/sensor"},
-                        "delay": {"$ref": "#/definitions/sensor"},
-                        "quality_factor": {"$ref": "#/definitions/sensor"},
-                        "snr": {"$ref": "#/definitions/sensor"},
-                        "waterflow": {"$ref": "#/definitions/sensor"},
-                        "eer": {"$ref": "#/definitions/sensor"}
+                        "humidity": {"$ref": "#/$defs/sensor"},
+                        "airflow": {"$ref": "#/$defs/sensor"},
+                        "current": {"$ref": "#/$defs/sensor"},
+                        "frequency": {"$ref": "#/$defs/sensor"},
+                        "power": {"$ref": "#/$defs/sensor"},
+                        "pressure": {"$ref": "#/$defs/sensor"},
+                        "cooling": {"$ref": "#/$defs/sensor"},
+                        "charge": {"$ref": "#/$defs/sensor"},
+                        "runtime": {"$ref": "#/$defs/sensor"},
+                        "dbm": {"$ref": "#/$defs/sensor"},
+                        "load": {"$ref": "#/$defs/sensor"},
+                        "chromatic_dispersion": {"$ref": "#/$defs/sensor"},
+                        "delay": {"$ref": "#/$defs/sensor"},
+                        "quality_factor": {"$ref": "#/$defs/sensor"},
+                        "snr": {"$ref": "#/$defs/sensor"},
+                        "waterflow": {"$ref": "#/$defs/sensor"},
+                        "eer": {"$ref": "#/$defs/sensor"}
                     }
                 },
                 "storage": {
@@ -378,18 +378,18 @@
                                     "free": {
                                         "type": "string"
                                     },
-                                    "free_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "free_num_oid": {"$ref": "#/$defs/num_oid"},
                                     "index": {
                                         "type": [
                                             "integer",
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/definitions/oid"},
+                                    "oid": {"$ref": "#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
-                                    "percent_used_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "percent_used_num_oid": {"$ref": "#/$defs/num_oid"},
                                     "units": {
                                         "type": [
                                             "integer",
@@ -402,9 +402,9 @@
                                             "string"
                                         ]
                                     },
-                                    "size_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "size_num_oid": {"$ref": "#/$defs/num_oid"},
                                     "skip_values": {
-                                        "$ref": "#/definitions/skip_values"
+                                        "$ref": "#/$defs/skip_values"
                                     },
                                     "type": {
                                         "type": "string"
@@ -415,7 +415,7 @@
                                     "used": {
                                         "type": "string"
                                     },
-                                    "used_num_oid": {"$ref": "#/definitions/num_oid"},
+                                    "used_num_oid": {"$ref": "#/$defs/num_oid"},
                                     "warn_percent": {
                                         "type": [
                                             "integer",
@@ -435,7 +435,7 @@
     "required": [
         "modules"
     ],
-    "definitions": {
+    "$defs": {
         "oid": {
             "type": "string"
         },
@@ -453,7 +453,7 @@
         "pre-cache": {
             "type": "object",
             "properties": {
-                "oids": {"$ref": "#/definitions/oids"},
+                "oids": {"$ref": "#/$defs/oids"},
                 "snmp_flags": {
                     "type": [
                         "string",
@@ -480,7 +480,7 @@
                             "oid": {
                                 "type": "string"
                             },
-                            "num_oid": {"$ref": "#/definitions/num_oid"},
+                            "num_oid": {"$ref": "#/$defs/num_oid"},
                             "index": {
                                 "type": ["integer", "string"]
                             },
@@ -518,7 +518,8 @@
                                 "type": "number"
                             },
                             "skip_values": {
-                                "$ref": "#/definitions/skip_values"                            },
+                                "$ref": "#/$defs/skip_values"
+                            },
                             "snmp_flags": {
                                 "type": [
                                     "string",
@@ -554,7 +555,7 @@
                     }
                 },
                 "options": {
-                    "$ref": "#/definitions/options"
+                    "$ref": "#/$defs/options"
                 }
             },
             "additionalProperties": false,
@@ -609,7 +610,7 @@
                                         ]
                                     },
                                     "op": {
-                                        "$ref": "#/definitions/comparison"
+                                        "$ref": "#/$defs/comparison"
                                     },
                                     "value": {
                                         "type": ["boolean", "number", "string", "array"],
@@ -638,7 +639,7 @@
                     "type": "integer"
                 },
                 "skip_values": {
-                    "$ref": "#/definitions/skip_values"
+                    "$ref": "#/$defs/skip_values"
                 },
                 "skip_value_gt": {
                     "type": "integer"

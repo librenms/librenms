@@ -29,7 +29,6 @@ namespace LibreNMS\Tests;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\StringHelpers;
 
 class FunctionsTest extends TestCase
 {
@@ -42,14 +41,6 @@ class FunctionsTest extends TestCase
     {
         $input = '4c 61 72 70 69 6e 67 20 34 20 55 00 0a';
         $this->assertEquals("Larping 4 U\n", snmp_hexstring($input));
-    }
-
-    public function testIsHexString(): void
-    {
-        $this->assertTrue(StringHelpers::isHex('af 28 02'));
-        $this->assertTrue(StringHelpers::isHex('aF 28 02 CE'));
-        $this->assertFalse(StringHelpers::isHex('a5 fj 53'));
-        $this->assertFalse(StringHelpers::isHex('a5fe53'));
     }
 
     public function testDynamicDiscoveryGetValue(): void

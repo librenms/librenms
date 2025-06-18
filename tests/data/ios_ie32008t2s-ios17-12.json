@@ -3300,7 +3300,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.46.101.254",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -3314,7 +3314,7 @@
                     "inetCidrRouteDest": "10.46.101.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -3328,7 +3328,7 @@
                     "inetCidrRouteDest": "10.46.101.113",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 32
                 }
             ]
@@ -4008,5 +4008,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.46.101.113",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.46.101.0/24",
+                    "ifIndex": 14
+                }
+            ]
+        }
     }
 }

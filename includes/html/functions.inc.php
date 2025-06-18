@@ -76,7 +76,7 @@ function generate_overlib_content($graph_array, $text)
 
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    $deviceModel = DeviceCache::get((int) $device['device_id']);
+    $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
     return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
@@ -230,6 +230,9 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
+    if (is_null($port)) {
+        return (string) $text;
+    }
     $graph_array = [];
 
     if (! $text) {
@@ -599,7 +602,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
-        if ($tmp_alerts['isisISAdjState']) {
+        if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
             $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
@@ -644,7 +647,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         }
         $details .= implode(', ', $details_a);
 
-        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name'] ?? '') . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -694,11 +697,12 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-        if ($tmp_alerts['error'] == '') {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
-        } else {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
+        $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'];
+        if (! empty($tmp_alerts['error'])) {
+            $fault_detail .= ' - ' . $tmp_alerts['error'];
         }
+        $fault_detail .= ';&nbsp;';
+
         $fallback = false;
     }
 
@@ -951,90 +955,6 @@ function generate_stacked_graphs($force_stack = false, $transparency = '88')
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Returns state generic label from value with optional text
- */
-function get_state_label($sensor)
-{
-    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', [$sensor['sensor_id'], $sensor['sensor_current']]);
-
-    switch ($state_translation['state_generic_value']) {
-        case 0:  // OK
-            $state_text = $state_translation['state_descr'] ?: 'OK';
-            $state_label = 'label-success';
-            break;
-        case 1:  // Warning
-            $state_text = $state_translation['state_descr'] ?: 'Warning';
-            $state_label = 'label-warning';
-            break;
-        case 2:  // Critical
-            $state_text = $state_translation['state_descr'] ?: 'Critical';
-            $state_label = 'label-danger';
-            break;
-        case 3:  // Unknown
-        default:
-            $state_text = $state_translation['state_descr'] ?: 'Unknown';
-            $state_label = 'label-default';
-    }
-
-    return "<span class='label $state_label'>$state_text</span>";
-}
-
-/**
- * Get sensor label and state color
- *
- * @param  array  $sensor
- * @param  string  $type  sensors or wireless
- * @return string
- */
-function get_sensor_label_color($sensor, $type = 'sensors')
-{
-    $label_style = 'label-success';
-    if (is_null($sensor)) {
-        return 'label-unknown';
-    }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
-        $label_style = 'label-warning';
-    }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
-        $label_style = 'label-warning';
-    }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
-        $label_style = 'label-danger';
-    }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
-        $label_style = 'label-danger';
-    }
-    $unit = __("$type.{$sensor['sensor_class']}.unit");
-    if ($sensor['sensor_class'] == 'runtime') {
-        $sensor['sensor_current'] = \LibreNMS\Util\Time::formatInterval($sensor['sensor_current'] * 60);
-
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
-    }
-
-    if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
-    }
-
-    if ($sensor['sensor_class'] == 'power_consumed') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 5, 5, 'Wh')) . '</span>';
-    }
-    if (in_array($sensor['rrd_type'], ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
-        //compute and display an approx rate for this sensor
-        return "<span class='label $label_style'>" . trim(Number::formatSi(max(0, $sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';
-    }
-
-    if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000000, 2, 3, 'Hz')) . '</span>';
-    }
-
-    if ($type == 'wireless' && $sensor['sensor_class'] == 'distance') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 2, 3, 'm')) . '</span>';
-    }
-
-    return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
 }
 
 /**
