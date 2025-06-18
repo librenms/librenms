@@ -431,7 +431,6 @@ class Service:
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
-        signal(SIGCHLD, SIG_IGN)  # capture sigchld and throw it on the floor
 
     def start(self):
         logger.debug("Performing startup checks...")
@@ -714,6 +713,8 @@ class Service:
         self._stop_managers()
         self._release_master()
 
+        # Set the SIGCHLD signal handler to ignore so remaining processes don't fail to report in and become zombies
+        signal(SIGCHLD, SIG_IGN)
         python = sys.executable
         sys.stdout.flush()
         os.execl(python, python, *sys.argv)
