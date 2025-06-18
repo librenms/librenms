@@ -428,7 +428,7 @@ class LdapAuthorizer extends AuthorizerBase
 
         // Build OR filter for group DNs if groups are provided
         $groupFilters = array_map(
-            fn($dn) => sprintf('(distinguishedName=%s)', ldap_escape($dn, '', LDAP_ESCAPE_FILTER)),
+            fn ($dn) => sprintf('(distinguishedName=%s)', ldap_escape($dn, '', LDAP_ESCAPE_FILTER)),
             $ldapGroups
         );
         $groupFilter = count($groupFilters) > 1
@@ -442,8 +442,9 @@ class LdapAuthorizer extends AuthorizerBase
 
         $search = ldap_search($connection, $baseDn, $filter, ['dn']);
 
-        if (!$search) {
+        if (! $search) {
             Log::error('LDAP group search failed.', ['filter' => $filter]);
+
             return false;
         }
 
@@ -470,7 +471,7 @@ class LdapAuthorizer extends AuthorizerBase
             $attr = strtolower($memberAttr);
             $values = $entries[0][$attr] ?? null;
 
-            if (!is_array($values) || !isset($values['count'])) {
+            if (! is_array($values) || ! isset($values['count'])) {
                 continue;
             }
 
