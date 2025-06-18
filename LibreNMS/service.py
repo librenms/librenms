@@ -455,7 +455,7 @@ class Service:
                     pid = p.pid
                     r = os.waitpid(p.pid, os.WNOHANG)
                     logger.warning(
-                        'Reaped long running job in state %s with PID %d - job returned %d',
+                        "Reaped long running job in state %s with PID %d - job returned %d",
                         status,
                         r[0],
                         r[1],
