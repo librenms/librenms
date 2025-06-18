@@ -449,7 +449,7 @@ class LdapAuthorizer extends AuthorizerBase
 
         $results = ldap_get_entries($connection, $search);
 
-        return ($results['count'] ?? 0) > 0;
+        return ((int) ($results['count'] ?? 0)) > 0;
     }
 
     protected function isUserInAnyGroupViaReadLoop(string $username, array $ldapGroups): bool
