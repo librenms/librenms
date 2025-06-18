@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Data;
 
 use App\Polling\Measure\MeasurementCollection;
 
-interface Datastore extends BatchWriteInterface
+interface Datastore extends WriteInterface
 {
     /**
      * Check if this is enabled by the configuration

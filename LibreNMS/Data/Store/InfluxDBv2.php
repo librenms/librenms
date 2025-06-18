@@ -90,7 +90,7 @@ class InfluxDBv2 extends BaseDatastore
         }
     }
 
-    public function __destruct()
+    public function terminate(): void
     {
         try {
             $this->client->close();

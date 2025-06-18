@@ -635,11 +635,6 @@ class Rrd extends BaseDatastore
         throw new RrdGraphException($error, null, null, null, $process->getExitCode());
     }
 
-    public function __destruct()
-    {
-        $this->terminate();
-    }
-
     /**
      * Remove invalid characters from the rrd file name
      *

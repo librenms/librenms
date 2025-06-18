@@ -67,14 +67,9 @@ abstract class BaseDatastore implements DatastoreContract
         return DeviceCache::getPrimary();
     }
 
-    public function startBatch(): void
+    public function __destruct()
     {
-        // do nothing
-    }
-
-    public function commitBatch(): void
-    {
-        // do nothing
+        $this->terminate();
     }
 
     public function terminate(): void
