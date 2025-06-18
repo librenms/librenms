@@ -16,6 +16,7 @@ use LibreNMS\Util\Notifications;
 use LibreNMS\Validations\Php;
 
 $options = getopt('df:o:t:r:');
+$options['f'] = isset($options['f']) ? $options['f'] : '';
 
 /**
  * Scripts without dependencies
