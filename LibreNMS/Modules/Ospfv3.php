@@ -189,7 +189,7 @@ class Ospfv3 implements Module
         ModuleModelObserver::done();
 
         // Ports
-        ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');;
+        ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');
         $ospf_ports = $instances->map(function (Ospfv3Instance $instance) use ($ospf_areas) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -209,7 +209,7 @@ class Ospfv3 implements Module
         ModuleModelObserver::done();
 
         // Neighbors
-        ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');;
+        ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');
         $ospf_neighbors = $instances->map(function (Ospfv3Instance $instance) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()

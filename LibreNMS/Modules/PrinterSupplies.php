@@ -64,12 +64,12 @@ class PrinterSupplies implements Module
     {
         $device = $os->getDeviceArray();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Printer Supplies');;
+        ModuleModelObserver::observe(PrinterSupply::class, 'Printer Supplies');
         $levels = $this->discoveryLevels($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $levels, [['supply_type', '!=', 'input']]);
         ModuleModelObserver::done();
 
-        ModuleModelObserver::observe(PrinterSupply::class, 'Tray Paper Level');;
+        ModuleModelObserver::observe(PrinterSupply::class, 'Tray Paper Level');
         $papers = $this->discoveryPapers($device);
         $this->syncModelsByGroup($os->getDevice(), 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
