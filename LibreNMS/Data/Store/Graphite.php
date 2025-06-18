@@ -70,7 +70,6 @@ class Graphite extends BaseDatastore
         return Config::get('graphite.enable', false);
     }
 
-
     /**
      * @inheritDoc
      */

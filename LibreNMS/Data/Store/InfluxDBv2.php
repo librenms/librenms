@@ -114,7 +114,6 @@ class InfluxDBv2 extends BaseDatastore
      */
     public function write(string $measurement, array $tags, array $fields, array $meta = []): void
     {
-
         $device = $this->getDevice($meta);
         $excluded_groups = Config::get('influxdbv2.groups-exclude');
 
