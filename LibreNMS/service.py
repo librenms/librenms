@@ -8,6 +8,11 @@ import time
 import LibreNMS
 from LibreNMS.config import DBConfig
 
+try:
+    import psutil
+except ImportError:
+    pass
+
 from datetime import timedelta
 from datetime import datetime
 from platform import python_version
@@ -431,7 +436,36 @@ class Service:
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
-        signal(SIGCHLD, SIG_DFL)  # default, but we need to reset it in case the process was reloaded
+        if "psutil" not in sys.modules:
+            logger.warning("psutil is not available, polling gap possible")
+        else:
+            signal(SIGCHLD, self.reap)  # capture sigchld and reap the process
+
+    def reap_psutil(self):
+        """
+        A process from a previous invocation is trying to report its status
+        """
+        # Speed things up by only looking at direct zombie children
+        for p in psutil.Process().children(recursive=False):
+            try:
+                cmd = (
+                    p.cmdline()
+                )  # cmdline is uncached, so needs to go here to avoid NoSuchProcess
+                status = p.status()
+
+                if status == psutil.STATUS_ZOMBIE:
+                    pid = p.pid
+                    r = os.waitpid(p.pid, os.WNOHANG)
+                    logger.warning(
+                        'Reaped long running job "%s" in state %s with PID %d - job returned %d',
+                        cmd,
+                        status,
+                        r[0],
+                        r[1],
+                    )
+            except (OSError, psutil.NoSuchProcess):
+                # process was already reaped
+                continue
 
     def start(self):
         logger.debug("Performing startup checks...")
@@ -508,6 +542,10 @@ class Service:
                 if self.reload_flag:
                     logger.info("Picked up reload flag, calling the reload process")
                     self.restart()
+
+                if self.reap_flag:
+                    self.reap_flag = False
+                    self.reap_psutil()
 
                 master_lock = self._acquire_master()
                 if master_lock:
@@ -711,7 +749,11 @@ class Service:
 
         logger.info("Restarting service... ")
 
-        self._stop_managers()
+        if "psutil" not in sys.modules:
+            logger.warning("psutil is not available, polling gap possible")
+            self._stop_managers_and_wait()
+        else:
+            self._stop_managers()
         self._release_master()
 
         # Set the SIGCHLD signal handler to ignore so remaining processes don't fail to report in and become zombies
@@ -719,6 +761,14 @@ class Service:
         python = sys.executable
         sys.stdout.flush()
         os.execl(python, python, *sys.argv)
+
+    def reap(self, signalnum=None, flag=None):
+        """
+        Handle a set the reload flag to begin a clean restart
+        :param signalnum: UNIX signal number
+        :param flag: Flags accompanying signal
+        """
+        self.reap_flag = True
 
     def reload(self, signalnum=None, flag=None):
         """
