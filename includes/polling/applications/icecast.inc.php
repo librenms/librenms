@@ -32,9 +32,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
 $fields = [
-    'cpu' => (float) $icecast['CPU Load'] ?? null,
-    'kbyte' => (int) $icecast['Used Memory'] ?? null,
-    'openfiles' => (int) $icecast['Open files'] ?? null,
+    'cpu' => $icecast['CPU Load'] ?? null,
+    'kbyte' => $icecast['Used Memory'] ?? null,
+    'openfiles' => icecast['Open files'] ?? null,
 ];
 
 $tags = [
