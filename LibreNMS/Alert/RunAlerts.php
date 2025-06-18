@@ -35,6 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
@@ -135,7 +136,7 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
@@ -251,7 +252,7 @@ class RunAlerts
     {
         if (Config::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
-                $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
             $sql = $alert['query'];
             $qry = dbFetchRows($sql, [$alert['device_id']]);
@@ -307,7 +308,7 @@ class RunAlerts
                 }
 
                 if (empty($alert['query'])) {
-                    $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                    $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later
@@ -442,7 +443,7 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
 

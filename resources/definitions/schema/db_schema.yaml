@@ -75,7 +75,6 @@ alert_log:
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: rule, Type: text, 'Null': false, Extra: '' }
     - { Field: severity, Type: "enum('ok','warning','critical')", 'Null': false, Extra: '' }
     - { Field: extra, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '' }

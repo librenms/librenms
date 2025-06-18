@@ -36,6 +36,7 @@ use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use PDO;
@@ -72,7 +73,7 @@ class AlertRules
             }
             d_echo(PHP_EOL);
             if (empty($rule['query'])) {
-                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
 
