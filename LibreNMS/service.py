@@ -431,6 +431,7 @@ class Service:
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
+        signal(SIGCHLD, SIG_DFL)  # default, but we need to reset it in case the process was reloaded
 
     def start(self):
         logger.debug("Performing startup checks...")
