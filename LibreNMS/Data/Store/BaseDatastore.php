@@ -36,7 +36,6 @@ abstract class BaseDatastore implements DatastoreContract
 {
     private MeasurementCollection $stats;
 
-
     public function __construct()
     {
         $this->stats = new MeasurementCollection();
@@ -46,7 +45,6 @@ abstract class BaseDatastore implements DatastoreContract
     {
         return $this->stats;
     }
-
 
     /**
      * Record statistics for operation

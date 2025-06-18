@@ -78,7 +78,7 @@ class Datastore implements WriteInterface, DataStorageInterface
 
     public function terminate(): void
     {
-        foreach($this->stores as $store) {
+        foreach ($this->stores as $store) {
             $store->terminate();
         }
     }
@@ -156,7 +156,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     private function rrdTagFilter(array &$tags): array
     {
-        [$metaTags, $filteredTags] = Arr::partition($tags, function($value, string $tag) {
+        [$metaTags, $filteredTags] = Arr::partition($tags, function ($value, string $tag) {
             return str_starts_with($tag, 'rrd_');
         });
 

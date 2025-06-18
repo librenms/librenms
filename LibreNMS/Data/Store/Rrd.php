@@ -221,7 +221,9 @@ class Rrd extends BaseDatastore
      * @param  string  $filename
      * @param  array  $data
      * @return array
+     *
      * @throws RrdException
+     *
      * @internal
      */
     public function update($filename, $data): array

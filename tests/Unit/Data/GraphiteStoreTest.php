@@ -85,7 +85,7 @@ class GraphiteStoreTest extends TestCase
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
-        $meta = ['device' => new Device(['hostname' => 'testhost', ]), 'rrd_name' => 'rrd_name'];
+        $meta = ['device' => new Device(['hostname' => 'testhost']), 'rrd_name' => 'rrd_name'];
 
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifIn 234234 $this->timestamp\n")->once();

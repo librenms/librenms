@@ -69,7 +69,6 @@ class InfluxDB extends BaseDatastore
      */
     public function write(string $measurement, array $tags, array $fields, array $meta = []): void
     {
-
         $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $this->getDevice($meta)->hostname;
