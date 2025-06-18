@@ -13,13 +13,7 @@ if (isset($vars['vm'])) {
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
-
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
-    $descr = 'COW';
-    $ds = 'cow';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+$descr = 'COW';
+$ds = 'cow';
 
 require 'includes/html/graphs/generic_stats.inc.php';
