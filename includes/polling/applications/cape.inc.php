@@ -738,7 +738,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
 
     $rrd_name = ['app', $name, $app->app_id, 'pkg-weight___-___', $pkg];
     $fields = [
-        'weight' => $returned['pkg_stats'][$pkg]['weight'],
+        'weight' => $returned['pkg_stats'][$pkg]['weight'] ?? null,
         's0weight' => $returned['pkg_stats'][$pkg]['min.weight'] ?? null,
         's1weight' => $returned['pkg_stats'][$pkg]['max.weight'] ?? null,
         's2weight' => $returned['pkg_stats'][$pkg]['range.weight'] ?? null,
