@@ -3,10 +3,10 @@
 // check_cmd is the command that is run to execute the check
 $check_cmd = \LibreNMS\Config::get('nagios_plugins') . '/check_icmp ' . $service['service_param'] . ' ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
 
-if (isset($rrd_filename)) {
-    // Check DS is a json array of the graphs that are available
-    $check_ds = '{"rta":"s","rtmax":"s","rtmin":"s","pl":"%"}';
+// Check DS is a json array of the graphs that are available
+$check_ds = '{"rta":"s","rtmax":"s","rtmin":"s","pl":"%"}';
 
+if (isset($rrd_filename)) {
     // Build the graph data
     $check_graph = [];
     $check_graph['rta'] = ' DEF:DS0=' . $rrd_filename . ':rta:AVERAGE ';
