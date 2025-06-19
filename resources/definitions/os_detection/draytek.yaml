@@ -2,6 +2,7 @@ os: draytek
 text: DrayTek
 type: network
 icon: draytek
+mib_dir: draytek
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
