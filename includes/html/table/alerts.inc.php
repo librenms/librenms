@@ -77,7 +77,7 @@ if (! $show_recovered) {
 }
 
 if (! empty($searchPhrase)) {
-    $where .= ' AND (`alerts`.`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
+    $where .= ' AND (`alerts`.`timestamp` LIKE ? OR `builder` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
