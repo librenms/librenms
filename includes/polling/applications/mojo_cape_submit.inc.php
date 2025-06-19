@@ -18,7 +18,7 @@ try {
 
 $app_data = $app->data;
 if (! is_array($app_data)) {
-    $app_data['slugs'] = [];
+    $app_data = [];
 }
 if (! isset($app_data['slugs']) || ! is_array($app_data['slugs'])) {
     $app_data['slugs'] = [];
