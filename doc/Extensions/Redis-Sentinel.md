@@ -26,6 +26,7 @@ REDIS_BROADCAST_CONNECTION=sentinel_cache
 REDIS_CACHE_CONNECTION=sentinel_cache
 REDIS_LOCK_CACHE_CONNECTION=sentinel_cache
 SESSION_DRIVER=redis
+SESSION_CONNECTION=sentinel_session
 ```
 
 ### Poller Configuration
