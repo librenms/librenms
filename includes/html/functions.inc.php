@@ -76,7 +76,7 @@ function generate_overlib_content($graph_array, $text)
 
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    $deviceModel = DeviceCache::get((int) $device['device_id']);
+    $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
     return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
@@ -230,6 +230,9 @@ function print_percentage_bar($width, $height, $percent, $left_text, $left_colou
 
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
+    if (is_null($port)) {
+        return (string) $text;
+    }
     $graph_array = [];
 
     if (! $text) {
@@ -599,7 +602,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
-        if ($tmp_alerts['isisISAdjState']) {
+        if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
             $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
@@ -623,7 +626,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     if (isset($tmp_alerts['sensor_id'])) {
         if ($tmp_alerts['sensor_class'] == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            $details = 'State: ' . $tmp_alerts['state_descr'] ?? '' . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
         } else {
             // Other sensors
             $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
@@ -644,7 +647,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         }
         $details .= implode(', ', $details_a);
 
-        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name'] ?? '') . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -694,11 +697,12 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-        if ($tmp_alerts['error'] == '') {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
-        } else {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
+        $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'];
+        if (! empty($tmp_alerts['error'])) {
+            $fault_detail .= ' - ' . $tmp_alerts['error'];
         }
+        $fault_detail .= ';&nbsp;';
+
         $fallback = false;
     }
 

@@ -137,8 +137,8 @@ $metrics = [
     'disks_with_failed_health_count' => 0,
     'new_disks_with_failed_tests_count' => 0,
     'new_disks_with_failed_health_count' => 0,
-    'exit_nonzero' => $data['exit_nonzero'],
-    'unhealthy' => $data['unhealthy'],
+    'exit_nonzero' => $data['exit_nonzero'] ?? null,
+    'unhealthy' => $data['unhealthy'] ?? null,
 ];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
@@ -204,19 +204,23 @@ foreach ($data['disks'] as $disk_id => $disk) {
 
     $metrics['disk_' . $disk_id . '_id9'] = $disk['9'];
 
-    $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
-    $fields_id232 = ['id232' => $disk['232']];
-    $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
-    app('Datastore')->put($device, 'app', $tags_id232, $fields_id232);
+    if (isset($disk['232'])) {
+        $rrd_name_id232 = ['app', $name . '_id232', $app->app_id, $disk_id];
+        $fields_id232 = ['id232' => $disk['232']];
+        $tags_id232 = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_id232, 'rrd_name' => $rrd_name_id232];
+        app('Datastore')->put($device, 'app', $tags_id232, $fields_id232);
 
-    $metrics['disk_' . $disk_id . '_id232'] = $disk['232'];
+        $metrics['disk_' . $disk_id . '_id232'] = $disk['232'];
+    }
 
-    $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
-    $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
-    $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
-    app('Datastore')->put($device, 'app', $tags_maxtemp, $fields_maxtemp);
+    if (isset($disk['max_temp'])) {
+        $rrd_name_maxtemp = ['app', $name . '_maxtemp', $app->app_id, $disk_id];
+        $fields_maxtemp = ['maxtemp' => $disk['max_temp']];
+        $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_maxtemp, 'rrd_name' => $rrd_name_maxtemp];
+        app('Datastore')->put($device, 'app', $tags_maxtemp, $fields_maxtemp);
 
-    $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
+        $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
+    }
 
     // check if it has any failed tests
     // only counting failures, ignoring ones that have been interrupted
@@ -233,13 +237,13 @@ foreach ($data['disks'] as $disk_id => $disk) {
 
     // check for what IDs we actually got
     foreach (['5', '9', '10', '173', '177', '183', '184', '187', '188', '190', '194', '196', '197', '198', '199', '231', '232', '233'] as $id_check) {
-        if (is_numeric($disk[$id_check])) {
+        if (isset($disk[$id_check]) && is_numeric($disk[$id_check])) {
             $data['has']['id' . $id_check] = 1;
         }
     }
 
     // figure out if this disk is a SSD or not
-    if (is_numeric($disk['173']) || is_numeric($disk['177']) || is_numeric($disk['231']) || is_numeric($disk['232']) || is_numeric($disk['233'])) {
+    if (isset($disk['173']) && is_numeric($disk['173']) || isset($disk['177']) && is_numeric($disk['177']) || isset($disk['231']) && is_numeric($disk['231']) || isset($disk['232']) && is_numeric($disk['232']) || isset($disk['233']) && is_numeric($disk['233'])) {
         $data['disks'][$disk_id]['is_ssd'] = 1;
         $metrics['disk_' . $disk_id]['is_ssd'] = 1;
     } else {
@@ -258,8 +262,13 @@ foreach ($data['disks'] as $disk_id => $disk) {
         }
     }
 
-    $metrics['disk_' . $disk_id . '_health'] = $disk['health_pass'];
-    $metrics['disk_' . $disk_id . '_exit'] = $disk['exit'];
+    if (isset($disk['health_pass'])) {
+        $metrics['disk_' . $disk_id . '_health'] = $disk['health_pass'];
+    }
+
+    if (isset($disk['exit'])) {
+        $metrics['disk_' . $disk_id . '_exit'] = $disk['exit'];
+    }
 }
 
 // log any disks with failed tests found

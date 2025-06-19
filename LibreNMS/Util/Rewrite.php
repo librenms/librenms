@@ -109,7 +109,7 @@ class Rewrite
         return str_ireplace(array_keys($rewrite_ifname), array_values($rewrite_ifname), $name);
     }
 
-    public static function shortenIfName($name)
+    public static function shortenIfName($name): string
     {
         $rewrite_shortif = [
             'hundredgige' => 'Hu',
@@ -135,7 +135,7 @@ class Rewrite
             'bridge-aggregation' => 'BA',
         ];
 
-        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
+        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), (string) $name);
     }
 
     /**
@@ -145,10 +145,10 @@ class Rewrite
      * @param  bool  $short
      * @return string
      */
-    public static function ciscoHardware(&$device, $short = false)
+    public static function ciscoHardware(&$device, bool $short = false): string
     {
         if ($device['os'] == 'ios') {
-            if ($device['hardware']) {
+            if (! empty($device['hardware'])) {
                 if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
                     if (! $short) {
                         $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
@@ -181,7 +181,7 @@ class Rewrite
             }
         }
 
-        return $device['hardware'];
+        return $device['hardware'] ?? '';
     }
 
     public static function location($location)

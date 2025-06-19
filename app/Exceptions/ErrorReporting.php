@@ -157,11 +157,18 @@ class ErrorReporting
 
     private function adjustErrorHandlingForAppEnv(string $environment): void
     {
-        // TODO remove APP_DEBUG requirement when issues are cleaned up
-        if ($environment == 'production' || ! config('app.debug')) {
+        // TODO remove testing and then APP_DEBUG requirement when issues are cleaned up
+        if ($environment == 'production' || $environment == 'testing' || ! config('app.debug')) {
             // in production, don't halt execution on non-fatal errors
             set_error_handler(function ($severity, $message, $file, $line) {
-                error_log("PHP Error($severity): $message in $file on line $line");
+                // If file is from a package, find the first non-vendor frame
+                if (str_contains($file, '/vendor/')) {
+                    // add vendor file to message
+                    $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
+                    [$file, $line] = self::findFirstNonVendorFrame();
+                }
+
+                error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
 
                 // For notices and warnings, prevent conversion to exceptions
                 if (in_array($severity, [E_NOTICE, E_WARNING, E_USER_NOTICE, E_USER_WARNING, E_DEPRECATED])) {
@@ -179,5 +186,23 @@ class ErrorReporting
                 ]);
             });
         }
+    }
+
+    private static function findFirstNonVendorFrame(): array
+    {
+        foreach (debug_backtrace() as $trace) {
+            // not vendor frames
+            if (isset($trace['file']) && str_contains($trace['file'], '/vendor/')) {
+                continue;
+            }
+            // not this class
+            if (isset($trace['class']) && $trace['class'] === self::class) {
+                continue;
+            }
+
+            return [$trace['file'], $trace['line']];
+        }
+
+        return ['', ''];
     }
 }

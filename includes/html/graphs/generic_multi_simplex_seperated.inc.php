@@ -5,11 +5,13 @@ use LibreNMS\Config;
 
 require 'includes/html/graphs/common.inc.php';
 
-$unitlen = $unitlen ?? 0;
-$descr_len = $descr_len ?? 12;
-$multiplier = $multiplier ?? false;
+$unitlen ??= 0;
+$descr_len ??= 12;
+$multiplier ??= null;
+$divider ??= null;
 $previous = $graph_params->visible('previous');
-$stack = $stack ?? '';
+$stack ??= '';
+$total_units ??= '';
 
 $seperatorX = '';
 $thingX = '';
@@ -32,7 +34,7 @@ if ($nototal) {
 $unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
 $colour_iter = 0;
-foreach ($rrd_list as $i => $rrd) {
+foreach ($rrd_list ?? [] as $i => $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
