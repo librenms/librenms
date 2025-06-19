@@ -34,7 +34,7 @@ $rrd_def = RrdDefinition::make()
 $fields = [
     'cpu' => $icecast['CPU Load'] ?? null,
     'kbyte' => $icecast['Used Memory'] ?? null,
-    'openfiles' => icecast['Open files'] ?? null,
+    'openfiles' => $icecast['Open files'] ?? null,
 ];
 
 $tags = [
