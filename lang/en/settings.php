@@ -2062,7 +2062,7 @@ return [
         ],
         'title_image' => [
             'description' => 'Title Image',
-            'help' => 'Overrides the default Title Image.',
+            'help' => 'Overrides the default Title Image. SVG from the same server will be include and can use currentColor to match the current theme dynamically.',
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',

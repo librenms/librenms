@@ -1,9 +1,18 @@
 @props([
     'responsive' => false, // crop text at given breakpoint sm,md,lg,xl, etc
+    'image' => LibrenmsConfig::get('title_image'),
+    'alt' => LibrenmsConfig::get('project_name')
 ])
 
-@if(LibrenmsConfig::get('title_image'))
-    <img {{ $attributes }} src="{{ asset(LibrenmsConfig::get('title_image')) }}" alt="{{ LibrenmsConfig::get('project_name') }}">
+@if($image)
+    {{-- Include svgs inline so they can use currentColor for light/dark mode, but only if they are hosted on the same server (browser will reject it otherwise) --}}
+    @if(str_ends_with($image, '.svg') && ! str_contains($image, '//'))
+        <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600']) }}>
+            <use href="{{ asset($image) }}"></use>
+        </svg>
+    @else
+        <img {{ $attributes }} src="{{ asset($image) }}" alt="{{ $alt }}">
+    @endif
 @else
     <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600'])->class($responsive ? ['tw:hidden', "tw:$responsive:inline-block"] : []) }}
          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 32.275086">
