@@ -805,6 +805,9 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
@@ -1632,9 +1635,17 @@ return [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'ports_ipv4_neighbours' => [
+            'description' => 'Port IPv4 neighbour lookup method',
+            'help' => 'Method to use for looking up IPv4 neighours when viewing port details.  ARP will use the ARP table to find devices with matching IP and MAC addresses.  Subnet will just look for devices with IP addresses in the same subnet.',
+        ],
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
         ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
