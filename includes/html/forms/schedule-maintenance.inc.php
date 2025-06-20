@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\UserPref;
-use Illuminate\Support\Str;
-
 /*
  * LibreNMS
  *
@@ -14,6 +11,9 @@ use Illuminate\Support\Str;
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use App\Models\UserPref;
+use Illuminate\Support\Str;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
