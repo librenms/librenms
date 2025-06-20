@@ -297,12 +297,14 @@ class SnmpResponse
      * Filter bad lines from the raw output, examples:
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     * oidName = NULL
      */
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
             '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
             '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
+            '/^.* = NULL$/',
         ], '', $this->raw);
     }
 
