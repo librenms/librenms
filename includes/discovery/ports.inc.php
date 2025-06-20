@@ -62,6 +62,11 @@ if ($device['os'] == 'airos-af-ltu') {
     require 'ports/airos-af-ltu.inc.php';
 }
 
+//JETSTREAM old device
+if ($device['os'] == 'jetstream') {
+    require base_path('includes/discovery/ports/jetstream.inc.php');
+}
+
 //Teleste Luminato ifOperStatus
 if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
