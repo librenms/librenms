@@ -49,12 +49,14 @@ class HrDevice implements Module
             ->walk([
                 'HOST-RESOURCES-MIB::hrProcessorLoad',
                 'HOST-RESOURCES-MIB::hrDeviceTable',
-            ])->mapTable(function (array $hrDevice, int $hrDeviceIndex) {
-                $model = new \App\Models\HrDevice($hrDevice);
-                $model->hrDeviceIndex = $hrDeviceIndex;
+            ])->mapTable(function ($hrDevice = '', $hrDeviceIndex = '') {
+                if (is_array($hrDevice) && is_numeric($hrDeviceIndex)) {
+                    $model = new \App\Models\HrDevice($hrDevice);
+                    $model->hrDeviceIndex = intval($hrDeviceIndex);
 
-                return $model;
-            });
+                    return $model;
+                }
+            })->filter();
 
         ModuleModelObserver::observe(\App\Models\HrDevice::class);
         $this->syncModels($os->getDevice(), 'hostResources', $models);
