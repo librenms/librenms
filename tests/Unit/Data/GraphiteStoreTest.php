@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Models\Device;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Graphite;
@@ -35,7 +36,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('datastores')]
 class GraphiteStoreTest extends TestCase
 {
-    protected $timestamp = 997464400;
+    protected $timestamp = 1197464400;
 
     protected function setUp(): void
     {
@@ -73,7 +74,7 @@ class GraphiteStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
 
-        $graphite->put(['hostname' => 'test'], 'fake', ['rrd_name' => 'name'], ['one' => 1]);
+        $graphite->write('fake', ['rrd_name' => 'name'], ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -81,16 +82,16 @@ class GraphiteStoreTest extends TestCase
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
 
-        $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
-        $tags = ['rrd_name' => 'rrd_name', 'ifName' => 'testifname', 'type' => 'testtype'];
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
+        $meta = ['device' => new Device(['hostname' => 'testhost']), 'rrd_name' => 'rrd_name'];
 
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifIn 234234 $this->timestamp\n")->once();
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n")->once();
-        $graphite->put($device, $measurement, $tags, $fields);
+        $graphite->write($measurement, $tags, $fields, $meta);
     }
 
     /**

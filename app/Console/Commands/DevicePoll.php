@@ -121,6 +121,8 @@ class DevicePoll extends LnmsCommand
             $this->error($e->getMessage());
 
             return 1;
+        } finally {
+            app('Datastore')->terminate();
         }
 
         $this->error(trans('commands.device:poll.errors.none_polled'));
