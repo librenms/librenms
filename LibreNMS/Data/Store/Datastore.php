@@ -144,7 +144,7 @@ class Datastore implements WriteInterface, DataStorageInterface
     public function write(string $measurement, array $tags, array $fields, array $meta = []): void
     {
         foreach ($this->stores as $store) {
-            $store->write($measurement, $fields, $tags, $meta);
+            $store->write($measurement, $tags, $fields, $meta);
         }
     }
 
