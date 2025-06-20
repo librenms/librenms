@@ -1,7 +1,7 @@
 <?php
 
 /**
- * InvalidRrdTypeException.php
+ * RrdException.php
  *
  * -Description-
  *
@@ -20,12 +20,12 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-class InvalidRrdTypeException extends RrdException
+class RrdException extends \Exception
 {
 }
