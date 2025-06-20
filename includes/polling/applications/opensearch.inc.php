@@ -122,7 +122,7 @@ $rrd_def = RrdDefinition::make()
 $metrics = [
     'tr_total' => $data['tr_total'] ?? null,
     'tr_time' => $data['tr_time'] ?? null,
-    'tr_ext_total' => $data['tr_ext_tota ?? nulll'],
+    'tr_ext_total' => $data['tr_ext_tota'] ?? null,
     'tr_ext_time' => $data['tr_ext_time'] ?? null,
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
