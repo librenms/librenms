@@ -134,12 +134,18 @@ By default hooks are always shown, but you may control when the user is authoriz
 As an example, you could imagine that the device-overview.blade.php should only be displayed when the
 device is in maintenance mode and the current user has the admin role.
 
+Please note: Scheduled maintenance may have different behaviors, so the parameter isUnderMaintenance
+further below checks for all possible behaviors.
+
 ```php
+// […]
+use LibreNMS\Enum\MaintenanceAlertBehavior;
+
 class DeviceOverview extends DeviceOverviewHook
 {
     public function authorize(User $user, Device $device): bool
     {
-        return $user->can('admin') && $device->isUnderMaintenance();
+        return $user->can('admin') && $device->isUnderMaintenance(MaintenanceAlertBehavior::ANY->value);
     }
 }
 ```

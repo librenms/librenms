@@ -7108,6 +7108,17 @@
             "order": 0,
             "type": "integer"
         },
+        "webui.scheduled_maintenance_default_behavior": {
+            "default": "1",
+            "type": "select",
+            "group": "webui",
+            "section": "scheduled-maintenance",
+            "options": {
+                "1": "Skip alerts",
+                "2": "Mute alert",
+                "3": "Run alerts"
+            }
+        },
         "whois": {
             "default": "/usr/bin/whois",
             "group": "external",
