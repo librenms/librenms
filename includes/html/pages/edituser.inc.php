@@ -11,52 +11,53 @@ $pagetitle[] = 'Edit user';
 if (! Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
-    if ($vars['user_id'] && ! $vars['edit']) {
+    if ($vars['user_id'] && empty($vars['edit'])) {
+        $action = $vars['action'] ?? '';
         /** @var User $user */
         $user = User::find($vars['user_id']);
         $user_data = $user->toArray(); // for compatibility with current code
 
         echo '<p><h2>' . $user_data['realname'] . '</h2></p>';
         // Perform actions if requested
-        if ($vars['action'] == 'deldevperm') {
+        if ($action == 'deldevperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']])) {
                 dbDelete('devices_perms', '`device_id` =  ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']]);
             }
         }
 
-        if ($vars['action'] == 'adddevperm') {
+        if ($action == 'adddevperm') {
             if (! dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']])) {
                 dbInsert(['device_id' => $vars['device_id'], 'user_id' => $user_data['user_id']], 'devices_perms');
             }
         }
 
-        if ($vars['action'] == 'deldevgroupperm') {
+        if ($action == 'deldevgroupperm') {
             $user->deviceGroups()->detach($vars['device_group_id']);
         }
 
-        if ($vars['action'] == 'adddevgroupperm') {
+        if ($action == 'adddevgroupperm') {
             $user->deviceGroups()->syncWithoutDetaching($vars['device_group_id']);
         }
 
-        if ($vars['action'] == 'delifperm') {
+        if ($action == 'delifperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']])) {
                 dbDelete('ports_perms', '`port_id` =  ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']]);
             }
         }
 
-        if ($vars['action'] == 'addifperm') {
+        if ($action == 'addifperm') {
             if (! dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']])) {
                 dbInsert(['port_id' => $vars['port_id'], 'user_id' => $user_data['user_id']], 'ports_perms');
             }
         }
 
-        if ($vars['action'] == 'delbillperm') {
+        if ($action == 'delbillperm') {
             if (dbFetchCell('SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']])) {
                 dbDelete('bill_perms', '`bill_id` =  ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']]);
             }
         }
 
-        if ($vars['action'] == 'addbillperm') {
+        if ($action == 'addbillperm') {
             if (! dbFetchCell('SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']])) {
                 dbInsert(['bill_id' => $vars['bill_id'], 'user_id' => $user_data['user_id']], 'bill_perms');
             }
@@ -85,7 +86,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo '</table>
           </div>';
 
-        if (! $permdone) {
+        if (empty($permdone)) {
             echo 'None Configured';
         }
 
@@ -174,7 +175,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo '</table>
           </div>';
 
-        if (! $ipermdone) {
+        if (empty($ipermdone)) {
             echo 'None Configured';
         }
 
@@ -232,7 +233,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         echo '</table>
           </div>';
 
-        if (! $bpermdone) {
+        if (empty($bpermdone)) {
             echo 'None Configured';
         }
 
