@@ -98,4 +98,4 @@ $string = $argv[0] . ' ' . date(\LibreNMS\Config::get('dateformat.compact'))
     . " - $polled_services services polled in $poller_time secs";
 d_echo("$string\n");
 
-Datastore::terminate();
+app('Datastore')->terminate();
