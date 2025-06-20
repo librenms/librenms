@@ -65,58 +65,62 @@ $ports_rrd_def = RrdDefinition::make()
 // update the RRD files for each port
 //
 
-$ports_keys = array_keys($ports);
-$ports_keys_int = 0;
-while (isset($ports[$ports_keys[$ports_keys_int]])) {
-    $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
-    $fields = [
-        'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'],
-        'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'],
-        'total_from' => $ports[$ports_keys[$ports_keys_int]]['total_from'],
-        'totalLISTEN' => $ports[$ports_keys[$ports_keys_int]]['total']['LISTEN'],
-        'totalCLOSED' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSED'],
-        'totalSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_SENT'],
-        'totalSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_RECEIVED'],
-        'totalESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['total']['ESTABLISHED'],
-        'totalCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSE_WAIT'],
-        'totalFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_1'],
-        'totalCLOSING' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSING'],
-        'totalLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['total']['LAST_ACK'],
-        'totalFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_2'],
-        'totalTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['TIME_WAIT'],
-        'totalUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['total']['UNKNOWN'],
-        'totalother' => $ports[$ports_keys[$ports_keys_int]]['total']['other'],
-        'toLISTEN' => $ports[$ports_keys[$ports_keys_int]]['to']['LISTEN'],
-        'toCLOSED' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSED'],
-        'toSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_SENT'],
-        'toSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_RECEIVED'],
-        'toESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['to']['ESTABLISHED'],
-        'toCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSE_WAIT'],
-        'toFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_1'],
-        'toCLOSING' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSING'],
-        'toLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['to']['LAST_ACK'],
-        'toFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_2'],
-        'toTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['TIME_WAIT'],
-        'toUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['to']['UNKNOWN'],
-        'toother' => $ports[$ports_keys[$ports_keys_int]]['to']['other'],
-        'fromLISTEN' => $ports[$ports_keys[$ports_keys_int]]['from']['LISTEN'],
-        'fromCLOSED' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSED'],
-        'fromSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_SENT'],
-        'fromSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_RECEIVED'],
-        'fromESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['from']['ESTABLISHED'],
-        'fromCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSE_WAIT'],
-        'fromFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_1'],
-        'fromCLOSING' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSING'],
-        'fromLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['from']['LAST_ACK'],
-        'fromFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_2'],
-        'fromTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['TIME_WAIT'],
-        'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'],
-        'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
-    ];
-    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
-    app('Datastore')->put($device, 'app', $tags, $fields);
+if (is_array($ports)) {
+    $ports_keys = array_keys($ports);
+    $ports_keys_int = 0;
+    while (isset($ports[$ports_keys[$ports_keys_int]])) {
+        if (is_array($ports[$ports_keys[$ports_keys_int]])) {
+            $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
+            $fields = [
+                'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'] ?? null,
+                'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'] ?? null,
+                'total_from' => $ports[$ports_keys[$ports_keys_int]]['total_from'] ?? null,
+                'totalLISTEN' => $ports[$ports_keys[$ports_keys_int]]['total']['LISTEN'] ?? null,
+                'totalCLOSED' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSED'] ?? null,
+                'totalSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_SENT'] ?? null,
+                'totalSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_RECEIVED'] ?? null,
+                'totalESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['total']['ESTABLISHED'] ?? null,
+                'totalCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSE_WAIT'] ?? null,
+                'totalFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_1'] ?? null,
+                'totalCLOSING' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSING'] ?? null,
+                'totalLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['total']['LAST_ACK'] ?? null,
+                'totalFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_2'] ?? null,
+                'totalTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['TIME_WAIT'] ?? null,
+                'totalUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['total']['UNKNOWN'] ?? null,
+                'totalother' => $ports[$ports_keys[$ports_keys_int]]['total']['other'] ?? null,
+                'toLISTEN' => $ports[$ports_keys[$ports_keys_int]]['to']['LISTEN'] ?? null,
+                'toCLOSED' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSED'] ?? null,
+                'toSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_SENT'] ?? null,
+                'toSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_RECEIVED'] ?? null,
+                'toESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['to']['ESTABLISHED'] ?? null,
+                'toCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSE_WAIT'] ?? null,
+                'toFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_1'] ?? null,
+                'toCLOSING' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSING'] ?? null,
+                'toLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['to']['LAST_ACK'] ?? null,
+                'toFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_2'] ?? null,
+                'toTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['TIME_WAIT'] ?? null,
+                'toUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['to']['UNKNOWN'] ?? null,
+                'toother' => $ports[$ports_keys[$ports_keys_int]]['to']['other'] ?? null,
+                'fromLISTEN' => $ports[$ports_keys[$ports_keys_int]]['from']['LISTEN'] ?? null,
+                'fromCLOSED' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSED'] ?? null,
+                'fromSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_SENT'] ?? null,
+                'fromSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_RECEIVED'] ?? null,
+                'fromESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['from']['ESTABLISHED'] ?? null,
+                'fromCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSE_WAIT'] ?? null,
+                'fromFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_1'] ?? null,
+                'fromCLOSING' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSING'] ?? null,
+                'fromLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['from']['LAST_ACK'] ?? null,
+                'fromFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_2'] ?? null,
+                'fromTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['TIME_WAIT'] ?? null,
+                'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'] ?? null,
+                'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'] ?? null,
+            ];
+            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
+            app('Datastore')->put($device, 'app', $tags, $fields);
+        }
 
-    $ports_keys_int++;
+        $ports_keys_int++;
+    }
 }
 
 // check for added or removed instances
