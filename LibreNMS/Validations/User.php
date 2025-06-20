@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User.php
  *
@@ -92,7 +93,8 @@ class User extends BaseValidation
             ];
 
             if (! Config::get('installed_from_package')) {
-                $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
+                $find_output = shell_exec("find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null");
+                $find_result = rtrim($find_output ?: '');
                 if (! empty($find_result)) {
                     // Ignore files created by the webserver
                     $ignore_files = [

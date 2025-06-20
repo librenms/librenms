@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -98,8 +99,8 @@ echo '</tr></thead><tbody>';
 foreach (dbFetchRows('SELECT * FROM `processes` WHERE `device_id` = ? ORDER BY ' . $order . ' ' . $by, [$device['device_id']]) as $entry) {
     echo '<tr>';
     echo '<td>' . $entry['pid'] . '</td>';
-    echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['vsz'] * 1024, 2, 3, '') . '</td>';
-    echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['rss'] * 1024, 2, 3, '') . '</td>';
+    echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['vsz'] * 1024, 2, 0, '') . '</td>';
+    echo '<td>' . \LibreNMS\Util\Number::formatSi($entry['rss'] * 1024, 2, 0, '') . '</td>';
     echo '<td>' . $entry['cputime'] . '</td>';
     echo '<td>' . $entry['user'] . '</td>';
     echo '<td>' . $entry['command'] . '</td>';

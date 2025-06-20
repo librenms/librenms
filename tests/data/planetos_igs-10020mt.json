@@ -2637,8 +2637,8 @@
                     "ifName": "VLAN    1",
                     "portName": null,
                     "ifIndex": 50001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2737,8 +2737,8 @@
                     "ifName": "VLAN  130",
                     "portName": null,
                     "ifIndex": 50130,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2837,8 +2837,8 @@
                     "ifName": "VLAN  330",
                     "portName": null,
                     "ifIndex": 50330,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2937,8 +2937,8 @@
                     "ifName": "VLAN  331",
                     "portName": null,
                     "ifIndex": 50331,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3037,8 +3037,8 @@
                     "ifName": "VLAN 1998",
                     "portName": null,
                     "ifIndex": 51998,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3255,5 +3255,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.252.2.10",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.252.2.0/26",
+                    "ifIndex": 60001
+                }
+            ]
+        }
     }
 }

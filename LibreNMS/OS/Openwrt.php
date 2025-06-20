@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Openwrt.php
  *
@@ -32,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Oid;
 
 class Openwrt extends OS implements
     OSDiscovery,
@@ -96,15 +98,15 @@ class Openwrt extends OS implements
         foreach ($interfaces as $index => $interface) {
             // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
             foreach ($statstr as $stat) {
-                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-$index$stat\"";
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, "$interface$query$stat");
+                $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("$type$query-$index$stat");
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, "$interface$query$stat");
                 $count += 1;
             }
         }
         // If system level (i.e. overall) sensor desired, add that one as well
         if ($system and (count($interfaces) > 1)) {
-            $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-wlan\"";
-            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, 'wlan');
+            $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("$type$query-wlan");
+            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, 'wlan');
         }
 
         // And, return all the sensors that have been created above (i.e. the array of sensors)

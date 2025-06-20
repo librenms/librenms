@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Url.php
  *
@@ -300,7 +301,7 @@ class Url
             $args['bg'] = 'FFFFFF00';
         }
 
-        return '<img src="' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
+        return '<img src="graph-image ' . url('graph.php') . '?type=' . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . '">';
     }
 
     public static function generate($vars, $new_vars = [])
@@ -358,17 +359,18 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img class="graph-image" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = $args['from'];
+        $original_from = isset($args['from']) ? $args['from'] : '';
+        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
-        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $popup = "<div class='list-large'>$popup_title</div>";
         $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
@@ -398,7 +400,7 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+        $tag = '<img class="graph-image img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (Config::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
@@ -464,7 +466,7 @@ class Url
     {
         $vars = ['device=' . $device->device_id, "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size"];
 
-        return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
+        return '<img class="graph-image ' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
     }
 
     /**

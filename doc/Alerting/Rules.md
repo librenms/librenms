@@ -72,30 +72,29 @@ On the Advanced tab, you can specify some additional options for the alert rule:
 - An example of this would be an average rule for all CPUs over 10%
 
 ```sql
-SELECT devices.device_id, devices.status, devices.disabled, devices.ignore, 
-AVG(processors.processor_usage) AS cpu_avg  FROM 
+SELECT devices.*,AVG(processors.processor_usage) AS cpu_avg, processors.* FROM 
 devices INNER JOIN processors ON devices.device_id 
 = processors.device_id WHERE devices.device_id 
 = ? AND devices.status = 1 AND devices.disabled = 
 0 AND devices.ignore = 0 GROUP BY devices.device_id, 
 devices.status, devices.disabled, devices.ignore 
 HAVING AVG(processors.processor_usage) 
-> 10
+> 10;
 ```
 
-> The 10 would then contain the average CPU usage value, you can
-> change this value to be whatever you like.
-
-- You will to need copy and paste this into the Alert Rule under
-  Advanced then paste into Query box and switch the Override SQL.
+!!! note
+    The 10 would then contain the average CPU usage value, you can
+    change this value to be whatever you like.
+    You will to need copy and paste this into the Alert Rule under
+    Advanced then paste into Query box and switch the Override SQL.
 
 ## Procedure
 
-You can associate a rule to a procedure by giving the URL of the
-procedure when creating the rule. Only links like "http://" are
-supported, otherwise an error will be returned. Once configured,
-procedure can be opened from the Alert widget through the "Open"
-button, which can be shown/hidden from the widget configuration box.
+You can provide procedure URL when creating the rule. Only links
+like "http://" are supported, otherwise an error will be returned.
+Once configured, procedures can be opened from the Alert widget
+through the "Open" button, which can be shown/hidden from the
+widget configuration box.
 
 ## Examples
 
@@ -129,6 +128,6 @@ Alert when:
 
 You can also select Alert Rule from the Alerts Collection. These Alert
 Rules are submitted by users in the community :) If would like to
-submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/blob/master/misc/alert_rules.json)
+submit your alert rules to the collection, please submit them here [Alert Rules Collection](https://github.com/librenms/librenms/edit/master/resources/definitions/alert_rules.json)
 
-![Alert Rules Collection](/img/alert-rules-collection.png)
+![Alert Rules Collection](../img/alert-rules-collection.png)

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,6 +17,10 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$filename ??= $rrd_filename; // use $rrd_filename
+$units ??= '';
+$unit_text ??= '';
+$rrd_optionsb = '';
 
 if (! isset($munge)) {
     $munge = false;

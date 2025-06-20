@@ -6,6 +6,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -17,7 +18,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected $ldap_connection;
+    protected ?Connection $ldap_connection = null;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
     public function authenticate($credentials)
@@ -210,7 +211,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
 
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
+        $this->ldap_connection = ldap_connect(Config::get('auth_ad_url'));
+        if (empty($this->ldap_connection)) {
+            throw new AuthenticationException('Fatal error while connecting to AD, uri not valid: ' . Config::get('auth_ad_url'));
+        }
 
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
@@ -253,7 +257,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
     }
 
-    protected function getConnection()
+    protected function getConnection(): ?Connection
     {
         $this->init(); // make sure connected and bound
 

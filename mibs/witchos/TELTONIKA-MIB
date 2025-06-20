@@ -1,0 +1,241 @@
+TELTONIKA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+ Integer32, enterprises, Counter64,
+ IpAddress, Unsigned32    FROM SNMPv2-SMI
+ DisplayString,
+ PhysAddress     FROM SNMPv2-TC
+ OBJECT-GROUP, NOTIFICATION-GROUP  FROM SNMPv2-CONF;
+
+teltonika MODULE-IDENTITY
+ LAST-UPDATED "202405151020Z"
+ ORGANIZATION "TELTONIKA"
+ CONTACT-INFO "TELTONIKA"
+ DESCRIPTION "The MIB module for TELTONIKA TSW212 routers."
+ REVISION "202206200000Z"
+ DESCRIPTION "Initial version"
+ ::= { enterprises 48690 }
+
+teltonikaSnmpGroups OBJECT IDENTIFIER ::= { teltonika 0 }
+device   OBJECT IDENTIFIER ::= { teltonika 1 }
+vlan   OBJECT IDENTIFIER ::= { teltonika 8 }
+iface   OBJECT IDENTIFIER ::= { teltonika 11 }
+
+-- Device --
+
+deviceGroup OBJECT-GROUP
+ OBJECTS { serial,
+    deviceName,
+    productCode,
+    batchNumber,
+    hardwareRevision,
+    fwVersion,
+    deviceUptime,
+    cpuUsage }
+ STATUS current
+ DESCRIPTION "Device SNMP group defined according to RFC 2580"
+ ::= { teltonikaSnmpGroups 1 }
+
+serial OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Serial number"
+ ::= { device 1 }
+
+deviceName OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device name"
+ ::= { device 2 }
+
+productCode OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device product code"
+ ::= { device 3 }
+
+batchNumber OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device batch number"
+ ::= { device 4 }
+
+hardwareRevision OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device hardware revision"
+ ::= { device 5 }
+
+fwVersion OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device firmware version"
+ ::= { device 6 }
+
+deviceUptime OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device uptime in seconds"
+ ::= { device 7 }
+
+cpuUsage OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Device cpu usage in percents"
+ ::= { device 8 }
+
+-- Port-based VLAN in switches --
+
+pVlanCount OBJECT-TYPE
+ SYNTAX      INTEGER
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "Amount of port-based virtual networks."
+ ::= { vlan 1 }
+
+-- Iface --
+
+ifaceGroup OBJECT-GROUP
+ OBJECTS { ifaceCount,
+    ifaceIndex,
+    ifaceName,
+    ifaceState,
+    ifaceSpeed,
+    ifaceMulticast,
+    ifaceRDiscards,
+    ifaceRErrors,
+    ifaceRTraffic,
+    ifaceTDiscards,
+    ifaceTErrors,
+    ifaceTTraffic }
+ STATUS current
+ DESCRIPTION "Interface SNMP group defined according to RFC 2580"
+ ::= { teltonikaSnmpGroups 13 }
+
+ifaceCount OBJECT-TYPE
+ SYNTAX  Integer32
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Number of interfaces on the device"
+ ::= { iface 1 }
+
+-- Iface table
+
+ifaceTable OBJECT-TYPE
+ SYNTAX  SEQUENCE OF IfaceEntry
+ MAX-ACCESS not-accessible
+ STATUS  current
+ DESCRIPTION "A list of iface entries. The number of entries is given by the value of ifaceCount"
+ ::= { iface 2 }
+
+ifaceEntry OBJECT-TYPE
+ SYNTAX  IfaceEntry
+ MAX-ACCESS not-accessible
+ STATUS  current
+ DESCRIPTION "An entry containing information of a particular interface"
+ INDEX  { ifaceIndex }
+ ::= { ifaceTable 1 }
+
+IfaceEntry ::=
+ SEQUENCE {
+ ifaceIndex   INTEGER,
+ ifaceName   DisplayString,
+ ifaceState   DisplayString,
+ ifaceSpeed   INTEGER,
+ ifaceMulticast   INTEGER,
+ ifaceRDiscards   INTEGER,
+        ifaceRErrors   INTEGER,
+        ifaceRTraffic   INTEGER,
+ ifaceTDiscards   INTEGER,
+        ifaceTErrors   INTEGER,
+        ifaceTTraffic   INTEGER
+ }
+
+ifaceIndex OBJECT-TYPE
+ SYNTAX  INTEGER (0..65535)
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "A unique value, greater than zero, for each interface."
+ ::= { ifaceEntry 1 }
+
+ifaceName OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's name."
+ ::= { ifaceEntry 2 }
+
+ifaceState OBJECT-TYPE
+ SYNTAX  DisplayString (SIZE (0..255))
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Indicates interface's operational state as a string."
+ ::= { ifaceEntry 3 }
+
+ifaceSpeed OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Indicates the interface latest or current speed value. Value is an integer representing the link speed in Mbits/sec."
+ ::= { ifaceEntry 4 }
+
+ifaceMulticast OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's multicast"
+ ::= { ifaceEntry 5 }
+
+ifaceRDiscards OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's incoming discards"
+ ::= { ifaceEntry 6 }
+
+ifaceRErrors OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's incoming errors"
+ ::= { ifaceEntry 7 }
+
+ifaceRTraffic OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's incoming traffic count"
+ ::= { ifaceEntry 8 }
+
+ifaceTDiscards OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's outgoing discards"
+ ::= { ifaceEntry 9 }
+
+ifaceTErrors OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's outgoing errors"
+ ::= { ifaceEntry 10 }
+
+ifaceTTraffic OBJECT-TYPE
+ SYNTAX  INTEGER
+ MAX-ACCESS read-only
+ STATUS  current
+ DESCRIPTION "Interface's outgoing traffic count"
+ ::= { ifaceEntry 11 }
+
+
+END

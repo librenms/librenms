@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ospf.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\PortCache;
 use App\Models\Device;
-use App\Models\Ipv4Address;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
@@ -146,12 +147,9 @@ class Ospf implements Module
                 ->walk('OSPF-MIB::ospfIfTable')
                 ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
                     // find port_id
-                    $ospf_port['port_id'] = (int) $os->getDevice()->ports()->where('ifIndex', $ifIndex)->value('port_id');
+                    $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $os->getDevice());
                     if ($ospf_port['port_id'] == 0) {
-                        $ospf_port['port_id'] = (int) $os->getDevice()->ipv4()
-                            ->where('ipv4_address', $ip)
-                            ->where('context_name', $context_name)
-                            ->value('ipv4_addresses.port_id');
+                        $ospf_port['port_id'] = (int) PortCache::getIdFromIp($ip, $context_name, $os->getDevice());
                     }
 
                     return OspfPort::updateOrCreate([
@@ -177,10 +175,7 @@ class Ospf implements Module
                 ->walk('OSPF-MIB::ospfNbrTable')
                 ->mapTable(function ($ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
                     // get neighbor port_id
-                    $ospf_nbr['port_id'] = Ipv4Address::query()
-                        ->where('ipv4_address', $ip)
-                        ->where('context_name', $context_name)
-                        ->value('port_id');
+                    $ospf_nbr['port_id'] = PortCache::getIdFromIp($ip, $context_name); // search all devices
 
                     return OspfNbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),

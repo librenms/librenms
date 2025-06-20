@@ -1,5 +1,0 @@
-modules:
-  os:
-    hardware: PM8ECCMIB::midDeviceName.1
-    serial: PM8ECCMIB::midSerialNumber.1
-    version: PM8ECCMIB::midFirmwareVersion.1

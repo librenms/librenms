@@ -2,7 +2,16 @@
 
 $pagetitle[] = 'Routing';
 
-if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
+$optb = isset($_GET['optb']) ? $_GET['optb'] : '';
+$optc = isset($_GET['optc']) ? $_GET['optc'] : '';
+$vars['view'] = isset($vars['view']) ? $vars['view'] : 'basic';
+$vars['graph'] = isset($vars['graph']) ? $vars['graph'] : '';
+$vars['type'] = isset($vars['type']) ? $vars['type'] : 'all';
+$vars['adminstatus'] = isset($vars['adminstatus']) ? $vars['adminstatus'] : '';
+$vars['state'] = isset($vars['state']) ? $vars['state'] : '';
+$width = isset($vars['width']) ? $vars['width'] : '218';
+
+if ($optb == 'graphs' || $optc == 'graphs') {
     $graphs = 'graphs';
 } else {
     $graphs = 'nographs';
@@ -17,6 +26,7 @@ $type_text['bgp'] = 'BGP';
 $type_text['cef'] = 'CEF';
 $type_text['mpls'] = 'MPLS';
 $type_text['ospf'] = 'OSPF';
+$type_text['ospfv3'] = 'OSPFv3';
 $type_text['isis'] = 'ISIS';
 $type_text['vrf'] = 'VRFs';
 $type_text['cisco-otv'] = 'OTV';
@@ -59,6 +69,7 @@ switch ($vars['protocol']) {
     case 'cef':
     case 'mpls':
     case 'ospf':
+    case 'ospfv3':
     case 'isis':
     case 'cisco-otv':
         include 'includes/html/pages/routing/' . $vars['protocol'] . '.inc.php';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config.php
  *
@@ -36,6 +37,7 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
+use Symfony\Component\Yaml\Yaml;
 
 class ConfigRepository
 {
@@ -52,8 +54,9 @@ class ConfigRepository
         $cache_ttl = config('librenms.config_cache_ttl');
         $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
             $this->config = [];
-            // merge all config sources together config_definitions.json > db config > config.php
+            // merge all config sources together config_definitions.json & os defs > db config > config.php
             $this->loadPreUserConfigDefaults();
+            $this->loadAllOsDefinitions();
             $this->loadDB();
             $this->loadUserConfigFile($this->config);
             $this->loadPostUserConfigDefaults();
@@ -72,7 +75,7 @@ class ConfigRepository
      */
     public function getDefinitions(): array
     {
-        return json_decode(file_get_contents($this->get('install_dir') . '/misc/config_definitions.json'), true)['config'];
+        return json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/config_definitions.json'), true)['config'];
     }
 
     /**
@@ -155,16 +158,7 @@ class ConfigRepository
     public function getOsSetting($os, $key, $default = null): mixed
     {
         if ($os) {
-            \LibreNMS\Util\OS::loadDefinition($os);
-
-            if (isset($this->config['os'][$os][$key])) {
-                return $this->config['os'][$os][$key];
-            }
-
-            $os_key = "os.$os.$key";
-            if ($this->has($os_key)) {
-                return $this->get($os_key);
-            }
+            return $this->get("os.$os.$key", $default);
         }
 
         return $default;
@@ -184,23 +178,19 @@ class ConfigRepository
     public function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
         $global_key = $global_prefix . $key;
+        $os_key = "os.$os.$key";
 
-        if (! isset($this->config['os'][$os][$key])) {
-            if (! Str::contains($global_key, '.')) {
-                return (array) $this->get($global_key, $default);
-            }
-            if (! $this->has("os.$os.$key")) {
-                return (array) $this->get($global_key, $default);
-            }
+        if (! $this->has($os_key)) {
+            return (array) $this->get($global_key, $default);
         }
 
-        if (! $this->has("os.$os.$key")) {
-            return (array) $this->get($global_key, $default);
+        if (! $this->has($global_key)) {
+            return (array) $this->getOsSetting($os, $key, $default);
         }
 
         return array_unique(array_merge(
             (array) $this->get($global_key),
-            (array) $this->getOsSetting($os, $key)
+            (array) $this->get($os_key)
         ));
     }
 
@@ -231,13 +221,15 @@ class ConfigRepository
                 return false;  // can't save it if there is no DB
             }
 
-            \App\Models\Config::updateOrCreate(['config_name' => $key], [
+            Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
             ]);
 
             // delete any children (there should not be any unless it is legacy)
-            \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+            Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+
+            $this->invalidateCache(); // config has been changed, it will need to be reloaded
 
             return true;
         } catch (Exception $e) {
@@ -248,7 +240,7 @@ class ConfigRepository
                 echo $e;
             }
 
-            if ($e instanceof \Illuminate\Database\QueryException && $e->getCode() !== '42S02') {
+            if ($e instanceof QueryException && $e->getCode() !== '42S02') {
                 // re-throw, else Config service provider get stuck in a loop
                 // if there is an error (database not connected)
                 // unless it is table not found (migrations have not been run yet)
@@ -271,7 +263,7 @@ class ConfigRepository
     {
         $this->forget($key);
         try {
-            return \App\Models\Config::withChildren($key)->delete();
+            return Models\Config::withChildren($key)->delete();
         } catch (Exception $e) {
             return false;
         }
@@ -317,6 +309,16 @@ class ConfigRepository
     }
 
     /**
+     * Invalidate config cache (but don't reload)
+     * Next time the config is loaded, it will loaded fresh
+     * Because this is currently hardcoded to file cache, it will only clear the cache on this node
+     */
+    public function invalidateCache(): void
+    {
+        Cache::driver('file')->forget('librenms-config');
+    }
+
+    /**
      * merge the database config with the global config,
      * global config overrides db
      */
@@ -327,7 +329,7 @@ class ConfigRepository
         }
 
         try {
-            \App\Models\Config::get(['config_name', 'config_value'])
+            Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) {
                     Arr::set($this->config, $item->config_name, $item->config_value);
                 });
@@ -380,7 +382,7 @@ class ConfigRepository
         }
 
         // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
+        $macros = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/macros.json'), true);
         Arr::set($this->config, 'alert.macros.rule', $macros);
 
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
@@ -456,8 +458,8 @@ class ConfigRepository
         if (! $this->has('snmp.unescape')) {
             $this->persist('snmp.unescape', version_compare((new Version($this))->netSnmp(), '5.8.0', '<'));
         }
-        if (! self::has('reporting.usage')) {
-            self::persist('reporting.usage', (bool) Callback::get('enabled'));
+        if (! $this->has('reporting.usage')) {
+            $this->persist('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later
@@ -548,7 +550,9 @@ class ConfigRepository
         $this->set('time.twelvehour', $now - 43200); // time() - (12 * 60 * 60);
         $this->set('time.day', $now - 86400); // time() - (24 * 60 * 60);
         $this->set('time.twoday', $now - 172800); // time() - (2 * 24 * 60 * 60);
+        $this->set('time.threeday', $now - 259200); // time() - (3 * 24 * 60 * 60);
         $this->set('time.week', $now - 604800); // time() - (7 * 24 * 60 * 60);
+        $this->set('time.tenday', $now - 864000); // time() - (10 * 24 * 60 * 60);
         $this->set('time.twoweek', $now - 1209600); // time() - (2 * 7 * 24 * 60 * 60);
         $this->set('time.month', $now - 2678400); // time() - (31 * 24 * 60 * 60);
         $this->set('time.twomonth', $now - 5356800); // time() - (2 * 31 * 24 * 60 * 60);
@@ -572,5 +576,20 @@ class ConfigRepository
         $this->set('db_pass', config("database.connections.$db.password"));
         $this->set('db_port', config("database.connections.$db.port", 3306));
         $this->set('db_socket', config("database.connections.$db.unix_socket"));
+    }
+
+    /**
+     * Load all OS settings from yaml or cache
+     */
+    private function loadAllOsDefinitions(): void
+    {
+        $os_list = glob($this->get('install_dir') . '/resources/definitions/os_detection/*.yaml');
+
+        foreach ($os_list as $yaml_file) {
+            $os = basename($yaml_file, '.yaml');
+            $os_def = Yaml::parse(file_get_contents($yaml_file));
+
+            $this->set("os.$os", $os_def);
+        }
     }
 }

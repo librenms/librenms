@@ -1,4 +1,5 @@
 <?php
+
 /**
  * delete-poller.inc.php
  *

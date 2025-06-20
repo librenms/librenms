@@ -718,11 +718,13 @@
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = {};
                     node_cfg.id = nodeid;
+                    node_cfg.device_id = node.device_id;
+                    node_cfg.linked_map_id = node.linked_map_id;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
-                        node_cfg.title = node.device_id;
+                        node_cfg.title = "Device " + node.device_id;
                     } else if(node.linked_map_id) {
-                        node_cfg.title = "map:" + node.linked_map_id;
+                        node_cfg.title = "Link to map " + node.linked_map_id;
                     } else {
                         node_cfg.title = null;
                     }
@@ -851,11 +853,11 @@
             for (const mutation of mutationList) {
                 if (mutation.addedNodes.length) {
                     if(Array.from(mutation.addedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.add("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.add("tw:cursor-crosshair")
                     }
                 } else if (mutation.removedNodes.length) {
                     if(Array.from(mutation.removedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.remove("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.remove("tw:cursor-crosshair")
                     }
                 }
             }

@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -12,6 +14,11 @@ $old_checks_data = [];
 if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
     $old_checks = array_keys($app->data['data']['checks']);
     $old_checks_data = $app->data['data']['checks'];
+}
+
+$old_debugs = [];
+if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
+    $old_debugs = array_keys($app->data['data']['debugs']);
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -35,6 +42,11 @@ $app->data = $json_return;
 $new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
     $new_checks = array_keys($json_return['data']['checks']);
+}
+
+$new_debugs = [];
+if (isset($json_return['data']) and isset($json_return['data']['debugs'])) {
+    $new_debugs = array_keys($json_return['data']['debugs']);
 }
 
 $rrd_name = ['app', $name, $app->app_id];
@@ -66,7 +78,7 @@ $fields = [
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key => $value) {
@@ -80,18 +92,28 @@ if (abs($time_to_polling) > 540) {
     $json_return['data']['alert'] = 1;
 }
 
-//check for added checks
+//check for added checks/debugs
 $added_checks = array_values(array_diff($new_checks, $old_checks));
+$added_debugs = array_values(array_diff($new_debugs, $old_debugs));
 
-//check for removed checks
+//check for removed checks/debugs
 $removed_checks = array_values(array_diff($old_checks, $new_checks));
+$removed_debugs = array_values(array_diff($old_debugs, $new_debugs));
 
 // if we have any check changes, log it
-if (sizeof($added_checks) > 0 || sizeof($removed_checks) > 0) {
+if (count($added_checks) > 0 || count($removed_checks) > 0) {
     $log_message = 'Sneck Check Change:';
     $log_message .= count($added_checks) > 0 ? ' Added ' . json_encode($added_checks) : '';
     $log_message .= count($removed_checks) > 0 ? ' Removed ' . json_encode($added_checks) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
+}
+
+// if we have any debug changes, log it
+if (count($added_debugs) > 0 || count($removed_debugs) > 0) {
+    $log_message = 'Sneck Debugs Change:';
+    $log_message .= count($added_debugs) > 0 ? ' Added ' . json_encode($added_debugs) : '';
+    $log_message .= count($removed_debugs) > 0 ? ' Removed ' . json_encode($added_debugs) : '';
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // go through and looking for status changes
@@ -132,27 +154,27 @@ foreach ($new_checks as $check) {
 }
 
 // log any clears
-if (sizeof($cleared) > 0) {
+if (count($cleared) > 0) {
     $log_message = 'Sneck Check Clears: ' . json_encode($cleared);
-    log_event($log_message, $device, 'application', 1);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
 // log any warnings
-if (sizeof($warned) > 0) {
+if (count($warned) > 0) {
     $log_message = 'Sneck Check Warns: ' . json_encode($warned);
-    log_event($log_message, $device, 'application', 4);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Warning);
 }
 
 // log any alerts
-if (sizeof($alerted) > 0) {
+if (count($alerted) > 0) {
     $log_message = 'Sneck Check Alerts: ' . json_encode($alerted);
-    log_event($log_message, $device, 'application', 5);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
 }
 
 // log any unknowns
-if (sizeof($unknowned) > 0) {
+if (count($unknowned) > 0) {
     $log_message = 'Sneck Check Unknowns: ' . json_encode($unknownwed);
-    log_event($log_message, $device, 'application', 6);
+    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Unknown);
 }
 
 // update it here as we are done with this mostly

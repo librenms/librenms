@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WirelessSnrDiscovery.php
  *

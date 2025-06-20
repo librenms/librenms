@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Mac;
+
 $vtpdomains = snmpwalk_group($device, 'managementDomainName', 'CISCO-VTP-MIB');
 $vlans = snmpwalk_group($device, 'vtpVlanEntry', 'CISCO-VTP-MIB', 2);
 
@@ -24,12 +26,11 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             $portid_dict = [];
             $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
             foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-                $port = get_port_by_index_cache($device['device_id'], $data['BRIDGE-MIB::dot1dBasePortIfIndex']);
-                $portid_dict[$portLocal] = $port['port_id'];
+                $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'], $device['device_id']);
             }
 
-            foreach ((array) $fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
-                $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            foreach ((array) ($fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] ?? []) as $mac => $dot1dBasePort) {
+                $mac_address = Mac::parse($mac)->hex();
                 if (strlen($mac_address) != 12) {
                     d_echo("MAC address padding failed for $mac\n");
                     continue;

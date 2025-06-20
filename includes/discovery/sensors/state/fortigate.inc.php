@@ -1,4 +1,5 @@
 <?php
+
 /**
  * fortigate.inc.php
  *
@@ -21,22 +22,18 @@
  *
  * @copyright  2020 Net Entertainment AB
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
- * @copyright  2024 CTNET BV
+ * @copyright  2025 CTNET BV
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
-$index = 0;
-$fgHaSystemMode_num = '.1.3.6.1.4.1.12356.101.13.1.1.0';
-$fgHaSystemMode_txt = 'fgHaSystemMode.0';
-$systemMode = snmp_get($device, $fgHaSystemMode_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
+$systemMode = SnmpQuery::enumStrings()->get('FORTINET-FORTIGATE-MIB::fgHaSystemMode.0')->value(0);
 
 // Verify that the device is clustered
 if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     // Indexes of all the members
     $fgHaStatsIndex_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.1';
-    $fgHaStatsIndex_txt = 'fgHaStatsIndex';
 
     // Fetch the cluster members
-    $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsIndex_txt, [], 'FORTINET-FORTIGATE-MIB');
+    $haStatsEntries = SnmpQuery::hideMIB()->walk('FORTINET-FORTIGATE-MIB::fgHaStatsIndex')->table(1);
 
     // As of July 2024:
     // FortiNet considers a single-node cluster a valid setup. Therefor, if a cluster node is removed or
@@ -64,14 +61,13 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
     create_state_index($stateName, $states);
 
-    $fgHaStatsSyncStatus_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.12';
-    $fgHaStatsSyncStatus_txt = 'fgHaStatsSyncStatus';
-
     // Per-node loop
     foreach ($haStatsEntries as $index => $entry) {
+        // Get current value (for issue #16544)
+        $sensor_value = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgHaStatsSyncStatus.' . $index)->value(0);
+
         // Get name of cluster member
-        $fgHaStatsHostname_txt = 'fgHaStatsHostname.' . $index;
-        $cluster_member_name = snmp_get($device, $fgHaStatsHostname_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
+        $cluster_member_name = SnmpQuery::get('FORTINET-FORTIGATE-MIB::fgHaStatsHostname.' . $index)->value(0);
 
         $descr = 'HA sync status ' . $cluster_member_name;
 
@@ -81,7 +77,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             null,
             'state',
             $device,
-            $fgHaStatsSyncStatus_num . '.' . $index,
+            '.1.3.6.1.4.1.12356.101.13.2.1.1.12.' . $index,
             $index,
             $stateName,
             $descr,
@@ -91,32 +87,21 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             null,
             null,
             null,
-            -1,
+            $sensor_value,
             'snmp',
             $index,
             null,
             null,
             'HA'
         );
-
-        create_sensor_to_state_index($device, $stateName, $index);
     }
 }
 
 unset(
-    $index,
-    $fgHaSystemMode_num,
-    $fgHaSystemMode_txt,
     $systemMode,
-    $fgHaStatsIndex_num,
-    $fgHaStatsIndex_txt,
-    $fgHaStatsSyncStatus_num,
-    $fgHaStatsSyncStatus_txt,
     $haStatsEntries,
     $stateName,
     $descr,
     $states,
-    $clusterMemberCount,
-    $clusterState,
     $entry
 );

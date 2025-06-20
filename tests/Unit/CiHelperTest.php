@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiHelperTest.php
  *
@@ -101,7 +102,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -156,7 +157,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -170,7 +171,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [

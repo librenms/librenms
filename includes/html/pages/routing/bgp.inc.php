@@ -329,8 +329,8 @@ if (! Auth::user()->hasGlobalRead()) {
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
             <td>' . $last_error . '</td>
             <td>' . Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
-            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerInUpdates'], 2, 3, '') . "
-            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerOutUpdates'], 2, 3, '') . '</td></tr>';
+            Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerInUpdates'], 2, 0, '') . "
+            <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerOutUpdates'], 2, 0, '') . '</td></tr>';
 
         unset($invalid);
         switch ($vars['graph']) {

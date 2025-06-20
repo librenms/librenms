@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Openbsd.php
  *
@@ -58,11 +59,29 @@ class Openbsd extends Unix implements OSPolling
             'OPENBSD-PF-MIB::pfCntNoRoute.0',
         ])->values();
 
-        $this->graphOID('states', $datastore, ['states' => $oids['OPENBSD-PF-MIB::pfStateCount.0']], 'GAUGE');
-        $this->graphOID('searches', $datastore, ['searches' => $oids['OPENBSD-PF-MIB::pfStateSearches.0']]);
-        $this->graphOID('inserts', $datastore, ['inserts' => $oids['OPENBSD-PF-MIB::pfStateInserts.0']]);
-        $this->graphOID('removals', $datastore, ['removals' => $oids['OPENBSD-PF-MIB::pfStateRemovals.0']]);
-        $this->graphOID('matches', $datastore, ['matches' => $oids['OPENBSD-PF-MIB::pfCntMatch.0']]);
+        if (empty($oids)) {
+            return;
+        }
+
+        if (isset($oids['OPENBSD-PF-MIB::pfStateCount.0'])) {
+            $this->graphOID('states', $datastore, ['states' => $oids['OPENBSD-PF-MIB::pfStateCount.0']], 'GAUGE');
+        }
+
+        if (isset($oids['OPENBSD-PF-MIB::pfStateSearches.0'])) {
+            $this->graphOID('searches', $datastore, ['searches' => $oids['OPENBSD-PF-MIB::pfStateSearches.0']]);
+        }
+
+        if (isset($oids['OPENBSD-PF-MIB::pfStateInserts.0'])) {
+            $this->graphOID('inserts', $datastore, ['inserts' => $oids['OPENBSD-PF-MIB::pfStateInserts.0']]);
+        }
+
+        if (isset($oids['OPENBSD-PF-MIB::pfStateRemovals.0'])) {
+            $this->graphOID('removals', $datastore, ['removals' => $oids['OPENBSD-PF-MIB::pfStateRemovals.0']]);
+        }
+
+        if (isset($oids['OPENBSD-PF-MIB::pfCntMatch.0'])) {
+            $this->graphOID('matches', $datastore, ['matches' => $oids['OPENBSD-PF-MIB::pfCntMatch.0']]);
+        }
 
         $this->graphOID('drops', $datastore, [
             'badoffset' => $oids['OPENBSD-PF-MIB::pfCntBadOffset.0'],

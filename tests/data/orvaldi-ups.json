@@ -737,8 +737,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -837,8 +837,8 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -937,8 +937,8 @@
                     "ifName": "ip6tnl0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1170,7 +1170,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 100,
-                    "sensor_limit": 101,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 15,
                     "sensor_limit_low_warn": 50,
@@ -1866,60 +1866,72 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "36",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/shm",
                     "storage_size": 63582208,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.36",
+                    "storage_free": 63582208,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "37",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/mnt/rwfs",
                     "storage_size": 524288,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.37",
+                    "storage_free": 524288,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/shm",
-                    "storage_size": 63582208,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 63582208,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv6_address": "fe80:0000:0000:0000:6219:29ff:fe01:e5d9",
+                    "ipv6_compressed": "fe80::6219:29ff:fe01:e5d9",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "linklayer",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.255.211",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.0.255.0/24",
+                    "ifIndex": 2
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/mnt/rwfs",
-                    "storage_size": 524288,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 524288,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
                 }
             ]
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * MempoolsController.php
  *
@@ -28,6 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
@@ -73,7 +75,7 @@ class MempoolsController extends TableController
     {
         if ($mempool instanceof Device) {
             $device = $mempool;
-            $graphs = \LibreNMS\Util\Html::graphRow([
+            $graphs = Html::graphRow([
                 'device' => $device->device_id,
                 'type' => 'device_mempool',
                 'height' => 100,
@@ -81,7 +83,7 @@ class MempoolsController extends TableController
             ]);
 
             return [
-                'hostname' => Url::deviceLink($device),
+                'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $device]),
                 'mempool_descr' => $graphs[0],
                 'graph' => $graphs[1],
                 'mempool_used' => $graphs[2],
@@ -91,7 +93,7 @@ class MempoolsController extends TableController
 
         /** @var Mempool $mempool */
         return [
-            'hostname' => Url::deviceLink($mempool->device),
+            'hostname' => Blade::render('<x-device-link :device="$device"/>', ['device' => $mempool->device]),
             'mempool_descr' => $mempool->mempool_descr,
             'graph' => $this->miniGraph($mempool),
             'mempool_used' => $this->barLink($mempool),
@@ -133,5 +135,46 @@ class MempoolsController extends TableController
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Description',
+            'Used',
+            'Free',
+            'Total',
+            'Percentage',
+            'Warning Threshold',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Mempool  $mempool
+     * @return array
+     */
+    protected function formatExportRow($mempool)
+    {
+        $is_percent = $mempool->mempool_total == 100;
+
+        return [
+            'device_id' => $mempool->device_id,
+            'hostname' => $mempool->device->displayName(),
+            'description' => $mempool->mempool_descr,
+            'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
+            'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),
+            'total' => $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total),
+            'percentage' => $mempool->mempool_perc . '%',
+            'warning_threshold' => $mempool->mempool_perc_warn ?? '-',
+        ];
     }
 }

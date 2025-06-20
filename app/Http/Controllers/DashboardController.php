@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DashboardController.php
  *
@@ -71,7 +72,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
@@ -117,8 +118,8 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  Request  $request
+     * @param  Dashboard  $dashboard
      * @return \Illuminate\Contracts\View\View
      */
     public function show(Request $request, Dashboard $dashboard)
@@ -198,7 +199,7 @@ class DashboardController extends Controller
     {
         $validated = $this->validate($request, [
             'dashboard_name' => 'string|max:255',
-            'access' => 'int|in:0,1,2',
+            'access' => 'int|in:0,1,2,3',
         ]);
 
         $dashboard->fill($validated);
@@ -257,7 +258,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \App\Models\User  $user
+     * @param  User  $user
      * @return \Illuminate\Support\Collection<\App\Models\Dashboard>
      */
     private function getAvailableDashboards(User $user): Collection

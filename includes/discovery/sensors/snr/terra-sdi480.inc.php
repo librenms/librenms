@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Terra-sdi480 inputs SNR
  *
@@ -25,10 +26,12 @@
 $divisor = 10;
 $multiplier = 1;
 
-if (is_array($pre_cache['sdi480status'])) {
+$oids = SnmpQuery::cache()->hideMib()->walk('TERRA-sdi480-MIB::sdi480status')->table(1);
+
+if (is_array($oids)) {
     d_echo('Terra sdi480 SNR');
     for ($inputid = 1; $inputid <= 8; $inputid++) {
-        $snr = $pre_cache['sdi480status'][0]['insnr' . $inputid];
+        $snr = $oids[0]['insnr' . $inputid];
         if ($snr) {
             $oid = '.1.3.6.1.4.1.30631.1.17.1.' . $inputid . '.3.0';
             $type = 'terra_snr';
@@ -38,28 +41,26 @@ if (is_array($pre_cache['sdi480status'])) {
             $lowwarnlimit = 14;
             $lowlimit = 12;
             $value = $snr / $divisor;
-            $group = 'Inputs';
-            discover_sensor(
-                null,
-                'snr',
-                $device,
-                $oid,
-                $inputid,
-                $type,
-                $descr,
-                $divisor,
-                $multiplier,
-                $lowlimit,
-                $lowwarnlimit,
-                $limitwarn,
-                $limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                $group
-            );
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'snr',
+                'sensor_oid' => $oid,
+                'sensor_index' => $inputid,
+                'sensor_type' => $type,
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $lowlimit,
+                'sensor_limit_low_warn' => $lowwarnlimit,
+                'sensor_limit_warn' => $limitwarn,
+                'sensor_limit' => $limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => null,
+                'entPhysicalIndex_measured' => null,
+                'user_func' => null,
+                'group' => 'Inputs',
+            ]));
         }
     }
 }

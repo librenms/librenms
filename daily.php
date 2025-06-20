@@ -9,13 +9,14 @@
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
-use LibreNMS\Alert\AlertDB;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Notifications;
 use LibreNMS\Validations\Php;
 
 $options = getopt('df:o:t:r:');
+$options['f'] = isset($options['f']) ? $options['f'] : '';
 
 /**
  * Scripts without dependencies
@@ -260,27 +261,16 @@ if ($options['f'] === 'alert_log') {
     // we want only to keep the last alert_log that contains the alert details
 
     $msg = "Deleting history of active alert_logs more than %d days\n";
-    $sql = 'DELETE
+    $sql = 'DELETE alert_log FROM
+                alert_log
+                INNER JOIN
+                (SELECT device_id, rule_id, max(time_logged) AS mtime_logged
                     FROM alert_log
-                    WHERE id IN(
-                        SELECT id FROM(
-                            SELECT id
-                            FROM alert_log a1
-                            WHERE
-                                time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                                AND (device_id, rule_id, time_logged) NOT IN (
-                                    SELECT device_id, rule_id, max(time_logged)
-                                    FROM alert_log a2 WHERE a1.device_id = a2.device_id AND a1.rule_id = a2.rule_id
-                                    AND a2.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
-                                )
-                        ) as c
-                    )
-                ';
-    $purge_duration = Config::get('alert_log_purge');
-    if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
-        return -2;
-    }
-    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
+                    WHERE time_logged < DATE_SUB(NOW(), INTERVAL ? DAY)
+                    GROUP BY device_id, rule_id) AS b
+                ON
+                    alert_log.device_id = b.device_id AND alert_log.rule_id = b.rule_id
+                WHERE alert_log.time_logged < b.mtime_logged';
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -316,7 +306,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
-                $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
                 if (! empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
                     unset($data);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * alert-transports.inc.php
  *
@@ -83,7 +84,7 @@ if (empty($name)) {
             $transport_config = (array) json_decode(dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
             foreach ($result['config'] as $tmp_config) {
                 if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
-                    $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']];
+                    $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']] ?? null;
                 }
             }
             //Update the json config field

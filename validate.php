@@ -127,12 +127,6 @@ if (! file_exists(Config::get('install_dir') . '/.env')) {
     exit(1);
 }
 
-if (\LibreNMS\DB\Eloquent::isConnected()) {
-    $validator->ok('Database connection successful', null, 'database');
-} else {
-    $validator->fail('Error connecting to your database.', null, 'database');
-}
-
 $precheck_complete = true; // disable shutdown function
 print_header();
 
@@ -154,10 +148,14 @@ $validator->validate($modules, isset($options['s']) || ! empty($modules));
 
 exit($validator->getStatus() ? 0 : 1);
 
-function print_header()
+function print_header(): void
 {
-    $output = ob_get_clean();
-    @ob_end_clean();
+    $output = '';
+
+    if (ob_get_level() > 0) {
+        $output = ob_get_contents();
+        ob_end_clean();
+    }
 
     echo \LibreNMS\Util\Version::get()->header() . PHP_EOL;
     echo $output;

@@ -7703,7 +7703,7 @@
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 78954664,
                     "bgpPeerOutTotalMessages": 5243874,
-                    "bgpPeerFsmEstablishedTime": 2,
+                    "bgpPeerFsmEstablishedTime": 3,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
@@ -7726,7 +7726,7 @@
                     "bgpPeerOutUpdates": 0,
                     "bgpPeerInTotalMessages": 4828014,
                     "bgpPeerOutTotalMessages": 5243447,
-                    "bgpPeerFsmEstablishedTime": 2,
+                    "bgpPeerFsmEstablishedTime": 3,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
@@ -9097,6 +9097,33 @@
                     "ifAlias": "SAR: to-SITEA-7750 1/1/8",
                     "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
                     "ifName": "1/3/8"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.18.20.14",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "10.18.30.14",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.18.60.86",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.18.60.84/30",
+                    "ifIndex": 5
                 }
             ]
         }

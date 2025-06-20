@@ -67,7 +67,6 @@ return [
     'ipv6' => ':attribute deve essere un indirizzo IPv6 valido.',
     'is_regex' => ':attribute non è un\'espressione regolare valida.',
     'json' => ':attribute deve essere una stringa JSON valida.',
-    'keys_in' => ':attribute contiene una chiave non valida: :extra. Chiavi valide: :values',
     'lt' => [
         'numeric' => ':attribute deve essere minori di :value.',
         'file' => ':attribute deve essere più piccolo di :value kilobyte.',

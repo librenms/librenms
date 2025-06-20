@@ -1,0 +1,581 @@
+-- Namespace: http://viptela.com/hardware
+
+VIPTELA-HARDWARE DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-hardware MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for hardware operational data"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 3 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+HwSensorTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {board(0),cPU-Junction(1),dRAM(2),pIM(3)}
+
+HwTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {unknown(0),chassis(1),cPU(2),dRAM(3),flash(4),eMMC(5),sDCard(6),uSB(7),pIM(8),transceiver(9),fanTray(10),pEM(11),nIM(12)}
+
+ModuleStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {inserted(0),removed(1)}
+
+FailureStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {oK(0),failed(1)}
+
+HwPoeClassEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {unknown(0),class-1(1),class-2(2),class-3(3),class-4(4),reserved(5),class-0(6),over-current(7)}
+
+-- Display hardware information
+-- tagpath /hardware
+hardware OBJECT IDENTIFIER ::= { viptela-hardware 1 }
+
+-- System object IDs for viptela devices
+-- tagpath /viptela-devices
+viptelaDevices OBJECT IDENTIFIER ::= { viptela-hardware 2 }
+
+-- tagpath /viptela-devices/vsmart
+vsmart OBJECT IDENTIFIER ::= { viptelaDevices 1 }
+
+-- tagpath /viptela-devices/vmanage
+vmanage OBJECT IDENTIFIER ::= { viptelaDevices 2 }
+
+-- tagpath /viptela-devices/vbond-software
+vbondSoftware OBJECT IDENTIFIER ::= { viptelaDevices 3 }
+
+-- tagpath /viptela-devices/vedge-1000-AC
+vedge1000AC OBJECT IDENTIFIER ::= { viptelaDevices 4 }
+
+-- tagpath /viptela-devices/vedge-2000-AC
+vedge2000AC OBJECT IDENTIFIER ::= { viptelaDevices 5 }
+
+-- tagpath /viptela-devices/vedge-100-AC
+vedge100AC OBJECT IDENTIFIER ::= { viptelaDevices 6 }
+
+-- tagpath /viptela-devices/vedge-100-W2-AC
+vedge100W2AC OBJECT IDENTIFIER ::= { viptelaDevices 7 }
+
+-- tagpath /viptela-devices/vedge-100-WM-AC
+vedge100WMAC OBJECT IDENTIFIER ::= { viptelaDevices 8 }
+
+-- tagpath /viptela-devices/vedge-100-M2-AC
+vedge100M2AC OBJECT IDENTIFIER ::= { viptelaDevices 9 }
+
+-- tagpath /viptela-devices/vedge-100-M-AC
+vedge100MAC OBJECT IDENTIFIER ::= { viptelaDevices 10 }
+
+-- tagpath /viptela-devices/vedge-100-B-AC
+vedge100BAC OBJECT IDENTIFIER ::= { viptelaDevices 11}
+
+-- tagpath /viptela-devices/vedge-cloud
+vedgeCloud OBJECT IDENTIFIER ::= { viptelaDevices 12}
+
+-- tagpath /viptela-devices/vcontainer
+vcontainer OBJECT IDENTIFIER ::= { viptelaDevices 13}
+
+-- tagpath /viptela-devices/vedge-5000-AC
+vedge5000AC OBJECT IDENTIFIER ::= { viptelaDevices 14}
+
+-- tagpath /viptela-devices/vedge-101-B-AC
+vedge101BAC OBJECT IDENTIFIER ::= { viptelaDevices 15}
+
+-- tagpath /viptela-devices/vedge-1001-AC
+vedge1001AC OBJECT IDENTIFIER ::= { viptelaDevices 16}
+
+-- tagpath /viptela-devices/vedge-101-M-AC
+vedge101MAC OBJECT IDENTIFIER ::= { viptelaDevices 17}
+
+-- tagpath /viptela-devices/vedge-ISR1100-4G-AC
+vedgeISR11004GAC OBJECT IDENTIFIER ::= { viptelaDevices 18}
+
+-- tagpath /viptela-devices/vedge-ISR1100-6G-AC
+vedgeISR11006GAC OBJECT IDENTIFIER ::= { viptelaDevices 19}
+
+-- tagpath /viptela-devices/vedge-ISR1100-4GLTE-AC
+vedgeISR11004GLTEAC OBJECT IDENTIFIER ::= { viptelaDevices 20}
+
+-- tagpath /viptela-devices/vedge-ISR1100X-4G-AC
+vedgeISR1100X4GAC OBJECT IDENTIFIER ::= { viptelaDevices 21}
+
+-- tagpath /viptela-devices/vedge-ISR1100X-6G-AC
+vedgeISR1100X6GAC OBJECT IDENTIFIER ::= { viptelaDevices 22}
+
+
+-- tagpath /hardware/inventory
+hardwareInventoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HardwareInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display hardware inventory"
+    ::= { hardware 1 }
+
+-- tagpath /hardware/inventory
+hardwareInventoryEntry OBJECT-TYPE
+    SYNTAX      HardwareInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { hardwareInventoryHwType, hardwareInventoryHwDevIndex }
+        ::= { hardwareInventoryTable 1 }
+
+HardwareInventoryEntry ::=
+    SEQUENCE {
+        hardwareInventoryHwType HwTypeEnum,
+        hardwareInventoryHwDevIndex Unsigned32,
+        hardwareInventoryVersion String,
+        hardwareInventoryPartNumber String,
+        hardwareInventoryPartInfo String,
+        hardwareInventorySerialNumber String,
+        hardwareInventoryHwDescription String
+    }
+
+-- tagpath /hardware/inventory/hw-type
+hardwareInventoryHwType OBJECT-TYPE
+    SYNTAX      HwTypeEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware type"
+    ::= { hardwareInventoryEntry 1 }
+
+-- tagpath /hardware/inventory/hw-dev-index
+hardwareInventoryHwDevIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware device index"
+    ::= { hardwareInventoryEntry 2 }
+
+-- tagpath /hardware/inventory/version
+hardwareInventoryVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Version"
+    ::= { hardwareInventoryEntry 3 }
+
+-- tagpath /hardware/inventory/part-number
+hardwareInventoryPartNumber OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Part number"
+    ::= { hardwareInventoryEntry 4 }
+
+-- tagpath /hardware/inventory/serial-number
+hardwareInventorySerialNumber OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Serial number"
+    ::= { hardwareInventoryEntry 5 }
+
+-- tagpath /hardware/inventory/hw-description
+hardwareInventoryHwDescription OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Description"
+    ::= { hardwareInventoryEntry 6 }
+
+-- tagpath /hardware/inventory/part-info
+hardwareInventoryPartInfo OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Part Info"
+    ::= { hardwareInventoryEntry 7 } 
+
+-- tagpath /hardware/environment
+hardwareEnvironmentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HardwareEnvironmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display hardware environment status"
+    ::= { hardware 2 }
+
+-- tagpath /hardware/environment
+hardwareEnvironmentEntry OBJECT-TYPE
+    SYNTAX      HardwareEnvironmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { hardwareEnvironmentHwClass, hardwareEnvironmentHwItem, hardwareEnvironmentHwDevIndex } 
+--  //FIXME: IMPLIED?
+        ::= { hardwareEnvironmentTable 1 }
+
+HardwareEnvironmentEntry ::=
+    SEQUENCE {
+        hardwareEnvironmentHwClass INTEGER,
+        hardwareEnvironmentHwItem String,
+        hardwareEnvironmentHwDevIndex Unsigned32,
+        hardwareEnvironmentStatus INTEGER,
+        hardwareEnvironmentMeasurement String
+    }
+
+-- tagpath /hardware/environment/hw-class
+hardwareEnvironmentHwClass OBJECT-TYPE
+    SYNTAX      INTEGER {temperatureSensors(0),fans(1),pEM(2),pIM(3),uSB(4),lED(5),nIM(6)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware class"
+    ::= { hardwareEnvironmentEntry 1 }
+
+-- tagpath /hardware/environment/hw-item
+hardwareEnvironmentHwItem OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Item"
+    ::= { hardwareEnvironmentEntry 2 }
+
+-- tagpath /hardware/environment/hw-dev-index
+hardwareEnvironmentHwDevIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware device index"
+    ::= { hardwareEnvironmentEntry 3 }
+
+-- tagpath /hardware/environment/status
+hardwareEnvironmentStatus OBJECT-TYPE
+    SYNTAX      INTEGER {oK(0),down(1),failed(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Status"
+    ::= { hardwareEnvironmentEntry 4 }
+
+-- tagpath /hardware/environment/measurement
+hardwareEnvironmentMeasurement OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Measurement"
+    ::= { hardwareEnvironmentEntry 5 }
+
+-- tagpath /hardware/alarms
+hardwareAlarmsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HardwareAlarmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display hardware alarms"
+    ::= { hardware 3 }
+
+-- tagpath /hardware/alarms
+hardwareAlarmsEntry OBJECT-TYPE
+    SYNTAX      HardwareAlarmsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { hardwareAlarmsAlarmId, hardwareAlarmsAlarmInstance }
+        ::= { hardwareAlarmsTable 1 }
+
+HardwareAlarmsEntry ::=
+    SEQUENCE {
+        hardwareAlarmsAlarmId Unsigned32,
+        hardwareAlarmsAlarmName String,
+        hardwareAlarmsAlarmInstance Unsigned32,
+        hardwareAlarmsAlarmTime String,
+        hardwareAlarmsAlarmCategory INTEGER,
+        hardwareAlarmsAlarmDescription String
+    }
+
+-- tagpath /hardware/alarms/alarm-id
+hardwareAlarmsAlarmId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Alarm ID"
+    ::= { hardwareAlarmsEntry 1 }
+
+-- tagpath /hardware/alarms/alarm-name
+hardwareAlarmsAlarmName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name"
+    ::= { hardwareAlarmsEntry 2 }
+
+-- tagpath /hardware/alarms/alarm-instance
+hardwareAlarmsAlarmInstance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Alarm instance"
+    ::= { hardwareAlarmsEntry 3 }
+
+-- tagpath /hardware/alarms/alarm-time
+hardwareAlarmsAlarmTime OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm time"
+    ::= { hardwareAlarmsEntry 4 }
+
+-- tagpath /hardware/alarms/alarm-category
+hardwareAlarmsAlarmCategory OBJECT-TYPE
+    SYNTAX      INTEGER {critical(0),major(1),minor(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Category"
+    ::= { hardwareAlarmsEntry 5 }
+
+-- tagpath /hardware/alarms/alarm-description
+hardwareAlarmsAlarmDescription OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Description"
+    ::= { hardwareAlarmsEntry 6 }
+
+-- tagpath /hardware/temperature-thresholds
+hardwareTemperatureThresholdsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HardwareTemperatureThresholdsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display hardware temperature thresholds"
+    ::= { hardware 4 }
+
+-- tagpath /hardware/temperature-thresholds
+hardwareTemperatureThresholdsEntry OBJECT-TYPE
+    SYNTAX      HardwareTemperatureThresholdsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { hardwareTemperatureThresholdsHwSensorType, hardwareTemperatureThresholdsHwDevIndex }
+        ::= { hardwareTemperatureThresholdsTable 1 }
+
+HardwareTemperatureThresholdsEntry ::=
+    SEQUENCE {
+        hardwareTemperatureThresholdsHwSensorType HwSensorTypeEnum,
+        hardwareTemperatureThresholdsHwDevIndex Unsigned32,
+        hardwareTemperatureThresholdsFanSpeedNormal Unsigned32,
+        hardwareTemperatureThresholdsYellowAlarmNormal Unsigned32,
+        hardwareTemperatureThresholdsYellowAlarmBadFan Unsigned32,
+        hardwareTemperatureThresholdsRedAlarmNormal Unsigned32,
+        hardwareTemperatureThresholdsRedAlarmBadFan Unsigned32
+    }
+
+-- tagpath /hardware/temperature-thresholds/hw-sensor-type
+hardwareTemperatureThresholdsHwSensorType OBJECT-TYPE
+    SYNTAX      HwSensorTypeEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Hardware sensor type"
+    ::= { hardwareTemperatureThresholdsEntry 1 }
+
+-- tagpath /hardware/temperature-thresholds/hw-dev-index
+hardwareTemperatureThresholdsHwDevIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device index"
+    ::= { hardwareTemperatureThresholdsEntry 2 }
+
+-- tagpath /hardware/temperature-thresholds/fan-speed-normal
+hardwareTemperatureThresholdsFanSpeedNormal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "No alarm below this threshold when fans at normal speed"
+    ::= { hardwareTemperatureThresholdsEntry 3 }
+
+-- tagpath /hardware/temperature-thresholds/yellow-alarm-normal
+hardwareTemperatureThresholdsYellowAlarmNormal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Yellow alarm threshold, in degrees C, when fans at normal speed"
+    ::= { hardwareTemperatureThresholdsEntry 4 }
+
+-- tagpath /hardware/temperature-thresholds/yellow-alarm-bad-fan
+hardwareTemperatureThresholdsYellowAlarmBadFan OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Yellow alarm threshold, in degrees C, when one or more fans has failed"
+    ::= { hardwareTemperatureThresholdsEntry 5 }
+
+-- tagpath /hardware/temperature-thresholds/red-alarm-normal
+hardwareTemperatureThresholdsRedAlarmNormal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Red alarm threshold, in degrees C, when fans at normal speed"
+    ::= { hardwareTemperatureThresholdsEntry 6 }
+
+-- tagpath /hardware/temperature-thresholds/red-alarm-bad-fan
+hardwareTemperatureThresholdsRedAlarmBadFan OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Red alarm threshold, in degrees C, when one or more fans has failed"
+    ::= { hardwareTemperatureThresholdsEntry 7 }
+
+-- tagpath /hardware/poe
+hardwarePoeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HardwarePoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display hardware PoE information"
+    ::= { hardware 5 }
+
+-- tagpath /hardware/poe
+hardwarePoeEntry OBJECT-TYPE
+    SYNTAX      HardwarePoeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { hardwarePoeIfname }
+        ::= { hardwarePoeTable 1 }
+
+HardwarePoeEntry ::=
+    SEQUENCE {
+        hardwarePoeIfname String,
+        hardwarePoeIfStatus String,
+        hardwarePoeStatus String,
+        hardwarePoeMaxPower ConfdString,
+        hardwarePoeUsedPower ConfdString,
+        hardwarePoePdClass HwPoeClassEnum
+    }
+
+-- tagpath /hardware/poe/poe-ifname
+hardwarePoeIfname OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { hardwarePoeEntry 1 }
+
+-- tagpath /hardware/poe/poe-if-status
+hardwarePoeIfStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface administrative status"
+    ::= { hardwarePoeEntry 2 }
+
+-- tagpath /hardware/poe/poe-status
+hardwarePoeStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface PoE status"
+    ::= { hardwarePoeEntry 3 }
+
+-- tagpath /hardware/poe/poe-max-power
+hardwarePoeMaxPower OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum power available, in Watts"
+    ::= { hardwarePoeEntry 4 }
+
+-- tagpath /hardware/poe/poe-used-power
+hardwarePoeUsedPower OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used power, in Watts"
+    ::= { hardwarePoeEntry 5 }
+
+-- tagpath /hardware/poe/poe-pd-class
+hardwarePoePdClass OBJECT-TYPE
+    SYNTAX      HwPoeClassEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PoE powered device class"
+    ::= { hardwarePoeEntry 6 }
+END

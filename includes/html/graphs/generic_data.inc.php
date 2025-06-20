@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,10 +25,8 @@ $multiplier = $multiplier ?? false;
 $format = $format ?? '';
 $previous = $graph_params->visible('previous');
 
-if ($rrd_filename) {
-    $rrd_filename_out = $rrd_filename;
-    $rrd_filename_in = $rrd_filename;
-}
+$rrd_filename_out ??= $rrd_filename ?? '';
+$rrd_filename_in ??= $rrd_filename ?? '';
 
 if ($inverse) {
     $in = 'out';
@@ -170,7 +169,7 @@ $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
 if (! empty($port['ifSpeed'])) {
     $speed_line_type = ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
-    $rrd_options .= " $speed_line_type:{$port['ifSpeed']}#000000:'Port Speed " . Number::formatSi($port['ifSpeed'], 2, 3, 'bps') . "\\n'";
+    $rrd_options .= " $speed_line_type:{$port['ifSpeed']}#000000:'Port Speed " . Number::formatSi($port['ifSpeed'], 2, 0, 'bps') . "\\n'";
 }
 
 // Linear prediction of trend

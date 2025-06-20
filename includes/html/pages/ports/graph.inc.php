@@ -13,7 +13,7 @@ $param = [];
 $where = '';
 $ignore_filter = 0;
 $disabled_filter = 0;
-$device = DeviceCache::get((int) $vars['device_id']);
+$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
 
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 echo '<script>init_select2("#device_id", "device", {field: "device_id"}, ' . $device_selected . ' , "All Devices")</script>';
@@ -149,11 +149,11 @@ switch ($vars['sort'] ?? '') {
 }
 
 foreach ($ports as $port) {
-    $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+    $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
     $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
 
-    $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps');
-    $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
+    $port['in_rate'] = \LibreNMS\Util\Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+    $port['out_rate'] = \LibreNMS\Util\Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
 
     if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
         $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');

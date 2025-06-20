@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -45,7 +46,7 @@ $metrics['total'] = $fields; // don't include legacy ds in db
 $fields['firewalled'] = 'U'; // legacy ds
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $jails = [];
 foreach ($f2b['jails'] as $jail => $banned) {
@@ -55,7 +56,7 @@ foreach ($f2b['jails'] as $jail => $banned) {
 
     $metrics["jail_$jail"] = $fields;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $jails[] = $jail;
 }
@@ -71,7 +72,7 @@ if (count($added_jails) > 0 || count($removed_jails) > 0) {
     $log_message = 'Fail2ban Jail Change:';
     $log_message .= count($added_jails) > 0 ? ' Added ' . implode(',', $added_jails) : '';
     $log_message .= count($removed_jails) > 0 ? ' Removed ' . implode(',', $added_jails) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 update_application($app, 'ok', $metrics);

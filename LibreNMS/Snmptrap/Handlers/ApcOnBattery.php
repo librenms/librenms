@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ApcOnBattery.php
  *

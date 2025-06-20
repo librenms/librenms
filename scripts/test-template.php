@@ -48,8 +48,8 @@ Usage:
     -h Is the device ID or hostname
     -r Is the rule ID
     -p Is the transport name (optional)
-    -s Is the alert state <0|1|2|3|4> (optional - defaults to current state.)
-       0 = ok, 1 = alert, 2 = acknowledged, 3 = got worse, 4 = got better
+    -s Is the alert state <0|1|2|3|4|5> (optional - defaults to current state.)
+       0 = ok, 1 = alert, 2 = acknowledged, 3 = got worse, 4 = got better, 5 = changed
     -d Debug
 
 Example:

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * init.php
  *
@@ -34,13 +35,8 @@ use LibreNMS\Util\Laravel;
 
 global $vars, $console_color;
 
-error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-
-if (! defined('IGNORE_ERRORS')) {
-    define('IGNORE_ERRORS', true);
-}
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -62,7 +58,6 @@ if (! function_exists('module_selected')) {
 // function only files
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
-require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
@@ -119,7 +114,6 @@ try {
 
 if (module_selected('web', $init_modules)) {
     require $install_dir . '/includes/html/vars.inc.php';
-    \LibreNMS\Util\OS::loadAllDefinitions(! module_selected('nodb', $init_modules), true);
 }
 
 $console_color = new Console_Color2();

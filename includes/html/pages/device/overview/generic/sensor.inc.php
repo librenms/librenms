@@ -1,10 +1,15 @@
 <?php
 
-$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver'); // cache all sensors on device and exclude transceivers
+use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Util\Html;
+
+$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
+    ['group', 'asc'],
+    ['sensor_descr', 'asc'],
+]); // cache all sensors on device and exclude transceivers
 
 if ($sensors->isNotEmpty()) {
-    $icons = \App\Models\Sensor::getIconMap();
-    $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
+    $sensor_fa_icon = 'fa-' . SensorEnum::from($sensor_class)->icon();
 
     echo '
         <div class="row">
@@ -16,10 +21,6 @@ if ($sensors->isNotEmpty()) {
         <table class="table table-hover table-condensed table-striped">';
     $group = '';
     foreach ($sensors as $sensor) {
-        if (! isset($sensor->sensor_current)) {
-            $sensor->sensor_current = 'NaN';
-        }
-
         if ($group != $sensor->group) {
             $group = $sensor->group;
             echo "<tr><td colspan='3'><strong>$group</strong></td></tr>";
@@ -63,10 +64,10 @@ if ($sensors->isNotEmpty()) {
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $sensor_minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-        $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
+        $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
 
         echo '<tr><td><div style="display: grid; grid-gap: 10px; grid-template-columns: 3fr 1fr 1fr;">
-            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfType($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
+            <div>' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Rewrite::shortenIfName($sensor->sensor_descr), $overlib_content, $sensor_class) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_minigraph, $overlib_content, $sensor_class) . '</div>
             <div>' . \LibreNMS\Util\Url::overlibLink($link, $sensor_current, $overlib_content, $sensor_class) . '</div>
             </div></td></tr>';

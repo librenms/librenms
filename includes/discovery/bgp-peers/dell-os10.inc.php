@@ -103,6 +103,10 @@ if ($device['os'] == 'dell-os10') {
         $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
     }
     foreach ($peers as $peer) {
+        if (! isset($peer['bgpPeerIdentifier'])) {
+            continue;
+        }
+
         $vrfId = $peer['vrf_id'];
         $address = $peer['bgpPeerIdentifier'];
 

@@ -6,13 +6,13 @@ $where = '1';
 $param = [];
 $data = [];
 
-if (is_numeric($_GET['device_id'])) {
+if (is_numeric($_GET['device_id']) && $_GET['device_id'] != '0') {
     $where .= ' AND E.device_id = ?';
     $param[] = $_GET['device_id'];
 }
 
 if ($_GET['string']) {
-    $where .= ' AND R.rule LIKE ?';
+    $where .= ' AND R.builder LIKE ?';
     $param[] = '%' . $_GET['string'] . '%';
 }
 
@@ -56,6 +56,9 @@ foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     } elseif ($alert_state == '4') {
         $glyph_color = 'khaki';
         $text = 'Better';
+    } elseif ($alert_state == '5') {
+        $glyph_color = 'yellow';
+        $text = 'Changed';
     } else {
         $glyph_color = 'red';
         $text = 'Unknown state';

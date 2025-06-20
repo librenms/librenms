@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -136,7 +137,7 @@ if (isset($data['totals']) && is_array($data['totals'])) {
             $fields = ['data' => $value];
             $metrics[$var_name] = $value;
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
         }
     }
 }
@@ -197,7 +198,7 @@ if (count($added_oslvms) > 0 || count($removed_oslvms) > 0) {
     $log_message = 'OSLV Change:';
     $log_message .= count($added_oslvms) > 0 ? ' Added ' . implode(',', $added_oslvms) : '';
     $log_message .= count($removed_oslvms) > 0 ? ' Removed ' . implode(',', $removed_oslvms) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // all done so update the app metrics

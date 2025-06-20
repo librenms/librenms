@@ -1,4 +1,5 @@
 <?php
+
 /**
  * geist-watchdog.inc.php
  *

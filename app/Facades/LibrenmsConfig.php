@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibrenmsConfig.php
  *
@@ -27,6 +28,7 @@ namespace App\Facades;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Log;
 
 class LibrenmsConfig extends Facade
 {
@@ -39,5 +41,13 @@ class LibrenmsConfig extends Facade
     {
         App::forgetInstance('librenms-config'); // clear singleton
         self::clearResolvedInstances(); // clear facade resolved instances cache
+    }
+
+    public static function invalidateAndReload(): void
+    {
+        self::invalidateCache();
+        self::reload();
+
+        Log::info('LibreNMS config cache cleared and config reloaded.');
     }
 }

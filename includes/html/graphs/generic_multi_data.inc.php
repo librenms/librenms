@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,6 +17,9 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$format ??= 'bits';
+$inverse ??= false;
+$legend ??= false;
 
 if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
@@ -26,9 +30,19 @@ if ($format == 'octets' || $format == 'bytes') {
 }
 
 $i = 0;
+$seperator = '';
+$seperatorX = '';
+$in_thing = '';
+$out_thing = '';
+$in_thingX = '';
+$out_thingX = '';
+$pluses = '';
+$plusesX = '';
+$plus = '';
+$plusX = '';
 
-foreach ($rrd_filenames as $key => $rrd_filename) {
-    if ($rrd_inverted[$key]) {
+foreach ($rrd_filenames ?? [] as $key => $rrd_filename) {
+    if (! empty($rrd_inverted[$key])) {
         $in = 'out';
         $out = 'in';
     } else {

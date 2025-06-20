@@ -61,5 +61,5 @@
      | Amount of seconds to allow the config to be cached.  0 means no cache.
      */
 
-     'config_cache_ttl' => env('CONFIG_CACHE_TTL', 0),
+     'config_cache_ttl' => env('CONFIG_CACHE_TTL', 300),
  ];

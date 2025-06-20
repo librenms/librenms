@@ -38,7 +38,7 @@ if (isset($_POST['editing'])) {
             $device->features = null;
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
-            $device->os = $_POST['os'] ? $_POST['os_id'] : 'ping';
+            $device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
             $device->snmp_disable = 1;
             $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
@@ -89,6 +89,7 @@ if (isset($_POST['editing'])) {
                 }
 
                 $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
+                
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
                 if ($form_value != $get_devices_attrib && $form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {
@@ -107,10 +108,8 @@ if (isset($_POST['editing'])) {
                     $device->forgetAttrib($devices_attrib);
                 }
 
-                if ($form_value != $get_devices_attrib && $set_devices_attrib) {
-                    unset($device->attribs); // unload relation
-                    $set_devices_attrib = $device->getAttrib($devices_attrib); // re-check the db value
-                }
+                unset($device->attribs); // unload relation
+                $set_devices_attrib = $device->getAttrib($devices_attrib); // re-check the db value
 
                 if ($form_value != $get_devices_attrib && $form_value == $set_devices_attrib && (is_null($set_devices_attrib) || $set_devices_attrib == '')) {
                     $update_message[] = "$feedback_prefix deleted";
@@ -211,7 +210,7 @@ echo "
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
     <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . $device->os . "'/>
+    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
     </div>
     </div>
     </div>
@@ -326,7 +325,7 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='authalgo' name='authalgo' class='form-control'>";
 foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-    echo "<option value='$algo' " . ($device->authalgo === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp($device->authalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>';
 
@@ -348,7 +347,7 @@ echo "
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
 
 foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-    echo "<option value='$algo' " . ($device->cryptoalgo === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp($device->cryptoalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>
     ';

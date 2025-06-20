@@ -47,9 +47,11 @@ class MplsLsp extends Model implements Keyable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLspPath, $this>
+     */
     public function paths(): HasMany
     {
-        return $this->hasMany(\App\Models\MplsLspPath::class, 'lsp_id');
+        return $this->hasMany(MplsLspPath::class, 'lsp_id');
     }
 }

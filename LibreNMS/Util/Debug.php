@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Debug.php
  *
@@ -120,10 +121,9 @@ class Debug
      */
     public static function disableErrorReporting(bool $silence = false): void
     {
+        ini_set('display_startup_errors', '1');
         ini_set('display_errors', '0');
-        ini_set('display_startup_errors', '0');
         ini_set('log_errors', '1');
-        error_reporting($silence ? 0 : E_ERROR);
     }
 
     /**
@@ -131,9 +131,8 @@ class Debug
      */
     public static function enableErrorReporting(): void
     {
-        ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
-        ini_set('log_errors', '0');
-        error_reporting(E_ALL & ~E_NOTICE);
+        ini_set('display_errors', '1');
+        ini_set('log_errors', '1');
     }
 }

@@ -1,0 +1,267 @@
+mib: TELTONIKA-RUTX-MIB
+modules:
+    os:
+        hardware: TELTONIKA-RUTX-MIB::routerName.0
+        serial: TELTONIKA-RUTX-MIB::serial.0
+        version: TELTONIKA-RUTX-MIB::fwVersion.0
+        lat: TELTONIKA-RUTX-MIB::latitude.0
+        long: TELTONIKA-RUTX-MIB::longtitude.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - mOperator
+                        - ioSystemName
+        temperature:
+            data:
+                -
+                    oid: mTemperature
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.17.{{ $index }}"
+                    descr: Modem Module Temp
+                    group: Modem
+                    index: "mTemperature.{{ $index }}"
+                    divisor: 10
+                    low_limit: -40
+                    high_limit: 75
+        state:
+            data:
+                -
+                    oid: ioInput
+                    num_oid: ".1.3.6.1.4.1.48690.6.2.1.7.{{ $index }}"
+                    descr:  I/O {{ $index }} Type
+                    group: Inputs/Outputs
+                    state_name: TELTONIKA-RUTX-MIB::ioInput
+                    states:
+                        - { descr: Digital Output, graph: 1, value: 0, generic: 0 }
+                        - { descr: Digital Input, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: ioState
+                    num_oid: ".1.3.6.1.4.1.48690.6.2.1.6.{{ $index }}"
+                    descr:  I/O {{ $index }} State ({{ $ioSystemName }})
+                    group: Inputs/Outputs
+                    state_name: TELTONIKA-RUTX-MIB::ioState
+                    states:
+                        - { descr: Low, graph: 1, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: mSimState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
+                    descr: SIM State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::SimState
+                    states:
+                        - { descr: inserted, graph: 1, value: 0, generic: 0 }
+                        - { descr: not inserted, graph: 1, value: 1, generic: 2 }
+                        - { descr: unknown, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: mPinState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.10.{{ $index }}"
+                    descr: SIM PIN State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::PinState
+                    states:
+                        - { descr: PIN REQUIRED, graph: 1, value: 0, generic: 2 }
+                        - { descr: NOT READY, graph: 1, value: 1, generic: 1 }
+                        - { descr: READY, graph: 1, value: 2, generic: 0 }
+                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
+                        - { descr: SIM not inserted, graph: 1, value: 4, generic: 2 }
+                        - { descr: OK, graph: 1, value: 5, generic: 0 }
+                        - { descr: Required PIN, graph: 1, value: 6, generic: 1 }
+                        - { descr: Required PUK, graph: 1, value: 7, generic: 1 }
+                        - { descr: Required network personalization password, graph: 1, value: 8, generic: 1 }
+                        - { descr: Required network personalization unlocking password, graph: 1, value: 9, generic: 1 }
+                        - { descr: Required network subset personalization password, graph: 1, value: 10, generic: 1 }
+                        - { descr: Required network subset personalization unlocking password, graph: 1, value: 11, generic: 1 }
+                        - { descr: SIM failure, graph: 1, value: 12, generic: 2 }
+                        - { descr: SIM busy, graph: 1, value: 13, generic: 1 }
+                        - { descr: PUK, graph: 1, value: 14, generic: 1 }
+                -
+                    oid: mNetState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.11.{{ $index }}"
+                    descr: Mobile Net State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::NetState
+                    states:
+                        - { descr: searching, graph: 1, value: 0, generic: 1 }
+                        - { descr: registered (home), graph: 1, value: 1, generic: 0 }
+                        - { descr: registered (roaming), graph: 1, value: 2, generic: 1 }
+                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
+                        - { descr: unregistered, graph: 1, value: 4, generic: 2 }
+                        - { descr: 'Registered, home', graph: 1, value: 5, generic: 0 }
+                        - { descr: Denied, graph: 1, value: 6, generic: 2 }
+                        - { descr: 'Registered, roaming', graph: 1, value: 7, generic: 2 }
+                        - { descr: Not supported, graph: 1, value: 8, generic: 2 }
+                        - { descr: 'Registered, emergency services only', graph: 1, value: 9, generic: 2 }
+                -
+                    oid:  mConnectionState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.15.{{ $index }}"
+                    descr: "Connection State ({{ $mOperator }})"
+                    group: Mobile
+                    index: "mConnectionState.{{ $index }}"
+                    state_name: TELTONIKA-RUTX-MIB::ConnectionState
+                    states:
+                        - { descr: Connected, graph: 1, value: 0, generic: 0 }
+                        - { descr: Not connected, graph: 1, value: 1, generic: 2 }
+                        - { descr: Disconnected, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: mConnectionType
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.16.{{ $index }}"
+                    descr: "Connection Type"
+                    group: Mobile
+                    index: "mConnectionType.{{ $index }}"
+                    state_name: TELTONIKA-RUTX-MIB::ConnectionType
+                    states:
+                        - { descr: LTE, graph: 1, value: 0, generic: 0 }
+                        - { descr: 4G, graph: 1, value: 1, generic: 0 }
+                        - { descr: 3G, graph: 1, value: 2, generic: 1 }
+                        - { descr: 2G, graph: 1, value: 3, generic: 1 }
+                        - { descr: WCDMA, graph: 1, value: 4, generic: 0 }
+                        - { descr: unknown, graph: 1, value: 5, generic: 3 }
+                        - { descr: Auto, graph: 1, value: 6, generic: 0 }
+                        - { descr: No service, graph: 1, value: 7, generic: 1 }
+                        - { descr: GSM, graph: 1, value: 8, generic: 0 }
+                        - { descr: GPRS, graph: 1, value: 9, generic: 0 }
+                        - { descr: EDGE, graph: 1, value: 10, generic: 0 }
+                        - { descr: TDSCDMA, graph: 1, value: 11, generic: 0 }
+                        - { descr: CDMA, graph: 1, value: 12, generic: 0 }
+                        - { descr: EVDO, graph: 1, value: 13, generic: 0 }
+                        - { descr: CDMA-EVDO, graph: 1, value: 14, generic: 0 }
+                        - { descr: HSDPA, graph: 1, value: 15, generic: 0 }
+                        - { descr: HSUPA, graph: 1, value: 16, generic: 0 }
+                        - { descr: HSPA+, graph: 1, value: 17, generic: 0 }
+                        - { descr: EHRPD, graph: 1, value: 18, generic: 0 }
+                        - { descr: HDR, graph: 1, value: 19, generic: 0 }
+                        - { descr: UMTS, graph: 1, value: 20, generic: 0 }
+                        - { descr: HSDPA+HSUPA, graph: 1, value: 21, generic: 0 }
+                        - { descr: 5G, graph: 1, value: 22, generic: 0 }
+                        - { descr: NR5G, graph: 1, value: 23, generic: 0 }
+                        - { descr: 5G-NSA, graph: 1, value: 24, generic: 0 }
+                        - { descr: 5G-SA, graph: 1, value: 25, generic: 0 }
+                        - { descr: CAT-M1, graph: 1, value: 26, generic: 0 }
+                        - { descr: CAT-NB, graph: 1, value: 27, generic: 0 }
+                        - { descr: 2G_3G, graph: 1, value: 28, generic: 0 }
+                        - { descr: GSM_WCDMA, graph: 1, value: 29, generic: 0 }
+                        - { descr: 2G_4G, graph: 1, value: 30, generic: 0 }
+                        - { descr: GSM_LTE, graph: 1, value: 31, generic: 0 }
+                        - { descr: 3G_4G, graph: 1, value: 32, generic: 0 }
+                        - { descr: WCDMA_LTE, graph: 1, value: 33, generic: 0 }
+                        - { descr: 3G_5G, graph: 1, value: 34, generic: 0 }
+                        - { descr: WCDMA_NR5G, graph: 1, value: 35, generic: 0 }
+                        - { descr: 4G_5G, graph: 1, value: 36, generic: 0 }
+                        - { descr: LTE_NR5G, graph: 1, value: 37, generic: 0 }
+        count:
+            data:
+                -
+                    oid: mReceivedToday
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.26.{{ $index }}"
+                    descr: "Mobile bytes received today"
+                    group: Mobile
+                    index: "mReceivedToday.{{ $index }}"
+                -
+                    oid: mSentToday
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.25.{{ $index }}"
+                    descr: "Mobile bytes sent today"
+                    group: Mobile
+                    index: "mSentToday.{{ $index }}"
+                -
+                    oid: mReceived
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.23.{{ $index }}"
+                    descr: "Mobile total bytes received"
+                    group: Mobile
+                    index: "mReceived.{{ $index }}"
+                -
+                    oid: mSent
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.22.{{ $index }}"
+                    descr: "Mobile total bytes sent"
+                    group: Mobile
+                    index: "mSent.{{ $index }}"
+                -
+                    oid: numSatellites
+                    num_oid: ".1.3.6.1.4.1.48690.3.5.{{ $index }}"
+                    descr: "Number of GPS Satellites"
+                    group: GPS
+                    index: "numSatellites.{{ $index }}"
+                -
+                    oid: latitude
+                    num_oid: ".1.3.6.1.4.1.48690.3.1.{{ $index }}"
+                    descr: "GPS Latitude"
+                    group: GPS
+                    index: "latitude.{{ $index }}"
+                -
+                    oid: longtitude
+                    num_oid: ".1.3.6.1.4.1.48690.3.2.{{ $index }}"
+                    descr: "GPS Longitude"
+                    group: GPS
+                    index: "longtitude.{{ $index }}"
+                -
+                    oid: mCellID
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.18.{{ $index }}"
+                    descr: "Cell ID"
+                    group: Mobile
+                    index: "mCellID.{{ $index }}"
+                -
+                    oid: mImei
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.3.{{ $index }}"
+                    descr: "IMEI"
+                    group: Mobile
+                    index: "mImei.{{ $index }}"
+                -
+                    oid: mIMSI
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.8.{{ $index }}"
+                    descr: "IMSI"
+                    group: Mobile
+                    index: "mIMSI.{{ $index }}"
+        signal:
+            data:
+                -
+                    oid: mSignal
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.12.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    descr: "Signal Level - RSSI"
+                    group: Mobile
+                    index: "mSignal.{{ $index }}"
+                    low_warn_limit: -75
+                    low_limit: -85
+                    high_limit: 0
+                -
+                    oid: mRSRP
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.20.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    descr: "Signal Level - RSRP"
+                    group: Mobile
+                    index: "mRSRP.{{ $index }}"
+                    low_warn_limit: -90
+                    low_limit: -100
+                    high_limit: 0
+                -
+                    oid: mRSRQ
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.21.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    descr: "Signal Level - RSRQ"
+                    group: Mobile
+                    index: "mRSRQ.{{ $index }}"
+                    low_warn_limit: -15
+                    low_limit: -20
+                    high_limit: 0
+        snr:
+            data:
+                -
+                    oid: mSINR
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.19.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    descr: "Signal Level - SINR"
+                    group: Mobile
+                    index: "mSINR.{{ $index }}"
+                    low_warn_limit: 13
+                    low_limit: 6
+                    high_limit: 30
+        runtime:
+            data:
+                -
+                    oid: connectionUptime
+                    num_oid: ".1.3.6.1.4.1.48690.2.3.{{ $index }}"
+                    descr: "Connection Uptime "
+                    group: Mobile
+                    index: "ConnectionUptime.{{ $index }}"
+                    divisor: 60

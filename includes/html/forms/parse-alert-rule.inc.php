@@ -12,14 +12,12 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alerting\QueryBuilderParser;
-
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     exit('ERROR: You need to be admin');
 }
 $alert_id = $vars['alert_id'];
-$template_id = $vars['template_id'];
+$template_id = $vars['template_id'] ?? null;
 
 if (is_numeric($alert_id) && $alert_id > 0) {
     $rule = dbFetchRow('SELECT * FROM `alert_rules` WHERE `id` = ? LIMIT 1', [$alert_id]);
@@ -64,12 +62,7 @@ if (is_numeric($alert_id) && $alert_id > 0) {
 }
 
 if (is_array($rule)) {
-    if (empty($rule['builder'])) {
-        // convert old rules when editing
-        $builder = QueryBuilderParser::fromOld($rule['rule'])->toArray();
-    } else {
-        $builder = json_decode($rule['builder']);
-    }
+    $builder = json_decode($rule['builder']);
 
     header('Content-type: application/json');
     echo json_encode([

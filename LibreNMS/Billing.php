@@ -4,6 +4,7 @@ namespace LibreNMS;
 
 use DateTime;
 use DateTimeZone;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
 
 class Billing
@@ -15,12 +16,12 @@ class Billing
 
     public static function formatBytesShort($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'), 2, 3, '');
+        return Number::formatBase($value, Config::get('billing.base'), 2, 0, '');
     }
 
     public static function getDates($dayofmonth, $months = 0): array
     {
-        $dayofmonth = zeropad($dayofmonth);
+        $dayofmonth = Str::padLeft($dayofmonth, 2, '0');
         $year = date('Y');
         $month = date('m');
 
@@ -451,7 +452,7 @@ class Billing
             exit("Unknown graph type $imgtype");
         }//end if
 
-        $average = ($average / $ave_count);
+        $average = $ave_count ? ($average / $ave_count) : 0;
         $tot_data_size = count($tot_data);
         for ($x = 0; $x <= $tot_data_size; $x++) {
             array_push($ave_data, $average);

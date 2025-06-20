@@ -467,7 +467,7 @@ sensor_id value is provided then you will be sent a stacked sensor graph.
 Route: `/api/v0/devices/:hostname/graphs/health/:type(/:sensor_id)`
 
 - hostname can be either the device hostname or id
-- type is the name of the health graph as returned by [`list_available_health_graphs`](#function-list_available_health_graphs)
+- type is the name of the health graph as returned by [`list_available_health_graphs`](#list_available_health_graphs)
 - sensor_id (optional) restricts the graph to return a particular health sensor graph.
 
 Input:
@@ -503,7 +503,7 @@ sensor_id value is provided then you will be sent a stacked wireless graph.
 Route: `/api/v0/devices/:hostname/graphs/wireless/:type(/:sensor_id)`
 
 - hostname can be either the device hostname or id
-- type is the name of the wireless graph as returned by [`list_available_wireless_graphs`](#function-list_available_wireless_graphs)
+- type is the name of the wireless graph as returned by [`list_available_wireless_graphs`](#list_available_wireless_graphs)
 - sensor_id (optional) restricts the graph to return a particular
   wireless sensor graph.
 
@@ -539,7 +539,7 @@ Route: `/api/v0/devices/:hostname/:type`
 
 - hostname can be either the device hostname or id
 - type is the type of graph you want, use
-  [`get_graphs`](#function-get_graphs to see the graphs
+  [`get_graphs`](#get_graphs to see the graphs
   available. Defaults to device uptime.
 
 Input:
@@ -663,6 +663,52 @@ Output:
         "created_at": "2019-01-1 01:01:01",
         "updated_at": "2019-01-1 01:01:01"
     }
+}
+```
+
+### `get_device_nac`
+
+Get a list of NAC entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/nac`
+
+- hostname can be either the device hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/nac
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports_nac": [
+        {
+            "ports_nac_id": 1,
+            "auth_id": "0000000000000AAAABBBB8CC",
+            "device_id": 3,
+            "port_id": 6,
+            "domain": "data",
+            "username": "hostname.librenms.org",
+            "mac_address": "1aaa2bbb3ccc",
+            "ip_address": "192.0.2.2",
+            "host_mode": "singleHost",
+            "authz_status": "authorizationSuccess",
+            "authz_by": "Authentication Server",
+            "authc_status": "authcSuccess",
+            "method": "dot1x",
+            "timeout": "0",
+            "time_left": "0",
+            "vlan": 0,
+            "time_elapsed": null,
+            "created_at": "2025-05-08T08:55:06.000000Z",
+            "updated_at": "2025-05-08T08:55:06.000000Z",
+            "historical": 0
+        }
+    ]
 }
 ```
 
@@ -972,7 +1018,7 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  [`get_port_graphs`](#get_port_graphs). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
@@ -1009,11 +1055,11 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#function-get_port_graphs). Please ensure that
+  [`get_port_graphs`](#get_port_graphs). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
   to be urlencoded.
 - type is the port type you want the graph for, you can request a list
-  of ports for a device with [`get_port_graphs`](#function-get_port graphs).
+  of ports for a device with [`get_port_graphs`](#get_port_graphs).
 
 Input:
 
@@ -1104,23 +1150,27 @@ Input:
 - order: How to order the output, default is by hostname. Can be
   prepended by DESC or ASC to change the order.
 - type: can be one of the following to filter or search by:
-  - all: All devices
-  - active: Only not ignored and not disabled devices
-  - ignored: Only ignored devices
-  - up: Only devices that are up
-  - down: Only devices that are down
-  - disabled: Disabled devices
-  - os: search by os type
-  - mac: search by mac address
-  - ipv4: search by IPv4 address
-  - ipv6: search by IPv6 address (compressed or uncompressed)
-  - location: search by location
-  - location_id: search by location_id
-  - hostname: search by hostname
-  - sysName: search by sysName
-  - display: search by display name
-  - device_id: exact match by device-id
-  - type: search by device type
+    - all: All devices
+    - active: Only not ignored and not disabled devices
+    - ignored: Only ignored devices
+    - up: Only devices that are up
+    - down: Only devices that are down
+    - disabled: Disabled devices
+    - os: search by os type
+    - mac: search by mac address
+    - ipv4: search by IPv4 address
+    - ipv6: search by IPv6 address (compressed or uncompressed)
+    - location: search by location
+    - location_id: search by location_id
+    - hostname: search by hostname
+    - sysName: search by sysName
+    - display: search by display name
+    - device_id: exact match by device-id
+    - type: search by device type
+    - serial: Serial number of the device (wildcard)
+    - version: Software version of the device (wildcard)
+    - hardware: The model of the device (wildcard)
+    - features: Software license features (wildcard)
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1285,10 +1335,11 @@ Fields:
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
 - location or location_id: set the location by text or location id
+- override_sysLocation: force use of the location/location_id: and not the value returned by sysLocation
 
 Options:
 
-- force_add: Skip all checks and attempts to detect credentials. Add the device as given directly to the database.
+- force_add: Skip all checks, credentials are required. Add the device as given directly to the database.
 - ping_fallback: if snmp checks fail, add the device as ping only instead of failing
 
 SNMP v1 or v2c credentials:

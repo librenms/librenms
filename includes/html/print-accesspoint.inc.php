@@ -37,9 +37,9 @@ echo "<br>\n";
 
 echo '</td><td width=120>';
 
-echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['numasoclients'], 2, 3, '') . ' Clients<br />';
-echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['radioutil'], 2, 3, '') . ' % busy<br />';
-echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['interference'], 2, 3, '') . ' interference index<br />';
+echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['numasoclients'], 2, 0, '') . ' Clients<br />';
+echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['radioutil'], 2, 0, '') . ' % busy<br />';
+echo "<i class='fa fa-wifi fa-lg icon-theme' aria-hidden='true'></i> " . \LibreNMS\Util\Number::formatBi($ap['interference'], 2, 0, '') . ' interference index<br />';
 
 echo '</td></tr>';
 

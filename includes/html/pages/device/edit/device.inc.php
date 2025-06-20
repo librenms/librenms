@@ -263,7 +263,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
     <?php
     foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="' . $group['id'] . '"' .
-        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . $group['group_name'];
+        ($device_model->poller_group == $group['id'] ? ' selected' : '') . '>' . htmlentities($group['group_name']);
         echo \LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)' : '';
         echo '</option>';
     } ?>
@@ -387,7 +387,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <?php
 print_optionbar_start();
 [$sizeondisk, $numrrds] = foldersize(Rrd::dirFromHost($device['hostname']));
-echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 3) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 0) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
 echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
     echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';

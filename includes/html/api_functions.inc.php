@@ -17,15 +17,23 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Eventlog;
+use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Nbr;
+use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
+use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -39,6 +47,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
@@ -204,12 +213,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 0, 'bps');
         $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
         $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
-        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -314,7 +323,7 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+    if (is_string($order) && preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
         $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
     } else {
         $order = 'd.`hostname` ASC';
@@ -374,6 +383,9 @@ function list_devices(Illuminate\Http\Request $request)
     } elseif ($type == 'display') {
         $sql = '`d`.`display` LIKE ?';
         $param[] = "%$query%";
+    } elseif (in_array($type, ['serial', 'version', 'hardware', 'features'])) {
+        $sql = "`d`.`$type` LIKE ?";
+        $param[] = "%$query%";
     } else {
         $sql = '1';
     }
@@ -414,6 +426,7 @@ function add_device(Illuminate\Http\Request $request)
             'display',
             'overwrite_ip',
             'location_id',
+            'override_sysLocation',
             'port',
             'transport',
             'poller_group',
@@ -491,7 +504,9 @@ function del_device(Illuminate\Http\Request $request)
 
 function maintenance_device(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -504,27 +519,27 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (! $request->json('duration')) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device->displayName();
+    empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
+    $title = $data['title'] ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
@@ -536,7 +551,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         $device->save();
     }
 
-    if ($request->json('start')) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -830,6 +845,38 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     }
 
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
+}
+
+function list_ospfv3(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+
+    $ospf_neighbours = Ospfv3Nbr::hasAccess(Auth::user())
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
+        ->get();
+
+    if ($ospf_neighbours->isEmpty()) {
+        return api_error(500, 'Error retrieving ospfv3_nbrs');
+    }
+
+    return api_success($ospf_neighbours, 'ospfv3_neighbours', count: $ospf_neighbours->count());
+}
+
+function list_ospfv3_ports(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+
+    $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospfv3 ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospfv3_ports', count: $ospf_ports->count());
 }
 
 function get_graph_by_portgroup(Request $request)
@@ -1160,8 +1207,11 @@ function get_port_info(Illuminate\Http\Request $request)
     $port_id = $request->route('portid');
 
     return check_port_permission($port_id, null, function ($port_id) {
-        // use hostname as device_id if it's all digits
-        $port = dbFetchRows('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
+        $with = request()->input('with');
+        $allowed = ['vlans', 'device'];
+        $port = Port::where('port_id', $port_id)
+                    ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
+                    ->get();
 
         return api_success($port, 'port');
     });
@@ -1197,13 +1247,13 @@ function update_port_description(Illuminate\Http\Request $request)
     if ($description == 'repoll') {
         // No description provided, clear description
         del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
-        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias cleared via API", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description cleared.');
     } else {
         // Prevent poller from overwriting new description
         set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
-        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias set via API: $description", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description updated.');
     }
@@ -1322,7 +1372,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
-    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
+    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
         $param = explode(',', $request->get('state'));
@@ -1740,15 +1790,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);
@@ -2467,7 +2517,9 @@ function get_device_groups(Illuminate\Http\Request $request)
 
 function maintenance_devicegroup(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -2482,35 +2534,34 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(404, "Device group $name not found");
     }
 
-    if (! $request->json('duration')) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device_group->name;
-
+    $notes = $data['notes'] ?? '';
+    $title = $data['title'] ?? $device_group->name;
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
     $alert_schedule->save();
     $alert_schedule->deviceGroups()->attach($device_group);
 
-    if ($request->json('start')) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -2736,6 +2787,26 @@ function get_fdb(Illuminate\Http\Request $request)
     });
 }
 
+function get_nac(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device = \App\Facades\DeviceCache::get($hostname);
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($device) {
+        $nac = $device->portsNac;
+
+        return api_success($nac, 'ports_nac');
+    });
+}
+
 function get_transceivers(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2785,7 +2856,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
         ->where('mac_address', $macAddress->hex())
         ->orderBy('ports_fdb.updated_at', 'desc')
-        ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at')
+        ->select('devices.hostname', 'devices.sysName', 'ports.ifName', 'ports.ifAlias', 'ports.ifDescr', 'ports_fdb.updated_at')
         ->limit(1000)->get();
 
     if ($fdb->isEmpty()) {
@@ -2802,6 +2873,23 @@ function list_fdb_detail(Illuminate\Http\Request $request)
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
 }
 
+function list_nac(Illuminate\Http\Request $request)
+{
+    $mac = $request->route('mac');
+
+    $nac = PortsNac::hasAccess(Auth::user())
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
+
+    if ($nac->isEmpty()) {
+        return api_error(404, ' Nac entry does not exist');
+    }
+
+    return api_success($nac, 'ports_nac');
+}
+
 function list_sensors()
 {
     $sensors = Sensor::hasAccess(Auth::user())->get();
@@ -2813,28 +2901,70 @@ function list_sensors()
     return api_success($sensors, 'sensors');
 }
 
-function list_ip_addresses()
+function list_ip_addresses(Illuminate\Http\Request $request)
 {
-    $ipv4_addresses = dbFetchRows('SELECT * FROM `ipv4_addresses`');
-    $ipv6_addresses = dbFetchRows('SELECT * FROM `ipv6_addresses`');
-    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
-    if ($ip_addresses_count == 0) {
-        return api_error(404, 'IP addresses do not exist');
+    $address_family = $request->route('address_family');
+
+    if ($address_family === 'ipv4') {
+        $ipv4_addresses = Ipv4Address::get();
+        if ($ipv4_addresses->isEmpty()) {
+            return api_error(404, 'IPv4 Addresses do not exist');
+        }
+
+        return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
     }
 
-    return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+    if ($address_family === 'ipv6') {
+        $ipv6_addresses = Ipv6Address::get();
+        if ($ipv6_addresses->isEmpty()) {
+            return api_error(404, 'IPv6 Addresses do not exist');
+        }
+
+        return api_success($ipv6_addresses, 'ip_addresses', null, 200, $ipv6_addresses->count());
+    }
+
+    if (empty($address_family)) {
+        $ipv4_addresses = Ipv4Address::get()->toArray();
+        $ipv6_addresses = Ipv6Address::get()->toArray();
+        $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+        if ($ip_addresses_count == 0) {
+            return api_error(404, 'IP addresses do not exist');
+        }
+
+        return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses', null, 200, $ip_addresses_count);
+    }
 }
 
-function list_ip_networks()
+function list_ip_networks(Illuminate\Http\Request $request)
 {
-    $ipv4_networks = dbFetchRows('SELECT * FROM `ipv4_networks`');
-    $ipv6_networks = dbFetchRows('SELECT * FROM `ipv6_networks`');
-    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
-    if ($ip_networks_count == 0) {
-        return api_error(404, 'IP networks do not exist');
-    }
+    $address_family = $request->route('address_family');
 
-    return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+    if ($address_family === 'ipv4') {
+        $ipv4_networks = Ipv4Network::get();
+        if ($ipv4_networks->isEmpty()) {
+            return api_error(404, 'IPv4 Networks do not exist');
+        }
+
+        return api_success($ipv4_networks, 'ip_networks', null, 200, $ipv4_networks->count());
+    }
+    if ($address_family === 'ipv6') {
+        $ipv6_networks = Ipv6Network::get();
+        if ($ipv6_networks->isEmpty()) {
+            return api_error(404, 'IPv6 Networks do not exist');
+        }
+
+        return api_success($ipv6_networks, 'ip_networks', null, 200, $ipv6_networks->count());
+    }
+    if (empty($address_family)) {
+        $ipv4_networks = Ipv4Network::get()->toArray();
+        $ipv6_networks = Ipv6Network::get()->toArray();
+        $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+        if ($ip_networks_count == 0) {
+            return api_error(404, 'IP networks do not exist');
+        }
+
+        return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
+    }
 }
 
 function list_arp(Illuminate\Http\Request $request)

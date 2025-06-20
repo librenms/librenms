@@ -41,6 +41,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
     $total_data = $bill_data['total_data'];
     $rate_average = $bill_data['rate_average'];
 
+    $paid_kb ??= 0;
     if ($rate_95th > $paid_kb) {
         $over = ($rate_95th - $paid_kb);
         $bill_text = $over . 'Kbit excess.';
@@ -171,7 +172,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $type = '&amp;ave=yes'; ?>
         <td>
             <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
-            - Average rate <?php echo Number::formatSi($rate_average, 2, 3, 'bps') ?>
+            - Average rate <?php echo Number::formatSi($rate_average, 2, 0, 'bps') ?>
         </td>
         <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
         </tr>
@@ -190,7 +191,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;95th=yes'; ?>
         <td>
-            <?php echo Number::formatSi($rate_95th, 2, 3, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 3, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
+            <?php echo Number::formatSi($rate_95th, 2, 0, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 0, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
             <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?>
@@ -199,7 +200,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         <tr>
             <td colspan="2">
             <?php
-                echo 'Predicted usage: ' . Number::formatSi(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 3, '') . 'bps'; ?>
+                echo 'Predicted usage: ' . Number::formatSi(Billing::getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th']), 2, 0, '') . 'bps'; ?>
             </td>
 
         <?php

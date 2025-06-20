@@ -1,0 +1,199 @@
+mib: PAN-COMMON-MIB
+modules:
+    os:
+        hardware: PAN-COMMON-MIB::panChassisType.0
+        serial: PAN-COMMON-MIB::panSysSerialNumber.0
+        version: PAN-COMMON-MIB::panSysSwVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - panSessionMax
+                        - panVsysName
+                        - panVsysMaxSessions
+        state:
+            data:
+                -
+                    oid: panSysHAMode
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.13.{{ $index }}'
+                    index: 'panSysHAMode.{{ $index }}'
+                    descr: High Availability Mode
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: active-passive }
+                        - { value: 2, generic: 0, graph: 1, descr: active-active }
+                -
+                    oid: panSysHAState
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.11.{{ $index }}'
+                    index: 'panSysHAState.{{ $index }}'
+                    descr: High Availability Local Status
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: unknown }
+                        - { value: 1, generic: 2, graph: 1, descr: suspended }
+                        - { value: 2, generic: 2, graph: 1, descr: non-functional }
+                        - { value: 3, generic: 1, graph: 1, descr: initial }
+                        - { value: 4, generic: 3, graph: 1, descr: passive }
+                        - { value: 5, generic: 0, graph: 1, descr: active }
+                        - { value: 10, generic: 2, graph: 1, descr: tentative }
+                        - { value: 11, generic: 3, graph: 1, descr: active-secondary }
+                        - { value: 12, generic: 0, graph: 1, descr: active-primary }
+                -
+                    oid: panSysHAPeerState
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.12.{{ $index }}'
+                    index: 'panSysHAPeerState.{{ $index }}'
+                    descr: High Availability Peer Status
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: unknown }
+                        - { value: 1, generic: 2, graph: 1, descr: suspended }
+                        - { value: 2, generic: 2, graph: 1, descr: non-functional }
+                        - { value: 3, generic: 1, graph: 1, descr: initial }
+                        - { value: 4, generic: 3, graph: 1, descr: passive }
+                        - { value: 5, generic: 0, graph: 1, descr: active }
+                        - { value: 10, generic: 1, graph: 1, descr: tentative }
+                        - { value: 11, generic: 3, graph: 1, descr: active-secondary }
+                        - { value: 12, generic: 0, graph: 1, descr: active-primary }
+                    skip_values:
+                        -
+                          oid: panSysHAState.0
+                          op: '='
+                          value: 'disabled'
+                -
+                    oid: panSysHAPeerState
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.12.{{ $index }}'
+                    index: 'panSysHAPeerState.{{ $index }}'
+                    descr: High Availability Peer Status
+                    state_name: panSysHAPeerState_local
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: unknown }
+                        - { value: 1, generic: 0, graph: 1, descr: suspended }
+                        - { value: 2, generic: 0, graph: 1, descr: non-functional }
+                        - { value: 3, generic: 1, graph: 1, descr: initial }
+                        - { value: 4, generic: 3, graph: 1, descr: passive }
+                        - { value: 5, generic: 0, graph: 1, descr: active }
+                        - { value: 10, generic: 1, graph: 1, descr: tentative }
+                        - { value: 11, generic: 3, graph: 1, descr: active-secondary }
+                        - { value: 12, generic: 0, graph: 1, descr: active-primary }
+                    skip_values:
+                        -
+                          oid: panSysHAState.0
+                          op: '!='
+                          value: 'disabled'
+                -
+                    oid: panMgmtPanoramaConnected
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.4.1.{{ $index }}'
+                    index: 'panMgmtPanoramaConnected.{{ $index }}'
+                    descr: Panorama Server 1
+                    group: Panorama
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
+                        - { value: 1, generic: 0, graph: 1, descr: Connected }
+                    skip_values:
+                        -
+                          device: hardware
+                          op: '='
+                          value: 'Panorama'
+                -
+                    oid: panMgmtPanorama2Connected
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.4.2.{{ $index }}'
+                    index: 'panMgmtPanorama2Connected.{{ $index }}'
+                    descr: Panorama Server 2
+                    group: Panorama
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
+                        - { value: 1, generic: 0, graph: 1, descr: Connected }
+                    skip_values:
+                        -
+                          device: hardware
+                          op: '='
+                          value: 'Panorama'
+        count:
+            data:
+                -
+                    oid: panSessionActive
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.3.{{ $index }}'
+                    index: 'panSessionActive.{{ $index }}'
+                    descr: Active Sessions
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panSessionActiveSslProxy
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.7.{{ $index }}'
+                    index: 'panSessionActiveSslProxy.{{ $index }}'
+                    descr: Active Sessions in SSL Proxy
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panSessionActiveTcp
+                    value: panSessionActiveTcp
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.4.{{ $index }}'
+                    index: 'panSessionActiveTcp.{{ $index }}'
+                    descr: Active TCP Sessions
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panSessionActiveUdp
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.5.{{ $index }}'
+                    index: 'panSessionActiveUdp.{{ $index }}'
+                    descr: Active UDP Sessions
+                    group: Sessions
+                    high_limit: panSessionMax
+                -
+                    oid: panVsysActiveSessions
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
+                    index: 'panVsysActiveSessions.{{ $index }}'
+                    descr: Active Sessions
+                    group: '{{ $panVsysName }}'
+                    high_limit: panVsysMaxSessions
+                -
+                    oid: panVsysActiveTcpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.6.{{ $index }}'
+                    index: 'panVsysActiveTcpCps.{{ $index }}'
+                    descr: TCP Connections Per Second
+                    group: '{{ $panVsysName }}'
+                -
+                    oid: panVsysActiveUdpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.7.{{ $index }}'
+                    index: 'panVsysActiveUdpCps.{{ $index }}'
+                    descr: UDP Connections Per Second
+                    group: '{{ $panVsysName }}'
+                -
+                    oid: panVsysActiveOtherIpCps
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.8.{{ $index }}'
+                    index: 'panVsysActiveOtherIpCps.{{ $index }}'
+                    descr: Other IP Connections Per Second
+                    group: '{{ $panVsysName }}'
+                -
+                    oid: panLcLogRate
+                    num_oid: '.1.3.6.1.4.1.25461.2.3.30.1.1.{{ $index }}'
+                    index: 'panLcLogRate.{{ $index }}'
+                    descr: Log Collection Write Rate (logs/sec)
+                    group: Log Collection
+                -
+                    oid: panGPGWUtilizationActiveTunnels
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.3.{{ $index }}'
+                    index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
+                    descr: GlobalProtect VPN Active Sessions
+                    group: VPN
+                    low_limit: 0
+                    low_warn_limit: 0
+        load:
+            data:
+                -
+                    oid: panSessionUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.1.{{ $index }}'
+                    index: 'panSessionUtilization.{{ $index }}'
+                    descr: Session Utilization
+                    group: Sessions
+                -
+                    oid: panSessionSslProxyUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'
+                    index: 'panSessionSslProxyUtilization.{{ $index }}'
+                    descr: Session Utilization in SSL Proxy
+                    group: Sessions
+                -
+                    oid: panVsysSessionUtilizationPct
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.3.{{ $index }}'
+                    index: 'panVsysSessionUtilizationPct.{{ $index }}'
+                    descr: Session Utilization
+                    group: '{{ $panVsysName }}'
+

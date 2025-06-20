@@ -197,11 +197,14 @@ if ($format == 'graph') {
         $where .= ' AND `disable_notify`= ?';
         $sql_param[] = $vars['disable_notify'];
     }
-    if (! empty($vars['location']) && $vars['location'] == 'Unset') {
-        $location_filter = '';
-    }
-    if (! empty($vars['location'])) {
-        $location_filter = $vars['location'];
+    if (! empty($vars['location']) && $vars['location'] != 'Unset') {
+        if (is_numeric($vars['location'])) {
+            $where .= ' AND `locations`.`id`= ?';
+            $sql_param[] = $vars['location'];
+        } else {
+            $where .= ' AND `locations`.`location`= ?';
+            $sql_param[] = $vars['location'];
+        }
     }
     if (isset($vars['poller_group'])) {
         $where .= ' AND `poller_group`= ?';
@@ -235,42 +238,39 @@ if ($format == 'graph') {
         }
 
         if (device_permitted($device['device_id'])) {
-            if (! $location_filter || $device['location'] == $location_filter) {
-                $graph_type = 'device_' . $subformat;
+            $graph_type = 'device_' . $subformat;
 
-                if (session('widescreen')) {
-                    $width = 270;
-                } else {
-                    $width = 315;
-                }
-
-                $graph_array_new = [];
-                $graph_array_new['type'] = $graph_type;
-                $graph_array_new['device'] = $device['device_id'];
-                $graph_array_new['height'] = '110';
-                $graph_array_new['width'] = $width;
-                $graph_array_new['legend'] = 'no';
-                $graph_array_new['title'] = 'yes';
-                $graph_array_new['from'] = $graph_array['from'];
-                $graph_array_new['to'] = $graph_array['to'];
-
-                $graph_array_zoom = $graph_array_new;
-                $graph_array_zoom['height'] = '150';
-                $graph_array_zoom['width'] = '400';
-                $graph_array_zoom['legend'] = 'yes';
-
-                $link_array = $graph_array;
-                $link_array['page'] = 'graphs';
-                $link_array['type'] = $graph_type;
-                $link_array['device'] = $device['device_id'];
-                unset($link_array['height'], $link_array['width']);
-                $overlib_link = \LibreNMS\Util\Url::generate($link_array);
-
-                echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
-                echo '<div class="panel panel-default">';
-                echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
-                echo "</div></div>\n\n";
+            if (session('widescreen')) {
+                $width = 270;
+            } else {
+                $width = 315;
             }
+
+            $graph_array_new = [];
+            $graph_array_new['type'] = $graph_type;
+            $graph_array_new['device'] = $device['device_id'];
+            $graph_array_new['height'] = '110';
+            $graph_array_new['width'] = $width;
+            $graph_array_new['legend'] = 'no';
+            $graph_array_new['title'] = 'yes';
+            $graph_array_new['from'] = $graph_array['from'];
+            $graph_array_new['to'] = $graph_array['to'];
+
+            $graph_array_zoom = $graph_array_new;
+            $graph_array_zoom['height'] = '150';
+            $graph_array_zoom['width'] = '400';
+            $graph_array_zoom['legend'] = 'yes';
+
+            $link_array = $graph_array;
+            $link_array['page'] = 'graphs';
+            $link_array['type'] = $graph_type;
+            $link_array['device'] = $device['device_id'];
+            unset($link_array['height'], $link_array['width']);
+            $overlib_link = \LibreNMS\Util\Url::generate($link_array);
+            echo '<div class="devices-overlib-box" style="min-width:' . ($width + 90) . '; max-width: ' . ($width + 90) . '">';
+            echo '<div class="panel panel-default">';
+            echo \LibreNMS\Util\Url::overlibLink($overlib_link, \LibreNMS\Util\Url::lazyGraphTag($graph_array_new), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
+            echo "</div></div>\n\n";
         }
     }
     echo '</div>';
@@ -278,7 +278,7 @@ if ($format == 'graph') {
     $state = isset($vars['state']) ? $vars['state'] : '';
     $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
         "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
-        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option><select>';
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option></select>';
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
@@ -307,8 +307,9 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
-        <?php show_device_group($vars['group']); ?>
-        <table id="devices" class="table table-hover table-condensed table-striped">
+        <?php show_device_group($vars['group'] ?? 0); ?>
+        <table id="devices" class="table table-hover table-condensed table-striped"
+               data-url="<?php echo route('table.device') ?>">
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
@@ -337,7 +338,7 @@ if ($format == 'graph') {
                     return "<span title=\"Status: " + row.status + " : " + row.extra.replace(/^label-/,'') + "\" class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                    return "<span class=\"device-table-icon tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2\">" + row.icon + "</span>";
                 },
                 "maintenance": function (column, row) {
                     if (row.maintenance) {
@@ -380,7 +381,6 @@ if ($format == 'graph') {
                     device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 };
             },
-            url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php

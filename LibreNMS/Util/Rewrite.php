@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rewrite.php
  *
@@ -108,9 +109,11 @@ class Rewrite
         return str_ireplace(array_keys($rewrite_ifname), array_values($rewrite_ifname), $name);
     }
 
-    public static function shortenIfName($name)
+    public static function shortenIfName($name): string
     {
         $rewrite_shortif = [
+            'hundredgige' => 'Hu',
+            'twentyfivegige' => 'Twe',
             'tengigabitethernet' => 'Te',
             'ten-gigabitethernet' => 'Te',
             'tengige' => 'Te',
@@ -132,7 +135,7 @@ class Rewrite
             'bridge-aggregation' => 'BA',
         ];
 
-        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
+        return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), (string) $name);
     }
 
     /**
@@ -142,10 +145,10 @@ class Rewrite
      * @param  bool  $short
      * @return string
      */
-    public static function ciscoHardware(&$device, $short = false)
+    public static function ciscoHardware(&$device, bool $short = false): string
     {
         if ($device['os'] == 'ios') {
-            if ($device['hardware']) {
+            if (! empty($device['hardware'])) {
                 if (preg_match('/^WS-C([A-Za-z0-9]+)/', $device['hardware'], $matches)) {
                     if (! $short) {
                         $device['hardware'] = 'Catalyst ' . $matches[1] . ' (' . $device['hardware'] . ')';
@@ -178,7 +181,7 @@ class Rewrite
             }
         }
 
-        return $device['hardware'];
+        return $device['hardware'] ?? '';
     }
 
     public static function location($location)
@@ -391,11 +394,6 @@ class Rewrite
         return $guests[$guest_id] ?? $guest_id;
     }
 
-    public static function zeropad($num, $length = 2)
-    {
-        return str_pad($num, $length, '0', STR_PAD_LEFT);
-    }
-
     /**
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
@@ -405,5 +403,10 @@ class Rewrite
     public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
+    }
+
+    public static function celsiusToFahrenheit(float $celsius): float
+    {
+        return round($celsius * 1.8 + 32, 2);
     }
 }

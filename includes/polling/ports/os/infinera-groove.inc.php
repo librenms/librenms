@@ -1,4 +1,5 @@
 <?php
+
 /**
  * infinera-groove.inc.php
  *
@@ -22,6 +23,9 @@
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
+
+use LibreNMS\Util\Number;
+
 echo 'Port types:';
 
 foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
@@ -74,7 +78,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
         }
 
         // convert to integer
-        $lindex = cast_number($lindex);
+        $lindex = Number::cast($lindex);
 
         $port_stats[$lindex]['ifName'] = $descr;
         $port_stats[$lindex]['ifDescr'] = $descr;

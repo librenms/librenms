@@ -176,6 +176,7 @@
             success: function (data) {
                 $.each( data, function( link_id, link ) {
                     var this_edge = link['style'];
+                    this_edge['id'] = link_id;
                     this_edge['from'] = link['ldev'];
                     this_edge['to'] = link['rdev'];
                     this_edge['label'] = link['ifnames'];
@@ -234,6 +235,26 @@
             network.on('doubleClick', function (properties) {
                 if (properties.nodes > 0) {
                     window.location.href = "device/device="+properties.nodes+"/"
+                }
+            });
+            network.on('showPopup', function (itemId) {
+                let item = null;
+                if(itemId.includes('.')) {
+                    // Edges have a .
+                    item = network_edges.get(itemId);
+                } else {
+                    // Nodes are numeric
+                    item = network_nodes.get(itemId);
+                }
+                if (item && item.title) {
+                    for (let img of item.title.getElementsByClassName('graph-image')) {
+                        if(img.src.includes('&refreshnum=')) {
+                            let regex = /&refreshnum=\d+/;
+                            img.src = img.src.replace(regex, "&refreshnum=" + Countdown.refreshNum.toString());
+                        } else {
+                            img.src += "&refreshnum=" + Countdown.refreshNum.toString();
+                        }
+                    }
                 }
             });
         }

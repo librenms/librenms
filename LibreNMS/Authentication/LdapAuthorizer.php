@@ -3,6 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use ErrorException;
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -10,7 +11,7 @@ use LibreNMS\Exceptions\LdapMissingException;
 
 class LdapAuthorizer extends AuthorizerBase
 {
-    protected $ldap_connection;
+    protected ?Connection $ldap_connection = null;
     private $userloginname = '';
 
     public function authenticate($credentials)
@@ -171,7 +172,7 @@ class LdapAuthorizer extends AuthorizerBase
         return -1;
     }
 
-    public function getUser($user_id)
+    public function getUser($user_id): false|array
     {
         $connection = $this->getLdapConnection();
 
@@ -218,7 +219,7 @@ class LdapAuthorizer extends AuthorizerBase
         return $username;
     }
 
-    public function getGroupList()
+    public function getGroupList(): array
     {
         $ldap_groups = [];
 
@@ -241,7 +242,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return string
      */
-    protected function getFullDn($username)
+    protected function getFullDn($username): string
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
@@ -254,7 +255,7 @@ class LdapAuthorizer extends AuthorizerBase
      *
      * @return false|true
      */
-    protected function setAuthLdapSuffixOu($username)
+    protected function setAuthLdapSuffixOu($username): bool
     {
         $connection = $this->getLdapConnection();
         $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
@@ -262,9 +263,9 @@ class LdapAuthorizer extends AuthorizerBase
         $base_dn = trim($base_dn, ',');
         $search = ldap_search($connection, $base_dn, $filter);
         foreach (ldap_get_entries($connection, $search) as $entry) {
-            if ($entry['uid'][0] == $username) {
+            if (isset($entry['uid'][0]) && $entry['uid'][0] == $username) {
                 preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
-                $user_ou = $matches[1];
+                $user_ou = $matches[1] ?? '';
                 $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', Config::get('auth_ldap_suffix'));
                 Config::set('auth_ldap_suffix', $new_auth_ldap_suffix);
 
@@ -281,7 +282,7 @@ class LdapAuthorizer extends AuthorizerBase
      * @internal
      *
      * @param  bool  $skip_bind  do not attempt to bind on connection
-     * @return \LDAP\Connection
+     * @return Connection
      *
      * @throws AuthenticationException
      */
@@ -304,15 +305,15 @@ class LdapAuthorizer extends AuthorizerBase
      * @param  array  $entry  ldap entry array
      * @return array
      */
-    private function ldapToUser($entry)
+    private function ldapToUser($entry): array
     {
         $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
 
         return [
-            'username' => $entry['uid'][0],
-            'realname' => $entry['cn'][0],
-            'user_id' => $entry[$uid_attr][0],
-            'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
+            'username' => $entry['uid'][0] ?? null,
+            'realname' => $entry['cn'][0] ?? null,
+            'user_id' => $entry[$uid_attr][0] ?? null,
+            'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0] ?? null,
         ];
     }
 
@@ -326,10 +327,17 @@ class LdapAuthorizer extends AuthorizerBase
             throw new LdapMissingException();
         }
 
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));
+        $port = Config::get('auth_ldap_port');
+        $uri = Config::get('auth_ldap_server');
+        if ($port && ! str_contains($uri, '://')) {
+            $scheme = $port == 636 ? 'ldaps://' : 'ldap://';
+            $uri = $scheme . $uri . ':' . $port;
+        }
 
-        if (! $this->ldap_connection) {
-            throw new AuthenticationException('Unable to connect to ldap server');
+        $this->ldap_connection = ldap_connect($uri);
+
+        if (empty($this->ldap_connection)) {
+            throw new AuthenticationException('Fatal error while connecting to LDAP server, uri not valid: ' . $uri);
         }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
@@ -344,7 +352,7 @@ class LdapAuthorizer extends AuthorizerBase
         }
     }
 
-    public function bind($credentials = [])
+    public function bind($credentials = []): void
     {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);

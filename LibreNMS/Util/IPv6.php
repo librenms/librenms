@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IPv6.php
  *
@@ -25,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 
 class IPv6 extends IP
@@ -45,7 +47,7 @@ class IPv6 extends IP
             throw new InvalidIpException("$ipv6 is not a valid ipv6 address");
         }
 
-        $this->ip = $this->compressed();  // store in compressed format
+        $this->ip = strtolower($this->uncompressed());  // store in uncompressed format
     }
 
     /**
@@ -76,10 +78,18 @@ class IPv6 extends IP
     {
         $filter = FILTER_FLAG_IPV6;
         if ($exclude_reserved) {
-            $filter |= FILTER_FLAG_NO_RES_RANGE;
+            $filter |= FILTER_FLAG_NO_RES_RANGE | FILTER_FLAG_GLOBAL_RANGE;
         }
 
         return filter_var($ipv6, FILTER_VALIDATE_IP, $filter) !== false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLinkLocal()
+    {
+        return substr($this->uncompressed(), 0, 20) == 'fe80:0000:0000:0000:';
     }
 
     /**
@@ -161,15 +171,37 @@ class IPv6 extends IP
      */
     public function uncompressed()
     {
+        $ip = $this->ip;
+
+        if (strlen($ip) === 39) {
+            return $ip; // already uncompressed
+        }
+
+        // mapped ipv4 to hex
+        if (str_contains($ip, '.') && str_contains($ip, ':')) {
+            $split = strrpos($ip, ':');
+            $parts = array_map(function ($part) {
+                return dechex((int) $part);
+            }, explode('.', substr($ip, $split + 1)));
+            $ip = substr($ip, 0, $split); // extract prefix
+
+            foreach ($parts as $pos => $part) {
+                if ($pos % 2 == 0) {
+                    $ip .= ':';
+                }
+                $ip .= str_pad($part, 2, '0', STR_PAD_LEFT);
+            }
+        }
+
         // remove ::
-        $replacement = ':' . str_repeat('0000:', 8 - substr_count($this->ip, ':'));
-        $ip = str_replace('::', $replacement, $this->ip);
+        $replacement = ':' . str_repeat('0000:', 8 - substr_count($ip, ':'));
+        $ip = str_replace('::', $replacement, $ip);
 
         // zero pad
         $parts = explode(':', $ip, 8);
 
         return implode(':', array_map(function ($section) {
-            return Rewrite::zeropad($section, 4);
+            return Str::padLeft($section, 4, '0');
         }, $parts));
     }
 

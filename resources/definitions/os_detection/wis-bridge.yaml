@@ -1,0 +1,14 @@
+os: wis-bridge
+text: 'WIS Bridge'
+type: wireless
+icon: wis
+snmp_bulk: false
+mib_dir: wis
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_clients, text: 'Connected Clients' }
+    - { graph: device_wireless_ccq, text: 'Connection Quality' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.62821.1.4

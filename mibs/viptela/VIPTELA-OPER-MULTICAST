@@ -1,0 +1,1358 @@
+-- Namespace: http://viptela.com/oper-multicast
+
+VIPTELA-OPER-MULTICAST DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-oper-multicast MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for PIM operational data"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 15 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+IpPrefix ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:ipPrefix"
+    SYNTAX      OCTET STRING (SIZE (5|17))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+IgmpIfStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {init(0),querier(1),non-querier(2)}
+
+ReplicatorStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {yes(0),no(1)}
+
+IgmpIfEventEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {init-event(0),query-timer-expiry(1),query-from-lower-ip(2),other-querier-present(3)}
+
+RpfStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {resolved(0),not-resolved(1)}
+
+MulticastFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Multicast flags"
+    SYNTAX      BITS {s(0)}
+
+JoinTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {invalid(0),starStarRp(1),starGroup(2),sourceGroup(3),sourceGroupRpt(4),autoRp(5),sourceActive(6)}
+
+IgmpGroupStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {no-members-present(0),members-present(1),v1-members-present(2),checking-membership(3)}
+
+MulticastOifFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Multicast OIF flags"
+    SYNTAX      BITS {a(0)}
+
+UpstreamStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {invalid(0),not-joined(1),joined(2),not-pruned(3),pruned(4)}
+
+IgmpGroupEventEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {init-event(0),membership-report(1),v1-membership-report(2),leave(3),query-timer-expired(4),retransmit-timer-expired(5),v1-host-timer-expired(6)}
+
+-- Multicast information
+-- tagpath /multicast
+multicast OBJECT IDENTIFIER ::= { viptela-oper-multicast 1 }
+
+-- PIM information
+-- tagpath /pim
+pim OBJECT IDENTIFIER ::= { viptela-oper-multicast 2 }
+
+-- IGMP information
+-- tagpath /igmp
+igmp OBJECT IDENTIFIER ::= { viptela-oper-multicast 3 }
+
+-- Summary of various variables
+-- tagpath /igmp/summary
+igmpSummary OBJECT IDENTIFIER ::= { igmp 1 }
+
+-- tagpath /igmp/summary/version
+igmpSummaryVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Version"
+    ::= { igmpSummary 1 }
+
+-- tagpath /igmp/summary/query-interval
+igmpSummaryQueryInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Query Interval, in seconds"
+    ::= { igmpSummary 2 }
+
+-- tagpath /igmp/summary/query-response-time
+igmpSummaryQueryResponseTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Query Response Time, in seconds"
+    ::= { igmpSummary 3 }
+
+-- tagpath /igmp/summary/last-member-query-response-time
+igmpSummaryLastMemberQueryResponseTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last member query response time, in seconds"
+    ::= { igmpSummary 4 }
+
+-- tagpath /igmp/summary/last-member-query-count
+igmpSummaryLastMemberQueryCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last member query count time"
+    ::= { igmpSummary 5 }
+
+-- tagpath /igmp/summary/querier-timeout
+igmpSummaryQuerierTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Other Querier timeout, in seconds"
+    ::= { igmpSummary 6 }
+
+-- tagpath /multicast/rpf
+multicastRpfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastRpfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of RPF entries"
+    ::= { multicast 1 }
+
+-- tagpath /multicast/rpf
+multicastRpfEntry OBJECT-TYPE
+    SYNTAX      MulticastRpfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastRpfVpnId, multicastRpfRpfAddress }
+        ::= { multicastRpfTable 1 }
+
+MulticastRpfEntry ::=
+    SEQUENCE {
+        multicastRpfVpnId Unsigned32,
+        multicastRpfRpfAddress InetAddressIP,
+        multicastRpfRpfStatus RpfStatusEnum,
+        multicastRpfNexthopCount Unsigned32
+    }
+
+-- tagpath /multicast/rpf/vpn-id
+multicastRpfVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { multicastRpfEntry 1 }
+
+-- tagpath /multicast/rpf/rpf-address
+multicastRpfRpfAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Address"
+    ::= { multicastRpfEntry 2 }
+
+-- tagpath /multicast/rpf/rpf-status
+multicastRpfRpfStatus OBJECT-TYPE
+    SYNTAX      RpfStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RPF status"
+    ::= { multicastRpfEntry 3 }
+
+-- tagpath /multicast/rpf/nexthop-count
+multicastRpfNexthopCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop count"
+    ::= { multicastRpfEntry 4 }
+
+-- tagpath /multicast/rpf/rpf-nexthops
+multicastRpfRpfNexthopsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastRpfRpfNexthopsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of next hops"
+    ::= { multicast 2 }
+
+-- tagpath /multicast/rpf/rpf-nexthops
+multicastRpfRpfNexthopsEntry OBJECT-TYPE
+    SYNTAX      MulticastRpfRpfNexthopsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastRpfVpnId, multicastRpfRpfAddress, multicastRpfRpfNexthopsIndex }
+        ::= { multicastRpfRpfNexthopsTable 1 }
+
+MulticastRpfRpfNexthopsEntry ::=
+    SEQUENCE {
+        multicastRpfRpfNexthopsIndex Unsigned32,
+        multicastRpfRpfNexthopsRpfNbrAddr InetAddressIP,
+        multicastRpfRpfNexthopsRpfIfName String,
+        multicastRpfRpfNexthopsRpfTunnel InetAddressIP,
+        multicastRpfRpfNhopsRpfTunColor INTEGER,
+        multicastRpfRpfNhopsRpfTunEncap INTEGER
+    }
+
+-- tagpath /multicast/rpf/rpf-nexthops/index
+multicastRpfRpfNexthopsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index"
+    ::= { multicastRpfRpfNexthopsEntry 1 }
+
+-- tagpath /multicast/rpf/rpf-nexthops/rpf-nbr-addr
+multicastRpfRpfNexthopsRpfNbrAddr OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RPF neighbor address"
+    ::= { multicastRpfRpfNexthopsEntry 2 }
+
+-- tagpath /multicast/rpf/rpf-nexthops/rpf-if-name
+multicastRpfRpfNexthopsRpfIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface"
+    ::= { multicastRpfRpfNexthopsEntry 3 }
+
+-- tagpath /multicast/rpf/rpf-nexthops/rpf-tunnel
+multicastRpfRpfNexthopsRpfTunnel OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tunnel end point"
+    ::= { multicastRpfRpfNexthopsEntry 4 }
+
+-- tagpath /multicast/rpf/rpf-nexthops/rpf-tunnel-color
+multicastRpfRpfNhopsRpfTunColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { multicastRpfRpfNexthopsEntry 5 }
+
+-- tagpath /multicast/rpf/rpf-nexthops/rpf-tunnel-encap
+multicastRpfRpfNhopsRpfTunEncap OBJECT-TYPE
+    SYNTAX      INTEGER {gre(1),ipsec(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encapsulation"
+    ::= { multicastRpfRpfNexthopsEntry 6 }
+
+-- tagpath /multicast/topology
+multicastTopologyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastTopologyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "PIM topology database"
+    ::= { multicast 3 }
+
+-- tagpath /multicast/topology
+multicastTopologyEntry OBJECT-TYPE
+    SYNTAX      MulticastTopologyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastTopologyVpnId, multicastTopologyGroup, multicastTopologySource, multicastTopologyJoinType }
+        ::= { multicastTopologyTable 1 }
+
+MulticastTopologyEntry ::=
+    SEQUENCE {
+        multicastTopologyVpnId Unsigned32,
+        multicastTopologyGroup InetAddressIP,
+        multicastTopologySource InetAddressIP,
+        multicastTopologyJoinType JoinTypeEnum,
+        multicastTopologyFlags MulticastFlags,
+        multicastTopologyRpAddress InetAddressIP,
+        multicastTopologyReplicator InetAddressIP,
+        multicastTopologyUpstreamNeighbor InetAddressIP,
+        multicastTopologyUpstreamState UpstreamStateEnum,
+        multicastTopologyUpstreamInterface String,
+        multicastTopologyUpTime String,
+        multicastTopologyExpires String
+    }
+
+-- tagpath /multicast/topology/vpn-id
+multicastTopologyVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { multicastTopologyEntry 1 }
+
+-- tagpath /multicast/topology/group
+multicastTopologyGroup OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Group address"
+    ::= { multicastTopologyEntry 2 }
+
+-- tagpath /multicast/topology/source
+multicastTopologySource OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Source address"
+    ::= { multicastTopologyEntry 3 }
+
+-- tagpath /multicast/topology/join-type
+multicastTopologyJoinType OBJECT-TYPE
+    SYNTAX      JoinTypeEnum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Type of join"
+    ::= { multicastTopologyEntry 4 }
+
+-- tagpath /multicast/topology/Flags
+multicastTopologyFlags OBJECT-TYPE
+    SYNTAX      MulticastFlags
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Topology flags"
+    ::= { multicastTopologyEntry 5 }
+
+-- tagpath /multicast/topology/rp-address
+multicastTopologyRpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RP address"
+    ::= { multicastTopologyEntry 6 }
+
+-- tagpath /multicast/topology/replicator
+multicastTopologyReplicator OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Multicast replicator"
+    ::= { multicastTopologyEntry 7 }
+
+-- tagpath /multicast/topology/upstream-neighbor
+multicastTopologyUpstreamNeighbor OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Upstream neighbor"
+    ::= { multicastTopologyEntry 8 }
+
+-- tagpath /multicast/topology/upstream-state
+multicastTopologyUpstreamState OBJECT-TYPE
+    SYNTAX      UpstreamStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Upstream neighbor"
+    ::= { multicastTopologyEntry 9 }
+
+-- tagpath /multicast/topology/upstream-interface
+multicastTopologyUpstreamInterface OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RPF interface"
+    ::= { multicastTopologyEntry 10 }
+
+-- tagpath /multicast/topology/up-time
+multicastTopologyUpTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uptime (Days:Hours:Minutes:Seconds)"
+    ::= { multicastTopologyEntry 11 }
+
+-- tagpath /multicast/topology/expires
+multicastTopologyExpires OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Expires (Days:Hours:Minutes:Seconds)"
+    ::= { multicastTopologyEntry 12 }
+
+-- tagpath /multicast/topology/topology-oil
+multicastTopologyTopologyOilTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastTopologyTopologyOilEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of outgoing interfaces"
+    ::= { multicast 4 }
+
+-- tagpath /multicast/topology/topology-oil
+multicastTopologyTopologyOilEntry OBJECT-TYPE
+    SYNTAX      MulticastTopologyTopologyOilEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastTopologyVpnId, multicastTopologyGroup, multicastTopologySource, multicastTopologyJoinType, multicastTopologyTopologyOilIndex }
+        ::= { multicastTopologyTopologyOilTable 1 }
+
+MulticastTopologyTopologyOilEntry ::=
+    SEQUENCE {
+        multicastTopologyTopologyOilIndex Unsigned32,
+        multicastTopologyTopologyOilOifName String,
+        multicastTopologyTopologyOilOifFlags MulticastOifFlags,
+        multicastTopologyTopologyOilOifTunnel InetAddressIP
+    }
+
+-- tagpath /multicast/topology/topology-oil/index
+multicastTopologyTopologyOilIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index"
+    ::= { multicastTopologyTopologyOilEntry 1 }
+
+-- tagpath /multicast/topology/topology-oil/oif-name
+multicastTopologyTopologyOilOifName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outgoing interface name"
+    ::= { multicastTopologyTopologyOilEntry 2 }
+
+-- tagpath /multicast/topology/topology-oil/oif-flags
+multicastTopologyTopologyOilOifFlags OBJECT-TYPE
+    SYNTAX      MulticastOifFlags
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outgoing interface flag"
+    ::= { multicastTopologyTopologyOilEntry 3 }
+
+-- tagpath /multicast/topology/topology-oil/oif-tunnel
+multicastTopologyTopologyOilOifTunnel OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outgoing tunnel end point"
+    ::= { multicastTopologyTopologyOilEntry 4 }
+
+-- tagpath /multicast/replicator
+multicastReplicatorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastReplicatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of replicators"
+    ::= { multicast 5 }
+
+-- tagpath /multicast/replicator
+multicastReplicatorEntry OBJECT-TYPE
+    SYNTAX      MulticastReplicatorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastReplicatorVpnId, multicastReplicatorReplicatorAddress }
+        ::= { multicastReplicatorTable 1 }
+
+MulticastReplicatorEntry ::=
+    SEQUENCE {
+        multicastReplicatorVpnId Unsigned32,
+        multicastReplicatorReplicatorAddress InetAddressIP,
+        multicastReplicatorReplicatorStatus INTEGER,
+        multicastReplicatorLoadPercent Unsigned32
+    }
+
+-- tagpath /multicast/replicator/vpn-id
+multicastReplicatorVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { multicastReplicatorEntry 1 }
+
+-- tagpath /multicast/replicator/replicator-address
+multicastReplicatorReplicatorAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Address"
+    ::= { multicastReplicatorEntry 2 }
+
+-- tagpath /multicast/replicator/replicator-status
+multicastReplicatorReplicatorStatus OBJECT-TYPE
+    SYNTAX      INTEGER {dOWN(1),uP(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Replicator status"
+    ::= { multicastReplicatorEntry 3 }
+
+-- tagpath /multicast/replicator/load-percent
+multicastReplicatorLoadPercent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Load percentage for VPN"
+    ::= { multicastReplicatorEntry 4 }
+
+-- tagpath /multicast/tunnel
+multicastTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MulticastTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of tunnels"
+    ::= { multicast 6 }
+
+-- tagpath /multicast/tunnel
+multicastTunnelEntry OBJECT-TYPE
+    SYNTAX      MulticastTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { multicastTunnelVpnId, multicastTunnelTunnelAddress }
+        ::= { multicastTunnelTable 1 }
+
+MulticastTunnelEntry ::=
+    SEQUENCE {
+        multicastTunnelVpnId Unsigned32,
+        multicastTunnelTunnelAddress InetAddressIP,
+        multicastTunnelTunnelStatus INTEGER,
+        multicastTunnelReplicator ReplicatorStatusEnum
+    }
+
+-- tagpath /multicast/tunnel/vpn-id
+multicastTunnelVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { multicastTunnelEntry 1 }
+
+-- tagpath /multicast/tunnel/tunnel-address
+multicastTunnelTunnelAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Tunnel end point"
+    ::= { multicastTunnelEntry 2 }
+
+-- tagpath /multicast/tunnel/tunnel-status
+multicastTunnelTunnelStatus OBJECT-TYPE
+    SYNTAX      INTEGER {dOWN(1),uP(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tunnel status"
+    ::= { multicastTunnelEntry 3 }
+
+-- tagpath /multicast/tunnel/replicator
+multicastTunnelReplicator OBJECT-TYPE
+    SYNTAX      ReplicatorStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Replicator status"
+    ::= { multicastTunnelEntry 4 }
+
+-- tagpath /pim/interface
+pimInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PimInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of interfaces"
+    ::= { pim 1 }
+
+-- tagpath /pim/interface
+pimInterfaceEntry OBJECT-TYPE
+    SYNTAX      PimInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { pimInterfaceVpnId, IMPLIED pimInterfaceIfName }
+        ::= { pimInterfaceTable 1 }
+
+PimInterfaceEntry ::=
+    SEQUENCE {
+        pimInterfaceVpnId Unsigned32,
+        pimInterfaceIfName String,
+        pimInterfaceIfAddr IpPrefix,
+        pimInterfaceNeighborCount Unsigned32,
+        pimInterfaceHelloInterval Unsigned32,
+        pimInterfacePriority Unsigned32,
+        pimInterfaceDrAddress InetAddressIP,
+        pimInterfaceJoinPruneInterval Unsigned32
+    }
+
+-- tagpath /pim/interface/vpn-id
+pimInterfaceVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { pimInterfaceEntry 1 }
+
+-- tagpath /pim/interface/if-name
+pimInterfaceIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface"
+    ::= { pimInterfaceEntry 2 }
+
+-- tagpath /pim/interface/if-addr
+pimInterfaceIfAddr OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address"
+    ::= { pimInterfaceEntry 3 }
+
+-- tagpath /pim/interface/neighbor-count
+pimInterfaceNeighborCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor count"
+    ::= { pimInterfaceEntry 4 }
+
+-- tagpath /pim/interface/hello-interval
+pimInterfaceHelloInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello interval"
+    ::= { pimInterfaceEntry 5 }
+
+-- tagpath /pim/interface/priority
+pimInterfacePriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "DR priority"
+    ::= { pimInterfaceEntry 6 }
+
+-- tagpath /pim/interface/dr-address
+pimInterfaceDrAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "DR address"
+    ::= { pimInterfaceEntry 7 }
+
+-- tagpath /pim/interface/join-prune-interval
+pimInterfaceJoinPruneInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Join prune interval"
+    ::= { pimInterfaceEntry 8 }
+
+-- tagpath /pim/rp-mapping
+pimRpMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PimRpMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of RP mapping entries"
+    ::= { pim 2 }
+
+-- tagpath /pim/rp-mapping
+pimRpMappingEntry OBJECT-TYPE
+    SYNTAX      PimRpMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { pimRpMappingVpnId, pimRpMappingType, pimRpMappingGroup }
+        ::= { pimRpMappingTable 1 }
+
+PimRpMappingEntry ::=
+    SEQUENCE {
+        pimRpMappingVpnId Unsigned32,
+        pimRpMappingType INTEGER,
+        pimRpMappingGroup IpPrefix,
+        pimRpMappingRpAddress InetAddressIP
+    }
+
+-- tagpath /pim/rp-mapping/vpn-id
+pimRpMappingVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { pimRpMappingEntry 1 }
+
+-- tagpath /pim/rp-mapping/type
+pimRpMappingType OBJECT-TYPE
+    SYNTAX      INTEGER {auto-RP(0)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Mapping source type"
+    ::= { pimRpMappingEntry 2 }
+
+-- tagpath /pim/rp-mapping/group
+pimRpMappingGroup OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Group prefix"
+    ::= { pimRpMappingEntry 3 }
+
+-- tagpath /pim/rp-mapping/rp-address
+pimRpMappingRpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RP address"
+    ::= { pimRpMappingEntry 4 }
+
+-- tagpath /pim/neighbor
+pimNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PimNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of neighbors"
+    ::= { pim 3 }
+
+-- tagpath /pim/neighbor
+pimNeighborEntry OBJECT-TYPE
+    SYNTAX      PimNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { pimNeighborVpnId, pimNeighborIfName, pimNeighborNbrAddr }
+        ::= { pimNeighborTable 1 }
+
+PimNeighborEntry ::=
+    SEQUENCE {
+        pimNeighborVpnId Unsigned32,
+        pimNeighborIfName String,
+        pimNeighborNbrAddr InetAddressIP,
+        pimNeighborUpTime String,
+        pimNeighborExpires String,
+        pimNeighborPriority Unsigned32,
+        pimNeighborHoldTime Unsigned32,
+        pimNeighborDrAddress InetAddressIP
+    }
+
+-- tagpath /pim/neighbor/vpn-id
+pimNeighborVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { pimNeighborEntry 1 }
+
+-- tagpath /pim/neighbor/if-name
+pimNeighborIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface"
+    ::= { pimNeighborEntry 2 }
+
+-- tagpath /pim/neighbor/nbr-addr
+pimNeighborNbrAddr OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Neighbor address"
+    ::= { pimNeighborEntry 3 }
+
+-- tagpath /pim/neighbor/up-time
+pimNeighborUpTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uptime (Days:Hours:Minutes:Seconds)"
+    ::= { pimNeighborEntry 4 }
+
+-- tagpath /pim/neighbor/expires
+pimNeighborExpires OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Expires (Days:Hours:Minutes:Seconds)"
+    ::= { pimNeighborEntry 5 }
+
+-- tagpath /pim/neighbor/priority
+pimNeighborPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "DR priority"
+    ::= { pimNeighborEntry 6 }
+
+-- tagpath /pim/neighbor/hold-time
+pimNeighborHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor's advertised hold time"
+    ::= { pimNeighborEntry 7 }
+
+-- tagpath /pim/neighbor/dr-address
+pimNeighborDrAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "DR address"
+    ::= { pimNeighborEntry 8 }
+
+-- tagpath /pim/statistics
+pimStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PimStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Packet statistics"
+    ::= { pim 4 }
+
+-- tagpath /pim/statistics
+pimStatisticsEntry OBJECT-TYPE
+    SYNTAX      PimStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { pimStatisticsVpnId }
+        ::= { pimStatisticsTable 1 }
+
+PimStatisticsEntry ::=
+    SEQUENCE {
+        pimStatisticsVpnId Unsigned32,
+        pimStatisticsHelloRx Unsigned32,
+        pimStatisticsJoinPruneRx Unsigned32,
+        pimStatisticsAssertRx Unsigned32,
+        pimStatisticsAutoRpAnnounceRx Unsigned32,
+        pimStatisticsAutoRpMappingRx Unsigned32,
+        pimStatisticsUnsupportedRx Unsigned32,
+        pimStatisticsUnknownRx Unsigned32,
+        pimStatisticsBadRx Unsigned32,
+        pimStatisticsHelloTx Unsigned32,
+        pimStatisticsJoinPruneTx Unsigned32,
+        pimStatisticsAssertTx Unsigned32
+    }
+
+-- tagpath /pim/statistics/vpn-id
+pimStatisticsVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { pimStatisticsEntry 1 }
+
+-- tagpath /pim/statistics/hello-rx
+pimStatisticsHelloRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets received"
+    ::= { pimStatisticsEntry 2 }
+
+-- tagpath /pim/statistics/join-prune-rx
+pimStatisticsJoinPruneRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Join-prune packets received"
+    ::= { pimStatisticsEntry 3 }
+
+-- tagpath /pim/statistics/assert-rx
+pimStatisticsAssertRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Assert packets received"
+    ::= { pimStatisticsEntry 4 }
+
+-- tagpath /pim/statistics/auto-rp-announce-rx
+pimStatisticsAutoRpAnnounceRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Auto-RP announce packets received"
+    ::= { pimStatisticsEntry 5 }
+
+-- tagpath /pim/statistics/auto-rp-mapping-rx
+pimStatisticsAutoRpMappingRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Auto-RP mapping packets received"
+    ::= { pimStatisticsEntry 6 }
+
+-- tagpath /pim/statistics/unsupported-rx
+pimStatisticsUnsupportedRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unsupported packets received"
+    ::= { pimStatisticsEntry 7 }
+
+-- tagpath /pim/statistics/unknown-rx
+pimStatisticsUnknownRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unknown packets received"
+    ::= { pimStatisticsEntry 8 }
+
+-- tagpath /pim/statistics/bad-rx
+pimStatisticsBadRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bad packets received"
+    ::= { pimStatisticsEntry 9 }
+
+-- tagpath /pim/statistics/hello-tx
+pimStatisticsHelloTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello packets transmitted"
+    ::= { pimStatisticsEntry 10 }
+
+-- tagpath /pim/statistics/join-prune-tx
+pimStatisticsJoinPruneTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Join-prune packets transmitted"
+    ::= { pimStatisticsEntry 11 }
+
+-- tagpath /pim/statistics/assert-tx
+pimStatisticsAssertTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Assert packets transmitted"
+    ::= { pimStatisticsEntry 12 }
+
+-- tagpath /igmp/interface
+igmpInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of interfaces"
+    ::= { igmp 2 }
+
+-- tagpath /igmp/interface
+igmpInterfaceEntry OBJECT-TYPE
+    SYNTAX      IgmpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { igmpInterfaceVpnId, IMPLIED igmpInterfaceIfName }
+        ::= { igmpInterfaceTable 1 }
+
+IgmpInterfaceEntry ::=
+    SEQUENCE {
+        igmpInterfaceVpnId Unsigned32,
+        igmpInterfaceIfName String,
+        igmpInterfaceIfAddr IpPrefix,
+        igmpInterfaceGroupCount Unsigned32,
+        igmpInterfaceQuerier TruthValue,
+        igmpInterfaceQuerierIp InetAddressIP,
+        igmpInterfaceQueryInterval String,
+        igmpInterfaceState IgmpIfStateEnum,
+        igmpInterfaceOtherQuerierExpiry String,
+        igmpInterfaceEvent IgmpIfEventEnum
+    }
+
+-- tagpath /igmp/interface/vpn-id
+igmpInterfaceVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { igmpInterfaceEntry 1 }
+
+-- tagpath /igmp/interface/if-name
+igmpInterfaceIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface"
+    ::= { igmpInterfaceEntry 2 }
+
+-- tagpath /igmp/interface/if-addr
+igmpInterfaceIfAddr OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address"
+    ::= { igmpInterfaceEntry 3 }
+
+-- tagpath /igmp/interface/group-count
+igmpInterfaceGroupCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of groups for this interface"
+    ::= { igmpInterfaceEntry 4 }
+
+-- tagpath /igmp/interface/querier
+igmpInterfaceQuerier OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Querier state on this interface"
+    ::= { igmpInterfaceEntry 5 }
+
+-- tagpath /igmp/interface/querier-ip
+igmpInterfaceQuerierIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Querier IP"
+    ::= { igmpInterfaceEntry 6 }
+
+-- tagpath /igmp/interface/query-interval
+igmpInterfaceQueryInterval OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Expiration of the other querier, in seconds"
+    ::= { igmpInterfaceEntry 7 }
+
+-- tagpath /igmp/interface/state
+igmpInterfaceState OBJECT-TYPE
+    SYNTAX      IgmpIfStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface state for this interface"
+    ::= { igmpInterfaceEntry 8 }
+
+-- tagpath /igmp/interface/other-querier-expiry
+igmpInterfaceOtherQuerierExpiry OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Expiration of the other querier, in seconds"
+    ::= { igmpInterfaceEntry 9 }
+
+-- tagpath /igmp/interface/event
+igmpInterfaceEvent OBJECT-TYPE
+    SYNTAX      IgmpIfEventEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last interface event"
+    ::= { igmpInterfaceEntry 10 }
+
+-- tagpath /igmp/groups
+igmpGroupsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpGroupsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of groups"
+    ::= { igmp 3 }
+
+-- tagpath /igmp/groups
+igmpGroupsEntry OBJECT-TYPE
+    SYNTAX      IgmpGroupsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { igmpGroupsVpnId, igmpGroupsIfName, igmpGroupsGroup }
+        ::= { igmpGroupsTable 1 }
+
+IgmpGroupsEntry ::=
+    SEQUENCE {
+        igmpGroupsVpnId Unsigned32,
+        igmpGroupsIfName String,
+        igmpGroupsGroup InetAddressIP,
+        igmpGroupsV1MembersPresent TruthValue,
+        igmpGroupsState IgmpGroupStateEnum,
+        igmpGroupsUptime String,
+        igmpGroupsExpires String,
+        igmpGroupsV1Expires String,
+        igmpGroupsEvent IgmpGroupEventEnum
+    }
+
+-- tagpath /igmp/groups/vpn-id
+igmpGroupsVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { igmpGroupsEntry 1 }
+
+-- tagpath /igmp/groups/if-name
+igmpGroupsIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { igmpGroupsEntry 2 }
+
+-- tagpath /igmp/groups/group
+igmpGroupsGroup OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Group Address"
+    ::= { igmpGroupsEntry 3 }
+
+-- tagpath /igmp/groups/v1-members-present
+igmpGroupsV1MembersPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether IGMPv1 members are present"
+    ::= { igmpGroupsEntry 4 }
+
+-- tagpath /igmp/groups/state
+igmpGroupsState OBJECT-TYPE
+    SYNTAX      IgmpGroupStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IGMP Group State"
+    ::= { igmpGroupsEntry 5 }
+
+-- tagpath /igmp/groups/uptime
+igmpGroupsUptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "How long the group has been up"
+    ::= { igmpGroupsEntry 6 }
+
+-- tagpath /igmp/groups/expires
+igmpGroupsExpires OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Expiration of the group, in seconds"
+    ::= { igmpGroupsEntry 7 }
+
+-- tagpath /igmp/groups/v1-expires
+igmpGroupsV1Expires OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time to expiration of IGMPv1 host timer, in seconds"
+    ::= { igmpGroupsEntry 8 }
+
+-- tagpath /igmp/groups/event
+igmpGroupsEvent OBJECT-TYPE
+    SYNTAX      IgmpGroupEventEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last group event"
+    ::= { igmpGroupsEntry 9 }
+
+-- tagpath /igmp/statistics
+igmpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Packet statistics"
+    ::= { igmp 4 }
+
+-- tagpath /igmp/statistics
+igmpStatisticsEntry OBJECT-TYPE
+    SYNTAX      IgmpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { igmpStatisticsVpnId }
+        ::= { igmpStatisticsTable 1 }
+
+IgmpStatisticsEntry ::=
+    SEQUENCE {
+        igmpStatisticsVpnId Unsigned32,
+        igmpStatisticsRxGeneralQuery Counter64,
+        igmpStatisticsRxGroupQuery Counter64,
+        igmpStatisticsRxV1Report Counter64,
+        igmpStatisticsRxV2Report Counter64,
+        igmpStatisticsRxLeave Counter64,
+        igmpStatisticsRxUnknown Counter64,
+        igmpStatisticsRxError Counter64,
+        igmpStatisticsTxGeneralQuery Counter64,
+        igmpStatisticsTxGroupQuery Counter64,
+        igmpStatisticsTxError Counter64
+    }
+
+-- tagpath /igmp/statistics/vpn-id
+igmpStatisticsVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { igmpStatisticsEntry 1 }
+
+-- tagpath /igmp/statistics/rx_general_query
+igmpStatisticsRxGeneralQuery OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx General Query"
+    ::= { igmpStatisticsEntry 2 }
+
+-- tagpath /igmp/statistics/rx_group_query
+igmpStatisticsRxGroupQuery OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Group Query"
+    ::= { igmpStatisticsEntry 3 }
+
+-- tagpath /igmp/statistics/rx_v1_report
+igmpStatisticsRxV1Report OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx V1 Report"
+    ::= { igmpStatisticsEntry 4 }
+
+-- tagpath /igmp/statistics/rx_v2_report
+igmpStatisticsRxV2Report OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx V2 Report"
+    ::= { igmpStatisticsEntry 5 }
+
+-- tagpath /igmp/statistics/rx_leave
+igmpStatisticsRxLeave OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Leave"
+    ::= { igmpStatisticsEntry 6 }
+
+-- tagpath /igmp/statistics/rx_unknown
+igmpStatisticsRxUnknown OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Unknown"
+    ::= { igmpStatisticsEntry 7 }
+
+-- tagpath /igmp/statistics/rx_error
+igmpStatisticsRxError OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rx Error"
+    ::= { igmpStatisticsEntry 8 }
+
+-- tagpath /igmp/statistics/tx_general_query
+igmpStatisticsTxGeneralQuery OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tx General Query"
+    ::= { igmpStatisticsEntry 9 }
+
+-- tagpath /igmp/statistics/tx_group_query
+igmpStatisticsTxGroupQuery OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tx Group Query"
+    ::= { igmpStatisticsEntry 10 }
+
+-- tagpath /igmp/statistics/tx_error
+igmpStatisticsTxError OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tx Error"
+    ::= { igmpStatisticsEntry 11 }
+
+END

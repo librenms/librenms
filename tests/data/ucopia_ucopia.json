@@ -4239,216 +4239,270 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "31",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/",
                     "storage_size": 10434699264,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 2487160832,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.31",
+                    "storage_free": 7947538432,
+                    "storage_free_oid": null,
+                    "storage_perc": 24,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "36",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run",
                     "storage_size": 210788352,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 860160,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.36",
+                    "storage_free": 209928192,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "37",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run/lock",
                     "storage_size": 5242880,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.37",
+                    "storage_free": 5242880,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "39",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run/shm",
                     "storage_size": 846028800,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 4210688,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.39",
+                    "storage_free": 841818112,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "40",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/var",
                     "storage_size": 346548088832,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 5925191680,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.40",
+                    "storage_free": 340622897152,
+                    "storage_free_oid": null,
+                    "storage_perc": 2,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "42",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 12288,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "43",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/run/cgmanager/fs",
                     "storage_size": 102400,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 0,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.43",
+                    "storage_free": 102400,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "45",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/var/chroot/etc/clish",
                     "storage_size": 10434699264,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 2487160832,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.45",
+                    "storage_free": 7947538432,
+                    "storage_free_oid": null,
+                    "storage_perc": 24,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "31",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/",
-                    "storage_size": 10434699264,
-                    "storage_units": 4096,
-                    "storage_used": 2487160832,
-                    "storage_free": 7947538432,
-                    "storage_perc": 24,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.104.1.20",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.104.1.0/24",
+                    "ifIndex": 14
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "36",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run",
-                    "storage_size": 210788352,
-                    "storage_units": 4096,
-                    "storage_used": 860160,
-                    "storage_free": 209928192,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.104.1.21",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.104.1.0/24",
+                    "ifIndex": 8
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "37",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/lock",
-                    "storage_size": 5242880,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 5242880,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.108.1.20",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.108.1.0/24",
+                    "ifIndex": 14
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "39",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/shm",
-                    "storage_size": 846028800,
-                    "storage_units": 4096,
-                    "storage_used": 4210688,
-                    "storage_free": 841818112,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.108.1.21",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.108.1.0/24",
+                    "ifIndex": 8
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "40",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var",
-                    "storage_size": 346548088832,
-                    "storage_units": 4096,
-                    "storage_used": 5925191680,
-                    "storage_free": 340622897152,
-                    "storage_perc": 2,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.121.7.252",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.121.0.0/21",
+                    "ifIndex": 6
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "42",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/sys/fs/cgroup",
-                    "storage_size": 12288,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 12288,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.121.7.254",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.121.0.0/21",
+                    "ifIndex": 11
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "43",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/run/cgmanager/fs",
-                    "storage_size": 102400,
-                    "storage_units": 4096,
-                    "storage_used": 0,
-                    "storage_free": 102400,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.122.1.252",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.122.1.0/24",
+                    "ifIndex": 7
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "45",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/var/chroot/etc/clish",
-                    "storage_size": 10434699264,
-                    "storage_units": 4096,
-                    "storage_used": 2487160832,
-                    "storage_free": 7947538432,
-                    "storage_perc": 24,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.122.1.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.122.1.0/24",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "10.123.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.123.1.0/24",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "10.123.1.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.123.1.0/24",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "10.151.7.252",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.151.0.0/21",
+                    "ifIndex": 6
+                },
+                {
+                    "ipv4_address": "10.151.7.254",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.151.0.0/21",
+                    "ifIndex": 11
+                },
+                {
+                    "ipv4_address": "10.152.1.252",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.152.1.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "10.152.1.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.152.1.0/24",
+                    "ifIndex": 12
+                },
+                {
+                    "ipv4_address": "10.153.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.153.1.0/24",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "10.153.1.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.153.1.0/24",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.0.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/24",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "169.254.0.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/24",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "169.254.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.1.0/24",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "169.254.1.254",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.1.0/24",
+                    "ifIndex": 10
                 }
             ]
         }

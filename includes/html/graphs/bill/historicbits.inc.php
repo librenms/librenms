@@ -58,7 +58,7 @@ function InvertCallback($x)
 
 function YCallback($y)
 {
-    return \LibreNMS\Util\Number::formatSi($y, 2, 0, '');
+    return \LibreNMS\Util\Number::formatSi($y, 0, 0, '');
 }
 
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);

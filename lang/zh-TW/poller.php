@@ -89,7 +89,7 @@ return [
             ],
             'watchdog_enabled' => [
                 'description' => '啟用看門狗',
-                'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated',
+                'help' => 'Watchdog monitors the log file and restarts the service if it has not been updated',
             ],
             'watchdog_log' => [
                 'description' => '看門狗記錄檔',

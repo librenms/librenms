@@ -124,7 +124,7 @@ if (! $device['status'] && ! $device['last_polled']) {
     $uptime = Time::formatInterval($device['uptime']);
     $uptime_text = 'Uptime';
 } else {
-    $uptime = Time::formatInterval(DeviceCache::getPrimary()->downSince()->diffInSeconds());
+    $uptime = Time::formatInterval((int) DeviceCache::getPrimary()->downSince()->diffInSeconds(null, true));
     $uptime_text = 'Downtime';
 }
 
@@ -185,8 +185,12 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
              var device_marker, device_location;
              if (device_map == null) {
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
-                config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
-                device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
+                var config = {
+                    "tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '",
+                    "engine": "' . $maps_engine . '",
+                    "api_key": "' . $maps_api . '"
+                };
+                device_map = init_map("location-map", config);
                 device_marker = L.marker(device_location).addTo(device_map);
                 let zoom = (device_location.lat === 0 && device_location.lng === 0) ? 2 : 17;
                 device_map.setView(device_location, zoom);

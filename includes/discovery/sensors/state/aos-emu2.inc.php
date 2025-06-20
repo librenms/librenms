@@ -1,4 +1,5 @@
 <?php
+
 /**
  * aos-emu2.inc.php
  *
@@ -21,26 +22,28 @@
  *
  * @copyright  2018 Ben Gibbons
  * @author     Ben Gibbons <axemann@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 // Input Contact discovery
+$oids = SnmpQuery::walk([
+    'PowerNet-MIB::emsInputContactStatusEntry',
+])->table(1);
 
-$contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry', 'PowerNet-MIB');
-
-foreach ($contacts['emu2_contacts'] as $id => $contact) {
-    $index = $contact['emsInputContactStatusInputContactIndex'];
+foreach ($oids as $id => $contact) {
+    $index = $contact['PowerNet-MIB::emsInputContactStatusInputContactIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
-    $descr = $contact['emsInputContactStatusInputContactName'];
-    $currentstate = $contact['emsInputContactStatusInputContactState'];
-    $normalstate = $contact['emsInputContactStatusInputContactNormalState'];
-    if (is_array($contacts['emu2_contacts']) && $normalstate == '1') {
+    $descr = $contact['PowerNet-MIB::emsInputContactStatusInputContactName'];
+    $currentstate = $contact['PowerNet-MIB::emsInputContactStatusInputContactState'];
+    $normalstate = $contact['PowerNet-MIB::emsInputContactStatusInputContactNormalState'];
+    if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsInputContactNormalState_NC';
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'],
             ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
-    } elseif (is_array($contacts['emu2_contacts']) && $normalstate == '2') {
+    } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsInputContactNormalState_NO';
         $states = [
             ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'],
@@ -49,28 +52,46 @@ foreach ($contacts['emu2_contacts'] as $id => $contact) {
         create_state_index($state_name, $states);
     }
 
-    discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
+    app('sensor-discovery')->discover(new \App\Models\Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $oid,
+        'sensor_index' => $index,
+        'sensor_type' => $state_name,
+        'sensor_descr' => $descr,
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_limit_low' => null,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit' => null,
+        'sensor_current' => $currentstate,
+        'entPhysicalIndex' => $index,
+        'entPhysicalIndex_measured' => null,
+        'user_func' => null,
+        'group' => null,
+    ]));
 }
 
 // Output Relay discovery
+$oids = SnmpQuery::walk([
+    'PowerNet-MIB::emsOutputRelayStatusEntry',
+])->table(1);
 
-$relays['emu2_relays'] = snmpwalk_group($device, 'emsOutputRelayStatusEntry', 'PowerNet-MIB');
-
-foreach ($relays['emu2_relays'] as $id => $relay) {
-    $index = $relay['emsOutputRelayStatusOutputRelayIndex'];
+foreach ($oids as $id => $relay) {
+    $index = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
-    $descr = $relay['emsOutputRelayStatusOutputRelayName'];
-    $currentstate = $relay['emsOutputRelayStatusOutputRelayState'];
-    $normalstate = $relay['emsOutputRelayStatusOutputRelayNormalState'];
-    if (is_array($relays['emu2_relays']) && $normalstate == '1') {
+    $descr = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayName'];
+    $currentstate = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayState'];
+    $normalstate = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayNormalState'];
+    if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutputRelayNormalState_NC';
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Closed'],
             ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Open'],
         ];
         create_state_index($state_name, $states);
-    } elseif (is_array($relays['emu2_relays']) && $normalstate == '2') {
+    } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsOutputRelayNormalState_NO';
         $states = [
             ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Closed'],
@@ -79,28 +100,46 @@ foreach ($relays['emu2_relays'] as $id => $relay) {
         create_state_index($state_name, $states);
     }
 
-    discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
+    app('sensor-discovery')->discover(new \App\Models\Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $oid,
+        'sensor_index' => $index,
+        'sensor_type' => $state_name,
+        'sensor_descr' => $descr,
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_limit_low' => null,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit' => null,
+        'sensor_current' => $currentstate,
+        'entPhysicalIndex' => $index,
+        'entPhysicalIndex_measured' => null,
+        'user_func' => null,
+        'group' => null,
+    ]));
 }
 
 // Outlet discovery
+$oids = SnmpQuery::walk([
+    'PowerNet-MIB::emsOutletStatusEntry',
+])->table(1);
 
-$outlets['emu2_outlets'] = snmpwalk_group($device, 'emsOutletStatusEntry', 'PowerNet-MIB');
-
-foreach ($outlets['emu2_outlets'] as $id => $outlet) {
-    $index = $outlet['emsOutletStatusOutletIndex'];
+foreach ($oids as $id => $outlet) {
+    $index = $outlet['PowerNet-MIB::emsOutletStatusOutletIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
-    $descr = $outlet['emsOutletStatusOutletName'];
-    $currentstate = $outlet['emsOutletStatusOutletState'];
-    $normalstate = $outlet['emsOutletStatusOutletNormalState'];
-    if (is_array($outlets['emu2_outlets']) && $normalstate == '1') {
+    $descr = $outlet['PowerNet-MIB::emsOutletStatusOutletName'];
+    $currentstate = $outlet['PowerNet-MIB::emsOutletStatusOutletState'];
+    $normalstate = $outlet['PowerNet-MIB::emsOutletStatusOutletNormalState'];
+    if (is_array($oids) && $normalstate == '1') {
         $state_name = 'emsOutletNormalState_ON';
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'On'],
             ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Off'],
         ];
         create_state_index($state_name, $states);
-    } elseif (is_array($outlets['emu2_outlets']) && $normalstate == '2') {
+    } elseif (is_array($oids) && $normalstate == '2') {
         $state_name = 'emsOutletNormalState_OFF';
         $states = [
             ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'On'],
@@ -109,6 +148,23 @@ foreach ($outlets['emu2_outlets'] as $id => $outlet) {
         create_state_index($state_name, $states);
     }
 
-    discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $currentstate, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
+    app('sensor-discovery')->discover(new \App\Models\Sensor([
+        'poller_type' => 'snmp',
+        'sensor_class' => 'state',
+        'sensor_oid' => $oid,
+        'sensor_index' => $index,
+        'sensor_type' => $state_name,
+        'sensor_descr' => $descr,
+        'sensor_divisor' => 1,
+        'sensor_multiplier' => 1,
+        'sensor_limit_low' => null,
+        'sensor_limit_low_warn' => null,
+        'sensor_limit_warn' => null,
+        'sensor_limit' => null,
+        'sensor_current' => $currentstate,
+        'entPhysicalIndex' => $index,
+        'entPhysicalIndex_measured' => null,
+        'user_func' => null,
+        'group' => null,
+    ]));
 }

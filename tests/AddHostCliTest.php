@@ -1,8 +1,9 @@
 <?php
+
 /**
  * addhostCliTest.php
  *
- * Tests for addhost.php cli tool
+ * Tests for lnms device:add cli tool
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

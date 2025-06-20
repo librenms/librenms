@@ -1,4 +1,5 @@
 <?php
+
 /**
  * QueryBuilderParser.php
  *
@@ -31,16 +32,6 @@ use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
 {
-    protected static $legacy_operators = [
-        '=' => 'equal',
-        '!=' => 'not_equal',
-        '~' => 'regex',
-        '!~' => 'not_regex',
-        '<' => 'less',
-        '>' => 'greater',
-        '<=' => 'less_or_equal',
-        '>=' => 'greater_or_equal',
-    ];
     protected static $operators = [
         'equal' => '=',
         'not_equal' => '!=',
@@ -154,84 +145,6 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         return new static($json);
-    }
-
-    /**
-     * Initialize this from a legacy LibreNMS rule
-     *
-     * @param  string  $query
-     * @return static
-     */
-    public static function fromOld($query)
-    {
-        $condition = null;
-        $rules = [];
-        $filter = new QueryBuilderFilter();
-
-        $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
-
-        foreach ($split as $chunk) {
-            if (count($chunk) < 2) {
-                if (empty($chunk[0])) {
-                    continue; // likely the ending && or ||
-                }
-
-                $chunk[1] = '';
-            }
-
-            @[$rule_text, $rule_operator] = $chunk;
-            if (! isset($condition)) {
-                // only allow one condition.  Since old rules had no grouping, this should hold logically
-                $condition = ($rule_operator == '||' ? 'OR' : 'AND');
-            }
-
-            $rule_split = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
-
-            $field = ltrim($rule_split[0], '%');
-            $op = $rule_split[1] ?? null;
-            $value = $rule_split[2] ?? null;
-
-            // for rules missing values just use '= 1'
-            $operator = isset(self::$legacy_operators[$op]) ? self::$legacy_operators[$op] : 'equal';
-            if (is_null($value)) {
-                $value = '1';
-            } else {
-                // value is a field, mark it with backticks
-                if (Str::startsWith($value, '%')) {
-                    $value = '`' . ltrim($value, '%') . '`';
-                } else {
-                    // but if it has quotes just remove the %
-                    $value = ltrim(trim($value, '"'), '%');
-                }
-
-                // replace regex placeholder, don't think we can safely convert to like operators
-                if ($operator == 'regex' || $operator == 'not_regex') {
-                    $value = str_replace('@', '.*', $value);
-                }
-            }
-
-            $filter_item = $filter->getFilter($field);
-
-            $type = $filter_item['type'];
-            $input = isset($filter_item['input']) ? $filter_item['input'] : 'text';
-
-            $rules[] = [
-                'id' => $field,
-                'field' => $field,
-                'type' => $type,
-                'input' => $input,
-                'operator' => $operator,
-                'value' => $value,
-            ];
-        }
-
-        $builder = [
-            'condition' => $condition,
-            'rules' => $rules,
-            'valid' => true,
-        ];
-
-        return new static($builder);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EltexMes23xx.php
  *
@@ -24,16 +25,22 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\EntPhysical;
+use App\Models\Ipv6Address;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS\Shared\Radlan;
 use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\Util\IPv6;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class EltexMes23xx extends Radlan implements TransceiverDiscovery
+class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -69,12 +76,10 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
-
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
-            ->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            ->mapTable(function ($data, $ifIndex) {
                 return new Transceiver([
-                    'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                     'index' => $ifIndex,
                     'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
                     'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
@@ -93,6 +98,36 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery
      */
     protected function normData(string $par = ''): string
     {
-        return StringHelpers::isHex($par) ? StringHelpers::hexToAscii($par, ' ') : $par;
+        return StringHelpers::isHex($par, ' ') ? StringHelpers::hexToAscii($par, ' ') : $par;
+    }
+
+    public function discoverIpv6Addresses(): Collection
+    {
+        $ips = new Collection;
+
+        $ips = $ips->merge(SnmpQuery::enumStrings()->walk([
+            'IP-MIB::ipAddressIfIndex.ipv6',
+            'RADLAN-IPv6::rlIpAddressTable',
+        ])->mapTable(function ($data, $addrType, $address = '') {
+            if ($addrType == 'ipv6') {
+                try {
+                    $ip = IPv6::fromHexString($address);
+
+                    return new Ipv6Address([
+                        'ipv6_address' => $ip->uncompressed(),
+                        'ipv6_compressed' => $ip->compressed(),
+                        'ipv6_prefixlen' => $data['RADLAN-IPv6::rlIpAddressPrefixLength'] ?? '',
+                        'ipv6_origin' => $data['RADLAN-IPv6::rlIpAddressType'] ?? 'unknown',
+                        'port_id' => PortCache::getIdFromIfIndex($data['IP-MIB::ipAddressIfIndex'], $this->getDevice()),
+                    ]);
+                } catch (InvalidIpException $e) {
+                    Log::error('Failed to parse IP: ' . $e->getMessage());
+
+                    return null;
+                }
+            }
+        }));
+
+        return $ips->filter();
     }
 }

@@ -1,0 +1,45 @@
+os: iosxe
+group: cisco
+text: 'Cisco IOS-XE'
+type: network
+ifXmcbc: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: cisco
+mib_dir: cisco
+poller_modules:
+    cisco-ace-serverfarms: true
+    cisco-ace-loadbalancer: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-remote-access-monitor: true
+    slas: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    ipmi: false
+    cisco-vpdn: true
+    cisco-qfp: true
+    xdsl: true
+discovery_modules:
+    cisco-cef: true
+    slas: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+    cisco-qfp: true
+    xdsl: true
+discovery:
+    -
+        sysDescr:
+            - IOS-XE
+            - IOSXE
+            - LINUX_IOSD
+            - CAT3K_CAA
+bad_iftype:
+    - macSecControlledIF
+    - macSecUncontrolledIF

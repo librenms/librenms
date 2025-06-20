@@ -1,0 +1,33 @@
+os: ciscowlc
+text: 'Cisco WLC'
+type: wireless
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_wireless_ap-count, text: 'Connected APs' }
+    - { graph: device_wireless_clients, text: 'Number of Clients' }
+icon: cisco
+poller_modules:
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-remote-access-monitor: true
+    slas: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+discovery_modules:
+    cisco-cef: true
+    slas: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+mib_dir: cisco
+discovery:
+    -
+        sysDescr:
+            - 'Cisco Controller'
+            - 'Cisco Business Wireless'

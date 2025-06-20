@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Programs.php
  *
@@ -105,9 +106,9 @@ class Programs extends BaseValidation
 
         if ($getcap = $this->findExecutable('getcap')) {
             $getcap_out = shell_exec("$getcap $cmd");
-            preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
+            preg_match("#^$cmd (.*)$#", $getcap_out, $matches);
 
-            if (empty($matches) || ! Str::contains($matches[1], 'cap_net_raw+ep')) {
+            if (empty($matches) || ! Str::contains($matches[1], ['cap_net_raw+ep', 'cap_net_raw=ep'])) {
                 $validator->fail(
                     "$cmd should have CAP_NET_RAW!",
                     "setcap cap_net_raw+ep $cmd"

@@ -445,7 +445,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 98,
-                    "sensor_limit": 101,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 15,
                     "sensor_limit_low_warn": 50,
@@ -1170,7 +1170,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 98,
-                    "sensor_limit": 101,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 15,
                     "sensor_limit_low_warn": 50,
@@ -1878,6 +1878,26 @@
                     "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.0.104",
+                    "ipv4_prefixlen": 20,
+                    "context_name": "",
+                    "ipv4_network": "192.168.0.0/20",
+                    "ifIndex": 2
                 }
             ]
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS discovery module for Terra-sdi480 bitrates
  *
@@ -29,72 +30,70 @@ $limitwarn = 49 * 1000 * 1000; // 49 mbps
 $lowwarnlimit = 1 * 1000 * 1000; // 1 mbps
 $lowlimit = 100 * 1000; // 0.1 mbps
 
-if (is_array($pre_cache['sdi480status'])) {
+$oids = SnmpQuery::cache()->hideMib()->walk('TERRA-sdi480-MIB::sdi480status')->table(1);
+
+if (is_array($oids)) {
     d_echo('Terra sdi480 Bitrates');
 
     //inputs from SAT
     for ($inputid = 1; $inputid <= 8; $inputid++) {
-        $br = $pre_cache['sdi480status'][0]['inbr' . $inputid];
+        $br = $oids[0]['inbr' . $inputid];
         if ($br) {
             $oid = '.1.3.6.1.4.1.30631.1.17.1.' . $inputid . '.4.0';
             $type = 'terra_brin';
             $descr = 'In# ' . sprintf('%02d', $inputid);
             $value = $br * $multiplier;
-            $group = 'Inputs';
-            discover_sensor(
-                null,
-                'bitrate',
-                $device,
-                $oid,
-                $inputid,
-                $type,
-                $descr,
-                $divisor,
-                $multiplier,
-                $lowlimit,
-                $lowwarnlimit,
-                $limitwarn,
-                $limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                $group
-            );
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'bitrate',
+                'sensor_oid' => $oid,
+                'sensor_index' => $inputid,
+                'sensor_type' => $type,
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $lowlimit,
+                'sensor_limit_low_warn' => $lowwarnlimit,
+                'sensor_limit_warn' => $limitwarn,
+                'sensor_limit' => $limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => null,
+                'entPhysicalIndex_measured' => null,
+                'user_func' => null,
+                'group' => 'Inputs',
+            ]));
         }
     }
 
     //outputs per stream
     for ($outputid = 1; $outputid <= 576; $outputid++) {
-        $br = $pre_cache['sdi480status'][0]['outBr' . $outputid];
+        $br = $oids[0]['outBr' . $outputid];
         if ($br) {
             $oid = '.1.3.6.1.4.1.30631.1.17.1.' . (9 + $outputid) . '.1.0';
             $type = 'terra_brout';
             $descr = 'Out# ' . sprintf('%03d', $outputid);
             $value = $br * $multiplier;
-            $group = 'Streams';
-            discover_sensor(
-                null,
-                'bitrate',
-                $device,
-                $oid,
-                $outputid,
-                $type,
-                $descr,
-                $divisor,
-                $multiplier,
-                $lowlimit,
-                $lowwarnlimit,
-                $limitwarn,
-                $limit,
-                $value,
-                'snmp',
-                null,
-                null,
-                null,
-                $group
-            );
+
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'bitrate',
+                'sensor_oid' => $oid,
+                'sensor_index' => $outputid,
+                'sensor_type' => $type,
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => $lowlimit,
+                'sensor_limit_low_warn' => $lowwarnlimit,
+                'sensor_limit_warn' => $limitwarn,
+                'sensor_limit' => $limit,
+                'sensor_current' => $value,
+                'entPhysicalIndex' => null,
+                'entPhysicalIndex_measured' => null,
+                'user_func' => null,
+                'group' => 'Streams',
+            ]));
         }
     }
 }

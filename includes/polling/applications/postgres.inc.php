@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postgres';
@@ -55,7 +56,7 @@ $fields = [
 $metrics['none'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //process each database
 $db_lines = explode("\n", $postgres);
@@ -92,7 +93,7 @@ while (isset($db_lines[$db_lines_int])) {
 
     $metrics[$dbname] = $fields;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $db_lines_int++;
 }
@@ -112,7 +113,7 @@ if (count($added_databases) > 0 || count($removed_databases) > 0) {
     if (count($removed_databases)) {
         $log_message .= ' Removed ' . implode(',', $removed_databases);
     }
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 update_application($app, $postgres, $metrics);

@@ -6546,5 +6546,42 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe7a:3ea0",
+                    "ipv6_compressed": "fe80::21f:ceff:fe7a:3ea0",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 3025
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe7a:3ea0",
+                    "ipv6_compressed": "fe80::21f:ceff:fe7a:3ea0",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 3567
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.11.11.3",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.11.11.0/24",
+                    "ifIndex": 3025
+                }
+            ]
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * StringHelpers.php
  *
@@ -27,22 +28,6 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
-    /**
-     * Shorten text over 50 chars, if shortened, add ellipsis
-     *
-     * @param  string  $string
-     * @param  int  $max
-     * @return string
-     */
-    public static function shortenText($string, $max = 30)
-    {
-        if (strlen($string) > 50) {
-            return substr($string, 0, $max) . '...';
-        }
-
-        return $string;
-    }
-
     public static function niceCase($string)
     {
         $replacements = [
@@ -201,8 +186,25 @@ class StringHelpers
         return preg_replace($regex, '', str_replace("\n", '', $string));
     }
 
-    public static function isHex(string $string): bool
+    /**
+     * If string has a number at the start (excluding whitespace) that can be extraced by Number::cast()
+     */
+    public static function hasNumber(string $string): bool
     {
-        return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
+        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+    }
+
+    public static function isHex(string $string, string $delimiter = ''): bool
+    {
+        $string = trim($string);
+
+        if ($delimiter === '') {
+            return (bool) preg_match('/^(?:[[:xdigit:]]{2})+$/', $string);
+        }
+
+        $escapedDelimiter = preg_quote($delimiter, '/');
+        $pattern = '/^[[:xdigit:]]{2}(?:' . $escapedDelimiter . '[[:xdigit:]]{2})*$/';
+
+        return (bool) preg_match($pattern, $string);
     }
 }

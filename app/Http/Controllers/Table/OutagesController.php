@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OutagesController.php
  *
@@ -27,11 +28,13 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
+    protected $model = DeviceOutage::class;
+
     public function rules()
     {
         return [
@@ -84,7 +87,7 @@ class OutagesController extends TableController
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => $outage->device ? Url::deviceLink($outage->device, $outage->device->shortDisplayName()) : null,
+            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
             'duration' => $this->formatTime($duration),
         ];
     }
@@ -130,5 +133,36 @@ class OutagesController extends TableController
         $output = "<span class='alert-status " . $label . "'></span>";
 
         return $output;
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Start',
+            'End',
+            'Duration',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  DeviceOutage  $outage
+     * @return array
+     */
+    protected function formatExportRow($outage)
+    {
+        return [
+            $outage->device ? $outage->device->displayName() : '',
+            $this->formatDatetime($outage->going_down),
+            $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
+            $this->formatTime(($outage->up_again ?: time()) - $outage->going_down),
+        ];
     }
 }

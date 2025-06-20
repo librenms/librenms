@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -38,8 +39,11 @@ class Port extends DeviceRelatedModel
             $port->macAccounting()->delete();
             $port->macs()->delete();
             $port->nac()->delete();
+            $port->nd()->delete();
             $port->ospfNeighbors()->delete();
             $port->ospfPorts()->delete();
+            $port->ospfv3Neighbors()->delete();
+            $port->ospfv3Ports()->delete();
             $port->pseudowires()->delete();
             $port->statistics()->delete();
             $port->stp()->delete();
@@ -291,60 +295,92 @@ class Port extends DeviceRelatedModel
     }
 
     // ---- Define Relationships ----
-
-    public function adsl(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortAdsl, $this>
+     */
+    public function adsl(): HasOne
     {
         return $this->hasOne(PortAdsl::class, 'port_id');
     }
 
-    public function vdsl(): \Illuminate\Database\Eloquent\Relations\HasOne
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortVdsl, $this>
+     */
+    public function vdsl(): HasOne
     {
         return $this->hasOne(PortVdsl::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>
+     */
     public function events(): MorphMany
     {
         return $this->morphMany(Eventlog::class, 'events', 'type', 'reference');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsFdb, $this>
+     */
     public function fdbEntries(): HasMany
     {
-        return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
+        return $this->hasMany(PortsFdb::class, 'port_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\PortGroup, $this>
+     */
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
+        return $this->belongsToMany(PortGroup::class, 'port_group_port', 'port_id', 'port_group_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Address, $this>
+     */
     public function ipv4(): HasMany
     {
         return $this->hasMany(Ipv4Address::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv4Network, \App\Models\Ipv4Address, $this>
+     */
     public function ipv4Networks(): HasManyThrough
     {
         return $this->hasManyThrough(Ipv4Network::class, Ipv4Address::class, 'port_id', 'ipv4_network_id', 'port_id', 'ipv4_network_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Address, $this>
+     */
     public function ipv6(): HasMany
     {
         return $this->hasMany(Ipv6Address::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Ipv6Network, \App\Models\Ipv6Address, $this>
+     */
     public function ipv6Networks(): HasManyThrough
     {
         return $this->hasManyThrough(Ipv6Network::class, Ipv6Address::class, 'port_id', 'ipv6_network_id', 'port_id', 'ipv6_network_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     */
     public function links(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'local_port_id');
+        return $this->hasMany(Link::class, 'local_port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Link, $this>
+     */
     public function remoteLinks(): HasMany
     {
-        return $this->hasMany(\App\Models\Link::class, 'remote_port_id');
+        return $this->hasMany(Link::class, 'remote_port_id');
     }
 
     public function allLinks(): \Illuminate\Support\Collection
@@ -352,88 +388,184 @@ class Port extends DeviceRelatedModel
         return $this->links->merge($this->remoteLinks);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function xdpLinkedPorts(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'links', 'local_port_id', 'remote_port_id');
     }
 
-    public function macLinkedPorts(): BelongsToMany
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\Ipv4Mac, $this>
+     */
+    public function macLinkedPorts(): HasManyThrough
     {
-        return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
+        return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'port_id', 'ifPhysAddress', 'port_id', 'mac_address')
+            ->join('ipv4_addresses', function ($j) {
+                $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
+                $j->on('ports.port_id', 'ipv4_addresses.port_id');
+            })
+            ->whereNotIn('mac_address', ['000000000000', 'ffffffffffff']);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MacAccounting, $this>
+     */
     public function macAccounting(): HasMany
     {
         return $this->hasMany(MacAccounting::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Mac, $this>
+     */
     public function macs(): HasMany
     {
         return $this->hasMany(Ipv4Mac::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsNac, $this>
+     */
     public function nac(): HasMany
     {
         return $this->hasMany(PortsNac::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv6Nd, $this>
+     */
+    public function nd(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfNbr, $this>
+     */
     public function ospfNeighbors(): HasMany
     {
         return $this->hasMany(OspfNbr::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\OspfPort, $this>
+     */
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(OspfPort::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Nbr, $this>
+     */
+    public function ospfv3Neighbors(): HasMany
+    {
+        return $this->hasMany(Ospfv3Nbr::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ospfv3Port, $this>
+     */
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(Ospfv3Port::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
     public function pagpParent(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'pagpGroupIfIndex', 'ifIndex');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Pseudowire, $this>
+     */
     public function pseudowires(): HasMany
     {
         return $this->hasMany(Pseudowire::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Qos, $this>
+     */
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class, 'port_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\PortStack, $this>
+     */
     public function stackChildren(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, PortStack::class, 'low_port_id', 'port_id', 'port_id', 'high_port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\PortStack, $this>
+     */
     public function stackParent(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, PortStack::class, 'high_port_id', 'port_id', 'port_id', 'low_port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStatistic, $this>
+     */
     public function statistics(): HasMany
     {
         return $this->hasMany(PortStatistic::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortStp, $this>
+     */
     public function stp(): HasMany
     {
         return $this->hasMany(PortStp::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Transceiver, $this>
+     */
     public function transceivers(): HasMany
     {
         return $this->hasMany(Transceiver::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\User, $this>
+     */
     public function users(): BelongsToMany
     {
         // FIXME does not include global read
-        return $this->belongsToMany(\App\Models\User::class, 'ports_perms', 'port_id', 'user_id');
+        return $this->belongsToMany(User::class, 'ports_perms', 'port_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortVlan, $this>
+     */
     public function vlans(): HasMany
     {
         return $this->hasMany(PortVlan::class, 'port_id');
     }
 
-    public function vrf()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Vrf, $this>
+     */
+    public function vrf(): HasOne
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
     }

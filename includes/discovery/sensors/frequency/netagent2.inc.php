@@ -1,4 +1,5 @@
 <?php
+
 /**
  * netagent2.inc.php
  *
@@ -69,7 +70,7 @@ if ($in_phaseNum == '1') {
     }
     // Output Frequency
     $out_frequency_oid = '.1.3.6.1.4.1.935.1.1.1.4.2.2.0';
-    $out_frequency = snmp_get($device, $frequency_oid, '-Oqv');
+    $out_frequency = snmp_get($device, $out_frequency_oid, '-Oqv');
 
     if (! empty($out_frequency) || $out_frequency == 0) {
         $type = 'netagent2';

@@ -1537,8 +1537,8 @@
                     "ifName": "default",
                     "portName": null,
                     "ifIndex": 200000001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1637,8 +1637,8 @@
                     "ifName": "Customer",
                     "portName": null,
                     "ifIndex": 200000005,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1737,8 +1737,8 @@
                     "ifName": "Manage",
                     "portName": null,
                     "ifIndex": 200000061,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2159,5 +2159,20 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0003:0000:0000:ba38:61ff:fe68:8b28",
+                    "ipv6_compressed": "fe80:3::ba38:61ff:fe68:8b28",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "unknown",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 200000061
+                }
+            ]
+        }
     }
 }

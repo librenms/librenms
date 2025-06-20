@@ -1,11 +1,15 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 echo 'JUNIPER-VLAN-MIB VLANs: ';
 
 $vlanversion = snmp_get($device, 'dot1qVlanVersionNumber.0', '-Oqv', 'IEEE8021-Q-BRIDGE-MIB');
 
 if ($vlanversion == 'version1' || $vlanversion == '2') {
     echo "ver $vlanversion ";
+    $tagness_by_vlan_index = [];
     $vtpdomain_id = '1';
     $vlans = snmpwalk_cache_oid($device, 'jnxExVlanName', [], 'JUNIPER-VLAN-MIB');
     if (empty($vlans)) {
@@ -34,41 +38,57 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }
         //set all port vlan relationships to be tagged
         foreach ($taganduntag as $key => $taganduntag) {
+            if (empty($taganduntag['dot1qVlanStaticEgressPorts'])) {
+                continue;
+            }
+
             $vlan_index = array_search($key, $temp_vlan);
             $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
             foreach ($port_on_vlan as $port) {
-                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 0;
+                if (isset($base_to_index[$port])) {
+                    $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 0;
+                }
+
                 unset($tagness_by_vlan_index[$vlan_index]['']);
             }
         }
         // correct all untagged ports to be untagged
         foreach ($untag as $key => $untag) {
+            if (empty($untag['dot1qVlanStaticUntaggedPorts'])) {
+                continue;
+            }
+
             $vlan_index = array_search($key, $temp_vlan);
             $port_on_vlan = explode(',', $untag['dot1qVlanStaticUntaggedPorts']);
             foreach ($port_on_vlan as $port) {
-                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 1;
+                if (isset($base_to_index[$port])) {
+                    $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 1;
+                }
+
                 unset($tagness_by_vlan_index[$vlan_index]['']);
             }
         }
     } else {
         foreach ($untag as $key => $tagness) {
             $key = explode('.', $key);
+            $base = $base_to_index[$key[1]] ?? '';
+
             if ($tagness['jnxExVlanPortTagness'] == 2) {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 1;
+                $tagness_by_vlan_index[$key[0]][$base]['tag'] = 1;
             } else {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 0;
+                $tagness_by_vlan_index[$key[0]][$base]['tag'] = 0;
             }
         }
     }
     foreach ($vlans as $vlan_index => $vlan) {
         $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
         d_echo("VLAN --> $vlan_id");
-        if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+        if (! empty($vlans_db) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
                 $vlan_upd['vlan_name'] = $vlan[$tmp_name];
                 dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan[$tmp_name]} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
+                Eventlog::log("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan[$tmp_name]} ", $device['device_id'], 'vlan', Severity::Notice, $vlan_data['vlan_id']);
                 echo 'U';
             } else {
                 echo '.';

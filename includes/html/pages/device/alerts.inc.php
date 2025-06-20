@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -55,7 +56,7 @@ switch ($vars['section']) {
         break;
     case 'alert-log':
         $vars['fromdevice'] = true;
-        $device_id = (int) $vars['device'];
+        $vars['device_id'] = (int) $vars['device'];
         include 'includes/html/modal/alert_details.php';
         include 'includes/html/common/alert-log.inc.php';
         echo implode('', $common_output);

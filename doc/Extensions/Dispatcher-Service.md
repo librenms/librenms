@@ -117,6 +117,12 @@ Additional configuration settings can be set in your config.
 The defaults are shown here - it's recommended that you at least tune
 the number of workers.
 
+!!! warning "Workers"
+    The number of workers configured will be evenly split amongst the number of poller
+    groups configured. I.e if you have 4 groups and 24 workers then each group will get 
+    6 workers. If you have an uneven distribution of devices between the groups then you
+    should consider setting the workers value higher.
+
 !!! setting "poller/dispatcherservice"
     ```bash
     lnms config:set service_poller_workers 24
@@ -134,7 +140,7 @@ Optional Settings
     lnms config:set service_poller_frequency 300
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
-    lnms config:set schedule_type.alert dispatcher
+    lnms config:set schedule_type.alerting dispatcher
     lnms config:set schedule_type.billing dispatcher
     lnms config:set service_billing_frequency 300
     lnms config:set service_billing_calculate_frequency 60

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CommonFunctionsTest.php
  *
@@ -41,14 +42,14 @@ class CommonFunctionsTest extends TestCase
         $this->assertTrue(Str::contains($data, 'Just'));
         $this->assertFalse(Str::contains($data, 'just'));
 
-        $this->assertTrue(str_i_contains($data, 'juSt'));
-        $this->assertFalse(str_i_contains($data, 'nope'));
+        $this->assertTrue(Str::contains($data, 'juSt', ignoreCase: true));
+        $this->assertFalse(Str::contains($data, 'nope', ignoreCase: true));
 
         $this->assertTrue(Str::contains($data, ['not', 'this', 'This']));
         $this->assertFalse(Str::contains($data, ['not', 'this']));
 
-        $this->assertTrue(str_i_contains($data, ['not', 'thIs']));
-        $this->assertFalse(str_i_contains($data, ['not', 'anything']));
+        $this->assertTrue(Str::contains($data, ['not', 'thIs'], ignoreCase: true));
+        $this->assertFalse(Str::contains($data, ['not', 'anything'], ignoreCase: true));
     }
 
     public function testStartsWith(): void
@@ -94,6 +95,10 @@ class CommonFunctionsTest extends TestCase
     {
         $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', Clean::html('<html>string</html>', []));
         $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', Clean::html('<script>alert("test")</script>', []));
+        $this->assertEquals("Is your name O'reilly?", Clean::html("Is your name O\'reilly?", []));
+        $this->assertEquals("Is your name O'reilly?", Clean::html("Is your name O\'reilly?"));
+        $this->assertEquals('', Clean::html(''));
+        $this->assertEquals('', Clean::html(null));
 
         $tmp_config = [
             'HTML.Allowed' => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',

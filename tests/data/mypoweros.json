@@ -11137,8 +11137,8 @@
                     "ifName": "null0",
                     "portName": null,
                     "ifIndex": 190,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -33149,5 +33149,40 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "10fe:8000:0000:0000:0000:0000:0000:0000",
+                    "ipv6_compressed": "10fe:8000::",
+                    "ipv6_prefixlen": 10,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": "10c0::/10",
+                    "ifIndex": 190
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "192.168.32.193",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.32.0/24",
+                    "ifIndex": 192
+                },
+                {
+                    "ipv4_address": "74.8.95.193",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "74.8.95.0/24",
+                    "ifIndex": 191
+                }
+            ]
+        }
     }
 }

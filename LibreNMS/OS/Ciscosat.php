@@ -60,7 +60,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 'ciscosat-cn-margin',
                 $index,
                 'C/N Link Margin  ' . $index,
-                $entry
+                $entry['satSignalCnMargin']
             );
         }
 
@@ -74,7 +74,7 @@ class Ciscosat extends OS implements WirelessErrorsDiscovery, WirelessRssiDiscov
                 'ciscosat-cn-ratio',
                 $index,
                 'C/N Ratio ' . $index,
-                $entry
+                $entry['satSignalCndisp']
             );
         }
 

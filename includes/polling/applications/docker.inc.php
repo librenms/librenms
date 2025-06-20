@@ -68,15 +68,15 @@ foreach ($docker_data as $data) {
         'mem_perc' => (float) $data['memory']['perc'],
         'mem_used' => (int) Number::toBytes($data['memory']['used']),
         'mem_limit' => (int) Number::toBytes($data['memory']['limit']),
-        'uptime' => $data['state']['uptime'],
-        'size_rw' => $data['size']['size_rw'],
-        'size_root_fs' => $data['size']['size_root_fs'],
+        'uptime' => $data['state']['uptime'] ?? null,
+        'size_rw' => $data['size']['size_rw'] ?? null,
+        'size_root_fs' => $data['size']['size_root_fs'] ?? null,
     ];
 
     $rrd_name = ['app', $name, $app->app_id, $container];
     $metrics[$container] = $fields;
     $tags = ['name' => $container, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 $rrd_def = RrdDefinition::make();
@@ -85,7 +85,7 @@ foreach ($totals as $status => $value) {
 }
 $rrd_name = ['app', $name, $app->app_id];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $totals);
+app('Datastore')->put($device, 'app', $tags, $totals);
 
 $metrics['total'] = $totals;
 

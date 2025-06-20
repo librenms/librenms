@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Compare.php
  *
@@ -78,9 +79,9 @@ class Compare
             case 'not_ends':
                 return ! Str::endsWith($a, $b);
             case 'regex':
-                return (bool) preg_match($b, $a);
+                return Str::isMatch($b, $a);
             case 'not_regex':
-                return ! ((bool) preg_match($b, $a));
+                return ! Str::isMatch($b, $a);
             case 'in_array':
                 return in_array($a, $b);
             case 'not_in_array':

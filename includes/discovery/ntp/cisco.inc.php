@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture statistics from the CISCO-NTP-MIB
  *
@@ -19,7 +20,7 @@ $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id'], ['type' => $module]);
 
 // We only care about our device id.
-$components = $components[$device['device_id']];
+$components = $components[$device['device_id']] ?? [];
 
 // Begin our master array, all other values will be processed into this array.
 $tblComponents = [];
@@ -42,7 +43,7 @@ if (is_null($cntpPeersVarEntry)) {
     d_echo("Objects Found:\n");
 
     // Let's grab the index for each NTP peer
-    foreach ((array) $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][2] as $index => $value) {
+    foreach ((array) ($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][2] ?? []) as $index => $value) {
         $result = [];
         $result['UID'] = (string) $index;    // This is cast as a string so it can be compared with the database value.
         $result['peer'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][3][$index];

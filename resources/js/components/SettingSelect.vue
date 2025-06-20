@@ -39,7 +39,7 @@
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting";
+    import BaseSetting from "./BaseSetting.vue";
 
     export default {
         name: "SettingSelect",

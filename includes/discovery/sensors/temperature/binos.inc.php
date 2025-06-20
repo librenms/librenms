@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Telco Systems Temperature Sensor Discovery module
  *
