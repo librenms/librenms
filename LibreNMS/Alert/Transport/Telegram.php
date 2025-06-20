@@ -78,11 +78,13 @@ class Telegram extends Transport
                 switch ($send_as) {
                     case 'photo':
                         $res = Http::client()->attach('photo', $image, $file_name)
-                            ->post($url_send_photo . '?chat_id=' . $base_params['chat_id']);
+                            ->withQueryParameters($base_params)
+                            ->post($url_send_photo);
                         break;
                     case 'file':
                         $res = Http::client()->attach('document', $image, $file_name)
-                            ->post($url_send_file . '?chat_id=' . $base_params['chat_id']);
+                            ->withQueryParameters($base_params)
+                            ->post($url_send_file);
                         break;
                 }
             }
