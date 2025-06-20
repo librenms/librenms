@@ -12,8 +12,10 @@
  * the source code distribution for details.
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\MaintenanceAlertBehavior;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
@@ -43,6 +45,9 @@ if ($sub_type == 'new-maintenance') {
     $start = $_POST['start'];
     [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
     $end = $_POST['end'];
+    $behavior = isset($_POST['behavior'])
+        ? $_POST['behavior']
+        : LibrenmsConfig::get('webui.scheduled_maintenance_default_behavior');
     $maps = $_POST['maps'] ?? null;
 
     if (isset($duration_hour) && isset($duration_min)) {
@@ -110,6 +115,12 @@ if ($sub_type == 'new-maintenance') {
         $end_recurring_hr = '00:00:00';
     }
 
+    if (empty($_POST['behavior'])) {
+        $message .= 'Missing behavior<br />';
+    } elseif (! MaintenanceAlertBehavior::is_valid_option($behavior)) {
+        $message .= 'Invalid behavior<br />';
+    }
+
     if (! is_array($maps)) {
         $message .= 'Not mapped to any groups or devices<br />';
     }
@@ -118,6 +129,7 @@ if ($sub_type == 'new-maintenance') {
         $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
         $alert_schedule->title = $title;
         $alert_schedule->notes = $notes;
+        $alert_schedule->behavior = $behavior;
         $alert_schedule->recurring = $recurring;
         $alert_schedule->start = $start;
         $alert_schedule->end = $end;
