@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"status\":\"test2\",\"build_info\":\"test\",\"history\":null,\"sets\":[\"13relengAMD64-default\",\"13relengI386-default\"]}",
+                    "data": "{\"status\":\"test2\",\"build_info\":\"test\",\"history\":"",\"sets\":[\"13relengAMD64-default\",\"13relengI386-default\"]}",
                     "deleted_at": null
                 }
             ],
