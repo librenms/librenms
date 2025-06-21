@@ -116,8 +116,8 @@ $data = $returned['data'];
 $metrics = [];
 $old_data = $app->data;
 $new_data = [
-    'backend' => $data['backend'],
-    'uid_mapping' => $data['uid_mapping'],
+    'backend' => $data['backend'] ?? null,
+    'uid_mapping' => $data['uid_mapping'] ?? null,
     'oslvm_data' => [],
     'inactive' => [],
     'has' => [],
@@ -128,40 +128,44 @@ if (isset($data['has']) && is_array($data['has'])) {
 }
 
 // process total stats, .data.totals
-foreach ($stat_vars as $key => $stat) {
-    if (isset($data['totals'][$stat])) {
-        $var_name = 'totals_' . $stat;
-        $value = $data['totals'][$stat];
-        $rrd_name = ['app', $name, $app->app_id, $var_name];
-        $fields = ['data' => $value];
-        $metrics[$var_name] = $value;
-        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-        app('Datastore')->put($device, 'app', $tags, $fields);
+if (isset($data['totals']) && is_array($data['totals'])) {
+    foreach ($stat_vars as $key => $stat) {
+        if (isset($data['totals'][$stat])) {
+            $var_name = 'totals_' . $stat;
+            $value = $data['totals'][$stat];
+            $rrd_name = ['app', $name, $app->app_id, $var_name];
+            $fields = ['data' => $value];
+            $metrics[$var_name] = $value;
+            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
+            app('Datastore')->put($device, 'app', $tags, $fields);
+        }
     }
 }
 
 // process each oslvm under .data.oslvms
 $oslvms = [];
 $current_time = now()->format('U');
-foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
-    $new_data['oslvm_data'][$oslvms_key] = [
-        'ip' => $oslvms_stats['ip'],
-        'path' => $oslvms_stats['path'],
-        'seen' => $current_time,
-    ];
+if (isset($data['oslvms']) && is_array($data['oslvms'])) {
+    foreach ($data['oslvms'] as $oslvms_key => $oslvms_stats) {
+        $new_data['oslvm_data'][$oslvms_key] = [
+            'ip' => $oslvms_stats['ip'],
+            'path' => $oslvms_stats['path'],
+            'seen' => $current_time,
+        ];
 
-    $metrics['running_' . $oslvms_key] = 1;
+        $metrics['running_' . $oslvms_key] = 1;
 
-    $oslvms[] = $oslvms_key;
-    foreach ($stat_vars as $key => $stat) {
-        if (isset($oslvms_stats[$stat])) {
-            $var_name = 'oslvm___' . $oslvms_key . '___' . $stat;
-            $value = $oslvms_stats[$stat];
-            $rrd_name = ['app', $name, $app->app_id, $var_name];
-            $fields = ['data' => $value];
-            $metrics[$var_name] = $value;
-            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
-            app('Datastore')->put($device, 'app', $tags, $fields);
+        $oslvms[] = $oslvms_key;
+        foreach ($stat_vars as $key => $stat) {
+            if (isset($oslvms_stats[$stat])) {
+                $var_name = 'oslvm___' . $oslvms_key . '___' . $stat;
+                $value = $oslvms_stats[$stat];
+                $rrd_name = ['app', $name, $app->app_id, $var_name];
+                $fields = ['data' => $value];
+                $metrics[$var_name] = $value;
+                $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
+                app('Datastore')->put($device, 'app', $tags, $fields);
+            }
         }
     }
 }
