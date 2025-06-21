@@ -78,7 +78,7 @@ class Epmp extends OS implements
                 'numTracked' => $cambiumGPSNumTrackedSat,
                 'numVisible' => $cambiumGPSNumVisibleSat,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($device, 'cambium-epmp-gps', $tags, $fields);
             $this->enableGraph('cambium_epmp_gps');
         }
@@ -93,7 +93,7 @@ class Epmp extends OS implements
                 'uplinkMCSMode' => $cambiumSTAUplinkMCSMode,
                 'downlinkMCSMode' => $cambiumSTADownlinkMCSMode,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($device, 'cambium-epmp-modulation', $tags, $fields);
             $this->enableGraph('cambium_epmp_modulation');
         }
@@ -111,7 +111,7 @@ class Epmp extends OS implements
                 'entryAccess' => $sysNetworkEntrySuccess,
                 'authFailure' => $sysNetworkEntryAuthenticationFailure,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($device, 'cambium-epmp-access', $tags, $fields);
             $this->enableGraph('cambium_epmp_access');
         }
@@ -135,7 +135,7 @@ class Epmp extends OS implements
                 'ulwlanframeutilization' => $ulWlanFrameUtilization,
                 'dlwlanframeutilization' => $dlWlanFrameUtilization,
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($device, 'cambium-epmp-frameUtilization', $tags, $fields);
             $this->enableGraph('cambium-epmp-frameUtilization');
         }

@@ -75,7 +75,7 @@ class OpenTSDBStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
 
-        $opentsdb->write('fake', [], ['one' => 1]);
+        $opentsdb->write('fake', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -92,7 +92,7 @@ class OpenTSDBStoreTest extends TestCase
             ->with("put net.testmeasure $this->timestamp 234234.000000 hostname=testhost ifName=testifname type=testtype key=ifIn\n")->once();
         $mockSocket->shouldReceive('write')
             ->with("put net.testmeasure $this->timestamp 53453.000000 hostname=testhost ifName=testifname type=testtype key=ifOut\n")->once();
-        $opentsdb->write($measurement, $tags, $fields, $meta);
+        $opentsdb->write($measurement, $fields, $tags, $meta);
     }
 
     public function testPortWrite(): void
@@ -114,7 +114,7 @@ class OpenTSDBStoreTest extends TestCase
             ->with("put net.port.ifin $this->timestamp 897238.000000 hostname=testhost ifName=testifname type=testtype\n")->once();
         $mockSocket->shouldReceive('write')
             ->with("put net.port.ifout $this->timestamp 2342.000000 hostname=testhost ifName=testifname type=testtype\n")->once();
-        $opentsdb->write($measurement, $tags, $fields);
+        $opentsdb->write($measurement, $fields, $tags);
     }
 
     /**
