@@ -12,7 +12,7 @@ if ($action == 'delete_bill' && $confirm == 'confirm') {
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo "<meta http-equiv='Refresh' content=\"2; url='" . url('bills') . "'\">";
 }
 
 if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
@@ -27,7 +27,7 @@ if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
 
     echo '<div class=infobox>Bill Resetting. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo "<meta http-equiv='Refresh' content=\"2; url='" . url('bills') . "'\">";
 }
 
 if ($action == 'add_bill_port') {
