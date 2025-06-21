@@ -39,7 +39,7 @@ class KafkaDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $metadata = [
-            'device' => $device
+            'device' => $device,
         ];
         $kafka->write($measurement, $tags, $fields, $metadata);
     }
