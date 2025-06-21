@@ -21414,7 +21414,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "MikroTik",
-                    "remote_port": "bridge1/ether1 (744d28eb6d5b)",
+                    "remote_port": "ether1 (744d28eb6d5b)",
                     "remote_platform": null,
                     "remote_version": "MikroTik RouterOS 6.48.6 (long-term) RB951Ui-2HnD",
                     "ifAlias": "MIKHOLAP",
