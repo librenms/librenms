@@ -16,7 +16,7 @@ class Kafka extends BaseDatastore
 {
     private $client = null;
     private $device_id = 0;
-    private $kafkaFlushTimeout = 1;
+    private $kafkaFlushTimeout = 100;
 
     public function __construct(Producer $client)
     {
@@ -26,20 +26,19 @@ class Kafka extends BaseDatastore
 
         // Cache the flush timeout value early to avoid Config during shutdown
         if ($this->kafkaFlushTimeout == null) {
-            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 1);
+            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 100);
         }
-
-        // Register shutdown function
-        register_shutdown_function(function () {
-            $this->safeFlush();
-        });
     }
 
     public function __destruct()
     {
+        $this->terminate();
+    }
+
+    public function terminate(): void
+    {
+        // Safely flush the producer to ensure all messages are sent before shutdown
         $this->safeFlush();
-        // Clear reference
-        $this->client = null;
     }
 
     public static function getClient(): Producer
@@ -142,20 +141,21 @@ class Kafka extends BaseDatastore
                     error_log($error_msg);
                 }
             }
-
-            $this->client = null; // Clear the client reference to allow garbage collection
         } catch (\Throwable $e) {
             $error_msg = 'KAFKA: SafeFlush | failed with exception. Error: ' . $e->getMessage() . '. Trace: ' . $e->getTraceAsString();
             error_log($error_msg);
+        } finally {
+            // Reset the client to null to avoid further operations
+            $this->client = null;
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Kafka';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
         return Config::get('kafka.enable', false);
     }
@@ -166,23 +166,12 @@ class Kafka extends BaseDatastore
     }
 
     /**
-     * Datastore-independent function which should be used for all polled metrics.
-     *
-     * RRD Tags:
-     *   rrd_def     RrdDefinition
-     *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
-     *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
-     *   rrd_step             int: rrd step, defaults to 300
-     *
-     * @param  array  $device
-     * @param  string  $measurement  Name of this measurement
-     * @param  array  $tags  tags for the data (or to control rrdtool)
-     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
-     *                               single values are allowed and will be paired with $measurement
+     * @inheritDoc
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
     {
         try {
+            $device = $this->getDevice($meta);
             // get the singleton instance of the produced
             /** @var Producer $producer */
             $producer = $this->client;
@@ -259,7 +248,7 @@ class Kafka extends BaseDatastore
             }
 
             // create and organize data
-            $filteredDeviceData = array_diff_key($device, array_flip($excluded_device_fields_arr));
+            $filteredDeviceData = array_diff_key($device->toArray(), array_flip($excluded_device_fields_arr));
             // add current time to the data
             $filteredDeviceData['current_polled_time'] = Carbon::now();
 
