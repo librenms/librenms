@@ -173,4 +173,4 @@ if ($poller_time > 300) {
 }
 echo "\nCompleted in $poller_time sec\n";
 
-Datastore::terminate();
+app('Datastore')->terminate();
