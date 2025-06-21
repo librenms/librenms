@@ -76,8 +76,6 @@ if (module_selected('polling', $init_modules)) {
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
-Debug::set($debug ?? false); // disable debug initially
-
 // Boot Laravel
 if (module_selected('web', $init_modules)) {
     Laravel::bootWeb(module_selected('auth', $init_modules));

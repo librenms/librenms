@@ -76,8 +76,7 @@ class Ospf implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
-            Log::info('Processes: ');
-            ModuleModelObserver::observe(OspfInstance::class);
+            ModuleModelObserver::observe(OspfInstance::class, 'Processes');
 
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
@@ -109,6 +108,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             $instance_count = $ospf_instances->count();
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
@@ -116,8 +116,7 @@ class Ospf implements Module
                 return;
             }
 
-            Log::info('Areas: ');
-            ModuleModelObserver::observe(OspfArea::class);
+            ModuleModelObserver::observe(OspfArea::class, 'Areas');
 
             // Pull data from device
             $ospf_areas = SnmpQuery::context($context_name)
@@ -136,10 +135,10 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_areas->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total areas: ' . $ospf_areas->count());
 
-            Log::info('Ports: ');
-            ModuleModelObserver::observe(OspfPort::class);
+            ModuleModelObserver::observe(OspfPort::class, 'Ports');
 
             // Pull data from device
             $ospf_ports = SnmpQuery::context($context_name)
@@ -164,10 +163,10 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_ports->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total Ports: ' . $ospf_ports->count());
 
-            Log::info('Neighbours: ');
-            ModuleModelObserver::observe(OspfNbr::class);
+            ModuleModelObserver::observe(OspfNbr::class, 'Neighbours');
 
             // Pull data from device
             $ospf_neighbours = SnmpQuery::context($context_name)
@@ -189,6 +188,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total neighbors: ' . $ospf_neighbours->count());
 
             Log::info('TOS Metrics: ');
