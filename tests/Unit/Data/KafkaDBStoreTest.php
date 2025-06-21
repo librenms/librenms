@@ -41,7 +41,7 @@ class KafkaDBStoreTest extends TestCase
         $metadata = [
             'device' => $device,
         ];
-        $kafka->write($measurement, $tags, $fields, $metadata);
+        $kafka->write($measurement, $fields, $tags, $metadata);
     }
 
     protected function tearDown(): void
