@@ -65,7 +65,7 @@ class OpenTSDB extends BaseDatastore
     /**
      * @inheritDoc
      */
-    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         if (! $this->connection) {
             Log::error("OpenTSDB Error: not connected\n");
