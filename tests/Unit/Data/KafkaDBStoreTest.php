@@ -38,7 +38,10 @@ class KafkaDBStoreTest extends TestCase
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
-        $kafka->put($device, $measurement, $tags, $fields);
+        $metadata = [
+            'device' => $device
+        ];
+        $kafka->write($measurement, $tags, $fields, $metadata);
     }
 
     protected function tearDown(): void
