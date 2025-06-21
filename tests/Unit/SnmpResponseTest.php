@@ -348,5 +348,13 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.1.1 = INTEGER: 1\n", "Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1\n >= .1.3.6.1.2.1.2.2.1.1.1\n", 1);
         $this->assertFalse($response->isValid());
         $this->assertEquals('Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1', $response->getErrorMessage());
+
+        // NULL return
+        $response = new SnmpResponse("hrDeviceTable = NULL\n", '', 0);
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('', $response->getRawWithoutBadLines());
+        $response->mapTable(function () {
+            $this->fail('There should be no data in the array.');
+        });
     }
 }
