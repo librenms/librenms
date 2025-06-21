@@ -73,7 +73,7 @@ class ComponentStatusController extends WidgetController
             $status[$key]['total'] = isset($component_status[$key]) ? $component_status[$key] : 0;
         }
 
-        return view('widgets.component-status', compact('status'));
+        return view('widgets.component-status', ['status' => $status]);
     }
 
     public function getSettingsView(Request $request)

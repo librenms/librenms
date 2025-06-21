@@ -91,6 +91,6 @@ class OverviewController extends Controller
                 ->get();
         }
 
-        return view('overview.simple', compact('devices_down', 'ports_down', 'services_down', 'bgp_down', 'devices_uptime', 'syslog'));
+        return view('overview.simple', ['devices_down' => $devices_down, 'ports_down' => $ports_down, 'services_down' => $services_down, 'bgp_down' => $bgp_down, 'devices_uptime' => $devices_uptime, 'syslog' => $syslog]);
     }
 }
