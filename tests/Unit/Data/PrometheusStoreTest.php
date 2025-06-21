@@ -51,7 +51,7 @@ class PrometheusStoreTest extends TestCase
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->once()->with('Prometheus Error: Bad response');
-        $prometheus->write('none', [], ['one' => 1]);
+        $prometheus->write('none', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -70,7 +70,7 @@ class PrometheusStoreTest extends TestCase
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->times(0);
 
-        $prometheus->write($measurement, $tags, $fields, $meta);
+        $prometheus->write($measurement, $fields, $tags, $meta);
 
         LaravelHttp::assertSentCount(1);
         LaravelHttp::assertSent(function (\Illuminate\Http\Client\Request $request) {

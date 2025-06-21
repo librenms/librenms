@@ -159,7 +159,7 @@ class Rrd extends BaseDatastore
     /**
      * @inheritDoc
      */
-    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $device_model = $this->getDevice($meta);
 

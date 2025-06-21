@@ -15,9 +15,9 @@ interface WriteInterface
      *   rrd_step             int: rrd step, defaults to 300
      *
      * @param  string  $measurement  Name of this measurement
-     * @param  array<string, scalar>  $fields  The data to update in an associative array
      * @param  array<string, scalar>  $tags  tags for the data to be able to diffrentiate data sets
+     * @param  array<string, scalar>  $fields  The data to update in an associative array
      * @param  array<string, mixed>  $meta  additional data for the datastore (such ass rrd_def)
      */
-    public function write(string $measurement, array $tags, array $fields, array $meta = []): void;
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void;
 }
