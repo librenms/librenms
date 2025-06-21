@@ -47,6 +47,11 @@ class Stats
         }
     }
 
+    public function dump(): array
+    {
+        return $this->collectData();
+    }
+
     public function isEnabled(): bool
     {
         $enabled = Callback::get('enabled');
