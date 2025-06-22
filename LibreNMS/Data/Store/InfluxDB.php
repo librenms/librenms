@@ -67,7 +67,7 @@ class InfluxDB extends BaseDatastore
     /**
      * @inheritDoc
      */
-    public function write(string $measurement, array $tags, array $fields, array $meta = []): void
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $stat = Measurement::start('write');
         $tmp_fields = [];

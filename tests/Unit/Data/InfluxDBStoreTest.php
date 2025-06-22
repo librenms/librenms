@@ -43,7 +43,7 @@ class InfluxDBStoreTest extends TestCase
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->once()->with('InfluxDB exception: Unable to parse URI: http://:0'); // the important one
-        $influx->write('fake', [], ['one' => 1]);
+        $influx->write('fake', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -63,6 +63,6 @@ class InfluxDBStoreTest extends TestCase
         $expected = [new Point($measurement, null, ['hostname' => $device->hostname] + $tags, $fields)];
 
         $mock->shouldReceive('writePoints')->withArgs([$expected])->once();
-        $influx->write($measurement, $tags, $fields, $meta);
+        $influx->write($measurement, $fields, $tags, $meta);
     }
 }
