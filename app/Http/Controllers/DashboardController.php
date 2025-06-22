@@ -30,6 +30,7 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\UserWidget;
+use App\Services\WidgetRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -38,37 +39,16 @@ use LibreNMS\Config;
 
 class DashboardController extends Controller
 {
-    /** @var string[] */
-    public static $widgets = [
-        'alerts',
-        'alertlog',
-        'alertlog-stats',
-        'availability-map',
-        'component-status',
-        'custom-map',
-        'device-summary-horiz',
-        'device-summary-vert',
-        'device-types',
-        'eventlog',
-        'globe',
-        'generic-graph',
-        'graylog',
-        'generic-image',
-        'notes',
-        'server-stats',
-        'syslog',
-        'top-devices',
-        'top-errors',
-        'top-interfaces',
-        'worldmap',
-    ];
-
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
-    public function __construct()
+    /** @var WidgetRegistry */
+    private $widgetRegistry;
+
+    public function __construct(WidgetRegistry $widgetRegistry)
     {
         $this->authorizeResource(Dashboard::class, 'dashboard');
+        $this->widgetRegistry = $widgetRegistry;
     }
 
     /**
@@ -153,9 +133,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
-            return trans("widgets.$widget.title");
-        }, self::$widgets));
+        $widgets = $this->widgetRegistry->getWidgetTitles();
 
         $user_list = $user->can('manage', User::class)
             ? User::where('user_id', '!=', $user->user_id)

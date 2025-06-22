@@ -61,6 +61,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('sensor-discovery', function (Application $app) {
             return new \App\Discovery\Sensor($app->make('device-cache')->getPrimary());
         });
+
+        $this->app->singleton(\App\Services\WidgetRegistry::class, function ($app) {
+            return new \App\Services\WidgetRegistry($app);
+        });
     }
 
     /**

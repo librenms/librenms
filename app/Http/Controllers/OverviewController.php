@@ -28,7 +28,7 @@ class OverviewController extends Controller
         }
 
         // default to dashboard
-        return (new DashboardController())->index($request);
+        return app(DashboardController::class)->index($request);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dashboard;
 use App\Models\UserWidget;
+use App\Services\WidgetRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,12 +12,20 @@ use Illuminate\Validation\Rule;
 
 class DashboardWidgetController extends Controller
 {
+    /** @var WidgetRegistry */
+    private $widgetRegistry;
+
+    public function __construct(WidgetRegistry $widgetRegistry)
+    {
+        $this->widgetRegistry = $widgetRegistry;
+    }
+
     public function add(Dashboard $dashboard, Request $request): JsonResponse
     {
         $this->authorize('update', $dashboard);
 
         $this->validate($request, [
-            'widget_type' => Rule::in(DashboardController::$widgets),
+            'widget_type' => Rule::in($this->widgetRegistry->getWidgetNames()),
         ]);
 
         $type = $request->get('widget_type');
