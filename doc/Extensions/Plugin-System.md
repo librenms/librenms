@@ -143,3 +143,7 @@ class DeviceOverview extends DeviceOverviewHook
     }
 }
 ```
+
+## See Also
+
+The [Developing/Widget-Plugins.md](Widget Plugins) for creating dashboard widgets.
