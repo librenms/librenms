@@ -65,7 +65,8 @@ class YourWidgetHook implements DashboardWidgetHook
 
 ## Widget Controller
 
-Extend [`WidgetController`](../../app/Http/Controllers/Widgets/WidgetController.php:37) base class:
+This class is responsible for displaying widget related data.
+Extend the `WidgetController` with your own code.
 
 ```php
 <?php
