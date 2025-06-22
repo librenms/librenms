@@ -5,7 +5,6 @@ namespace App\Services;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use LibreNMS\Interfaces\Plugins\Hooks\DashboardWidgetHook;
 
 class WidgetRegistry
@@ -74,8 +73,8 @@ class WidgetRegistry
             $taggedWidgets = $this->app->tagged('librenms.widget');
 
             foreach ($taggedWidgets as $widget) {
-                if (!$widget instanceof DashboardWidgetHook) {
-                    Log::warning("Tagged widget service does not implement DashboardWidgetHook interface");
+                if (! $widget instanceof DashboardWidgetHook) {
+                    Log::warning('Tagged widget service does not implement DashboardWidgetHook interface');
                     continue;
                 }
 
@@ -90,14 +89,13 @@ class WidgetRegistry
                     'name' => $widgetName,
                     'title' => $widget->getWidgetTitle(),
                     'controller' => $widget->getWidgetController(),
-                    'type' => 'plugin'
+                    'type' => 'plugin',
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error("Failed to register plugin widgets: " . $e->getMessage());
+            Log::error('Failed to register plugin widgets: ' . $e->getMessage());
         }
     }
-
 
     /**
      * Get all registered widgets
@@ -132,7 +130,7 @@ class WidgetRegistry
     /**
      * Get a specific widget by name
      *
-     * @param string $name
+     * @param  string  $name
      * @return array|null
      */
     public function getWidget(string $name): ?array
@@ -143,7 +141,7 @@ class WidgetRegistry
     /**
      * Check if a widget exists
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public function hasWidget(string $name): bool
@@ -154,7 +152,7 @@ class WidgetRegistry
     /**
      * Get the controller class for a core widget
      *
-     * @param string $widget
+     * @param  string  $widget
      * @return string
      */
     private function getControllerClass(string $widget): string
@@ -186,4 +184,3 @@ class WidgetRegistry
         return $controllerMap[$widget] ?? 'App\Http\Controllers\Widgets\PlaceholderController';
     }
 }
-
