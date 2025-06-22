@@ -85,7 +85,7 @@ class WidgetRegistryTest extends TestCase
 
         $widgetNames = $registry->getWidgetNames();
 
-        $this->assertIsArray($widgetNames);
+        $this->assertNotEmpty($widgetNames);
         $this->assertContains('alerts', $widgetNames);
         $this->assertContains('worldmap', $widgetNames);
     }
@@ -99,7 +99,7 @@ class WidgetRegistryTest extends TestCase
 
         $widgetTitles = $registry->getWidgetTitles();
 
-        $this->assertIsArray($widgetTitles);
+        $this->assertNotEmpty($widgetTitles);
         $this->assertArrayHasKey('alerts', $widgetTitles);
         $this->assertArrayHasKey('worldmap', $widgetTitles);
     }
