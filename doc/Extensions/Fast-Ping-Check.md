@@ -12,9 +12,8 @@ devices by switching to 1 minute polling.
 
 !!! warning
 
-    If you do not have an alert rule that alerts on device
-    status, enabling this will be a waste of resources. You can find one
-    in the [Alert Rules
+    You likely want to have a device down alert rule to take advantage
+    of Fast Ping checks. You can find one in the [Alert Rules
     Collection](../Alerting/Rules.md#alert-rules-collection).
 
 ## Setting the ping check to 1 minute
