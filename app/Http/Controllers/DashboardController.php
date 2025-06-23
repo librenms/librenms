@@ -40,31 +40,6 @@ use LibreNMS\Config;
 
 class DashboardController extends Controller
 {
-    /** @var string[] */
-    public static $widgets = [
-        'alerts',
-        'alertlog',
-        'alertlog-stats',
-        'availability-map',
-        'component-status',
-        'custom-map',
-        'device-summary-horiz',
-        'device-summary-vert',
-        'device-types',
-        'eventlog',
-        'globe',
-        'generic-graph',
-        'graylog',
-        'generic-image',
-        'notes',
-        'server-stats',
-        'syslog',
-        'top-devices',
-        'top-errors',
-        'top-interfaces',
-        'worldmap',
-    ];
-
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
@@ -263,12 +238,22 @@ class DashboardController extends Controller
     public static function listWidgets(): Collection
     {
         return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            if (str_ends_with($route->uri, 'placeholder')) {
+                return false;
+            }
+
             return $route->getPrefix() === 'ajax/dash';
         })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
             $widget = Str::afterLast($route->uri, '/');
+            $title = $widget; // default to path for title
 
-            return [$widget => trans("widgets.$widget.title")];
-        });
+            $controller = $route->getController();
+            if (method_exists($controller, 'getTitle')) {
+                $title = $controller->getTitle();
+            }
+
+            return [$widget => $title];
+        })->sort();
     }
 
     /**
