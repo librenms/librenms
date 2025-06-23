@@ -27,6 +27,7 @@
 namespace LibreNMS\Device;
 
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
@@ -189,11 +190,11 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             /** @var string $processor_descr */
             if (array_key_exists($processor_id, $data)) {
                 $usage = round($data[$processor_id], 2);
-                echo "$processor_descr: $usage%\n";
+                Log::info("$processor_descr: $usage%");
 
                 $rrd_name = ['processor', $processor_type, $processor_index];
-                $fields = compact('usage');
-                $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
+                $fields = ['usage' => $usage];
+                $tags = ['processor_type' => $processor_type, 'processor_index' => $processor_index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                 app('Datastore')->put($os->getDeviceArray(), 'processors', $tags, $fields);
 
                 if ($usage != $processor_usage) {

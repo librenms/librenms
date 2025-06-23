@@ -5,6 +5,12 @@ use LibreNMS\Config;
 
 require 'includes/html/graphs/common.inc.php';
 
+$multiplier ??= null;
+$divider ??= null;
+$dostack ??= null;
+$printtotal ??= 0;
+$total_units ??= '';
+
 if ($width > '500') {
     $descr_len = $bigdescrlen;
 } else {
@@ -28,8 +34,11 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
 }
 
+$colour_iter = 0;
+$i = 0;
+
 foreach ($rrd_list as $rrd) {
-    if ($rrd['colour']) {
+    if (! empty($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
         if (! Config::get("graph_colours.$colours.$colour_iter")) {
@@ -48,7 +57,7 @@ foreach ($rrd_list as $rrd) {
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
-    if ($simple_rrd) {
+    if (! empty($simple_rrd)) {
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
     } else {
@@ -88,9 +97,7 @@ foreach ($rrd_list as $rrd) {
         $t_defname = $g_defname;
     }
 
-    if ($i && ($dostack === 1)) {
-        $stack = ':STACK';
-    }
+    $stack = $i && ($dostack === 1) ? ':STACK' : '';
 
     $rrd_options .= ' LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
     $rrd_options .= ' GPRINT:' . $t_defname . $i . ':LAST:%8.0lf%s GPRINT:' . $t_defname . $i . 'min:MIN:%8.0lf%s';

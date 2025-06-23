@@ -124,6 +124,11 @@ class Device
         return isset($this->devices[$device_id]);
     }
 
+    public function fake(\App\Models\Device $device): void
+    {
+        $this->devices[$device->device_id] = $device;
+    }
+
     private function load(mixed $value, string $field = 'device_id'): \App\Models\Device
     {
         $device = \App\Models\Device::query()->where($field, $value)->first();

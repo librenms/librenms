@@ -76,7 +76,7 @@ class XirrusAos extends OS implements
                 $fields = [
                     'stations' => $count,
                 ];
-                $tags = compact('radio', 'rrd_name', 'rrd_def');
+                $tags = ['radio' => $radio, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                 $datastore->put($this->getDeviceArray(), $measurement, $tags, $fields);
             }
             $this->enableGraph('xirrus_stations');

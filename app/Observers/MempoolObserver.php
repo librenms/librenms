@@ -42,11 +42,11 @@ class MempoolObserver
     {
         if ($mempool->isDirty('mempool_class')) {
             Log::debug("Mempool class changed $mempool->mempool_descr ($mempool->mempool_id)");
-            $device = [
-                'device_id' => $mempool->device->device_id,
-                'hostname' => $mempool->device->hostname,
-            ];
-            Rrd::renameFile($device, ['mempool', $mempool->mempool_type, $mempool->getOriginal('mempool_class'), $mempool->mempool_index], ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]);
+            Rrd::renameFile(
+                $mempool->device,
+                ['mempool', $mempool->mempool_type, $mempool->getOriginal('mempool_class'), $mempool->mempool_index],
+                ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]
+            );
         }
     }
 }

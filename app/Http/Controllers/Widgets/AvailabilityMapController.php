@@ -32,12 +32,13 @@ use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
 {
-    protected $title = 'Availability Map';
+    protected string $name = 'availability-map';
 
     public function __construct()
     {
@@ -53,7 +54,7 @@ class AvailabilityMapController extends WidgetController
         ];
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
 
@@ -66,11 +67,6 @@ class AvailabilityMapController extends WidgetController
         $data['services_totals'] = $services_totals;
 
         return view('widgets.availability-map', $data);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.availability-map', $this->getSettings(true));
     }
 
     private function getDevices(): array

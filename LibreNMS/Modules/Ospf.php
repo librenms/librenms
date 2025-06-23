@@ -232,7 +232,7 @@ class Ospf implements Module
                     'neighbours' => $ospf_neighbours->count(),
                 ];
 
-                $tags = compact('rrd_def');
+                $tags = ['rrd_def' => $rrd_def];
                 $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
             }
         }

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Models\Device;
 use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
@@ -42,7 +43,7 @@ class InfluxDBStoreTest extends TestCase
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->once()->with('InfluxDB exception: Unable to parse URI: http://:0'); // the important one
-        $influx->put(['hostname' => 'test'], 'fake', [], ['one' => 1]);
+        $influx->write('fake', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -53,14 +54,15 @@ class InfluxDBStoreTest extends TestCase
         $mock->shouldReceive('exists')->once()->andReturn(true);
         $influx = new InfluxDB($mock);
 
-        $device = ['hostname' => 'testhost'];
+        $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
 
-        $expected = [new Point($measurement, null, ['hostname' => $device['hostname']] + $tags, $fields)];
+        $expected = [new Point($measurement, null, ['hostname' => $device->hostname] + $tags, $fields)];
 
         $mock->shouldReceive('writePoints')->withArgs([$expected])->once();
-        $influx->put($device, $measurement, $tags, $fields);
+        $influx->write($measurement, $fields, $tags, $meta);
     }
 }

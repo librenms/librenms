@@ -206,8 +206,7 @@ class AuthSSOTest extends DBTestCase
     public function testNoAttribute(): void
     {
         $this->basicConfig();
-        /** @var \LibreNMS\Authentication\SSOAuthorizer */
-        $a = LegacyAuth::reset();
+        LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
         unset($_SERVER['displayName']);

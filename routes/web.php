@@ -280,6 +280,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
             Route::post('syslog', Table\SyslogController::class);
+            Route::post('printer-supply', Table\PrinterSupplyController::class)->name('table.printer-supply');
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
@@ -291,6 +292,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('dash')->group(function () {
             Route::post('alerts', Widgets\AlertsController::class);
             Route::post('alertlog', Widgets\AlertlogController::class);
+            Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
             Route::post('availability-map', Widgets\AvailabilityMapController::class);
             Route::post('component-status', Widgets\ComponentStatusController::class);
             Route::post('custom-map', Widgets\CustomMapController::class);
@@ -310,7 +312,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('top-interfaces', Widgets\TopInterfacesController::class);
             Route::post('top-errors', Widgets\TopErrorsController::class);
             Route::post('worldmap', Widgets\WorldMapController::class)->name('widget.worldmap');
-            Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
         });
     });
 

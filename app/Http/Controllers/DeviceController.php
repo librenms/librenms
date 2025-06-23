@@ -103,13 +103,30 @@ class DeviceController extends Controller
         $primary_device_link = $device_links[$primary_device_link_name];
         unset($device_links[$primary_device_link_name], $primary_device_link_name);
 
+        $data_array = [
+            'title' => $title,
+            'device' => $device,
+            'device_id' => $device_id,
+            'data' => $data,
+            'vars' => $vars,
+            'alert_class' => $alert_class,
+            'parent_id' => $parent_id,
+            'overview_graphs' => $overview_graphs,
+            'tabs' => $tabs,
+            'current_tab' => $current_tab,
+            'page_links' => $page_links,
+            'device_links' => $device_links,
+            'primary_device_link' => $primary_device_link,
+            'request' => $request,
+        ];
+
         if (view()->exists('device.tabs.' . $current_tab)) {
-            return view('device.tabs.' . $current_tab, get_defined_vars());
+            return view('device.tabs.' . $current_tab, $data_array);
         }
 
-        $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+        $data_array['tab_content'] = $this->renderLegacyTab($current_tab, $device, $data);
 
-        return view('device.tabs.legacy', get_defined_vars());
+        return view('device.tabs.legacy', $data_array);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)
