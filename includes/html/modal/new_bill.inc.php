@@ -14,8 +14,6 @@
 use LibreNMS\Config;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    require 'includes/html/javascript-interfacepicker.inc.php';
-
     $port_device_id = -1;
     if (isset($vars['port']) && is_numeric($vars['port'])) {
         $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', [$vars['port']]);
@@ -41,30 +39,26 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="device">Device</label>
                     <div class="col-sm-8">
-                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
-                        <script type="text/javascript">
-                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . (isset($device) ? format_hostname($device) : 'No Device') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
-                        </script>
+                        <select class="form-control input-sm" id="device" name="device" onchange="billDeviceChanged()"></select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="port_id">Port</label>
                     <div class="col-sm-8">
-                        <select class="form-control input-sm" id="port_id" name="port_id">
-                        <?php
-                        if (isset($port) && is_array($port)) {
-                            // Need to pre-populate port as we've got a port pre-selected
-                            foreach (dbFetchRows('SELECT * FROM ports WHERE device_id = ?', [$port_device_id]) as $interface) {
-                                $interface = cleanPort($interface);
-                                $string = $interface['label'] . ' - ' . \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
-                                $selected = $interface['port_id'] === $port['port_id'] ? ' selected' : '';
-                                echo "<option value='{$interface['port_id']}' $selected>$string</option>\n";
-                            }
-                        } ?>
-                        </select>
+                        <select class="form-control input-sm" id="port_id" name="port_id"></select>
                     </div>
                 </div>
-
+    <script type="text/javascript">
+        const makePortData = function (param) {
+            param.device = $('#device').val();
+            return param;
+        }
+        init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . (isset($device) ? format_hostname($device) : 'No Device') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
+        init_select2('#port_id', 'port', makePortData, <?php echo '{id: ' . ($port['port_id'] ?? '0') . ", text: '" . (isset($port['ifAlias']) ? htmlentities($port['ifAlias']) : 'No Port') . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
+        function billDeviceChanged() {
+            $('#port_id').val(null).trigger('change'); // clear port selection
+        }
+    </script>
     <?php
     if (Config::get('billing.95th_default_agg') == 1) {
         $bill_data['dir_95th'] = 'agg';
