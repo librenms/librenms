@@ -179,96 +179,75 @@ class Kafka extends BaseDatastore
             $topic = $producer->newTopic(Kafka::getTopicName());
 
             $device_data = DeviceCache::get($device['device_id']);
-            $excluded_groups = Config::get('kafka.groups-exclude'); // comman separated string
-            $excluded_measurement = Config::get('kafka.measurement-exclude'); // comman separated string
-            $excluded_device_fields = Config::get('kafka.device-fields-exclude'); // comman separated string
-            $excluded_device_fields_arr = [];
+            $excluded_groups = [];
+            $excluded_measurement = [];
 
-            if ($excluded_groups != null && strlen($excluded_groups) > 0) {
-                // convert into array
-                $excluded_groups_arr = explode(',', strtoupper($excluded_groups));
-
-                $device_groups = $device_data->groups;
-                foreach ($device_groups as $group) {
-                    // The group name will always be parsed as lowercase, even when uppercase in the GUI.
-                    if (in_array(strtoupper($group->name), $excluded_groups_arr)) {
-                        Log::debug('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
-
-                        return;
-                    }
-                }
+            # Load excluded values from config
+            foreach(Config::get('kafka.groups-exclude') as $group) {
+                $excluded_groups[] = strtoupper($group);
+            }
+            foreach(Config::get('kafka.measurement-exclude') as $measurement) {
+                $excluded_measurement[] = $measurement;
             }
 
-            if ($excluded_measurement != null && strlen($excluded_measurement) > 0) {
-                // convert into array
-                $excluded_measurement_arr = explode(',', $excluded_measurement);
 
-                if (in_array($measurement, $excluded_measurement_arr)) {
-                    Log::debug('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+            # Check if the device is excluded from Kafka processing
+            $device_groups = $device_data->groups;
+            foreach ($device_groups as $group) {
+                // The group name will always be parsed as lowercase, even when uppercase in the GUI.
+                if (in_array(strtoupper($group->name), $excluded_groups)) {
+                    Log::debug('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
 
                     return;
                 }
             }
 
-            if ($excluded_device_fields != null && strlen($excluded_device_fields) > 0) {
-                // convert into array
-                $excluded_device_fields_arr = explode(',', $excluded_device_fields);
+            // If the measurement is in the excluded list, skip processing
+            if (in_array($measurement, $excluded_measurement)) {
+                Log::debug('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
+
+                return;
             }
 
             // start
             $stat = Measurement::start('write');
 
-            $tmp_fields = [];
-            $tmp_tags = [];
-            $tmp_tags['device_groups'] = implode('|', $device_data->groups->pluck('name')->toArray());
+            // remove tags with empty values
+            $tags = array_filter($tags, function ($value) {
+                return !empty($value);
+            });
 
-            foreach ($tags as $k => $v) {
-                if (empty($v)) {
-                    $v = '_blank_';
-                }
-                $tmp_tags[$k] = $v;
-            }
-            foreach ($fields as $k => $v) {
-                if ($k == 'time') {
-                    $k = 'rtime';
-                }
-
-                if (($value = $this->forceType($v)) !== null) {
-                    $tmp_fields[$k] = $value;
-                }
-            }
-
-            if (empty($tmp_fields)) {
+            if (empty($fields)) {
                 Log::warning('KAFKA: All fields empty, skipping update', [
-                    'orig_fields' => $fields,
                     'device_id' => $this->device_id,
                 ]);
 
                 return;
             }
 
-            // create and organize data
-            $filteredDeviceData = array_diff_key($device->toArray(), array_flip($excluded_device_fields_arr));
-            // add current time to the data
-            $filteredDeviceData['current_polled_time'] = Carbon::now();
+            // add current sent time
+            $tags['current_polled_time'] = Carbon::now();
+            // if hostname is not set, use device hostname
+            if (!isset($tags['hostname'])) {
+                $tags['hostname'] = $device_data->hostname;
+            }
 
             $resultArr = [
                 'measurement' => $measurement,
-                'device' => $filteredDeviceData,
-                'fields' => $tmp_fields,
-                'tags' => $tmp_tags,
+                'fields' => $fields,
+                'tags' => $tags,
             ];
 
             if (Config::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
                     'device_id' => $this->device_id,
                     'measurement' => $measurement,
-                    'fields' => $tmp_fields,
+                    'fields' => $fields,
                 ]);
             }
 
             $dataArr = json_encode($resultArr);
-            $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr);
+            $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr, $this->device_id);
 
             // If debug is enabled, log the total size of the data being sent
             if (Config::get('kafka.debug') === true) {

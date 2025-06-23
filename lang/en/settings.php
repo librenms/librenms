@@ -1239,24 +1239,20 @@ return [
                 'description' => 'Excluded measurements',
                 'help' => 'Discovery modules to be excluded from sending to kafka. Comman separated',
             ],
-            'device-fields-exclude' => [
-                'description' => 'Excluded device fields',
-                'help' => 'Device fields to be excluded from sending to kafka. Comman separated',
-            ],
             'debug' => [
                 'description' => 'Debug',
-                'help' => 'A comma-separated list of debug contexts to enable. Detailed Producer debugging: broker,topic,msg. Consumer: consumer,cgrp,topic,fetch Type: CSV flags',
+                'help' => 'Enable detailed logs about internal kafka store process',
             ],
             'security' => [
                 'debug' => [
                     'description' => 'Security Debug',
-                    'help' => 'Show more detailed info about security comunication with Kafka',
+                    'help' => 'Show more detailed info about security comunication with Kafka brokers',
                 ],
             ],
             'broker' => [
                 'list' => [
-                    'description' => 'Initial list of kakfa brokers as a CSV list of broker host or host:port',
-                    'help' => 'Initial list of kakfa brokers as a CSV list of broker host or host:port. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
+                    'description' => 'List of Kafka Brokers servers in format of host!:port',
+                    'help' => 'List of kafka brokers in format of host!:port. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
                 ],
             ],
             'idempotence' => [
