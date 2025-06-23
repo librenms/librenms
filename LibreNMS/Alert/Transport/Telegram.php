@@ -71,16 +71,16 @@ class Telegram extends Transport
                 foreach ($this->message['images'] as $image) {
                     $mime_type = finfo_buffer(finfo_open(), $image, FILEINFO_MIME_TYPE);
                     $file_name = 'default';
-    
+
                     if ($mime_type == 'image/svg+xml') {
                         $file_name = 'graph.svg';
                         $send_mode = 'file';
                     }
-    
+
                     if ($mime_type == 'image/png') {
                         $file_name = 'graph.png';
                     }
-    
+
                     switch ($send_as) {
                         case 'photo':
                             $res = Http::client()->attach('photo', $image, $file_name)
