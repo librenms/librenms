@@ -182,16 +182,15 @@ class Kafka extends BaseDatastore
             $excluded_groups = [];
             $excluded_measurement = [];
 
-            # Load excluded values from config
-            foreach(Config::get('kafka.groups-exclude', []) as $exclude_group) {
+            // Load excluded values from config
+            foreach (Config::get('kafka.groups-exclude', []) as $exclude_group) {
                 $excluded_groups[] = strtoupper($exclude_group);
             }
-            foreach(Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
+            foreach (Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
                 $excluded_measurement[] = strtoupper($exclude_measurement);
             }
 
-
-            # Check if the device is excluded from Kafka processing
+            // Check if the device is excluded from Kafka processing
             $device_groups = $device_data->groups;
             foreach ($device_groups as $group) {
                 // The group name will always be parsed as lowercase, even when uppercase in the GUI.
@@ -214,7 +213,7 @@ class Kafka extends BaseDatastore
 
             // remove tags with empty values
             $tags = array_filter($tags, function ($value) {
-                return !empty($value);
+                return ! empty($value);
             });
 
             if (empty($fields)) {
@@ -228,7 +227,7 @@ class Kafka extends BaseDatastore
             // add current sent time
             $tags['current_polled_time'] = Carbon::now();
             // if hostname is not set, use device hostname
-            if (!isset($tags['hostname'])) {
+            if (! isset($tags['hostname'])) {
                 $tags['hostname'] = $device_data->hostname;
             }
 
