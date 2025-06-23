@@ -183,11 +183,11 @@ class Kafka extends BaseDatastore
             $excluded_measurement = [];
 
             # Load excluded values from config
-            foreach(Config::get('kafka.groups-exclude') as $group) {
-                $excluded_groups[] = strtoupper($group);
+            foreach(Config::get('kafka.groups-exclude', []) as $exclude_group) {
+                $excluded_groups[] = strtoupper($exclude_group);
             }
-            foreach(Config::get('kafka.measurement-exclude') as $measurement) {
-                $excluded_measurement[] = $measurement;
+            foreach(Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
+                $excluded_measurement[] = strtoupper($exclude_measurement);
             }
 
 
@@ -196,14 +196,14 @@ class Kafka extends BaseDatastore
             foreach ($device_groups as $group) {
                 // The group name will always be parsed as lowercase, even when uppercase in the GUI.
                 if (in_array(strtoupper($group->name), $excluded_groups)) {
-                    Log::debug('KAFKA: Skipped parsing to Kafka, device is in group: ' . $group->name);
+                    Log::debug('KAFKA: Skipped parsing to Kafka, measurement ' . $measurement . ' device is in group: ' . $group->name);
 
                     return;
                 }
             }
 
             // If the measurement is in the excluded list, skip processing
-            if (in_array($measurement, $excluded_measurement)) {
+            if (in_array(strtoupper($measurement), $excluded_measurement)) {
                 Log::debug('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
 
                 return;
