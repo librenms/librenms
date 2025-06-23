@@ -33,6 +33,7 @@ discovery:
             - .1.3.6.1.4.1.9.1.3055 # { ciscoProducts 3055 } -- Cisco Secure Firewall 3130 Security Appliance
             - .1.3.6.1.4.1.9.1.3056 # { ciscoProducts 3056 } -- Cisco Secure Firewall 3140 Security Appliance
             - .1.3.6.1.4.1.9.1.3057 # { ciscoProducts 3057 } -- Cisco Secure Firewall 3105 Security Appliance
+            - .1.3.6.1.4.1.9.1.3166 # { ciscoProducts 3166 } -- Cisco Secure Firewall 3105 Security Appliance - Cisco FTD 7.4.2.1 (Build 30)
             - .1.3.6.1.4.1.9.1.3305 # { ciscoProducts 3305 } -- Cisco Secure Firewall 1220 Threat Defense
 
 discovery_modules:
