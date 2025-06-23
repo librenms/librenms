@@ -34,35 +34,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class DashboardController extends Controller
 {
-    /** @var string[] */
-    public static $widgets = [
-        'alerts',
-        'alertlog',
-        'alertlog-stats',
-        'availability-map',
-        'component-status',
-        'custom-map',
-        'device-summary-horiz',
-        'device-summary-vert',
-        'device-types',
-        'eventlog',
-        'globe',
-        'generic-graph',
-        'graylog',
-        'generic-image',
-        'notes',
-        'server-stats',
-        'syslog',
-        'top-devices',
-        'top-errors',
-        'top-interfaces',
-        'worldmap',
-    ];
-
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
@@ -153,9 +130,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
-            return trans("widgets.$widget.title");
-        }, self::$widgets));
+        $widgets = self::listWidgets();
 
         $user_list = $user->can('manage', User::class)
             ? User::where('user_id', '!=', $user->user_id)
@@ -255,6 +230,30 @@ class DashboardController extends Controller
             'status' => 'error',
             'message' => 'ERROR: Could not copy Dashboard',
         ]);
+    }
+
+    /**
+     * @return Collection<string, string> widget name, widget localized title
+     */
+    public static function listWidgets(): Collection
+    {
+        return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            if (str_ends_with($route->uri, 'placeholder')) {
+                return false;
+            }
+
+            return $route->getPrefix() === 'ajax/dash';
+        })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
+            $widget = Str::afterLast($route->uri, '/');
+            $title = $widget; // default to path for title
+
+            $controller = $route->getController();
+            if (method_exists($controller, 'getTitle')) {
+                $title = $controller->getTitle();
+            }
+
+            return [$widget => $title];
+        })->sort();
     }
 
     /**
