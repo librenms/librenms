@@ -11,10 +11,10 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "eltex-mes23xx",
+                    "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "eltex.png"
                 }
             ]
         },
