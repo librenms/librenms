@@ -78,12 +78,6 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
 
       -
-        name: Plugins install kafka packages
-        run: |
-          composer require idealo/php-rdkafka-ffi --prefer-dist --no-interaction --no-progress --no-scripts
-          composer require ext-ffi --prefer-dist --no-interaction --no-progress --no-scripts
-
-      -
         name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G
 
