@@ -34,6 +34,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class DashboardController extends Controller
@@ -153,9 +155,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
-            return trans("widgets.$widget.title");
-        }, self::$widgets));
+        $widgets = self::listWidgets();
 
         $user_list = $user->can('manage', User::class)
             ? User::where('user_id', '!=', $user->user_id)
@@ -255,6 +255,20 @@ class DashboardController extends Controller
             'status' => 'error',
             'message' => 'ERROR: Could not copy Dashboard',
         ]);
+    }
+
+    /**
+     * @return Collection<string, string>  widget name, widget localized title
+     */
+    public static function listWidgets(): Collection
+    {
+        return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            return $route->getPrefix() === 'ajax/dash';
+        })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
+            $widget = Str::afterLast($route->uri, '/');
+
+            return [$widget => trans("widgets.$widget.title")];
+        });
     }
 
     /**
