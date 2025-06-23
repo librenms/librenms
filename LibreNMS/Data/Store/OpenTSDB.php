@@ -73,7 +73,6 @@ class OpenTSDB extends BaseDatastore
             return;
         }
 
-        $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
         $tmp_tags = 'hostname=' . $this->getDevice($meta)->hostname;
 
