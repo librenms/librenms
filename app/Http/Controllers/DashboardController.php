@@ -258,7 +258,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return Collection<string, string>  widget name, widget localized title
+     * @return Collection<string, string> widget name, widget localized title
      */
     public static function listWidgets(): Collection
     {
