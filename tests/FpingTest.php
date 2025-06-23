@@ -38,17 +38,6 @@ class FpingTest extends TestCase
         $output = "192.168.1.3 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\n";
         $this->mockFpingProcess($output, 0);
 
-        $expected = [
-            'xmt' => 3,
-            'rcv' => 3,
-            'loss' => 0,
-            'min' => 0.62,
-            'max' => 0.93,
-            'avg' => 0.71,
-            'dup' => 0,
-            'exitcode' => 0,
-        ];
-
         $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
         $this->assertTrue($actual->success());
