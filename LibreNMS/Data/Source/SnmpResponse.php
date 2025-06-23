@@ -151,7 +151,7 @@ class SnmpResponse
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -297,12 +297,14 @@ class SnmpResponse
      * Filter bad lines from the raw output, examples:
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     * oidName = NULL
      */
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
             '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
             '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
+            '/^.* = NULL[\r\n]*$/',
         ], '', $this->raw);
     }
 

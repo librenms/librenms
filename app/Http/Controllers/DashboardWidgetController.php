@@ -16,7 +16,7 @@ class DashboardWidgetController extends Controller
         $this->authorize('update', $dashboard);
 
         $this->validate($request, [
-            'widget_type' => Rule::in(DashboardController::$widgets),
+            'widget_type' => Rule::in(DashboardController::listWidgets()->keys()),
         ]);
 
         $type = $request->get('widget_type');

@@ -62,7 +62,7 @@
   <div id="quotaDiv">
     <label class="col-sm-4 control-label" for="bill_quota">Quota</label>
     <div class="col-sm-3">
-      <input class="form-control input-sm" type="text" name="bill_quota" value="<?php echo $quota['data'] ?>">
+      <input class="form-control input-sm" type="text" name="bill_quota" value="<?php echo $quota['data'] ?? '' ?>">
     </div>
     <div class="col-sm-5">
       <select name="bill_quota_type" class="form-control input-sm">
@@ -92,19 +92,19 @@
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_custid">Customer Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo htmlentities($bill_data['bill_custid']); ?>">
+        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo htmlentities($bill_data['bill_custid'] ?? ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_ref">Billing Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo htmlentities($bill_data['bill_ref']); ?>">
+        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo htmlentities($bill_data['bill_ref'] ?? ''); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_notes">Notes</label>
       <div class="col-sm-8">
-        <textarea class="form-control input-sm" name="bill_notes"><?php echo htmlentities($bill_data['bill_notes']); ?></textarea>
+        <textarea class="form-control input-sm" name="bill_notes"><?php echo htmlentities($bill_data['bill_notes'] ?? ''); ?></textarea>
       </div>
     </div>
 </fieldset>
