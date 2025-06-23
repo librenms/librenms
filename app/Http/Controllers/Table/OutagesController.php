@@ -97,7 +97,6 @@ class OutagesController extends TableController
         $day_seconds = 86400;
 
         $duration_days = (int) ($duration / $day_seconds);
-        $duration_time = $duration % $day_seconds;
 
         $output = "<span style='display:inline;'>";
         if ($duration_days) {

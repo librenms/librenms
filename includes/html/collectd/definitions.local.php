@@ -49,8 +49,6 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
         $opts['title'] = $title;
     }
     $opts['rrd_opts'] = ['-v', 'Events'];
-
-    $files = [];
     /*  $opts['colors'] = array(
             'ham'     => '00e000',
             'spam'    => '0000ff',
