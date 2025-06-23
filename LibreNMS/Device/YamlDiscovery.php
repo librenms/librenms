@@ -48,7 +48,6 @@ class YamlDiscovery
     public static function discover(OS $os, $class, $yaml_data)
     {
         $pre_cache = $os->preCache();
-        $device = $os->getDeviceArray();
         $items = [];
 
         // convert to class name for static call below

@@ -97,7 +97,7 @@ class TestConfigCommands extends InMemoryDbTestCase
 
         // append to non-array
         Config::set('login_message', 'blah');
-        $message = Config::get('login_message');
+        Config::get('login_message');
         $this->artisan('config:set', ['setting' => 'login_message.+', 'value' => 'something', '--no-ansi' => true])
             ->expectsOutput(trans('commands.config:set.errors.append'))
             ->assertExitCode(2);

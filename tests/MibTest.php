@@ -175,8 +175,6 @@ class MibTest extends TestCase
      */
     private static function extractMibName(string $file): string
     {
-        // extract the mib name (tried regex, but was too complex and I had to read the whole file)
-        $mib_name = null;
         if ($handle = fopen($file, 'r')) {
             $header = '';
             while (($line = fgets($handle)) !== false) {
