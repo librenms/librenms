@@ -117,6 +117,7 @@ class DeviceController extends Controller
             'page_links' => $page_links,
             'device_links' => $device_links,
             'primary_device_link' => $primary_device_link,
+            'request' => $request,
         ];
 
         if (view()->exists('device.tabs.' . $current_tab)) {
