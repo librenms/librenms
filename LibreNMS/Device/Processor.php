@@ -105,7 +105,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc->processor_oid = '.' . ltrim($oid, '.');
 
         $proc->processor_perc_warn = $warn_percent ?? LibrenmsConfig::get('processor_perc_warn', 75);
-        
+
         // validity not checked yet
         if (is_null($proc->processor_usage)) {
             $data = snmp_get(device_by_id_cache($proc->device_id), $proc->processor_oid, '-Ovq');
