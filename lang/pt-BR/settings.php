@@ -1111,12 +1111,12 @@ return [
                 'help' => 'Exporta métricas para o Kafka usando o idealo/php-rdkafka-ffi',
             ],
             'groups-exclude' => [
-                'description' => 'Grupos de dispositivos excluídos',
-                'help' => 'Grupos de dispositivos excluídos do envio de dados para o Kafka. Separados por vírgula',
+                'description' => 'Identificador de Grupos de dispositivos excluídos',
+                'help' => 'Identificador de Grupos de dispositivos excluídos do envio de dados para o Kafka.',
             ],
             'measurement-exclude' => [
                 'description' => 'Medições excluídas',
-                'help' => 'Módulos de descoberta a serem excluídos do envio para o kafka. Separados por vírgula',
+                'help' => 'Módulos de descoberta a serem excluídos do envio para o kafka.',
             ],
             'debug' => [
                 'description' => 'Debug',

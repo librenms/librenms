@@ -1232,12 +1232,12 @@ return [
                 'help' => 'Exports metrics to Kafka using the idealo/php-rdkafka-ffi',
             ],
             'groups-exclude' => [
-                'description' => 'Excluded device groups',
-                'help' => 'Device groups excluded from sending data to Kafka. Comman separated',
+                'description' => 'Excluded device groups id',
+                'help' => 'Device groups ids excluded from sending data to Kafka',
             ],
             'measurement-exclude' => [
                 'description' => 'Excluded measurements',
-                'help' => 'Discovery modules to be excluded from sending to kafka. Comman separated',
+                'help' => 'Discovery modules to be excluded from sending to kafka',
             ],
             'debug' => [
                 'description' => 'Debug',

@@ -4684,7 +4684,7 @@
             "section": "kafka",
             "validate": {
                  "value": "array",
-                 "value.*": "string"
+                 "value.*": "int"
              },
             "order": 1
         },
@@ -4770,7 +4770,7 @@
         },
         "kafka.ssl.key.password": {
             "default": "",
-            "type": "text",
+            "type": "password",
             "group": "poller",
             "section": "kafka",
             "order": 13
@@ -4784,7 +4784,7 @@
         },
         "kafka.ssl.keystore.password": {
             "default": "",
-            "type": "text",
+            "type": "password",
             "group": "poller",
             "section": "kafka",
             "order": 15

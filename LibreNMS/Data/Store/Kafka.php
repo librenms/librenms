@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Facades\DeviceCache;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -15,8 +14,10 @@ use RdKafka\Producer;
 class Kafka extends BaseDatastore
 {
     private $client = null;
-    private $device_id = 0;
+    private $topicName = null;
     private $kafkaFlushTimeout = 100;
+    private $excluded_groups = [];
+    private $excluded_measurement = [];
 
     public function __construct(Producer $client)
     {
@@ -24,9 +25,27 @@ class Kafka extends BaseDatastore
 
         $this->client = $client;
 
+        // Load the topic name from config
+        $this->topicName = Config::get('kafka.topic', 'librenms');
+
         // Cache the flush timeout value early to avoid Config during shutdown
         if ($this->kafkaFlushTimeout == null) {
             $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 100);
+        }
+
+        // Load excluded values from config
+        foreach (Config::get('kafka.groups-exclude', []) as $exclude_group) {
+            // Ensure its a valid number and parse it as an integer
+            if (!is_numeric($exclude_group)) {
+                Log::warning('KAFKA: Excluded group is not a valid number', [
+                    'exclude_group' => $exclude_group
+                ]);
+                continue;
+            }
+            $this->excluded_groups[] = (int) $exclude_group;
+        }
+        foreach (Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
+            $this->excluded_measurement[] = trim(strtolower($exclude_measurement));
         }
     }
 
@@ -50,7 +69,12 @@ class Kafka extends BaseDatastore
         $conf->setDrMsgCb(
             function (Producer $producer, Message $message): void {
                 if ($message->err !== RD_KAFKA_RESP_ERR_NO_ERROR) {
-                    error_log($message->errstr());
+                    Log::error(
+                        'KAFKA: Delivery failed',
+                        [
+                            'error' => $message->errstr()
+                        ]
+                    );
                 }
             }
         );
@@ -131,10 +155,9 @@ class Kafka extends BaseDatastore
 
                 if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
                     $error_msg = sprintf(
-                        'KAFKA: SafeFlush | Flush failed. Error: %s, Code: %d, Device ID: %d, Remaining: %d',
+                        'KAFKA: SafeFlush | Flush failed. Error: %s, Code: %d, Remaining: %d',
                         Library::rd_kafka_err2str($result),
                         $result,
-                        $this->device_id,
                         $this->client->getOutQLen()
                     );
 
@@ -171,38 +194,26 @@ class Kafka extends BaseDatastore
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         try {
-            $device = $this->getDevice($meta);
+            $device_data = $this->getDevice($meta);
             // get the singleton instance of the produced
             /** @var Producer $producer */
             $producer = $this->client;
-            $this->device_id = $device['device_id'];
-            $topic = $producer->newTopic(Kafka::getTopicName());
-
-            $device_data = DeviceCache::get($device['device_id']);
-            $excluded_groups = [];
-            $excluded_measurement = [];
-
-            // Load excluded values from config
-            foreach (Config::get('kafka.groups-exclude', []) as $exclude_group) {
-                $excluded_groups[] = strtoupper($exclude_group);
-            }
-            foreach (Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
-                $excluded_measurement[] = strtoupper($exclude_measurement);
-            }
+            $topic = $producer->newTopic($this->topicName);
 
             // Check if the device is excluded from Kafka processing
-            $device_groups = $device_data->groups;
-            foreach ($device_groups as $group) {
-                // The group name will always be parsed as lowercase, even when uppercase in the GUI.
-                if (in_array(strtoupper($group->name), $excluded_groups)) {
-                    Log::debug('KAFKA: Skipped parsing to Kafka, measurement ' . $measurement . ' device is in group: ' . $group->name);
+            $total_groups_excluded = $device_data->groups->whereIn('id', $this->excluded_groups)->count();
+            if ($total_groups_excluded > 0) {
+                Log::debug('KAFKA: Skipped parsing to Kafka, measurement ' . $measurement . ' device is in excluded group', [
+                    'device_id' => $device_data->device_id,
+                    'measurement' => $measurement,
+                    'excluded_groups_id' => $this->excluded_groups
+                ]);
 
-                    return;
-                }
+                return;
             }
 
             // If the measurement is in the excluded list, skip processing
-            if (in_array(strtoupper($measurement), $excluded_measurement)) {
+            if (in_array($measurement, $this->excluded_measurement)) {
                 Log::debug('KAFKA: Skipped parsing to Kafka, measurement is in measurement-excluded: ' . $measurement);
 
                 return;
@@ -213,19 +224,19 @@ class Kafka extends BaseDatastore
 
             // remove tags with empty values
             $tags = array_filter($tags, function ($value) {
-                return ! empty($value);
+                return $value !== '' && $value !== null;
             });
 
             if (empty($fields)) {
                 Log::warning('KAFKA: All fields empty, skipping update', [
-                    'device_id' => $this->device_id,
+                    'device_id' => $device_data->device_id,
                 ]);
 
                 return;
             }
 
-            // add current sent time
-            $tags['current_polled_time'] = Carbon::now();
+            // add current sent time in unix timestamp format
+            $tags['current_polled_time'] = Carbon::now()->timestamp;
             // if hostname is not set, use device hostname
             if (! isset($tags['hostname'])) {
                 $tags['hostname'] = $device_data->hostname;
@@ -239,20 +250,20 @@ class Kafka extends BaseDatastore
 
             if (Config::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
-                    'device_id' => $this->device_id,
+                    'device_id' => $device_data->device_id,
                     'measurement' => $measurement,
                     'fields' => $fields,
                 ]);
             }
 
             $dataArr = json_encode($resultArr);
-            $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr, $this->device_id);
+            $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr, $device_data->device_id);
 
             // If debug is enabled, log the total size of the data being sent
             if (Config::get('kafka.debug') === true) {
                 $outQLen = $this->client->getOutQLen();
                 Log::debug('KAFKA: Flush | Data size', [
-                    'device_id' => $this->device_id,
+                    'device_id' => $device_data->device_id,
                     'measurement' => $measurement,
                     'size' => $outQLen,
                 ]);
@@ -264,41 +275,10 @@ class Kafka extends BaseDatastore
             $this->recordStatistic($stat->end());
         } catch (\Throwable $e) {
             Log::error('KAFKA: Put failed with exception', [
-                'device_id' => $this->device_id,
+                'device_id' => $device_data->device_id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
         }
-    }
-
-    private function forceType($data)
-    {
-        /*
-         * It is not trivial to detect if something is a float or an integer, and
-         * therefore may cause breakages on inserts.
-         * Just setting every number to a float gets around this, but may introduce
-         * inefficiencies.
-         */
-
-        if (is_numeric($data)) {
-            return floatval($data);
-        }
-
-        return $data === 'U' ? null : $data;
-    }
-
-    public static function getTopicName()
-    {
-        return Config::get('kafka.topic', 'librenms');
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
-    {
-        return false;
     }
 }
