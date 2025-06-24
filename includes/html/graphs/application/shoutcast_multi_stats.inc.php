@@ -8,6 +8,7 @@ $total_text = 'Total of all ShoutCast Servers';
 $nototal = 0;
 
 $rrd_list = [];
+// FIXME fails with rrdcached
 $rrd_filenames = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app->app_id], '*.rrd'));
 foreach ($rrd_filenames as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
