@@ -33,8 +33,10 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\PortVlan;
 use App\Models\Sla;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -45,14 +47,15 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
-use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -73,7 +76,8 @@ class Vrp extends OS implements
     SlaPolling,
     TransceiverDiscovery,
     OSDiscovery,
-    VlanDiscovery
+    BasicVlanDiscovery,
+    PortVlanDiscovery
 {
     use SyncsModels;
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
@@ -702,26 +706,43 @@ class Vrp extends OS implements
         }
     }
 
-    public function discoverVlans($dot1dBasePortIfIndex): array
+    public function discoverBasicVlanData(): Collection
     {
-        $vlanData = [];
+        $ret = new Collection;
 
-        $vlans = SnmpQuery::hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanDescr')->table(1);
-        $vlans = SnmpQuery::hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus')->table(1, $vlans);
-        $vlans = SnmpQuery::hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanType')->table(1, $vlans);
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanDescr')->table(1);
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus')->table(1, $vlans);
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanType')->table(1, $vlans);
+
+        if (! empty($vlans)) {
+            $maxVlanId = 0;
+            foreach ($vlans as $vlanId => $vlanArray) {
+                if (in_array($vlanArray['hwL2VlanRowStatus'], [1, 4, 5])) { // active(1), createAndGo(4), createAndWait(5)
+                    $ret->push(new Vlan([
+                        'vlan_name' => $vlanArray['hwL2VlanDescr'] ?? '',
+                        'vlan_vlan' => $vlanId,
+                        'vlan_domain' => 1,
+                        'vlan_type' => $vlanArray['hwL2VlanType'] ?? '',
+                    ]));
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    public function discoverPortVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanDescr')->table(1);
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus')->table(1, $vlans);
+        $vlans = SnmpQuery::cache()->hideMib()->walk('HUAWEI-L2VLAN-MIB::hwL2VlanType')->table(1, $vlans);
 
         if (! empty($vlans)) {
             $maxVlanId = 0;
             foreach ($vlans as $vlanId => $vlanArray) {
                 $maxVlanId = ($vlanId > $maxVlanId) ? $vlanId : $maxVlanId; // highest VlanID value
-                if (in_array($vlanArray['hwL2VlanRowStatus'], [1, 4, 5])) { // active(1), createAndGo(4), createAndWait(5)
-                    $vlanData['basic'][] = [
-                        'vlan_name' => $vlanArray['hwL2VlanDescr'] ?? '',
-                        'vlan_vlan' => $vlanId,
-                        'vlan_domain' => 1,
-                        'vlan_type' => $vlanArray['hwL2VlanType'] ?? '',
-                    ];
-                }
             }
 
             $portsIndexes = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfPortIfIndex')->table();
@@ -743,12 +764,12 @@ class Vrp extends OS implements
                             $vlansOnPort = q_bridge_bits2indices($vlanArray[$oid]);
                             foreach ($vlansOnPort as $vlanIdOnPort) {
                                 $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
-                                $vlanData['ports'][] = [
+                                $ret->push(new PortVlan([
                                     'vlan' => $vlanIdOnPort,
                                     'baseport' => $baseport,
-                                    'ifIndex' => $portsIndexes[$baseport] ?? 0,
                                     'untagged' => 0,
-                                ];
+                                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                                ]));
                             }
                         }
                     }
@@ -758,16 +779,16 @@ class Vrp extends OS implements
             $portsData = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfPVID')->table(1);
             foreach ($portsData as $baseport => $data) {
                 if (! empty($data['hwL2IfPVID'])) {
-                    $vlanData['ports'][] = [
+                    $ret->push(new PortVlan([
                         'vlan' => $data['hwL2IfPVID'],
                         'baseport' => $baseport,
                         'untagged' => 1,
-                        'ifIndex' => $data['hwL2IfPortIfIndex'] ?? 0,
-                    ];
+                        'port_id' => PortCache::getIdFromIfIndex($data['hwL2IfPortIfIndex'] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
                 }
             }
         }
 
-        return $vlanData;
+        return $ret;
     }
 }
