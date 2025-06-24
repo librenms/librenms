@@ -36,9 +36,9 @@ class Kafka extends BaseDatastore
         // Load excluded values from config
         foreach (Config::get('kafka.groups-exclude', []) as $exclude_group) {
             // Ensure its a valid number and parse it as an integer
-            if (!is_numeric($exclude_group)) {
+            if (! is_numeric($exclude_group)) {
                 Log::warning('KAFKA: Excluded group is not a valid number', [
-                    'exclude_group' => $exclude_group
+                    'exclude_group' => $exclude_group,
                 ]);
                 continue;
             }
@@ -72,7 +72,7 @@ class Kafka extends BaseDatastore
                     Log::error(
                         'KAFKA: Delivery failed',
                         [
-                            'error' => $message->errstr()
+                            'error' => $message->errstr(),
                         ]
                     );
                 }
@@ -206,7 +206,7 @@ class Kafka extends BaseDatastore
                 Log::debug('KAFKA: Skipped parsing to Kafka, measurement ' . $measurement . ' device is in excluded group', [
                     'device_id' => $device_data->device_id,
                     'measurement' => $measurement,
-                    'excluded_groups_id' => $this->excluded_groups
+                    'excluded_groups_id' => $this->excluded_groups,
                 ]);
 
                 return;
