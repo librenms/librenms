@@ -7,15 +7,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: LibreNMS/Alert/AlertDB.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: LibreNMS/Alert/AlertRules.php
 
 		-
@@ -1646,15 +1637,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: LibreNMS/OS/Zyxelwlc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: html/ajax_listports.php
 
 		-
 			message: '''

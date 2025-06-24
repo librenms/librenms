@@ -323,7 +323,7 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+    if (is_string($order) && preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
         $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
     } else {
         $order = 'd.`hostname` ASC';
@@ -382,6 +382,9 @@ function list_devices(Illuminate\Http\Request $request)
         $param[] = $query;
     } elseif ($type == 'display') {
         $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
+    } elseif (in_array($type, ['serial', 'version', 'hardware', 'features'])) {
+        $sql = "`d`.`$type` LIKE ?";
         $param[] = "%$query%";
     } else {
         $sql = '1';

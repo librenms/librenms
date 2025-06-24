@@ -28,11 +28,12 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\CustomMap;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 
 class CustomMapController extends WidgetController
 {
-    protected $title = 'Custom Map';
+    protected string $name = 'custom-map';
     protected $defaults = [
         'title' => null,
         'custom_map' => null,
@@ -44,9 +45,9 @@ class CustomMapController extends WidgetController
         $this->authorizeResource(CustomMap::class, 'map');
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
-        $data = $this->getSettings(true);
+        $data = $this->getSettings();
 
         $data['map'] = CustomMap::find($data['custom_map']);
         if (! $data['map']) {
@@ -63,7 +64,7 @@ class CustomMapController extends WidgetController
         return view('widgets.custom-map', $data);
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
         $data['map'] = CustomMap::find($data['custom_map']);

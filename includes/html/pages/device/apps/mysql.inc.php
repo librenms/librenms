@@ -10,13 +10,10 @@ $app_sections = [
     'innodb' => 'InnoDB',
 ];
 
-unset($sep);
+$sep = '';
 foreach ($app_sections as $app_section => $app_section_text) {
     echo $sep;
-
-    if (! $vars['app_section']) {
-        $vars['app_section'] = $app_section;
-    }
+    $vars['app_section'] ??= $app_section; // if no section use first
 
     if ($vars['app_section'] == $app_section) {
         echo "<span class='pagemenu-selected'>";

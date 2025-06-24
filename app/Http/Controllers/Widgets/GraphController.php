@@ -41,7 +41,7 @@ use LibreNMS\Util\Time;
 
 class GraphController extends WidgetController
 {
-    protected $title = 'Graph';
+    protected string $name = 'generic-graph';
     protected $defaults = [
         'title' => null,
         'refresh' => 60,
@@ -59,7 +59,7 @@ class GraphController extends WidgetController
         'graph_bill' => null,
     ];
 
-    public function title()
+    public function getTitle(): string
     {
         $settings = $this->getSettings();
 
@@ -102,10 +102,10 @@ class GraphController extends WidgetController
             return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
         }
 
-        return $this->title;
+        return parent::getTitle();
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
 
@@ -163,7 +163,7 @@ class GraphController extends WidgetController
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
 
@@ -251,7 +251,7 @@ class GraphController extends WidgetController
         return false; // non-custom aggregate types require no additional settings
     }
 
-    public function getSettings($settingsView = false)
+    public function getSettings($settingsView = false): array
     {
         if (is_null($this->settings)) {
             $settings = parent::getSettings($settingsView);

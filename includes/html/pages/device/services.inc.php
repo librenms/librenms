@@ -24,10 +24,6 @@ $services = service_get($device['device_id']);
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
 
-if (! $vars['view']) {
-    $vars['view'] = 'basic';
-}
-
 $menu_options = [
     'basic' => 'Basic',
     'details' => 'Details',

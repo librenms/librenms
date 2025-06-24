@@ -9,13 +9,14 @@
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
-use LibreNMS\Alert\AlertDB;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Notifications;
 use LibreNMS\Validations\Php;
 
 $options = getopt('df:o:t:r:');
+$options['f'] = isset($options['f']) ? $options['f'] : '';
 
 /**
  * Scripts without dependencies
@@ -305,7 +306,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
-                $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
                 if (! empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
                     unset($data);

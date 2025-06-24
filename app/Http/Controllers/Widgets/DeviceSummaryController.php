@@ -27,12 +27,13 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;
 
 abstract class DeviceSummaryController extends WidgetController
 {
-    protected $title = 'Device Summary';
+    protected string $name = 'device-summary';
 
     public function __construct()
     {
@@ -44,9 +45,9 @@ abstract class DeviceSummaryController extends WidgetController
         ];
     }
 
-    public function getSettingsView(Request $request)
+    public function getView(Request $request): string|View
     {
-        return view('widgets.settings.device-summary', $this->getSettings(true));
+        return view("widgets.$this->name", $this->getData($request));
     }
 
     protected function getData(Request $request)

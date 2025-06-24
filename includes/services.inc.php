@@ -182,9 +182,9 @@ function poll_service($service)
             $fields[$k] = $v['value'];
         }
 
-        $tags = compact('service_id', 'rrd_name', 'rrd_def');
+        $tags = ['service_id' => $service_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         //TODO not sure if we have $device at this point, if we do replace faked $device
-        app('Datastore')->put(['hostname' => $service['hostname']], 'services', $tags, $fields);
+        app('Datastore')->put($service, 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {

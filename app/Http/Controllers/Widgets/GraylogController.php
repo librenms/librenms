@@ -32,7 +32,7 @@ use Illuminate\View\View;
 
 class GraylogController extends WidgetController
 {
-    protected $title = 'Graylog';
+    protected string $name = 'graylog';
     protected $defaults = [
         'title' => null,
         'stream' => null,
@@ -43,16 +43,7 @@ class GraylogController extends WidgetController
         'hidenavigation' => 0,
     ];
 
-    /**
-     * @param  Request  $request
-     * @return View
-     */
-    public function getView(Request $request)
-    {
-        return view('widgets.graylog', $this->getSettings());
-    }
-
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
 

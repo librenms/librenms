@@ -35,13 +35,8 @@ use LibreNMS\Util\Laravel;
 
 global $vars, $console_color;
 
-error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-
-if (! defined('IGNORE_ERRORS')) {
-    define('IGNORE_ERRORS', true);
-}
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -80,8 +75,6 @@ if (module_selected('discovery', $init_modules)) {
 if (module_selected('polling', $init_modules)) {
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
-
-Debug::set($debug ?? false); // disable debug initially
 
 // Boot Laravel
 if (module_selected('web', $init_modules)) {

@@ -35,7 +35,7 @@ use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
 {
-    protected $title = 'Globe';
+    protected string $name = 'globe';
 
     public function __construct()
     {
@@ -49,16 +49,11 @@ class GlobeController extends WidgetController
         ];
     }
 
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.globe', $this->getSettings(true));
-    }
-
     /**
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
         $locations = new Collection();

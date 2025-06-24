@@ -66,17 +66,20 @@ class Prometheus extends BaseDatastore
         $this->enabled = self::isEnabled();
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'Prometheus';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
         return Config::get('prometheus.enable', false);
     }
 
-    public function put($device, $measurement, $tags, $fields)
+    /**
+     * @inheritDoc
+     */
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $stat = Measurement::start('put');
         // skip if needed
@@ -99,9 +102,10 @@ class Prometheus extends BaseDatastore
             }
         }
 
-        $promurl = $device['hostname'] . $promtags;
+        $device = $this->getDevice($meta);
+        $promurl = $device->hostname . $promtags;
         if (Config::get('prometheus.attach_sysname', false)) {
-            $promurl .= '/sysName/' . $device['sysName'];
+            $promurl .= '/sysName/' . $device->sysName;
         }
         $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 
@@ -124,15 +128,5 @@ class Prometheus extends BaseDatastore
             \Illuminate\Support\Facades\Log::error("%RFailed to connect to Prometheus server $this->base_uri, temporarily disabling.%n", ['color' => true]);
             $this->enabled = false;
         }
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
-    {
-        return false;
     }
 }

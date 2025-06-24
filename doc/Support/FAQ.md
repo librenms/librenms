@@ -479,19 +479,20 @@ follow the below steps.
 
 Please [open a feature request in the community forum](https://community.librenms.org/c/feature-requests) and provide
 the output of Discovery, Poller, and Snmpwalk as separate non-expiring
-<https://p.libren.ms/> links :
+"pastebin" links, we recommend using <https://paste.rs/> or <https://paste.sh/>
 
 Please use preferably the command line to obtain the information.
 Especially, if snmpwalk results in a large amount of data. Replace the
 relevant information in these commands such as HOSTNAME and
 COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
-> These commands will automatically upload the data to LibreNMS servers.
+> These commands will automatically upload the data to <https://paste.rs/> servers.
+> Feel free to use another service!
 
 ```bash
-./discovery.php -h HOSTNAME -d | ./pbin.sh
-lnms device:poll HOSTNAME -vv | ./pbin.sh
-snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .  | ./pbin.sh
+./discovery.php -h HOSTNAME -d | curl --data-binary @- https://paste.rs/
+lnms device:poll HOSTNAME -vv | curl --data-binary @- https://paste.rs/
+snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME . | curl --data-binary @- https://paste.rs/
 ```
 
 You can use the links provided by these commands within the community post.

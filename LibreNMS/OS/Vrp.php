@@ -303,7 +303,7 @@ class Vrp extends OS implements
                 'NUMCLIENTS' => $numClients,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'vrp', $tags, $fields);
 
             $aps = new Collection;
@@ -386,7 +386,7 @@ class Vrp extends OS implements
                         'interference' => $interference,
                     ];
 
-                    $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
+                    $tags = ['name' => $name, 'radionum' => $radionum, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                     $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
                     $aps->push(new AccessPoint([
@@ -687,7 +687,7 @@ class Vrp extends OS implements
                         //->addDataset('MaxRtt', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $icmp);
                     $collected = array_merge($collected, $icmp);
                     break;

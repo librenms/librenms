@@ -28,10 +28,11 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ServerStatsController extends WidgetController
 {
-    protected $title = 'Server Stats';
+    protected string $name = 'server-stats';
     protected $defaults = [
         'title' => null,
         'columnsize' => 3,
@@ -42,22 +43,22 @@ class ServerStatsController extends WidgetController
         'unit' => 'AUTO',
     ];
 
-    public function title(Request $request)
+    public function getTitle(): string
     {
         $settings = $this->getSettings();
         if ($settings['title']) {
             return $settings['title'];
         }
 
-        $device = Device::hasAccess($request->user())->find($settings['device']);
+        $device = Device::hasAccess(request()->user())->find($settings['device']);
         if ($device) {
             return $device->displayName() . ' Stats';
         }
 
-        return $this->title;
+        return parent::getTitle();
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
         $data['unit'] = $data['unit'] ?? 'AUTO';
@@ -116,7 +117,7 @@ class ServerStatsController extends WidgetController
         return view('widgets.server-stats', $data);
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $settings = $this->getSettings(true);
         $settings['device'] = Device::hasAccess($request->user())->find($settings['device']) ?: null;
@@ -125,7 +126,7 @@ class ServerStatsController extends WidgetController
         return view('widgets.settings.server-stats', $settings);
     }
 
-    public function getSettings($settingsView = false)
+    public function getSettings($settingsView = false): array
     {
         $settings = parent::getSettings($settingsView);
         $settings['columns'] = 12 / $settings['columnsize'];
