@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use RdKafka\Conf;
 use RdKafka\FFI\Library;
 use RdKafka\Message;
@@ -26,15 +26,15 @@ class Kafka extends BaseDatastore
         $this->client = $client;
 
         // Load the topic name from config
-        $this->topicName = Config::get('kafka.topic', 'librenms');
+        $this->topicName = LibrenmsConfig::get('kafka.topic', 'librenms');
 
         // Cache the flush timeout value early to avoid Config during shutdown
         if ($this->kafkaFlushTimeout == null) {
-            $this->kafkaFlushTimeout = Config::get('kafka.flush.timeout', 100);
+            $this->kafkaFlushTimeout = LibrenmsConfig::get('kafka.flush.timeout', 100);
         }
 
         // Load excluded values from config
-        foreach (Config::get('kafka.groups-exclude', []) as $exclude_group) {
+        foreach (LibrenmsConfig::get('kafka.groups-exclude', []) as $exclude_group) {
             // Ensure its a valid number and parse it as an integer
             if (! is_numeric($exclude_group)) {
                 Log::warning('KAFKA: Excluded group is not a valid number', [
@@ -44,7 +44,7 @@ class Kafka extends BaseDatastore
             }
             $this->excluded_groups[] = (int) $exclude_group;
         }
-        foreach (Config::get('kafka.measurement-exclude', []) as $exclude_measurement) {
+        foreach (LibrenmsConfig::get('kafka.measurement-exclude', []) as $exclude_measurement) {
             $this->excluded_measurement[] = trim(strtolower($exclude_measurement));
         }
     }
@@ -86,33 +86,33 @@ class Kafka extends BaseDatastore
         );
 
         // Set the kafka broker servers
-        $conf->set('bootstrap.servers', Config::get('kafka.broker.list', '127.0.2.2:9092'));
+        $conf->set('bootstrap.servers', LibrenmsConfig::get('kafka.broker.list', '127.0.2.2:9092'));
         // Set the idempotence
-        $conf->set('enable.idempotence', Config::get('kafka.idempotence', false) ? 'true' : 'false');
+        $conf->set('enable.idempotence', LibrenmsConfig::get('kafka.idempotence', false) ? 'true' : 'false');
         // Max queue allowed messages in poller memory
-        $conf->set('queue.buffering.max.messages', Config::get('kafka.buffer.max.message', 1_000));
+        $conf->set('queue.buffering.max.messages', LibrenmsConfig::get('kafka.buffer.max.message', 1_000));
         // Num of messages each call to kafka
-        $conf->set('batch.num.messages', Config::get('kafka.batch.max.message', 200));
+        $conf->set('batch.num.messages', LibrenmsConfig::get('kafka.batch.max.message', 200));
         // Max wait time to acumulate before sending the batch
-        $conf->set('linger.ms', Config::get('kafka.linger.ms', default: 50));
+        $conf->set('linger.ms', LibrenmsConfig::get('kafka.linger.ms', default: 50));
         // Change ACK
         $conf->set(
             'request.required.acks',
             // If idempotence is enabled, set to 'all' to ensure all messages are acknowledged
             // Otherwise, use the configured value or default to '1'
             // '1' means the leader will acknowledge the message, 'all' means all replicas must acknowledge
-            Config::get('kafka.idempotence', false) ? 'all' :
-                (Config::get('kafka.request.required.acks', '-1'))
+            LibrenmsConfig::get('kafka.idempotence', false) ? 'all' :
+                (LibrenmsConfig::get('kafka.request.required.acks', '-1'))
         );
 
         // check if debug for ssl was set and enable it
-        $confKafkaSSLDebug = Config::get('kafka.security.debug', null);
+        $confKafkaSSLDebug = LibrenmsConfig::get('kafka.security.debug', null);
         $confKafkaSSLDebug != null || strlen($confKafkaSSLDebug) !== 0 ? $conf->set('debug', $confKafkaSSLDebug) : null;
 
         // config ssl
-        $isSslEnabled = Config::get('kafka.ssl.enable', false);
+        $isSslEnabled = LibrenmsConfig::get('kafka.ssl.enable', false);
         if ($isSslEnabled) {
-            $conf->set('security.protocol', Config::get('kafka.ssl.protocol', 'ssl'));
+            $conf->set('security.protocol', LibrenmsConfig::get('kafka.ssl.protocol', 'ssl'));
             $conf->set('ssl.endpoint.identification.algorithm', 'none');
 
             // prepare all necessary librenms kafka config with associated rdkafka key
@@ -127,7 +127,7 @@ class Kafka extends BaseDatastore
 
             // fetch kafka config values, if exists, associate its value to rdkafka key
             foreach ($kafkaSSLConfigs as $configKey => $kafkaKey) {
-                $configValue = Config::get($configKey, null);
+                $configValue = LibrenmsConfig::get($configKey, null);
                 $configValue != null || strlen($configValue) !== 0 ? $conf->set($kafkaKey, $configValue) : null;
             }
         }
@@ -180,7 +180,7 @@ class Kafka extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('kafka.enable', false);
+        return LibrenmsConfig::get('kafka.enable', false);
     }
 
     public function getKafkaFlushTimeout()
@@ -248,7 +248,7 @@ class Kafka extends BaseDatastore
                 'tags' => $tags,
             ];
 
-            if (Config::get('kafka.debug') === true) {
+            if (LibrenmsConfig::get('kafka.debug') === true) {
                 Log::debug('Kafka data: ', [
                     'device_id' => $device_data->device_id,
                     'measurement' => $measurement,
@@ -260,7 +260,7 @@ class Kafka extends BaseDatastore
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $dataArr, $device_data->device_id);
 
             // If debug is enabled, log the total size of the data being sent
-            if (Config::get('kafka.debug') === true) {
+            if (LibrenmsConfig::get('kafka.debug') === true) {
                 $outQLen = $this->client->getOutQLen();
                 Log::debug('KAFKA: Flush | Data size', [
                     'device_id' => $device_data->device_id,
