@@ -11482,19 +11482,6 @@
             ]
         }
     },
-    "vlans": {
-        "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 0,
-                    "vlan_domain": 1,
-                    "vlan_name": "____juniper_private1____",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ]
-        }
-    },
     "isis": {
         "discovery": {
             "isis_adjacencies": [
