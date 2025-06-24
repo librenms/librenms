@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -56,7 +57,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     public $processor_precision;
     public $entPhysicalIndex;
     public $hrDeviceIndex;
-    public $processor_perc_warn = 75;
+    public $processor_perc_warn;
 
     /**
      * Processor constructor.
@@ -81,7 +82,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $description = 'Processor',
         $precision = 1,
         $current_usage = null,
-        $warn_percent = 75,
+        $warn_percent = null,
         $entPhysicalIndex = null,
         $hrDeviceIndex = null
     ) {
@@ -103,10 +104,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
 
-        if (! is_null($warn_percent)) {
-            $proc->processor_perc_warn = $warn_percent;
-        }
-
+        $proc->processor_perc_warn = $warn_percent ?? LibrenmsConfig::get('processor_perc_warn', 75);
+        
         // validity not checked yet
         if (is_null($proc->processor_usage)) {
             $data = snmp_get(device_by_id_cache($proc->device_id), $proc->processor_oid, '-Ovq');

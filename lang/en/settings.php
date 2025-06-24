@@ -44,6 +44,7 @@ return [
             'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
+            'processor' => ['name' => 'Processor Module'],
             'ipmi' => ['name' => 'IPMI Module'],
             'sensors' => ['name' => 'Sensors Module'],
             'virtualization' => ['name' => 'Virtualization Module'],
@@ -1639,6 +1640,10 @@ return [
         'ports_purge' => [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'processor_perc_warn' => [
+            'description' => 'Processor Percentage Warning',
+            'help' => 'Percentage of processor used before a warning is raised. 0 disables warning.',
         ],
         'prometheus' => [
             'enable' => [
