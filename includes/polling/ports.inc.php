@@ -695,13 +695,13 @@ foreach ($ports as $port) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = DeviceCache::getPrimary()->getAttrib('ifName_tune:' . $port['ifName']);
-                $device_tune = DeviceCache::getPrimary()->getAttrib('override_rrdtool_tune');
-                if ($port_tune == 'true' ||
-                    ($device_tune == 'true' && $port_tune != 'false') ||
-                    (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
-                    if ($oid == 'ifSpeed') {
-                        $tune_port = true;
+                if ($oid == 'ifSpeed') {
+                    $port_tune = DeviceCache::getPrimary()->getAttrib('ifName_tune:' . $port['ifName']);
+                    $device_tune = DeviceCache::getPrimary()->getAttrib('override_rrdtool_tune');
+                    if ($port_tune == 'true' ||
+                        ($device_tune == 'true' && $port_tune != 'false') ||
+                        (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
+                        $tune_port = $port[$oid] < $current_oid; // only tune when speed goes up
                     }
                 }
 
