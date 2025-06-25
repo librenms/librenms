@@ -91,7 +91,7 @@ class SimpleTemplate
             foreach ($matches as $match) {
                 $filterName = $match[1];
                 $argsString = $match[2] ?? '';
-                $args = !empty($argsString) ? $this->parseArguments($argsString) : [];
+                $args = ! empty($argsString) ? $this->parseArguments($argsString) : [];
                 $value = $this->executeFilter($value, $filterName, $args);
             }
         }
@@ -193,7 +193,7 @@ class SimpleTemplate
             'addslashes' => addslashes($value),
             'stripslashes' => stripslashes($value),
             'number_format' => number_format((float) $value, ...$args),
-            'date' =>  date($args[0] ?? 'Y-m-d H:i:s', is_numeric($value) ? (int) $value : (strtotime($value) ?: time())),
+            'date' => date($args[0] ?? 'Y-m-d H:i:s', is_numeric($value) ? (int) $value : (strtotime($value) ?: time())),
             'json_encode' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
             'truncate' => (isset($args[0]) && strlen($value) > $args[0]) ? substr($value, 0, $args[0]) . ($args[1] ?? '...') : $value,
             'slug' => strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $value), '-')),
@@ -208,14 +208,14 @@ class SimpleTemplate
             $variableName = $matches[1];
             $value = $this->variables[$variableName] ?? ($this->keepEmpty ? $matches[0] : '');
 
-            if (!StringHelpers::isStringable($value)) {
+            if (! StringHelpers::isStringable($value)) {
                 return '';
             }
 
             $stringValue = (string) $value;
 
             // Apply filters if present
-            if (!empty($matches[2])) {
+            if (! empty($matches[2])) {
                 $stringValue = $this->applyFilters($stringValue, $matches[2]);
             }
 
