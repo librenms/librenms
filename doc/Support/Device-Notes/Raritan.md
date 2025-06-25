@@ -85,7 +85,7 @@ The sensor type indexes can be found in the MIB, but are below for convenience.
 
 ## Known Sensor Types
 
-'supported' means that support for polling that sensor type has been added to the YAML. Any of the below sensor types should be supportable by LibreNMS, however test data is not currently available for 
+'supported' means that support for polling that sensor type has been added to the YAML. Any of the below sensor types should be supportable by LibreNMS, however test data is not currently available for those sensor types.
 
 | Sensor Type                | Supported | Index |
 |----------------------------|-----------|-------|
