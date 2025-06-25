@@ -15,8 +15,6 @@ You can do this with in bulk with either the JSON-RPC API, or RedFish.
 
 For a small number of devices (or with sufficient patience) you can configure the thresholds on the device via the GUI - though the setting is buried.
 
-The process for an outlet is identical to the process for an inlet
-
 Hysteresis and deassert are advanced settings - you do not need to change these unless you know what you are doing.
 
 For an inlet:
