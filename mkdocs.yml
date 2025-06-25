@@ -302,5 +302,6 @@ nav:
       - Dell OpenManage: Extensions/Dell-OpenManage.md
       - Fortigate: Support/Device-Notes/Fortigate.md
       - OpenWRT: Support/Device-Notes/Openwrt.md
+      - Raritan: Support/Device-Notes/Raritan.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md
