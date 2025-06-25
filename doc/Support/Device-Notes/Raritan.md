@@ -7,7 +7,7 @@ If you don't care about threshold data, these can simply be turned off in the de
 
 Unfortunately Raritan use a threshold of 0 to mean both 'the low value for this sensor is 0' and 'no threshold is configured' so it's impossible for us to filter out these bad values.
 
-Alternatively (and this is the best course of action, you can configure the thresholds on the devices themselves, and LibreNMS will detect them automatically.
+Alternatively (and this is the best course of action), you can configure the thresholds on the devices themselves, and LibreNMS will detect them automatically.
 
 You can do this with in bulk with either the JSON-RPC API, or RedFish.
 * https://pypi.org/project/raritan/4.3.0.51180/
