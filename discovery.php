@@ -64,7 +64,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $doing = $options['n'] . '/' . $options['i'];
 }
 
-if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
+if (Debug::set(isset($options['d'])) || isset($options['v'])) {
     echo \LibreNMS\Util\Version::get()->header();
 
     echo "DEBUG!\n";

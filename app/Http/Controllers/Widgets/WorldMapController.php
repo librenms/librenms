@@ -27,11 +27,12 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Config;
 
 class WorldMapController extends WidgetController
 {
-    protected $title = 'World Map';
+    protected string $name = 'world-map';
 
     public function __construct()
     {
@@ -47,7 +48,7 @@ class WorldMapController extends WidgetController
         ];
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
@@ -62,11 +63,6 @@ class WorldMapController extends WidgetController
             'layer' => $settings['init_layer'],
         ];
 
-        return view('widgets.worldmap', $settings);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.worldmap', $this->getSettings(true));
+        return view('widgets.world-map', $settings);
     }
 }
