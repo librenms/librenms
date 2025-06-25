@@ -143,7 +143,7 @@
             "@php artisan key:generate --ansi"
         ],
         "python-requirements": [
-            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
+            "scripts/dynamic_check_requirements.py || ([ -n \"$VIRTUAL_ENV\" ] && pip install -r requirements.txt || pip install --user -r requirements.txt) || :"
         ]
     },
     "support": {
