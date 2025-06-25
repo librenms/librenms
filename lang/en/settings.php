@@ -1641,7 +1641,7 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
-        'processor_perc_warn' => [
+        'processor.default_perc_warn' => [
             'description' => 'Default Processor Percentage Warning',
             'help' => 'Default Percentage of processor used before a warning is raised.',
         ],

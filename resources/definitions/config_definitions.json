@@ -5962,7 +5962,7 @@
             "default": true,
             "type": "boolean"
         },
-        "processor_perc_warn": {
+        "processor.default_perc_warn": {
             "default": 75,
             "type": "integer",
             "validate": {

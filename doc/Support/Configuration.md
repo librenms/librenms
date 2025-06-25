@@ -1097,7 +1097,7 @@ is discovered and the perc
 
 !!! setting "discovery/processor"
     ```bash
-    lnms config:set processor_perc_warn 75
+    lnms config:set processor.default_perc_warn 75
     ```
 
 ## Storage configuration
