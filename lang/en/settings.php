@@ -44,6 +44,7 @@ return [
             'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
+            'processor' => ['name' => 'Processor Module'],
             'ipmi' => ['name' => 'IPMI Module'],
             'sensors' => ['name' => 'Sensors Module'],
             'virtualization' => ['name' => 'Virtualization Module'],
@@ -1643,6 +1644,10 @@ return [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'processor.default_perc_warn' => [
+            'description' => 'Default Processor Percentage Warning',
+            'help' => 'Default Percentage of processor used before a warning is raised.',
+        ],
         'prometheus' => [
             'enable' => [
                 'description' => 'Enable',
@@ -2050,8 +2055,8 @@ return [
             'description' => 'Path to snmpwalk',
         ],
         'storage_perc_warn' => [
-            'description' => 'Storage Percentage Warning',
-            'help' => 'Percentage of storage used before a warning is raised. 0 disables warning.',
+            'description' => 'Default Storage Percentage Warning',
+            'help' => 'Default Percentage of storage used before a warning is raised. 0 disables warning.',
         ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
