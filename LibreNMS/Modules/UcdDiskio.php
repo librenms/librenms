@@ -81,7 +81,7 @@ class UcdDiskio implements Module
      */
     public function poll(OS $os, ?DataStorageInterface $datastore = null): void
     {
-        $oids = SnmpQuery::hideMib()->walk('UCD-DISKIO-MIB::diskIOEntry')->table(1);
+        $oids = SnmpQuery::hideMib()->walk('UCD-DISKIO-MIB::diskIOTable')->table(1);
         $ucddisk = new Collection;
 
         foreach ($oids as $key => $diskData) {
