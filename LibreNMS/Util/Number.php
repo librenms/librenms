@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use InvalidArgumentException;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
@@ -142,6 +143,50 @@ class Number
     }
 
     /**
+     * @throws InvalidArgumentException
+     */
+    public static function toBaseUnits(string $input): float
+    {
+        $input = strtolower(trim($input));
+
+        if (!preg_match('/^([-+]?[0-9]*\.?[0-9]+)\s*([a-zµ]{1,3})$/', $input, $matches)) {
+            throw new InvalidArgumentException("Invalid format: '$input'");
+        }
+
+        $value = (float) $matches[1];
+        $unitSuffix = $matches[2];
+        $prefix = substr($unitSuffix, 0, -1);
+
+        $multiplier = match ($prefix) {
+            'y'  => 1e-24,
+            'z'  => 1e-21,
+            'a'  => 1e-18,
+            'f'  => 1e-15,
+            'p'  => 1e-12,
+            'n'  => 1e-9,
+            'µ', 'u' => 1e-6,
+            'm'  => 1e-3,
+            'c'  => 1e-2,
+            'd'  => 1e-1,
+            '' => 1,
+            'da' => 1e1,
+            'h'  => 1e2,
+            'k'  => 1e3,
+            'M'  => 1e6,
+            'G'  => 1e9,
+            'T'  => 1e12,
+            'P'  => 1e15,
+            'E'  => 1e18,
+            'Z'  => 1e21,
+            'Y'  => 1e24,
+            default => throw new InvalidArgumentException("Unknown prefix '$unitSuffix'"),
+        };
+
+        return $value * $multiplier;
+    }
+
+
+    /**
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
@@ -207,7 +252,7 @@ class Number
 
                 // if conversion was successful, the number will still be in the valid range
                 if ($signedValue > $maxSignedValue) {
-                    throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
+                    throw new InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
                 }
 
                 return $signedValue;
@@ -221,7 +266,7 @@ class Number
             $unsignedValue = $value + $integerSize->maxValue() - 1;
 
             if ($unsignedValue < 0) {
-                throw new \InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
+                throw new InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
             }
 
             return $unsignedValue;
