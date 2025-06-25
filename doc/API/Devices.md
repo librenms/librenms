@@ -1420,6 +1420,70 @@ Output:
 ]
 ```
 
+### `get_oxidized_state`
+
+Check if a device has been excluded from Oxidized.
+
+Route: `/api/v0/oxidized/disabled/:hostname`
+
+  - hostname can be either the device hostname or id
+
+Examples:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/disabled/localhost
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "oxidized_disabled": false
+}
+```
+
+### `set_oxidized_state`
+
+Enable or disable Oxidized for a device.
+
+Route: `/api/v0/oxidized/disabled/:hostname`
+
+  - hostname can be either the device hostname or id
+
+Input (JSON):
+
+  - oxidized_disabled: Should Oxidized be disabled for this device or not?
+
+Examples:
+
+```curl
+curl -X PUT -d '{"oxidized_disabled": true}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/state/localhost
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "Device localhost has been excluded from Oxidized"
+}
+```
+
+```curl
+curl -X PUT -d '{"oxidized_disabled": false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/state/localhost
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "Device localhost is no longer excluded from Oxidized"
+}
+```
+
+
 ### `update_device_field`
 
 Update devices field in the database.

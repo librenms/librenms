@@ -87,6 +87,8 @@ Route::prefix('v0')->group(function () {
         Route::post('services/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'add_service_for_host'])->name('add_service_for_host');
         Route::get('oxidized/config/search/{searchstring}', [App\Api\Controllers\LegacyApiController::class, 'search_oxidized'])->name('search_oxidized');
         Route::get('oxidized/config/{device_name}', [App\Api\Controllers\LegacyApiController::class, 'get_oxidized_config'])->name('get_oxidized_config');
+        Route::get('oxidized/disabled/{hostname}', 'LegacyApiController@get_oxidized_state')->name('get_oxidized_state');
+        Route::put('oxidized/disabled/{hostname}', 'LegacyApiController@set_oxidized_state')->name('set_oxidized_state');
         Route::post('devicegroups', [App\Api\Controllers\LegacyApiController::class, 'add_device_group'])->name('add_device_group');
         Route::patch('devices/{hostname}/port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'update_device_port_notes'])->name('update_device_port_notes');
         Route::post('port_groups', [App\Api\Controllers\LegacyApiController::class, 'add_port_group'])->name('add_port_group');
