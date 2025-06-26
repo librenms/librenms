@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Kafka;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -14,14 +14,14 @@ class KafkaDBStoreTest extends TestCase
     {
         parent::setUp();
 
-        Config::set('kafka.enable', true);
-        Config::set('kafka.broker.list', 'localhost:9092');
-        Config::set('kafka.topic', 'librenms');
-        Config::set('kafka.idempotence', false);
-        Config::set('kafka.buffer.max.message', 10);
-        Config::set('kafka.batch.max.message', 25);
-        Config::set('kafka.linger.ms', 5000);
-        Config::set('kafka.request.required.acks', 0);
+        LibrenmsConfig::set('kafka.enable', true);
+        LibrenmsConfig::set('kafka.broker.list', 'localhost:9092');
+        LibrenmsConfig::set('kafka.topic', 'librenms');
+        LibrenmsConfig::set('kafka.idempotence', false);
+        LibrenmsConfig::set('kafka.buffer.max.message', 10);
+        LibrenmsConfig::set('kafka.batch.max.message', 25);
+        LibrenmsConfig::set('kafka.linger.ms', 5000);
+        LibrenmsConfig::set('kafka.request.required.acks', 0);
     }
 
     public function testDataPushToKafka()
@@ -46,7 +46,7 @@ class KafkaDBStoreTest extends TestCase
 
     protected function tearDown(): void
     {
-        Config::set('kafka.enable', false);
+        LibrenmsConfig::set('kafka.enable', false);
         parent::tearDown();
     }
 }
