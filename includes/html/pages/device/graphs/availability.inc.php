@@ -5,9 +5,9 @@ $graph_type = 'availability';
 $deviceModel = DeviceCache::getPrimary();
 foreach ($deviceModel->availability as $index => $duration) {
     if (is_integer($index / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
     }
 
     $graph_array['device'] = $duration->device_id;

@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use InfluxDB\Point;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -37,8 +37,8 @@ class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
     {
-        Config::set('influxdb.host', '');
-        Config::set('influxdb.port', 'abc');
+        LibrenmsConfig::set('influxdb.host', '');
+        LibrenmsConfig::set('influxdb.port', 'abc');
         $influx = new InfluxDB(InfluxDB::createFromConfig());
 
         \Log::shouldReceive('debug');

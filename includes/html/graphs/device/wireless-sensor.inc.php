@@ -53,8 +53,8 @@ $rrd_options .= " COMMENT:'" . str_pad($unit_long, 35) . str_pad('Cur', $col_w) 
 
 foreach ($sensors as $index => $sensor) {
     $sensor_id = $sensor['sensor_id'];
-    $colour_index = $index % count(\LibreNMS\Config::get('graph_colours.mixed'));
-    $colour = \LibreNMS\Config::get("graph_colours.mixed.$colour_index");
+    $colour_index = $index % count(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'));
+    $colour = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$colour_index");
 
     $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28);
     $rrd_file = Rrd::name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);

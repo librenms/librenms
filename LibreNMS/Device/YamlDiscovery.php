@@ -26,11 +26,11 @@
 
 namespace LibreNMS\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
@@ -352,7 +352,7 @@ class YamlDiscovery
                         continue;
                     }
 
-                    $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
+                    $saved_nobulk = LibrenmsConfig::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
                         foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
@@ -371,13 +371,13 @@ class YamlDiscovery
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
-                                    Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
+                                    LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
                                 $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
-                                Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
+                                LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }

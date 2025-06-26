@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 function rewrite_entity_descr($descr)
 {
@@ -57,15 +57,15 @@ function cleanPort($interface, $device = null)
     $interface['label'] = $interface['ifDescr'];
     if (isset($device['os'])) {
         $os = strtolower($device['os']);
-        if (Config::get("os.$os.ifname")) {
+        if (LibrenmsConfig::get("os.$os.ifname")) {
             $interface['label'] = $interface['ifName'];
 
             if ($interface['ifName'] == '') {
                 $interface['label'] = $interface['ifDescr'];
             }
-        } elseif (Config::get("os.$os.ifalias")) {
+        } elseif (LibrenmsConfig::get("os.$os.ifalias")) {
             $interface['label'] = $interface['ifAlias'];
-        } elseif (Config::get("os.$os.ifindex")) {
+        } elseif (LibrenmsConfig::get("os.$os.ifindex")) {
             $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
 
@@ -74,16 +74,16 @@ function cleanPort($interface, $device = null)
         }
     }
 
-    if (is_array(Config::get('rewrite_if'))) {
-        foreach (Config::get('rewrite_if') as $src => $val) {
+    if (is_array(LibrenmsConfig::get('rewrite_if'))) {
+        foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
             if (stristr($interface['label'], $src)) {
                 $interface['label'] = $val;
             }
         }
     }
 
-    if (is_array(Config::get('rewrite_if_regexp'))) {
-        foreach (Config::get('rewrite_if_regexp') as $reg => $val) {
+    if (is_array(LibrenmsConfig::get('rewrite_if_regexp'))) {
+        foreach (LibrenmsConfig::get('rewrite_if_regexp') as $reg => $val) {
             if (preg_match($reg . 'i', $interface['label'])) {
                 $interface['label'] = preg_replace($reg . 'i', $val, $interface['label']);
             }

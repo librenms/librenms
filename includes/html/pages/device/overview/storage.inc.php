@@ -22,7 +22,7 @@ if (count($drives)) {
         $skipdrive = 0;
 
         if ($device['os'] == 'junos') {
-            foreach (\LibreNMS\Config::get('ignore_junos_os_drives', []) as $jdrive) {
+            foreach (\App\Facades\LibrenmsConfig::get('ignore_junos_os_drives', []) as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -32,7 +32,7 @@ if (count($drives)) {
         }
 
         if ($device['os'] == 'freebsd') {
-            foreach (\LibreNMS\Config::get('ignore_bsd_os_drives', []) as $jdrive) {
+            foreach (\App\Facades\LibrenmsConfig::get('ignore_bsd_os_drives', []) as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -52,10 +52,10 @@ if (count($drives)) {
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $drive['storage_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
