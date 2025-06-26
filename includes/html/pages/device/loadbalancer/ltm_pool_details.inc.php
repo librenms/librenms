@@ -123,7 +123,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_currconns';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -140,7 +140,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_conns';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -158,7 +158,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_bytesin';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -176,7 +176,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_bytesout';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -194,7 +194,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_pktsin';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -212,7 +212,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_allpm_pktsout';
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>

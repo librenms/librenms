@@ -13,6 +13,7 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -46,7 +47,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -984,7 +984,7 @@ function get_graphs(Illuminate\Http\Request $request)
             'name' => 'device_icmp_perf',
         ];
         foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
-            $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
+            $desc = LibrenmsConfig::get("graph_types.device.{$graph['graph']}.descr");
             $graphs[] = [
                 'desc' => $desc,
                 'name' => 'device_' . $graph['graph'],
@@ -1603,7 +1603,7 @@ function ack_alert(Illuminate\Http\Request $request)
     if (! empty($note)) {
         $note .= PHP_EOL;
     }
-    $note .= date(Config::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
     $info['until_clear'] = $data['until_clear'];
     $info = json_encode($info);
 
@@ -1629,7 +1629,7 @@ function unmute_alert(Illuminate\Http\Request $request)
     if (! empty($note)) {
         $note .= PHP_EOL;
     }
-    $note .= date(Config::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
 
     if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         return api_success_noresult(200, 'Alert has been unmuted');
@@ -1719,8 +1719,8 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->when($request->route('hostname'), function ($query, $hostname) {
                  return $query->where('hostname', $hostname);
              })
-             ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
              ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
              ->get();
@@ -1741,13 +1741,13 @@ function list_oxidized(Illuminate\Http\Request $request)
             $output['telnet_port'] = $custom_telnet_port;
         }
         // Pre-populate the group with the default
-        if (Config::get('oxidized.group_support') === true && ! empty(Config::get('oxidized.default_group'))) {
-            $output['group'] = Config::get('oxidized.default_group');
+        if (LibrenmsConfig::get('oxidized.group_support') === true && ! empty(LibrenmsConfig::get('oxidized.default_group'))) {
+            $output['group'] = LibrenmsConfig::get('oxidized.default_group');
         }
 
-        foreach (Config::get('oxidized.maps') as $maps_column => $maps) {
+        foreach (LibrenmsConfig::get('oxidized.maps') as $maps_column => $maps) {
             // Based on Oxidized group support we can apply groups by setting group_support to true
-            if ($maps_column == 'group' && Config::get('oxidized.group_support', true) !== true) {
+            if ($maps_column == 'group' && LibrenmsConfig::get('oxidized.group_support', true) !== true) {
                 continue;
             }
 
@@ -1772,7 +1772,7 @@ function list_oxidized(Illuminate\Http\Request $request)
             }
         }
         //Exclude groups from being sent to Oxidized
-        if (in_array($output['group'], Config::get('oxidized.ignore_groups'))) {
+        if (in_array($output['group'], LibrenmsConfig::get('oxidized.ignore_groups'))) {
             continue;
         }
 

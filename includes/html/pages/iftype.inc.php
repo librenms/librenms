@@ -18,7 +18,7 @@ foreach ($ports as $port) {
 unset($seperator);
 
 // show title from config file (but ucwords it)
-$ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($descr) {
+$ctypes = collect(\App\Facades\LibrenmsConfig::get('custom_descr', []))->keyBy(function ($descr) {
     if (is_array($descr)) {
         return strtolower($descr[0]);
     }

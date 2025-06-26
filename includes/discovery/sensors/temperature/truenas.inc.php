@@ -1,5 +1,5 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
-include Config::get('install_dir') . '/includes/discovery/sensors/temperature/unix.inc.php';
+include LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/temperature/unix.inc.php';
