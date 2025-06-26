@@ -27,13 +27,13 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -75,7 +75,7 @@ class ModuleTestHelper
         if ($variant) {
             $variant = '_' . $this->variant;
         }
-        $install_dir = Config::get('install_dir');
+        $install_dir = LibrenmsConfig::get('install_dir');
         $this->file_name = $os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
         $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
@@ -83,13 +83,13 @@ class ModuleTestHelper
         $this->json_file = $this->json_dir . $this->file_name . '.json';
 
         // never store time series data
-        Config::set('rrd.enable', false);
-        Config::set('hide_rrd_disabled', true);
-        Config::set('influxdb.enable', false);
-        Config::set('influxdbv2.enable', false);
-        Config::set('kafka.enable', false);
-        Config::set('graphite.enable', false);
-        Config::set('prometheus.enable', false);
+        LibrenmsConfig::set('rrd.enable', false);
+        LibrenmsConfig::set('hide_rrd_disabled', true);
+        LibrenmsConfig::set('influxdb.enable', false);
+        LibrenmsConfig::set('influxdbv2.enable', false);
+        LibrenmsConfig::set('graphite.enable', false);
+        LibrenmsConfig::set('prometheus.enable', false);
+        LibrenmsConfig::set('kafka.enable', false);
     }
 
     private static function compareOid($a, $b): int
@@ -250,7 +250,7 @@ class ModuleTestHelper
     {
         $os_list = [];
 
-        foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
+        foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
 
@@ -548,8 +548,8 @@ class ModuleTestHelper
     public function generateTestData(string $snmpSimIp, int $snmpSimPort, bool $noSave = false): ?array
     {
         global $device;
-        Config::set('rrd.enable', false); // disable rrd
-        Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
+        LibrenmsConfig::set('rrd.enable', false); // disable rrd
+        LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
         app()->bind(AutonomousSystem::class, function ($app, $parameters) {
@@ -815,7 +815,7 @@ class ModuleTestHelper
     public function getJsonFilepath($short = false)
     {
         if ($short) {
-            return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
+            return ltrim(str_replace(LibrenmsConfig::get('install_dir'), '', $this->json_file), '/');
         }
 
         return $this->json_file;

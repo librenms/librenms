@@ -13,17 +13,17 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
-$default_severity = Config::get('alert_rule.severity');
-$default_max_alerts = Config::get('alert_rule.max_alerts');
-$default_delay = Config::get('alert_rule.delay') . 'm';
-$default_interval = Config::get('alert_rule.interval') . 'm';
-$default_mute_alerts = Config::get('alert_rule.mute_alerts');
-$default_invert_rule_match = Config::get('alert_rule.invert_rule_match');
-$default_recovery_alerts = Config::get('alert_rule.recovery_alerts');
-$default_acknowledgement_alerts = Config::get('alert_rule.acknowledgement_alerts');
-$default_invert_map = Config::get('alert_rule.invert_map');
+$default_severity = LibrenmsConfig::get('alert_rule.severity');
+$default_max_alerts = LibrenmsConfig::get('alert_rule.max_alerts');
+$default_delay = LibrenmsConfig::get('alert_rule.delay') . 'm';
+$default_interval = LibrenmsConfig::get('alert_rule.interval') . 'm';
+$default_mute_alerts = LibrenmsConfig::get('alert_rule.mute_alerts');
+$default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
+$default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
+$default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
+$default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
     $device_id = isset($device['device_id']) ? $device['device_id'] : -1;

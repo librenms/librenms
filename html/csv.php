@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];
@@ -25,14 +25,14 @@ if (! Auth::check()) {
 Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
 
 $report = basename($vars['report']);
-if ($report && file_exists(Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php")) {
+if ($report && file_exists(LibrenmsConfig::get('install_dir') . "/includes/html/reports/$report.csv.inc.php")) {
     if (! Debug::isEnabled()) {
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $report . '-' . date('Ymd') . '.csv"');
     }
 
     $csv = [];
-    require Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php";
+    require LibrenmsConfig::get('install_dir') . "/includes/html/reports/$report.csv.inc.php";
     foreach ($csv as $line) {
         echo implode(',', $line) . "\n";
     }

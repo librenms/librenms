@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 /*
  * Bind9 Query Graph
@@ -49,7 +49,7 @@ $array = [
 $colours = 'merged';
 $rrd_list = [];
 
-Config::set('graph_colours.merged', array_merge(Config::get('graph_colours.greens'), Config::get('graph_colours.blues')));
+LibrenmsConfig::set('graph_colours.merged', array_merge(LibrenmsConfig::get('graph_colours.greens'), LibrenmsConfig::get('graph_colours.blues')));
 
 foreach ($array as $ds) {
     $rrd_list[$i]['filename'] = $rrd_filename;

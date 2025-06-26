@@ -51,9 +51,9 @@ class SocialiteControllerTest extends TestCase
         array $scopes = ['groups']
     ): bool {
         // Inject scopes & claims.
-        \LibreNMS\Config::set('auth.socialite.scopes', $scopes);
-        \LibreNMS\Config::set('auth.socialite.claims', $claimMap);
-        \LibreNMS\Config::set('auth.socialite.debug', false);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.scopes', $scopes);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.claims', $claimMap);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
 
         // Stub the Socialite user.
         $socialiteUserStub = $this->createMock(AbstractUser::class);

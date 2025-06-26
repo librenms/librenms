@@ -26,11 +26,11 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
@@ -77,23 +77,23 @@ class Rrd extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('rrd.enable', true);
+        return LibrenmsConfig::get('rrd.enable', true);
     }
 
     protected function loadConfig(): void
     {
-        $this->rrdcached = Config::get('rrdcached', false);
-        $this->rrd_dir = Config::get('rrd_dir', Config::get('install_dir') . '/rrd');
-        $this->step = Config::get('rrd.step', 300);
-        $this->rra = Config::get(
+        $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
+        $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+        $this->step = LibrenmsConfig::get('rrd.step', 300);
+        $this->rra = LibrenmsConfig::get(
             'rrd_rra',
             'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
             ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         );
-        $this->version = Config::get('rrdtool_version', '1.4');
-        $this->rrdtool_executable = Config::get('rrdtool', 'rrdtool');
+        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
+        $this->rrdtool_executable = LibrenmsConfig::get('rrdtool', 'rrdtool');
     }
 
     /**
@@ -412,7 +412,7 @@ class Rrd extends BaseDatastore
         // do not write rrd files, but allow read-only commands
         $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
         if ($this->disabled && ! in_array($command, $ro_commands)) {
-            if (! Config::get('hide_rrd_disabled')) {
+            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
                 Log::debug('[%rRRD Disabled%n]', ['color' => true]);
             }
 
@@ -696,7 +696,7 @@ class Rrd extends BaseDatastore
      */
     public static function version(): ?string
     {
-        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $proc = new Process([LibrenmsConfig::get('rrdtool', 'rrdtool'), '--version']);
         $proc->run();
         $parts = explode(' ', $proc->getOutput(), 3);
 

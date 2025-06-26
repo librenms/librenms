@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
@@ -13,11 +13,11 @@ $init_modules = [];
 require $install_dir . '/includes/init.php';
 $options = getopt('dh:e:', ['help']);
 
-Config::set('rrd.enable', false);
-Config::set('influxdb.enable', false);
-Config::set('influxdbv2.enable', false);
-Config::set('kafka.enable', false);
-Config::set('nographite', true);
+LibrenmsConfig::set('rrd.enable', false);
+LibrenmsConfig::set('influxdb.enable', false);
+LibrenmsConfig::set('influxdbv2.enable', false);
+LibrenmsConfig::set('nographite', true);
+LibrenmsConfig::set('kafka.enable', false);
 
 function print_help()
 {
@@ -62,7 +62,7 @@ if (isset($options['e'])) {
 }
 
 echo 'Full Polling: ';
-Config::set('polling.selected_ports', false);
+LibrenmsConfig::set('polling.selected_ports', false);
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';
     if (! Debug::isEnabled()) {
@@ -76,7 +76,7 @@ foreach ($devices as $index => $device) {
 }
 echo PHP_EOL;
 
-Config::set('polling.selected_ports', true);
+LibrenmsConfig::set('polling.selected_ports', true);
 echo 'Selective Polling: ';
 foreach ($devices as $index => $device) {
     echo $device['device_id'] . ' ';

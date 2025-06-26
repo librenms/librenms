@@ -32,11 +32,11 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -197,7 +197,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
+        $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
@@ -250,7 +250,7 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        if (Config::get('alert.fixed-contacts') == false) {
+        if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
                 $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
@@ -262,7 +262,7 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
                 $this->extTransports($obj);
             }
             echo "\r\n";
@@ -496,7 +496,7 @@ class RunAlerts
                 $noiss = true;
             }
 
-            $tolerence_window = Config::get('alert.tolerance_window');
+            $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             if (! empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
@@ -601,7 +601,7 @@ class RunAlerts
         }
 
         // alerting for default contacts, etc
-        if (Config::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',

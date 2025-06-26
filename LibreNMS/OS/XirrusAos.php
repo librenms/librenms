@@ -58,7 +58,7 @@ class XirrusAos extends OS implements
         // if this config flag is true, don't poll for stations
         // this in case of large APs which may have many stations
         // to prevent causing long polling times
-        if (\LibreNMS\Config::get('xirrus_disable_stations') != true) {
+        if (\App\Facades\LibrenmsConfig::get('xirrus_disable_stations') != true) {
             // station associations
             // custom RRDs and graph as each AP may have 16 radios
             $assoc = snmpwalk_cache_oid($this->getDeviceArray(), 'XIRRUS-MIB::stationAssociationIAP', [], 'XIRRUS-MIB');

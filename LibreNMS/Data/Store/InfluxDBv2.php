@@ -27,12 +27,12 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
 use InfluxDB2\Model\WritePrecision;
 use InfluxDB2\Point;
 use InfluxDB2\WriteType;
-use LibreNMS\Config;
 use Log;
 
 class InfluxDBv2 extends BaseDatastore
@@ -44,19 +44,19 @@ class InfluxDBv2 extends BaseDatastore
         parent::__construct();
 
         try {
-            $host = Config::get('influxdbv2.host', 'localhost');
-            $transport = Config::get('influxdbv2.transport', 'http');
-            $port = Config::get('influxdbv2.port', 8086);
-            $bucket = Config::get('influxdbv2.bucket', 'librenms');
-            $organization = Config::get('influxdbv2.organization', '');
-            $allow_redirects = Config::get('influxdbv2.allow_redirects', true);
-            $token = Config::get('influxdbv2.token', '');
-            $debug = Config::get('influxdbv2.debug', false);
-            $log_file = Config::get('influxdbv2.log_file', Config::get('log_file'));
-            $timeout = Config::get('influxdbv2.timeout', 1);
-            $verify = Config::get('influxdbv2.verify', false);
-            $batch_size = Config::get('influxdbv2.batch_size', 1000);
-            $max_retry = Config::get('influxdbv2.max_retry', 3);
+            $host = LibrenmsConfig::get('influxdbv2.host', 'localhost');
+            $transport = LibrenmsConfig::get('influxdbv2.transport', 'http');
+            $port = LibrenmsConfig::get('influxdbv2.port', 8086);
+            $bucket = LibrenmsConfig::get('influxdbv2.bucket', 'librenms');
+            $organization = LibrenmsConfig::get('influxdbv2.organization', '');
+            $allow_redirects = LibrenmsConfig::get('influxdbv2.allow_redirects', true);
+            $token = LibrenmsConfig::get('influxdbv2.token', '');
+            $debug = LibrenmsConfig::get('influxdbv2.debug', false);
+            $log_file = LibrenmsConfig::get('influxdbv2.log_file', LibrenmsConfig::get('log_file'));
+            $timeout = LibrenmsConfig::get('influxdbv2.timeout', 1);
+            $verify = LibrenmsConfig::get('influxdbv2.verify', false);
+            $batch_size = LibrenmsConfig::get('influxdbv2.batch_size', 1000);
+            $max_retry = LibrenmsConfig::get('influxdbv2.max_retry', 3);
 
             // The "connection: close" is to avoid a high quantity of TIME_WAIT
             $guzzleOptions = [
@@ -106,7 +106,7 @@ class InfluxDBv2 extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('influxdbv2.enable', false);
+        return LibrenmsConfig::get('influxdbv2.enable', false);
     }
 
     /**
@@ -115,7 +115,7 @@ class InfluxDBv2 extends BaseDatastore
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $device = $this->getDevice($meta);
-        $excluded_groups = Config::get('influxdbv2.groups-exclude');
+        $excluded_groups = LibrenmsConfig::get('influxdbv2.groups-exclude');
 
         if (! empty($excluded_groups)) {
             $device_groups = $device->groups;
@@ -154,7 +154,7 @@ class InfluxDBv2 extends BaseDatastore
             return;
         }
 
-        if (Config::get('influxdbv2.debug') === true) {
+        if (LibrenmsConfig::get('influxdbv2.debug') === true) {
             Log::debug('InfluxDB data: ', [
                 'measurement' => $measurement,
                 'tags' => $tmp_tags,
