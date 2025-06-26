@@ -150,7 +150,7 @@ class ConfigRepository
     /**
      * Get a setting from the $config['os'] array using the os of the given device
      *
-     * @param  string  $os  The os name
+     * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
      * @param  mixed  $default  optional value to return if the setting is not set
      * @return mixed

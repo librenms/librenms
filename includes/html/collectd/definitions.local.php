@@ -63,7 +63,7 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
         $type_instances = array('ham', 'spam', 'malware',  'sent', 'deferred', 'reject', 'bounced'); */
     foreach ($type_instances as $inst) {
         $file = '';
-        foreach (\LibreNMS\Config::get('datadirs') as $datadir) {
+        foreach (\App\Facades\LibrenmsConfig::get('datadirs') as $datadir) {
             if (is_file($datadir . '/' . $title . '-' . $inst . '.rrd')) {
                 $file = $datadir . '/' . $title . '-' . $inst . '.rrd';
                 break;

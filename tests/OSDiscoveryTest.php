@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
@@ -75,7 +75,7 @@ class OSDiscoveryTest extends TestCase
             $this->app->bind(NetSnmpQuery::class, SnmpQueryMock::class);
         }
 
-        $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
+        $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
             return basename($file, '.snmprec');
         }, glob($glob));
@@ -160,9 +160,9 @@ class OSDiscoveryTest extends TestCase
     public static function osProvider(): array
     {
         // make sure all OS are loaded
-        $config_os = array_keys(Config::get('os'));
+        $config_os = array_keys(LibrenmsConfig::get('os'));
         if (count($config_os) < count(glob(resource_path('definitions/os_detection/*.yaml')))) {
-            $config_os = array_keys(Config::get('os'));
+            $config_os = array_keys(LibrenmsConfig::get('os'));
         }
 
         $excluded_os = [

@@ -26,25 +26,25 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NetflowController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        if (Config::get('nfsen_enable')) {
-            foreach ((array) Config::get('nfsen_rrds', []) as $nfsenrrds) {
+        if (LibrenmsConfig::get('nfsen_enable')) {
+            foreach ((array) LibrenmsConfig::get('nfsen_rrds', []) as $nfsenrrds) {
                 if ($nfsenrrds[strlen($nfsenrrds) - 1] != '/') {
                     $nfsenrrds .= '/';
                 }
 
-                $nfsensuffix = Config::get('nfsen_suffix', '');
+                $nfsensuffix = LibrenmsConfig::get('nfsen_suffix', '');
 
-                if (Config::get('nfsen_split_char')) {
-                    $basefilename_underscored = preg_replace('/\./', Config::get('nfsen_split_char'), $device->hostname);
+                if (LibrenmsConfig::get('nfsen_split_char')) {
+                    $basefilename_underscored = preg_replace('/\./', LibrenmsConfig::get('nfsen_split_char'), $device->hostname);
                 } else {
                     $basefilename_underscored = $device->hostname;
                 }
