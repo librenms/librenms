@@ -1,7 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -62,7 +62,7 @@ $stat_vars = [
     'size',
 ];
 
-if (Config::get('apps.oslv_monitor.linux_pg_memory_stats')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.linux_pg_memory_stats')) {
     array_push(
         $stat_vars,
         'pgactivate',
@@ -80,7 +80,7 @@ if (Config::get('apps.oslv_monitor.linux_pg_memory_stats')) {
         'pgsteal_kswapd'
     );
 }
-if (Config::get('apps.oslv_monitor.misc_linux_memory_stats')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.misc_linux_memory_stats')) {
     array_push(
         $stat_vars,
         'anon',
@@ -106,14 +106,14 @@ if (Config::get('apps.oslv_monitor.misc_linux_memory_stats')) {
         'slab',
     );
 }
-if (Config::get('apps.oslv_monitor.zswap_size')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.zswap_size')) {
     array_push(
         $stat_vars,
         'zswap',
         'zswapped',
     );
 }
-if (Config::get('apps.oslv_monitor.zswap_activity')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.zswap_activity')) {
     array_push(
         $stat_vars,
         'zswpin',
@@ -121,7 +121,7 @@ if (Config::get('apps.oslv_monitor.zswap_activity')) {
         'zswpwb',
     );
 }
-if (Config::get('apps.oslv_monitor.workingset_stats')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.workingset_stats')) {
     array_push(
         $stat_vars,
         'workingset_refault_anon',
@@ -133,7 +133,7 @@ if (Config::get('apps.oslv_monitor.workingset_stats')) {
         'workingset_nodereclaim',
     );
 }
-if (Config::get('apps.oslv_monitor.thp_activity')) {
+if (LibrenmsConfig::get('apps.oslv_monitor.thp_activity')) {
     array_push(
         $stat_vars,
         'thp_fault_alloc',
@@ -214,7 +214,7 @@ $new_data['oslvms'] = $oslvms;
 
 // process unseen items, save info for ones that were last seen with in the specified time
 // 604800 seconds = 7 days
-$back_till = $current_time - LibreNMS\Config::get('apps.oslv_monitor.seen_age', 604800);
+$back_till = $current_time - LibrenmsConfig::get('apps.oslv_monitor.seen_age', 604800);
 foreach ($old_data['oslvm_data'] as $key => $oslvm) {
     if (! isset($new_data['oslvm_data'][$key]) && isset($old_data['oslvm_data'][$key]['seen']) &&
         $back_till <= $old_data['oslvm_data'][$key]['seen']) {
