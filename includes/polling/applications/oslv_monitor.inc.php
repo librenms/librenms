@@ -62,7 +62,7 @@ $stat_vars = [
     'size',
 ];
 
-if (Config::has('apps.oslv_monitor.linux_pg_memory_stats')) {
+if (Config::get('apps.oslv_monitor.linux_pg_memory_stats')) {
     array_push(
         $stat_vars,
         'pgactivate',
@@ -80,7 +80,7 @@ if (Config::has('apps.oslv_monitor.linux_pg_memory_stats')) {
         'pgsteal_kswapd'
     );
 }
-if (Config::has('apps.oslv_monitor.misc_linux_memory_stats')) {
+if (Config::get('apps.oslv_monitor.misc_linux_memory_stats')) {
     array_push(
         $stat_vars,
         'anon',
@@ -106,14 +106,14 @@ if (Config::has('apps.oslv_monitor.misc_linux_memory_stats')) {
         'slab',
     );
 }
-if (Config::has('apps.oslv_monitor.zswap_size')) {
+if (Config::get('apps.oslv_monitor.zswap_size')) {
     array_push(
         $stat_vars,
         'zswap',
         'zswapped',
     );
 }
-if (Config::has('apps.oslv_monitor.zswap_activity')) {
+if (Config::get('apps.oslv_monitor.zswap_activity')) {
     array_push(
         $stat_vars,
         'zswpin',
@@ -121,7 +121,7 @@ if (Config::has('apps.oslv_monitor.zswap_activity')) {
         'zswpwb',
     );
 }
-if (Config::has('apps.oslv_monitor.workingset_stats')) {
+if (Config::get('apps.oslv_monitor.workingset_stats')) {
     array_push(
         $stat_vars,
         'workingset_refault_anon',
@@ -133,7 +133,7 @@ if (Config::has('apps.oslv_monitor.workingset_stats')) {
         'workingset_nodereclaim',
     );
 }
-if (Config::has('apps.oslv_monitor.thp_activity')) {
+if (Config::get('apps.oslv_monitor.thp_activity')) {
     array_push(
         $stat_vars,
         'thp_fault_alloc',
