@@ -2,6 +2,7 @@
 
 use App\Models\Port;
 use App\Models\Storage;
+use LibreNMS\Config;
 
 $name = 'oslv_monitor';
 
@@ -611,26 +612,42 @@ if ($app_data['has']['sock']) {
     ];
 }
 if ($app_data['has']['linux_mem_stats']) {
-    $graphs[] = [
-        'type' => 'cgroups_pg',
-        'description' => 'Linux Pg Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_mem_misc',
-        'description' => 'Misc Linux Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap',
-        'description' => 'Zswap Size',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap_activity',
-        'description' => 'Zswap Activity',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_workingset',
-        'description' => 'Workingset Stats',
-    ];
+    if (Config::has('apps.oslv_monitor.linux_pg_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_pg',
+            'description' => 'Linux Pg Memory Stats',
+        ];
+    }
+    if (Config::has('apps.oslv_monitor.misc_linux_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_mem_misc',
+            'description' => 'Misc Linux Memory Stats',
+        ];
+    }
+    if (Config::has('apps.oslv_monitor.zswap_size')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap',
+            'description' => 'Zswap Size',
+        ];
+    }
+    if (Config::has('apps.oslv_monitor.zswap_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap_activity',
+            'description' => 'Zswap Activity',
+        ];
+    }
+    if (Config::has('apps.oslv_monitor.workingset_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_workingset',
+            'description' => 'Workingset Stats',
+        ];
+    }
+    if (Config::has('apps.oslv_monitor.thp_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_thp_activity',
+            'description' => 'THP Activity',
+        ];
+    }
 }
 if ($app_data['has']['throttled_time']) {
     $graphs[] = [
