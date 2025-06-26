@@ -17,6 +17,11 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$multiplier ??= '8';
+$stack ??= '';
+$rrd_optionsb ??= '';
+$aggr_in ??= '';
+$aggr_out ??= '';
 
 $i = 0;
 if ($width > '1500') {
@@ -50,10 +55,7 @@ if (! $noagg || ! $nodetails) {
     }
 }
 
-if (! isset($multiplier)) {
-    $multiplier = '8';
-}
-
+$iter = 0;
 foreach ($rrd_list as $rrd) {
     if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
@@ -161,7 +163,7 @@ if (! $noagg) {
     $rrd_options .= '\\n';
 }
 
-if ($custom_graph) {
+if (isset($custom_graph)) {
     $rrd_options .= $custom_graph;
 }
 
