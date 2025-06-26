@@ -127,7 +127,7 @@ class Version
     public function python(): string
     {
         $pythonPath = $this->config->get('install_dir') . '.python_venvs/dispatcher/bin/python3';
-        if (!file_exists($pythonPath) || !is_executable($pythonPath)) {
+        if (! file_exists($pythonPath) || ! is_executable($pythonPath)) {
             $pythonPath = trim(shell_exec('which python3'));
         }
 
