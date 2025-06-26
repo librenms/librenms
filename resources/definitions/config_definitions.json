@@ -6119,6 +6119,16 @@
             "default": true,
             "type": "boolean"
         },
+        "processor.default_perc_warn": {
+            "default": 75,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            },
+            "group": "discovery",
+            "section": "processor",
+            "order": 1
+        },
         "project_home": {
             "default": "https://www.librenms.org/",
             "type": "text"

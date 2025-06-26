@@ -439,11 +439,6 @@ function delta_to_bits($delta, $period)
     return round($delta * 8 / $period, 2);
 }
 
-function report_this($message)
-{
-    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
-}//end report_this()
-
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
