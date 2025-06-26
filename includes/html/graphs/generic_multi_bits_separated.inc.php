@@ -17,6 +17,11 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$multiplier ??= '8';
+$stack ??= '';
+$rrd_optionsb ??= '';
+$aggr_in ??= '';
+$aggr_out ??= '';
 
 $i = 0;
 if ($width > '1500') {
@@ -50,30 +55,7 @@ if (! $noagg || ! $nodetails) {
     }
 }
 
-if (! isset($multiplier)) {
-    $multiplier = '8';
-}
-
-if (! isset($iter)) {
-    $iter = 0;
-}
-
-if (! isset($stack)) {
-    $stack = '';
-}
-
-if (! isset($rrd_optionsb)) {
-    $rrd_optionsb = '';
-}
-
-if (! isset($aggr_in)) {
-    $aggr_in = '';
-}
-
-if (! isset($aggr_out)) {
-    $aggr_out = '';
-}
-
+$iter = 0;
 foreach ($rrd_list as $rrd) {
     if (! \LibreNMS\Config::get("graph_colours.$colours_in.$iter") || ! \LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
