@@ -38,10 +38,7 @@ if (count($bgpPeersCache) == 0) {
 // So if we have HUAWEI BGP entries or if we don't have anything from HUAWEI nor BGP4-MIB
 if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
     $map_vrf = [];
-
-    if (! isset($bgpPeers)) {
-        $bgpPeers = [];
-    }
+    $bgpPeers ??= [];
 
     $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_name')->get();
     foreach ($vrfs as $vrf) {
