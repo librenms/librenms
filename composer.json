@@ -31,7 +31,7 @@
         "easybook/geshi": "^1.0.8",
         "enshrined/svg-sanitize": "^0.21.0",
         "fico7489/laravel-pivot": "^3.0",
-        "influxdata/influxdb-client-php": "^3.4",
+        "influxdata/influxdb-client-php": "^3.8",
         "influxdb/influxdb-php": "^1.15",
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
