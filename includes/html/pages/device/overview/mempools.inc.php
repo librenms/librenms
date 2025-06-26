@@ -78,9 +78,19 @@ if ($mempools->isNotEmpty()) {
         // the 00 at the end makes the area transparent.
         $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-        $percentageBar = $available_used_all
-            ? Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", "$available_used_all%", $mempool->mempool_perc_warn, $available_used_all)
-            : Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", '', $mempool->mempool_perc_warn);
+        switch ($mempool->mempool_class) {
+            case 'system':
+                $percentageBar = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn, $available_used_all);
+                break;
+            case 'virtual':
+            case 'swap':
+                $percentageBar = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn);
+                break;
+            default:
+                $percentageBar = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn);
+                break;
+        }
+
         echo '<tr>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</td>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
