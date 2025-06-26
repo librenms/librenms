@@ -26,11 +26,11 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
@@ -42,9 +42,9 @@ class GlobeController extends WidgetController
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
             'title' => null,
-            'markers' => Config::get('frontpage_globe.markers', 'devices'),
-            'region' => Config::get('frontpage_globe.region', 'world'),
-            'resolution' => Config::get('frontpage_globe.resolution', 'countries'),
+            'markers' => LibrenmsConfig::get('frontpage_globe.markers', 'devices'),
+            'region' => LibrenmsConfig::get('frontpage_globe.region', 'world'),
+            'resolution' => LibrenmsConfig::get('frontpage_globe.resolution', 'countries'),
             'device_group' => null,
         ];
     }

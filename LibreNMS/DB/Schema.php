@@ -26,9 +26,9 @@
 
 namespace LibreNMS\DB;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
@@ -147,7 +147,7 @@ class Schema
     {
         $update_cache = true;
         $cache = [];
-        $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $cache_file = LibrenmsConfig::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->databaseMigrationCount();
 
         if (is_file($cache_file)) {

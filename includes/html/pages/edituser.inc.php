@@ -130,7 +130,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
         // Display device groups this user doesn't have access to
         echo '<h4>Grant access to new Device Group</h4>';
-        $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
+        $allow_dynamic = \App\Facades\LibrenmsConfig::get('permission.device_group.allow_dynamic');
         if (! $allow_dynamic) {
             echo '<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>';
         }

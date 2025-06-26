@@ -24,9 +24,9 @@ if (is_numeric($vars['vsvr'])) {
     $vservers = dbFetchRows('SELECT * FROM `netscaler_vservers` WHERE `device_id` = ? AND `vsvr_id` = ? ORDER BY `vsvr_name`', [$device['device_id'], $vars['vsvr']]);
     foreach ($vservers as $vsvr) {
         if (is_integer($i / 2)) {
-            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
         if ($vsvr['vsvr_state'] == 'up') {
@@ -53,7 +53,7 @@ if (is_numeric($vars['vsvr'])) {
             $graph_type = 'netscalervsvr_' . $graph_type;
             $graph_array['height'] = '100';
             $graph_array['width'] = '213';
-            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             $graph_array['id'] = $vsvr['vsvr_id'];
             $graph_array['type'] = $graph_type;
 
@@ -148,9 +148,9 @@ if (is_numeric($vars['vsvr'])) {
     $i = '0';
     foreach ($vservers as $vsvr) {
         if (is_integer($i / 2)) {
-            $bg_colour = \LibreNMS\Config::get('list_colour.even');
+            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
-            $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+            $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
         if ($vsvr['vsvr_state'] == 'up') {
@@ -175,7 +175,7 @@ if (is_numeric($vars['vsvr'])) {
             $graph_type = 'netscalervsvr_' . $vars['graph'];
             $graph_array['height'] = '100';
             $graph_array['width'] = '213';
-            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             $graph_array['id'] = $vsvr['vsvr_id'];
             $graph_array['type'] = $graph_type;
 

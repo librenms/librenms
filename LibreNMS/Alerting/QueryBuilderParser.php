@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Alerting;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
@@ -255,7 +255,7 @@ class QueryBuilderParser implements \JsonSerializable
             return $subject;
         }
 
-        $macros = Config::get('alert.macros.rule');
+        $macros = LibrenmsConfig::get('alert.macros.rule');
 
         $count = 0;
         while ($count++ < $depth_limit && Str::contains($subject, 'macros.')) {

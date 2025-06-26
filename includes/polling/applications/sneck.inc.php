@@ -1,8 +1,8 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
@@ -21,8 +21,8 @@ if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
     $old_debugs = array_keys($app->data['data']['debugs']);
 }
 
-if (Config::has('apps.sneck.polling_time_diff')) {
-    $compute_time_diff = Config::get('apps.sneck.polling_time_diff');
+if (LibrenmsConfig::has('apps.sneck.polling_time_diff')) {
+    $compute_time_diff = LibrenmsConfig::get('apps.sneck.polling_time_diff');
 } else {
     $compute_time_diff = false;
 }

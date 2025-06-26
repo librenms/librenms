@@ -33,7 +33,7 @@ if (! Auth::user()->hasGlobalRead()) {
     $param = array_merge($param, $device_ids);
 }
 
-$query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql GROUP BY DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "'),alert_rules.severity";
+$query = "SELECT DATE_FORMAT(time_logged, '" . \App\Facades\LibrenmsConfig::get('alert_graph_date_format') . "') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql GROUP BY DATE_FORMAT(time_logged, '" . \App\Facades\LibrenmsConfig::get('alert_graph_date_format') . "'),alert_rules.severity";
 
 ?>
 <br>

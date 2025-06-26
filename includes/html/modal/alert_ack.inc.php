@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 ?>
 <form class="form-horizontal">
@@ -48,7 +48,7 @@ use LibreNMS\Config;
             $('#ack_section').show();
         }
         document.getElementById('ack-alert').innerText = button_label;
-        $("#ack_until_clear").bootstrapSwitch('state', <?php echo Config::get('alert.ack_until_clear') ? 'true' : 'false'; ?>);
+        $("#ack_until_clear").bootstrapSwitch('state', <?php echo LibrenmsConfig::get('alert.ack_until_clear') ? 'true' : 'false'; ?>);
     });
     $("#ack-alert").on("click", function(event) {
         event.preventDefault();
