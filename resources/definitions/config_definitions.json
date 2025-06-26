@@ -414,6 +414,10 @@
             "default": true,
             "type": "boolean"
         },
+        "apps.oslv_monitor.thp_activity": {
+            "default": true,
+            "type": "boolean"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
