@@ -54,6 +54,26 @@ if (! isset($multiplier)) {
     $multiplier = '8';
 }
 
+if (! isset($iter)) {
+    $iter = 0;
+}
+
+if (! isset($stack)) {
+    $stack = '';
+}
+
+if (! isset($rrd_optionsb)) {
+    $rrd_optionsb = '';
+}
+
+if (! isset($aggr_in)) {
+    $aggr_in = '';
+}
+
+if (! isset($aggr_out)) {
+    $aggr_out = '';
+}
+
 foreach ($rrd_list as $rrd) {
     if (! \LibreNMS\Config::get("graph_colours.$colours_in.$iter") || ! \LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
@@ -161,7 +181,7 @@ if (! $noagg) {
     $rrd_options .= '\\n';
 }
 
-if ($custom_graph) {
+if (isset($custom_graph)) {
     $rrd_options .= $custom_graph;
 }
 
