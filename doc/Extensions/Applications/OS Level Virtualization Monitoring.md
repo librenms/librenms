@@ -179,6 +179,23 @@ lnms config:set apps.oslv_monitor.thp_activity false
 `apps.oslv_monitor.linux_pg_memory_stats` will disable graphs and stat gathering for the
 items below.
 
+- `pgactivate`
+- `pgdeactivate`
+- `pglazyfree`
+- `pglazyfreed`
+- `pgrefill`
+- `pgscan`
+- `pgscan_direct`
+- `pgscan_khugepaged`
+- `pgscan_kswapd`
+- `pgsteal`
+- `pgsteal_direct`
+- `pgsteal_khugepaged`
+- `pgsteal_kswapd`
+
+`apps.oslv_monitor.misc_linux_memory_stats` will disable graphs and stat gathering for the
+items below.
+
 - `anon`
 - `file`
 - `kernel`
