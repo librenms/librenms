@@ -126,7 +126,12 @@ class Version
 
     public function python(): string
     {
-        $proc = new Process(['python3', '--version']);
+        $pythonPath = $this->config->get('install_dir') . '.python_venvs/dispatcher/bin/python3';
+        if (!file_exists($pythonPath) || !is_executable($pythonPath)) {
+            $pythonPath = trim(shell_exec('which python3'));
+        }
+
+        $proc = new Process([$pythonPath, '--version']);
         $proc->run();
 
         if ($proc->getExitCode() !== 0) {

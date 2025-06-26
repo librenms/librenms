@@ -56,6 +56,31 @@ class Python extends BaseValidation
         $this->checkExtensions($validator);
     }
 
+    private function getVenvPath(string $subdir = ''): string
+    {
+        return Config::get('install_dir') . '/.python_venvs/dispatcher/' . $subdir;
+    }
+
+    private function getPythonPath(): string
+    {
+        $pythonPath = $this->getVenvPath('bin/python3');
+        if (file_exists($pythonPath) && is_executable($pythonPath)) {
+            return $pythonPath;
+        }
+
+        return trim(shell_exec('which python3'));
+    }
+
+    private function getPipPath(): string
+    {
+        $pipPath = $this->getVenvPath('bin/pip3');
+        if (file_exists($pipPath) && is_executable($pipPath)) {
+            return $pipPath;
+        }
+
+        return trim(shell_exec('which pip3'));
+    }
+
     private function checkVersion(Validator $validator, $version)
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
@@ -65,7 +90,7 @@ class Python extends BaseValidation
 
     private function checkPipVersion(Validator $validator, $version)
     {
-        preg_match('/\(python ([0-9.]+)\)/', `pip3 --version 2>/dev/null`, $matches);
+        preg_match('/\(python ([0-9.]+)\)/', shell_exec($this->getPipPath() . ' --version 2>/dev/null'), $matches);
         $pip = $matches[1];
         $python = implode('.', array_slice(explode('.', $version), 0, 2));
         if ($pip && version_compare($python, $pip, '!=')) {
@@ -76,7 +101,7 @@ class Python extends BaseValidation
     private function checkExtensions(Validator $validator)
     {
         $pythonExtensions = '/scripts/dynamic_check_requirements.py';
-        $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
+        $process = new Process([$this->getPythonPath(), Config::get('install_dir') . $pythonExtensions, '-v']);
         $process->run();
 
         if ($process->getExitCode() !== 0) {
