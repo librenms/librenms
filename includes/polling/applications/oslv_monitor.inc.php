@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -18,8 +19,6 @@ try {
 $stat_vars = [
     'active_anon',
     'active_file',
-    'anon',
-    'anon_thp',
     'burst-time',
     'copy-on-write-faults',
     'core_sched.force_idle-time',
@@ -28,85 +27,121 @@ $stat_vars = [
     'dbytes',
     'dios',
     'elapsed-times',
-    'file',
-    'file_dirty',
-    'file_mapped',
-    'file_thp',
-    'file_writeback',
-    'inactive_anon',
     'inactive_file',
     'involuntary-context-switches',
-    'kernel',
     'kernel_stack',
     'major-faults',
     'minor-faults',
     'nr_bursts',
     'nr_periods',
     'nr_throttled',
-    'pagetables',
     'percent-cpu',
     'percent-memory',
-    'percpu',
-    'pgactivate',
-    'pgdeactivate',
-    'pglazyfree',
-    'pglazyfreed',
-    'pgrefill',
-    'pgscan',
-    'pgscan_direct',
-    'pgscan_khugepaged',
-    'pgscan_kswapd',
-    'pgsteal',
-    'pgsteal_direct',
-    'pgsteal_khugepaged',
-    'pgsteal_kswapd',
     'procs',
     'rbytes',
     'read-blocks',
     'received-messages',
     'rios',
     'rss',
-    'sec_pagetables',
     'sent-messages',
-    'shmem',
-    'shmem_thp',
     'signals-taken',
-    'slab',
-    'slab_reclaimable',
-    'slab_unreclaimable',
     'sock',
     'stack-size',
     'swapcached',
     'swaps',
     'system-time',
     'text-size',
-    'thp_collapse_alloc',
-    'thp_fault_alloc',
-    'thp_swpout',
-    'thp_swpout_fallback',
     'throttled-time',
     'unevictable',
     'user-time',
     'virtual-size',
-    'vmalloc',
     'voluntary-context-switches',
     'wbytes',
     'wios',
-    'workingset_activate_anon',
-    'workingset_activate_file',
-    'workingset_nodereclaim',
-    'workingset_refault_anon',
-    'workingset_refault_file',
-    'workingset_restore_anon',
-    'workingset_restore_file',
     'written-blocks',
-    'zswap',
-    'zswapped',
-    'zswpin',
-    'zswpout',
-    'zswpwb',
     'size',
 ];
+
+if (Config::has('apps.oslv_monitor.linux_pg_memory_stats')) {
+    array_push(
+        $stat_vars,
+        'pgactivate',
+        'pgdeactivate',
+        'pglazyfree',
+        'pglazyfreed',
+        'pgrefill',
+        'pgscan',
+        'pgscan_direct',
+        'pgscan_khugepaged',
+        'pgscan_kswapd',
+        'pgsteal',
+        'pgsteal_direct',
+        'pgsteal_khugepaged',
+        'pgsteal_kswapd'
+    );
+}
+if (Config::has('apps.oslv_monitor.misc_linux_memory_stats')) {
+    array_push(
+        $stat_vars,
+        'anon',
+        'file',
+        'kernel',
+        'kernel_stack',
+        'pagetables',
+        'sec_pagetables',
+        'percpu',
+        'vmalloc',
+        'shmem',
+        'file_mapped',
+        'file_dirty',
+        'file_writeback',
+        'swapcached',
+        'anon_thp',
+        'file_thp',
+        'shmem_thp',
+        'inactive_anon',
+        'active_anon',
+        'slab_reclaimable',
+        'slab_unreclaimable',
+        'slab',
+    );
+}
+if (Config::has('apps.oslv_monitor.zswap_size')) {
+    array_push(
+        $stat_vars,
+        'zswap',
+        'zswapped',
+    );
+}
+if (Config::has('apps.oslv_monitor.zswap_activity')) {
+    array_push(
+        $stat_vars,
+        'zswpin',
+        'zswpout',
+        'zswpwb',
+    );
+}
+if (Config::has('apps.oslv_monitor.workingset_stats')) {
+    array_push(
+        $stat_vars,
+        'workingset_refault_anon',
+        'workingset_refault_file',
+        'workingset_activate_anon',
+        'workingset_activate_file',
+        'workingset_restore_anon',
+        'workingset_restore_file',
+        'workingset_nodereclaim',
+    );
+}
+if (Config::has('apps.oslv_monitor.thp_activity')) {
+    array_push(
+        $stat_vars,
+        'thp_fault_alloc',
+        'thp_collapse_alloc',
+        'thp_swpout',
+        'thp_swpout_fallback',
+    );
+}
 
 $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
