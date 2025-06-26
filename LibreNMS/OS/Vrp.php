@@ -525,7 +525,7 @@ class Vrp extends OS implements
         $sensors = [];
         $ap_number = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanCurJointApNum.0', [], 'HUAWEI-WLAN-GLOBAL-MIB');
 
-        if( !empty($ap_number)) {
+        if (! empty($ap_number)) {
             $sensors[] = new WirelessSensor(
                 'ap-count',
                 $this->getDeviceId(),
