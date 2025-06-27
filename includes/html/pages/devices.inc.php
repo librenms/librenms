@@ -14,6 +14,7 @@
 */
 
 function show_device_group($device_group_id) {
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
     ?>
     <div class="panel-heading">
         <span class="devices-font-bold">
@@ -22,10 +23,10 @@ function show_device_group($device_group_id) {
             echo "Ungrouped Devices";
         } elseif ($device_group_id) {
             echo "Device Group: ";
-            echo htmlentities(\App\Models\DeviceGroup::where('id', $device_group_id)->value('name'));
         }
         ?>
         </span>
+        <?php echo htmlentities($device_group_name) ?>
     </div>
     <?php
 }
