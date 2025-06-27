@@ -38,18 +38,18 @@ class WeechatBot extends Transport
         }
         $pre .= "{$this->config['irc-channel']} ";
 
-        // https://www.php.net/manual/en/function.fsockopen.php example #2
-        $fp = fsockopen('udp://' . $this->config['bot-hostname'], $this->config['bot-port'], $errno, $errstr);
+        try {
+	        $fp = (new \Socket\Raw\Factory())
+	                ->createClient("udp://$this->config['bot-hostname']:$this->config['bot-port']");
+	    } catch (Exception $e) {
+	        throw new AlertTransportDeliverException("?alertData" ,$e->getCode(), $e->getMessage());
+	    }
 
-        if (! $fp) {
-            throw new AlertTransportDeliveryException($alert_data, $errno, $errstr);
-        } else {
-            fwrite($fp, $pre . $alert_data['title']);
-            foreach (preg_split('/((\r?\n)|(\r\n?))/', $alert_data['msg']) as $line) {
-                fwrite($fp, $pre . $line);
-            }
-            fclose($fp);
+        $fp->write($pre . $alert_data['title']);
+        foreach (preg_split('/((\r?\n)|(\r\n?))/', $alert_data['msg']) as $line) {
+            $fp->write($pre . $line);
         }
+        $fp->close();
 
         return true;
     }
