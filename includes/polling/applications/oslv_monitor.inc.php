@@ -150,6 +150,12 @@ $data = $returned['data'];
 
 $metrics = [];
 $old_data = $app->data;
+if (!is_array($old_data)) {
+    $old_data = [];
+}
+if (!isset($old_data['oslvm_data']) || !is_array($old_data['oslvm_data'])) {
+    $old_data['oslvm_data'] = [];
+}
 $new_data = [
     'backend' => $data['backend'] ?? null,
     'uid_mapping' => $data['uid_mapping'] ?? null,
