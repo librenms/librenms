@@ -11,20 +11,10 @@ try {
     $data = json_app_get($device, $name)['data'];
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
-
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
     return;
 }
 
-$app_data = $app->data;
-if (! is_array($app_data)) {
-    $app_data = [];
-}
-if (! isset($app_data['slugs']) || ! is_array($app_data['slugs'])) {
-    $app_data['slugs'] = [];
-}
-
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('app_protos', 'GAUGE', 0)
     ->addDataset('hash_changed', 'GAUGE', 0)
@@ -37,89 +27,62 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('size_sum', 'GAUGE', 0)
     ->addDataset('sub_count', 'GAUGE', 0);
 
-$fields = [
-    'app_protos' => $data['totals']['app_protos'],
-    'hash_changed' => $data['totals']['hash_changed'],
-    'size_max' => $data['totals']['size_max'],
-    'size_mean' => $data['totals']['size_mean'],
-    'size_median' => $data['totals']['size_median'],
-    'size_min' => $data['totals']['size_min'],
-    'size_mode' => $data['totals']['size_mode'],
-    'size_stddev' => $data['totals']['size_stddev'],
-    'size_sum' => $data['totals']['size_sum'],
-    'sub_count' => $data['totals']['sub_count'],
+// Helper function to create fields array from data
+$createFields = fn($data) => [
+    'app_protos' => $data['app_protos'] ?? 0,
+    'hash_changed' => $data['hash_changed'] ?? 0,
+    'size_max' => $data['size_max'] ?? 0,
+    'size_mean' => $data['size_mean'] ?? 0,
+    'size_median' => $data['size_median'] ?? 0,
+    'size_min' => $data['size_min'] ?? 0,
+    'size_mode' => $data['size_mode'] ?? 0,
+    'size_stddev' => $data['size_stddev'] ?? 0,
+    'size_sum' => $data['size_sum'] ?? 0,
+    'sub_count' => $data['sub_count'] ?? 0,
 ];
 
+// Store totals
+$rrd_name = ['app', $name, $app->app_id];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-app('Datastore')->put($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $createFields($data['totals']));
 
+// Process all slugs (both active and inactive)
+$slugs = $app->data['slugs'] ?? [];
 $new_slugs = [];
-$seen_slugs = [];
-foreach ($data['slugs'] as $slug => $slug_data) {
-    $fields = [
-        'app_protos' => $slug_data['app_protos'],
-        'hash_changed' => $slug_data['hash_changed'],
-        'size_max' => $slug_data['size_max'],
-        'size_mean' => $slug_data['size_mean'],
-        'size_median' => $slug_data['size_median'],
-        'size_min' => $slug_data['size_min'],
-        'size_mode' => $slug_data['size_mode'],
-        'size_stddev' => $slug_data['size_stddev'],
-        'size_sum' => $slug_data['size_sum'],
-        'sub_count' => $slug_data['sub_count'],
-    ];
-    $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
-    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    app('Datastore')->put($device, 'app', $tags, $fields);
-    if (! isset($app_data['slugs'][$slug])) {
-        array_push($new_slugs, $slug);
-    }
-    $app_data['slugs'][$slug] = $slug_data['sub_count'];
-    $seen_slugs[$slug] = 1;
-}
+$all_slugs = array_unique(array_merge(array_keys($data['slugs']), array_keys($slugs)));
+foreach ($all_slugs as $slug) {
+    $slug_data = $data['slugs'][$slug] ?? null;
+    $is_active = $slug_data !== null;
 
-// make sure we update the RRDs for slugs that have not been seen
-// if this is not done slugs that do not generate data regularly
-// will only display nan
-foreach ($app_data['slugs'] as $slug => $slug_data) {
-    if (! isset($seen_slugs[$slug])) {
-        $fields = [
-            'app_protos' => 0,
-            'hash_changed' => 0,
-            'size_max' => 0,
-            'size_mean' => 0,
-            'size_median' => 0,
-            'size_min' => 0,
-            'size_mode' => 0,
-            'size_stddev' => 0,
-            'size_sum' => 0,
-            'sub_count' => 0,
-        ];
-        $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug];
-        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        app('Datastore')->put($device, 'app', $tags, $fields);
-        if (! isset($app_data['slugs'][$slug])) {
-            array_push($new_slugs, $slug);
-        }
-        $app_data['slugs'][$slug] = 0;
+    $rrd_name = ['app', $name, $app->app_id, 'slugs___-___' . $slug]; // FIXME non-standard rrdname
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'slug' => $slug, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    app('Datastore')->put($device, 'app', $tags, $createFields($slug_data ?? []));
+
+    if (!isset($slugs[$slug])) {
+        $new_slugs[] = $slug;
     }
+
+    $slugs[$slug] = $is_active ? $slug_data['sub_count'] : 0; // Update slug count
 }
 
 if ($data['totals']['hash_changed'] >= 1) {
-    Eventlog::log('Mojo Cape Submit has recieved submissions with changed hashes: ' . json_encode($data['changed_hashes']), $device['device_id'], 'application', Severity::Error);
+    Eventlog::log(
+        'Mojo Cape Submit has received submissions with changed hashes: ' . json_encode($data['changed_hashes']),
+        $device['device_id'],
+        'application',
+        Severity::Error
+    );
 }
 
-if (isset($new_slugs[0])) {
-    Eventlog::log('Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs), $device['device_id'], 'application', Severity::Ok);
+if (!empty($new_slugs)) {
+    Eventlog::log(
+        'Mojo Cape Submit has seen one or more new slugs: ' . json_encode($new_slugs),
+        $device['device_id'],
+        'application',
+        Severity::Ok
+    );
 }
 
-uasort($app_data['slugs'], function ($a, $b) {
-    if ($a == $b) {
-        return 0;
-    }
-
-    return ($a > $b) ? -1 : 1;
-});
-
-$app->data = $app_data;
+arsort($slugs);
+$app->data = ['slugs' => $slugs];
 update_application($app, 'OK', $data['totals']);
