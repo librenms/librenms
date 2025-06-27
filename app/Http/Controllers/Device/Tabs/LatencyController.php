@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
 
@@ -37,7 +37,7 @@ class LatencyController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return Config::get('smokeping.integration') || $device->getAttrib('override_icmp_disable') !== 'true';
+        return LibrenmsConfig::get('smokeping.integration') || $device->getAttrib('override_icmp_disable') !== 'true';
     }
 
     public function slug(): string
@@ -57,8 +57,8 @@ class LatencyController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $from = $request->get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
-        $to = $request->get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute')));
+        $from = $request->get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(LibrenmsConfig::get('dateformat.byminute')));
+        $to = $request->get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.byminute')));
 
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];

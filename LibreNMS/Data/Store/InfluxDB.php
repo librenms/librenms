@@ -27,11 +27,11 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\UDP;
-use LibreNMS\Config;
 use Log;
 
 class InfluxDB extends BaseDatastore
@@ -61,7 +61,7 @@ class InfluxDB extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('influxdb.enable', false);
+        return LibrenmsConfig::get('influxdb.enable', false);
     }
 
     /**
@@ -125,14 +125,14 @@ class InfluxDB extends BaseDatastore
      */
     public static function createFromConfig()
     {
-        $host = Config::get('influxdb.host', 'localhost');
-        $transport = Config::get('influxdb.transport', 'http');
-        $port = Config::get('influxdb.port', 8086);
-        $db = Config::get('influxdb.db', 'librenms');
-        $username = Config::get('influxdb.username', '');
-        $password = Config::get('influxdb.password', '');
-        $timeout = Config::get('influxdb.timeout', 0);
-        $verify_ssl = Config::get('influxdb.verifySSL', false);
+        $host = LibrenmsConfig::get('influxdb.host', 'localhost');
+        $transport = LibrenmsConfig::get('influxdb.transport', 'http');
+        $port = LibrenmsConfig::get('influxdb.port', 8086);
+        $db = LibrenmsConfig::get('influxdb.db', 'librenms');
+        $username = LibrenmsConfig::get('influxdb.username', '');
+        $password = LibrenmsConfig::get('influxdb.password', '');
+        $timeout = LibrenmsConfig::get('influxdb.timeout', 0);
+        $verify_ssl = LibrenmsConfig::get('influxdb.verifySSL', false);
 
         $client = new Client($host, $port, $username, $password, $transport == 'https', $verify_ssl, $timeout, $timeout);
 

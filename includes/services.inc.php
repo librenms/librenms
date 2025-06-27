@@ -1,9 +1,9 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
@@ -131,14 +131,14 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == '') {
-        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
+        $check_cmd = LibrenmsConfig::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
         $check_cmd .= ' ' . $service['service_param'];
     }
 

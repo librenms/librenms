@@ -2,8 +2,8 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -54,7 +54,7 @@ class ConnectivityHelperTest extends TestCase
         $device = new Device();
 
         /** ping and snmp enabled */
-        Config::set('icmp_check', true);
+        LibrenmsConfig::set('icmp_check', true);
         $device->snmp_disable = false;
 
         // ping up, snmp up
@@ -79,7 +79,7 @@ class ConnectivityHelperTest extends TestCase
         $this->assertEquals('icmp', $device->status_reason);
 
         /** ping disabled and snmp enabled */
-        Config::set('icmp_check', false);
+        LibrenmsConfig::set('icmp_check', false);
         $device->snmp_disable = false;
 
         // ping up, snmp up
@@ -103,7 +103,7 @@ class ConnectivityHelperTest extends TestCase
         $this->assertEquals('snmp', $device->status_reason);
 
         /** ping enabled and snmp disabled */
-        Config::set('icmp_check', true);
+        LibrenmsConfig::set('icmp_check', true);
         $device->snmp_disable = true;
 
         // ping up, snmp up
@@ -127,7 +127,7 @@ class ConnectivityHelperTest extends TestCase
         $this->assertEquals('icmp', $device->status_reason);
 
         /** ping and snmp disabled */
-        Config::set('icmp_check', false);
+        LibrenmsConfig::set('icmp_check', false);
         $device->snmp_disable = true;
 
         // ping up, snmp up

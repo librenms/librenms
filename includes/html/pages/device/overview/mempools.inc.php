@@ -34,7 +34,7 @@ if ($mempools->isNotEmpty()) {
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_mempool',
-        'from' => \LibreNMS\Config::get('time.day'),
+        'from' => \App\Facades\LibrenmsConfig::get('time.day'),
         'legend' => 'no',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Memory Usage',
     ]);
@@ -64,8 +64,8 @@ if ($mempools->isNotEmpty()) {
             'id' => $mempool->mempool_id,
             'height' => 100,
             'width' => 210,
-            'from' => \LibreNMS\Config::get('time.day'),
-            'to' => \LibreNMS\Config::get('time.now'),
+            'from' => \App\Facades\LibrenmsConfig::get('time.day'),
+            'to' => \App\Facades\LibrenmsConfig::get('time.now'),
             'legend' => 'no',
         ];
 

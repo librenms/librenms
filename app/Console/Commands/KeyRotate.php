@@ -144,18 +144,18 @@ class KeyRotate extends LnmsCommand
 
     private function rekeyConfigData(string $key): bool
     {
-        if (! \LibreNMS\Config::has($key)) {
+        if (! \App\Facades\LibrenmsConfig::has($key)) {
             return true;
         }
 
         try {
-            $data = $this->decrypt->decryptString(\LibreNMS\Config::get($key));
-            \LibreNMS\Config::persist($key, $this->encrypt->encryptString($data));
+            $data = $this->decrypt->decryptString(\App\Facades\LibrenmsConfig::get($key));
+            \App\Facades\LibrenmsConfig::persist($key, $this->encrypt->encryptString($data));
 
             return true;
         } catch (DecryptException $e) {
             try {
-                $this->encrypt->decryptString(\LibreNMS\Config::get($key));
+                $this->encrypt->decryptString(\App\Facades\LibrenmsConfig::get($key));
 
                 return true; // already rotated
             } catch (DecryptException $e) {

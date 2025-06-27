@@ -11,9 +11,9 @@
  */
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Port;
-use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -65,7 +65,7 @@ function generate_overlib_content($graph_array, $text)
 {
     $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
-        $graph_array['from'] = Config::get("time.$period");
+        $graph_array['from'] = LibrenmsConfig::get("time.$period");
         $overlib_content .= escape_quotes(Url::graphTag($graph_array));
     }
 
@@ -265,16 +265,16 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
     $graph_array['width'] = '340';
-    $graph_array['to'] = Config::get('time.now');
-    $graph_array['from'] = Config::get('time.day');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
+    $graph_array['from'] = LibrenmsConfig::get('time.day');
     $graph_array['id'] = $port['port_id'];
     $content .= Url::graphTag($graph_array);
     if ($single_graph == 0) {
-        $graph_array['from'] = Config::get('time.week');
+        $graph_array['from'] = LibrenmsConfig::get('time.week');
         $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = Config::get('time.month');
+        $graph_array['from'] = LibrenmsConfig::get('time.month');
         $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = Config::get('time.year');
+        $graph_array['from'] = LibrenmsConfig::get('time.year');
         $content .= Url::graphTag($graph_array);
     }
 
@@ -315,24 +315,24 @@ function generate_sensor_link($args, $text = null, $type = null)
         'legend' => 'yes',
         'height' => '100',
         'width' => '340',
-        'to' => Config::get('time.now'),
-        'from' => Config::get('time.day'),
+        'to' => LibrenmsConfig::get('time.now'),
+        'from' => LibrenmsConfig::get('time.day'),
         'id' => $args['sensor_id'],
     ];
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.week');
+    $graph_array['from'] = LibrenmsConfig::get('time.week');
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.month');
+    $graph_array['from'] = LibrenmsConfig::get('time.month');
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.year');
+    $graph_array['from'] = LibrenmsConfig::get('time.year');
     $content .= Url::graphTag($graph_array);
 
     $content .= '</div>';
 
-    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
+    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \App\Facades\LibrenmsConfig::get('time.day')], []);
 
     return Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
@@ -449,15 +449,15 @@ function generate_ap_link($args, $text = null, $type = null)
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
     $graph_array['width'] = '340';
-    $graph_array['to'] = Config::get('time.now');
-    $graph_array['from'] = Config::get('time.day');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
+    $graph_array['from'] = LibrenmsConfig::get('time.day');
     $graph_array['id'] = $args['accesspoint_id'];
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.week');
+    $graph_array['from'] = LibrenmsConfig::get('time.week');
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.month');
+    $graph_array['from'] = LibrenmsConfig::get('time.month');
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.year');
+    $graph_array['from'] = LibrenmsConfig::get('time.year');
     $content .= Url::graphTag($graph_array);
     $content .= '</div>';
 
@@ -782,8 +782,8 @@ function get_ports_from_type($given_types)
     //  entry in config.
     $search_types = [];
     foreach ($given_types as $type) {
-        if (Config::has($type . '_descr')) {
-            $type_descr = Config::get($type . '_descr');
+        if (LibrenmsConfig::has($type . '_descr')) {
+            $type_descr = LibrenmsConfig::get($type . '_descr');
             if (is_array($type_descr)) {
                 $search_types = array_merge($search_types, $type_descr);
             } else {
@@ -846,7 +846,7 @@ function search_oxidized_config($search_in_conf_textbox)
         return false;
     }
 
-    $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
+    $oxidized_search_url = LibrenmsConfig::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
         [
             'search_in_conf_textbox' => $search_in_conf_textbox,
@@ -908,7 +908,7 @@ function get_oxidized_nodes_list()
         ],
     ]);
 
-    $data = json_decode(file_get_contents(Config::get('oxidized.url') . '/nodes?format=json', false, $context), true);
+    $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
@@ -950,7 +950,7 @@ function get_oxidized_nodes_list()
  */
 function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
+    if (LibrenmsConfig::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
@@ -1003,7 +1003,7 @@ function lowest_time($time, $seconds = 300)
 function time_to_nfsen_subpath($time)
 {
     $time = lowest_time($time);
-    $layout = Config::get('nfsen_subdirlayout');
+    $layout = LibrenmsConfig::get('nfsen_subdirlayout');
 
     if ($layout == 0) {
         return 'nfcapd.' . date('YmdHi', $time);
@@ -1036,10 +1036,10 @@ function time_to_nfsen_subpath($time)
  */
 function nfsen_hostname($hostname)
 {
-    $nfsen_hostname = str_replace('.', Config::get('nfsen_split_char'), $hostname);
+    $nfsen_hostname = str_replace('.', LibrenmsConfig::get('nfsen_split_char'), $hostname);
 
-    if (! is_null(Config::get('nfsen_suffix'))) {
-        $nfsen_hostname = str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    if (! is_null(LibrenmsConfig::get('nfsen_suffix'))) {
+        $nfsen_hostname = str_replace(LibrenmsConfig::get('nfsen_suffix'), '', $nfsen_hostname);
     }
 
     return $nfsen_hostname;
@@ -1057,7 +1057,7 @@ function nfsen_live_dir($hostname)
 {
     $hostname = nfsen_hostname($hostname);
 
-    foreach (Config::get('nfsen_base') as $base_dir) {
+    foreach (LibrenmsConfig::get('nfsen_base') as $base_dir) {
         if (file_exists($base_dir) && is_dir($base_dir)) {
             return $base_dir . '/profiles-data/live/' . $hostname;
         }

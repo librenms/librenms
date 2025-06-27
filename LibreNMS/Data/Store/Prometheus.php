@@ -27,10 +27,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Http;
 use Log;
 
@@ -46,19 +46,19 @@ class Prometheus extends BaseDatastore
     {
         parent::__construct();
 
-        $url = Config::get('prometheus.url');
-        $job = Config::get('prometheus.job', 'librenms');
+        $url = LibrenmsConfig::get('prometheus.url');
+        $job = LibrenmsConfig::get('prometheus.job', 'librenms');
         $this->base_uri = "$url/metrics/job/$job/instance/";
 
         $this->client = Http::client()->baseUrl($this->base_uri);
 
-        $user = Config::get('prometheus.user', '');
-        $passwd = Config::get('prometheus.password', '');
+        $user = LibrenmsConfig::get('prometheus.user', '');
+        $passwd = LibrenmsConfig::get('prometheus.password', '');
         if ($user && $passwd) {
             $this->client = $this->client->withBasicAuth($user, $passwd);
         }
 
-        $this->prefix = Config::get('prometheus.prefix', '');
+        $this->prefix = LibrenmsConfig::get('prometheus.prefix', '');
         if ($this->prefix) {
             $this->prefix = "$this->prefix" . '_';
         }
@@ -73,7 +73,7 @@ class Prometheus extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('prometheus.enable', false);
+        return LibrenmsConfig::get('prometheus.enable', false);
     }
 
     /**
@@ -104,7 +104,7 @@ class Prometheus extends BaseDatastore
 
         $device = $this->getDevice($meta);
         $promurl = $device->hostname . $promtags;
-        if (Config::get('prometheus.attach_sysname', false)) {
+        if (LibrenmsConfig::get('prometheus.attach_sysname', false)) {
             $promurl .= '/sysName/' . $device->sysName;
         }
         $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url

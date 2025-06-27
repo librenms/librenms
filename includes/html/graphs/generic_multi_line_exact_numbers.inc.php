@@ -1,7 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use LibreNMS\Config;
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -41,11 +41,11 @@ foreach ($rrd_list as $rrd) {
     if (! empty($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! LibrenmsConfig::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = Config::get("graph_colours.$colours.$colour_iter");
+        $colour = LibrenmsConfig::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
     $i++;

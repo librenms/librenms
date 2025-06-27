@@ -179,7 +179,7 @@ $new_data['oslvms'] = $oslvms;
 
 // process unseen items, save info for ones that were last seen with in the specified time
 // 604800 seconds = 7 days
-$back_till = $current_time - LibreNMS\Config::get('apps.oslv_monitor.seen_age', 604800);
+$back_till = $current_time - \App\Facades\LibrenmsConfig::get('apps.oslv_monitor.seen_age', 604800);
 foreach ($old_data['oslvm_data'] as $key => $oslvm) {
     if (! isset($new_data['oslvm_data'][$key]) && isset($old_data['oslvm_data'][$key]['seen']) &&
         $back_till <= $old_data['oslvm_data'][$key]['seen']) {

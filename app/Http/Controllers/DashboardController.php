@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -36,7 +37,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 
 class DashboardController extends Controller
 {
@@ -69,7 +69,7 @@ class DashboardController extends Controller
 
         // default dashboard
         $user_default_dash = (int) UserPref::getPref($user, 'dashboard');
-        $global_default = (int) Config::get('webui.default_dashboard_id');
+        $global_default = (int) LibrenmsConfig::get('webui.default_dashboard_id');
 
         // load user default
         if ($dashboards->has($user_default_dash)) {

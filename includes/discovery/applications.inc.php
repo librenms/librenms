@@ -24,10 +24,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 echo "\nApplications: ";
@@ -38,7 +38,7 @@ $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MI
 // Load our list of available applications
 $applications = [];
 if ($results) {
-    foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(LibrenmsConfig::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }

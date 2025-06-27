@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -170,7 +170,7 @@ class SnmpResponse
             }
 
             // remove extra escapes
-            if (Config::get('snmp.unescape')) {
+            if (LibrenmsConfig::get('snmp.unescape')) {
                 $value = stripslashes($value);
             }
 

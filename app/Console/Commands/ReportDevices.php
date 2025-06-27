@@ -5,12 +5,12 @@ namespace App\Console\Commands;
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -138,7 +138,7 @@ class ReportDevices extends LnmsCommand
         return [
             'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn (Device $device) => $device->displayName(), headerName: 'display name'),
             'location' => new SyntheticDeviceField('location', ['location_id'], fn (Device $device) => $device->location->location, fn (Builder $q) => $q->with('location')),
-            'os_text' => new SyntheticDeviceField('os_text', ['os'], fn (Device $device) => Config::getOsSetting($device->os, 'text'), headerName: 'os text'),
+            'os_text' => new SyntheticDeviceField('os_text', ['os'], fn (Device $device) => LibrenmsConfig::getOsSetting($device->os, 'text'), headerName: 'os text'),
         ];
     }
 

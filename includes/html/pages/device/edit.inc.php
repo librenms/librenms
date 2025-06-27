@@ -19,7 +19,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['routing'] = 'Routing';
     }
 
-    if (count(\LibreNMS\Config::get("os.{$device['os']}.icons", []))) {
+    if (count(\App\Facades\LibrenmsConfig::get("os.{$device['os']}.icons", []))) {
         $panes['icon'] = 'Icon';
     }
 
@@ -31,7 +31,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $panes['modules'] = 'Modules';
     }
 
-    if (\LibreNMS\Config::get('show_services')) {
+    if (\App\Facades\LibrenmsConfig::get('show_services')) {
         $panes['services'] = 'Services';
     }
 

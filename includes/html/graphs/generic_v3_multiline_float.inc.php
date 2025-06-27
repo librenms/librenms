@@ -31,11 +31,11 @@ foreach ($rrd_list as $i => $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
+        $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
 

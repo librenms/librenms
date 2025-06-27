@@ -17,9 +17,9 @@
     $config['lng'] = $lng ?? $config['lng'] ?? 40;
     $config['zoom'] = $zoom ?? $config['zoom'] ?? 3;
     $config['layer'] = $layer ?? $config['layer'] ?? null;
-    $config['engine'] ??= \LibreNMS\Config::get('geoloc.engine');
-    $config['api_key'] ??= \LibreNMS\Config::get('geoloc.api_key');
-    $config['tile_url'] ??= \LibreNMS\Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org');
+    $config['engine'] ??= \App\Facades\LibrenmsConfig::get('geoloc.engine');
+    $config['api_key'] ??= \App\Facades\LibrenmsConfig::get('geoloc.api_key');
+    $config['tile_url'] ??= \App\Facades\LibrenmsConfig::get('leaflet.tile_url', '{s}.tile.openstreetmap.org');
 @endphp
 
 <div id="{{ $id }}" style="width: {{ $width }};height: {{ $height }}" {{ $attributes }}></div>

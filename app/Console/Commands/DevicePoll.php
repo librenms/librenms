@@ -11,7 +11,6 @@ use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Polling\Result;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\Version;
@@ -46,11 +45,11 @@ class DevicePoll extends LnmsCommand
         $this->configureOutputOptions();
 
         if ($this->option('no-data')) {
-            Config::set('rrd.enable', false);
-            Config::set('influxdb.enable', false);
-            Config::set('influxdbv2.enable', false);
-            Config::set('prometheus.enable', false);
-            Config::set('graphite.enable', false);
+            LibrenmsConfig::set('rrd.enable', false);
+            LibrenmsConfig::set('influxdb.enable', false);
+            LibrenmsConfig::set('influxdbv2.enable', false);
+            LibrenmsConfig::set('prometheus.enable', false);
+            LibrenmsConfig::set('graphite.enable', false);
         }
 
         try {

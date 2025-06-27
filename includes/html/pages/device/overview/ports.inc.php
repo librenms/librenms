@@ -13,10 +13,10 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
             <table class="table table-hover table-condensed table-striped">';
 
     $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth();
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['device'] = $device['device_id'];
     $graph_array['type'] = 'device_bits';
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
     $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 

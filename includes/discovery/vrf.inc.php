@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Rewrite;
 
-if (Config::get('enable_vrfs')) {
+if (LibrenmsConfig::get('enable_vrfs')) {
     if (in_array($device['os_group'], ['vrp', 'cisco']) ||
         in_array($device['os'], ['junos', 'ironware'])) {
         unset($vrf_count);

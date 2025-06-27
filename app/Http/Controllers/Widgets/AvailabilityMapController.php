@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -33,7 +34,6 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
@@ -44,12 +44,12 @@ class AvailabilityMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'type' => (int) Config::get('webui.availability_map_compact', 0),
+            'type' => (int) LibrenmsConfig::get('webui.availability_map_compact', 0),
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
             'mode_select' => 0,
-            'order_by' => Config::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
+            'order_by' => LibrenmsConfig::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
             'device_group' => null,
         ];
     }
@@ -90,7 +90,7 @@ class AvailabilityMapController extends WidgetController
         $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'ignore', 'ignore_status'])->get();
 
         // process status
-        $uptime_warn = (int) Config::get('uptime_warning', 86400);
+        $uptime_warn = (int) LibrenmsConfig::get('uptime_warning', 86400);
         $check_maintenance = AlertSchedule::isActive()->exists(); // check if any maintenance schedule is active
         // TODO: take a deeper look, why key ignored still has to exist
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'ignored-up' => 0, 'ignored-down' => 0, 'disabled' => 0];

@@ -74,9 +74,9 @@ class CustomMap extends BaseModel
     public function getBackgroundConfig(): array
     {
         $config = $this->background_data ?? [];
-        $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
-        $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
-        $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
+        $config['engine'] = \App\Facades\LibrenmsConfig::get('geoloc.engine');
+        $config['api_key'] = \App\Facades\LibrenmsConfig::get('geoloc.api_key');
+        $config['tile_url'] = \App\Facades\LibrenmsConfig::get('leaflet.tile_url');
         $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
 
         return $config;

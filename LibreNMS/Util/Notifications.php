@@ -28,9 +28,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Notification;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 
 class Notifications
 {
@@ -93,7 +93,7 @@ class Notifications
     protected static function fetch(): array
     {
         $notifications = [];
-        foreach (Config::get('notifications') as $name => $url) {
+        foreach (LibrenmsConfig::get('notifications') as $name => $url) {
             echo '[ ' . date('r') . " ] $name $url ";
 
             $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);

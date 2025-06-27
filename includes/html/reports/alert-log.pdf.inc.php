@@ -35,7 +35,7 @@ if (isset($_GET['results']) && is_numeric($_GET['results'])) {
     $numresults = 250;
 }
 
-$full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate $query LIMIT $start,$numresults";
+$full_query = "SELECT D.device_id,name,state,time_logged,DATE_FORMAT(time_logged, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate $query LIMIT $start,$numresults";
 
 foreach (dbFetchRows($full_query, $param) as $alert_entry) {
     $hostname = gethostbyid($alert_entry['device_id']);

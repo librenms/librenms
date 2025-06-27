@@ -92,8 +92,8 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     $headeroptions .= '<option value="' .
         \LibreNMS\Util\Url::generate($vars, [
             'format' => 'graph_' . $avail_type,
-            'from' => $vars['from'] ?? \LibreNMS\Config::get('time.day'),
-            'to' => $vars['to'] ?? \LibreNMS\Config::get('time.now'),
+            'from' => $vars['from'] ?? \App\Facades\LibrenmsConfig::get('time.day'),
+            'to' => $vars['to'] ?? \App\Facades\LibrenmsConfig::get('time.now'),
         ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
@@ -118,12 +118,12 @@ $no_refresh = $format == 'list';
 
 if ($format == 'graph') {
     if (empty($vars['from'])) {
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     } else {
         $graph_array['from'] = $vars['from'];
     }
     if (empty($vars['to'])) {
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     } else {
         $graph_array['to'] = $vars['to'];
     }
@@ -232,9 +232,9 @@ if ($format == 'graph') {
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row / 2)) {
-            $row_colour = \LibreNMS\Config::get('list_colour.even');
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
-            $row_colour = \LibreNMS\Config::get('list_colour.odd');
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
         if (device_permitted($device['device_id'])) {
@@ -288,7 +288,7 @@ if ($format == 'graph') {
 
     $os_selected = '""';
     if (isset($vars['os'])) {
-        $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
+        $os_selected = json_encode(['id' => $vars['os'], 'text' => \App\Facades\LibrenmsConfig::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 
     $location_selected = '""';

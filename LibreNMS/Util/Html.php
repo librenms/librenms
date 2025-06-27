@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\PowerState;
 use LibreNMS\Enum\Severity;
 
@@ -89,7 +89,7 @@ class Html
                 $graph_array['width'] = '215';
             }
 
-            $periods = Config::get('graphs.mini.widescreen');
+            $periods = LibrenmsConfig::get('graphs.mini.widescreen');
         } else {
             if (! array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '100';
@@ -99,7 +99,7 @@ class Html
                 $graph_array['width'] = '215';
             }
 
-            $periods = Config::get('graphs.mini.normal');
+            $periods = LibrenmsConfig::get('graphs.mini.normal');
         }
 
         $screen_width = session('screen_width');
@@ -117,7 +117,7 @@ class Html
 
         $graph_data = [];
         foreach ($periods as $period => $period_text) {
-            $graph_array['from'] = Config::get("time.$period");
+            $graph_array['from'] = LibrenmsConfig::get("time.$period");
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';

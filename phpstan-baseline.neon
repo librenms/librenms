@@ -191,11 +191,6 @@ parameters:
 			path: tests/CommonFunctionsTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$os of static method LibreNMS\\\\Config\\:\\:getOsSetting\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
-
-		-
 			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
 			count: 1
 			path: tests/Unit/LocationTest.php

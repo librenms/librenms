@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
 use Mews\Purifier\Facades\Purifier;
 
 class Clean

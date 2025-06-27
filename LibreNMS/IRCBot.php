@@ -101,7 +101,7 @@ class IRCBot
     {
         $this->log('Setting up IRC-Bot..');
 
-        $this->config = Config::getAll();
+        $this->config = LibrenmsConfig::getAll();
         $this->debug = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
         $this->max_retry = $this->config['irc_maxretry'];

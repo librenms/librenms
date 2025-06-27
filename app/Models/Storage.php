@@ -51,7 +51,7 @@ class Storage extends DeviceRelatedModel implements Keyable
     public function isValid(string $os): bool
     {
         // filter by mounts ignores
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount') as $im) {
+        foreach (\App\Facades\LibrenmsConfig::getCombined($os, 'ignore_mount') as $im) {
             if ($im == $this->storage_descr) {
                 Log::debug("ignored $this->storage_descr\n");
 
@@ -59,7 +59,7 @@ class Storage extends DeviceRelatedModel implements Keyable
             }
         }
 
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_string') as $ims) {
+        foreach (\App\Facades\LibrenmsConfig::getCombined($os, 'ignore_mount_string') as $ims) {
             if (str_contains($this->storage_descr, $ims)) {
                 Log::debug("ignored $this->storage_descr (matched: $ims)\n");
 
@@ -67,7 +67,7 @@ class Storage extends DeviceRelatedModel implements Keyable
             }
         }
 
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_regexp') as $imr) {
+        foreach (\App\Facades\LibrenmsConfig::getCombined($os, 'ignore_mount_regexp') as $imr) {
             if (preg_match($imr, $this->storage_descr)) {
                 Log::debug("ignored $this->storage_descr (matched: $imr)\n");
 
@@ -76,7 +76,7 @@ class Storage extends DeviceRelatedModel implements Keyable
         }
 
         // filter by type
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_type') as $imt) {
+        foreach (\App\Facades\LibrenmsConfig::getCombined($os, 'ignore_mount_type') as $imt) {
             if ($imt == $this->storage_type) {
                 Log::debug("ignored type $this->storage_type\n");
 

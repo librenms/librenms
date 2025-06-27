@@ -6,8 +6,8 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use LDAP\Connection;
-use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
@@ -27,19 +27,19 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         if ($this->ldap_connection) {
             // bind with sAMAccountName instead of full LDAP DN
-            if (! empty($credentials['username']) && ! empty($credentials['password']) && ldap_bind($this->ldap_connection, $credentials['username'] . '@' . Config::get('auth_ad_domain'), $credentials['password'])) {
+            if (! empty($credentials['username']) && ! empty($credentials['password']) && ldap_bind($this->ldap_connection, $credentials['username'] . '@' . LibrenmsConfig::get('auth_ad_domain'), $credentials['password'])) {
                 $this->is_bound = true;
                 // group membership in one of the configured groups is required
-                if (Config::get('auth_ad_require_groupmembership', true)) {
+                if (LibrenmsConfig::get('auth_ad_require_groupmembership', true)) {
                     // cycle through defined groups, test for memberOf-ship
-                    foreach (Config::get('auth_ad_groups', []) as $group => $level) {
+                    foreach (LibrenmsConfig::get('auth_ad_groups', []) as $group => $level) {
                         if ($this->userInGroup($credentials['username'], $group)) {
                             return true;
                         }
                     }
 
                     // failed to find user
-                    if (Config::get('auth_ad_debug', false)) {
+                    if (LibrenmsConfig::get('auth_ad_debug', false)) {
                         throw new AuthenticationException('User is not in one of the required groups or user/group is outside the base dn');
                     }
 
@@ -53,7 +53,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         if (empty($credentials['password'])) {
             throw new AuthenticationException('A password is required');
-        } elseif (Config::get('auth_ad_debug', false)) {
+        } elseif (LibrenmsConfig::get('auth_ad_debug', false)) {
             ldap_get_option($this->ldap_connection, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error);
             throw new AuthenticationException(ldap_error($this->ldap_connection) . '<br />' . $extended_error);
         }
@@ -71,14 +71,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // get DN for auth_ad_group
         $search = ldap_search(
             $connection,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             $search_filter,
             ['cn']
         );
         $result = ldap_get_entries($connection, $search);
 
         if ($result == false || $result['count'] !== 1) {
-            if (Config::get('auth_ad_debug', false)) {
+            if (LibrenmsConfig::get('auth_ad_debug', false)) {
                 if ($result == false) {
                     throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter', last LDAP error: " . ldap_error($connection));
                 } elseif ((int) $result['count'] == 0) {
@@ -96,7 +96,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         $search = ldap_search(
             $connection,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
             // limiting to "DN" for shorter array
             '(&' . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
@@ -113,7 +113,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
         $search = ldap_search(
             $connection,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             $this->userFilter($username),
             ['samaccountname']
         );
@@ -129,14 +129,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
     public function getRoles(string $username): array|false
     {
         $roles = [];
-        if (! Config::get('auth_ad_require_groupmembership', true)) {
-            if (Config::get('auth_ad_global_read', false)) {
+        if (! LibrenmsConfig::get('auth_ad_require_groupmembership', true)) {
+            if (LibrenmsConfig::get('auth_ad_global_read', false)) {
                 $roles[] = 'global-read';
             }
         }
 
         // cycle through defined groups, test for memberOf-ship
-        foreach (Config::get('auth_ad_groups', []) as $group => $data) {
+        foreach (LibrenmsConfig::get('auth_ad_groups', []) as $group => $data) {
             try {
                 if ($this->userInGroup($username, $group)) {
                     if (isset($data['roles']) && is_array($data['roles'])) {
@@ -162,7 +162,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $attributes = ['objectsid'];
         $search = ldap_search(
             $connection,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             $this->userFilter($username),
             $attributes
         );
@@ -202,25 +202,25 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             throw new LdapMissingException();
         }
 
-        if (Config::has('auth_ad_check_certificates') &&
-            ! Config::get('auth_ad_check_certificates')) {
+        if (LibrenmsConfig::has('auth_ad_check_certificates') &&
+            ! LibrenmsConfig::get('auth_ad_check_certificates')) {
             putenv('LDAPTLS_REQCERT=never');
         }
 
-        if (Config::has('auth_ad_check_certificates') && Config::get('auth_ad_debug')) {
+        if (LibrenmsConfig::has('auth_ad_check_certificates') && LibrenmsConfig::get('auth_ad_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
 
-        $this->ldap_connection = ldap_connect(Config::get('auth_ad_url'));
+        $this->ldap_connection = ldap_connect(LibrenmsConfig::get('auth_ad_url'));
         if (empty($this->ldap_connection)) {
-            throw new AuthenticationException('Fatal error while connecting to AD, uri not valid: ' . Config::get('auth_ad_url'));
+            throw new AuthenticationException('Fatal error while connecting to AD, uri not valid: ' . LibrenmsConfig::get('auth_ad_url'));
         }
 
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
-        $starttls = Config::get('auth_ad_starttls');
+        $starttls = LibrenmsConfig::get('auth_ad_starttls');
         if ($starttls == 'optional' || $starttls == 'required') {
             $tls = ldap_start_tls($this->ldap_connection);
             if ($starttls == 'required' && $tls === false) {
@@ -238,13 +238,13 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
-            $username = Config::get('auth_ad_binduser');
-            $password = Config::get('auth_ad_bindpassword');
+        if (LibrenmsConfig::has('auth_ad_binduser') && LibrenmsConfig::has('auth_ad_bindpassword')) {
+            $username = LibrenmsConfig::get('auth_ad_binduser');
+            $password = LibrenmsConfig::get('auth_ad_bindpassword');
         }
-        $username .= '@' . Config::get('auth_ad_domain');
+        $username .= '@' . LibrenmsConfig::get('auth_ad_domain');
 
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, LibrenmsConfig::get('auth_ad_timeout', 5));
         $bind_result = ldap_bind($this->ldap_connection, $username, $password);
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
@@ -252,7 +252,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             return $bind_result;
         }
 
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, LibrenmsConfig::get('auth_ad_timeout', 5));
         ldap_bind($this->ldap_connection);
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
     }

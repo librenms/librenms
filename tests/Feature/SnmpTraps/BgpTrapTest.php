@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use LibreNMS\Util\AutonomousSystem;
@@ -42,7 +42,7 @@ class BgpTrapTest extends SnmpTrapTestCase
     public function testBgpUp(): void
     {
         // Cache it to avoid DNS Lookup
-        Config::set('astext.1', 'PHPUnit ASTEXT');
+        LibrenmsConfig::set('astext.1', 'PHPUnit ASTEXT');
         $device = Device::factory()->create();
         /** @var Device $device */
         $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle', 'bgpPeerRemoteAs' => 1]);
@@ -68,7 +68,7 @@ BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n",
     public function testBgpDown(): void
     {
         // Cache it to avoid DNS Lookup
-        Config::set('astext.1', 'PHPUnit ASTEXT');
+        LibrenmsConfig::set('astext.1', 'PHPUnit ASTEXT');
         $device = Device::factory()->create();
         /** @var Device $device */
         $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established', 'bgpPeerRemoteAs' => 1]);

@@ -41,7 +41,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];
         $rrd_list[$i]['ds'] = $ds;
-        $rrd_list[$i]['colour'] = \LibreNMS\Config::get("graph_colours.$colours" . ($i + 2));
+        $rrd_list[$i]['colour'] = \App\Facades\LibrenmsConfig::get("graph_colours.$colours" . ($i + 2));
         $i++;
     }
 } else {

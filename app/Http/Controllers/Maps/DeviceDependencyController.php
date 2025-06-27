@@ -26,11 +26,11 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 
 class DeviceDependencyController extends Controller
 {
@@ -45,18 +45,18 @@ class DeviceDependencyController extends Controller
         }
 
         $data = [
-            'page_refresh' => Config::get('page_refresh', 300),
+            'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => Config::get('network_map_dependencymap_vis_options') ?? Config::get('network_map_vis_options'),
+            'options' => LibrenmsConfig::get('network_map_dependencymap_vis_options') ?? LibrenmsConfig::get('network_map_vis_options'),
             'group_name' => $group_name,
             'highlight_style' => [
                 'color' => [
                     'highlight' => [
-                        'border' => Config::get('network_map_legend.highlight.border'),
+                        'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
                     ],
-                    'border' => Config::get('network_map_legend.highlight.border'),
+                    'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
                 ],
-                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+                'borderWidth' => LibrenmsConfig::get('network_map_legend.highlight.borderWidth'),
             ],
         ];
 

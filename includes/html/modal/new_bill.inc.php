@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 if (Auth::user()->hasGlobalAdmin()) {
     $port_device_id = -1;
@@ -60,7 +60,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
     </script>
     <?php
-    if (Config::get('billing.95th_default_agg') == 1) {
+    if (LibrenmsConfig::get('billing.95th_default_agg') == 1) {
         $bill_data['dir_95th'] = 'agg';
     } else {
         $bill_data['dir_95th'] = 'in';

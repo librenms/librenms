@@ -72,7 +72,7 @@ switch ($type) {
             $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
-        if (\LibreNMS\Config::get('alert.transports.mail') === true) {
+        if (\App\Facades\LibrenmsConfig::get('alert.transports.mail') === true) {
             $contacts = AlertUtil::getContacts($results);
             if (count($contacts) > 0) {
                 $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
@@ -84,8 +84,8 @@ switch ($type) {
         }
         $transports = '';
         $x = 0;
-        foreach (\LibreNMS\Config::get('alert.transports') as $name => $v) {
-            if (\LibreNMS\Config::get("alert.transports.$name") === true) {
+        foreach (\App\Facades\LibrenmsConfig::get('alert.transports') as $name => $v) {
+            if (\App\Facades\LibrenmsConfig::get("alert.transports.$name") === true) {
                 $transports .= 'Transport: ' . $name . PHP_EOL;
                 $x++;
             }
