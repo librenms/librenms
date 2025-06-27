@@ -15,19 +15,19 @@ try {
 
 $app_data['hv'] = $return_data['hv'];
 
-if (! is_array($app_data['VMs'])) {
+if (! isset($app_data['VMs']) || ! is_array($app_data['VMs'])) {
     $app_data['VMs'] = [];
 }
 
-if (! is_array($app_data['VMdisks'])) {
+if (! isset($app_data['VMdisks']) || ! is_array($app_data['VMdisks'])) {
     $app_data['VMdisks'] = [];
 }
 
-if (! is_array($app_data['VMifs'])) {
+if (! isset($app_data['VMifs']) || ! is_array($app_data['VMifs'])) {
     $app_data['VMdifs'] = [];
 }
 
-if (! is_array($app_data['VMstatus'])) {
+if (! isset($app_data['VMstatus']) || ! is_array($app_data['VMstatus'])) {
     $app_data['VMdstatus'] = [];
 }
 
