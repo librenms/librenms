@@ -140,7 +140,8 @@ class InfluxDB extends BaseDatastore
             $client->setDriver(new UDP($host, $port));
         }
 
-        return $client->selectDB($db);
+        // Suppress InfluxDB\Database::create(): Implicitly marking parameter $retentionPolicy as nullable is deprecated
+        return @$client->selectDB($db);
     }
 
     private function forceType($data)
