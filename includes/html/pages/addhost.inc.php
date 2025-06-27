@@ -1,7 +1,7 @@
 <?php
 
 use App\Actions\Device\ValidateDeviceAndCreate;
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
@@ -47,7 +47,7 @@ if (! empty($_POST['hostname'])) {
                 $new_device->sysName = strip_tags($_POST['sysName']);
             } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
                 $new_device->snmpver = strip_tags($_POST['snmpver']);
-                $communities = Config::get('snmp.community');
+                $communities = LibrenmsConfig::get('snmp.community');
                 if ($_POST['community']) {
                     $new_device->community = $_POST['community'];
                     $communities = [$_POST['community']];
@@ -148,7 +148,7 @@ $pagetitle[] = 'Add host';
           <div class="col-sm-3">
             <select name="snmpver" id="snmpver" class="form-control input-sm" onChange="changeForm();">
                 <?php
-                $snmpver_pref = Config::get('snmp.version.0', 'v2c');
+                $snmpver_pref = LibrenmsConfig::get('snmp.version.0', 'v2c');
                 $snmpver_list = ['v1', 'v2c', 'v3'];
                 foreach ($snmpver_list as $snmpver_item) {
                     echo "<option value=\"" . $snmpver_item ."\"" . ($snmpver_item == $snmpver_pref ? ' selected' : '') . ">" . $snmpver_item. "</option>";
@@ -162,9 +162,9 @@ $pagetitle[] = 'Add host';
           <div class="col-sm-3">
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
-var_dump(Config::get('snmp.transports', ['udp']));
-foreach (Config::get('snmp.transports', 'udp') as $transport) {
-    echo '<option value="' . $transport . '"'. (Config::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
+var_dump(LibrenmsConfig::get('snmp.transports', ['udp']));
+foreach (LibrenmsConfig::get('snmp.transports', 'udp') as $transport) {
+    echo '<option value="' . $transport . '"'. (LibrenmsConfig::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
 }
 ?>
             </select>
@@ -177,7 +177,7 @@ foreach (Config::get('snmp.transports', 'udp') as $transport) {
 <?php
 
 foreach (PortAssociationMode::getModes() as $mode) {
-    $selected = $mode == Config::get('default_port_association_mode') ? ' selected' : '';
+    $selected = $mode == LibrenmsConfig::get('default_port_association_mode') ? ' selected' : '';
     echo "              <option value=\"$mode\"$selected>$mode</option>\n";
 }
 
@@ -210,7 +210,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
               <select name="authlevel" id="authlevel" class="form-control input-sm">
                   <?php
                   $authlevel_list = [ "noAuthNoPriv", "authNoPriv", "authPriv" ];
-                  $authlevel_pref = Config::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
+                  $authlevel_pref = LibrenmsConfig::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
                   foreach ($authlevel_list as $authlevel_item) {
                       echo "<option value=\"" . $authlevel_item. '"' . ($authlevel_item == $authlevel_pref ? ' selected' : '') . ">" . $authlevel_item. "</option>";
                   }
@@ -235,7 +235,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <div class="col-sm-9">
               <select name="authalgo" id="authalgo" class="form-control input-sm">
                   <?php
-                  $algo_pref = Config::get('snmp.v3.0.authalgo');
+                  $algo_pref = LibrenmsConfig::get('snmp.v3.0.authalgo');
                   foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
                       echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . ($algo == $algo_pref ? ' selected' : '') . ">$algo</option>";
                   }
@@ -257,7 +257,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                   <?php
-                  $algo_pref = Config::get('snmp.v3.0.cryptoalgo');
+                  $algo_pref = LibrenmsConfig::get('snmp.v3.0.cryptoalgo');
                   foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
                       echo "<option value=\"$algo\"" . ($enabled ? '' : ' disabled') . ($algo == $algo_pref ? ' selected' : '') . ">$algo</option>";
                   }
@@ -271,7 +271,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
         </div>
       </div>
 <?php
-if (Config::get('distributed_poller') === true) {
+if (LibrenmsConfig::get('distributed_poller') === true) {
                       echo '
           <div class="form-group">
               <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>

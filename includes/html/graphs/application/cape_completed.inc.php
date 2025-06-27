@@ -11,13 +11,7 @@ $transparency = 15;
 $float_precision = 3;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
-
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $filename = $rrd_filename;
-    $descr = 'completed';
-    $ds = 'completed';
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+$descr = 'completed';
+$ds = 'completed';
 
 require 'includes/html/graphs/generic_stats.inc.php';

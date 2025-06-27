@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -51,18 +51,18 @@ class SSOAuthorizer extends MysqlAuthorizer
         }
 
         // User has already been approved by the authenticator so if automatic user create/update is enabled, do it
-        if (Config::get('sso.create_users') || Config::get('sso.update_users')) {
+        if (LibrenmsConfig::get('sso.create_users') || LibrenmsConfig::get('sso.update_users')) {
             $user = User::thisAuth()->firstOrNew(['username' => $credentials['username']]);
 
-            $create = ! $user->exists && Config::get('sso.create_users');
-            $update = $user->exists && Config::get('sso.update_users');
+            $create = ! $user->exists && LibrenmsConfig::get('sso.create_users');
+            $update = $user->exists && LibrenmsConfig::get('sso.update_users');
 
             if ($create || $update) {
                 $user->auth_type = LegacyAuth::getType();
                 $user->can_modify_passwd = 0;
-                $user->realname = $this->authSSOGetAttr(Config::get('sso.realname_attr'));
-                $user->email = $this->authSSOGetAttr(Config::get('sso.email_attr'));
-                $user->descr = $this->authSSOGetAttr(Config::get('sso.descr_attr')) ?: 'SSO User';
+                $user->realname = $this->authSSOGetAttr(LibrenmsConfig::get('sso.realname_attr'));
+                $user->email = $this->authSSOGetAttr(LibrenmsConfig::get('sso.email_attr'));
+                $user->descr = $this->authSSOGetAttr(LibrenmsConfig::get('sso.descr_attr')) ?: 'SSO User';
                 $user->save();
             }
         }
@@ -72,7 +72,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 
     public function getExternalUsername()
     {
-        return $this->authSSOGetAttr(Config::get('sso.user_attr'), '');
+        return $this->authSSOGetAttr(LibrenmsConfig::get('sso.user_attr'), '');
     }
 
     /**
@@ -93,9 +93,9 @@ class SSOAuthorizer extends MysqlAuthorizer
 
             $header_key = $prefix . str_replace('-', '_', strtoupper($attr));
 
-            if (Config::get('sso.mode') === 'header' && array_key_exists($header_key, $_SERVER)) {
+            if (LibrenmsConfig::get('sso.mode') === 'header' && array_key_exists($header_key, $_SERVER)) {
                 return $_SERVER[$header_key];
-            } elseif (Config::get('sso.mode') === 'env' && array_key_exists($attr, $_SERVER)) {
+            } elseif (LibrenmsConfig::get('sso.mode') === 'env' && array_key_exists($attr, $_SERVER)) {
                 return $_SERVER[$attr];
             } else {
                 return null;
@@ -114,7 +114,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function authSSOProxyTrusted()
     {
         // We assume IP is used - if anyone is using a non-ip transport, support will need to be added
-        if (Config::get('sso.trusted_proxies')) {
+        if (LibrenmsConfig::get('sso.trusted_proxies')) {
             try {
                 // Where did the HTTP connection originate from?
                 if (isset($_SERVER['REMOTE_ADDR'])) {
@@ -124,7 +124,7 @@ class SSOAuthorizer extends MysqlAuthorizer
                     return false;
                 }
 
-                $proxies = Config::get('sso.trusted_proxies');
+                $proxies = LibrenmsConfig::get('sso.trusted_proxies');
 
                 if (is_array($proxies)) {
                     foreach ($proxies as $value) {
@@ -161,25 +161,25 @@ class SSOAuthorizer extends MysqlAuthorizer
      */
     public function getRoles(string $username): array|false
     {
-        if (Config::get('sso.group_strategy') === 'attribute') {
-            if (Config::get('sso.level_attr')) {
-                if (is_numeric($this->authSSOGetAttr(Config::get('sso.level_attr')))) {
-                    return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOGetAttr(Config::get('sso.level_attr')))?->getName());
+        if (LibrenmsConfig::get('sso.group_strategy') === 'attribute') {
+            if (LibrenmsConfig::get('sso.level_attr')) {
+                if (is_numeric($this->authSSOGetAttr(LibrenmsConfig::get('sso.level_attr')))) {
+                    return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOGetAttr(LibrenmsConfig::get('sso.level_attr')))?->getName());
                 } else {
                     throw new AuthenticationException('group assignment by attribute requested, but httpd is not setting the attribute to a number');
                 }
             } else {
                 throw new AuthenticationException('group assignment by attribute requested, but \'sso.level_attr\' not set in your config');
             }
-        } elseif (Config::get('sso.group_strategy') === 'map') {
-            if (Config::get('sso.group_level_map') && is_array(Config::get('sso.group_level_map')) && Config::get('sso.group_delimiter') && Config::get('sso.group_attr')) {
+        } elseif (LibrenmsConfig::get('sso.group_strategy') === 'map') {
+            if (LibrenmsConfig::get('sso.group_level_map') && is_array(LibrenmsConfig::get('sso.group_level_map')) && LibrenmsConfig::get('sso.group_delimiter') && LibrenmsConfig::get('sso.group_attr')) {
                 return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOParseGroups())?->getName());
             } else {
                 throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
             }
-        } elseif (Config::get('sso.group_strategy') === 'static') {
-            if (Config::get('sso.static_level')) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level'))?->getName());
+        } elseif (LibrenmsConfig::get('sso.group_strategy') === 'static') {
+            if (LibrenmsConfig::get('sso.static_level')) {
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int) LibrenmsConfig::get('sso.static_level'))?->getName());
             } else {
                 throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
             }
@@ -196,14 +196,14 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function authSSOParseGroups()
     {
         // Parse a delimited group list
-        $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')) ?? '');
+        $groups = explode(LibrenmsConfig::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(LibrenmsConfig::get('sso.group_attr')) ?? '');
 
         $valid_groups = [];
 
         // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups
-        if (Config::get('sso.group_filter')) {
+        if (LibrenmsConfig::get('sso.group_filter')) {
             foreach ($groups as $group) {
-                if (preg_match(Config::get('sso.group_filter'), $group)) {
+                if (preg_match(LibrenmsConfig::get('sso.group_filter'), $group)) {
                     array_push($valid_groups, $group);
                 }
             }
@@ -211,9 +211,9 @@ class SSOAuthorizer extends MysqlAuthorizer
             $groups = $valid_groups;
         }
 
-        $level = (int) Config::get('sso.static_level', 0);
+        $level = (int) LibrenmsConfig::get('sso.static_level', 0);
 
-        $config_map = Config::get('sso.group_level_map');
+        $config_map = LibrenmsConfig::get('sso.group_level_map');
 
         // Find the highest level the user is entitled to
         foreach ($groups as $value) {

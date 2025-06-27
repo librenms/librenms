@@ -11,7 +11,10 @@
         },
         "addhost_alwayscheckip": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 2
         },
         "alert.ack_until_clear": {
             "default": false,
@@ -391,6 +394,30 @@
             "default": 604800,
             "type": "integer"
         },
+        "apps.oslv_monitor.linux_pg_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.misc_linux_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_size": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_activity": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.workingset_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.thp_activity": {
+            "default": true,
+            "type": "boolean"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
@@ -400,7 +427,10 @@
                 "65332": "Cymru FullBogon Feed",
                 "65333": "Cymru Bogon Feed"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "general",
+            "order": 4
         },
         "auth.allow_get_login": {
             "group": "auth",
@@ -912,7 +942,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
-            }
+            },
+            "group": "discovery",
+            "section": "sensors",
+            "order": 0
         },
         "bad_disk_regexp": {
             "default": [],
@@ -1020,6 +1053,13 @@
             "order": 5,
             "type": "text"
         },
+        "billing.95th_default_agg": {
+            "default": false,
+            "type": "boolean",
+            "group": "system",
+            "section": "billing",
+            "order": 0
+        },
         "billing.base": {
             "default": 1000,
             "type": "integer"
@@ -1048,11 +1088,17 @@
         },
         "collectd_dir": {
             "default": null,
-            "type": "directory"
+            "type": "directory",
+            "group": "external",
+            "section": "collectd",
+            "order": 0
         },
         "collectd_sock": {
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "external",
+            "section": "collectd",
+            "order": 1
         },
         "core_descr": {
             "default": ["core"],
@@ -1067,7 +1113,10 @@
         },
         "custom_descr": {
             "default": [""],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "port-descr",
+            "order": 4
         },
         "custom_map.background_type": {
             "default": "none",
@@ -1407,7 +1456,10 @@
                 "/l2vlan/",
                 "/ppp/"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "webui",
+            "section": "graph",
+            "order": 8
         },
         "device_types": {
             "default": [
@@ -1476,7 +1528,10 @@
         },
         "disabled_sensors": {
             "default": null,
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "sensors",
+            "order": 1
         },
         "disabled_sensors_regex": {
             "default": null,
@@ -1484,7 +1539,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
-            }
+            },
+            "group": "discovery",
+            "section": "sensors",
+            "order": 2
         },
         "discover_services": {
             "default": false,
@@ -2110,27 +2168,52 @@
         },
         "enable_billing": {
             "default": false,
-            "type": "boolean"
+            "group": "system",
+            "section": "billing",
+            "type": "boolean",
+            "order": 1
         },
         "enable_clear_discovery": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "device",
+            "order": 8
         },
         "enable_footer": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general",
+            "order": 0
         },
         "enable_inventory": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu",
+            "order": 0
         },
         "enable_lazy_load": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general",
+            "order": 1
         },
         "enable_libvirt": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "virtualization",
+            "order": 0
+        },
+        "enable_proxmox": {
+            "default": false,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "virtualization",
+            "order": 1
         },
         "enable_ports_adsl": {
             "default": true,
@@ -2144,17 +2227,19 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_proxmox": {
-            "default": false,
-            "type": "boolean"
-        },
         "enable_pseudowires": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu",
+            "order": 1
         },
         "enable_syslog": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "menu",
+            "order": 2
         },
         "enable_syslog_hooks": {
             "default": false,
@@ -2226,19 +2311,40 @@
         },
         "front_page": {
             "default": "default",
-            "type": "text"
+            "group": "webui",
+            "section": "front-page",
+            "type": "text",
+            "order": 0
         },
         "front_page_down_box_limit": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            },
+            "order": 1
         },
         "front_page_settings.top.devices": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            },
+            "order": 2
         },
         "front_page_settings.top.ports": {
             "default": 10,
-            "type": "integer"
+            "group": "webui",
+            "section": "front-page",
+            "type": "integer",
+            "validate": {
+                "value": "integer"
+            },
+            "order": 3
         },
         "gateone.server": {
             "default": null,
@@ -2330,7 +2436,10 @@
         },
         "good_if": {
             "default": null,
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 8
         },
         "graph_stat_percentile_disable": {
             "default": false,
@@ -4344,6 +4453,9 @@
         },
         "icmp_check": {
             "default": true,
+            "group": "poller",
+            "section": "ping",
+            "order": 4,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -4583,6 +4695,163 @@
             "default": [
             ]
         },
+        "kafka.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 0
+        },
+        "kafka.groups-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "int"
+             },
+            "order": 1
+        },
+        "kafka.measurement-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             },
+            "order": 2
+        },
+        "kafka.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 3
+        },
+        "kafka.security.debug": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 4
+        },
+        "kafka.broker.list": {
+            "default": "127.0.2.2:9092",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 5
+        },
+        "kafka.idempotence": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 6
+        },
+        "kafka.topic": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 7
+        },
+        "kafka.ssl.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 8
+        },
+        "kafka.ssl.protocol": {
+            "default": "ssl",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 9
+        },
+        "kafka.ssl.ca.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 10
+        },
+        "kafka.ssl.certificate.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 11
+        },
+        "kafka.ssl.key.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 12
+        },
+        "kafka.ssl.key.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 13
+        },
+        "kafka.ssl.keystore.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 14
+        },
+        "kafka.ssl.keystore.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 15
+        },
+        "kafka.flush.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 16
+        },
+        "kafka.buffer.max.message": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 17
+        },
+        "kafka.batch.max.message": {
+            "default": 100,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 18
+        },
+        "kafka.linger.ms": {
+            "default": 50,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 19
+        },
+        "kafka.request.required.acks": {
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "Dont wait for ack",
+                "all": "Wait for ack from all replicas"
+            },
+            "group": "poller",
+            "section": "kafka",
+            "order": 20
+        },
         "influxdbv2.timeout": {
             "default": 1,
             "type": "integer",
@@ -4616,23 +4885,38 @@
         },
         "int_core": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 3
         },
         "int_customers": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 4
         },
         "int_l2tp": {
             "default": false,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 5
         },
         "int_peering": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 6
         },
         "int_transit": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 7
         },
         "ipmi.type": {
             "default": [
@@ -4641,7 +4925,10 @@
                 "imb",
                 "open"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ipmi",
+            "order": 0
         },
         "ipmi_unit": {
             "default": {
@@ -4653,7 +4940,10 @@
                 "discrete": "",
                 "percent": "load"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ipmi",
+            "order": 1
         },
         "ipmitool": {
             "default": "/usr/bin/ipmitool",
@@ -4741,11 +5031,17 @@
                 "qemu+ssh",
                 "xen+ssh"
             ],
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "virtualization",
+            "order": 2
         },
         "libvirt_username": {
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "discovery",
+            "section": "virtualization",
+            "order": 3
         },
         "list_colour.even": {
             "default": "#ffffff",
@@ -4781,7 +5077,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device",
+            "order": 9
         },
         "location_map_regex": {
             "default": null,
@@ -4789,7 +5088,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device",
+            "order": 10
         },
         "location_map_regex_sub": {
             "default": null,
@@ -4797,7 +5099,10 @@
             "validate": {
                 "value": "array",
                 "value.*": "string"
-            }
+            },
+            "group": "webui",
+            "section": "device",
+            "order": 11
         },
         "log_dir": {
             "type": "directory"
@@ -5194,7 +5499,10 @@
         },
         "overview_show_sysDescr": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "webui",
+            "section": "general",
+            "order": 2
         },
         "own_hostname": {
             "default": "localhost",
@@ -5365,8 +5673,11 @@
         },
         "page_refresh": {
             "default": 300,
+            "group": "webui",
+            "section": "general",
             "type": "integer",
-            "units": "seconds"
+            "units": "seconds",
+            "order": 3
         },
         "page_title_prefix": {
             "default": "",
@@ -5401,9 +5712,12 @@
         "percentile_value": {
             "default": 95,
             "type": "integer",
+            "group": "webui",
+            "section": "graph",
             "validate": {
                 "value": "integer|between:0,100"
-            }
+            },
+            "order": 8
         },
         "permission.device_group.allow_dynamic": {
             "default": false,
@@ -5785,6 +6099,13 @@
             "default": true,
             "type": "boolean"
         },
+        "polling.selected_ports": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "ports",
+            "order": 0
+        },
         "port_descr_parser": {
             "default": "includes/port-descr-parser.inc.php",
             "type": "text"
@@ -5821,6 +6142,16 @@
             "order": 9,
             "default": true,
             "type": "boolean"
+        },
+        "processor.default_perc_warn": {
+            "default": 75,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            },
+            "group": "discovery",
+            "section": "processor",
+            "order": 1
         },
         "project_home": {
             "default": "https://www.librenms.org/",
@@ -5913,11 +6244,17 @@
         },
         "rancid_configs": {
             "default": [],
-            "type": "array"
+            "type": "array",
+            "group": "external",
+            "section": "rancid",
+            "order": 0
         },
         "rancid_ignorecomments": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "external",
+            "section": "rancid",
+            "order": 1
         },
         "rancid_repo_type": {
             "default": "svn",
@@ -5925,7 +6262,10 @@
             "options": {
                 "svn": "SVN",
                 "git": "Git"
-            }
+            },
+            "group": "external",
+            "section": "rancid",
+            "order": 2
         },
         "reporting.error": {
             "group": "system",
@@ -5950,13 +6290,23 @@
             "type": "boolean"
         },
         "rewrite_if": {
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 9
         },
         "rewrite_if_regexp": {
             "default": {
                 "/^cpu interface/": "Mgmt"
             },
-            "type": "array"
+            "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "validate": {
+                "value": "array",
+                "value.*": "is_regex"
+            },
+            "order": 10
         },
         "routes_max_number": {
             "default": 1000,
@@ -6131,7 +6481,10 @@
         },
         "sensors.guess_limits": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "sensors",
+            "order": 4
         },
         "service_poller_workers": {
             "default": 24,
@@ -6288,15 +6641,24 @@
         },
         "show_locations": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 8
         },
         "show_locations_dropdown": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 9
         },
         "show_services": {
             "default": false,
-            "type": "boolean"
+            "group": "webui",
+            "section": "menu",
+            "type": "boolean",
+            "order": 10
         },
         "site_style": {
             "default": "device",
@@ -6490,7 +6852,10 @@
             "type": "integer",
             "validate": {
                 "value": "integer|between:0,100"
-            }
+            },
+            "group": "discovery",
+            "section": "storage",
+            "order": 8
         },
         "stylesheet": {
             "default": "css/styles.css",
@@ -6651,7 +7016,10 @@
         },
         "web_mouseover": {
             "default": true,
-            "type": "boolean"
+            "group": "webui",
+            "section": "general",
+            "type": "boolean",
+            "order": 4
         },
         "webui.availability_map_box_size": {
             "default": 165,
@@ -6683,7 +7051,10 @@
         },
         "webui.custom_css": {
             "default": [],
-            "type": "array"
+            "group": "webui",
+            "section": "style",
+            "type": "array",
+            "order": 4
         },
         "webui.default_dashboard_id": {
             "default": 0,

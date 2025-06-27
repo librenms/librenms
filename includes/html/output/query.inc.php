@@ -24,7 +24,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Alert\AlertDB;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
@@ -46,7 +45,7 @@ switch ($type) {
         $results = [];
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, [$device_id]);
@@ -60,10 +59,8 @@ switch ($type) {
             $extra = json_decode($rule['extra'], true);
             if ($extra['options']['override_query'] === 'on') {
                 $qb = $extra['options']['override_query'];
-            } elseif ($rule['builder']) {
-                $qb = QueryBuilderParser::fromJson($rule['builder']);
             } else {
-                $qb = QueryBuilderParser::fromOld($rule['rule']);
+                $qb = QueryBuilderParser::fromJson($rule['builder'] ?? []);
             }
 
             $output .= 'Rule name: ' . $rule['name'] . PHP_EOL;
@@ -75,7 +72,7 @@ switch ($type) {
             $output .= 'Alert query: ' . $rule['query'] . PHP_EOL;
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
-        if (\LibreNMS\Config::get('alert.transports.mail') === true) {
+        if (\App\Facades\LibrenmsConfig::get('alert.transports.mail') === true) {
             $contacts = AlertUtil::getContacts($results);
             if (count($contacts) > 0) {
                 $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
@@ -87,8 +84,8 @@ switch ($type) {
         }
         $transports = '';
         $x = 0;
-        foreach (\LibreNMS\Config::get('alert.transports') as $name => $v) {
-            if (\LibreNMS\Config::get("alert.transports.$name") === true) {
+        foreach (\App\Facades\LibrenmsConfig::get('alert.transports') as $name => $v) {
+            if (\App\Facades\LibrenmsConfig::get("alert.transports.$name") === true) {
                 $transports .= 'Transport: ' . $name . PHP_EOL;
                 $x++;
             }

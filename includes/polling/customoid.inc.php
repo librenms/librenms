@@ -64,7 +64,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $rrd_def = RrdDefinition::make()
         ->addDataset('oid_value', $datatype);
 
-    $tags = compact('descr', 'unit', 'rrd_name', 'rrd_def');
+    $tags = ['descr' => $descr, 'unit' => $unit, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
 
     app('Datastore')->put($device, 'customoid', $tags, $fields);
     dbUpdate(['customoid_current' => $oid_value, 'lastupdate' => ['NOW()'], 'customoid_prev' => $prev_oid_value], 'customoids', '`customoid_id` = ?', [$customoid['customoid_id']]);

@@ -1,10 +1,10 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 // Load our list of available applications
 $applications = [];
-foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
+foreach (glob(LibrenmsConfig::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
     $name = basename($file, '.inc.php');
     $applications[$name] = $name;
 }
@@ -27,7 +27,7 @@ foreach ($applications as $app) {
     if (isset($enabled_apps[$app])) {
         $modifiers = ' checked';
         if ($enabled_apps[$app]
-            && (get_dev_attrib($device, 'poll_applications') || Config::getOsSetting($device['os'], 'poller_modules.applications'))
+            && (get_dev_attrib($device, 'poll_applications') || LibrenmsConfig::getOsSetting($device['os'], 'poller_modules.applications'))
         ) {
             $app_text .= '<span class="text-success"> (Discovered)</span>';
             $modifiers .= ' disabled';

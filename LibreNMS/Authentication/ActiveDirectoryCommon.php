@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use LDAP\Connection;
-use LibreNMS\Config;
 
 trait ActiveDirectoryCommon
 {
@@ -68,7 +68,7 @@ trait ActiveDirectoryCommon
         $attributes = ['dn'];
         $result = ldap_search(
             $link_identifier,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             $this->groupFilter($samaccountname),
             $attributes
         );
@@ -85,7 +85,7 @@ trait ActiveDirectoryCommon
         // don't return disabled users
         $user_filter = "(&(samaccountname=$username)(!(useraccountcontrol:1.2.840.113556.1.4.803:=2))";
 
-        $extra = Config::get('auth_ad_user_filter');
+        $extra = LibrenmsConfig::get('auth_ad_user_filter');
         if ($extra) {
             $user_filter .= $extra;
         }
@@ -98,7 +98,7 @@ trait ActiveDirectoryCommon
     {
         $group_filter = "(samaccountname=$groupname)";
 
-        $extra = Config::get('auth_ad_group_filter');
+        $extra = LibrenmsConfig::get('auth_ad_group_filter');
         if ($extra) {
             $group_filter = "(&$extra$group_filter)";
         }
@@ -112,7 +112,7 @@ trait ActiveDirectoryCommon
         $attributes = ['name'];
         $result = ldap_search(
             $connection,
-            Config::get('auth_ad_base_dn'),
+            LibrenmsConfig::get('auth_ad_base_dn'),
             $this->userFilter($username),
             $attributes
         );
@@ -133,17 +133,17 @@ trait ActiveDirectoryCommon
         // show all Active Directory Users by default
         $default_group = 'Users';
 
-        if (Config::has('auth_ad_group')) {
-            if (Config::get('auth_ad_group') !== $default_group) {
-                $ldap_groups[] = Config::get('auth_ad_group');
+        if (LibrenmsConfig::has('auth_ad_group')) {
+            if (LibrenmsConfig::get('auth_ad_group') !== $default_group) {
+                $ldap_groups[] = LibrenmsConfig::get('auth_ad_group');
             }
         }
 
-        if (! Config::has('auth_ad_groups') && ! Config::has('auth_ad_group')) {
+        if (! LibrenmsConfig::has('auth_ad_groups') && ! LibrenmsConfig::has('auth_ad_group')) {
             $ldap_groups[] = $this->getDn($default_group);
         }
 
-        foreach (Config::get('auth_ad_groups') as $key => $value) {
+        foreach (LibrenmsConfig::get('auth_ad_groups') as $key => $value) {
             $ldap_groups[] = $this->getDn($key);
         }
 
@@ -178,7 +178,7 @@ trait ActiveDirectoryCommon
 
         $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
         $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
-        $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
+        $search = ldap_search($connection, LibrenmsConfig::get('auth_ad_base_dn'), $search_filter, $attributes);
 
         if ($search !== false) {
             $entry = ldap_get_entries($connection, $search);
@@ -196,7 +196,7 @@ trait ActiveDirectoryCommon
         $connection = $this->getConnection();
 
         // Extract only the domain components
-        $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', Config::get('auth_ad_base_dn'));
+        $dn_candidate = preg_replace('/^.*?DC=/i', 'DC=', LibrenmsConfig::get('auth_ad_base_dn'));
 
         $search = ldap_read(
             $connection,

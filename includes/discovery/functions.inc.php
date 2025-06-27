@@ -13,11 +13,11 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
@@ -40,7 +40,7 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     Log::debug("discovering $hostname\n");
-    if (empty(Config::get('nets'))) {
+    if (empty(LibrenmsConfig::get('nets'))) {
         Log::debug("Allowed discovery network list is empty - skipping\n");
 
         return false;
@@ -48,14 +48,14 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 
     if (IP::isValid($hostname)) {
         $ip = $hostname;
-        if (! Config::get('discovery_by_ip', false)) {
+        if (! LibrenmsConfig::get('discovery_by_ip', false)) {
             Log::debug('Discovery by IP disabled, skipping ' . $hostname);
             Eventlog::log("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', Severity::Warning);
 
             return false;
         }
     } elseif (\LibreNMS\Util\Validate::hostname($hostname)) {
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $full_host = rtrim($hostname, '.') . '.' . $mydomain;
             if (isDomainResolves($full_host)) {
                 $hostname = $full_host;
@@ -80,13 +80,13 @@ function discover_new_device($hostname, $device, $method, $interface = null)
     $hostname = rtrim($hostname, '.'); // remove trailing dot
 
     $ip = IP::parse($ip, true);
-    if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+    if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
         Log::debug("$ip in an excluded network - skipping\n");
 
         return false;
     }
 
-    if (! $ip->inNetworks(Config::get('nets'))) {
+    if (! $ip->inNetworks(LibrenmsConfig::get('nets'))) {
         Log::debug("$ip not in a matched network - skipping\n");
 
         return false;
@@ -146,14 +146,14 @@ function discover_device(&$device, $force_module = false)
         return false;
     }
 
-    $discovery_modules = ['core' => true] + Config::get('discovery_modules', []);
+    $discovery_modules = ['core' => true] + LibrenmsConfig::get('discovery_modules', []);
 
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
     $measurements->checkpoint(); // don't count previous stats
 
     foreach ($discovery_modules as $module => $module_status) {
-        $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
+        $os_module_status = LibrenmsConfig::getOsSetting($device['os'], "discovery_modules.$module");
         $device_module_status = DeviceCache::getPrimary()->getAttrib('discover_' . $module);
         Log::debug('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         Log::debug('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
@@ -327,7 +327,7 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
 */
 function check_entity_sensor($string, $device)
 {
-    $fringe = array_merge(Config::get('bad_entity_sensor_regex', []), Config::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
+    $fringe = array_merge(LibrenmsConfig::get('bad_entity_sensor_regex', []), LibrenmsConfig::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
 
     foreach ($fringe as $bad) {
         if (preg_match($bad . 'i', $string)) {
@@ -599,7 +599,7 @@ function sensors($types, $os, $pre_cache = [])
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst($sensor_class) . ': ';
-        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
+        $dir = LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
         if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -607,7 +607,7 @@ function sensors($types, $os, $pre_cache = [])
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (Config::getOsSetting($device['os'], 'rfc1628_compat', false)) {
+        if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
             if (is_file($dir . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
@@ -740,7 +740,7 @@ function add_bgp_peer($device, $peer)
             'bgpPeerInUpdateElapsedTime' => 0,
         ];
         dbInsert($bgpPeers, 'bgpPeers');
-        if (Config::get('autodiscovery.bgp')) {
+        if (LibrenmsConfig::get('autodiscovery.bgp')) {
             $name = gethostbyaddr($peer['ip']);
             discover_new_device($name, $device, 'BGP');
         }
@@ -794,7 +794,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
 {
     if ($sysName) {
-        foreach ((array) Config::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysName)) {
                 Log::debug("$sysName - regexp '$needle' matches '$sysName' - skipping device discovery \n");
 
@@ -804,7 +804,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     }
 
     if ($sysDescr) {
-        foreach ((array) Config::get('autodiscovery.xdp_exclude.sysdesc_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.xdp_exclude.sysdesc_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysDescr)) {
                 Log::debug("$sysName - regexp '$needle' matches '$sysDescr' - skipping device discovery \n");
 
@@ -814,7 +814,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     }
 
     if ($platform) {
-        foreach ((array) Config::get('autodiscovery.cdp_exclude.platform_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.cdp_exclude.platform_regexp') as $needle) {
             if (preg_match($needle . 'i', $platform)) {
                 Log::debug("$sysName - regexp '$needle' matches '$platform' - skipping device discovery \n");
 
@@ -844,7 +844,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         $where[] = '`hostname`=?';
         $params[] = $name;
 
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $where[] = '`hostname`=?';
             $params[] = "$name.$mydomain";
 
@@ -886,7 +886,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         $where[] = '`sysName`=?';
         $params[] = $name;
 
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $where[] = '`sysName`=?';
             $params[] = "$name.$mydomain";
 

@@ -26,8 +26,9 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Facades\Http as LaravelHttp;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -39,8 +40,8 @@ class PrometheusStoreTest extends TestCase
     {
         parent::setUp();
 
-        Config::set('prometheus.enable', true);
-        Config::set('prometheus.url', 'http://fake:9999');
+        LibrenmsConfig::set('prometheus.enable', true);
+        LibrenmsConfig::set('prometheus.url', 'http://fake:9999');
     }
 
     public function testFailWrite(): void
@@ -50,7 +51,7 @@ class PrometheusStoreTest extends TestCase
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->once()->with('Prometheus Error: Bad response');
-        $prometheus->put(['hostname' => 'test'], 'none', [], ['one' => 1]);
+        $prometheus->write('none', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
@@ -61,15 +62,15 @@ class PrometheusStoreTest extends TestCase
 
         $prometheus = app(Prometheus::class);
 
-        $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
+        $meta = ['device' => new Device(['hostname' => 'testhost'])];
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->times(0);
 
-        $prometheus->put($device, $measurement, $tags, $fields);
+        $prometheus->write($measurement, $fields, $tags, $meta);
 
         LaravelHttp::assertSentCount(1);
         LaravelHttp::assertSent(function (\Illuminate\Http\Client\Request $request) {

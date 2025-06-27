@@ -66,7 +66,7 @@
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
                                 @config('smokeping.integration')
-                                <li><a href="{{ \LibreNMS\Config::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
+                                <li><a href="{{ \App\Facades\LibrenmsConfig::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
@@ -377,7 +377,7 @@
                                                                                   aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
                                 @endconfig
-                                @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
+                                @if(\App\Facades\LibrenmsConfig::get('int_peering') && \App\Facades\LibrenmsConfig::get('int_transit'))
                                     <li><a href="{{ url('iftype/type=peering,transit') }}"><i
                                                 class="fa fa-rocket fa-fw fa-lg"
                                                 aria-hidden="true"></i> {{ __('Peering + Transit') }}</a></li>
@@ -651,7 +651,7 @@
                         </li>
                         <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
                         <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
-                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
+                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \App\Facades\LibrenmsConfig::get('project_name')]) }}
                             </a></li>
                     </ul>
                 </li>
@@ -748,7 +748,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" style="float: left; min-height: 32px; margin-right: 5px;"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" class="tw:h-8 tw:float-left  tw:m-1 tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-1 tw:mr-2"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
             }
         },
         {

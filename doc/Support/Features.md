@@ -40,27 +40,33 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 -->
 
 ### 3
+
 * 3Com
 
 ### A
+
 * A10 Networks
 * Acano OS
 * Accedian AEN
+* Adtran ALM
 * Adtran AOS
+* ADVA AOS
 * ADVA FSP150CC
+* ADVA FSP150CP
 * ADVA FSP3000 R7
+* Advantech
 * ADVA OptiSwitch
 * ADVA OSA
-* Advantech
 * Aerohive HiveOS
 * Airconsole Server
 * AIX
 * AKCP SensorProbe
-* Alcatel OmniPCX
 * Alcatel-Lucent Enterprise Stellar Wireless OS (AWOS)
 * Alcatel-Lucent OS
+* Alcatel OmniPCX
 * Alcoma
 * ALGCOM DC UPS
+* ALGCOM SM
 * Allied Telesis Wireless (TQ)
 * Alliedware
 * Alliedware Plus
@@ -115,6 +121,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * AXIS Network Document Server
 
 ### B
+
 * Baicells CPE
 * Barco Clickshare
 * Barracuda Email Security Gateway
@@ -127,14 +134,16 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Benu
 * Bintec Be.IP Plus
 * Bintec Smart Router
+* Bison Router
+* Bitstream Hyperion
 * BKE
 * BKtel
 * Blade Network Technologies
 * BladeShelter PDU by PowerTek
-* Blue Coat PacketShaper
-* Blue Coat SSL Visibility
 * Bluecat Networks
+* Blue Coat PacketShaper
 * BlueCoat ProxySG
+* Blue Coat SSL Visibility
 * Broadcom BCM963xx
 * Brocade FabricOS
 * Brocade IronWare
@@ -145,7 +154,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Buffalo
 
 ### C
-* C&C Power Commander plus
+
 * Calix AXOS
 * Calix B6 System
 * Calix EXA
@@ -166,7 +175,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Cambium PTP 800
 * Canon Printer
 * Carel pCOWeb
-* Catalyst 1200-1300 Series Managed Switch
+* C&C Power Commander plus
 * cdata
 * Ceragon CeraOS
 * CET TSI Controller
@@ -228,25 +237,24 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Cyberpower
 
 ### D
-* D-Link Access Point
-* D-Link Switch
+
 * Dahua NVR
 * Dantel Webmon
 * Dantherm
 * Dasan NOS
 * Datacom
-* dd-wrt
 * DDN Storage
+* dd-wrt
 * Deliberant OS
 * Dell DRAC
 * Dell EMC Networking OS10 Enterprise
+* Dell Enterprise SONiC
 * Dell EqualLogic
 * Dell Laser
 * Dell Networking OS
 * Dell OpenManage Enterprise Modular
 * Dell PowerConnect
 * Dell PowerVault
-* Dell PowerVault MD
 * Dell Rack PDU
 * Dell Remote Console
 * Dell Storage
@@ -258,6 +266,8 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Digipower
 * Digital China Networks
 * DKT Comega
+* D-Link Access Point
+* D-Link Switch
 * DmOS
 * DPS Telecom NetGuardian
 * DragonflyBSD
@@ -265,11 +275,13 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Dragonwave Horizon Compact
 * Dragonwave Horizon Compact Plus
 * Dragonwave Horizon Duo
+* Dragonwave Horizon Quantum
 * DrayTek
 * DVB Modulator & Ampiflier
 * DVB-T Transmitter
 
 ### E
+
 * E3 Meter
 * E3 Meter DataConcentrator
 * Eagle-I
@@ -279,6 +291,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Eaton MGE PDU
 * Eaton PDU
 * Eaton SC200 Controller
+* Eaton SC300 Controller
 * Eaton UPS
 * EDFA
 * Edgecore
@@ -308,25 +321,28 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Epson Scanner
 * Ericsson 6600 series
 * Ericsson IPOS
+* EricssonLG IPECS ES
 * Ericsson LG iPECS UCP
 * Ericsson MINI-LINK
 * Ericsson Traffic Node
-* EricssonLG IPECS ES
+* ESP-Home
 * Etherwan Managed Switch
 * EUROstor RAID Subsystem
 * Exagrid
 * Exalt ExtendAir
 * Exinda
+* Exos
 * Expert Sensor Box
 * Extrahop Appliance
 * Extreme BOSS
 * Extreme SLX-OS
 * Extreme VOSS
+* Extremeware
 * Extreme Wireless Convergence
 * Extreme XOS
-* Extremeware
 
 ### F
+
 * F5 Big IP
 * F5OS
 * Fiberhome
@@ -368,25 +384,28 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * FusionHub
 
 ### G
+
 * Gamatronic UPS Stack
 * Gandi Packet Journey
 * GE Digital Energy UPS
-* GE MDS Orbit network Operating System
-* GE Pulsar
 * Geist PDU
 * Geist Watchdog
+* GE MDS Orbit network Operating System
 * Generex UPS SNMP adapter
 * Generic
 * Generic Device
+* GE Pulsar
 * Gestetner Printer
 * GigaVUE
 * Glass Way WDM EYDFA
 * Grandstream HT
+* Grandstream Switch
 * Greenbone OS
 * Gude Expert Transfer Switch
 * gwd
 
 ### H
+
 * Halon
 * Hanwha Techwin
 * HAProxy ALOHA
@@ -399,12 +418,6 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Hirschmann
 * Hitachi Storage Virtualization Operating System (SVOS)
 * HP Blade Management
-* HP MSM
-* HP PDU Management Module
-* HP Print server
-* HP ProCurve
-* HP UPS
-* HP Virtual Connect
 * HPE 3PAR
 * HPE Comware
 * HPE Integrated Lights Out
@@ -413,8 +426,15 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * HPE MSA
 * HPE OpenVMS
 * HPE StoreEver MSL
+* HP MSM
+* HP PDU Management Module
+* HP Print server
+* HP ProCurve
+* HP UPS
+* HP Virtual Connect
 * Huawei iBMC Management Console
 * Huawei OceanStor
+* Huawei OptiX RTN
 * Huawei SmartAX
 * Huawei SmartAX MDU
 * Huawei SMU
@@ -428,6 +448,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Hytera Repeater
 
 ### I
+
 * IBM AMM
 * IBM DPI
 * IBM i
@@ -448,6 +469,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Imco Power
 * Imco Power LS/PS
 * Infinera Groove
+* Infinera IQNOS
 * Infinera PON
 * Infinera XTM
 * Infoblox
@@ -460,6 +482,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * ITWatchDogs Goose
 
 ### J
+
 * Jacarta InterSeptor
 * Janitza
 * Janitza UMG96
@@ -471,12 +494,15 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Juniper ScreenOS
 
 ### K
+
+* KeeneticOS
 * Kemp Loadbalancer
 * Konica-Minolta Printer
 * KTI
 * Kyocera Mita Printer
 
 ### L
+
 * Lambdatrail
 * Lancom OS
 * Lancom Systems LCOS LX
@@ -487,8 +513,8 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Lantronix UDS
 * Last Mile Gear CTM
 * Lenovo Cloud Network Operating System
-* Lenovo XCC IMPI
 * LenovoEMC
+* Lenovo XCC IMPI
 * Lexmark Printer
 * Liebert
 * LigoWave Infinity
@@ -500,6 +526,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Loop Telecom Operating System
 
 ### M
+
 * m0n0wall
 * Maipu MyPower
 * Marathon UPS
@@ -525,19 +552,24 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * MNI Microwave Radio
 * MobileIron
 * Montclair EDFA
+* MorningStar MPPT
+* MorningStar PWM
 * Motorola DOCSIS Cable Modem
 * Motorola Netopia
 * Moxa
 * Moxa AWK
 * Moxa-EDS-4000-Series
+* MPB SRP
 * MRV LambdaDriver
 * MRV OptiDriver
 
 ### N
+
 * NEC Univerge
 * NetApp
 * NetBotz Environment Sensor
 * NetBSD
+* NetElastic Flex BNG
 * Netgear ProSafe
 * NetMan Plus
 * NetModule
@@ -556,12 +588,13 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * NVT Phybridge
 
 ### O
+
 * OKI Printer
 * Omnitron iConverter
 * OneAccess
 * Open Access Netspire
-* Open-E
 * OpenBSD
+* Open-E
 * Opengear
 * OpenIndiana
 * OpenSystems
@@ -573,6 +606,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Overture Hatteras DSLAM
 
 ### P
+
 * Packetflux SiteMonitor
 * Packetlight
 * Panasonic KX-NS Series
@@ -591,8 +625,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * pfSense
 * Pica8 OS
 * Ping only
+* PK700
 * PLANET
 * Polycom Videoconferencing System
+* Positron Access Solutions GAM
 * Powercode BMU
 * PowerWalker UPS
 * PowerWalker VFI
@@ -603,6 +639,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Pulse Secure
 
 ### Q
+
 * QNAP TurboNAS
 * QTECH
 * Quanta
@@ -610,6 +647,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Quantum
 
 ### R
+
 * Radlan
 * RADWIN
 * Raisecom ROAP
@@ -620,9 +658,9 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * RAy
 * RAy3
 * RecoveryOS
-* Red Lion Sixnet
 * Redback Networks SmartEdge
 * Redlion N-Tron
+* Red Lion Sixnet
 * Ribbon GSX
 * Ribbon SBC
 * Ricoh Printer
@@ -642,6 +680,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Ruijie Networks
 
 ### S
+
 * SAF CFM
 * SAF Integra B
 * SAF Integra E
@@ -651,10 +690,12 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Sagem ADR IONOS
 * Samlex Inverter
 * Samsung Printer
+* Sangoma Vega
 * Savin Printer
 * Schleifenbauer SPDM
 * Schneider PowerLogic
 * SCS KS
+* SEH
 * Sensatronics EM1
 * Sensatronics ITTM
 * ServersCheck
@@ -668,10 +709,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Silver Peak VXOA
 * Sinetica UPS
 * Skyhigh Secure Web Gateway
-* SM-OS
 * SmartOptics DCP-M Series
 * SmartOptics M-Series
 * SmartOptics T-Series
+* SM-OS
 * snr
 * snr-erd
 * Socomec Net Vision
@@ -694,6 +735,8 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Synology DSM
 
 ### T
+
+* Tachyon
 * Tait Infra93 Series
 * Tait TN Admin OS
 * Tandberg Magnum
@@ -707,6 +750,9 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Teleste Luminato
 * Teltonika RutOS
 * Teltonika RutOS RUTX Series
+* Teltonika RutOS RUTM Series
+* Teltonika WitchOS
+* TeraCom
 * Teradici PCoIP
 * Terra
 * Thomson DOCSIS Cable Modem
@@ -720,13 +766,15 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Transition
 * Tranzeo
 * TRENDnet Switch
-* Tripp Lite PowerAlert
 * TrippLite console server
+* Tripp Lite PowerAlert
 * TrueNAS
+* TrueNAS-SCALE
 * TSC Printer
 * Tycon Systems TPDIN
 
 ### U
+
 * Ubiquiti AirFiber
 * Ubiquiti AirFiber 60
 * Ubiquiti AirFiber LTU
@@ -739,10 +787,12 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * UHP Networks VSAT Terminal
 * ULAF+
 * UniPing
+* UTAX Printer
 
 ### V
-* V-Solution
+
 * Vanguard ApplicationsWare
+* Venturi Wireless
 * Vertiv Avocent MergePoint Unity
 * Vertiv PDU
 * Video Communication Server
@@ -754,29 +804,34 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * VMware vCenter
 * Volius
 * Voswall
+* V-Solution
 * Vubiq Networks
 * Vutlan
 * Vyatta
 * VyOS
 
 ### W
+
 * Watchguard Fireware
 * Waystream iBOS
-* Web-Thermo-Hygrometer
 * WebPower
 * WebPower-smart2
-* West Mountain RMCU
+* Web-Thermo-Hygrometer
 * Westermo WeOS
+* West Mountain RMCU
+* WIS Bridge
 * WISI Tangram
 * WTI CONSOLE
 * WTI MPC
 * WTI POWER
 
 ### X
+
 * Xerox Printer
 * Xirrus ArrayOS
 
 ### Z
+
 * ZebraNet
 * Zhone MXK
 * Zmtel Greenpacket
@@ -786,9 +841,10 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * ZyXEL AC
 * ZyXEL DSLAM
 * ZyXEL Ethernet Switch
-* ZyXEL IES MSAN
 * ZyXEL IES-5000 DSLAM
+* ZyXEL IES MSAN
 * ZyXEL NWA
 * ZyXEL Prestige
+* ZyXEL USG
 * ZyXEL ZyWALL
 * Zyxel Zyxelwlc

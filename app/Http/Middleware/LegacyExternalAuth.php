@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class LegacyExternalAuth
@@ -21,7 +21,7 @@ class LegacyExternalAuth
     {
         if (! Auth::guard($guard)->check()) {
             // check for get variables
-            if (Config::get('auth.allow_get_login')) {
+            if (LibrenmsConfig::get('auth.allow_get_login')) {
                 if ($request->isMethod('get') && $request->has(['username', 'password'])) {
                     Auth::attempt($request->only(['username', 'password']));
                 }

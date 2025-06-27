@@ -1,7 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Ospfv3Nbr;
-use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
 
@@ -21,7 +21,7 @@ if ($device['os'] == 'ironware') {
             if (! $remote_device_id &&
                     ! can_skip_discovery($fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheVersion'])
             ) {
-                if (Config::get('autodiscovery.xdp') === true) {
+                if (LibrenmsConfig::get('autodiscovery.xdp') === true) {
                     $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device, 'FDP', $interface);
                 }
             }
@@ -67,11 +67,11 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
             if (
                 ! $remote_device_id &&
                 ! can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform']) &&
-                Config::get('autodiscovery.xdp') === true
+                LibrenmsConfig::get('autodiscovery.xdp') === true
             ) {
                 $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
-                if ($cdp_ip && ! $remote_device_id && Config::get('discovery_by_ip', false)) {
+                if ($cdp_ip && ! $remote_device_id && LibrenmsConfig::get('discovery_by_ip', false)) {
                     $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
                 }
             }
@@ -120,7 +120,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if (! $remote_device_id &&
                     \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
                     ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
-                    Config::get('autodiscovery.xdp') === true) {
+                    LibrenmsConfig::get('autodiscovery.xdp') === true) {
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
@@ -150,7 +150,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum'] ?? null);
             $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
 
-            if (Config::get('autodiscovery.xdp') && isset($lldp['lldpRemSysName']) && ! $remote_device_id &&
+            if (LibrenmsConfig::get('autodiscovery.xdp') && isset($lldp['lldpRemSysName']) && ! $remote_device_id &&
                     \LibreNMS\Util\Validate::hostname($lldp['lldpRemSysName']) &&
                     ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])
             ) {
@@ -187,7 +187,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     if (! $remote_device_id &&
                             \LibreNMS\Util\Validate::hostname($lldp['tmnxLldpRemSysName']) &&
                             ! can_skip_discovery($lldp['tmnxLldpRemSysName'], $lldp['tmnxLldpRemSysDesc']) &&
-                            Config::get('autodiscovery.xdp') === true
+                            LibrenmsConfig::get('autodiscovery.xdp') === true
                     ) {
                         $remote_device_id = discover_new_device($lldp['tmnxLldpRemSysName'], $device, 'LLDP', $interface);
                     }
@@ -240,7 +240,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if (! $remote_device_id &&
                     \LibreNMS\Util\Validate::hostname($remote_device_name) &&
                     ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
-                    Config::get('autodiscovery.xdp') === true) {
+                    LibrenmsConfig::get('autodiscovery.xdp') === true) {
                 $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $interface);
             }
 
@@ -384,10 +384,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 }
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'] ?? '', $remote_port_mac);
                 // add device if configured to do so
-                if (Config::get('autodiscovery.xdp') && ! $remote_device_id && ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] ?? null)) {
+                if (LibrenmsConfig::get('autodiscovery.xdp') && ! $remote_device_id && ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] ?? null)) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
 
-                    if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
+                    if (! $remote_device_id && LibrenmsConfig::get('discovery_by_ip', false)) {
                         $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
                         d_echo($ptopo_array);
                         foreach ($ptopo_array as $ptopo) {
@@ -473,19 +473,19 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo PHP_EOL;
 }//end elseif
 
-if (Config::get('autodiscovery.ospf') === true) {
+if (LibrenmsConfig::get('autodiscovery.ospf') === true) {
     echo ' OSPF Discovery: ';
     $sql = 'SELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs` WHERE `device_id`=?';
     foreach (dbFetchRows($sql, [$device['device_id']]) as $nbr) {
         try {
             $ip = IP::parse($nbr['ospfNbrIpAddr']);
 
-            if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+            if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
                 echo 'x';
                 continue;
             }
 
-            if (! $ip->inNetworks(Config::get('nets'))) {
+            if (! $ip->inNetworks(LibrenmsConfig::get('nets'))) {
                 echo 'i';
                 continue;
             }
@@ -499,7 +499,7 @@ if (Config::get('autodiscovery.ospf') === true) {
     echo PHP_EOL;
 }
 
-if (Config::get('autodiscovery.ospfv3') === true) {
+if (LibrenmsConfig::get('autodiscovery.ospfv3') === true) {
     echo ' OSPFv3 Discovery: ';
     $ospf_nbrs = Ospfv3Nbr::select('ospfv3NbrAddress', 'device_id')
        ->distinct()
@@ -509,12 +509,12 @@ if (Config::get('autodiscovery.ospfv3') === true) {
         try {
             $ip = IP::parse($nbr->ospfv3NbrAddress);
 
-            if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+            if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
                 echo 'x';
                 continue;
             }
 
-            if (! $ip->inNetworks(Config::get('nets'))) {
+            if (! $ip->inNetworks(LibrenmsConfig::get('nets'))) {
                 echo 'i';
                 continue;
             }

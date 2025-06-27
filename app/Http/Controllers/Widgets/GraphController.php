@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Bill;
 use App\Models\Device;
@@ -35,13 +36,12 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 
 class GraphController extends WidgetController
 {
-    protected $title = 'Graph';
+    protected string $name = 'generic-graph';
     protected $defaults = [
         'title' => null,
         'refresh' => 60,
@@ -59,7 +59,7 @@ class GraphController extends WidgetController
         'graph_bill' => null,
     ];
 
-    public function title()
+    public function getTitle(): string
     {
         $settings = $this->getSettings();
 
@@ -102,10 +102,10 @@ class GraphController extends WidgetController
             return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
         }
 
-        return $this->title;
+        return parent::getTitle();
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
 
@@ -163,7 +163,7 @@ class GraphController extends WidgetController
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
 
@@ -200,8 +200,8 @@ class GraphController extends WidgetController
             } else {
                 $port_types = collect((array) $aggregate_type)->map(function ($type) {
                     // check for config definitions
-                    if (Config::has("{$type}_descr")) {
-                        return Config::get("{$type}_descr", []);
+                    if (LibrenmsConfig::has("{$type}_descr")) {
+                        return LibrenmsConfig::get("{$type}_descr", []);
                     }
 
                     return $type;
@@ -251,7 +251,7 @@ class GraphController extends WidgetController
         return false; // non-custom aggregate types require no additional settings
     }
 
-    public function getSettings($settingsView = false)
+    public function getSettings($settingsView = false): array
     {
         if (is_null($this->settings)) {
             $settings = parent::getSettings($settingsView);

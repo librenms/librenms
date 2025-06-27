@@ -205,8 +205,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array = [];
     $graph_array['type'] = 'bgp_updates';
     $graph_array['id'] = $peer['bgpPeer_id'];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['height'] = '110';
     if (isset($width)) {
         $graph_array['width'] = $width;
@@ -284,7 +284,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     if (! empty($peer['graph'])) {
         $graph_array['height'] = '100';
         $graph_array['width'] = '216';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         echo '<tr class="bgp"><td colspan="7">';
 
         include 'includes/html/print-graphrow.inc.php';

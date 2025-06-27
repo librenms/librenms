@@ -190,4 +190,22 @@ class ErrorReporting
             return false; // For other errors, let Laravel handle them
         });
     }
+
+    private static function findFirstNonVendorFrame(): array
+    {
+        foreach (debug_backtrace() as $trace) {
+            // not vendor frames
+            if (isset($trace['file']) && str_contains($trace['file'], '/vendor/')) {
+                continue;
+            }
+            // not this class
+            if (isset($trace['class']) && $trace['class'] === self::class) {
+                continue;
+            }
+
+            return [$trace['file'], $trace['line']];
+        }
+
+        return ['', ''];
+    }
 }
