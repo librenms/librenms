@@ -42,7 +42,7 @@ class WeechatBot extends Transport
             $fp = (new \Socket\Raw\Factory())
                     ->createClient("udp://$this->config['bot-hostname']:$this->config['bot-port']");
         } catch (Exception $e) {
-            throw new AlertTransportDeliveryException($alert_data ,$e->getCode(), $e->getMessage());
+            throw new AlertTransportDeliveryException($alert_data, $e->getCode(), $e->getMessage());
         }
 
         $fp->write($pre . $alert_data['title']);
