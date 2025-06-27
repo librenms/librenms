@@ -14,13 +14,13 @@
 */
 
 function show_device_group($device_group_id) {
-    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
     ?>
     <div class="panel-heading">
         <span class="devices-font-bold">
         <?php
         if ($device_group_id == 'none') {
-            echo "ungrouped Devices";
+            echo "Ungrouped Devices";
         } elseif ($device_group_id) {
             echo "Device Group: ";
         }
