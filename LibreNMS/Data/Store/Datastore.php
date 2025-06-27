@@ -27,10 +27,10 @@
 namespace LibreNMS\Data\Store;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Interfaces\Data\WriteInterface;
@@ -56,10 +56,11 @@ class Datastore implements WriteInterface, DataStorageInterface
             'p' => 'prometheus.enable',
             'g' => 'graphite.enable',
             '2' => 'influxdbv2.enable',
+            'k' => 'kafka.enable',
         ];
         foreach ($opts as $opt => $setting) {
             if (isset($options[$opt])) {
-                Config::set($setting, false);
+                LibrenmsConfig::set($setting, false);
             }
         }
 

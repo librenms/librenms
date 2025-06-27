@@ -76,6 +76,6 @@ switch ($vars['protocol']) {
         break;
 
     default:
-        echo report_this('Unknown protocol ' . $vars['protocol']);
+        echo 'Unknown protocol';
         break;
 }

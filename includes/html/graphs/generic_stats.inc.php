@@ -68,7 +68,7 @@ $i = 0;
 $iter = 0;
 
 if (! isset($colour)) {
-    $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
@@ -81,54 +81,54 @@ if (! isset($colourAalpha)) {
 }
 
 if (! isset($colour25th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour25th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour50th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour50th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour75th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour75th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1h)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1h = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1d)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1d = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1w)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1w = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
-$graph_stat_percentile_disable = \LibreNMS\Config::get('graph_stat_percentile_disable');
+$graph_stat_percentile_disable = \App\Facades\LibrenmsConfig::get('graph_stat_percentile_disable');
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
 

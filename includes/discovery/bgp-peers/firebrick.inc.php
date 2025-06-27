@@ -24,7 +24,7 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
@@ -84,7 +84,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 
             DeviceCache::getPrimary()->bgppeers()->create($peers);
 
-            if (Config::get('autodiscovery.bgp')) {
+            if (LibrenmsConfig::get('autodiscovery.bgp')) {
                 $name = gethostbyaddr($address);
                 discover_new_device($name, $device, 'BGP');
             }

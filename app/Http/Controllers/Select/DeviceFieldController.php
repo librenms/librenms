@@ -26,8 +26,8 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 
 class DeviceFieldController extends SelectController
 {
@@ -83,7 +83,7 @@ class DeviceFieldController extends SelectController
 
         $text = $device[$field];
         if ($field == 'os') {
-            $text = Config::getOsSetting($text, 'text');
+            $text = LibrenmsConfig::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
             $text = ucfirst($text);
         }

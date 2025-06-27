@@ -41,7 +41,7 @@ class Stats
         if ($stats->isEnabled()) {
             Http::client()
                 ->asForm()
-                ->post(\LibreNMS\Config::get('callback_post'), [
+                ->post(\App\Facades\LibrenmsConfig::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
                 ]);
         }
@@ -71,7 +71,7 @@ class Stats
 
         $response = Http::client()
             ->asForm()
-            ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
+            ->post(\App\Facades\LibrenmsConfig::get('callback_clear'), ['uuid' => $uuid]);
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();

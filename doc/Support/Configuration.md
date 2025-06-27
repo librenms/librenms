@@ -1090,6 +1090,16 @@ lnms config:set os.vrp.disabled_sensors.current true
 lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 ```
 
+## Processor configuration
+
+Custom processor warning percentage which will be set when processor information
+is discovered and the perc
+
+!!! setting "discovery/processor"
+    ```bash
+    lnms config:set processor.default_perc_warn 75
+    ```
+
 ## Storage configuration
 
 Storage / mount points to ignore in discovery and polling.
