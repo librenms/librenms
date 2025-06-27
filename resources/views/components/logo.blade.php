@@ -1,6 +1,6 @@
 @if($image)
     {{-- Include svgs inline so they can use currentColor for light/dark mode, but only if they are hosted on the same server (browser will reject it otherwise) --}}
-    @if(str_ends_with($image, '.svg') && ! str_contains($image, '//'))
+    @if($is_svg)
         <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600']) }}>
             <use href="{{ asset($image) }}"></use>
         </svg>
