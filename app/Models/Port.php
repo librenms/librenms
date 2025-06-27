@@ -71,27 +71,27 @@ class Port extends DeviceRelatedModel
     {
         $os = $this->device?->os;
 
-        if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
+        if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
-        } elseif (\LibreNMS\Config::getOsSetting($os, 'ifalias')) {
+        } elseif (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifalias')) {
             $label = $this->ifAlias;
         }
 
         if (empty($label)) {
             $label = $this->ifDescr;
 
-            if (\LibreNMS\Config::getOsSetting($os, 'ifindex')) {
+            if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifindex')) {
                 $label .= " $this->ifIndex";
             }
         }
 
-        foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
+        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
             if (Str::contains(strtolower($label), strtolower($src))) {
                 $label = $val;
             }
         }
 
-        foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
+        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
             $label = preg_replace($reg . 'i', $val, $label);
         }
 

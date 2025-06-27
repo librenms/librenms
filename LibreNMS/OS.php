@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;
@@ -249,7 +250,7 @@ class OS implements
     {
         if (isset($device['os'])) {
             // Populate os_group
-            $device['os_group'] = Config::get("os.{$device['os']}.group");
+            $device['os_group'] = LibrenmsConfig::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
             d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
@@ -260,7 +261,7 @@ class OS implements
             }
 
             // If not a specific OS, check for a group one.
-            if ($os_group = Config::get("os.{$device['os']}.group")) {
+            if ($os_group = LibrenmsConfig::get("os.{$device['os']}.group")) {
                 $class = StringHelpers::toClass($os_group, 'LibreNMS\\OS\\Shared\\');
                 d_echo("Attempting to initialize Group OS: $os_group\n");
                 if (class_exists($class)) {

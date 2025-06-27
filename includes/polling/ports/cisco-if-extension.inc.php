@@ -48,6 +48,6 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      * Generate/update RRD
      */
     $ifName = $port['ifName'];
-    $tags = compact('ifName', 'rrd_name', 'rrd_def');
+    $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
     app('Datastore')->put($device, 'drops', $tags, $rrd_data);
 }

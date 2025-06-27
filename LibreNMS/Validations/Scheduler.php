@@ -23,9 +23,9 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -60,7 +60,7 @@ class Scheduler extends BaseValidation
     private function generateCommands(Validator $validator): array
     {
         $commands = [];
-        $systemctl_bin = Config::locateBinary('systemctl');
+        $systemctl_bin = LibrenmsConfig::locateBinary('systemctl');
         $base_dir = rtrim($validator->getBaseDir(), '/');
 
         if (is_executable($systemctl_bin)) {

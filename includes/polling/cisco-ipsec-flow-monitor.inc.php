@@ -102,7 +102,7 @@ if ($device['os_group'] == 'cisco') {
             'SysCapFails' => $data['cipSecGlobalSysCapFails'],
         ];
 
-        $tags = compact('rrd_def');
+        $tags = ['rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'cipsec_flow', $tags, $fields);
 
         $os->enableGraph('cipsec_flow_tunnels');

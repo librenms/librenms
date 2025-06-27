@@ -75,12 +75,12 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
-                echo '<div class="form-group" title="' . (isset($item['descr']) ? htmlentities($item['descr']) : '') . '">';
+                echo '<div class="form-group" title="' . htmlentities($item['descr'] ?? '') . '">';
                 echo '<label for="' . htmlentities($item['name']) . '" class="col-sm-3 col-md-2 control-label">' . htmlentities($item['title']) . ': </label>';
                 if ($item['type'] == 'text' || $item['type'] == 'password') {
                     echo '<div class="col-sm-9 col-md-10">';
                     echo '<input type="' . htmlentities($item['type']) . '" id="' . htmlentities($item['name']) . '" name="' . htmlentities($item['name']) . '" class="form-control" ';
-                    if (isset($item['required']) && $item['required']) {
+                    if (! empty($item['required'])) {
                         echo 'required>';
                     } else {
                         echo '>';

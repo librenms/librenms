@@ -25,8 +25,8 @@ $components = $components[$device['device_id']];
 
 foreach ($components as $component_id => $tmp_component) {
     $default_graph_array = [
-        'from' => \LibreNMS\Config::get('time.day'),
-        'to' => \LibreNMS\Config::get('time.now'),
+        'from' => \App\Facades\LibrenmsConfig::get('time.day'),
+        'to' => \App\Facades\LibrenmsConfig::get('time.now'),
         'id' => $component_id,
         'page' => 'graphs',
     ];

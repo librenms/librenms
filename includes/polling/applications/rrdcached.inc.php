@@ -47,7 +47,7 @@ if ($agent_data['app'][$name]) {
         $data = str_replace("<<<rrdcached>>>\n", '', $data);
     }
     if (strlen($data) < 100) {
-        $socket = \LibreNMS\Config::get('rrdcached');
+        $socket = \App\Facades\LibrenmsConfig::get('rrdcached');
         if (substr($socket, 0, 6) == 'unix:/') {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {

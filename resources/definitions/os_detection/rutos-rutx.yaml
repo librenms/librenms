@@ -17,10 +17,11 @@ discovery:
             oid: .1.3.6.1.4.1.48690.1.3.0
             op: starts
             value:
-                - RUTX
-                - RUT360
                 - RUT2
-                - TRB500
+                - RUT360
+                - RUT950
+                - RUT955
                 - RUT956
-                - TRB25500XXXX
-                - RUT955V03XXX
+                - RUTX
+                - TRB255
+                - TRB500

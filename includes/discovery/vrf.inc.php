@@ -1,9 +1,9 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Rewrite;
 
-if (Config::get('enable_vrfs')) {
+if (LibrenmsConfig::get('enable_vrfs')) {
     if (in_array($device['os_group'], ['vrp', 'cisco']) ||
         in_array($device['os'], ['junos', 'ironware'])) {
         unset($vrf_count);
@@ -88,11 +88,12 @@ if (Config::get('enable_vrfs')) {
                 continue;
             }
             echo "\n";
+            $vrf_rd = null;
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
                 $vrf_oid = $oid;
-                unset($vrf_rd);
+
                 if (Str::contains($oid, ' ')) {
                     [$vrf_oid, $vrf_rd] = explode(' ', $oid);
                 }
@@ -124,7 +125,7 @@ if (Config::get('enable_vrfs')) {
                 } elseif (empty($descr_oid)) {
                     // Move rd to vrf_name and remove rd (no way to grab these values with CISCO-VRF-MIB)
                     $vrf_name = $vrf_rd;
-                    unset($vrf_rd);
+                    $vrf_rd = null;
                 }
 
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
@@ -132,9 +133,9 @@ if (Config::get('enable_vrfs')) {
                 echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid], 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd ?? null, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
                 }
 
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
@@ -162,7 +163,7 @@ if (Config::get('enable_vrfs')) {
             $vrf_name = $vr['vRtrName'] ?? null;
             $vrf_desc = $vr['vRtrDescription'] ?? null;
             $vrf_as = $vr['vRtrAS4Byte'] ?? null;
-            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? null;
+            $vrf_rd = $vr['vRtrRouteDistinguisher'] ?? '';
             // Nokia, The VPRN route distinguisher is a 8-octet object.
             // It contains a 2-octet type field followed by a 6-octet value field. The type field specify how to interpret the value field.
             // Type 0 specifies two subfields as a 2-octet administrative field and a 4-octet assigned number subfield.
@@ -170,7 +171,7 @@ if (Config::get('enable_vrfs')) {
             // Type 2 specifies two subfields as a 4-octet administrative field which contains a 4-octet AS number and a 2-octet assigned number subfield.
             // FIXME Hardcoded to Type 0
             $vrf_rd = str_replace(' ', '', $vrf_rd);
-            if ($vrf_rd != '000000000000') {
+            if (! empty($vrf_rd) && $vrf_rd != '000000000000') {
                 $vrf_rd_1 = substr($vrf_rd, 4, 4);
                 $vrf_rd_2 = substr($vrf_rd, 8);
                 $vrf_rd = hexdec($vrf_rd_1) . ':' . hexdec($vrf_rd_2);

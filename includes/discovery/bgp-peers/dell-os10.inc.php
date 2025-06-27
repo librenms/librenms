@@ -24,9 +24,9 @@
  * @author     LibreNMS Contributors
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Vrf;
-use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'dell-os10') {
@@ -72,7 +72,7 @@ if ($device['os'] == 'dell-os10') {
                 ];
                 DeviceCache::getPrimary()->bgppeers()->create($row);
 
-                if (Config::get('autodiscovery.bgp')) {
+                if (LibrenmsConfig::get('autodiscovery.bgp')) {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
