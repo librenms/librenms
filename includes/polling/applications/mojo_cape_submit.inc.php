@@ -12,6 +12,7 @@ try {
 } catch (JsonAppException $e) {
     echo PHP_EOL . "$name:{$e->getCode()}:{$e->getMessage()}" . PHP_EOL;
     update_application($app, "{$e->getCode()}:{$e->getMessage()}");
+
     return;
 }
 
@@ -61,7 +62,7 @@ foreach ($slugs as $slug => $slug_data) {
 
     app('Datastore')->put($device, 'app', $tags, $fields);
 
-    if (!isset($existing_slugs[$slug])) {
+    if (! isset($existing_slugs[$slug])) {
         $new_slugs[] = $slug;
     }
 
@@ -86,7 +87,7 @@ if ($totals['hash_changed'] >= 1) {
     );
 }
 
-if (!empty($new_slugs)) {
+if (! empty($new_slugs)) {
     Eventlog::log(
         'Mojo Cape Submit has seen one or more new slugs: ' . implode(',', $new_slugs),
         $device['device_id'],
