@@ -149,13 +149,6 @@ $gauge_rrd_def = RrdDefinition::make()
 $data = $returned['data'];
 
 $metrics = [];
-$old_data = $app->data;
-if (! is_array($old_data)) {
-    $old_data = [];
-}
-if (! isset($old_data['oslvm_data']) || ! is_array($old_data['oslvm_data'])) {
-    $old_data['oslvm_data'] = [];
-}
 $new_data = [
     'backend' => $data['backend'] ?? null,
     'uid_mapping' => $data['uid_mapping'] ?? null,
@@ -213,18 +206,18 @@ if (isset($data['oslvms']) && is_array($data['oslvms'])) {
 
 // check for added or removed logs
 sort($oslvms);
-$old_oslvms = $old_data['oslvms'] ?? [];
+$old_oslvms = $app->data['oslvms'] ?? [];
 $added_oslvms = array_diff($oslvms, $old_oslvms);
 $removed_oslvms = array_diff($old_oslvms, $oslvms);
-$new_data['oslvms'] = $oslvms;
+$new_data = ['oslvms' => $oslvms, 'oslvm_data' => [], 'inactive' => []];
 
 // process unseen items, save info for ones that were last seen with in the specified time
 // 604800 seconds = 7 days
 $back_till = $current_time - LibrenmsConfig::get('apps.oslv_monitor.seen_age', 604800);
-foreach ($old_data['oslvm_data'] as $key => $oslvm) {
-    if (! isset($new_data['oslvm_data'][$key]) && isset($old_data['oslvm_data'][$key]['seen']) &&
-        $back_till <= $old_data['oslvm_data'][$key]['seen']) {
-        $new_data['oslvm_data'][$key] = $old_data['oslvm_data'][$key];
+foreach ($app->data['oslvm_data'] ?? [] as $key => $oslvm) {
+    if (! isset($new_data['oslvm_data'][$key]) && isset($oslvm['seen']) &&
+        $back_till <= $oslvm['seen']) {
+        $new_data['oslvm_data'][$key] = $oslvm;
         $new_data['inactive'][] = $key;
         $metrics['running_' . $key] = 0;
     }
