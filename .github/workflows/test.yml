@@ -101,7 +101,6 @@ jobs:
           APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
           APP_URL=http://127.0.0.1:8000
           APP_ENV=testing
-          APP_DEBUG=true
           DB_DRIVER=mysql
           DB_HOST=127.0.0.1
           DB_PORT=${{ job.services.database.ports[3306] }}
