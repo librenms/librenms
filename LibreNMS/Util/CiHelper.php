@@ -182,7 +182,7 @@ class CiHelper
         $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
 
         if ($this->flags['fail-fast']) {
-            array_push($phpunit_cmd, '--stop-on-defect');
+            $phpunit_cmd[] = '--stop-on-defect';
         }
 
         if (Debug::isVerbose()) {
