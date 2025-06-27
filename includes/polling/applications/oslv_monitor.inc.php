@@ -209,7 +209,7 @@ sort($oslvms);
 $old_oslvms = $app->data['oslvms'] ?? [];
 $added_oslvms = array_diff($oslvms, $old_oslvms);
 $removed_oslvms = array_diff($old_oslvms, $oslvms);
-$new_data = ['oslvms' => $oslvms, 'oslvm_data' => [], 'inactive' => []];
+$new_data['oslvms'] = $oslvms;
 
 // process unseen items, save info for ones that were last seen with in the specified time
 // 604800 seconds = 7 days
