@@ -26,9 +26,9 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;
 
 abstract class DeviceSummaryController extends WidgetController
@@ -39,9 +39,9 @@ abstract class DeviceSummaryController extends WidgetController
     {
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
-            'show_services' => (int) Config::get('show_services', 1),
-            'show_sensors' => (int) Config::get('show_sensors', 1),
-            'summary_errors' => (int) Config::get('summary_errors', 0),
+            'show_services' => (int) LibrenmsConfig::get('show_services', 1),
+            'show_sensors' => (int) LibrenmsConfig::get('show_sensors', 1),
+            'summary_errors' => (int) LibrenmsConfig::get('summary_errors', 0),
         ];
     }
 

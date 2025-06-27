@@ -11,9 +11,9 @@ $sensors = \App\Models\Sensor::where('sensor_class', $class)->where('device_id',
 
 foreach ($sensors as $sensor) {
     if (! is_integer($row++ / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
     }
 
     if ($sensor['poller_type'] == 'ipmi') {

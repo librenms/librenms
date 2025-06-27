@@ -64,7 +64,7 @@ switch ($vars['section']) {
 
     default:
         echo '</div>';
-        echo report_this('Unknown section ' . $vars['section']);
+        echo 'Unknown section';
         break;
 }
 

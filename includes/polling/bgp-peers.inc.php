@@ -526,8 +526,8 @@ if (! empty($peers)) {
 
         // --- Send event log notices ---
         if ($peer_data['bgpPeerFsmEstablishedTime']) {
-            if (! (is_array(\LibreNMS\Config::get('alerts.bgp.whitelist'))
-                    && ! in_array($peer['bgpPeerRemoteAs'], \LibreNMS\Config::get('alerts.bgp.whitelist')))
+            if (! (is_array(\App\Facades\LibrenmsConfig::get('alerts.bgp.whitelist'))
+                    && ! in_array($peer['bgpPeerRemoteAs'], \App\Facades\LibrenmsConfig::get('alerts.bgp.whitelist')))
                 && ($peer_data['bgpPeerFsmEstablishedTime'] < $peer['bgpPeerFsmEstablishedTime']
                     || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
             ) {

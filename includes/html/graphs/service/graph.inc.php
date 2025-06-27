@@ -36,7 +36,7 @@ if (isset($vars['id'])) {
 $rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
 
 // if we have a script for this check, use it.
-$check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
+$check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
 if (is_file($check_script)) {
     include $check_script;
 
@@ -80,8 +80,8 @@ if ($services[$vars['service']]['service_ds'] != '') {
             } else {
                 $tint = 'blues';
             }
-            $color_avg = \LibreNMS\Config::get("graph_colours.$tint.2");
-            $color_max = \LibreNMS\Config::get("graph_colours.$tint.0");
+            $color_avg = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.2");
+            $color_max = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.0");
 
             $rrd_additions .= ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
             $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';

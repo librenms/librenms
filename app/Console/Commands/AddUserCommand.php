@@ -27,10 +27,10 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -63,7 +63,7 @@ class AddUserCommand extends LnmsCommand
      */
     public function handle(): int
     {
-        if (Config::get('auth_mechanism') != 'mysql') {
+        if (LibrenmsConfig::get('auth_mechanism') != 'mysql') {
             $this->warn(__('commands.user:add.wrong-auth'));
         }
 

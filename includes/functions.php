@@ -8,12 +8,12 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\StringHelpers;
 
@@ -30,15 +30,15 @@ function parse_modules($type, $options)
 
     if (! empty($options['m'])) {
         // get all modules in the correct order and disable all
-        $modules = array_map(fn ($v) => false, Config::get("{$type}_modules", []));
+        $modules = array_map(fn ($v) => false, LibrenmsConfig::get("{$type}_modules", []));
 
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);
-                $existing_submodules = Config::get("{$type}_submodules.$module", []);
+                $existing_submodules = LibrenmsConfig::get("{$type}_submodules.$module", []);
                 $existing_submodules[] = $submodule;
-                Config::set("{$type}_submodules.$module", $existing_submodules);
+                LibrenmsConfig::set("{$type}_submodules.$module", $existing_submodules);
             }
 
             $dir = $type == 'poller' ? 'polling' : $type;
@@ -49,14 +49,14 @@ function parse_modules($type, $options)
         }
 
         // filter disabled modules and set in global config
-        Config::set("{$type}_modules", array_filter($modules));
+        LibrenmsConfig::set("{$type}_modules", array_filter($modules));
 
         // display selected modules
         $modules = array_map(function ($module) use ($type) {
-            $submodules = Config::get("{$type}_submodules.$module");
+            $submodules = LibrenmsConfig::get("{$type}_submodules.$module");
 
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
-        }, array_keys(Config::get("{$type}_modules", [])));
+        }, array_keys(LibrenmsConfig::get("{$type}_modules", [])));
 
         Log::debug('Override ' . $type . ' modules: ' . implode(', ', $modules));
     }
@@ -66,7 +66,7 @@ function parse_modules($type, $options)
 
 function logfile($string)
 {
-    $file = Config::get('log_file');
+    $file = LibrenmsConfig::get('log_file');
     $fd = fopen($file, 'a');
 
     if ($fd === false) {
@@ -230,7 +230,7 @@ function is_port_valid($port, $device)
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
-        if (! Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
+        if (! LibrenmsConfig::getOsSetting($device['os'], 'empty_ifdescr', LibrenmsConfig::get('empty_ifdescr', false))) {
             Log::debug('ignored: empty ifDescr');
 
             return false;
@@ -243,11 +243,11 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'] ?? '';
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
+    if (Str::contains($ifDescr, LibrenmsConfig::getOsSetting($device['os'], 'good_if', LibrenmsConfig::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_if') as $bi) {
         if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
             Log::debug("ignored by ifDescr: $ifDescr (matched: $bi)");
 
@@ -255,7 +255,7 @@ function is_port_valid($port, $device)
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_if_regexp') as $bir) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_if_regexp') as $bir) {
         if (preg_match($bir . 'i', $ifDescr)) {
             Log::debug("ignored by ifDescr: $ifDescr (matched: $bir)");
 
@@ -263,7 +263,7 @@ function is_port_valid($port, $device)
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
         if (preg_match($bnr . 'i', $ifName)) {
             Log::debug("ignored by ifName: $ifName (matched: $bnr)");
 
@@ -271,7 +271,7 @@ function is_port_valid($port, $device)
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
             Log::debug("ignored by ifAlias: $ifAlias (matched: $bar)");
 
@@ -279,7 +279,7 @@ function is_port_valid($port, $device)
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (Str::contains($ifType, $bt)) {
             Log::debug("ignored by ifType: $ifType (matched: $bt )");
 
@@ -287,7 +287,7 @@ function is_port_valid($port, $device)
         }
     }
 
-    foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
         if (Str::contains($ifOperStatus, $bos)) {
             Log::debug("ignored by ifOperStatus: $ifOperStatus (matched: $bos)");
 
@@ -376,8 +376,8 @@ function host_exists(string $hostname, ?string $sysName = null): bool
 {
     return Device::where('hostname', $hostname)
         ->when(! empty($sysName), function ($query) use ($sysName) {
-            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
-                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+            $query->when(! LibrenmsConfig::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
+                  ->when(! empty(LibrenmsConfig::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . LibrenmsConfig::get('mydomain')));
         })->exists();
 }
 
@@ -438,11 +438,6 @@ function delta_to_bits($delta, $period)
 {
     return round($delta * 8 / $period, 2);
 }
-
-function report_this($message)
-{
-    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
-}//end report_this()
 
 function hytera_h2f($number, $nd)
 {
@@ -542,7 +537,7 @@ function q_bridge_bits2indices($hex_data): array
  */
 function cache_peeringdb()
 {
-    if (Config::get('peeringdb.enabled') === true) {
+    if (LibrenmsConfig::get('peeringdb.enabled') === true) {
         $peeringdb_url = 'https://peeringdb.com/api';
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
@@ -644,13 +639,13 @@ function get_device_oid_limit($device)
     }
 
     // then os
-    $os_max = Config::getOsSetting($device['os'], 'snmp_max_oid', 0);
+    $os_max = LibrenmsConfig::getOsSetting($device['os'], 'snmp_max_oid', 0);
     if ($os_max > 0) {
         return $os_max;
     }
 
     // then global
-    $global_max = Config::get('snmp.max_oid', 10);
+    $global_max = LibrenmsConfig::get('snmp.max_oid', 10);
 
     return $global_max > 0 ? $global_max : 10;
 }
@@ -667,7 +662,7 @@ function lock_and_purge($table, $sql)
     $purge_name = $table . '_purge';
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        $purge_days = Config::get($purge_name);
+        $purge_days = LibrenmsConfig::get($purge_name);
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
@@ -695,7 +690,7 @@ function lock_and_purge_query($table, $sql, $msg)
 {
     $purge_name = $table . '_purge';
 
-    $purge_duration = Config::get($purge_name);
+    $purge_duration = LibrenmsConfig::get($purge_name);
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
@@ -722,7 +717,7 @@ function lock_and_purge_query($table, $sql, $msg)
  */
 function is_disk_valid($disk, $device)
 {
-    foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
+    foreach (LibrenmsConfig::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
         if (preg_match($bir . 'i', $disk['diskIODevice'])) {
             Log::debug('Ignored Disk: ' . $disk['diskIODevice'] . ' (matched: ' . $bir . ')');
 
