@@ -80,7 +80,7 @@ foreach ($ports as $port_key => $port_data) {
         'app_id' => $app->app_id,
         'port' => $port_key,
         'rrd_def' => $ports_rrd_def,
-        'rrd_name' => ['app', $name, $app->app_id, $port_key]
+        'rrd_name' => ['app', $name, $app->app_id, $port_key],
     ];
 
     app('Datastore')->put($device, 'app', $tags, $fields);
