@@ -394,6 +394,30 @@
             "default": 604800,
             "type": "integer"
         },
+        "apps.oslv_monitor.linux_pg_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.misc_linux_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_size": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_activity": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.workingset_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.thp_activity": {
+            "default": true,
+            "type": "boolean"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
