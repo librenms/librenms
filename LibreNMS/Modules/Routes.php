@@ -35,6 +35,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\TooManyRoutes;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -88,12 +89,16 @@ class Routes implements Module
         }
 
         if ($routesFromOs->isEmpty()) {
-            $routesFromDiscovery = $this->discoverInetCidrRoutes($os->getDevice(), $max_routes);
-
-            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
-            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
-            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice(), $max_routes));
-            $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes));
+            try {
+                // fetch VPN routes first so we get VPN routes even if we hit max routes
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes));
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverInetCidrRoutes($os->getDevice(), $max_routes));
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice(), $max_routes));
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
+            } catch (TooManyRoutes $e) {
+                Log::error("More than $max_routes, skipping routes. " . $e->getMessage());
+            }
         }
 
         $routes = $routesFromOs->merge($routesFromDiscovery)->filter(function ($data) use ($update_timestamp) {
@@ -210,9 +215,7 @@ class Routes implements Module
     {
         $route_count = intval(SnmpQuery::hideMib()->get('IP-FORWARD-MIB::inetCidrRouteNumber.0')->value());
         if ($route_count > $max_routes) {
-            Log::info('Skipping all inetCidrRouteTable routes because device has more than ' . $max_routes . ' routes');
-
-            return new Collection;
+            throw new TooManyRoutes('IP-FORWARD-MIB::inetCidrRouteTable');
         }
 
         Log::info('IP-FORWARD-MIB::inetCidrRouteTable');
@@ -241,9 +244,7 @@ class Routes implements Module
     {
         $route_count = intval(SnmpQuery::hideMib()->get('IP-FORWARD-MIB::ipCidrRouteNumber.0')->value());
         if ($route_count > $max_routes) {
-            Log::info('Skipping all ipCidrRouteTable routes because device has more than ' . $max_routes . ' routes');
-
-            return new Collection;
+            throw new TooManyRoutes('IP-FORWARD-MIB::ipCidrRouteTable');
         }
 
         Log::info('IP-FORWARD-MIB::ipCidrRouteTable');
@@ -273,23 +274,23 @@ class Routes implements Module
         Log::info('RFC1213-MIB::ipRouteTable');
 
         return SnmpQuery::hideMib()->walk(['RFC1213-MIB::ipRouteTable'])
-        ->mapTable(function ($data) use ($device) {
-            return new Route([
-                'port_id' => PortCache::getIdFromIfIndex($data['ipRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
-                'context_name' => '',
-                'inetCidrRouteType' => $data['ipRouteType'] ?? 0,
-                'inetCidrRouteProto' => $data['ipRouteProto'] ?? 0,
-                'inetCidrRouteIfIndex' => $data['ipRouteIfIndex'] ?? 0,
-                'inetCidrRouteNextHopAS' => '0',
-                'inetCidrRouteMetric1' => $data['ipRouteMetric1'] ?? 0,
-                'inetCidrRouteDestType' => 'ipv4',
-                'inetCidrRouteDest' => $data['ipRouteDest'] ?? '',
-                'inetCidrRouteNextHopType' => 'ipv4',
-                'inetCidrRouteNextHop' => $data['ipRouteNextHop'] ?? '',
-                'inetCidrRoutePfxLen' => $data['ipRouteMask'] ?? '',
-                'inetCidrRoutePolicy' => $data['ipRouteInfo'] ?? '',
-            ]);
-        })->filter();
+            ->mapTable(function ($data) use ($device) {
+                return new Route([
+                    'port_id' => PortCache::getIdFromIfIndex($data['ipRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
+                    'context_name' => '',
+                    'inetCidrRouteType' => $data['ipRouteType'] ?? 0,
+                    'inetCidrRouteProto' => $data['ipRouteProto'] ?? 0,
+                    'inetCidrRouteIfIndex' => $data['ipRouteIfIndex'] ?? 0,
+                    'inetCidrRouteNextHopAS' => '0',
+                    'inetCidrRouteMetric1' => $data['ipRouteMetric1'] ?? 0,
+                    'inetCidrRouteDestType' => 'ipv4',
+                    'inetCidrRouteDest' => $data['ipRouteDest'] ?? '',
+                    'inetCidrRouteNextHopType' => 'ipv4',
+                    'inetCidrRouteNextHop' => $data['ipRouteNextHop'] ?? '',
+                    'inetCidrRoutePfxLen' => $data['ipRouteMask'] ?? '',
+                    'inetCidrRoutePolicy' => $data['ipRouteInfo'] ?? '',
+                ]);
+            })->filter();
     }
 
     private function discoverIpv6MibRoutes(Device $device, int $max_routes): Collection
@@ -297,9 +298,7 @@ class Routes implements Module
 
         $route_count = intval(SnmpQuery::hideMib()->get('IPV6-MIB::ipv6RouteNumber.0')->value());
         if ($route_count > $max_routes) {
-            Log::info('Skipping all IPv6 routes because device has more than ' . $max_routes . ' routes');
-
-            return new Collection;
+            throw new TooManyRoutes('IPV6-MIB::ipv6RouteTable');
         }
 
         Log::info('IPV6-MIB::ipv6RouteTable');
@@ -327,13 +326,10 @@ class Routes implements Module
     {
         Log::info('MPLS-L3VPN-STD-MIB');
 
-        foreach (SnmpQuery::hideMib()->walk(['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes'])->table(1) as $vpnId => $data) {
-            if (! empty($data['mplsL3VpnVrfPerfCurrNumRoutes'])) {
-                if ($data['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-                    Log::info('Skipping all MPLS routes because vpn instance ' . $vpnId . ' has more than ' . $max_routes . ' routes');
-
-                    return new Collection;
-                }
+        $vpn_routes = SnmpQuery::hideMib()->walk(['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes'])->pluck();
+        foreach ($vpn_routes as $vpnId => $mplsL3VpnVrfPerfCurrNumRoutes) {
+            if ($mplsL3VpnVrfPerfCurrNumRoutes > $max_routes) {
+                throw new TooManyRoutes("MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable vpn instance $vpnId");
             }
         }
 
