@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 
 class Rewrite
 {
@@ -188,8 +188,8 @@ class Rewrite
     {
         $location = str_replace(["\n", '"'], '', $location);
 
-        if (is_array(Config::get('location_map_regex'))) {
-            foreach (Config::get('location_map_regex') as $reg => $val) {
+        if (is_array(LibrenmsConfig::get('location_map_regex'))) {
+            foreach (LibrenmsConfig::get('location_map_regex') as $reg => $val) {
                 if (preg_match($reg, $location)) {
                     $location = $val;
                     break;
@@ -197,8 +197,8 @@ class Rewrite
             }
         }
 
-        if (is_array(Config::get('location_map_regex_sub'))) {
-            foreach (Config::get('location_map_regex_sub') as $reg => $val) {
+        if (is_array(LibrenmsConfig::get('location_map_regex_sub'))) {
+            foreach (LibrenmsConfig::get('location_map_regex_sub') as $reg => $val) {
                 if (preg_match($reg, $location)) {
                     $location = preg_replace($reg, $val, $location);
                     break;
@@ -206,8 +206,8 @@ class Rewrite
             }
         }
 
-        if (Config::has("location_map.$location")) {
-            $location = Config::get("location_map.$location");
+        if (LibrenmsConfig::has("location_map.$location")) {
+            $location = LibrenmsConfig::get("location_map.$location");
         }
 
         return $location;

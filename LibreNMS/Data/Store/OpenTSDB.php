@@ -27,9 +27,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use Log;
 
 class OpenTSDB extends BaseDatastore
@@ -40,8 +40,8 @@ class OpenTSDB extends BaseDatastore
     public function __construct(\Socket\Raw\Factory $socketFactory)
     {
         parent::__construct();
-        $host = Config::get('opentsdb.host');
-        $port = Config::get('opentsdb.port', 2181);
+        $host = LibrenmsConfig::get('opentsdb.host');
+        $port = LibrenmsConfig::get('opentsdb.port', 2181);
         try {
             if (self::isEnabled() && $host && $port) {
                 $this->connection = $socketFactory->createClient("$host:$port");
@@ -114,6 +114,6 @@ class OpenTSDB extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('opentsdb.enable', false);
+        return LibrenmsConfig::get('opentsdb.enable', false);
     }
 }

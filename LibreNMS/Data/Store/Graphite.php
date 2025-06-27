@@ -27,9 +27,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use Log;
 
 class Graphite extends BaseDatastore
@@ -41,8 +41,8 @@ class Graphite extends BaseDatastore
     public function __construct(\Socket\Raw\Factory $socketFactory)
     {
         parent::__construct();
-        $host = Config::get('graphite.host');
-        $port = Config::get('graphite.port', 2003);
+        $host = LibrenmsConfig::get('graphite.host');
+        $port = LibrenmsConfig::get('graphite.port', 2003);
         try {
             if (self::isEnabled() && $host && $port) {
                 $this->connection = $socketFactory->createClient("$host:$port");
@@ -57,7 +57,7 @@ class Graphite extends BaseDatastore
             Log::error("Graphite connection to $host has failed!");
         }
 
-        $this->prefix = Config::get('graphite.prefix', '');
+        $this->prefix = LibrenmsConfig::get('graphite.prefix', '');
     }
 
     public function getName(): string
@@ -67,7 +67,7 @@ class Graphite extends BaseDatastore
 
     public static function isEnabled(): bool
     {
-        return Config::get('graphite.enable', false);
+        return LibrenmsConfig::get('graphite.enable', false);
     }
 
     /**

@@ -42,7 +42,7 @@ if (! $swap_present) {
     $rrd_options .= '-l 0 '; // swap is negative axis
 }
 
-$colors = \LibreNMS\Config::get('graph_colours.varied');
+$colors = \App\Facades\LibrenmsConfig::get('graph_colours.varied');
 $legend_sections = [0 => '', 1 => '', 2 => ''];
 $section = 0;
 $free_indexes = [];

@@ -63,7 +63,7 @@ class DeviceTypeController extends WidgetController
 
         $count = 0;
         $device_types = [];
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+        foreach (\App\Facades\LibrenmsConfig::get('device_types') as $device_type) {
             $count++;
             $device_types[] = [
                 'type' => $device_type['type'],

@@ -2,7 +2,7 @@
 
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $scale_min = 0;
 $scale_rigid = true;
@@ -11,7 +11,7 @@ require 'includes/html/graphs/common.inc.php';
 require 'includes/html/graphs/device/smokeping_common.inc.php';
 
 $i = 0;
-$pings = Config::get('smokeping.pings');
+$pings = LibrenmsConfig::get('smokeping.pings');
 $iter = 0;
 $colourset = 'mixed';
 
@@ -29,11 +29,11 @@ if ($width > '500') {
 }
 
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
-    if (! Config::has("graph_colours.$colourset.$iter")) {
+    if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
         $iter = 0;
     }
 
-    $colour = Config::get("graph_colours.$colourset.$iter");
+    $colour = LibrenmsConfig::get("graph_colours.$colourset.$iter");
     $iter++;
 
     // FIXME: $descr unused? -- PDG 2015-11-14
