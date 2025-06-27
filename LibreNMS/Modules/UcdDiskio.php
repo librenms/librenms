@@ -26,12 +26,12 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DiskIo;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -153,7 +153,7 @@ class UcdDiskio implements Module
 
     private function valid_disk($os, $disk): bool
     {
-        foreach (Config::getCombined($os->getDevice()->os, 'bad_disk_regexp') as $bir) {
+        foreach (LibrenmsConfig::getCombined($os->getDevice()->os, 'bad_disk_regexp') as $bir) {
             if (preg_match($bir . 'i', $disk)) {
                 Log::debug('Ignored Disk: ' . $disk . ' (matched: ' . $bir . ')');
 
