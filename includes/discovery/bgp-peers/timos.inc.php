@@ -24,7 +24,7 @@
  * @author     LibreNMS Contributors
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'timos') {
@@ -77,7 +77,7 @@ if ($device['os'] == 'timos') {
 
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->create($peers)->bgpPeer_id;
 
-                if (Config::get('autodiscovery.bgp')) {
+                if (LibrenmsConfig::get('autodiscovery.bgp')) {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }

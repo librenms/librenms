@@ -24,16 +24,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 
 $scale_min = '0';
-$colors = Config::get('graph_colours.manycolours');
+$colors = LibrenmsConfig::get('graph_colours.manycolours');
 
 require 'includes/html/graphs/common.inc.php';
 
 $hostnames = Device::pluck('hostname');
-$modules = array_keys(Config::get('poller_modules'));
+$modules = array_keys(LibrenmsConfig::get('poller_modules'));
 sort($modules);
 
 foreach ($modules as $module_index => $module) {

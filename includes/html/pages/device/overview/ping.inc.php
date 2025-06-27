@@ -17,7 +17,7 @@ if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-per
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_icmp_perf',
-        'from' => \LibreNMS\Config::get('time.day'),
+        'from' => \App\Facades\LibrenmsConfig::get('time.day'),
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',
     ]);

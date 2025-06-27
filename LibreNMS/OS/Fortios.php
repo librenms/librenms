@@ -50,7 +50,7 @@ class Fortios extends Fortinet implements OSPolling
             $log_rate = str_replace(' logs per second', '', $log_rate);
             $rrd_def = RrdDefinition::make()->addDataset('lograte', 'GAUGE', 0, 100000000);
             $fields = ['lograte' => $log_rate];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fortios_lograte', $tags, $fields);
             $this->enableGraph('fortios_lograte');
         }

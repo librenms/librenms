@@ -134,7 +134,7 @@ if ($vars['id']) {
         $graph_array['device'] = $device['device_id'];
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_sla';
         $graph_array['id'] = $sla['sla_id'];
         echo '<div class="panel panel-default ' . $danger . '">

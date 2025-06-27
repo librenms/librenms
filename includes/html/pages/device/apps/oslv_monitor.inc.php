@@ -350,10 +350,10 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = LibreNMS\Config::get('time.now');
+                $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = LibreNMS\Config::get('time.day');
+                $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;

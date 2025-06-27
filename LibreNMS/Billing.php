@@ -2,6 +2,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Str;
@@ -11,12 +12,12 @@ class Billing
 {
     public static function formatBytes($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'));
+        return Number::formatBase($value, LibrenmsConfig::get('billing.base'));
     }
 
     public static function formatBytesShort($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'), 2, 0, '');
+        return Number::formatBase($value, LibrenmsConfig::get('billing.base'), 2, 0, '');
     }
 
     public static function getDates($dayofmonth, $months = 0): array

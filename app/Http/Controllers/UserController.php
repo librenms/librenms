@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -36,7 +37,6 @@ use App\Models\UserPref;
 use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use Spatie\Permission\Models\Role;
 use URL;
 
@@ -151,8 +151,8 @@ class UserController extends Controller
             'timezone' => UserPref::getPref($user, 'timezone') ?: 'default',
         ];
 
-        if (Config::get('twofactor')) {
-            $lockout_time = Config::get('twofactor_lock');
+        if (LibrenmsConfig::get('twofactor')) {
+            $lockout_time = LibrenmsConfig::get('twofactor_lock');
             $twofactor = UserPref::getPref($user, 'twofactor');
             $data['twofactor_enabled'] = isset($twofactor['key']);
 

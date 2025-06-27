@@ -12,7 +12,6 @@ class Wled extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         $host = $this->config['wled-host'];
-        $port = $this->config['wled-port'];
 
         if ($alert_data['state'] === AlertState::RECOVERED) {
             $wled_preset = $this->config['wled-recovery'];

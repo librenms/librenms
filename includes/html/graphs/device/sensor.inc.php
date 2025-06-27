@@ -44,5 +44,4 @@ foreach ($sensors as $index => $sensor) {
     $rrd_options .= " GPRINT:$field:MIN:%5.1lf$unit_short";
     $rrd_options .= " GPRINT:$field:MAX:%5.1lf$unit_short";
     $rrd_options .= " GPRINT:$field:AVERAGE:%5.2lf$unit_short\\l ";
-    $iter++;
 }//end foreach

@@ -43,7 +43,7 @@ class Secureplatform extends \LibreNMS\OS implements OSPolling
                 'NumConn' => $connections,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'secureplatform_sessions', $tags, $fields);
             $this->enableGraph('secureplatform_sessions');
         }

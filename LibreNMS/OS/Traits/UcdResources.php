@@ -130,8 +130,6 @@ trait UcdResources
 
     public function discoverStorage(): Collection
     {
-        $disks = new Collection;
-
         return \SnmpQuery::walk('UCD-SNMP-MIB::dskTable')->mapTable(function ($data, $index) {
             $units = 1024;
             $total = $data['UCD-SNMP-MIB::dskTotal'] ?? null;

@@ -26,10 +26,9 @@
 
 namespace LibreNMS\Exceptions;
 
-use Exception;
 use LibreNMS\Util\Graph;
 
-class RrdGraphException extends Exception
+class RrdGraphException extends RrdException
 {
     /** @var string */
     protected $image_output;

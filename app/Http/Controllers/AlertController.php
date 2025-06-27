@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\Eventlog;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
@@ -34,7 +34,7 @@ class AlertController extends Controller
         $info['until_clear'] = filter_var($request->get('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
         $alert->info = $info;
 
-        $timestamp = date(Config::get('dateformat.long'));
+        $timestamp = date(LibrenmsConfig::get('dateformat.long'));
         $username = $request->user()->username;
         $ack_msg = $request->get('ack_msg');
         $alert->note = trim($alert->note . PHP_EOL . "$timestamp - $state_description ($username) " . $ack_msg);

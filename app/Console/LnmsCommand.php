@@ -31,6 +31,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Validator;
 
 abstract class LnmsCommand extends Command
@@ -165,10 +166,20 @@ abstract class LnmsCommand extends Command
 
     protected function configureOutputOptions(): void
     {
-        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
-        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
+        $verbosity = $this->getOutput()->getVerbosity();
+
+        if ($verbosity === OutputInterface::VERBOSITY_QUIET) {
+            \Log::setDefaultDriver('stack'); // this omits stdout
+            Debug::setCliQuietOutput();
+
+            return;
+        }
+
+        \Log::setDefaultDriver('console');
+
+        if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
             Debug::set();
-            if ($verbosity >= 256) {
+            if ($verbosity >= OutputInterface::VERBOSITY_DEBUG) {
                 Debug::setVerbose();
             }
         }

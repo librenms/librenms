@@ -43,7 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
-$device_id = (int) ($vars['device_id'] ?? 0);
+$device_id = (int) ($vars['device'] ?? 0);
 
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
@@ -152,7 +152,7 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($device_id) . '\',
+                device_id: \'' . htmlspecialchars($device_id ?: '') . '\',
                 state: \'' . htmlspecialchars($_POST['state']) . '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };

@@ -276,8 +276,8 @@ if (! Auth::user()->hasGlobalRead()) {
         // display overlib graphs
         $graph_array = [];
         $graph_array['type'] = 'bgp_updates';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['height'] = '110';
         $graph_array['width'] = $width;
 
@@ -368,7 +368,7 @@ if (! Auth::user()->hasGlobalRead()) {
         if ($peer['graph']) {
             $graph_array['height'] = '100';
             $graph_array['width'] = '218';
-            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             echo '<tr></tr><tr class="bgp"><td colspan="9">';
 
             include 'includes/html/print-graphrow.inc.php';

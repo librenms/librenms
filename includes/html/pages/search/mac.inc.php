@@ -8,7 +8,7 @@
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="interface">Interface</th>
                 <th data-column-id="address" data-sortable="false" data-formatter="tooltip">MAC Address</th>
-                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="<?php echo \LibreNMS\Config::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
+                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="<?php echo \App\Facades\LibrenmsConfig::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
                 <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th></tr>
             </tr>
         </thead>

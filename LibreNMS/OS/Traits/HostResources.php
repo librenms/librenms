@@ -151,7 +151,7 @@ trait HostResources
 
             $old_name = ['hrProcessor', $index];
             $new_name = ['processor', 'hr', $index];
-            Rrd::renameFile($this->getDeviceArray(), $old_name, $new_name);
+            Rrd::renameFile($this->getDevice(), $old_name, $new_name);
 
             $processor = Processor::discover(
                 'hr',

@@ -1,6 +1,6 @@
-<div id="alertlog_stats_container-{{ $id }}" data-reload="false">
+<div id="alertlog-stats_container-{{ $id }}" data-reload="false">
     <div class="table-responsive">
-        <table id="alertlog_stats-{{ $id }}" class="table table-hover table-condensed table-striped">
+        <table id="alertlog-stats-{{ $id }}" class="table table-hover table-condensed table-striped">
             <thead>
             <tr>
                 <th data-column-id="count">{{ __('Count') }}</th>
@@ -13,7 +13,7 @@
 </div>
 <script>
     (function () {
-        var grid = $("#alertlog_stats-{{ $id }}").bootgrid({
+        var grid = $("#alertlog-stats-{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
             navigation: ! {{ $hidenavigation }},
@@ -28,10 +28,10 @@
             url: "ajax_table.php"
         });
 
-        $('#alertlog_stats_container-{{ $id }}').on('refresh', function (event) {
+        $('#alertlog-stats_container-{{ $id }}').on('refresh', function (event) {
             grid.bootgrid('reload');
         });
-        $('#alertlog_stats_container-{{ $id }}').on('destroy', function (event) {
+        $('#alertlog-stats_container-{{ $id }}').on('destroy', function (event) {
             grid.bootgrid('destroy');
             delete grid;
         });

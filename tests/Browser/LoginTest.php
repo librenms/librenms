@@ -2,12 +2,12 @@
 
 namespace LibreNMS\Tests\Browser;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use App\Models\UserPref;
 use Hash;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
-use LibreNMS\Config;
 use LibreNMS\Tests\Browser\Pages\DashboardPage;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
@@ -65,7 +65,7 @@ class LoginTest extends DuskTestCase
             $user = User::factory()->create([
                 'password' => Hash::make($password),
             ]); /** @var User $user */
-            Config::persist('twofactor', true); // set to db
+            LibrenmsConfig::persist('twofactor', true); // set to db
             UserPref::setPref($user, 'twofactor', [
                 'key' => '5P3FLXBX7NU3ZBFOTWZL2GL5MKFEWBOA', // known key: 634456, 613687, 064292
                 'fails' => 0,

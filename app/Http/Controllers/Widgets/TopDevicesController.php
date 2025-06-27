@@ -44,7 +44,7 @@ use LibreNMS\Util\Validate;
 
 class TopDevicesController extends WidgetController
 {
-    protected $title = 'Top Devices';
+    protected string $name = 'top-devices';
     protected $defaults = [
         'title' => null,
         'top_query' => 'traffic',
@@ -54,18 +54,14 @@ class TopDevicesController extends WidgetController
         'device_group' => null,
     ];
 
-    public function title()
+    public function getTitle(): string
     {
         $settings = $this->getSettings();
 
-        return isset($settings['title']) ? $settings['title'] : $this->title;
+        return $settings['title'] ?? parent::getTitle();
     }
 
-    /**
-     * @param  Request  $request
-     * @return View
-     */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
@@ -100,11 +96,6 @@ class TopDevicesController extends WidgetController
         }
 
         return view('widgets.top-devices', $data);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.top-devices', $this->getSettings(true));
     }
 
     /**

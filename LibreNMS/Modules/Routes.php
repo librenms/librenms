@@ -26,13 +26,13 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Route;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -78,7 +78,7 @@ class Routes implements Module
     public function discover(OS $os): void
     {
         $update_timestamp = \Carbon\Carbon::now();
-        $max_routes = (null != Config::get('routes_max_number')) ? Config::get('routes_max_number') : 1000;
+        $max_routes = (null != LibrenmsConfig::get('routes_max_number')) ? LibrenmsConfig::get('routes_max_number') : 1000;
 
         $routesFromOs = new Collection;
         $routesFromDiscovery = new Collection;

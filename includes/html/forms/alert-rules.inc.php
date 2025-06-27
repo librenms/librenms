@@ -130,7 +130,6 @@ if (is_numeric($rule_id) && $rule_id > 0) {
         $message = 'No rules provided';
     } else {
         $rule_id = dbInsert([
-            'rule' => '',
             'severity' => $severity,
             'extra' => $extra_json,
             'disabled' => 0,

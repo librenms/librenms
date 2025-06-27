@@ -55,7 +55,7 @@ class HealthCheck extends Command
         if (EnvHelper::librenmsDocker()) {
             if (getenv('SIDECAR_DISPATCHER')) {
                 // check dispatcher
-                $health_file = \LibreNMS\Config::get('service_health_file');
+                $health_file = \App\Facades\LibrenmsConfig::get('service_health_file');
 
                 if (! $health_file) {
                     $this->warn('Dispatcher service health file not enabled, set service_health_file');

@@ -44,5 +44,5 @@ print_optionbar_end();
 if (file_exists("includes/html/pages/search/$search_type.inc.php")) {
     include "includes/html/pages/search/$search_type.inc.php";
 } else {
-    echo report_this('Unknown search type ' . htmlspecialchars($search_type));
+    echo 'Unknown search type';
 }
