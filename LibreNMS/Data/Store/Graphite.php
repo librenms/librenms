@@ -91,7 +91,7 @@ class Graphite extends BaseDatastore
 
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
-        $hostname = preg_replace('/\./', '_', $hostname);
+        $hostname = preg_replace('/\./', '_', (string) $hostname);
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
 
