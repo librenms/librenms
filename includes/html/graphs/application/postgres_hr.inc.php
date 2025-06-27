@@ -20,23 +20,19 @@ if (isset($vars['database'])) {
 
 $rrd_filename = Rrd::name($device['hostname'], $rrd_name_array);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Blocks Read',
-            'ds' => 'read',
-            'colour' => 'AA5439',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Buffer Hits',
-            'ds' => 'hit',
-            'colour' => '28774F',
-        ],
-    ];
-} else {
-    echo "file missing: $rrd_filename";
-}
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Blocks Read',
+        'ds' => 'read',
+        'colour' => 'AA5439',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Buffer Hits',
+        'ds' => 'hit',
+        'colour' => '28774F',
+    ],
+];
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

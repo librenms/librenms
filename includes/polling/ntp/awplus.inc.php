@@ -61,7 +61,7 @@ if ($components) {
         $rrd['delay'] = str_replace(' milliseconds', '', $rrd['delay']);
         $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
-        $tags = compact('type', 'rrd_name', 'rrd_def', 'peer');
+        $tags = ['type' => $type, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'peer' => $peer];
         app('Datastore')->put($device, 'ntp', $tags, $rrd);
 
         // Let's print some debugging info.

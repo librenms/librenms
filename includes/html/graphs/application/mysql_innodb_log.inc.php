@@ -2,11 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$mysql_rrd = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
-
-if (Rrd::checkRrdExists($mysql_rrd)) {
-    $rrd_filename = $mysql_rrd;
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $rrd_options .= ' DEF:a=' . $rrd_filename . ':IDBLBSe:AVERAGE ';
 $rrd_options .= ' DEF:b=' . $rrd_filename . ':IBLFh:AVERAGE ';

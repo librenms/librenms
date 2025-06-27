@@ -106,7 +106,7 @@ if (count($services) > '0') {
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
             $check_ds = null;
-            $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+            $check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
             if (is_file($check_script)) {
                 include $check_script;
 

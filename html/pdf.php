@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];
@@ -26,7 +26,7 @@ Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-$project_name = Config::get('project_name');
+$project_name = LibrenmsConfig::get('project_name');
 
 $pdf->SetCreator($project_name);
 $pdf->SetAuthor($project_name);
@@ -45,7 +45,7 @@ $pdf->setTextShadow(['enabled' => false, 'depth_w' => 0.2, 'depth_h' => 0.2, 'co
 
 if (! empty($_GET['report'])) {
     $report = \LibreNMS\Util\Clean::fileName($_GET['report']);
-    $image = base_path('html/' . Config::get('title_image'));
+    $image = base_path('html/' . LibrenmsConfig::get('title_image'));
     $pdf->SetHeaderData($image, 40, ucfirst($report), $project_name, [0, 0, 0], [0, 64, 128]);
     include_once "includes/html/reports/$report.pdf.inc.php";
 } else {

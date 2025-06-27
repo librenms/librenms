@@ -56,7 +56,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                                 <tr>
                                     <td>{$rule['name']}</td>
                                     <td>";
-                            echo ! empty($rule['builder']) ? QueryBuilderParser::fromJson($rule['builder'])->toSql(false) : $rule['rule'];
+                            echo QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
                             echo "  </td>
                                     <td>{$rule['rule_id']}</td>
                                 </tr>

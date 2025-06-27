@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 class LegacyAuth
@@ -41,7 +41,7 @@ class LegacyAuth
      */
     public static function getType()
     {
-        return Config::get('auth_mechanism');
+        return LibrenmsConfig::get('auth_mechanism');
     }
 
     /**

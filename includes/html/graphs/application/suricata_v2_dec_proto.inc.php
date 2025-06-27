@@ -228,8 +228,6 @@ if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
         'descr' => 'VXLAN',
         'ds' => 'data',
     ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

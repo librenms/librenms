@@ -26,16 +26,18 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\Graphite;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
+use Socket\Raw\Socket;
 
 #[Group('datastores')]
 class GraphiteStoreTest extends TestCase
 {
-    protected $timestamp = 997464400;
+    protected int $timestamp = 1197464400;
 
     protected function setUp(): void
     {
@@ -43,14 +45,14 @@ class GraphiteStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestampUTC($this->timestamp));
-        Config::set('graphite.enable', true);
+        LibrenmsConfig::set('graphite.enable', true);
     }
 
     protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
-        Config::set('graphite.enable', false);
+        LibrenmsConfig::set('graphite.enable', false);
 
         parent::tearDown();
     }
@@ -73,7 +75,7 @@ class GraphiteStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
 
-        $graphite->put(['hostname' => 'test'], 'fake', ['rrd_name' => 'name'], ['one' => 1]);
+        $graphite->write('fake', ['one' => 1], ['rrd_name' => 'name']);
     }
 
     public function testSimpleWrite(): void
@@ -81,31 +83,25 @@ class GraphiteStoreTest extends TestCase
         $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
 
-        $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
-        $tags = ['rrd_name' => 'rrd_name', 'ifName' => 'testifname', 'type' => 'testtype'];
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
+        $meta = ['device' => new Device(['hostname' => 'testhost']), 'rrd_name' => 'rrd_name'];
 
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifIn 234234 $this->timestamp\n")->once();
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n")->once();
-        $graphite->put($device, $measurement, $tags, $fields);
+        $graphite->write($measurement, $fields, $tags, $meta);
     }
 
-    /**
-     * @param  mixed  $mockSocket
-     * @return Graphite
-     */
-    private function mockGraphite($mockSocket)
+    private function mockGraphite(Socket $mockSocket): Graphite
     {
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
         $mockFactory->shouldReceive('createClient')
             ->andReturn($mockSocket);
 
-        $graphite = new Graphite($mockFactory);
-
-        return $graphite;
+        return new Graphite($mockFactory);
     }
 }

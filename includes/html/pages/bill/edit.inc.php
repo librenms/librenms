@@ -3,11 +3,9 @@
 // Don't refresh this page to stop adding multiple ports
 $no_refresh = true;
 
-  require 'includes/html/javascript-interfacepicker.inc.php';
-
   // This needs more verification. Is it already added? Does it exist?
   // Calculation to extract MB/GB/TB of Kbps/Mbps/Gbps
-$base = \LibreNMS\Config::get('billing.base');
+$base = \App\Facades\LibrenmsConfig::get('billing.base');
 
 if ($bill_data['bill_type'] == 'quota') {
     $data = $bill_data['bill_quota'];
@@ -116,7 +114,7 @@ if ($bill_data['bill_type'] == 'cdr') {
                         <input type="hidden" name="action" value="delete_bill_port" />
                         <input type="hidden" name="port_id" value="<?php echo $port['port_id'] ?>" />
                     </form>
-                    
+
                     <button class="btn btn-danger btn-xs pull-right" onclick="if (confirm('Are you sure you wish to remove this port?')) { document.forms['delete<?php echo $port['port_id'] ?>'].submit(); }">
                         <i class="fa fa-minus"></i>
                         Remove Interface
@@ -127,12 +125,12 @@ if ($bill_data['bill_type'] == 'cdr') {
                 </div>
                 <?php
                 }
-                if (! $emptyCheck) { ?>
+                if (empty($emptyCheck)) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
                 <?php                   } ?>
-            
+
             </div>
-                
+
                 <?php
             }
             $port_device_id = -1;
@@ -140,19 +138,16 @@ if ($bill_data['bill_type'] == 'cdr') {
         </div>
 
         <h4>Add Port</h4>
-        
+
         <form action="" method="post" class="form-horizontal" role="form">
             <?php echo csrf_field() ?>
             <input type="hidden" name="action" value="add_bill_port" />
             <input type="hidden" name="bill_id" value="<?php echo $bill_id; ?>" />
-            
+
             <div class="form-group">
                 <label class="col-sm-2 control-label" for="device">Device</label>
                 <div class="col-sm-8">
-                    <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
-                    <script type="text/javascript">
-                        init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>);
-                    </script>
+                    <select class="form-control input-sm" id="device" name="device" onchange="billDeviceChanged()"></select>
                 </div>
             </div>
             <div class="form-group">
@@ -162,8 +157,19 @@ if ($bill_data['bill_type'] == 'cdr') {
                 </div>
             </div>
             <div class="col-sm-2 col-sm-offset-2">
-                <button type="submit" class="btn btn-primary" name="Submit" value=" Add " /><i class="fa fa-plus"></i> Add Port</button>
+                <button type="submit" class="btn btn-primary" name="Submit" value=" Add "><i class="fa fa-plus"></i> Add Port</button>
             </div>
         </form>
     </div>
 </div>
+<script type="text/javascript">
+    const makePortData = function (param) {
+        param.device = $('#device').val();
+        return param;
+    }
+    init_select2('#device', 'device', {}, 'Select Device');
+    init_select2('#port_id', 'port', makePortData, 'Select Port');
+    function billDeviceChanged() {
+        $('#port_id').val(null).trigger('change'); // clear port selection
+    }
+</script>

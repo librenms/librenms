@@ -44,7 +44,7 @@ class Pulse extends \LibreNMS\OS implements OSPolling
                 'users' => $users,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'pulse_users', $tags, $fields);
             $this->enableGraph('pulse_users');
         }

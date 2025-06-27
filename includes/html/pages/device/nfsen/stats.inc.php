@@ -8,10 +8,10 @@ echo 'Top N:
 <select name = "topN" id = "topN" size = 1>
 ';
 
-$option_default = $vars['topN'] ?? \LibreNMS\Config::get('nfsen_top_default');
+$option_default = $vars['topN'] ?? \App\Facades\LibrenmsConfig::get('nfsen_top_default');
 
 $option_int = 0;
-foreach (\LibreNMS\Config::get('nfsen_top_N') as $option) {
+foreach (\App\Facades\LibrenmsConfig::get('nfsen_top_N') as $option) {
     if (strcmp($option_default, $option) == 0) {
         echo '<option value = "' . $option . '" selected>' . $option . '</option>';
     } else {
@@ -25,8 +25,8 @@ During the last:
 <select name = "lastN" id = "lastN" size = 1>
 ';
 
-$option_keys = array_keys(\LibreNMS\Config::get('nfsen_lasts'));
-$options = \LibreNMS\Config::get('nfsen_lasts');
+$option_keys = array_keys(\App\Facades\LibrenmsConfig::get('nfsen_lasts'));
+$options = \App\Facades\LibrenmsConfig::get('nfsen_lasts');
 foreach ($option_keys as $option) {
     if (strcmp($option_default, $option) == 0) {
         echo '<option value = "' . $option . '" selected>' . $options[$option] . '</option>';
@@ -41,7 +41,7 @@ echo '
 <select name = "stattype" id = "StatTypeSelector" size = 1>
 ';
 
-$option_default = $vars['stattype'] ?? \LibreNMS\Config::get('nfsen_stats_default');
+$option_default = $vars['stattype'] ?? \App\Facades\LibrenmsConfig::get('nfsen_stats_default');
 
 $stat_types = [
     'record' => 'Flow Records',
@@ -74,7 +74,7 @@ echo '
 <select name = "statorder" id = "statorder" sizeOC = 1>
 ';
 
-$option_default = \LibreNMS\Config::get('nfsen_order_default');
+$option_default = \App\Facades\LibrenmsConfig::get('nfsen_order_default');
 if (isset($vars['statorder'])) {
     $option_default = $vars['statorder'];
 }
@@ -113,7 +113,7 @@ if (isset($vars['process'])) {
     $lastN = 900;
     if (isset($vars['lastN']) &&
          is_numeric($vars['lastN']) &&
-         ($vars['lastN'] <= \LibreNMS\Config::get('nfsen_last_max'))
+         ($vars['lastN'] <= \App\Facades\LibrenmsConfig::get('nfsen_last_max'))
     ) {
         $lastN = $vars['lastN'];
     }
@@ -122,7 +122,7 @@ if (isset($vars['process'])) {
     $topN = 20; // The default if not set or something invalid is set
     if (isset($vars['topN']) &&
          is_numeric($vars['topN']) &&
-         ($vars['topN'] <= \LibreNMS\Config::get('nfsen_top_max'))
+         ($vars['topN'] <= \App\Facades\LibrenmsConfig::get('nfsen_top_max'))
     ) {
         $topN = $vars['topN'];
     }
@@ -142,7 +142,7 @@ if (isset($vars['process'])) {
     $current_time = lowest_time(time() - 300);
     $last_time = lowest_time($current_time - $lastN - 300);
 
-    $command = \LibreNMS\Config::get('nfdump') . ' -M ' . nfsen_live_dir($device['hostname']) . ' -T -R ' .
+    $command = \App\Facades\LibrenmsConfig::get('nfdump') . ' -M ' . nfsen_live_dir($device['hostname']) . ' -T -R ' .
              time_to_nfsen_subpath($last_time) . ':' . time_to_nfsen_subpath($current_time) .
              ' -n ' . $topN . ' -s ' . $stat_type . '/' . $stat_order;
 

@@ -11964,7 +11964,7 @@
                     "entPhysicalHardwareRev": "1.0.1",
                     "entPhysicalFirmwareRev": "7.5.6",
                     "entPhysicalSoftwareRev": "7.5.3.2(R0010.0044)",
-                    "entPhysicalAlias": "NULL",
+                    "entPhysicalAlias": null,
                     "entPhysicalAssetID": "N/A",
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "SNR-S2990X-24FQ",

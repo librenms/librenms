@@ -33,7 +33,7 @@ use Illuminate\View\View;
 
 class ComponentStatusController extends WidgetController
 {
-    protected $title = 'Component Status';
+    protected string $name = 'component-status';
     protected $defaults = [
         'device_group' => null,
     ];
@@ -42,7 +42,7 @@ class ComponentStatusController extends WidgetController
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
         $status = [
@@ -73,11 +73,6 @@ class ComponentStatusController extends WidgetController
             $status[$key]['total'] = isset($component_status[$key]) ? $component_status[$key] : 0;
         }
 
-        return view('widgets.component-status', compact('status'));
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.component-status', $this->getSettings(true));
+        return view('widgets.component-status', ['status' => $status]);
     }
 }

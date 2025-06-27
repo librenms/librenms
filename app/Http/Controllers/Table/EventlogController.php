@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Url;
 
@@ -119,7 +119,7 @@ class EventlogController extends TableController
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span><span style='display:inline;'>";
-        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(Config::get('dateformat.compact'));
+        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact'));
         $output .= '</span>';
 
         return $output;

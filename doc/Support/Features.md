@@ -750,6 +750,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename resources/defin
 * Teleste Luminato
 * Teltonika RutOS
 * Teltonika RutOS RUTX Series
+* Teltonika RutOS RUTM Series
 * Teltonika WitchOS
 * TeraCom
 * Teradici PCoIP

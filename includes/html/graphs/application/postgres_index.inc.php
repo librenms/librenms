@@ -20,41 +20,37 @@ if (isset($vars['database'])) {
 
 $rrd_filename = Rrd::name($device['hostname'], $rrd_name_array);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Scans',
-            'ds' => 'idxscan',
-            'colour' => '582A72',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Tuples Read',
-            'ds' => 'idxtupread',
-            'colour' => 'AA6C39',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Tuples Fetched',
-            'ds' => 'idxtupfetch',
-            'colour' => 'FFD1AA',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Blocks Read',
-            'ds' => 'idxblksread',
-            'colour' => '88CC88',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Buffer Hits',
-            'ds' => 'idxblkshit',
-            'colour' => '28536C',
-        ],
-    ];
-} else {
-    echo "file missing: $rrd_filename";
-}
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Scans',
+        'ds' => 'idxscan',
+        'colour' => '582A72',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Tuples Read',
+        'ds' => 'idxtupread',
+        'colour' => 'AA6C39',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Tuples Fetched',
+        'ds' => 'idxtupfetch',
+        'colour' => 'FFD1AA',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Blocks Read',
+        'ds' => 'idxblksread',
+        'colour' => '88CC88',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Buffer Hits',
+        'ds' => 'idxblkshit',
+        'colour' => '28536C',
+    ],
+];
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

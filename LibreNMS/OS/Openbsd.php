@@ -113,7 +113,7 @@ class Openbsd extends Unix implements OSPolling
                 $fields[$field] = $oid;
             }
         }
-        $tags = compact('rrd_def');
+        $tags = ['rrd_def' => $rrd_def];
         $datastore->put($this->getDeviceArray(), "pf_$graphName", $tags, $fields);
 
         $this->enableGraph("pf_$graphName");

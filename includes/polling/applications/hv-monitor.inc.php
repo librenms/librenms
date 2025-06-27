@@ -90,7 +90,7 @@ $ds = [
 $totals_fields = [];
 foreach ($ds as $key => $type) {
     $rrd_def->addDataset($key, $type, 0);
-    $totals_fields[$key] = $return_data['totals'][$type];
+    $totals_fields[$key] = $return_data['totals'][$key] ?? null;
 }
 
 $rrd_name = ['app', $name, $app->app_id];

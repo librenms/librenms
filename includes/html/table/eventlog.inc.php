@@ -71,7 +71,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,severity $sql";
+$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,severity $sql";
 
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);

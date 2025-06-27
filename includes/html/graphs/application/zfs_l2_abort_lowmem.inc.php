@@ -6,10 +6,6 @@ $colours = 'psychedelic';
 $descr = 'L2 Abort Lowmem';
 $ds = 'l2_abort_lowmem';
 
-$filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, '_____group2']);
-
-if (! Rrd::checkRrdExists($filename)) {
-    d_echo('RRD "' . $filename . '" not found');
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, '_____group2']);
 
 require 'includes/html/graphs/generic_stats.inc.php';

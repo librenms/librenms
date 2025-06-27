@@ -6,13 +6,9 @@ $descr = 'Hop Opts Only Padding';
 $ds = 'data';
 
 if (isset($vars['sinstance'])) {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__hopopts_only_padding']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__hopopts_only_padding']);
 } else {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv6__hopopts_only_padding']);
-}
-
-if (Rrd::checkRrdExists($filename)) {
-    d_echo('RRD "' . $filename . '" not found');
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv6__hopopts_only_padding']);
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

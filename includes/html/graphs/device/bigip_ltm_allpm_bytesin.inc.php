@@ -33,7 +33,7 @@ $components = $keep;
 include 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'LTM Pool Members                               Now      Avg      Max\\n'";
-$colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'), \LibreNMS\Config::get('graph_colours.manycolours'));
+$colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $count = 0;
 d_echo('<pre>');
 

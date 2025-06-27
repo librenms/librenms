@@ -11,6 +11,7 @@ and MySQL queries can be done using [macros](Macros.md)
 
 Rules must consist of at least 3 elements: An __Entity__, a __Condition__ and a __Value__.
 Rules can contain braces and __Glues__.
+
 __Entities__ are provided from Table and Field from the database. For Example: `ports.ifOperStatus`.
 
 __Conditions__ can be any of:
@@ -37,8 +38,8 @@ __Conditions__ can be any of:
 - Less or Equal `<=`
 - Regex `REGEXP`
 
-__Values__ can be an entity or any data. If using macros as value you
-must include the macro name into backticks. i.e. \`macros.past_60m\`
+__Values__ can be an entity or any data. If using macros or another column name as a value you
+must include the macro or column name with backticks. i.e. \`macros.past_60m\` or \`processors.processor_perc_warn\`.
 
 __Note__: Regex supports MySQL Regular expressions.
 

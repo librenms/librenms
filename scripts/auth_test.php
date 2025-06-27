@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 
 $options = getopt('u:rldvh');
@@ -25,14 +25,14 @@ if (isset($options['d'])) {
 
 if (isset($options['v'])) {
     // Enable debug mode for auth methods that have it
-    Config::set('auth_ad_debug', 1);
-    Config::set('auth_ldap_debug', 1);
+    LibrenmsConfig::set('auth_ad_debug', 1);
+    LibrenmsConfig::set('auth_ldap_debug', 1);
 }
 
-echo 'Authentication Method: ' . Config::get('auth_mechanism') . PHP_EOL;
+echo 'Authentication Method: ' . LibrenmsConfig::get('auth_mechanism') . PHP_EOL;
 
 // if ldap like, check selinux
-if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == 'active_directory') {
+if (LibrenmsConfig::get('auth_mechanism') == 'ldap' || LibrenmsConfig::get('auth_mechanism') == 'active_directory') {
     $enforce = shell_exec('getenforce 2>/dev/null');
     if (Str::contains($enforce, 'Enforcing')) {
         // has selinux
@@ -60,13 +60,13 @@ try {
         $adbind_rm->setAccessible(true);
 
         $bind_success = false;
-        if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
+        if (LibrenmsConfig::has('auth_ad_binduser') && LibrenmsConfig::has('auth_ad_bindpassword')) {
             $bind_success = $adbind_rm->invoke($authorizer, false, true);
             if (! $bind_success) {
                 $ldap_error = ldap_error($lc_rp->getValue($authorizer));
                 echo $ldap_error . PHP_EOL;
                 if ($ldap_error == 'Invalid credentials') {
-                    print_error('AD bind failed for user ' . Config::get('auth_ad_binduser') . '@' . Config::get('auth_ad_domain') .
+                    print_error('AD bind failed for user ' . LibrenmsConfig::get('auth_ad_binduser') . '@' . LibrenmsConfig::get('auth_ad_domain') .
                         '. Check \'auth_ad_binduser\' and \'auth_ad_bindpassword\' in your config');
                 }
             } else {

@@ -26,6 +26,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class InvalidRrdTypeException extends \Exception
+class InvalidRrdTypeException extends RrdException
 {
 }

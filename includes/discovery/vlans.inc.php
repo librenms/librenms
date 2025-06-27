@@ -1,7 +1,7 @@
 <?php
 
 // Pre-cache the existing state of VLANs for this device from the database
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $vlans_db = [];
 $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', [$device['device_id']]);
@@ -31,8 +31,8 @@ foreach ($tmp_base_indexes as $index => $array) {
 }
 $index_to_base = array_flip($base_to_index);
 
-if (file_exists(Config::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php")) {
-    include Config::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php";
+if (file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php")) {
+    include LibrenmsConfig::get('install_dir') . "/includes/discovery/vlans/{$device['os']}.inc.php";
 }
 
 if (empty($device['vlans']) === true) {

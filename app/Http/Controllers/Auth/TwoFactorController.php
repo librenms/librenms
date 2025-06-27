@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Http\Interfaces\ToastInterface;
 use App\Models\User;
@@ -33,7 +34,6 @@ use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
 
@@ -72,7 +72,7 @@ class TwoFactorController extends Controller
         $twoFactorSettings = $this->loadSettings($user);
 
         // don't allow visiting this page if not needed
-        if (empty($twoFactorSettings) || ! Config::get('twofactor') || session('twofactor')) {
+        if (empty($twoFactorSettings) || ! LibrenmsConfig::get('twofactor') || session('twofactor')) {
             return redirect()->intended();
         }
 
@@ -80,7 +80,7 @@ class TwoFactorController extends Controller
 
         // lockout the user if there are too many failures
         if (isset($twoFactorSettings['fails']) && $twoFactorSettings['fails'] >= 3) {
-            $lockout_time = Config::get('twofactor_lock', 0);
+            $lockout_time = LibrenmsConfig::get('twofactor_lock', 0);
 
             if (! $lockout_time) {
                 $errors['lockout'] = __('Too many two-factor failures, please contact administrator.');

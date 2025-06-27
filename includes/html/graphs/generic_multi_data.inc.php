@@ -89,10 +89,10 @@ if ($i) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outp=dpercentile_outn,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outp=dpercentile_outn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outpn=doutbits,doutbits,-,dpercentile_outp,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outpn,FIRST';
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
@@ -106,10 +106,10 @@ if ($i) {
         $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
         $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
-        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
         $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
         $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
     }
@@ -118,7 +118,7 @@ if ($i) {
         $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':';
         $rrd_options .= ' AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
     } else {
-        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \LibreNMS\Config::get('percentile_value') . "th %\\n'";
+        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . \App\Facades\LibrenmsConfig::get('percentile_value') . "th %\\n'";
         $rrd_options .= ' AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
         $rrd_options .= ' GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';

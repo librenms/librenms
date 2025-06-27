@@ -27,10 +27,11 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AlertsController extends WidgetController
 {
-    protected $title = 'Alerts';
+    protected string $name = 'alerts';
     protected $defaults = [
         'title' => null,
         'device' => null,
@@ -47,12 +48,7 @@ class AlertsController extends WidgetController
         'unreachable' => null,
     ];
 
-    public function getView(Request $request)
-    {
-        return view('widgets.alerts', $this->getSettings());
-    }
-
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
         $data['severities'] = [

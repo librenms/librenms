@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 
 class OutagesController extends TableController
 {
@@ -97,13 +97,12 @@ class OutagesController extends TableController
         $day_seconds = 86400;
 
         $duration_days = (int) ($duration / $day_seconds);
-        $duration_time = $duration % $day_seconds;
 
         $output = "<span style='display:inline;'>";
         if ($duration_days) {
             $output .= $duration_days . 'd ';
         }
-        $output .= (new Carbon($duration))->format(Config::get('dateformat.time'));
+        $output .= (new Carbon($duration))->format(LibrenmsConfig::get('dateformat.time'));
         $output .= '</span>';
 
         return $output;
@@ -116,7 +115,7 @@ class OutagesController extends TableController
         }
 
         $output = "<span style='display:inline;'>";
-        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
+        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact')); // Convert epoch to local time
         $output .= '</span>';
 
         return $output;

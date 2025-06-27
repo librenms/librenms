@@ -171,11 +171,6 @@ parameters:
 			path: app/Providers/LegacyUserProvider.php
 
 		-
-			message: "#^Property App\\\\View\\\\SimpleTemplate\\:\\:\\$callback \\(callable\\) on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: app/View/SimpleTemplate.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
@@ -189,11 +184,6 @@ parameters:
 			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
 			count: 2
 			path: tests/CommonFunctionsTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$os of static method LibreNMS\\\\Config\\:\\:getOsSetting\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
 
 		-
 			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
