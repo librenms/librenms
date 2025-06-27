@@ -166,40 +166,97 @@ class SimpleTemplate
     }
 
     /**
-     * Execute a specific filter on a value
+     * Execute a specific filter on a value - Twig-compatible filters only
      */
     private function executeFilter(string $value, string $filterName, array $args): string
     {
         return match ($filterName) {
+            // Basic string filters
             'trim' => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
             'upper' => strtoupper($value),
             'lower' => strtolower($value),
-            'ucfirst' => ucfirst($value),
-            'ucwords' => ucwords($value),
+            'title' => ucwords(strtolower($value)),
+            'capitalize' => ucfirst(strtolower($value)),
             'length' => (string) strlen($value),
+
+            // String manipulation
             'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
-            'substr' => substr($value, ...$args) ?: $value,
-            'reverse' => strrev($value),
-            'md5' => md5($value),
-            'sha1' => sha1($value),
-            'base64_encode' => base64_encode($value),
-            'base64_decode' => base64_decode($value, true) ?: $value,
-            'urlencode' => urlencode($value),
-            'urldecode' => urldecode($value),
-            'htmlentities' => htmlentities($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            'html_entity_decode' => html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            'strip_tags' => strip_tags($value, ...$args),
+            'slice' => $this->sliceFilter($value, $args),
+
+            // Encoding/escaping
+            'escape' => $this->escapeFilter($value, $args),
+            'url_encode' => urlencode($value),
+
+            // HTML
+            'striptags' => strip_tags($value, ...($args ?: [])),
             'nl2br' => nl2br($value),
-            'addslashes' => addslashes($value),
-            'stripslashes' => stripslashes($value),
-            'number_format' => number_format((float) $value, ...$args),
-            'date' => date($args[0] ?? 'Y-m-d H:i:s', is_numeric($value) ? (int) $value : (strtotime($value) ?: time())),
+
+            // Formatting
+            'number_format' => $this->numberFormatFilter($value, $args),
+            'date' => $this->dateFilter($value, $args),
             'json_encode' => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $value,
-            'truncate' => (isset($args[0]) && strlen($value) > $args[0]) ? substr($value, 0, $args[0]) . ($args[1] ?? '...') : $value,
-            'slug' => strtolower(trim(preg_replace('/[^a-zA-Z0-9]+/', '-', $value), '-')),
-            'default' => empty($value) && isset($args[0]) ? (string) $args[0] : $value,
-            default => $value
+
+            // Utility
+            'default' => ($value === '' && isset($args[0])) ? (string) $args[0] : $value,
+            'abs' => (string) abs((float) $value),
+            'round' => (string) round((float) $value, $args[0] ?? 0),
+
+            default => $value // raw
         };
+    }
+
+    private function sliceFilter(string $value, array $args): string
+    {
+        $start = $args[0] ?? 0;
+        $length = $args[1] ?? null;
+
+        if ($length === null) {
+            return substr($value, $start) ?: $value;
+        }
+
+        return substr($value, $start, $length) ?: $value;
+    }
+
+    private function escapeFilter(string $value, array $args): string
+    {
+        $strategy = $args[0] ?? 'html';
+
+        return match ($strategy) {
+            'js' => json_encode($value, JSON_UNESCAPED_UNICODE),
+            'css' => $this->escapeCss($value),
+            'url' => urlencode($value),
+            default => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), // html
+        };
+    }
+
+    private function escapeCss(string $value): string
+    {
+        return preg_replace('/[^a-zA-Z0-9\-_]/', '\\\\$0', $value);
+    }
+
+    private function numberFormatFilter(string $value, array $args): string
+    {
+        $decimals = $args[0] ?? 0;
+        $decimalPoint = $args[1] ?? '.';
+        $thousandsSep = $args[2] ?? ',';
+
+        return number_format((float) $value, $decimals, $decimalPoint, $thousandsSep);
+    }
+
+    private function dateFilter(string $value, array $args): string
+    {
+        $format = $args[0] ?? 'F j, Y H:i'; // Twig's default format
+
+        if (is_numeric($value)) {
+            $timestamp = (int) $value;
+        } else {
+            $timestamp = strtotime($value);
+            if ($timestamp === false) {
+                $timestamp = time();
+            }
+        }
+
+        return date($format, $timestamp);
     }
 
     public function __toString(): string
