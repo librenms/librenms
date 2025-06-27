@@ -729,6 +729,11 @@ class Routeros extends OS implements
                 if (! empty($line)) {
                     [$mtType, $vlanId, $mtData] = array_map('trim', explode(',', $line));
 
+                    if ($mtType == 'N') { // type N is for vlan name, skip it from port/ifindex processing
+                        $vlanNames[$vlanId] = $mtData;
+                        continue;
+                    }
+
                     $ifIndex = $ifNames[$mtData] ?? 0;
                     $baseport = $index2base[$ifIndex] ?? 0;
                     $ret->push(new PortVlan([
