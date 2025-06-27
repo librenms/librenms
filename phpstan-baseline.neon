@@ -171,11 +171,6 @@ parameters:
 			path: app/Providers/LegacyUserProvider.php
 
 		-
-			message: "#^Property App\\\\View\\\\SimpleTemplate\\:\\:\\$callback \\(callable\\) on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: app/View/SimpleTemplate.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
