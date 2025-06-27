@@ -18,7 +18,7 @@ class Logo extends Component
         public string $responsive = '',
         ?string $image = null,
         public ?string $text = null,
-    ){
+    ) {
         $this->image ??= (string) LibrenmsConfig::get('title_image');
         $this->text ??= LibrenmsConfig::get('project_name');
         $this->is_svg = str_ends_with($image, '.svg') && ! str_contains($image, '//');
