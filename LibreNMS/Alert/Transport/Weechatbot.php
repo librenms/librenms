@@ -39,11 +39,11 @@ class WeechatBot extends Transport
         $pre .= "{$this->config['irc-channel']} ";
 
         try {
-	        $fp = (new \Socket\Raw\Factory())
-	                ->createClient("udp://$this->config['bot-hostname']:$this->config['bot-port']");
-	    } catch (Exception $e) {
-	        throw new AlertTransportDeliveryException($alert_data ,$e->getCode(), $e->getMessage());
-	    }
+            $fp = (new \Socket\Raw\Factory())
+                    ->createClient("udp://$this->config['bot-hostname']:$this->config['bot-port']");
+        } catch (Exception $e) {
+            throw new AlertTransportDeliveryException($alert_data ,$e->getCode(), $e->getMessage());
+        }
 
         $fp->write($pre . $alert_data['title']);
         foreach (preg_split('/((\r?\n)|(\r\n?))/', $alert_data['msg']) as $line) {
