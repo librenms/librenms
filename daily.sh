@@ -140,7 +140,7 @@ check_dependencies() {
     ver_73=$(php -r "echo (int)version_compare(PHP_VERSION, '7.3', '<');")
     ver_81=$(php -r "echo (int)version_compare(PHP_VERSION, '8.1', '<');")
     ver_82=$(php -r "echo (int)version_compare(PHP_VERSION, '8.2', '<');")
-    python_path=$([ -x "${LIBRENMS_DIR}/.python_venvs/dispatcher/bin/python3" ] && echo "${LIBRENMS_DIR}/.python_venvs/dispatcher/bin/python3" || { which python3; })
+    python_path=$(if [ -x "${LIBRENMS_DIR}/.python_venvs/dispatcher/bin/python3" ]; then echo "${LIBRENMS_DIR}/.python_venvs/dispatcher/bin/python3"; else which python3; fi)
     python3=$($python_path -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     python_deps=$(${python_path} "${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     phpver="master"
