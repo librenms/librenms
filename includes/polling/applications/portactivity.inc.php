@@ -67,59 +67,56 @@ $ports_rrd_def = RrdDefinition::make()
 
 if (is_array($ports)) {
     $ports_keys = array_keys($ports);
-    $ports_keys_int = 0;
-    while (isset($ports[$ports_keys[$ports_keys_int]])) {
-        if (is_array($ports[$ports_keys[$ports_keys_int]])) {
-            $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
+    foreach ($ports_keys as $key) {
+        if (is_array($ports[$key])) {
+            $rrd_name = ['app', $name, $app->app_id, $key];
             $fields = [
-                'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'] ?? null,
-                'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'] ?? null,
-                'total_from' => $ports[$ports_keys[$ports_keys_int]]['total_from'] ?? null,
-                'totalLISTEN' => $ports[$ports_keys[$ports_keys_int]]['total']['LISTEN'] ?? null,
-                'totalCLOSED' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSED'] ?? null,
-                'totalSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_SENT'] ?? null,
-                'totalSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['total']['SYN_RECEIVED'] ?? null,
-                'totalESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['total']['ESTABLISHED'] ?? null,
-                'totalCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSE_WAIT'] ?? null,
-                'totalFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_1'] ?? null,
-                'totalCLOSING' => $ports[$ports_keys[$ports_keys_int]]['total']['CLOSING'] ?? null,
-                'totalLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['total']['LAST_ACK'] ?? null,
-                'totalFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['total']['FIN_WAIT_2'] ?? null,
-                'totalTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['total']['TIME_WAIT'] ?? null,
-                'totalUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['total']['UNKNOWN'] ?? null,
-                'totalother' => $ports[$ports_keys[$ports_keys_int]]['total']['other'] ?? null,
-                'toLISTEN' => $ports[$ports_keys[$ports_keys_int]]['to']['LISTEN'] ?? null,
-                'toCLOSED' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSED'] ?? null,
-                'toSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_SENT'] ?? null,
-                'toSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['to']['SYN_RECEIVED'] ?? null,
-                'toESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['to']['ESTABLISHED'] ?? null,
-                'toCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSE_WAIT'] ?? null,
-                'toFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_1'] ?? null,
-                'toCLOSING' => $ports[$ports_keys[$ports_keys_int]]['to']['CLOSING'] ?? null,
-                'toLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['to']['LAST_ACK'] ?? null,
-                'toFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['to']['FIN_WAIT_2'] ?? null,
-                'toTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['to']['TIME_WAIT'] ?? null,
-                'toUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['to']['UNKNOWN'] ?? null,
-                'toother' => $ports[$ports_keys[$ports_keys_int]]['to']['other'] ?? null,
-                'fromLISTEN' => $ports[$ports_keys[$ports_keys_int]]['from']['LISTEN'] ?? null,
-                'fromCLOSED' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSED'] ?? null,
-                'fromSYN_SENT' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_SENT'] ?? null,
-                'fromSYN_RECEIVED' => $ports[$ports_keys[$ports_keys_int]]['from']['SYN_RECEIVED'] ?? null,
-                'fromESTABLISHED' => $ports[$ports_keys[$ports_keys_int]]['from']['ESTABLISHED'] ?? null,
-                'fromCLOSE_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSE_WAIT'] ?? null,
-                'fromFIN_WAIT_1' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_1'] ?? null,
-                'fromCLOSING' => $ports[$ports_keys[$ports_keys_int]]['from']['CLOSING'] ?? null,
-                'fromLAST_ACK' => $ports[$ports_keys[$ports_keys_int]]['from']['LAST_ACK'] ?? null,
-                'fromFIN_WAIT_2' => $ports[$ports_keys[$ports_keys_int]]['from']['FIN_WAIT_2'] ?? null,
-                'fromTIME_WAIT' => $ports[$ports_keys[$ports_keys_int]]['from']['TIME_WAIT'] ?? null,
-                'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'] ?? null,
-                'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'] ?? null,
+                'total_conns' => $ports[$key]['total_conns'] ?? null,
+                'total_to' => $ports[$key]['total_to'] ?? null,
+                'total_from' => $ports[$key]['total_from'] ?? null,
+                'totalLISTEN' => $ports[$key]['total']['LISTEN'] ?? null,
+                'totalCLOSED' => $ports[$key]['total']['CLOSED'] ?? null,
+                'totalSYN_SENT' => $ports[$key]['total']['SYN_SENT'] ?? null,
+                'totalSYN_RECEIVED' => $ports[$key]['total']['SYN_RECEIVED'] ?? null,
+                'totalESTABLISHED' => $ports[$key]['total']['ESTABLISHED'] ?? null,
+                'totalCLOSE_WAIT' => $ports[$key]['total']['CLOSE_WAIT'] ?? null,
+                'totalFIN_WAIT_1' => $ports[$key]['total']['FIN_WAIT_1'] ?? null,
+                'totalCLOSING' => $ports[$key]['total']['CLOSING'] ?? null,
+                'totalLAST_ACK' => $ports[$key]['total']['LAST_ACK'] ?? null,
+                'totalFIN_WAIT_2' => $ports[$key]['total']['FIN_WAIT_2'] ?? null,
+                'totalTIME_WAIT' => $ports[$key]['total']['TIME_WAIT'] ?? null,
+                'totalUNKNOWN' => $ports[$key]['total']['UNKNOWN'] ?? null,
+                'totalother' => $ports[$key]['total']['other'] ?? null,
+                'toLISTEN' => $ports[$key]['to']['LISTEN'] ?? null,
+                'toCLOSED' => $ports[$key]['to']['CLOSED'] ?? null,
+                'toSYN_SENT' => $ports[$key]['to']['SYN_SENT'] ?? null,
+                'toSYN_RECEIVED' => $ports[$key]['to']['SYN_RECEIVED'] ?? null,
+                'toESTABLISHED' => $ports[$key]['to']['ESTABLISHED'] ?? null,
+                'toCLOSE_WAIT' => $ports[$key]['to']['CLOSE_WAIT'] ?? null,
+                'toFIN_WAIT_1' => $ports[$key]['to']['FIN_WAIT_1'] ?? null,
+                'toCLOSING' => $ports[$key]['to']['CLOSING'] ?? null,
+                'toLAST_ACK' => $ports[$key]['to']['LAST_ACK'] ?? null,
+                'toFIN_WAIT_2' => $ports[$key]['to']['FIN_WAIT_2'] ?? null,
+                'toTIME_WAIT' => $ports[$key]['to']['TIME_WAIT'] ?? null,
+                'toUNKNOWN' => $ports[$key]['to']['UNKNOWN'] ?? null,
+                'toother' => $ports[$key]['to']['other'] ?? null,
+                'fromLISTEN' => $ports[$key]['from']['LISTEN'] ?? null,
+                'fromCLOSED' => $ports[$key]['from']['CLOSED'] ?? null,
+                'fromSYN_SENT' => $ports[$key]['from']['SYN_SENT'] ?? null,
+                'fromSYN_RECEIVED' => $ports[$key]['from']['SYN_RECEIVED'] ?? null,
+                'fromESTABLISHED' => $ports[$key]['from']['ESTABLISHED'] ?? null,
+                'fromCLOSE_WAIT' => $ports[$key]['from']['CLOSE_WAIT'] ?? null,
+                'fromFIN_WAIT_1' => $ports[$key]['from']['FIN_WAIT_1'] ?? null,
+                'fromCLOSING' => $ports[$key]['from']['CLOSING'] ?? null,
+                'fromLAST_ACK' => $ports[$key]['from']['LAST_ACK'] ?? null,
+                'fromFIN_WAIT_2' => $ports[$key]['from']['FIN_WAIT_2'] ?? null,
+                'fromTIME_WAIT' => $ports[$key]['from']['TIME_WAIT'] ?? null,
+                'fromUNKNOWN' => $ports[$key]['from']['UNKNOWN'] ?? null,
+                'fromother' => $ports[$key]['from']['other'] ?? null,
             ];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
             app('Datastore')->put($device, 'app', $tags, $fields);
         }
-
-        $ports_keys_int++;
     }
 }
 
