@@ -135,9 +135,6 @@
                 "ospfv3": {
                     "type": "boolean"
                 },
-                "ucd-diskio": {
-                    "type": "boolean"
-                },
                 "sensors": {
                     "type": "boolean"
                 },
@@ -280,9 +277,6 @@
                     "type": "boolean"
                 },
                 "vlans": {
-                    "type": "boolean"
-                },
-                "ucd-diskio": {
                     "type": "boolean"
                 },
                 "ucd-dsktable": {

@@ -17,7 +17,6 @@ poller_modules:
     hr-mib: false
     ntp: false
     ospf: false
-    ucd-diskio: false
     ucd-mib: false
     cisco-cef: true
     cisco-mac-accounting: true
@@ -35,5 +34,5 @@ discovery_modules:
     vrf: false
     cisco-vrf-lite: false
     ntp: false
-    ucd-diskio: false
+    ucd-mib: false
     

@@ -24,13 +24,14 @@ discovery_modules:
     mempools: false
     entity-physical: false
     ports-stack: false
-    ucd-diskio: false
+    ucd-mib: false
     processors: false
 poller_modules:
     ospf: false
     ntp: false
     services: false
     storage: false
+    ucd-mib: false
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }

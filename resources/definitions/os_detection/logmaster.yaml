@@ -17,7 +17,7 @@ discovery_modules:
     mempools: false
     discovery-protocols: false
     storage: false
-    ucd-diskio: false
+    ucd-mib: false
 poller_modules:
     bgp-peers: false
     entity-physical: false
@@ -33,6 +33,5 @@ poller_modules:
     stp: false
     mempools: false
     storage: false
-    ucd-diskio: false
     ucd-mib: false
     wireless: false

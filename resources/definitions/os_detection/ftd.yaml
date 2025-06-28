@@ -43,6 +43,6 @@ discovery_modules:
     storage: false
     hr-device: false
     arp-table: false
-    ucd-diskio: false
+    ucd-mib: false
     services: false
     wireless: false

@@ -709,7 +709,7 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
-            'ucd-diskio' => [
+            'ucd-mib' => [
                 'description' => 'UCD DiskIO',
             ],
             'vlans' => [
@@ -1457,9 +1457,6 @@ return [
             ],
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
-            ],
-            'ucd-diskio' => [
-                'description' => 'UCD DiskIO',
             ],
             'wireless' => [
                 'description' => 'Wireless',

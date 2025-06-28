@@ -107,7 +107,7 @@ Modules.
     lnms config:set discovery_modules.vlans true
     lnms config:set discovery_modules.vminfo false
     lnms config:set discovery_modules.printer-supplies false
-    lnms config:set discovery_modules.ucd-diskio true
+    lnms config:set discovery_modules.ucd-mib true
     lnms config:set discovery_modules.applications false
     lnms config:set discovery_modules.services true
     lnms config:set discovery_modules.stp true
@@ -197,7 +197,7 @@ device, with history data.
 
 `printer-supplies`: Toner levels support.
 
-`ucd-diskio`: Disk I/O support.
+`ucd-mib`: UCD based CPU and Disk I/O support.
 
 `services`: *Nix services support.
 

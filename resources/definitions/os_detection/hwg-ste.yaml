@@ -13,6 +13,7 @@ poller_modules:
     ospf: false
     stp: false
     netstats: false
+    ucd-mib: false
 discovery_modules:
     applications: false
     arp-table: false
@@ -31,7 +32,7 @@ discovery_modules:
     services: false
     storage: false
     stp: false
-    ucd-diskio: false
+    ucd-mib: false
     vlans: false
     wireless: false
 discovery:

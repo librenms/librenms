@@ -13,7 +13,6 @@ poller_modules:
     bgp-peers: false
     ipmi: false
     ospf: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     fdb-table: false
@@ -21,7 +20,7 @@ discovery_modules:
     bgp-peers: false
     ntp: false
     stp: false
-    ucd-diskio: false
+    ucd-mib: false
     vlans: false
 discovery:
     -

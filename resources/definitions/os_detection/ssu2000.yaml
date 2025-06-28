@@ -18,7 +18,6 @@ discovery_modules:
     arp-table: false
     mempools: false
     entity-physical: false
-    ucd-diskio: false
     processors: false
     mpls: false
     wireless: false
@@ -38,7 +37,6 @@ poller_modules:
     arp-table: false
     mempools: false
     entity-physical: false
-    ucd-diskio: false
     processors: false
     mpls: false
     wireless: false

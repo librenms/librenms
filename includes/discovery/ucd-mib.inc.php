@@ -6,4 +6,4 @@ if (! isset($os) || ! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\UcdDiskio())->discover($os);
+(new \LibreNMS\Modules\UcdMib())->discover($os);

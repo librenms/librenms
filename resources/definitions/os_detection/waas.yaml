@@ -20,7 +20,6 @@ poller_modules:
     ipmi: false
     ospf: false
     printer-supplies:   false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     bgp-peers: false
@@ -34,7 +33,7 @@ discovery_modules:
     ntp: false
     stp: false
     printer-supplies:   false
-    ucd-diskio: false
+    ucd-mib: false
     vlans: false
 discovery:
     - { sysDescr_regex: ['/^Cisco Wide Area Application Services/'] }

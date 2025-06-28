@@ -20,7 +20,7 @@
         },
         "poller": "matches discovery"
     },
-    "ucd-diskio": {
+    "ucd-mib": {
         "discovery": {
             "disks": [
                 {

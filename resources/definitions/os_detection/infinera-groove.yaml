@@ -7,7 +7,6 @@ discovery_modules:
     ntp: false
     ospf: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
     ipmi: false
     bgp-peers: false
@@ -31,7 +30,6 @@ poller_modules:
     ntp: false
     ospf: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
     ipmi: false
     bgp-peers: false

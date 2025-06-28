@@ -24,7 +24,7 @@ discovery_modules:
     mempools: false
     entity-physical: false
     ports-stack: false
-    ucd-diskio: false
+    ucd-mib: false
     processors: false
     mpls: false
     wireless: false
@@ -36,5 +36,5 @@ poller_modules:
     ntp: false
     services: false
     storage: false
-    ucd-diskio: false
+    ucd-mib: false
     mpls: false

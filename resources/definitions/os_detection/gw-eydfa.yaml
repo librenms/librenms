@@ -23,7 +23,6 @@ poller_modules:
     processors: false
     storage: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     ports: false
@@ -40,7 +39,7 @@ discovery_modules:
     arp-table: false
     bgp-peers: false
     vlans: false
-    ucd-diskio: false
+    ucd-mib: false
     services: false
     stp: false
     ntp: false

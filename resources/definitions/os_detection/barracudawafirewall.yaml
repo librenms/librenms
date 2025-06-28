@@ -13,7 +13,7 @@ poller_modules:
     ospf: false
     storage: false
     stp: false
-    ucd-diskio: false
+    ucd-mib: false
     wireless: false
 discovery_modules:
     bgp-peers: false
@@ -26,7 +26,7 @@ discovery_modules:
     ports-stack: false
     storage: false
     stp: false
-    ucd-diskio: false
+    ucd-mib: false
     wireless: false
 discovery:
     -

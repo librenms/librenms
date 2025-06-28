@@ -24,17 +24,17 @@ discovery_modules:
     mempools: false
     entity-physical: false
     ports-stack: false
-    ucd-diskio: false
     processors: false
     mpls: false
     wireless: false
     fdb-table: false
     services: false
     cisco-vrf-lite: false
+    ucd-mib: false
 poller_modules:
     ospf: false
     ntp: false
     services: false
     storage: false
-    ucd-diskio: false
     mpls: false
+    ucd-mib: false

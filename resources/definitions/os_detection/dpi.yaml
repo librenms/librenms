@@ -8,7 +8,6 @@ poller_modules:
     hr-mib: false
     ucd-mib: false
     bgp-peers: false
-    ucd-diskio: false
     wireless: false
     ospf: false
     entity-physical: false
@@ -24,11 +23,11 @@ discovery_modules:
     discovery-protocols: false
     arp-table: false
     bgp-peers: false
-    ucd-diskio: false
     services: false
     stp: false
     ntp: false
     wireless: false
+    ucd-mib: false
 discovery:
     -
         sysDescr: IBM DPI

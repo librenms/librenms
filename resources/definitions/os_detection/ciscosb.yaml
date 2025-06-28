@@ -23,13 +23,12 @@ poller_modules:
     hr-mib: false
     ntp: false
     ospf: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     bgp-peers: false
     cisco-vrf-lite: false
     ntp: false
-    ucd-diskio: false
+    ucd-mib: false
 discovery:
     -
         sysObjectID:

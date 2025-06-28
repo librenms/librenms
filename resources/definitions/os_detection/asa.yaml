@@ -19,7 +19,6 @@ poller_modules:
     ntp: false
     ospf: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     arp-table: false
@@ -27,8 +26,8 @@ discovery_modules:
     cisco-vrf-lite: false
     ntp: false
     stp: false
-    ucd-diskio: false
     vlans: false
+    ucd-mib: false
 discovery:
     -
         sysDescr_regex:

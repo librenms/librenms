@@ -15,7 +15,7 @@ discovery_modules:
     wireless: false
     discovery-protocols: false
     storage: false
-    ucd-diskio: false
+    ucd-mib: false
 poller_modules:
     applications: false
     bgp-peers: false
@@ -29,6 +29,5 @@ poller_modules:
     services: false
     storage: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
     wireless: false

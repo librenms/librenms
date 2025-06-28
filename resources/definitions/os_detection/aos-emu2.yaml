@@ -23,7 +23,7 @@ discovery_modules:
     discovery-protocols: false
     bgp-peers: false
     vlans: false
-    ucd-diskio: false
+    ucd-mib: false
     services: false
     stp: false
     ntp: false
@@ -37,12 +37,11 @@ poller_modules:
     storage: false
     netstats: false
     hr-mib: false
-    ucd-mib: false
     ipSystemStats: false
     ports: false
     bgp-peers: false
     ospf: false
-    ucd-diskio: false
+    ucd-mib: false
     services: false
     stp: false
     ntp: false

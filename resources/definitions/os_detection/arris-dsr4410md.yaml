@@ -22,7 +22,7 @@ discovery_modules:
     bgp-peers: false
     arp-table: false
     vlans: false
-    ucd-diskio: false
+    ucd-mib: false
     cisco-vrf-lite: false
     entity-physical: false
     ports-stack: false

@@ -12,7 +12,7 @@ poller_modules:
     mempools: false
     storage: false
     ospf: false
-    ucd-diskio: false
+    ucd-mib: false
     wireless: false
     applications: false
 
@@ -21,6 +21,6 @@ discovery_modules:
     mempools: false
     storage: false
     ospf: false
-    ucd-diskio: false
     cisco-vrf-lite: false
     wireless: false
+    ucd-mib: false

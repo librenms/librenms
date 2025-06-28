@@ -62,7 +62,6 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.bgp-peers true
     lnms config:set poller_modules.junose-atm-vp false
     lnms config:set poller_modules.printer-supplies false
-    lnms config:set poller_modules.ucd-diskio true
     lnms config:set poller_modules.wireless true
     lnms config:set poller_modules.ospf true
     lnms config:set poller_modules.ospfv3 true
@@ -132,7 +131,7 @@ E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
 `hr-mib`: Host resource support.
 
-`ucd-mib`: Support for CPU, Memory and Load.
+`ucd-mib`: UCD based support for CPU, Memory, Load and Disk.
 
 `ipSystemStats`: IP statistics for device.
 
@@ -148,8 +147,6 @@ configured to be ignored by config options.
 `junose-atm-vp`: Juniper ATM support.
 
 `printer-supplies`: Toner levels support.
-
-`ucd-diskio`: Disk I/O support.
 
 `wifi`: WiFi Support for those devices with support.
 

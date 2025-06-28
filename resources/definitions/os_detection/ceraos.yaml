@@ -22,7 +22,6 @@ poller_modules:
     ospf: false
     processors: false
     services: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     ports-stack: false
@@ -35,7 +34,7 @@ discovery_modules:
     discovery-protocols: false
     arp-table: false
     bgp-peers: false
-    ucd-diskio: false
+    ucd-mib: false
     services: false
     ntp: false
     charge: false

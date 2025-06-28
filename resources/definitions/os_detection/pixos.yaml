@@ -25,7 +25,6 @@ poller_modules:
     ntp: false
     ospf: false
     stp: false
-    ucd-diskio: false
     ucd-mib: false
 discovery_modules:
     bgp-peers: false
@@ -37,6 +36,7 @@ discovery_modules:
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
+    ucd-mib: false
 discovery:
     -
         sysDescr:

@@ -1808,7 +1808,7 @@
             "default": false,
             "type": "boolean"
         },
-        "discovery_modules.ucd-diskio": {
+        "discovery_modules.ucd-mib": {
             "order": 330,
             "group": "discovery",
             "section": "discovery_modules",
@@ -5894,13 +5894,6 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
-            "type": "boolean"
-        },
-        "poller_modules.ucd-diskio": {
-            "order": 400,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
             "type": "boolean"
         },
         "poller_modules.vminfo": {

@@ -572,7 +572,7 @@ return [
             'toner' => [
                 'description' => 'Toner',
             ],
-            'ucd-diskio' => [
+            'ucd-mib' => [
                 'description' => 'UCD DiskIO',
             ],
             'vlans' => [
@@ -1072,9 +1072,6 @@ return [
             ],
             'toner' => [
                 'description' => 'Toner',
-            ],
-            'ucd-diskio' => [
-                'description' => 'UCD DiskIO',
             ],
             'wireless' => [
                 'description' => 'Wireless',

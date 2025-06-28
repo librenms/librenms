@@ -11,9 +11,9 @@ discovery:
             - .1.3.6.1.4.1.1038
 poller_modules:
     hr-mib: false
-    ucd-mib: false
     stp: false
     ospf: false
+    ucd-mib: false
 discovery_modules:
     processors: false
     mempools: false
@@ -24,6 +24,6 @@ discovery_modules:
     bgp-peers: false
     ports-stack: false
     vlans: false
-    ucd-diskio: false
+    ucd-mib: false
     stp: false
     fdb-table: false

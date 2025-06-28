@@ -40,7 +40,7 @@ discovery_modules:
     discovery-protocols: false
     arp-table: false
     bgp-peers: false
-    ucd-diskio: false
+    ucd-mib: false
     fdb-table: false
     stp: false
     vlans: false
