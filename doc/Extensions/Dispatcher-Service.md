@@ -23,6 +23,12 @@ behaviour only found in Python3.4+.
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
+If a Python virtual environment has been set up, you need to activate it.
+
+```bash
+source .python_venvs/dispatcher/bin/activate
+```
+
 ```bash
 pip3 install -r requirements.txt
 ```
@@ -210,7 +216,10 @@ install run:
 cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
 ```
 
-
+If a Python virtual environment has been set up, use file `misc/librenms-venv.service`.
+```bash
+cp /opt/librenms/misc/librenms-venv.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
 ### systemd service with watchdog
 

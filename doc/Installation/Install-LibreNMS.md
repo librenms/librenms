@@ -64,13 +64,13 @@ Connect to the server command line and follow the instructions below.
 === "Debian 12"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-venv rrdtool snmp snmpd unzip whois
         ```
 
 === "Debian 13"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-venv rrdtool snmp snmpd unzip whois
         ```
 
 ## Add librenms user
@@ -93,6 +93,24 @@ chown -R librenms:librenms /opt/librenms
 chmod 771 /opt/librenms
 setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
+```
+
+## Create Python Virtual Environment
+
+!!! note
+    To install Python library module that isn't packaged in the OS (like Debian),
+    it's recommand installing it into a virtualenv.
+    See https://peps.python.org/pep-0668/
+
+Change to the LibreNMS user:
+```
+su - librenms
+```
+
+Create the virtual environment:
+```
+mkdir .python_venvs
+python3 -m venv .python_venvs/dispatcher
 ```
 
 ## Install PHP dependencies
@@ -629,6 +647,12 @@ systemctl restart snmpd
 ```
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
+
+!!! warning
+    If a Python virtual environment has been set up, copy librenms-venv.cron:
+    ```
+    cp /opt/librenms/dist/librenms-venv.cron /etc/cron.d/librenms
+    ```
 
 !!! note
     Keep in mind  that cron, by default, only uses a very limited
