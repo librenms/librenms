@@ -22,18 +22,26 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\PortVlan;
+use App\Models\Vlan;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Boss extends OS implements OSDiscovery, ProcessorDiscovery
+class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDiscovery, PortVlanDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -94,5 +102,57 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         }
 
         return $processors;
+    }
+
+    public function discoverBasicVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $vlans = SnmpQuery::cache()->hideMib()->walk('RC-VLAN-MIB::rcVlanName')->table(1);
+        foreach ($vlans as $vlan_id => $vlan) {
+            $ret->push(new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlan['rcVlanName'] ?? '',
+                'vlan_domain' => 1,
+            ]));
+        }
+
+        return $ret;
+    }
+
+    public function discoverPortVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $vlans = SnmpQuery::cache()->hideMib()->walk('RC-VLAN-MIB::rcVlanName')->table(1);
+        $tagoruntag = SnmpQuery::hideMib()->walk('RC-VLAN-MIB::rcVlanPortMembers')->table(1);
+        $port_pvids = SnmpQuery::hideMib()->walk('RC-VLAN-MIB::rcVlanPortDefaultVlanId')->table(1);
+        $port_mode = SnmpQuery::hideMib()->walk('RC-VLAN-MIB::rcVlanPortPerformTagging')->table(1);
+
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+
+        foreach ($vlans as $vlan_id => $vlan) {
+            $egress_ids = q_bridge_bits2indices($tagoruntag[$vlan_id]['rcVlanPortMembers']);
+            $untagged_ids = [];
+
+            foreach ($port_pvids as $port => $port_num) {
+                if ($port_num['rcVlanPortDefaultVlanId'] == $vlan_id &&
+                ($port_mode[$port]['rcVlanPortPerformTagging'] == 'false' || $port_mode[$port]['rcVlanPortPerformTagging'] == 4)) {
+                    array_push($untagged_ids, $port);
+                }
+            }
+
+            foreach ($egress_ids as $baseport) {
+                $ret->push(new PortVlan([
+                    'vlan' => $vlan_id,
+                    'baseport' => $baseport - 1,
+                    'untagged' => (in_array($baseport - 1, $untagged_ids) ? 1 : 0),
+                    'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport - 1] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                ]));
+            }
+        }
+
+        return $ret;
     }
 }

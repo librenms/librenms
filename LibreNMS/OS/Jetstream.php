@@ -1,19 +1,46 @@
 <?php
 
+/**
+ * Jetstream.php
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link       http://librenms.org
+ *
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
+use App\Models\PortVlan;
 use App\Models\Route;
+use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
+use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
+use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, BasicVlanDiscovery, PortVlanDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -115,5 +142,71 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery
         }));
 
         return $routes->filter();
+    }
+
+    public function discoverBasicVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $vlanConfigTable = SnmpQuery::cache()->hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
+        foreach ($vlanConfigTable as $vlan_id => $data) {
+            $ret->push(new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => 1,
+                'vlan_name' => $data['dot1qVlanDescription'],
+            ]));
+        }
+
+        return $ret;
+    }
+
+    public function discoverPortVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $vlanPortConfigTable = SnmpQuery::hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
+        foreach ($vlanPortConfigTable as $ifIndex => $data) {
+            $portConfig[$data['vlanPortNumber']] = $ifIndex;
+        }
+
+        $vlanConfigTable = SnmpQuery::cache()->hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
+        foreach ($vlanConfigTable as $vlan_id => $data) {
+            $types = ['vlanTagPortMemberAdd' => 0, 'vlanUntagPortMemberAdd' => 1];
+            foreach ($types as $type => $tag) {
+                $expand = $this->jetstreamExpand($data[$type] ?? []);
+                foreach ($expand as $key => $port) {
+                    $ifIndex = $portConfig[$port] ?? 0;
+                    $baseport = $index2base[$ifIndex] ?? 0;
+                    $ret->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $baseport,
+                        'untagged' => $tag,
+                        'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    private function jetstreamExpand($var): array
+    {
+        $result = [];
+
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
+
+        foreach ($lags[2] as $index => $start) {
+            $end = $lags[3][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
+            }
+        }
+
+        return $result;
     }
 }

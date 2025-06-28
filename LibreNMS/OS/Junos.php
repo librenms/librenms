@@ -22,6 +22,7 @@
  * @link       https://www.librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
@@ -29,12 +30,16 @@ namespace LibreNMS\OS;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\PortVlan;
 use App\Models\Sla;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
+use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -43,7 +48,7 @@ use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, BasicVlanDiscovery, PortVlanDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -382,5 +387,129 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // Nothing matched
         return [];
+    }
+
+    public function discoverBasicVlanData(): Collection
+    {
+        $ret = new Collection;
+
+        $vlans = SnmpQuery::cache()->hideMib()->walk([
+            'JUNIPER-VLAN-MIB::jnxExVlanName', 'JUNIPER-VLAN-MIB::jnxExVlanTag',
+        ])->table(1);
+        $prefix = 'jnxEx';
+
+        if (empty($vlans)) {
+            $vlans = SnmpQuery::cache()->hideMib()->walk([
+                'JUNIPER-L2ALD-MIB::jnxL2aldVlanName', 'JUNIPER-L2ALD-MIB::jnxL2aldVlanTag',
+            ])->table(1);
+            $prefix = 'jnxL2ald';
+        }
+
+        foreach ($vlans as $key => $data) {
+            $ret->push(new Vlan([
+                'vlan_vlan' => $data[$prefix . 'VlanTag'],
+                'vlan_domain' => 1,
+                'vlan_name' => $data[$prefix . 'VlanName'],
+            ]));
+        }
+
+        return $ret;
+    }
+
+    public function discoverPortVlanData(): Collection
+    {
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $ret = new Collection;
+        $tagness_by_vlan_index = [];
+        $vtpdomain_id = '1';
+
+        $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanName')->table(1);
+
+        if (empty($vlans)) {
+            $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanName')->table(1);
+            $vlan_tag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->valuesByIndex();
+            $untag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')->valuesByIndex();
+            $tmp_tag = 'jnxL2aldVlanTag';
+            $tmp_name = 'jnxL2aldVlanName';
+        } else {
+            $vlan_tag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanTag')->valuesByIndex();
+            $untag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')->valuesByIndex();
+            $tmp_tag = 'jnxExVlanTag';
+            $tmp_name = 'jnxExVlanName';
+        }
+
+        if (empty($untag)) {
+            // If $untag is empty, device is based on Junipers ELS software
+            $untag = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1);
+            $taganduntag = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1);
+            $vlan_tag = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->table(1);
+            $tmp_tag = 'jnxL2aldVlanTag';
+            $tmp_name = 'jnxL2aldVlanName';
+            $temp_vlan = [];
+            foreach ($vlan_tag as $key => $value) {
+                $temp_vlan[$key] = $value['jnxL2aldVlanTag'];
+            }
+            //set all port vlan relationships to be tagged
+            foreach ($taganduntag as $key => $taganduntag) {
+                if (empty($taganduntag['dot1qVlanStaticEgressPorts'])) {
+                    continue;
+                }
+
+                $vlan_index = array_search($key, $temp_vlan);
+                $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
+                foreach ($port_on_vlan as $port) {
+                    if (isset($dot1dBasePortIfIndex[$port])) {
+                        $tagness_by_vlan_index[$vlan_index][$dot1dBasePortIfIndex[$port]]['tag'] = 0;
+                    }
+
+                    unset($tagness_by_vlan_index[$vlan_index]['']);
+                }
+            }
+            // correct all untagged ports to be untagged
+            foreach ($untag as $key => $untag) {
+                if (empty($untag['dot1qVlanStaticUntaggedPorts'])) {
+                    continue;
+                }
+
+                $vlan_index = array_search($key, $temp_vlan);
+                $port_on_vlan = explode(',', $untag['dot1qVlanStaticUntaggedPorts']);
+                foreach ($port_on_vlan as $port) {
+                    if (isset($dot1dBasePortIfIndex[$port])) {
+                        $tagness_by_vlan_index[$vlan_index][$dot1dBasePortIfIndex[$port]]['tag'] = 1;
+                    }
+                    unset($tagness_by_vlan_index[$vlan_index]['']);
+                }
+            }
+        } else {
+            foreach ($untag as $key => $tagness) {
+                $key = explode('.', $key);
+                $base = $dot1dBasePortIfIndex[$key[1]] ?? '';
+                if ($tagness['jnxExVlanPortTagness'] == 2) {
+                    $tagness_by_vlan_index[$key[0]][$base]['tag'] = 1;
+                } else {
+                    $tagness_by_vlan_index[$key[0]][$base]['tag'] = 0;
+                }
+            }
+        }
+
+        foreach ($vlans as $vlan_index => $vlan) {
+            $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
+            if (isset($tagness_by_vlan_index[$vlan_index])) {
+                foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
+                    $f_portType = $tag['tag'] ? 'access' : 'trunk';
+                    $ret->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $index2base[$ifIndex] ?? 0,
+                        'untagged' => $tag['tag'],
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+        }
+
+        return $ret;
     }
 }
