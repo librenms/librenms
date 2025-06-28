@@ -703,7 +703,7 @@ return [
                 'description' => 'STP',
             ],
             'ucd-mib' => [
-                'description' => 'UCD DiskIO',
+                'description' => 'UCD MIB',
             ],
             'vlans' => [
                 'description' => 'VLAN',
