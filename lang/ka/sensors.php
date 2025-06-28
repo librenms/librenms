@@ -111,7 +111,7 @@ return [
     'power_consumed' => [
         'short' => 'ხარჯვადი სიმძლავრე',
         'long' => 'ხარჯვადი სიმძლავრე',
-        'unit' => 'კვტ/სთ,
+        'unit' => 'კვტ/სთ',
         'unit_long' => 'კილოვატ-საათი',
     ],
     'power_factor' => [
