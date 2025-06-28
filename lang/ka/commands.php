@@ -269,7 +269,7 @@ return [
             'full-name' => 'მომხმარებლის სრული სახელი',
             'role' => 'დაუყენეთ მომხმარებელს სასურველი როლები :roles',
         ],
-        'password-request' => "შეიყვანეთ მომხმარებლის პაროლი",
+        'password-request' => 'შეიყვანეთ მომხმარებლის პაროლი',
         'success' => 'წარმატებით დაემატა მომხმარებელი: :username',
         'wrong-auth' => 'ფრთხილად! You will not be able to log in with this user because you are not using MySQL auth',
     ],
