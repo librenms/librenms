@@ -480,7 +480,7 @@ return [
         ],
         'auth_mechanism' => [
             'description' => 'ავტორიზაციის მეთოდი (ყურადღებით!)',
-            'help' => "ავტორიზაციის მეთოდი. ფრთხილად. შეიძლება, შესვლის შესაძლებლობა დაკარგოთ. ამის დაბრუნება mysql-ზე config.php-ში\$config['auth_mechanism'] = 'mysql'; დაყენებით შეგიძლიათ",
+            'help' => 'ავტორიზაციის მეთოდი. ფრთხილად. შეიძლება, შესვლის შესაძლებლობა დაკარგოთ. ამის დაბრუნება mysql-ზე config.php-ში\$config[\'auth_mechanism\'] = \'mysql\'; დაყენებით შეგიძლიათ',
             'options' => [
                 'mysql' => 'MySQL (ნაგულისხმევი)',
                 'active_directory' => 'Active Directory',
