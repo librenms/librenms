@@ -234,6 +234,7 @@ nav:
     - Macros: Alerting/Macros.md
     - Testing: Alerting/Testing.md
     - Device Dependencies: Alerting/Device-Dependencies.md
+    - Scheduled Maintenances: Alerting/Scheduled-Maintenances.md
 
   - API:
     - Using the API: API/index.md

@@ -1,5 +1,5 @@
 {
-    "Warning!": "Please don't edit this file -- make changes to the config database table or the configuration array in config.php",
+    "Warning!": "Please don't edit this file for the purpose of changing your local config -- make changes to the config database table or the configuration array in config.php",
     "config": {
         "active_directory.users_purge": {
             "default": 0,
@@ -7107,6 +7107,17 @@
             "section": "graph",
             "order": 0,
             "type": "integer"
+        },
+        "webui.scheduled_maintenance_default_behavior": {
+            "default": "1",
+            "type": "select",
+            "group": "webui",
+            "section": "scheduled-maintenance",
+            "options": {
+                "1": "Skip alerts",
+                "2": "Mute alert",
+                "3": "Run alerts"
+            }
         },
         "whois": {
             "default": "/usr/bin/whois",
