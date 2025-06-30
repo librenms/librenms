@@ -736,6 +736,9 @@ class Service:
         """
         Stop then recreate this entire process by re-calling the original script.
         Has the effect of reloading the python files from disk.
+
+        This should only ever be called from the main thread and never directly.
+        In all other cases, set `reload_flag` to `True`.
         """
         if sys.version_info < (3, 4, 0):
             logger.warning(
