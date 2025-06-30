@@ -904,7 +904,7 @@ NPT-SYSTEM-MIB	DEFINITIONS ::= BEGIN
 		DESCRIPTION	"Transceiver power information."
 		::=  {	nptTransceiverInformation  4  }
 
-	nptTrafnsceiverPowerTable	OBJECT-TYPE
+	nptTransceiverPowerTable	OBJECT-TYPE
 		SYNTAX		SEQUENCE  OF  NptTransceiverPowerEntry
 		MAX-ACCESS	not-accessible
 		STATUS		current
