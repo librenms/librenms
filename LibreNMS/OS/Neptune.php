@@ -37,22 +37,22 @@ class Neptune extends OS implements EntityPhysicalDiscovery, TransceiverDiscover
             'NPT-SYSTEM-MIB::nptTransceiverConfigurationTable',
             'NPT-SYSTEM-MIB::nptTransceiverStatusTable',
             'NPT-SYSTEM-MIB::nptTransceiverInventoryTable',
-            ])
+        ])
             ->mapTable(function ($entry, $index) {
                 return new Transceiver([
-                        'port_id' => \PortCache::getIdFromIfIndex($index),
-                        'index' => $index,
-                        'type' => $entry['NPT-SYSTEM-MIB::nptRate'],
-                        'entity_physical_index' => $index,
-                        'vendor' => $entry['NPT-SYSTEM-MIB::nptTransceiverInventoryVendor'],
-                        'model' => $entry['NPT-SYSTEM-MIB::nptActualTransceiverType'],
-                        'revision' => $entry['NPT-SYSTEM-MIB::nptHWRevision'],
-                        'serial' => $entry['NPT-SYSTEM-MIB::nptSerialNumber'],
-                        'cable' => $entry['NPT-SYSTEM-MIB::nptSupportedFiberType'],
-                        'distance' => $entry['NPT-SYSTEM-MIB::nptActualSupportedLinkLength'],
-                        'wavelength' => $entry['NPT-SYSTEM-MIB::nptActualTransmitedWavelength'],
-                        'connector' => $entry['NPT-SYSTEM-MIB::nptConnectorType'],
-                    ]);
+                    'port_id' => \PortCache::getIdFromIfIndex($index),
+                    'index' => $index,
+                    'type' => $entry['NPT-SYSTEM-MIB::nptRate'],
+                    'entity_physical_index' => $index,
+                    'vendor' => $entry['NPT-SYSTEM-MIB::nptTransceiverInventoryVendor'],
+                    'model' => $entry['NPT-SYSTEM-MIB::nptActualTransceiverType'],
+                    'revision' => $entry['NPT-SYSTEM-MIB::nptHWRevision'],
+                    'serial' => $entry['NPT-SYSTEM-MIB::nptSerialNumber'],
+                    'cable' => $entry['NPT-SYSTEM-MIB::nptSupportedFiberType'],
+                    'distance' => $entry['NPT-SYSTEM-MIB::nptActualSupportedLinkLength'],
+                    'wavelength' => $entry['NPT-SYSTEM-MIB::nptActualTransmitedWavelength'],
+                    'connector' => $entry['NPT-SYSTEM-MIB::nptConnectorType'],
+                ]);
             });
     }
 }
