@@ -7,7 +7,8 @@ use Illuminate\Support\Collection;
 interface PortVlanDiscovery
 {
     /**
-     * @return Collection<\App\Models\Vlan>
+     * @param  Collection<\App\Models\Vlan>  $vlans
+     * @return Collection<\App\Models\PortVlan>
      */
-    public function discoverPortVlanData(): Collection;
+    public function discoverPortVlanData(Collection $vlans): Collection;
 }

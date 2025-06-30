@@ -958,92 +958,83 @@ class Cisco extends OS implements
 
     public function discoverBasicVlanData(): Collection
     {
-        $ret = new Collection;
-
         $vtpversion = SnmpQuery::enumStrings()->get('CISCO-VTP-MIB::vtpVersion.0')->value();
-        if (in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
-            // FIXME - can have multiple VTP domains.
-            $vtpdomains = SnmpQuery::cache()->hideMib()->walk('CISCO-VTP-MIB::vlanManagementDomains')->table(1);
-            $vlans = SnmpQuery::cache()->hideMib()->walk('CISCO-VTP-MIB::vtpVlanName')->table(2);
-            $vlans = SnmpQuery::cache()->hideMib()->enumStrings()->walk('CISCO-VTP-MIB::vtpVlanType')->table(2, $vlans);
+        if (! in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
+            return new Collection;
+        }
 
-            foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
-                echo 'VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomain['managementDomainName'] . ' ';
-                foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan) {
-                    $ret->push(new Vlan([
-                        'vlan_vlan' => $vlan_id,
-                        'vlan_name' => $vlan['vtpVlanName'] ?? '',
-                        'vlan_domain' => $vtpdomain_id,
-                        'vlan_type' => $vlan['vtpVlanType'] ?? '',
+        $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
+        $current_domain = 0;
+
+        return SnmpQuery::enumStrings()->walk([
+            'CISCO-VTP-MIB::vtpVlanType',
+            'CISCO-VTP-MIB::vtpVlanName',
+        ])->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+            if ($current_domain != $vtpdomain_id) {
+                $current_domain = $vtpdomain_id;
+                Log::info('VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomains[$vtpdomain_id]);
+            }
+
+            return new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlan['CISCO-VTP-MIB::vtpVlanName'] ?? '',
+                'vlan_domain' => $vtpdomain_id,
+                'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
+            ]);
+        });
+    }
+
+    public function discoverPortVlanData(Collection $vlans): Collection
+    {
+        $ports = new Collection;
+
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+        $index2base = array_flip($dot1dBasePortIfIndex);
+
+        $native_vlans = SnmpQuery::abortOnFailure()->walk([
+            'CISCO-VTP-MIB::vlanTrunkPortNativeVlan',
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
+        ])->table(1);
+
+        foreach ($native_vlans as $ifIndex => $data) {
+            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? 0;
+            $vlan_id = (empty($vlan_id)) ? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] : $vlan_id;
+            $baseport = $index2base[$ifIndex] ?? 0; // ifIndex to baseport
+            $ports->push(new PortVlan([
+                'vlan' => $vlan_id,
+                'baseport' => $baseport,
+                'untagged' => 1,
+                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
+                // ifIndex from device
+
+            ]));
+        }
+
+        foreach ($vlans as $vlan) {
+            // Ignore reserved VLAN IDs
+            if ($vlan->vlan_vlan && ($vlan->vlan_vlan < 1002 || $vlan->vlan_vlan > 1005)) {
+                $context = 'vlan-' . $vlan->vlan_vlan; // get dot1dStpPortEntry within the vlan context
+                $tmp_vlan_data = SnmpQuery::context($context)->abortOnFailure()->walk([
+                    'BRIDGE-MIB::dot1dStpPortPriority',
+                    'BRIDGE-MIB::dot1dStpPortPathCost',
+                    'BRIDGE-MIB::dot1dBasePortIfIndex',
+                ])->table(1);
+
+                foreach ($tmp_vlan_data as $baseport => $data) {
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan->vlan_vlan,
+                        'baseport' => $baseport,
+                        'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
+                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? '',
+                        'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                        'untagged' => 0,
+                        'port_id' => PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0,
+                                $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }
         }
 
-        return $ret;
-    }
-
-    public function discoverPortVlanData(): Collection
-    {
-        $ret = new Collection;
-
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
-        $index2base = array_flip($dot1dBasePortIfIndex);
-
-        $native_vlans = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::vlanTrunkPortNativeVlan')->table(1);
-        $native_vlans = SnmpQuery::hideMib()->walk('CISCO-VLAN-MEMBERSHIP-MIB::vmVlan')->table(1, $native_vlans);
-
-        // Not sure why we check for VTP, but this data comes from that MIB, so...
-        $vtpversion = SnmpQuery::cache()->enumStrings()->get('CISCO-VTP-MIB::vtpVersion.0')->value();
-        if (in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
-            // FIXME - can have multiple VTP domains.
-            $vtpdomains = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::vlanManagementDomains')->table(1);
-            $vlans = SnmpQuery::cache()->hideMib()->walk('CISCO-VTP-MIB::vtpVlanName')->table(2);
-            $vlans = SnmpQuery::cache()->hideMib()->enumStrings()->walk('CISCO-VTP-MIB::vtpVlanType')->table(2, $vlans);
-
-            foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
-                echo 'VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomain['managementDomainName'] . ' ';
-                foreach ($vlans[$vtpdomain_id] as $vlan_id => $vlan) {
-                    if (is_numeric($vlan_id) && ($vlan_id < 1002 || $vlan_id > 1005)) {
-                        // Ignore reserved VLAN IDs
-                        // get dot1dStpPortEntry within the vlan context
-                        $context = 'vlan-' . $vlan_id;
-                        $tmp_vlan_data = SnmpQuery::context($context)->hideMib()->walk('BRIDGE-MIB::dot1dStpPortPriority')->table(1);
-                        $tmp_vlan_data = SnmpQuery::context($context)->hideMib()->walk('BRIDGE-MIB::dot1dStpPortState')->table(1, $tmp_vlan_data);
-                        $tmp_vlan_data = SnmpQuery::context($context)->hideMib()->walk('BRIDGE-MIB::dot1dStpPortPathCost')->table(1, $tmp_vlan_data);
-                        // may need to fetch additional dot1dBasePortIfIndex mappings
-                        $tmp_vlan_data = SnmpQuery::context($context)->hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1, $tmp_vlan_data);
-                        // flatten the array, use ifIndex instead of dot1dBasePortId
-                        foreach ($tmp_vlan_data as $baseport => $data) {
-                            $ret->push(new PortVlan([
-                                'vlan' => $vlan_id,
-                                'baseport' => $baseport,
-                                'priority' => $data['dot1dStpPortPriority'] ?? 0,
-                                'state' => $data['dot1dStpPortState'] ?? '',
-                                'cost' => $data['dot1dStpPortPathCost'] ?? 0,
-                                'untagged' => 0,
-                                'port_id' => PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
-                            ]));
-                        }
-                    }
-
-                    foreach ($native_vlans as $ifIndex => $data) {
-                        $vlan_id = $data['vmVlan'] ?? 0;
-                        $vlan_id = (empty($vlan_id)) ? $data['vlanTrunkPortNativeVlan'] : $vlan_id;
-                        $baseport = $index2base[$ifIndex] ?? 0; // ifIndex to baseport
-                        $ret->push(new PortVlan([
-                            'vlan' => $vlan_id,
-                            'baseport' => $baseport,
-                            'untagged' => 1,
-                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-
-                        ]));
-                    }
-                }
-            }
-        }
-
-        return $ret;
+        return $ports;
     }
 }

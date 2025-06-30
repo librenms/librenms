@@ -27,7 +27,6 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
-use App\Models\Device;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
@@ -40,42 +39,30 @@ class Aos6 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
 {
     public function discoverBasicVlanData(): Collection
     {
-        $ret = new Collection;
-
-        $vlans = SnmpQuery::cache()->mibDir('nokia')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')->table();
-        foreach ($vlans['vlanDescription'] ?? [] as $vlan_id => $vlan_name) {
-            $ret->push(new Vlan([
-                'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan_name,
-                'vlan_domain' => 1,
-                'vlan_type' => null,
-            ]));
-        }
-
-        return $ret;
+        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
+            ->mapTable(function ($vlans, $vlan_id) {
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
+                    'vlan_domain' => 1,
+                    'vlan_type' => null,
+                ]);
+            });
     }
 
-    public function discoverPortVlanData(): Collection
+    public function discoverPortVlanData(Collection $vlans): Collection
     {
-        $ret = new Collection;
-
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $index2base = array_flip($dot1dBasePortIfIndex);
 
-        $vlanstype = SnmpQuery::cache()->mibDir('nokia')->hideMib()->walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')->table();
-        foreach ($vlanstype['vpaType'] ?? [] as $vlan_id => $data) {
-            foreach ($data as $ifIndex => $porttype) {
-                $baseport = $index2base[$ifIndex] ?? 0;
-                $ret->push(new Portvlan([
-                    'vlan' => $vlan_id,
-                    'baseport' => $baseport,
-                    'untagged' => ($porttype == 1 ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
-                ]));
-            }
-        }
-
-        return $ret;
+        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
+            ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex) use ($index2base) {
+                new Portvlan([
+                    'vlan' => $vpaVlanNumber,
+                    'baseport' => $index2base[$vpaIfIndex] ?? 0,
+                    'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
+                    'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                ]);
+            });
     }
 }

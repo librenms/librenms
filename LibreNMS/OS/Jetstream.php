@@ -146,36 +146,31 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
 
     public function discoverBasicVlanData(): Collection
     {
-        $ret = new Collection;
-
-        $vlanConfigTable = SnmpQuery::cache()->hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
-        foreach ($vlanConfigTable as $vlan_id => $data) {
-            $ret->push(new Vlan([
-                'vlan_vlan' => $vlan_id,
-                'vlan_domain' => 1,
-                'vlan_name' => $data['dot1qVlanDescription'],
-            ]));
-        }
-
-        return $ret;
+        return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
+            ->mapTable(function ($data, $vlan_id) {
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_domain' => 1,
+                    'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
+                ]);
+            });
     }
 
-    public function discoverPortVlanData(): Collection
+    public function discoverPortVlanData(Collection $vlans): Collection
     {
         $ret = new Collection;
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $index2base = array_flip($dot1dBasePortIfIndex);
 
-        $vlanPortConfigTable = SnmpQuery::hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
+        $vlanPortConfigTable = SnmpQuery::walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
         foreach ($vlanPortConfigTable as $ifIndex => $data) {
-            $portConfig[$data['vlanPortNumber']] = $ifIndex;
+            $portConfig[$data['TPLINK-DOT1Q-VLAN-MIB::vlanPortNumber']] = $ifIndex;
         }
 
-        $vlanConfigTable = SnmpQuery::cache()->hideMib()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
+        $vlanConfigTable = SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
         foreach ($vlanConfigTable as $vlan_id => $data) {
-            $types = ['vlanTagPortMemberAdd' => 0, 'vlanUntagPortMemberAdd' => 1];
+            $types = ['TPLINK-DOT1Q-VLAN-MIB::vlanTagPortMemberAdd' => 0, 'TPLINK-DOT1Q-VLAN-MIB::vlanUntagPortMemberAdd' => 1];
             foreach ($types as $type => $tag) {
                 $expand = $this->jetstreamExpand($data[$type] ?? []);
                 foreach ($expand as $key => $port) {

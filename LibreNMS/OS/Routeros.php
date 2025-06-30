@@ -709,12 +709,11 @@ class Routeros extends OS implements
         return $ret;
     }
 
-    public function discoverPortVlanData(): Collection
+    public function discoverPortVlanData(Collection $vlans): Collection
     {
         $ret = new Collection;
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $index2base = array_flip($dot1dBasePortIfIndex);
 
         $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
@@ -722,8 +721,7 @@ class Routeros extends OS implements
 
         if (! empty($scriptIndex)) {
             $data = SnmpQuery::cache()->get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
-            $ifNames = array_flip($this->getCacheByIndex('ifName', 'IF-MIB'));
-            $oldId = 0;
+            $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
             foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
                 if (! empty($line)) {

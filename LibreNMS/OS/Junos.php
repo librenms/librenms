@@ -391,61 +391,70 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverBasicVlanData(): Collection
     {
-        $ret = new Collection;
-
-        $vlans = SnmpQuery::cache()->hideMib()->walk([
-            'JUNIPER-VLAN-MIB::jnxExVlanName', 'JUNIPER-VLAN-MIB::jnxExVlanTag',
-        ])->table(1);
-        $prefix = 'jnxEx';
-
-        if (empty($vlans)) {
-            $vlans = SnmpQuery::cache()->hideMib()->walk([
-                'JUNIPER-L2ALD-MIB::jnxL2aldVlanName', 'JUNIPER-L2ALD-MIB::jnxL2aldVlanTag',
-            ])->table(1);
-            $prefix = 'jnxL2ald';
-        }
-
-        foreach ($vlans as $key => $data) {
-            $ret->push(new Vlan([
-                'vlan_vlan' => $data[$prefix . 'VlanTag'],
+        $vlans = SnmpQuery::walk([
+            'JUNIPER-VLAN-MIB::jnxExVlanName',
+            'JUNIPER-VLAN-MIB::jnxExVlanTag',
+        ])->mapTable(function ($data) {
+            new Vlan([
+                'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
                 'vlan_domain' => 1,
-                'vlan_name' => $data[$prefix . 'VlanName'],
-            ]));
+                'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
+            ]);
+        });
+
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
         }
 
-        return $ret;
+        return SnmpQuery::walk([
+                'JUNIPER-L2ALD-MIB::jnxL2aldVlanName',
+                'JUNIPER-L2ALD-MIB::jnxL2aldVlanTag',
+            ])->mapTable(function ($data) {
+                return new Vlan([
+                    'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'],
+                    'vlan_domain' => 1,
+                    'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'],
+                ]);
+        });
     }
 
-    public function discoverPortVlanData(): Collection
+    public function discoverPortVlanData(Collection $vlans): Collection
     {
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $index2base = array_flip($dot1dBasePortIfIndex);
 
-        $ret = new Collection;
-        $tagness_by_vlan_index = [];
-        $vtpdomain_id = '1';
+        $jVlans = SnmpQuery::walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')
+            ->mapTable(function ($data, $jnxExVlanPortGroupIndex, $jnxExVlanPort) use ($index2base) {
+                new PortVlan([
+                    'vlan' => $vlan_id,
+                    'baseport' => $index2base[$jnxExVlanPort] ?? 0,
+                    'untagged' => $tag['tag'],
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                ])
+            });
 
-        $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanName')->table(1);
-
-        if (empty($vlans)) {
-            $vlans = SnmpQuery::cache()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanName')->table(1);
-            $vlan_tag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->valuesByIndex();
-            $untag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')->valuesByIndex();
-            $tmp_tag = 'jnxL2aldVlanTag';
-            $tmp_name = 'jnxL2aldVlanName';
-        } else {
-            $vlan_tag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanTag')->valuesByIndex();
-            $untag = SnmpQuery::numericIndex()->hideMib()->walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')->valuesByIndex();
-            $tmp_tag = 'jnxExVlanTag';
-            $tmp_name = 'jnxExVlanName';
+        foreach ($vlans as $vlan_index => $vlan) {
+            dd($vlan_tag);
+            $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
+            if (isset($tagness_by_vlan_index[$vlan_index])) {
+                foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
+                    $f_portType = $tag['tag'] ? 'access' : 'trunk';
+                    $ret->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $index2base[$ifIndex] ?? 0,
+                        'untagged' => $tag['tag'],
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
         }
 
+
+        $vlan_tag = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->table(1);
+        dd($untag, $vlan_tag);
+
         if (empty($untag)) {
-            // If $untag is empty, device is based on Junipers ELS software
-            $untag = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1);
-            $taganduntag = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1);
-            $vlan_tag = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->table(1);
+            dd($vlan_tag);
             $tmp_tag = 'jnxL2aldVlanTag';
             $tmp_name = 'jnxL2aldVlanName';
             $temp_vlan = [];
@@ -495,20 +504,6 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             }
         }
 
-        foreach ($vlans as $vlan_index => $vlan) {
-            $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
-            if (isset($tagness_by_vlan_index[$vlan_index])) {
-                foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
-                    $f_portType = $tag['tag'] ? 'access' : 'trunk';
-                    $ret->push(new PortVlan([
-                        'vlan' => $vlan_id,
-                        'baseport' => $index2base[$ifIndex] ?? 0,
-                        'untagged' => $tag['tag'],
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                    ]));
-                }
-            }
-        }
 
         return $ret;
     }

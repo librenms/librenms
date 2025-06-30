@@ -32,7 +32,6 @@ use App\Models\PortVlan;
 use App\Models\Vlan;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
@@ -40,6 +39,7 @@ use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Vlans implements Module
@@ -67,7 +67,7 @@ class Vlans implements Module
      */
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return false;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -75,58 +75,39 @@ class Vlans implements Module
      */
     public function discover(OS $os): void
     {
-        $basic = new Collection;
-        $ports = new Collection;
-
-        // basic vlans data
-        if ($os instanceof BasicVlanDiscovery) {
-            $basic = $os->discoverBasicVlanData();
-        }
-
-        $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData($os->getDevice()) : $basic;
-        $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData8021($os->getDevice()) : $basic;
+        // basic vlan data, try in order
+        $basic = $os instanceof BasicVlanDiscovery ? $os->discoverBasicVlanData() : new Collection;
+        $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData() : $basic;
+        $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData8021() : $basic;
 
         $basic = $basic->filter(function (Vlan $data) {
-            if (empty($data['vlan_vlan'])) {
-                return null;
-            }
-
-            return true;
+            return !empty($data->vlan_vlan);
         })->each(function (Vlan $data) {
-            // default VLAN name
-            $data['vlan_name'] = (empty($data['vlan_name'])) ? 'VLAN ' . $data['vlan_vlan'] : $data['vlan_name'];
-
-            return $data;
+            if (empty($data->vlan_name)) {
+                $data->vlan_name = 'VLAN ' . $data->vlan_vlan; // default VLAN name
+            }
         });
 
-        Log::info(PHP_EOL . 'Basic Vlan data:');
-        ModuleModelObserver::observe(\App\Models\Vlan::class);
-        $this->syncModels($os->getDevice(), 'vlans', $basic);
+        ModuleModelObserver::observe(Vlan::class, 'Basic VLAN data');
+        $vlans = $this->syncModels($os->getDevice(), 'vlans', $basic);
+        ModuleModelObserver::done();
 
-        // ports vlan data
-        if ($os instanceof PortVlanDiscovery) {
-            $ports = $os->discoverPortVlanData();
-        }
-
+        // ports vlan data, try in order
+        $ports = $os instanceof PortVlanDiscovery ? $os->discoverPortVlanData($vlans) : new Collection;
         $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData($os->getDevice()) : $ports;
         $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData8021($os->getDevice()) : $ports;
 
         $ports = $ports->filter(function (PortVlan $data) {
-            if (empty($data['port_id']) || empty($data['vlan'])) {
-                return null;
-            }
-
-            return true;
+            return !empty($data->vlan) && !empty($data->port_id);
         })->each(function (PortVlan $data) {
-            $data['priority'] = $data['priority'] ?? 0;
-            $data['state'] = $data['state'] ?? 'unknown';
-            $data['cost'] = $data['cost'] ?? 0;
-
-            return $data;
+            $data->priority ??= 0;
+            $data->state ??= 'unknown';
+            $data->cost ??= 0;
         });
-        Log::info(PHP_EOL . 'Ports Vlan data:');
-        ModuleModelObserver::observe(\App\Models\PortVlan::class);
+
+        ModuleModelObserver::observe(PortVlan::class, 'Ports VLAN data');
         $this->syncModels($os->getDevice(), 'portsVlan', $ports);
+        ModuleModelObserver::done();
     }
 
     /**
@@ -142,7 +123,7 @@ class Vlans implements Module
      */
     public function dataExists(Device $device): bool
     {
-        return $device->vlans()->exists();
+        return $device->vlans()->exists() || $device->portsVlan()->exists();
     }
 
     /**
@@ -150,7 +131,7 @@ class Vlans implements Module
      */
     public function cleanup(Device $device): int
     {
-        return $device->vlans()->delete();
+        return $device->vlans()->delete() + $device->portsVlan()->delete();
     }
 
     /**
@@ -167,63 +148,57 @@ class Vlans implements Module
         ];
     }
 
-    private function discoverBasicVlanData(Device $device): Collection
+    private function discoverBasicVlanData(): Collection
     {
-        $ret = new Collection;
-
-        $oids = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')->table(1);
-        foreach ($oids as $vlan_id => $data) {
-            $ret->push(new Vlan([
+        return SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
+            ->mapTable(function ($data, $vlan_id) {
+            return new Vlan([
                 'vlan_vlan' => $vlan_id,
                 'vlan_domain' => 1,
                 'vlan_name' => $data['dot1qVlanStaticName'] ?? '',
-            ]));
-        }
-
-        return $ret;
+            ]);
+        });
     }
 
-    private function discoverBasicVlanData8021(Device $device): Collection
+    private function discoverBasicVlanData8021(): Collection
     {
-        $ret = new Collection;
-
-        $oids = SnmpQuery::hideMib()->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')->table(2);
-        foreach ($oids as $vlan_domain_id => $vlan_domains) {
-            foreach ($vlan_domains as $vlan_id => $data) {
-                $ret->push(new Vlan([
+        return SnmpQuery::hideMib()->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
+            ->mapTable(function ($data, $vlan_domain_id, $vlan_id) {
+                return new Vlan([
                     'vlan_vlan' => $vlan_id,
                     'vlan_domain' => $vlan_domain_id,
                     'vlan_name' => $data['ieee8021QBridgeVlanStaticName'] ?? '',
-                ]));
-            }
-        }
-
-        return $ret;
+                ]);
+            });
     }
 
     private function discoverPortVlanData(Device $device): Collection
     {
-        $ret = new Collection;
+        $ports = new Collection;
 
         $vlanVersion = SnmpQuery::get('Q-BRIDGE-MIB::dot1qVlanVersionNumber.0')->value();
 
         if ($vlanVersion < 1 || $vlanVersion > 2) {
-            return $ret;
+            return $ports;
         }
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
 
         // fetch vlan data
-        $oids = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts')->table(2);
-        $oids = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts')->table(2, $oids);
-        if (empty($oids)) {
+        $port_data = SnmpQuery::hideMib()->walk([
+            'Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts',
+            'Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts',
+        ])->table(2);
+
+        if (empty($port_data)) {
             // fall back to static
-            $oids = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1, $oids);
-            $oids = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1, $oids);
+            $port_data = SnmpQuery::hideMib()->walk([
+                'Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts',
+                'Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts',
+            ])->table(1);
         } else {
             // collapse timefilter from dot1qVlanCurrentTable results to only the newest
-            $oids = array_reduce($oids, function ($result, $time_data) {
+            $port_data = array_reduce($port_data, function ($result, $time_data) {
                 foreach ($time_data as $vlan_id => $vlan_data) {
                     $result[$vlan_id] = isset($result[$vlan_id]) ? array_merge($result[$vlan_id], $vlan_data) : $vlan_data;
                 }
@@ -232,14 +207,14 @@ class Vlans implements Module
             }, []);
         }
 
-        foreach ($oids as $vlan_id => $vlan) {
+        foreach ($port_data as $vlan_id => $vlan) {
             //portmap for untagged ports
-            $untagged_ids = q_bridge_bits2indices($vlan['dot1qVlanCurrentUntaggedPorts'] ?? $vlan['dot1qVlanStaticUntaggedPorts'] ?? '');
+            $untagged_ids = StringHelpers::bitsToIndices($vlan['dot1qVlanCurrentUntaggedPorts'] ?? $vlan['dot1qVlanStaticUntaggedPorts'] ?? '');
             //portmap for members ports (might be tagged)
-            $egress_ids = q_bridge_bits2indices($vlan['dot1qVlanCurrentEgressPorts'] ?? $vlan['dot1qVlanStaticEgressPorts'] ?? '');
+            $egress_ids = StringHelpers::bitsToIndices($vlan['dot1qVlanCurrentEgressPorts'] ?? $vlan['dot1qVlanStaticEgressPorts'] ?? '');
 
             foreach ($egress_ids as $baseport) {
-                $ret->push(new PortVlan([
+                $ports->push(new PortVlan([
                     'vlan' => $vlan_id,
                     'baseport' => $baseport,
                     'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
@@ -248,33 +223,34 @@ class Vlans implements Module
             }
         }
 
-        return $ret->filter();
+        return $ports;
     }
 
     private function discoverPortVlanData8021(Device $device): Collection
     {
-        $ret = new Collection;
+        $ports = new Collection;
 
-        $oids = SnmpQuery::hideMib()->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts')->table(2);
-        $oids = SnmpQuery::hideMib()->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts')->table(2, $oids);
+        $port_data = SnmpQuery::hideMib()->walk([
+            'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts',
+            'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts',
+            ])->table(2);
 
-        if (empty($oids)) {
-            return $ret;
+        if (empty($port_data)) {
+            return $ports;
         }
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
 
-        foreach ($oids as $vlan_domain_id => $vlan_domains) {
+        foreach ($port_data as $vlan_domain_id => $vlan_domains) {
             foreach ($vlan_domains as $vlan_id => $data) {
                 //portmap for untagged ports
-                $untagged_ids = q_bridge_bits2indices($data['ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');
+                $untagged_ids = StringHelpers::bitsToIndices($data['ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');
 
                 //portmap for members ports (might be tagged)
-                $egress_ids = q_bridge_bits2indices($data['ieee8021QBridgeVlanStaticEgressPorts'] ?? '');
+                $egress_ids = StringHelpers::bitsToIndices($data['ieee8021QBridgeVlanStaticEgressPorts'] ?? '');
 
                 foreach ($egress_ids as $baseport) {
-                    $ret->push(new PortVlan([
+                    $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
@@ -284,6 +260,6 @@ class Vlans implements Module
             }
         }
 
-        return $ret;
+        return $ports;
     }
 }
