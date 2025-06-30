@@ -392,7 +392,7 @@ class ModuleTestHelper
                     $type = $this->getSnmprecType($raw_type);
 
                     if ($type === null) {
-                        Log::debug('Skipped line, bad type: '. $line);
+                        Log::debug('Skipped line, bad type: ' . $line);
                         continue;
                     }
 
