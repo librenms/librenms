@@ -33,6 +33,7 @@ use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
@@ -382,13 +383,18 @@ class ModuleTestHelper
                 if (empty($raw_data) || $raw_data == '""') {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
-                    [$raw_type, $data] = explode(':', $raw_data, 2);
+                    [$raw_type, $data] = array_pad(explode(':', $raw_data, 2), 2, '');
                     if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         [$raw_type, $data] = explode(':', ltrim($data), 2);
                     }
 
                     $type = $this->getSnmprecType($raw_type);
+
+                    if ($type === null) {
+                        Log::debug('Skipped line, bad type: '. $line);
+                        continue;
+                    }
 
                     $data = ltrim($data, ' ');
                     if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
@@ -426,28 +432,22 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function getSnmprecType($text)
+    private function getSnmprecType($text): ?string
     {
-        $snmpTypes = [
-            'STRING' => '4',
-            'OID' => '6',
+        return match ($text) {
+            'STRING', 'OCTET STRING', 'BITS', 'Network Address' => '4',
+            'OID', 'OBJECT IDENTIFIER' => '6',
             'Hex-STRING' => '4x',
             'Timeticks' => '67',
-            'INTEGER' => '2',
-            'OCTET STRING' => '4',
-            'BITS' => '4', // not sure if this is right
-            'Integer32' => '2',
+            'INTEGER', 'Integer32' => '2',
             'NULL' => '5',
-            'OBJECT IDENTIFIER' => '6',
             'IpAddress' => '64',
             'Counter32' => '65',
             'Gauge32' => '66',
             'Opaque' => '68',
             'Counter64' => '70',
-            'Network Address' => '4',
-        ];
-
-        return $snmpTypes[$text];
+            default => null
+        };
     }
 
     private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): string
