@@ -27,7 +27,7 @@
          'api*',
          'graph*',
          'push*',
-         'device/*/popup'
+         'device/*/popup',
      ],
 
      /*

@@ -150,6 +150,7 @@ class DeviceController extends TableController
     public function formatItem($device)
     {
         $status = $this->getStatus($device);
+
         return [
             'extra' => $this->getLabel($device),
             'status' => $status,

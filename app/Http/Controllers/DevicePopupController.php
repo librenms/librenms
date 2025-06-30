@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DevicePopupController.php
  *
@@ -38,7 +39,7 @@ class DevicePopupController
         }
 
         // Check access permissions
-        if (!$device->canAccess(auth()->user())) {
+        if (! $device->canAccess(auth()->user())) {
             return response('Unauthorized', 403);
         }
 
