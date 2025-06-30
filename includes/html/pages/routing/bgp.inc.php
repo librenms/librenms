@@ -10,6 +10,8 @@ use LibreNMS\Util\Url;
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
+    $where = '';
+    $extra_sql = '';
     $link_array = [
         'page' => 'routing',
         'protocol' => 'bgp',
@@ -230,7 +232,7 @@ if (! Auth::user()->hasGlobalRead()) {
     $peer_query = "SELECT * FROM `bgpPeers` AS `B`, `devices` AS `D` WHERE `B`.`device_id` = `D`.`device_id` $where $extra_sql ORDER BY `D`.`hostname`, `B`.`bgpPeerRemoteAs`, `B`.`bgpPeerIdentifier`";
     foreach (dbFetchRows($peer_query) as $peer) {
         unset($alert);
-
+        $peer['alert'] = 0;
         if ($peer['bgpPeerState'] == 'established') {
             $col = 'green';
         } else {
@@ -323,7 +325,7 @@ if (! Auth::user()->hasGlobalRead()) {
             <td width=30><b>&#187;</b></td>
             <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
-            <td width=50>" . $peer['afi'] . '</td>
+            <td width=50>" . $peer['afi'] ?? '' . '</td>
             <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
             <td>' . $peer['bgpPeerDescr'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
@@ -333,6 +335,7 @@ if (! Auth::user()->hasGlobalRead()) {
             <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . Number::formatSi($peer['bgpPeerOutUpdates'], 2, 0, '') . '</td></tr>';
 
         unset($invalid);
+
         switch ($vars['graph']) {
             case 'prefixes_ipv4unicast':
             case 'prefixes_ipv4multicast':
@@ -365,7 +368,7 @@ if (! Auth::user()->hasGlobalRead()) {
             $peer['graph'] = 1;
         }
 
-        if ($peer['graph']) {
+        if (isset($peer['graph']) && $peer['graph']) {
             $graph_array['height'] = '100';
             $graph_array['width'] = '218';
             $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
