@@ -251,6 +251,48 @@ class ModuleTestHelper
     {
         $os_list = [];
 
+        $all_modules = self::resolveModuleDependencies([
+            "applications",
+            "arp-table",
+            "availability",
+            "bgp-peers",
+            "cipsec-tunnels",
+            "cisco-mac-accounting",
+            "cisco-pw",
+            "discovery-protocols",
+            "entity-physical",
+            "fdb-table",
+            "hr-device",
+            "ipv4-addresses",
+            "ipv6-addresses",
+            "ipv6-nd",
+            "isis",
+            "loadbalancers",
+            "mempools",
+            "mpls",
+            "nac",
+            "os",
+            "ospf",
+            "ospfv3",
+            "ports",
+            "ports-stack",
+            "printer-supplies",
+            "processors",
+            "qos",
+            "route",
+            "sensors",
+            "slas",
+            "storage",
+            "stp",
+            "transceivers",
+            "ucd-diskio",
+            "vlans",
+            "vminfo",
+            "vrf",
+            "wireless",
+            "xdsl",
+        ]);
+
         foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
@@ -259,6 +301,7 @@ class ModuleTestHelper
                 continue;
             }
 
+            /*
             // calculate valid modules
             $decoded = json_decode(file_get_contents($file), true);
 
@@ -278,12 +321,13 @@ class ModuleTestHelper
             if (empty($valid_modules)) {
                 continue;  // no test data for selected modules
             }
+            */
 
             try {
                 $os_list[$base_name] = [
                     $os,
                     $variant,
-                    self::resolveModuleDependencies($valid_modules),
+                    $all_modules,
                 ];
             } catch (InvalidModuleException $e) {
                 throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
