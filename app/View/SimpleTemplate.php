@@ -156,6 +156,13 @@ class SimpleTemplate
      */
     private function parseArgumentValue(string $value): mixed
     {
+        $value = trim($value);
+
+        // Handle single-quoted strings by removing quotes directly since json decode doesn't work there
+        if (strlen($value) >= 2 && $value[0] === "'" && $value[strlen($value) - 1] === "'") {
+            return substr($value, 1, -1);
+        }
+
         $decoded = json_decode($value);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $decoded;

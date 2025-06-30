@@ -117,6 +117,24 @@ class SimpleTemplateTest extends TestCase
         $this->assertEquals('hello universe', (string) $template);
     }
 
+    public function testReplaceFilterWithSingleQuotes()
+    {
+        $template = new SimpleTemplate("{{ value|replace('\"anon\" ', '') }}", ['value' => 'john "anon" doe']);
+        $this->assertEquals('john doe', (string) $template);
+    }
+
+    public function testReplaceFilterReplacementWithSingleQuotes()
+    {
+        $template = new SimpleTemplate("{{ value|replace(\"ryan's\", 'hello') }}", ['value' => "ryan's world"]);
+        $this->assertEquals('hello world', (string) $template);
+    }
+
+    public function testReplaceFilterWithNoQuotes()
+    {
+        $template = new SimpleTemplate('{{ value|replace(world, universe) }}', ['value' => 'hello world']);
+        $this->assertEquals('hello universe', (string) $template);
+    }
+
     public function testSliceFilter()
     {
         $template = new SimpleTemplate('{{ value|slice(0, 5) }}', ['value' => 'Hello World']);
