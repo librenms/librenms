@@ -681,7 +681,7 @@ class Service:
 
         self._lm.unlock("schema-update", self.config.unique_name)
 
-        self.restart()
+        self.reload_flag = True
 
     def create_lock_manager(self):
         """
@@ -944,7 +944,7 @@ class Service:
                 ),
                 exc_info=True,
             )
-            self.restart()
+            self.reload_flag = True
         else:
             logger.info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
