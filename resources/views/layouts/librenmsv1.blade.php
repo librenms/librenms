@@ -53,7 +53,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
@@ -78,7 +77,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=19062025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=30062025') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
