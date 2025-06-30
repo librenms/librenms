@@ -134,7 +134,7 @@ class Ipv4Addresses implements Module
                 } else {
                     $network = Ipv4Network::firstOrCreate([
                         'ipv4_network' => $netaddr,
-                        'context_name' => $ip->context_name,
+                        'context_name' => '',
                     ]);
 
                     $data->ipv4_network_id = $network->ipv4_network_id;
