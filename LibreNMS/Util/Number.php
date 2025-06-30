@@ -149,7 +149,7 @@ class Number
     {
         $input = strtolower(trim($input));
 
-        if (!preg_match('/^([-+]?[0-9]*\.?[0-9]+)\s*([a-zµ]{1,3})$/', $input, $matches)) {
+        if (! preg_match('/^([-+]?[0-9]*\.?[0-9]+)\s*([a-zµ]{1,3})$/', $input, $matches)) {
             throw new InvalidArgumentException("Invalid format: '$input'");
         }
 
@@ -158,33 +158,32 @@ class Number
         $prefix = substr($unitSuffix, 0, -1);
 
         $multiplier = match ($prefix) {
-            'y'  => 1e-24,
-            'z'  => 1e-21,
-            'a'  => 1e-18,
-            'f'  => 1e-15,
-            'p'  => 1e-12,
-            'n'  => 1e-9,
+            'y' => 1e-24,
+            'z' => 1e-21,
+            'a' => 1e-18,
+            'f' => 1e-15,
+            'p' => 1e-12,
+            'n' => 1e-9,
             'µ', 'u' => 1e-6,
-            'm'  => 1e-3,
-            'c'  => 1e-2,
-            'd'  => 1e-1,
+            'm' => 1e-3,
+            'c' => 1e-2,
+            'd' => 1e-1,
             '' => 1,
             'da' => 1e1,
-            'h'  => 1e2,
-            'k'  => 1e3,
-            'M'  => 1e6,
-            'G'  => 1e9,
-            'T'  => 1e12,
-            'P'  => 1e15,
-            'E'  => 1e18,
-            'Z'  => 1e21,
-            'Y'  => 1e24,
+            'h' => 1e2,
+            'k' => 1e3,
+            'M' => 1e6,
+            'G' => 1e9,
+            'T' => 1e12,
+            'P' => 1e15,
+            'E' => 1e18,
+            'Z' => 1e21,
+            'Y' => 1e24,
             default => throw new InvalidArgumentException("Unknown prefix '$unitSuffix'"),
         };
 
         return $value * $multiplier;
     }
-
 
     /**
      * Cast string to int or float.
