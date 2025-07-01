@@ -68,7 +68,7 @@ class Python extends BaseValidation
             return $pythonPath;
         }
 
-        return trim(shell_exec('which python3'));
+        return LibrenmsConfig::locateBinary('python3');
     }
 
     private function getPipPath(): string
@@ -78,7 +78,7 @@ class Python extends BaseValidation
             return $pipPath;
         }
 
-        return trim(shell_exec('which pip3'));
+        return LibrenmsConfig::locateBinary('pip3');
     }
 
     private function checkVersion(Validator $validator, $version)
