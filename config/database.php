@@ -10,20 +10,6 @@
 
 use Illuminate\Support\Str;
 
-$sentinelHosts = array_map(function ($entry) {
-    [$host, $port] = explode(':', $entry, 2);
-
-    $username = env('REDIS_USERNAME', '');
-    $password = env('REDIS_PASSWORD', '');
-
-    $query = http_build_query(array_filter([
-        'username' => $username ?: null,
-        'password' => $password ?: null,
-    ]));
-
-    return 'tcp://' . trim($host) . ':' . (int) $port . ($query ? '?' . $query : '');
-}, array_filter(explode(',', env('REDIS_SENTINEL', ''))));
-
 return [
     'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
 
@@ -162,28 +148,29 @@ return [
             'database' => env('REDIS_CACHE_DB', '1'),
         ],
 
-        'sentinel_session' => array_merge($sentinelHosts, [
+        'sentinel_session' => [
+            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
-                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
-                'parameters' => [
-                    'password' => env('REDIS_PASSWORD'),
-                    'sentinel_password' => env('REDIS_SENTINEL_PASSWORD'),
+                'service'     => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters'  => [
+                    'password' => env('REDIS_PASSWORD', ''),
                     'database' => env('REDIS_SESSION_DB', '0'),
                 ],
             ],
-        ]),
+        ],
 
-        'sentinel_cache' => array_merge($sentinelHosts, [
+        'sentinel_cache' => [
+            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
-                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
-                'parameters' => [
-                    'password' => env('REDIS_SENTINEL_PASSWORD'),
+                'service'     => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters'  => [
+                    'password' => env('REDIS_PASSWORD', ''),
                     'database' => env('REDIS_CACHE_DB', '1'),
                 ],
             ],
-        ]),
+        ],
 
     ],
 
