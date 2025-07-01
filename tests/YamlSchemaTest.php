@@ -29,6 +29,7 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
+use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -117,10 +118,9 @@ class YamlSchemaTest extends TestCase
                 $schema,
                 Constraint::CHECK_MODE_TYPE_CAST | Constraint::CHECK_MODE_VALIDATE_SCHEMA | Constraint::CHECK_MODE_EXCEPTIONS
             );
-        } catch (JsonDecodingException $e) {
+        } catch (JsonDecodingException|ValidationException $e) {
             // Output the filename so we know what file failed
-            echo "Json format invalid in $schema_file\n";
-            throw $e;
+            $this->fail("$filename failed to validate against $schema_file\n" . $e->getMessage());
         }
 
         $errors = collect($validator->getErrors())
