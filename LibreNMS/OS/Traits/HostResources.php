@@ -259,7 +259,7 @@ trait HostResources
     protected function memValid($storage): bool
     {
         if (! isset($storage['hrStorageIndex'])) {
-            Log::debug("hrStorage invalid: missing hrStorageIndex");
+            Log::debug('hrStorage invalid: missing hrStorageIndex');
 
             return false;
         }

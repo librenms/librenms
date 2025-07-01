@@ -25,7 +25,6 @@ return new class extends Migration
         Schema::table('hrDevice', function (Blueprint $table) {
             $table->string('hrDeviceDescr')->change();
             $table->integer('hrDeviceErrors')->change();
-
         });
     }
 };
