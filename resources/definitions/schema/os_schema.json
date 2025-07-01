@@ -50,7 +50,7 @@
                     {"required": ["sysObjectID"]},
                     {"required": ["sysObjectID_regex"]},
                     {"required": ["sysDescr"]},
-                    {"required": ["sysDescr_regex"]},
+                    {"required": ["sysDescr_regex"]}
                 ]
             }
         },
