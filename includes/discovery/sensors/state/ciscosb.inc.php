@@ -27,7 +27,7 @@ $temp = SnmpQuery::hideMib()->walk('CISCOSB-rlInterfaces::swIfOperSuspendedStatu
 
 $cur_oid = '.1.3.6.1.4.1.9.6.1.101.43.1.1.24.';
 
-if (is_array($temp)) {
+if (! empty($temp)) {
     //Create State Index
     $state_name = 'swIfOperSuspendedStatus';
     $states = [
