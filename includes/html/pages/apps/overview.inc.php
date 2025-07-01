@@ -10,7 +10,6 @@ $graph_array_zoom = $graph_array;
 $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width'] = '400';
 $graph_array['legend'] = 'no';
-$width_div ??= 0;
 
 $index = 0;
 foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE)->groupBy('app_type') as $type => $groupedApps) {
@@ -47,7 +46,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $overlib_link .= \LibreNMS\Util\Url::graphTag($graph_array);
         $overlib_content = generate_overlib_content($graph_array, htmlentities($app->device?->shortDisplayName() ?? '') . ' - ' . htmlentities($app->displayName()) . $content_add);
 
-        echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-width: " . $width_div . 'px; max-width:' . $width_div . "px; min-height:165px; max-height:165px;
+        echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-height:165px; max-height:165px;
                       text-align: center; float: left;'>";
         echo \LibreNMS\Util\Url::overlibLink($overlib_url, $overlib_link, $overlib_content);
         echo '</div>';
