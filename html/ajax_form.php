@@ -85,7 +85,7 @@ $ajax_form = match ($_POST['type'] ?? '') {
     default => null,
 };
 
-if (!$ajax_form || !file_exists($ajax_form)) {
+if (! $ajax_form || ! file_exists($ajax_form)) {
     http_response_code(400);
     exit('Invalid form type');
 }
