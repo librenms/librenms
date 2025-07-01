@@ -258,6 +258,12 @@ trait HostResources
 
     protected function memValid($storage): bool
     {
+        if (! isset($storage['hrStorageIndex'])) {
+            Log::debug('hrStorage invalid: missing hrStorageIndex');
+
+            return false;
+        }
+
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
             Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: empty hrStorageType or hrStorageDescr");
 
