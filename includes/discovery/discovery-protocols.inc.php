@@ -365,7 +365,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
             d_echo($lldp_instance);
 
-            if (!is_array($lldp_instance)) {
+            if (! is_array($lldp_instance)) {
                 continue;
             }
 

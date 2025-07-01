@@ -33,7 +33,7 @@ foreach ($bgpPeersCache as $key => $value) {
     $protocol = $oid[0];
 
     // We have test-data that looks like 'fbBgpPeerEntry.14.ipv4."90.155.53.63"', filter away when protocol doesn't start with "ipv"
-    if (! str_starts_with($protocol, "ipv")) {
+    if (! str_starts_with($protocol, 'ipv')) {
         continue;
     }
     $address = str_replace($protocol . '.', '', $key);
