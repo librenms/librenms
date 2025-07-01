@@ -27,29 +27,15 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
 use SnmpQuery;
 
-class IbmImm extends \LibreNMS\OS implements OSDiscovery, OSPolling
+class IbmImm extends \LibreNMS\OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
 
-        $this->customSysName($device);
-
         $device->features = implode(' ', SnmpQuery::walk('IMM-MIB::immVpdType')->pluck());
-    }
-
-    public function pollOS(DataStorageInterface $datastore): void
-    {
-        $this->customSysName($this->getDevice());
-    }
-
-    private function customSysName(Device $device): void
-    {
-        $device->sysName = SnmpQuery::get('IMM-MIB::spTxtId.0')->value() ?: $device->sysName;
     }
 }

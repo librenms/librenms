@@ -3,6 +3,7 @@ modules:
         serial: IMM-MIB::machineLevelSerialNumber.0
         hardware: IMM-MIB::machineLevelProductName.0
         version: IMM-MIB::immVpdVersionString.1
+        sysname: IMM-MIB::spTxtId.0
     sensors:
         percent:
             data:
