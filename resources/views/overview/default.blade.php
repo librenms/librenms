@@ -513,7 +513,7 @@
 
                 @if (
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
-                        ($dashboard->access == 0 || $dashboard->access == 3)
+                        ($dashboard->access == 0 || $dashboard->access >= 2)
                     )
                         '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
                 @endif
