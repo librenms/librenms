@@ -146,13 +146,6 @@ class Ipv4Addresses implements Module
 
         ModuleModelObserver::observe(Ipv4Address::class);
         $this->syncModels($os->getDevice(), 'ipv4', $ips);
-
-        // Delete any IPv4 networks that are no longer needed
-        $oldNetworks = Ipv4Network::withCount('ipv4')->having('ipv4_count', 0)->pluck('ipv4_network_id');
-        if ($oldNetworks->count() > 0) {
-            Log::debug('Deleting ' . $oldNetworks->count() . ' old networks');
-            Ipv4Network::whereIn('ipv4_network_id', $oldNetworks)->delete();
-        }
     }
 
     /**

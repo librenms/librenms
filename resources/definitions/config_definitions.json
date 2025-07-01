@@ -5184,6 +5184,13 @@
             "section": "autodiscovery",
             "order": 1
         },
+        "networks_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 10,
+            "default": false,
+            "type": "boolean"
+        },
         "network_map_dependencymap_vis_options": {
             "default": null,
             "type": "text"
