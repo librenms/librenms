@@ -198,6 +198,13 @@ class YamlDiscovery
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
             }
+
+            // try simple replacement first
+            if (isset($def['oid']) && isset($pre_cache[$def['oid']][$index]) && is_array($pre_cache[$def['oid']][$index])) {
+                $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
+            }
+
+//            if($pre_cache) dd($pre_cache, $def);
             $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
 
             // search discovery data for values

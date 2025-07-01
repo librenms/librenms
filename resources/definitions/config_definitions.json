@@ -394,6 +394,30 @@
             "default": 604800,
             "type": "integer"
         },
+        "apps.oslv_monitor.linux_pg_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.misc_linux_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_size": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_activity": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.workingset_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.thp_activity": {
+            "default": true,
+            "type": "boolean"
+        },
         "apps.sneck.polling_time_diff": {
             "default": false,
             "type": "boolean"
@@ -4670,6 +4694,163 @@
             "type": "array",
             "default": [
             ]
+        },
+        "kafka.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 0
+        },
+        "kafka.groups-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "int"
+             },
+            "order": 1
+        },
+        "kafka.measurement-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             },
+            "order": 2
+        },
+        "kafka.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 3
+        },
+        "kafka.security.debug": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 4
+        },
+        "kafka.broker.list": {
+            "default": "127.0.2.2:9092",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 5
+        },
+        "kafka.idempotence": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 6
+        },
+        "kafka.topic": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 7
+        },
+        "kafka.ssl.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 8
+        },
+        "kafka.ssl.protocol": {
+            "default": "ssl",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 9
+        },
+        "kafka.ssl.ca.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 10
+        },
+        "kafka.ssl.certificate.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 11
+        },
+        "kafka.ssl.key.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 12
+        },
+        "kafka.ssl.key.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 13
+        },
+        "kafka.ssl.keystore.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 14
+        },
+        "kafka.ssl.keystore.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 15
+        },
+        "kafka.flush.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 16
+        },
+        "kafka.buffer.max.message": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 17
+        },
+        "kafka.batch.max.message": {
+            "default": 100,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 18
+        },
+        "kafka.linger.ms": {
+            "default": 50,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 19
+        },
+        "kafka.request.required.acks": {
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "Dont wait for ack",
+                "all": "Wait for ack from all replicas"
+            },
+            "group": "poller",
+            "section": "kafka",
+            "order": 20
         },
         "influxdbv2.timeout": {
             "default": 1,

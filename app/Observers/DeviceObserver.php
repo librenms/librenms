@@ -116,7 +116,6 @@ class DeviceObserver
         $device->ipv4()->delete();
         $device->ipv6()->delete();
         $device->isisAdjacencies()->delete();
-        $device->isisAdjacencies()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();
         $device->mempools()->delete();

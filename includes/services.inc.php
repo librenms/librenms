@@ -260,7 +260,7 @@ function check_service($command)
     // Loop through the perf string extracting our metric data
     foreach ($perf_arr as $string) {
         // Separate the DS and value: DS=value
-        [$ds,$values] = explode('=', trim($string));
+        [$ds,$values] = array_pad(explode('=', trim($string)), 2, '');
 
         // Keep the first value, discard the others.
         $value = $values ? explode(';', trim($values)) : [];

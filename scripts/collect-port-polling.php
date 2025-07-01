@@ -17,6 +17,7 @@ LibrenmsConfig::set('rrd.enable', false);
 LibrenmsConfig::set('influxdb.enable', false);
 LibrenmsConfig::set('influxdbv2.enable', false);
 LibrenmsConfig::set('nographite', true);
+LibrenmsConfig::set('kafka.enable', false);
 
 function print_help()
 {

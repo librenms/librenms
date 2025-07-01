@@ -50,6 +50,7 @@ class DevicePoll extends LnmsCommand
             LibrenmsConfig::set('influxdbv2.enable', false);
             LibrenmsConfig::set('prometheus.enable', false);
             LibrenmsConfig::set('graphite.enable', false);
+            LibrenmsConfig::set('kafka.enable', false);
         }
 
         try {

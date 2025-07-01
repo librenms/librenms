@@ -41,6 +41,7 @@ class DatastoreTest extends TestCase
             'graphite',
             'influxdb',
             'influxdbv2',
+            'kafka',
             'opentsdb',
             'prometheus',
             'rrd',
@@ -64,6 +65,7 @@ class DatastoreTest extends TestCase
         LibrenmsConfig::set('influxdbv2.enable', true);
         LibrenmsConfig::set('opentsdb.enable', true);
         LibrenmsConfig::set('prometheus.enable', true);
+        LibrenmsConfig::set('kafka.enable', false);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();

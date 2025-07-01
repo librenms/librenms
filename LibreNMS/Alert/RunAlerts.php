@@ -605,6 +605,7 @@ class RunAlerts
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
+                'transport_name' => 'Default Mail',
             ];
         }
 
