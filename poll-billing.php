@@ -105,7 +105,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         //For debugging
         logfile("\n****$now: " . $bill->bill_name . "\nDB SNMP counters received.");
         logfile('in_measurement: ' . $port_data['in_measurement'] . '  out_measurement: ' . $port_data['out_measurement'] . "\nThe data types are. in_measurement:" . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']));
-        logfile('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . $port_data['last_in_delta'] . ' last_OUT_delta: ' . $port_data['last_out_delta']);
+        logfile('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . ($port_data['last_in_delta'] ?? '') . ' last_OUT_delta: ' . ($port_data['last_out_delta'] ?? ''));
 
         if (is_numeric($port_data['in_measurement']) && is_numeric($port_data['out_measurement'])) {
             echo "Nice, valid counters 'in/out_measurement', lets use them\n";
