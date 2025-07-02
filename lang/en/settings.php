@@ -102,6 +102,7 @@ return [
             'general' => ['name' => 'General Web UI Settings'],
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
+            'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
         ],
     ],
     'settings' => [
@@ -205,6 +206,8 @@ return [
                     '1' => 'Skip alerts',
                     '2' => 'Mute alerts',
                     '3' => 'Run alerts',
+                ],
+            ],
             'syscontact' => [
                 'description' => 'Issue alerts to sysContact (deprecated)',
                 'help' => 'Deprecated, use the mail alert transport instead.',
@@ -2236,6 +2239,10 @@ return [
             'help' => 'Enables the mouseover graphs in the web interface',
         ],
         'webui' => [
+            'scheduled_maintenance_default_behavior' => [
+                'description' => 'Default Behaviour',
+                'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
                 'help' => 'Input desired tile width in pixels for box size in full view',
