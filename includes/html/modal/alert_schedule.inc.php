@@ -12,7 +12,27 @@
  * the source code distribution for details.
  */
 
+ use App\Facades\LibrenmsConfig;
+ use LibreNMS\Enum\MaintenanceAlertBehavior;
+
 if (\Auth::user()->hasGlobalAdmin()) {
+    $default_behavior = LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
+    $asb__skip = MaintenanceAlertBehavior::SKIP->value;
+    $asb__skip__selected = ($default_behavior == $asb__skip)
+        ? ' selected="selected"'
+        : '';
+
+    $asb__mute = MaintenanceAlertBehavior::MUTE->value;
+    $asb__mute__selected = ($default_behavior == $asb__mute)
+        ? ' selected="selected"'
+        : '';
+
+    $asb__run = MaintenanceAlertBehavior::RUN->value;
+    $asb__run__selected = ($default_behavior == $asb__run)
+        ? ' selected="selected"'
+        : '';
+
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -109,6 +129,22 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for='behavior' class='col-sm-4 control-label'>Behavior <exp>*</exp> </label>
+                        <div class="col-sm-8">
+                            <select id="behavior" name="behavior" class="form-control">
+                                <option value='<?= $asb__skip; ?>' <?= $asb__skip__selected ?>>
+                                    <?= __('maintenance.behavior.options.skip_alerts') ?>
+                                </option>
+                                <option value='<?= $asb__mute; ?>' <?= $asb__mute__selected ?>>
+                                    <?= __('maintenance.behavior.options.mute_alerts') ?>
+                                </option>
+                                <option value='<?= $asb__run; ?>' <?= $asb__run__selected ?>>
+                                    <?= __('maintenance.behavior.options.run_alerts') ?>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
                          <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
@@ -176,6 +212,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
 
                 $('#title').val(output['title']);
                 $('#notes').val(output['notes']);
+                $('#behavior').find('option[value="'+output['behavior']+'"]').prop('selected', true);
                 if (output['recurring'] == 0){
                     var start = $('#start').data("DateTimePicker");
                     if (output['start']) {

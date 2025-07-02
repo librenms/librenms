@@ -6,7 +6,7 @@
         @if($parent_id)
             <a href="{{ route('device', $parent_id) }}" title="{{ __('VM Host') }}"><i class="fa fa-server fa-fw fa-lg"></i></a>
         @endif
-        @if($device->isUnderMaintenance())
+        @if($device->isUnderMaintenance($maintenance_any_behaviour))
             <span title="{{ __('Scheduled Maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
         @endif
         <span style="font-size: 20px;"><x-device-link :device="$device" /></span><br/>

@@ -109,7 +109,7 @@
                                 host_up_count++;
                             }
                         } else if (device['maintenance']) {
-                            state = 'alert-disabled';
+                            state = 'maintenance';
                             fullclass = 'label-default';
                             compactclass = 'availability-map-oldview-box-ignored';
                             host_maintenance_count++;
