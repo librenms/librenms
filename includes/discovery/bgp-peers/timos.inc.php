@@ -95,7 +95,7 @@ if ($device['os'] == 'timos') {
     }
 
     // clean up peers
-    if (! is_null($seenPeerID)) {
+    if (isset($seenPeerID) && ! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }
