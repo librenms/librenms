@@ -1,5 +1,7 @@
 mib: DANTHERM-COOLING-MIB
 modules:
+    os:
+        sysname: DANTHERM-COOLING-MIB::hostName.0
     sensors:
         temperature:
             data:
