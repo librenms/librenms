@@ -22,6 +22,7 @@ return [
             'general' => ['name' => 'General Alert Settings'],
             'email' => ['name' => 'Email Options'],
             'rules' => ['name' => 'Alert Rule Default Settings'],
+            'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
@@ -198,6 +199,13 @@ return [
                 'description' => 'Issue alerts to read only users (deprecated)',
                 'help' => 'Deprecated, use the mail alert transport instead.',
             ],
+            'scheduled_maintenance_default_behavior' => [
+                'description' => 'Default behavior for scheduled maintenance',
+                'help' => 'Default behavior for scheduled maintenance',
+                'options' => [
+                    '1' => 'Skip alerts',
+                    '2' => 'Mute alerts',
+                    '3' => 'Run alerts',
             'syscontact' => [
                 'description' => 'Issue alerts to sysContact (deprecated)',
                 'help' => 'Deprecated, use the mail alert transport instead.',
