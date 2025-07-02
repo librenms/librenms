@@ -15,7 +15,7 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
@@ -117,7 +117,7 @@ if ($sub_type == 'new-maintenance') {
 
     if (empty($_POST['behavior'])) {
         $message .= 'Missing behavior<br />';
-    } elseif (! MaintenanceAlertBehavior::is_valid_option($behavior)) {
+    } elseif (MaintenanceBehavior::tryFrom((int) $behavior) === null) {
         $message .= 'Invalid behavior<br />';
     }
 

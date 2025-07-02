@@ -24,33 +24,9 @@
 
 namespace LibreNMS\Enum;
 
-enum MaintenanceAlertBehavior: int
+enum MaintenanceBehavior: int
 {
-    case ANY = 0;
-    case SKIP = 1;
-    case MUTE = 2;
-    case RUN = 3;
-
-    public static function is_valid_option($value)
-    {
-        $valid_options = [
-            self::SKIP->value,
-            self::MUTE->value,
-            self::RUN->value,
-        ];
-
-        return in_array((int) $value, $valid_options);
-    }
-
-    public static function get_value_or_fallback($value, $fallback)
-    {
-        // the fallback value needs to be validated first to avoid config nonsense
-        $valid_fallback = self::is_valid_option($fallback)
-            ? $fallback
-            : self::SKIP->value;
-
-        return self::is_valid_option($value)
-            ? (int) $value
-            : (int) $valid_fallback;
-    }
+    case SKIP_ALERTS = 1;
+    case MUTE_ALERTS = 2;
+    case RUN_ALERTS = 3;
 }

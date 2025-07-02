@@ -29,7 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 class AlertScheduleController extends TableController
 {
@@ -67,26 +67,17 @@ class AlertScheduleController extends TableController
      */
     public function formatItem($schedule)
     {
-        $behavior_lang_keypart = '';
-
-        if ($schedule->behavior == MaintenanceAlertBehavior::SKIP->value) {
-            $behavior_lang_keypart = 'skip_alerts';
-        } elseif ($schedule->behavior == MaintenanceAlertBehavior::MUTE->value) {
-            $behavior_lang_keypart = 'mute_alerts';
-        } elseif ($schedule->behavior == MaintenanceAlertBehavior::RUN->value) {
-            $behavior_lang_keypart = 'run_alerts';
-        }
-
-        if (! empty($behavior_lang_keypart)) {
-            $behavior_str = __('maintenance.behavior.options.' . $behavior_lang_keypart);
-        } else {
-            $behavior_str = '';
-        }
+        $behavior = match($schedule->behavior) {
+            MaintenanceBehavior::SKIP_ALERTS => __('maintenance.behavior.options.skip_alerts'),
+            MaintenanceBehavior::MUTE_ALERTS => __('maintenance.behavior.options.mute_alerts'),
+            MaintenanceBehavior::RUN_ALERTS => __('maintenance.behavior.options.run_alerts'),
+            default => 'Error: Unknown behavior',
+        };
 
         return [
             'title' => htmlentities($schedule->title),
             'notes' => htmlentities($schedule->notes),
-            'behavior' => $behavior_str,
+            'behavior' => $behavior,
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),
             'end' => $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes'),

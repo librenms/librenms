@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Device;
-use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
@@ -292,12 +290,12 @@ if (\App\Facades\LibrenmsConfig::get('distributed_poller') === true) {
         <button type="button"
                 id="maintenance"
                 data-device_id="<?php echo $device['device_id']; ?>"
-                <?= AlertUtil::isMaintenance($device['device_id'], MaintenanceAlertBehavior::ANY->value)
+                <?= DeviceCache::get($device['device_id'])->isUnderMaintenance()
                   ? 'disabled class="btn btn-warning"'
                   : 'class="btn btn-success"'
                 ?>
                 name="maintenance">
-          <?= AlertUtil::isMaintenance($device['device_id'], MaintenanceAlertBehavior::ANY->value)
+          <?= DeviceCache::get($device['device_id'])->isUnderMaintenance()
             ? '<i class="fa fa-wrench"></i> Device already in Maintenance'
             : '<i class="fa fa-wrench"></i> Maintenance Mode';
           ?>

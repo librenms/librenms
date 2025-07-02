@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 return new class extends Migration
 {
@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('alert_schedule', function (Blueprint $table) {
             $table->integer('behavior')->default(
-                MaintenanceAlertBehavior::SKIP->value
+                MaintenanceBehavior::SKIP_ALERTS->value
             );
         });
     }

@@ -25,8 +25,7 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
@@ -57,17 +56,17 @@ foreach ($hour_steps as $hour) {
 
 $default_behavior = LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
 
-$asb__skip = MaintenanceAlertBehavior::SKIP->value;
+$asb__skip = MaintenanceBehavior::SKIP->value;
 $asb__skip__selected = ($default_behavior == $asb__skip)
     ? ' selected="selected"'
     : '';
 
-$asb__no_at = MaintenanceAlertBehavior::MUTE->value;
+$asb__no_at = MaintenanceBehavior::MUTE->value;
 $asb__no_at__selected = ($default_behavior == $asb__no_at)
     ? ' selected="selected"'
     : '';
 
-$asb__info = MaintenanceAlertBehavior::RUN->value;
+$asb__info = MaintenanceBehavior::RUN->value;
 $asb__info__selected = ($default_behavior == $asb__info)
     ? ' selected="selected"'
     : '';
@@ -122,7 +121,7 @@ $asb__info__selected = ($default_behavior == $asb__info)
                              type="button"
                              id="maintenance-submit"
                              data-device_id="<?php echo $device['device_id']; ?>"
-                             <?php echo AlertUtil::isMaintenance($device['device_id'], MaintenanceAlertBehavior::ANY->value)
+                             <?php echo DeviceCache::get($device['device_id'])->isUnderMaintenance()
                                     ? 'disabled class="btn btn-warning"'
                                     : 'class="btn btn-success"'
                              ?>

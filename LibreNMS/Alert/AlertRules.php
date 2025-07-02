@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use PDO;
 use PDOException;
@@ -48,7 +48,7 @@ class AlertRules
     public function runRules($device_id)
     {
         //Check to see if under maintenance
-        if (AlertUtil::isMaintenance($device_id, MaintenanceAlertBehavior::SKIP->value) > 0) {
+        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SKIP_ALERTS) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;

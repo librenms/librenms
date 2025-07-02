@@ -12,27 +12,11 @@
  * the source code distribution for details.
  */
 
- use App\Facades\LibrenmsConfig;
- use LibreNMS\Enum\MaintenanceAlertBehavior;
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 if (\Auth::user()->hasGlobalAdmin()) {
-    $default_behavior = LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
-
-    $asb__skip = MaintenanceAlertBehavior::SKIP->value;
-    $asb__skip__selected = ($default_behavior == $asb__skip)
-        ? ' selected="selected"'
-        : '';
-
-    $asb__mute = MaintenanceAlertBehavior::MUTE->value;
-    $asb__mute__selected = ($default_behavior == $asb__mute)
-        ? ' selected="selected"'
-        : '';
-
-    $asb__run = MaintenanceAlertBehavior::RUN->value;
-    $asb__run__selected = ($default_behavior == $asb__run)
-        ? ' selected="selected"'
-        : '';
-
+    $default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -132,13 +116,13 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         <label for='behavior' class='col-sm-4 control-label'>Behavior <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="behavior" name="behavior" class="form-control">
-                                <option value='<?= $asb__skip; ?>' <?= $asb__skip__selected ?>>
+                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.skip_alerts') ?>
                                 </option>
-                                <option value='<?= $asb__mute; ?>' <?= $asb__mute__selected ?>>
+                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.mute_alerts') ?>
                                 </option>
-                                <option value='<?= $asb__run; ?>' <?= $asb__run__selected ?>>
+                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.run_alerts') ?>
                                 </option>
                             </select>
