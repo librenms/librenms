@@ -150,12 +150,14 @@ class DeviceController extends TableController
      */
     public function formatItem($device)
     {
+        $status = $this->getStatus($device);
+
         return [
             'extra' => $this->getLabel($device),
-            'status' => $this->getStatus($device),
+            'status' => $status,
             'maintenance' => $device->isUnderMaintenance(MaintenanceAlertBehavior::ANY->value),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => $this->getHostname($device),
+            'hostname' => $this->getHostname($device, $status),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
@@ -167,20 +169,15 @@ class DeviceController extends TableController
     }
 
     /**
-     * Get the device up/down status
-     *
-     * @param  Device  $device
-     * @return string
+     * Get the device up/down/disabled status
      */
-    private function getStatus($device)
+    private function getStatus(Device $device): string
     {
-        if ($device->disabled == 1) {
+        if ($device->disabled) {
             return 'disabled';
-        } elseif ($device->status == 0) {
-            return 'down';
         }
 
-        return 'up';
+        return $device->status ? 'up' : ($device->ignore ? 'disabled' : 'down');
     }
 
     /**
@@ -213,11 +210,12 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getHostname($device)
+    private function getHostname(Device $device, string $status): string
     {
         return (string) view('device.list.hostname', [
             'device' => $device,
-            'detailed' => $this->isDetailed(),
+            'extra' => $this->isDetailed() ? $device->name() : '',
+            'class' => 'device-link-' . $status,
         ]);
     }
 
