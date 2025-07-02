@@ -118,9 +118,8 @@ class EventlogController extends TableController
     {
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
-        $output .= " eventlog-status'></span><span style='display:inline;'>";
+        $output .= " eventlog-status'></span>";
         $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact'));
-        $output .= '</span>';
 
         return $output;
     }
