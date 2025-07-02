@@ -46,7 +46,7 @@ if ($device['os'] == 'timos') {
         $map_vrf['byOid'][$vrf['vrf_oid']]['vrf_id'] = $vrf['vrf_id'];
     }
 
-    foreach ($bgpPeers as $vrfOid => $vrf) {
+    foreach ($bgpPeers ?? [] as $vrfOid => $vrf) {
         $vrfId = $map_vrf['byOid'][$vrfOid]['vrf_id'] ?? null;
 
         d_echo($vrfId);

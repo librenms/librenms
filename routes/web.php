@@ -110,6 +110,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Device Tabs
     Route::prefix('device/{device}')->name('device.')->group(function () {
+        Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
