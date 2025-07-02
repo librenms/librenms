@@ -16,7 +16,7 @@
  use LibreNMS\Enum\MaintenanceAlertBehavior;
 
 if (\Auth::user()->hasGlobalAdmin()) {
-    $default_behavior = LibrenmsConfig::get('webui.scheduled_maintenance_default_behavior');
+    $default_behavior = LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
 
     $asb__skip = MaintenanceAlertBehavior::SKIP->value;
     $asb__skip__selected = ($default_behavior == $asb__skip)
