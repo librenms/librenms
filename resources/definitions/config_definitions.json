@@ -37,6 +37,18 @@
                  "value.*": "string"
              }
         },
+        "alert.scheduled_maintenance_default_behavior": {
+            "default": "1",
+            "order": 5,
+            "type": "select",
+            "group": "alerting",
+            "section": "scheduled-maintenance",
+            "options": {
+                "1": "Skip alerts",
+                "2": "Mute alerts",
+                "3": "Run alerts"
+            }
+        },
         "alert_colour.ok": {
             "default": "#00ff00",
             "type": "color"
@@ -7107,18 +7119,6 @@
             "section": "graph",
             "order": 0,
             "type": "integer"
-        },
-        "webui.scheduled_maintenance_default_behavior": {
-            "default": "1",
-            "order": 5,
-            "type": "select",
-            "group": "webui",
-            "section": "scheduled-maintenance",
-            "options": {
-                "1": "Skip alerts",
-                "2": "Mute alerts",
-                "3": "Run alerts"
-            }
         },
         "whois": {
             "default": "/usr/bin/whois",
