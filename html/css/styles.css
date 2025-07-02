@@ -1947,8 +1947,6 @@ label {
 .device-icon img {
     max-height: 32px;
     max-width: 40px;
-    position: relative;
-    z-index: -1;
 }
 
 .device-icon {

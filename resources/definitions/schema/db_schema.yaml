@@ -106,7 +106,6 @@ alert_schedule:
     - { Field: recurring_day, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: notes, Type: text, 'Null': false, Extra: '' }
-    - { Field: behavior, Type: int, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [schedule_id], Unique: true, Type: BTREE }
 alert_templates:

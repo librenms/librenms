@@ -33,7 +33,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -155,7 +154,7 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $status,
-            'maintenance' => $device->isUnderMaintenance(MaintenanceAlertBehavior::ANY->value),
+            'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device, $status),
             'metrics' => $this->getMetrics($device),
