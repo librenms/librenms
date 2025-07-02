@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Table;
 use App\Models\AlertSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Enum\MaintenanceAlertBehavior;
 
 class AlertScheduleController extends TableController
 {
@@ -57,7 +56,6 @@ class AlertScheduleController extends TableController
             'start' => 'start',
             'end' => 'end',
             'status' => DB::raw("end < '" . Carbon::now('UTC') . "'"), // only partition lapsed
-            'behavior' => 'behavior',
         ];
     }
 
@@ -67,26 +65,9 @@ class AlertScheduleController extends TableController
      */
     public function formatItem($schedule)
     {
-        $behavior_lang_keypart = '';
-
-        if ($schedule->behavior == MaintenanceAlertBehavior::SKIP->value) {
-            $behavior_lang_keypart = 'skip_alerts';
-        } elseif ($schedule->behavior == MaintenanceAlertBehavior::MUTE->value) {
-            $behavior_lang_keypart = 'mute_alerts';
-        } elseif ($schedule->behavior == MaintenanceAlertBehavior::RUN->value) {
-            $behavior_lang_keypart = 'run_alerts';
-        }
-
-        if (! empty($behavior_lang_keypart)) {
-            $behavior_str = __('maintenance.behavior.options.' . $behavior_lang_keypart);
-        } else {
-            $behavior_str = '';
-        }
-
         return [
             'title' => htmlentities($schedule->title),
             'notes' => htmlentities($schedule->notes),
-            'behavior' => $behavior_str,
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),
             'end' => $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes'),
