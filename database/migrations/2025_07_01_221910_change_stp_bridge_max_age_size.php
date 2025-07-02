@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('stp', function (Blueprint $table) {
             $table->unsignedMediumInteger('bridgeMaxAge')->change();
-
         });
     }
 
