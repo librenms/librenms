@@ -207,9 +207,9 @@ class AlertUtil
      * @param  int  $device_id  Device-ID
      * @return bool
      */
-    public static function isMaintenance($device_id, $behavior)
+    public static function isMaintenance($device_id)
     {
-        return DeviceCache::get($device_id)->isUnderMaintenance($behavior);
+        return DeviceCache::get($device_id)->isUnderMaintenance();
     }
 
     /**
