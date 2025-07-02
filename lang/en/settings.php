@@ -102,7 +102,6 @@ return [
             'general' => ['name' => 'General Web UI Settings'],
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
-            'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
         ],
     ],
     'settings' => [
