@@ -120,7 +120,12 @@ class YamlSchemaTest extends TestCase
             );
         } catch (JsonDecodingException|ValidationException $e) {
             // Output the filename so we know what file failed
-            $this->fail("$filename failed to validate against $schema_file\n" . $e->getMessage());
+            $error = $e->getMessage();
+            if (str_contains($error, 'Error validating /discovery/')) {
+                $error = 'Discovery must contain an identifier sysObjectID or sysDescr';
+            }
+
+            $this->fail("$filename failed to validate against $schema_file\n\n$error");
         }
 
         $errors = collect($validator->getErrors())
