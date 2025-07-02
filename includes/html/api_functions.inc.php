@@ -528,7 +528,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     $title = $data['title'] ?? $device->displayName();
     $behavior = MaintenanceAlertBehavior::get_value_or_fallback(
         $data['behavior'],
-        LibrenmsConfig::get('webui.scheduled_maintenance_default_behavior')
+        LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior')
     );
 
     $alert_schedule = new \App\Models\AlertSchedule([
@@ -2549,7 +2549,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $title = $data['title'] ?? $device_group->name;
     $behavior = MaintenanceAlertBehavior::get_value_or_fallback(
         $data['behavior'],
-        LibrenmsConfig::get('webui.scheduled_maintenance_default_behavior')
+        LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior')
     );
 
     $alert_schedule = new \App\Models\AlertSchedule([
