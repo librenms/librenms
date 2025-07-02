@@ -47,7 +47,7 @@ if ($sub_type == 'new-maintenance') {
     $end = $_POST['end'];
     $behavior = isset($_POST['behavior'])
         ? $_POST['behavior']
-        : LibrenmsConfig::get('webui.scheduled_maintenance_default_behavior');
+        : LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
     $maps = $_POST['maps'] ?? null;
 
     if (isset($duration_hour) && isset($duration_min)) {
