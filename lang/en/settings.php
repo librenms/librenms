@@ -2237,10 +2237,6 @@ return [
             'help' => 'Enables the mouseover graphs in the web interface',
         ],
         'webui' => [
-            'scheduled_maintenance_default_behavior' => [
-                'description' => 'Default Behaviour',
-                'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
-            ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
                 'help' => 'Input desired tile width in pixels for box size in full view',
