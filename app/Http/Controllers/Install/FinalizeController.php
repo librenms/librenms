@@ -59,7 +59,7 @@ class FinalizeController extends InstallationController implements InstallerStep
     {
         $request->validate([
             'update_channel' => 'in:master,release',
-            'site_style' => 'in:light,dark',
+            'site_style' => 'in:device,light,dark',
         ]);
 
         $this->saveSetting('update_channel', $request->get('update_channel', 'master'));

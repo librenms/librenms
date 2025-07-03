@@ -2077,6 +2077,7 @@ return [
         'site_style' => [
             'description' => 'Default Theme',
             'options' => [
+                'device' => 'Device',
                 'blue' => 'Blue',
                 'dark' => 'Dark',
                 'light' => 'Light',
