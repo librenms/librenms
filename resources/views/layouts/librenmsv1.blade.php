@@ -83,7 +83,7 @@
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         window.siteStyle = '{{ session('applied_site_style') }}';
-        window.siteStylePreference = '{{ session('preferences.site_style') }}';
+        window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
 
         // Apply color scheme
         applySiteStyle(window.siteStylePreference);
