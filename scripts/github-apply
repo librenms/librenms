@@ -3,7 +3,6 @@
 LIBRENMS_DIR=$(dirname "$(readlink -f "$0/..")")
 cd "$LIBRENMS_DIR" || exit
 
-
 if [ $# -eq 0 ]; then
     echo "Error: You must specify a PR number to apply a patch"
     exit 1
