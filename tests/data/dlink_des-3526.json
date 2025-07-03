@@ -6573,17 +6573,6 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
-                    "remote_hostname": "PCM F-blok-RTR3",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "Gigabit Ethernet Switch",
-                    "ifAlias": "RMON Port 25 on Unit 1",
-                    "ifDescr": "RMON Port 25 on Unit 1",
-                    "ifName": "1/25"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
                     "remote_hostname": "PCM F10 SW 121.152",
                     "remote_port": "18 0F 76 0C BA F9 (180f760cbaf9)",
                     "remote_platform": null,
