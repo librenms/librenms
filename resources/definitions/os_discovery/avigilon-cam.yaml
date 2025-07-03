@@ -1,35 +1,35 @@
-mib: AVIGILON-CAMERA-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
                     oid: AVIGILON-CAMERA-MIB::tempSensorTable
-                    value: tempSensorValue
+                    value: AVIGILON-CAMERA-MIB::tempSensorValue
                     num_oid: '.1.3.6.1.4.1.46202.1.1.1.1.1.4.{{ $index }}'
                     descr: A collection of objects relating to temperature status.
+                    index: 'tempSensorValue.{{ $index }}'
                     multiplier: 1
                     divisor: 1
-                    mib: AVIGILON-CAMERA-MIB
         state:
             data:
                 -
                     oid: AVIGILON-CAMERA-MIB::tempSensorStatus
-                    value: tempSensorStatus
+                    value: AVIGILON-CAMERA-MIB::tempSensorStatus
                     num_oid: '.1.3.6.1.4.1.46202.1.1.1.1.1.3.{{ $index }}'
                     descr: Temperature Sensor Status {{ $index }}
-                    index: tempSensorId
+                    index: 'tempSensorStatus.{{ $index }}'
+                    state_name: tempSensorStatus
                     states:
                       - { value: 1, generic: 0, graph: 0, descr: ok }
                       - { value: 2, generic: 2, graph: 0, descr: failure }
                       - { value: 3, generic: 1, graph: 0, descr: outOfBoundary }
-        storage:
-            data:
                 -
                     oid: AVIGILON-CAMERA-MIB::storageState
-                    value: storageState
-                    num_oid: '.1.3.6.1.4.1.46202.1.1.1.5.0'
+                    value: AVIGILON-CAMERA-MIB::storageState
+                    num_oid: '.1.3.6.1.4.1.46202.1.1.1.5.{{ $index }}'
                     descr: SD Card Storage State
+                    index: 'storageState.{{ $index }}'
+                    state_name: storageState
                     states:
                       - { value: 1, generic: 3, graph: 0, descr: mediaNotPresent }
                       - { value: 2, generic: 0, graph: 0, descr: mediaDetected }
