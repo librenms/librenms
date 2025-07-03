@@ -534,7 +534,7 @@
 {{-- Alerts --}}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
-                            class="fa fa-exclamation-circle fa-col-{{ $alert_menu_class }} fa-fw fa-lg"
+                            class="fa fa-exclamation-circle text-{{ $alert_menu_class }} fa-fw fa-lg"
                             aria-hidden="true"></i> <span class="tw:md:hidden tw:2xl:inline-block">{{ __('Alerts') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
