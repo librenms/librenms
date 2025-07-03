@@ -87,13 +87,13 @@ $default_behavior = MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.s
                         <label for="behavior" class="col-sm-4 control-label">Behavior: </label>
                         <div class="col-sm-8">
                             <select name='behavior' id='behavior' class='form-control input-sm'>
-                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value ?>' <?= $default_behavior == MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.skip_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior == MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.mute_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior == MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
                                     <?= __('maintenance.behavior.options.run_alerts') ?>
                                 </option>
                             </select>
