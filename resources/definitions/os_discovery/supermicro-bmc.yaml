@@ -10,7 +10,7 @@ modules:
         features: ATEN-IPMI-MIB::biosVesion.0
         features_template: "Bios {{ ATEN-IPMI-MIB::biosVesion.0 }}"
         serial: ATEN-IPMI-MIB::productSerialNumber.0
-        sysname: ATEN-IPMI-MIB::hostName.0
+        sysName: ATEN-IPMI-MIB::hostName.0
     sensors:
         temperature:
             data:
