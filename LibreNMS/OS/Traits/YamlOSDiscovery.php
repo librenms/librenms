@@ -50,7 +50,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
-        'sysname',
+        'sysName',
     ];
 
     public function discoverOS(Device $device): void
