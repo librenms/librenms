@@ -42,6 +42,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysName',
     ];
 
     private $osFields = [
@@ -49,6 +50,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysname',
     ];
 
     public function discoverOS(Device $device): void

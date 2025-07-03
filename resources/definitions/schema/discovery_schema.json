@@ -85,6 +85,7 @@
                         "hardware": {"$ref": "#/$defs/oids"},
                         "features": {"$ref": "#/$defs/oids"},
                         "serial": {"$ref": "#/$defs/oids"},
+                        "sysname": {"$ref": "#/$defs/oids"},
                         "lat": {"$ref": "#/$defs/oid"},
                         "location": {"$ref": "#/$defs/oids"},
                         "long": {"$ref": "#/$defs/oid"},
