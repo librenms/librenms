@@ -37,7 +37,10 @@ class LoadUserPreferences
             });
         } elseif (! $request->session()->has('applied_site_style')) {
             // set applied_site_style for unauth sessions (once)
-            $request->session()->put('applied_site_style', LibrenmsConfig::get('site_style', 'device'));
+            $site_style = LibrenmsConfig::get('site_style');
+            if ($site_style !== 'device') {
+                $request->session()->put('applied_site_style', $site_style);
+            }
         }
 
         return $next($request);
