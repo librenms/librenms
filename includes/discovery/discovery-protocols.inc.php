@@ -461,7 +461,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if (empty($lldp['lldpRemSysName']) && isset($lldp['lldpRemSysDesc'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
-                if (is_array($interface) && $interface['port_id'] && isset($lldp['lldpRemSysName']) && $remote_port_name) {
+                if (is_array($interface) && $interface['port_id'] && isset($lldp['lldpRemSysName'])) {
                     discover_link(
                         $interface['port_id'],
                         'lldp',
