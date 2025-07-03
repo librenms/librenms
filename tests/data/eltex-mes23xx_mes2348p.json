@@ -16784,6 +16784,72 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 51 ED (0030592051ed)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE1",
+                    "ifDescr": "gigabitethernet1/0/3",
+                    "ifName": "gi1/0/3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 51 F1 (0030592051f1)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE2",
+                    "ifDescr": "gigabitethernet1/0/4",
+                    "ifName": "gi1/0/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 52 99 (003059205299)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE3",
+                    "ifDescr": "gigabitethernet1/0/5",
+                    "ifName": "gi1/0/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 51 D6 (0030592051d6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE4",
+                    "ifDescr": "gigabitethernet1/0/6",
+                    "ifName": "gi1/0/6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 51 EF (0030592051ef)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE5",
+                    "ifDescr": "gigabitethernet1/0/7",
+                    "ifName": "gi1/0/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 30 59 20 52 03 (003059205203)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "GATE6",
+                    "ifDescr": "gigabitethernet1/0/8",
+                    "ifName": "gi1/0/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "bt-stadion-payload-ap-07",
                     "remote_port": "bridge1/vlan75-payload (2cc81b5ba251)",
                     "remote_platform": null,
@@ -16846,6 +16912,28 @@
                     "ifAlias": "xxx",
                     "ifDescr": "gigabitethernet1/0/10",
                     "ifName": "gi1/0/10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "gi2/0/24 (e828c18e4900)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "xxx",
+                    "ifDescr": "gigabitethernet1/0/47",
+                    "ifName": "gi1/0/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "gi1/0/24 (e828c18e4900)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "xxx",
+                    "ifDescr": "gigabitethernet1/0/48",
+                    "ifName": "gi1/0/48"
                 },
                 {
                     "active": 1,
