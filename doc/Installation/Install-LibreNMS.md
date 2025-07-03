@@ -649,10 +649,7 @@ cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
 !!! warning
-    If a Python virtual environment has been set up, copy librenms-venv.cron:
-    ```
-    cp /opt/librenms/dist/librenms-venv.cron /etc/cron.d/librenms
-    ```
+    If a Python virtual environment has been set up, uncomment the line to define PATH environment variaible.
 
 !!! note
     Keep in mind  that cron, by default, only uses a very limited

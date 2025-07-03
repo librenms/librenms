@@ -1,3 +1,6 @@
+# If a Python virtual environment has been set up, you need define the PATH
+#PATH=/opt/librenms/.python_venvs/dispatcher/bin:/usr/local/bin:/usr/bin
+
 33   */6  * * *   librenms    /opt/librenms/cronic /opt/librenms/discovery-wrapper.py 1
 */5  *    * * *   librenms    /opt/librenms/discovery.php -h new >> /dev/null 2>&1
 

@@ -216,10 +216,8 @@ install run:
 cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
 ```
 
-If a Python virtual environment has been set up, use file `misc/librenms-venv.service`.
-```bash
-cp /opt/librenms/misc/librenms-venv.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
-```
+!!! warning
+    If a Python virtual environment has been set up, uncomment the line to define PATH environment variaible.
 
 ### systemd service with watchdog
 
