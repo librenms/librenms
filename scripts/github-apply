@@ -5,7 +5,8 @@ cd "$LIBRENMS_DIR" || exit
 for pr in "$@"
     do
         case $pr in
-        ''|*[!0-9]*) echo "You must specify a PR number to apply a patch" ;;
+        ''|*[!0-9]*) echo "Error: You must specify a PR number to apply a patch" ;;
+        9526) echo "Error: 9526 is just an example PR number. Please specify the actual PR number you want to apply." ;;
         *) curl -s https://patch-diff.githubusercontent.com/raw/librenms/librenms/pull/"${pr}".diff | git apply --exclude=*.png -v ;;
     esac
     php artisan optimize:clear
