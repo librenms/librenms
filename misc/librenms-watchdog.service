@@ -11,6 +11,8 @@ Group=librenms
 RestartSec=10
 Restart=always
 WatchdogSec=30
+# If a Python virtual environment has been set up, you need define the PATH
+#Environment=PATH=/opt/librenms/.python_venvs/dispatcher/bin:/usr/local/bin:/usr/bin
 
 [Install]
 WantedBy=multi-user.target

@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\ConfigRepository;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Eloquent;
@@ -126,7 +127,12 @@ class Version
 
     public function python(): string
     {
-        $proc = new Process(['python3', '--version']);
+        $pythonPath = $this->config->get('install_dir') . '.python_venvs/dispatcher/bin/python3';
+        if (! file_exists($pythonPath) || ! is_executable($pythonPath)) {
+            $pythonPath = LibrenmsConfig::locateBinary('python3');
+        }
+
+        $proc = new Process([$pythonPath, '--version']);
         $proc->run();
 
         if ($proc->getExitCode() !== 0) {
