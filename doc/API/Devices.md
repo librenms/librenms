@@ -666,6 +666,52 @@ Output:
 }
 ```
 
+### `get_device_nac`
+
+Get a list of NAC entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/nac`
+
+- hostname can be either the device hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/nac
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports_nac": [
+        {
+            "ports_nac_id": 1,
+            "auth_id": "0000000000000AAAABBBB8CC",
+            "device_id": 3,
+            "port_id": 6,
+            "domain": "data",
+            "username": "hostname.librenms.org",
+            "mac_address": "1aaa2bbb3ccc",
+            "ip_address": "192.0.2.2",
+            "host_mode": "singleHost",
+            "authz_status": "authorizationSuccess",
+            "authz_by": "Authentication Server",
+            "authc_status": "authcSuccess",
+            "method": "dot1x",
+            "timeout": "0",
+            "time_left": "0",
+            "vlan": 0,
+            "time_elapsed": null,
+            "created_at": "2025-05-08T08:55:06.000000Z",
+            "updated_at": "2025-05-08T08:55:06.000000Z",
+            "historical": 0
+        }
+    ]
+}
+```
+
 ### `get_device_ip_addresses`
 
 Get a list of IP addresses (v4 and v6) associated with a device.
@@ -1104,23 +1150,27 @@ Input:
 - order: How to order the output, default is by hostname. Can be
   prepended by DESC or ASC to change the order.
 - type: can be one of the following to filter or search by:
-  - all: All devices
-  - active: Only not ignored and not disabled devices
-  - ignored: Only ignored devices
-  - up: Only devices that are up
-  - down: Only devices that are down
-  - disabled: Disabled devices
-  - os: search by os type
-  - mac: search by mac address
-  - ipv4: search by IPv4 address
-  - ipv6: search by IPv6 address (compressed or uncompressed)
-  - location: search by location
-  - location_id: search by location_id
-  - hostname: search by hostname
-  - sysName: search by sysName
-  - display: search by display name
-  - device_id: exact match by device-id
-  - type: search by device type
+    - all: All devices
+    - active: Only not ignored and not disabled devices
+    - ignored: Only ignored devices
+    - up: Only devices that are up
+    - down: Only devices that are down
+    - disabled: Disabled devices
+    - os: search by os type
+    - mac: search by mac address
+    - ipv4: search by IPv4 address
+    - ipv6: search by IPv6 address (compressed or uncompressed)
+    - location: search by location
+    - location_id: search by location_id
+    - hostname: search by hostname
+    - sysName: search by sysName
+    - display: search by display name
+    - device_id: exact match by device-id
+    - type: search by device type
+    - serial: Serial number of the device (wildcard)
+    - version: Software version of the device (wildcard)
+    - hardware: The model of the device (wildcard)
+    - features: Software license features (wildcard)
 - query: If searching by, then this will be used as the input.
 
 Example:

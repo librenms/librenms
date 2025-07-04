@@ -48,13 +48,13 @@ files so that you don't need to know how to write PHP.
 > correct divisor / multiplier if applicable.
 
 All yaml files are located in
-`includes/definitions/discovery/$os.yaml`. Defining the information
+`resources/definitions/os_discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
 sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
 all the data you need. We will use netbotz as an example here.
 
-`includes/definitions/discovery/netbotz.yaml`
+`resources/definitions/os_discovery/netbotz.yaml`
 
 ```yaml
 mib: NETBOTZV2-MIB
@@ -314,19 +314,14 @@ required or supported.
 
 You will need to add code for your new sensor class in the following existing files:
 
-- `app/Models/Sensor.php`: add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
-in the $icons array.
+- `LibreNMS/Enum/Sensor.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
-- `includes/discovery/sensors.inc.php`: add the sensor class to the $run_sensors array.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[]
-entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
 in the desired order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English, feel free to do so for other languages as well.
 
@@ -335,10 +330,8 @@ Create and populate new files for the sensor class in the following places:
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
 =======
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[] entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
 order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
 free to do so for other languages as well.
 
@@ -388,7 +381,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPR.' . $index,
@@ -407,7 +400,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPT.' . $index,

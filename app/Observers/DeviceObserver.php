@@ -4,10 +4,10 @@ namespace App\Observers;
 
 use App;
 use App\ApiClients\Oxidized;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use Log;
 
@@ -37,7 +37,7 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            $polled_by = Config::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
+            $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
         }
@@ -115,7 +115,6 @@ class DeviceObserver
         $device->ipsecTunnels()->delete();
         $device->ipv4()->delete();
         $device->ipv6()->delete();
-        $device->isisAdjacencies()->delete();
         $device->isisAdjacencies()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();

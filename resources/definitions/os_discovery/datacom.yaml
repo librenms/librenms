@@ -1,0 +1,52 @@
+mib: DMswitch-MIB
+modules:
+    os:
+        hardware: DMswitch-MIB::swChassisModel.0
+        version: DMswitch-MIB::swFirmwareVer.1
+        serial: DMswitch-MIB::swSerialNumber.1
+    processors:
+        data:
+            -
+                oid: swCpuUsage
+                num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.10.{{ $index }}'
+                precision: 100
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifDescr
+        temperature:
+            data:
+                -
+                    oid: DMswitch-MIB::switchInfoTable
+                    value: DMswitch-MIB::swTemperature
+                    num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.2.1.12.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                    index: 'swTemperature.{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: DMswitch-MIB::ddTransceiversTable
+                    value: DMswitch-MIB::ddTransceiversRxPower
+                    num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx Power'
+                    index: 'rx-{{ $index }}'
+                    high_limit: 2.5
+                    warn_limit: -3
+                    low_warn_limit: -12.3
+                    low_limit: -30
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                -
+                    oid: DMswitch-MIB::ddTransceiversTable
+                    value: DMswitch-MIB::ddTransceiversTxPower
+                    num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.5.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Power'
+                    index: 'tx-{{ $index }}'
+                    high_limit: 2.5
+                    warn_limit: -3
+                    low_warn_limit: -12.3
+                    low_limit: -30
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports

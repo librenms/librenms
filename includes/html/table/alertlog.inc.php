@@ -26,6 +26,7 @@ $alert_severities = [
 
 $where = 1;
 $param = [];
+$alert_log_id = null;
 
 if (is_numeric($vars['device_id'])) {
     $where .= ' AND E.device_id = ?';
@@ -84,10 +85,10 @@ if ($rowCount != -1) {
 }
 
 if (session('preferences.timezone')) {
-    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,details $sql";
     $param = array_merge([session('preferences.timezone')], $param);
 } else {
-    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 }
 
 $rulei = 0;

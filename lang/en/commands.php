@@ -129,6 +129,9 @@ return [
         ],
         'polled' => 'Polled :count devices in :time',
     ],
+    'device:remove' => [
+        'doesnt_exists' => 'No such device: :device',
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
         'arguments' => [
@@ -197,6 +200,15 @@ return [
         'already_enabled' => 'Plugin already enabled',
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
+    ],
+    'port:tune' => [
+        'description' => 'Tune port rrd files to limit the max transfer rate based on ifSpeed',
+        'arguments' => [
+            'device spec' => 'Device spec to tune: device_id, hostname, wildcard (*), odd, even, all',
+            'ifname' => 'Port ifName to match can use all or * for a wildcard',
+        ],
+        'device' => 'Device :device:',
+        'port' => 'Tuning port :port',
     ],
     'report:devices' => [
         'description' => 'Print out data from devices',

@@ -1,0 +1,171 @@
+mib: AT-ENVMONv2-MIB:AT-SYSINFO-MIB
+modules:
+    processors:
+        data:
+            -
+                oid: cpuUtilisationStackEntry
+                value: cpuUtilisationStackAvgLastMinute
+                num_oid: '.1.3.6.1.4.1.207.8.4.4.3.3.8.1.4.{{ $index }}'
+                descr: 'Processor {{ $index }}'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifName
+        fanspeed:
+            options:
+                skip_values: 0
+            data:
+                -
+                    oid:  atEnvMonv2FanTable
+                    value:  atEnvMonv2FanCurrentSpeed
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.5.{{ $index }}'
+                    descr: atEnvMonv2FanDescription
+                    index: 'atEnvMonv2FanIndex.{{ $index }}'
+                    low_limit: atEnvMonv2FanLowerThreshold
+        voltage:
+            data:
+                -
+                    oid: atEnvMonv2VoltageTable
+                    value: atEnvMonv2VoltageCurrent
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.5.{{ $index }}'
+                    descr: atEnvMonv2VoltageDescription
+                    index: 'atEnvMonv2VoltageIndex.{{ $index }}'
+                    divisor: 1000
+                    low_limit: atEnvMonv2VoltageLowerThreshold
+                    high_limit: atEnvMonv2VoltageUpperThreshold
+                -
+                    oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccTable
+                    value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccStatusReading
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.28.1.2.1.3.{{ $index }}'
+                    descr: 'Voltage {{ IF-MIB::ifName:0 }} CH: {{ $subindex1 }}'
+                    divisor: 10000
+                    index: 'atPluggableDiagVccStatusReading.{{ $index }}'
+                    high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccAlarmMax
+                    warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMax
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccWarningMin
+                    low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccAlarmMin
+                    group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        temperature:
+            options:
+                skip_values: [128, -128]
+            data:
+                -
+                    oid:  atEnvMonv2TemperatureTable
+                    value:  atEnvMonv2TemperatureCurrent
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.5.{{ $index }}'
+                    descr: atEnvMonv2TemperatureDescription
+                    index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
+                    high_limit: atEnvMonv2TemperatureUpperThreshold
+                -
+                    oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempTable
+                    value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempStatusReading
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.28.1.1.1.3.{{ $index }}'
+                    descr: 'Temp {{ IF-MIB::ifName:0 }} CH: {{ $subindex1 }}'
+                    divisor: 1000
+                    index: 'atPluggableDiagTempStatusReading.{{ $index }}'
+                    high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempAlarmMax
+                    warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMax
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempWarningMin
+                    low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempAlarmMin
+                    group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        current:
+            data:
+                -
+                    oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasTable
+                    value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasStatusReading
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.28.1.3.1.3.{{ $index }}'
+                    descr: 'TX Bias {{ IF-MIB::ifName:0 }} CH: {{ $subindex1 }}'
+                    divisor: 1000000
+                    index: 'atPluggableDiagTxBiasStatusReading.{{ $index }}'
+                    high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasAlarmMax
+                    warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMax
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasWarningMin
+                    low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxBiasAlarmMin
+                    group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        dbm:
+            data:
+                -
+                    oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerTable
+                    value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerStatusReading
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.28.1.4.1.3.{{ $index }}'
+                    descr: 'TX Power {{ IF-MIB::ifName:0 }} CH: {{ $subindex1 }}'
+                    divisor: 10000
+                    index: 'atPluggableDiagTxPowerStatusReading.{{ $index }}'
+                    high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerAlarmMax
+                    warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMax
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerWarningMin
+                    low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTxPowerAlarmMin
+                    user_func: mw_to_dbm
+                    group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                -
+                    oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerTable
+                    value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerStatusReading
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.28.1.5.1.3.{{ $index }}'
+                    descr: 'RX Power {{ IF-MIB::ifName:0 }} CH: {{ $subindex1 }}'
+                    divisor: 10000
+                    index: 'atPluggableDiagRxPowerStatusReading.{{ $index }}'
+                    high_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerAlarmMax
+                    warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMax
+                    low_warn_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerWarningMin
+                    low_limit: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagRxPowerAlarmMin
+                    user_func: mw_to_dbm
+                    group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        state:
+            data:
+                -
+                    oid: atEnvMonv2FanTable
+                    value: atEnvMonv2FanStatus
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.{{ $index }}'
+                    descr: atEnvMonv2FanDescription
+                    index: 'atEnvMonv2FanIndex.{{ $index }}'
+                    state_name: 'AtFanState'
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: failed, graph: 0, value: 1, generic: 2 }
+                        - { descr: good, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atEnvMonv2VoltageTable
+                    value: atEnvMonv2VoltageStatus
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.{{ $index }}'
+                    descr: atEnvMonv2VoltageDescription
+                    index: 'atEnvMonv2VoltageIndex.{{ $index }}'
+                    state_name: 'AtVoltageState'
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
+                        - { descr: inRange, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atEnvMonv2TemperatureTable
+                    value: atEnvMonv2TemperatureStatus
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.{{ $index }}'
+                    descr: atEnvMonv2TemperatureDescription
+                    index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
+                    state_name: 'AtTemperatureState'
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
+                        - { descr: inRange, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: atEnvMonv2PsbSensorTable
+                    value: atEnvMonv2PsbSensorStatus
+                    num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.{{ $index }}'
+                    descr: atEnvMonv2PsbSensorDescription
+                    index: 'atEnvMonv2PsbSensorIndex.{{ $index }}'
+                    state_name: 'AtPowerSupplyState'
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: failed, graph: 0, value: 1, generic: 2 }
+                        - { descr: good, graph: 0, value: 2, generic: 0 }
+                        - { descr: notPowered, graph: 0, value: 3, generic: 3 }

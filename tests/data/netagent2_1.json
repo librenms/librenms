@@ -719,7 +719,7 @@
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 50,
                     "sensor_limit": 60,
                     "sensor_limit_warn": 51,
                     "sensor_limit_low": 0,
@@ -1648,6 +1648,26 @@
                     "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.2.97",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.2.0/24",
                     "ifIndex": 2
                 }
             ]

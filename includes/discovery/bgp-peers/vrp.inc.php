@@ -24,7 +24,7 @@
  * @author     PipoCanaja
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerRemoteAs', [], 'HUAWEI-BGP-VPN-MIB');
@@ -37,6 +37,9 @@ if (count($bgpPeersCache) == 0) {
 
 // So if we have HUAWEI BGP entries or if we don't have anything from HUAWEI nor BGP4-MIB
 if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
+    $map_vrf = [];
+    $bgpPeers ??= [];
+
     $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_name')->get();
     foreach ($vrfs as $vrf) {
         $map_vrf['byId'][$vrf['vrf_id']]['vrf_name'] = $vrf['vrf_name'];
@@ -78,8 +81,14 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
         }
     }
 
+    $vrp_bgp_peer_count = 0;
+    $seenPeerID = [];
+
     foreach ($bgpPeers as $vrfName => $vrf) {
-        $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
+        $vrfId = null;
+        if (isset($map_vrf['byName'][$vrfName]['vrf_id'])) {
+            $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
+        }
 
         foreach ($vrf as $address => $value) {
             $astext = \LibreNMS\Util\AutonomousSystem::get($value['hwBgpPeerRemoteAs'])->name();
@@ -109,7 +118,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 }
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->create($peers)->bgpPeer_id;
 
-                if (Config::get('autodiscovery.bgp')) {
+                if (LibrenmsConfig::get('autodiscovery.bgp')) {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
@@ -142,13 +151,13 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
     }
     // clean up peers
 
-    if (! is_null($seenPeerID)) {
+    if (! empty($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }
 
     $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?';
-    foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip']]) as $entry) {
+    foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'] ?? null]) as $entry) {
         $afi = $entry['afi'];
         $safi = $entry['safi'];
         $vrfName = $entry['context_name'];

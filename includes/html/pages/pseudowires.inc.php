@@ -81,8 +81,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         if ($pw_a) {
             $pw_a['width'] = '150';
             $pw_a['height'] = '30';
-            $pw_a['from'] = \LibreNMS\Config::get('time.day');
-            $pw_a['to'] = \LibreNMS\Config::get('time.now');
+            $pw_a['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+            $pw_a['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             $pw_a['bg'] = $bg;
             $types = ['bits', 'upkts', 'errors'];
             foreach ($types as $graph_type) {
@@ -96,8 +96,8 @@ foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D W
         if ($pw_b) {
             $pw_b['width'] = '150';
             $pw_b['height'] = '30';
-            $pw_b['from'] = \LibreNMS\Config::get('time.day');
-            $pw_b['to'] = \LibreNMS\Config::get('time.now');
+            $pw_b['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+            $pw_b['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             $pw_b['bg'] = $bg;
             $types = ['bits', 'upkts', 'errors'];
             foreach ($types as $graph_type) {

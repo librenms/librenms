@@ -33,6 +33,7 @@ use Illuminate\Support\Arr;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
+use SnmpQuery;
 
 trait YamlOSDiscovery
 {
@@ -41,6 +42,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysName',
     ];
 
     private $osFields = [
@@ -48,6 +50,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysName',
     ];
 
     public function discoverOS(Device $device): void
@@ -59,7 +62,11 @@ trait YamlOSDiscovery
         }
 
         if (isset($os_yaml['hardware_mib'])) {
-            $this->translateSysObjectID($os_yaml['hardware_mib'], $os_yaml['hardware_regex'] ?? null);
+            $device->hardware = SnmpQuery::mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
+
+            if (! empty($os_yaml['hardware_regex'])) {
+                $this->parseRegex($os_yaml['hardware_regex'], $device->hardware);
+            }
         }
 
         $oids = Arr::only($os_yaml, $this->osFields);
@@ -113,7 +120,10 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && ! Oid::of($oid)->isNumeric()) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
+            if ($numeric) {
+                $oid = Oid::of($oid)->toNumeric();
+            }
+
             if (! empty($data[$oid])) {
                 return $data[$oid];
             }
@@ -134,16 +144,6 @@ trait YamlOSDiscovery
                     }
                 }
             }
-        }
-    }
-
-    private function translateSysObjectID($mib, $regex)
-    {
-        $device = $this->getDevice();
-        $device->hardware = snmp_translate($device->sysObjectID, $mib, null, '-Os', $this->getDeviceArray());
-
-        if ($regex) {
-            $this->parseRegex($regex, $device->hardware);
         }
     }
 

@@ -21,11 +21,12 @@
         "sass": "^1.49.0",
         "sass-loader": "^12.4.0",
         "tailwindcss": "^4.0.13",
-        "vite": "^6.2",
+        "vite": "^6.3",
         "vue-loader": "^15.9.8",
         "vue-template-compiler": "^2.6.14"
     },
     "dependencies": {
+        "alpinejs": "^3.14.9",
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
         "es6-object-assign": "^1.1.0",
         "v-tooltip": "^2.0.3",

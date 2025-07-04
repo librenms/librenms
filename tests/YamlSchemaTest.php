@@ -29,7 +29,6 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
-use LibreNMS\Config;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -37,27 +36,27 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlSchemaTest extends TestCase
 {
-    private $excluded = [
-        '/includes/definitions/default.yaml',
-        '/includes/definitions/generic.yaml',
-        '/includes/definitions/ping.yaml',
+    private array $excluded = [
+        '/os_detection/default.yaml',
+        '/os_detection/generic.yaml',
+        '/os_detection/ping.yaml',
     ];
 
     public function testConfigSchema(): void
     {
-        $this->validateFileAgainstSchema('/misc/config_definitions.json', '/misc/config_schema.json');
+        $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'));
     }
 
     #[Group('os')]
     public function testOSDefinitionSchema(): void
     {
-        $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
+        $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_detection'), resource_path('definitions/schema/os_schema.json'));
     }
 
     #[Group('os')]
     public function testOSMatchFilename(): void
     {
-        foreach ($this->listFiles('/includes/definitions/*.yaml') as $filename => $file) {
+        foreach ($this->listFiles(resource_path('definitions/os_detection/*.yaml')) as $filename => $file) {
             $this->assertEquals(
                 Yaml::parseFile($file)['os'],
                 substr($filename, 0, -5),
@@ -69,30 +68,18 @@ class YamlSchemaTest extends TestCase
     #[Group('os')]
     public function testDiscoveryDefinitionSchema(): void
     {
-        $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');
+        $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_discovery'), resource_path('definitions/schema/discovery_schema.json'));
     }
 
-    private function validateYamlFilesAgainstSchema($dir, $schema_file)
+    private function validateYamlFilesAgainstSchema(string $dir, string $schema_file): void
     {
         foreach ($this->listFiles($dir . '/*.yaml') as $file) {
             $this->validateFileAgainstSchema($file, $schema_file);
         }
     }
 
-    public function listOsDefinitionFiles()
+    private function listFiles($pattern): array
     {
-        return $this->listFiles('/includes/definitions/*.yaml');
-    }
-
-    public function listDiscoveryFiles()
-    {
-        return $this->listFiles('/includes/definitions/discovery/*.yaml');
-    }
-
-    private function listFiles($pattern)
-    {
-        $pattern = Config::get('install_dir') . $pattern;
-
         return collect(glob($pattern))
             ->reduce(function ($array, $file) {
                 if (Str::contains($file, $this->excluded)) {
@@ -108,13 +95,12 @@ class YamlSchemaTest extends TestCase
 
     /**
      * @param  string  $filePath
-     * @param  string  $schema_file
+     * @param  string  $schema_file  full path
      */
-    private function validateFileAgainstSchema($filePath, $schema_file)
+    private function validateFileAgainstSchema(string $filePath, string $schema_file): void
     {
-        $schema = (object) ['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
+        $schema = (object) ['$ref' => 'file://' . $schema_file];
         $filename = basename($filePath);
-        $filePath = Str::start($filePath, Config::get('install_dir'));
 
         try {
             $data = Str::endsWith($filePath, '.json')
@@ -129,7 +115,7 @@ class YamlSchemaTest extends TestCase
             $validator->validate(
                 $data,
                 $schema,
-                Constraint::CHECK_MODE_TYPE_CAST  // | Constraint::CHECK_MODE_VALIDATE_SCHEMA
+                Constraint::CHECK_MODE_TYPE_CAST | Constraint::CHECK_MODE_VALIDATE_SCHEMA | Constraint::CHECK_MODE_EXCEPTIONS
             );
         } catch (JsonDecodingException $e) {
             // Output the filename so we know what file failed

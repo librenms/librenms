@@ -2533,7 +2533,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.232.3.2.2.2.1.9.0",
+                    "sensor_oid": ".1.3.6.1.4.1.232.3.2.2.2.1.6.0",
                     "sensor_index": "cpqDaAccelBattery.0",
                     "sensor_type": "cpqDaAccelBattery",
                     "sensor_descr": "Cache Module Board 0 Battery",
@@ -2558,7 +2558,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.232.3.2.2.2.1.9.1",
+                    "sensor_oid": ".1.3.6.1.4.1.232.3.2.2.2.1.6.1",
                     "sensor_index": "cpqDaAccelBattery.1",
                     "sensor_type": "cpqDaAccelBattery",
                     "sensor_descr": "Cache Module Board 1 Battery",
@@ -10997,6 +10997,26 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 7
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.1.8.66",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.1.8.0/24",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
                 }
             ]
         }

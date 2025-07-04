@@ -5,16 +5,24 @@ includes:
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
+    phpVersion:
+        min: 80200
+        max: 80499
+
     paths:
         - app
+        - bootstrap
         - config
         - database
         - LibreNMS
         - resources
+        - routes
         - tests
 
     excludePaths:
         - tests/phpstan/
+        - tests/Unit/Data/KafkaDBStoreTest.php
+        - LibreNMS/Data/Store/Kafka.php
 
     scanDirectories:
         - includes
@@ -27,10 +35,6 @@ parameters:
     checkInternalClassCaseSensitivity: true
 
     checkModelProperties: true
-
-    checkAlwaysTrueCheckTypeFunctionCall: true
-    checkAlwaysTrueInstanceof: true
-    checkAlwaysTrueStrictComparison: true
 
     ignoreErrors:
         - '#Unsafe usage of new static#'

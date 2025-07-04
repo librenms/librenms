@@ -16,11 +16,10 @@
  * the source code distribution for details.
  */
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
-use LibreNMS\Util\Oid;
 
 /**
  * @deprecated Please use SnmpQuery instead
@@ -31,7 +30,7 @@ function prep_snmp_setting($device, $setting)
         return $device[$setting];
     }
 
-    return Config::get("snmp.$setting");
+    return LibrenmsConfig::get("snmp.$setting");
 }//end prep_snmp_setting()
 
 /**
@@ -44,26 +43,26 @@ function get_mib_dir($device)
 {
     $dirs = [];
 
-    if (isset($device['os']) && file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
-        $dirs[] = Config::get('mib_dir') . '/' . $device['os'];
+    if (isset($device['os']) && file_exists(LibrenmsConfig::get('mib_dir') . '/' . $device['os'])) {
+        $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $device['os'];
     }
 
     if (isset($device['os_group'])) {
-        if (file_exists(Config::get('mib_dir') . '/' . $device['os_group'])) {
-            $dirs[] = Config::get('mib_dir') . '/' . $device['os_group'];
+        if (file_exists(LibrenmsConfig::get('mib_dir') . '/' . $device['os_group'])) {
+            $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $device['os_group'];
         }
 
-        if ($group_mibdir = Config::get("os_groups.{$device['os_group']}.mib_dir")) {
+        if ($group_mibdir = LibrenmsConfig::get("os_groups.{$device['os_group']}.mib_dir")) {
             if (is_array($group_mibdir)) {
                 foreach ($group_mibdir as $k => $dir) {
-                    $dirs[] = Config::get('mib_dir') . '/' . $dir;
+                    $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $dir;
                 }
             }
         }
     }
 
-    if (isset($device['os']) && ($os_mibdir = Config::get("os.{$device['os']}.mib_dir"))) {
-        $dirs[] = Config::get('mib_dir') . '/' . $os_mibdir;
+    if (isset($device['os']) && ($os_mibdir = LibrenmsConfig::get("os.{$device['os']}.mib_dir"))) {
+        $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $os_mibdir;
     }
 
     return $dirs;
@@ -74,7 +73,7 @@ function get_mib_dir($device)
  * If null return the default mib dir
  * If $mibdir is empty '', return an empty string
  *
- * @param  string  $mibdir  should be the name of the directory within \LibreNMS\Config::get('mib_dir')
+ * @param  string  $mibdir  should be the name of the directory within \App\Facades\LibrenmsConfig::get('mib_dir')
  * @param  array|null  $device
  * @return string The option string starting with -M
  *
@@ -84,7 +83,7 @@ function mibdir($mibdir = null, $device = null)
 {
     $dirs = is_array($device) ? get_mib_dir($device) : [];
 
-    $base = Config::get('mib_dir');
+    $base = LibrenmsConfig::get('mib_dir');
     $dirs[] = "$base/$mibdir";
 
     // make sure base directory is included first
@@ -112,7 +111,7 @@ function mibdir($mibdir = null, $device = null)
  */
 function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    $snmpcmd = [Config::get('snmpget')];
+    $snmpcmd = [LibrenmsConfig::get('snmpget')];
 
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } // end gen_snmpget_cmd()
@@ -134,12 +133,12 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     $oids = Arr::wrap($oids);
 
     if ($device['snmpver'] == 'v1'
-        || (isset($device['os']) && (Config::getOsSetting($device['os'], 'snmp_bulk', true) == false
-                || ! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
+        || (isset($device['os']) && (LibrenmsConfig::getOsSetting($device['os'], 'snmp_bulk', true) == false
+                || ! empty(array_intersect($oids, LibrenmsConfig::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
     ) {
-        $snmpcmd = [Config::get('snmpwalk')];
+        $snmpcmd = [LibrenmsConfig::get('snmpwalk')];
     } else {
-        $snmpcmd = [Config::get('snmpbulkwalk')];
+        $snmpcmd = [LibrenmsConfig::get('snmpbulkwalk')];
         $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
             $snmpcmd[] = "-Cr$max_repeaters";
@@ -147,7 +146,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
     }
 
     // allow unordered responses for specific oids
-    if (! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.unordered', 'snmp.')))) {
+    if (! empty(array_intersect($oids, LibrenmsConfig::getCombined($device['os'], 'oids.unordered', 'snmp.')))) {
         $snmpcmd[] = '-Cc';
     }
 
@@ -343,7 +342,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 {
     $measure = Measurement::start('snmpgetnext');
 
-    $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
+    $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd), "\" \n\r");
 
@@ -410,7 +409,11 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+        $index = '';
+        if (Str::contains($oid, '.')) {
+            [$oid, $index] = explode('.', $oid, 2);
+        }
+
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
         }
@@ -621,51 +624,6 @@ function snmp_gen_auth(&$device, $cmd = [])
 }//end snmp_gen_auth()
 
 /**
- * SNMP translate between numeric and textual oids
- *
- * Default options for a numeric oid is -Os
- * Default options for a textual oid is -On
- * You may override these by setting $options (an empty string for no options)
- *
- * @param  string|null  $oid
- * @param  string  $mib
- * @param  string  $mibdir  the mib directory (relative to the LibreNMS mibs directory)
- * @param  array|string  $options  Options to pass to snmptranslate
- * @param  array|null  $device
- * @return string
- *
- * @deprecated Please use SnmpQuery instead
- */
-function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
-{
-    if (empty($oid)) {
-        return '';
-    }
-
-    $measure = Measurement::start('snmptranslate');
-    $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
-
-    $oid = Oid::of($oid);
-    if ($oid->isNumeric()) {
-        $default_options = ['-Os', '-Pu'];
-    } else {
-        if ($mib != 'ALL' && ! $oid->hasMib()) {
-            $oid = "$mib::$oid";
-        }
-        $default_options = ['-On', '-Pu'];
-    }
-    $options = is_null($options) ? $default_options : $options;
-    $cmd = array_merge($cmd, (array) $options);
-    $cmd[] = $oid->oid;
-
-    $result = trim(external_exec($cmd));
-
-    $measure->manager()->recordSnmp($measure->end());
-
-    return $result;
-}
-
-/**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes
  * One Index:
  *  From: 1.3.6.1.4.1.9.9.166.1.15.1.1.27.18.655360 = 0
@@ -746,5 +704,5 @@ function get_device_max_repeaters($device)
 {
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_repeaters');
 
-    return $attrib ?? Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
+    return $attrib ?? LibrenmsConfig::getOsSetting($device['os'], 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
 }

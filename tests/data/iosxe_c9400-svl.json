@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
-                    "serial": null,
+                    "serial": "JAE214600ZR",
                     "icon": "cisco.svg"
                 }
             ]
@@ -29808,7 +29808,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-default - EWLC Data, Inter FED Traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1245184",
                     "rrd_id": "port-0-cbqos-225-1245184",
                     "ingress": 1,
@@ -29841,7 +29841,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-data - ICMP redirect, ICMP_GEN and BROADCAST",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.196608",
                     "rrd_id": "port-0-cbqos-225-196608",
                     "ingress": 1,
@@ -29874,7 +29874,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-dhcp-snooping - DHCP snooping",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1114112",
                     "rrd_id": "port-0-cbqos-225-1114112",
                     "ingress": 1,
@@ -29907,7 +29907,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-dot1x-auth - DOT1X Auth",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.983040",
                     "rrd_id": "port-0-cbqos-225-983040",
                     "ingress": 1,
@@ -29940,7 +29940,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ewlc-control - EWLC Control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1376256",
                     "rrd_id": "port-0-cbqos-225-1376256",
                     "ingress": 1,
@@ -29973,7 +29973,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-forus - Forus traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1179648",
                     "rrd_id": "port-0-cbqos-225-1179648",
                     "ingress": 1,
@@ -30006,7 +30006,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-forus-addr-resolution - Forus address resolution",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1507328",
                     "rrd_id": "port-0-cbqos-225-1507328",
                     "ingress": 1,
@@ -30039,7 +30039,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-high-rate-app - High Rate Applications",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1310720",
                     "rrd_id": "port-0-cbqos-225-1310720",
                     "ingress": 1,
@@ -30072,7 +30072,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ios-feature - ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.131072",
                     "rrd_id": "port-0-cbqos-225-131072",
                     "ingress": 1,
@@ -30105,7 +30105,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ios-routing - L2 control, Topology control, Routing control, Low Latency",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.65536",
                     "rrd_id": "port-0-cbqos-225-65536",
                     "ingress": 1,
@@ -30138,7 +30138,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-l2-control - L2 control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.589824",
                     "rrd_id": "port-0-cbqos-225-589824",
                     "ingress": 1,
@@ -30171,7 +30171,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-l2lvx-control - L2 LVX control packets",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.851968",
                     "rrd_id": "port-0-cbqos-225-851968",
                     "ingress": 1,
@@ -30204,7 +30204,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-meraki-next-tunnel - Meraki Next tunnel",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1441792",
                     "rrd_id": "port-0-cbqos-225-1441792",
                     "ingress": 1,
@@ -30237,7 +30237,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-multicast - MCAST Data",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.393216",
                     "rrd_id": "port-0-cbqos-225-393216",
                     "ingress": 1,
@@ -30270,7 +30270,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-multicast-end-station - MCAST END STATION",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.458752",
                     "rrd_id": "port-0-cbqos-225-458752",
                     "ingress": 1,
@@ -30303,7 +30303,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-protocol-snooping - Protocol snooping",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1048576",
                     "rrd_id": "port-0-cbqos-225-1048576",
                     "ingress": 1,
@@ -30336,7 +30336,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-punt-webauth - Punt Webauth",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.524288",
                     "rrd_id": "port-0-cbqos-225-524288",
                     "ingress": 1,
@@ -30369,7 +30369,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-routing-control - Routing control and Low Latency",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.720896",
                     "rrd_id": "port-0-cbqos-225-720896",
                     "ingress": 1,
@@ -30402,7 +30402,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-stackwise-virt-control - Stackwise Virtual OOB",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.655360",
                     "rrd_id": "port-0-cbqos-225-655360",
                     "ingress": 1,
@@ -30435,7 +30435,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-sw-forward - Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.327680",
                     "rrd_id": "port-0-cbqos-225-327680",
                     "ingress": 1,
@@ -30468,7 +30468,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-sys-data - Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.262144",
                     "rrd_id": "port-0-cbqos-225-262144",
                     "ingress": 1,
@@ -30501,7 +30501,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-system-critical - System Critical and Gold Pkt",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.786432",
                     "rrd_id": "port-0-cbqos-225-786432",
                     "ingress": 1,
@@ -30534,7 +30534,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-topology-control - Topology control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.917504",
                     "rrd_id": "port-0-cbqos-225-917504",
                     "ingress": 1,
@@ -30637,7 +30637,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-default - EWLC Data, Inter FED Traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1245184",
                     "rrd_id": "port-0-cbqos-225-1245184",
                     "ingress": 1,
@@ -30670,7 +30670,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-data - ICMP redirect, ICMP_GEN and BROADCAST",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.196608",
                     "rrd_id": "port-0-cbqos-225-196608",
                     "ingress": 1,
@@ -30703,7 +30703,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-dhcp-snooping - DHCP snooping",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1114112",
                     "rrd_id": "port-0-cbqos-225-1114112",
                     "ingress": 1,
@@ -30736,7 +30736,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-dot1x-auth - DOT1X Auth",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.983040",
                     "rrd_id": "port-0-cbqos-225-983040",
                     "ingress": 1,
@@ -30769,7 +30769,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ewlc-control - EWLC Control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1376256",
                     "rrd_id": "port-0-cbqos-225-1376256",
                     "ingress": 1,
@@ -30802,7 +30802,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-forus - Forus traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1179648",
                     "rrd_id": "port-0-cbqos-225-1179648",
                     "ingress": 1,
@@ -30835,7 +30835,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-forus-addr-resolution - Forus address resolution",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1507328",
                     "rrd_id": "port-0-cbqos-225-1507328",
                     "ingress": 1,
@@ -30868,7 +30868,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-high-rate-app - High Rate Applications",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1310720",
                     "rrd_id": "port-0-cbqos-225-1310720",
                     "ingress": 1,
@@ -30901,7 +30901,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ios-feature - ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.131072",
                     "rrd_id": "port-0-cbqos-225-131072",
                     "ingress": 1,
@@ -30934,7 +30934,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-ios-routing - L2 control, Topology control, Routing control, Low Latency",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.65536",
                     "rrd_id": "port-0-cbqos-225-65536",
                     "ingress": 1,
@@ -30967,7 +30967,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-l2-control - L2 control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.589824",
                     "rrd_id": "port-0-cbqos-225-589824",
                     "ingress": 1,
@@ -31000,7 +31000,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-l2lvx-control - L2 LVX control packets",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.851968",
                     "rrd_id": "port-0-cbqos-225-851968",
                     "ingress": 1,
@@ -31033,7 +31033,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-meraki-next-tunnel - Meraki Next tunnel",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1441792",
                     "rrd_id": "port-0-cbqos-225-1441792",
                     "ingress": 1,
@@ -31066,7 +31066,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-multicast - MCAST Data",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.393216",
                     "rrd_id": "port-0-cbqos-225-393216",
                     "ingress": 1,
@@ -31099,7 +31099,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-multicast-end-station - MCAST END STATION",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.458752",
                     "rrd_id": "port-0-cbqos-225-458752",
                     "ingress": 1,
@@ -31132,7 +31132,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-protocol-snooping - Protocol snooping",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.1048576",
                     "rrd_id": "port-0-cbqos-225-1048576",
                     "ingress": 1,
@@ -31165,7 +31165,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-punt-webauth - Punt Webauth",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.524288",
                     "rrd_id": "port-0-cbqos-225-524288",
                     "ingress": 1,
@@ -31198,7 +31198,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-routing-control - Routing control and Low Latency",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.720896",
                     "rrd_id": "port-0-cbqos-225-720896",
                     "ingress": 1,
@@ -31231,7 +31231,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-stackwise-virt-control - Stackwise Virtual OOB",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.655360",
                     "rrd_id": "port-0-cbqos-225-655360",
                     "ingress": 1,
@@ -31264,7 +31264,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-sw-forward - Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.327680",
                     "rrd_id": "port-0-cbqos-225-327680",
                     "ingress": 1,
@@ -31297,7 +31297,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-sys-data - Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.262144",
                     "rrd_id": "port-0-cbqos-225-262144",
                     "ingress": 1,
@@ -31330,7 +31330,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-system-critical - System Critical and Gold Pkt",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.786432",
                     "rrd_id": "port-0-cbqos-225-786432",
                     "ingress": 1,
@@ -31363,7 +31363,7 @@
                 {
                     "type": "cisco_cbqos_classmap",
                     "title": "system-cpp-police-topology-control - Topology control",
-                    "tooltip": "Match-Any:\n - ",
+                    "tooltip": "Match-Any:",
                     "snmp_idx": "225.917504",
                     "rrd_id": "port-0-cbqos-225-917504",
                     "ingress": 1,
@@ -35808,6 +35808,19 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.88.174.3",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.88.174.0/24",
+                    "ifIndex": 1
                 }
             ]
         }

@@ -29,6 +29,8 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -47,7 +49,11 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveById($identifier)
     {
-        return User::find($identifier);
+        try {
+            return User::find($identifier);
+        } catch (QueryException) {
+            return null;
+        }
     }
 
     /**
@@ -58,9 +64,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByLegacyId($identifier)
     {
-        error_reporting(0);
         $legacy_user = LegacyAuth::get()->getUser($identifier);
-        error_reporting(-1);
 
         return $this->retrieveByCredentials(['username' => $legacy_user['username'] ?? null]);
     }
@@ -74,10 +78,14 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByToken($identifier, $token): ?Authenticatable
     {
-        $user = new User();
-        $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
+        try {
+            $user = new User();
+            $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
 
-        if (! $user) {
+            if (! $user) {
+                return null;
+            }
+        } catch (QueryException) {
             return null;
         }
 
@@ -117,8 +125,6 @@ class LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
-        error_reporting(0);
-
         $authorizer = LegacyAuth::get();
 
         try {
@@ -142,8 +148,6 @@ class LegacyUserProvider implements UserProvider
             $username = $username ?? Session::get('username', $credentials['username']);
 
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
-        } finally {
-            error_reporting(-1);
         }
 
         return false;
@@ -157,8 +161,6 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        error_reporting(0);
-
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
 
@@ -171,18 +173,12 @@ class LegacyUserProvider implements UserProvider
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
 
-        error_reporting(-1);
-
         if (empty($new_user)) {
             // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)
             try {
-                error_reporting(0);
-
                 $auth->authenticate($credentials);
                 $auth_id = $auth->getUserid($username);
                 $new_user = $auth->getUser($auth_id);
-
-                error_reporting(-1);
             } catch (AuthenticationException $ae) {
                 toast()->error($ae->getMessage());
             }
@@ -216,5 +212,25 @@ class LegacyUserProvider implements UserProvider
         }
 
         return $user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function rehashPasswordIfRequired(Authenticatable $user, #[\SensitiveParameter] array $credentials, bool $force = false)
+    {
+        // TODO: NEEDS TO BE VERIFIED CORRECT SOLUTION
+        if (! isset($credentials['password']) || empty($user->getAuthPassword())) {
+            return;
+        }
+        $hasher = app(HasherContract::class);
+
+        if (! $hasher->needsRehash($user->getAuthPassword()) && ! $force) {
+            return;
+        }
+
+        $user->forceFill([
+            $user->getAuthPasswordName() => $hasher->make($credentials['password']),
+        ])->save();
     }
 }

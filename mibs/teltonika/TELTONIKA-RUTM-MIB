@@ -1,0 +1,1452 @@
+TELTONIKA-RUTM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+	Integer32, enterprises, Counter64,
+	IpAddress, Unsigned32				FROM SNMPv2-SMI
+	DisplayString,
+	PhysAddress					FROM SNMPv2-TC
+	OBJECT-GROUP, NOTIFICATION-GROUP		FROM SNMPv2-CONF;
+
+teltonika MODULE-IDENTITY
+	LAST-UPDATED	"202506122318Z"
+	ORGANIZATION	"TELTONIKA"
+	CONTACT-INFO	"TELTONIKA"
+	DESCRIPTION	"The MIB module for TELTONIKA RUTM routers."
+	REVISION	"202506122318Z"
+	DESCRIPTION	"RUTM MIB for LibreNMS by @westerterp"
+	::= { enterprises 48690 }
+
+teltonikaSnmpGroups	OBJECT IDENTIFIER ::= { teltonika 0 }
+device			OBJECT IDENTIFIER ::= { teltonika 1 }
+mobile			OBJECT IDENTIFIER ::= { teltonika 2 }
+gps                     OBJECT IDENTIFIER ::= { teltonika 3 }
+notifications		OBJECT IDENTIFIER ::= { teltonika 4 }
+mobileNotifications	OBJECT IDENTIFIER ::= { notifications 1 }
+ioNotifications	OBJECT IDENTIFIER ::= { notifications 2 }
+hotspotNotifications	OBJECT IDENTIFIER ::= { notifications 3 }
+eventNotifications	OBJECT IDENTIFIER ::= { notifications 4 }
+hotspot		OBJECT IDENTIFIER ::= { teltonika 5 }
+io			OBJECT IDENTIFIER ::= { teltonika 6 }
+wireless		OBJECT IDENTIFIER ::= { teltonika 7 }
+vlan			OBJECT IDENTIFIER ::= { teltonika 8 }
+sqm			OBJECT IDENTIFIER ::= { teltonika 9 }
+port			OBJECT IDENTIFIER ::= { teltonika 10 }
+mwan3			OBJECT IDENTIFIER ::= { teltonika 12 }
+
+-- Device --
+
+deviceGroup OBJECT-GROUP
+	OBJECTS { serial,
+		  deviceName,
+		  productCode,
+		  batchNumber,
+		  hardwareRevision,
+		  fwVersion,
+		  deviceUptime,
+		  cpuUsage }
+	STATUS current
+	DESCRIPTION "Device SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 1 }
+
+serial OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Serial number"
+	::= { device 1 }
+
+deviceName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device name"
+	::= { device 2 }
+
+productCode OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device product code"
+	::= { device 3 }
+
+batchNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device batch number"
+	::= { device 4 }
+
+hardwareRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device hardware revision"
+	::= { device 5 }
+
+fwVersion OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device firmware version"
+	::= { device 6 }
+
+deviceUptime OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device uptime in seconds"
+	::= { device 7 }
+
+cpuUsage OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Device cpu usage in percents"
+	::= { device 8 }
+
+-- GSM --
+
+modemGroup OBJECT-GROUP
+	OBJECTS { modemNum,
+		  mIndex,
+		  mDescr,
+		  mImei,
+		  mModel,
+		  mManufacturer,
+		  mRevision,
+		  mSerial,
+		  mIMSI,
+		  mSimState,
+		  mPinState,
+		  mNetState,
+		  mSignal,
+		  mOperator,
+		  mOperatorNumber,
+		  mConnectionState,
+		  mNetworkType,
+		  mTemperature,
+		  mCellID,
+		  mSINR,
+		  mRSRP,
+		  mRSRQ,
+		  mSent,
+		 mReceived,
+		  mIP,
+		  mSentToday,
+		  mReceivedToday,
+		  mICCID,
+		  mSentCurrentWeek,
+		  mReceivedCurrentWeek,
+		  mSentCurrentMonth,
+		  mReceivedCurrentMonth,
+		  connectionUptime }
+	STATUS current
+	DESCRIPTION "Mobile SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 2 }
+
+modemNum OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of modems (regardless of their current state) present on this system"
+	::= { mobile 1 }
+
+-- The modems table
+
+modemTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF ModemEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of modem entries. The number of entries is given by the value of modemNum"
+	::= { mobile 2 }
+
+modemEntry OBJECT-TYPE
+	SYNTAX		ModemEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular interface"
+	INDEX		{ mIndex }
+	::= { modemTable 1 }
+
+ModemEntry ::=
+	SEQUENCE {
+	mIndex			Integer32,
+	mDescr			DisplayString,
+	mImei			DisplayString,
+	mModel			DisplayString,
+	mManufacturer		DisplayString,
+	mRevision		DisplayString,
+	mSerial 		DisplayString,
+	mIMSI			DisplayString,
+	mSimState		DisplayString,
+	mPinState		DisplayString,
+	mNetState		DisplayString,
+	mSignal			DisplayString,
+	mOperator		DisplayString,
+	mOperatorNumber 	DisplayString,
+	mConnectionState	DisplayString,
+	mNetworkType		DisplayString,
+	mTemperature		INTEGER,
+	mCellID		DisplayString,
+	mSINR			DisplayString,
+	mRSRP			DisplayString,
+	mRSRQ			DisplayString,
+	mSent			Counter64,
+	mReceived		Counter64,
+	mIP			DisplayString,
+	mSentToday		Counter64,
+	mReceivedToday		Counter64,
+	mSentCurrentWeek	Counter64,
+	mReceivedCurrentWeek	Counter64,
+	mSentCurrentMonth	Counter64,
+	mReceivedCurrentMonth	Counter64,
+	mICCID			DisplayString
+	}
+
+mIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..2147483647)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each modem"
+	::= { modemEntry 1 }
+
+mDescr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A textual string containing information about the modem"
+	::= { modemEntry 2 }
+
+mImei OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem IMEI"
+	::= { modemEntry 3 }
+
+mModel OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem model"
+	::= { modemEntry 4 }
+
+mManufacturer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem manufacturer"
+	::= { modemEntry 5 }
+
+mRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem revision"
+	::= { modemEntry 6 }
+
+mSerial OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Serial number"
+	::= { modemEntry 7 }
+
+mIMSI OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"IMSI"
+	::= { modemEntry 8 }
+
+mSimState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SIM status"
+	::= { modemEntry 9 }
+
+mPinState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"PIN status"
+	::= { modemEntry 10 }
+
+mNetState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Mobile network registration status"
+	::= { modemEntry 11 }
+
+mSignal OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Signal level"
+	::= { modemEntry 12 }
+
+mOperator OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Operator currently in use"
+	::= { modemEntry 13 }
+
+mOperatorNumber OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Operator number (MCC+MNC)"
+	::= { modemEntry 14 }
+
+mConnectionState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Data session connection state"
+	::= { modemEntry 15 }
+
+mNetworkType OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Data session network type"
+	::= { modemEntry 16 }
+
+mTemperature OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem temperature"
+	::= { modemEntry 17 }
+
+mCellID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"CELL ID"
+	::= { modemEntry 18 }
+
+mSINR OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE SINR level"
+	::= { modemEntry 19 }
+
+mRSRP OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE RSRP level"
+	::= { modemEntry 20 }
+
+mRSRQ OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"LTE RSRQ level"
+	::= { modemEntry 21 }
+
+mSent OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total bytes sent"
+	::= { modemEntry 22 }
+
+mReceived OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total bytes received"
+	::= { modemEntry 23 }
+
+mIP OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Modem IP address(es)"
+	::= { modemEntry 24 }
+
+mSentToday OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent today"
+	::= { modemEntry 25 }
+
+mReceivedToday OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received today"
+	::= { modemEntry 26 }
+
+mICCID OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "SIM ICCID"
+	::= { modemEntry 27 }
+
+mSentCurrentWeek OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent current week"
+	::= { modemEntry 28 }
+
+mReceivedCurrentWeek OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received current week"
+	::= { modemEntry 29 }
+
+mSentCurrentMonth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes sent current month"
+	::= { modemEntry 30 }
+
+mReceivedCurrentMonth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bytes received current month"
+	::= { modemEntry 31 }
+
+-- End of the table
+
+connectionUptime OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Mobile connection uptime in seconds"
+	::= { mobile 3 }
+
+-- GPS --
+
+latitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latitutde coordinates"
+    ::= { gps 1 }
+
+longtitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Longtitude coordinates"
+    ::= { gps 2 }
+
+accuracy OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accuracy"
+    ::= { gps 3 }
+
+datetime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GPS datetime"
+    ::= { gps 4 }
+
+numSatellites OBJECT-TYPE
+    SYNTAX 	Integer32
+    MAX-ACCESS  read-only
+    STATUS	current
+    DESCRIPTION	"Number of satellites"
+    ::= { gps 5 }
+
+-- Traps --
+
+trapGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		signalChangeNotification,
+		networkTypeNotification,
+		digitalInputNotification,
+digitalOutputNotification,
+		clientConnectedNotification,
+		clientDisconnectedNotification,
+		eventLogNotification }
+	STATUS current
+	DESCRIPTION "Traps SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 4 }
+
+signalChangeNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Signal strength trap"
+	::= { mobileNotifications 1 }
+
+networkTypeNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Network type trap"
+	::= { mobileNotifications 2 }
+
+digitalInputNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Digital input trap"
+	::= { ioNotifications 1 }
+
+digitalOutputNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Digital output trap"
+	::= { ioNotifications 2 }
+
+clientConnectedNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Client connection to Hotspot trap"
+	::= { hotspotNotifications 1 }
+
+clientDisconnectedNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Client disconnection from Hotspot trap"
+	::= { hotspotNotifications 2 }
+
+eventLogNotification NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Event log notification trap"
+	::= { eventNotifications 1 }
+
+-- Hotspot --
+
+hotspotGroup OBJECT-GROUP
+	OBJECTS { hsState,
+		  hsIP,
+		  hsNet,
+		  hsAuth,
+		  hsSessionCount,
+		  hssIndex,
+		  hssMAC,
+		  hssIP,
+		  hssID,
+		  hssUsername,
+		  hssState,
+		  hssDwLimit,
+		  hssUpLimit,
+		  hssTimeLimit,
+		  hssIdleTimeout,
+		  hssDwBandwidth,
+		  hssUpBandwidth,
+		  hssURL }
+	STATUS current
+	DESCRIPTION "Hotspot SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 5 }
+
+hsState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disabled(0),	-- Hotspot service disabled
+		enabled(1)	-- Hotspot service enabled
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Hotspot state"
+	::= { hotspot 1 }
+
+hsIP OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The IPv4 address"
+	::= { hotspot 2 }
+
+hsNet OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Network interfaces"
+	::= { hotspot 3 }
+
+hsAuth OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Authentication mode"
+	::= { hotspot 4 }
+
+hsSessionCount OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of sessions"
+	::= { hotspot 5 }
+
+-- Hotspot table
+
+hsSessionTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF HsSessionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of hotspot session entries. The number of entries is given by the value of hsSessionNum."
+	::= { hotspot 6 }
+
+hsSessionEntry OBJECT-TYPE
+	SYNTAX		HsSessionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular hotspot session."
+	INDEX		{ hssIndex }
+	::= { hsSessionTable 1 }
+
+HsSessionEntry ::=
+	SEQUENCE {
+	hssIndex	INTEGER,
+	hssMAC		PhysAddress,
+	hssIP		IpAddress,
+	hssID		DisplayString,
+	hssUsername	DisplayString,
+	hssState	INTEGER,
+	hssDwLimit	Counter64,
+	hssUpLimit	Counter64,
+	hssTimeLimit	Counter64,
+	hssIdleTimeout	Integer32,
+	hssDwBandwidth	Counter64,
+	hssUpBandwidth	Counter64,
+	hssURL		DisplayString
+	}
+
+hssIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each session."
+	::= { hsSessionEntry 1 }
+
+hssMAC OBJECT-TYPE
+	SYNTAX		PhysAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Clients MAC address"
+	::= { hsSessionEntry 2 }
+
+hssIP OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Clients IP address"
+	::= { hsSessionEntry 3 }
+
+hssID OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Session ID"
+	::= { hsSessionEntry 4 }
+
+hssUsername OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Username"
+	::= { hsSessionEntry 5 }
+
+hssState OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notAuthorized(0),	-- user is authorized
+		authorized(1)		-- user is not authorized
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Session state"
+	::= { hsSessionEntry 6 }
+
+hssDwLimit OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Download limit in bytes. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 7 }
+
+hssUpLimit OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Upload limit in bytes. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 8 }
+
+hssTimeLimit OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Time limit in sec. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 9 }
+
+hssIdleTimeout OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Idle timeout in sec."
+	::= { hsSessionEntry 10 }
+
+hssDwBandwidth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Max download bandwidth in b/s. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 11 }
+
+hssUpBandwidth OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Max upwnload bandwidth in b/s. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 12 }
+
+hssURL OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Original URL"
+	::= { hsSessionEntry 13 }
+
+-- I/O --
+
+ioGroup OBJECT-GROUP
+	OBJECTS { ioCount,
+		  ioIndex,
+		  ioSystemName,
+		  ioName,
+		  ioType,
+		  ioBidirectional,
+		  ioState,
+		  ioInput,
+		  ioInverted,
+		  ioCurrent,
+		  ioPercentage,
+		  ioStateNumeric }
+	STATUS current
+	DESCRIPTION "I/O SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 6 }
+
+ioCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Count of I/O"
+	::= { io 1 }
+
+-- I/O table
+
+ioTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of I/O. The number of entries is given by the value of ioCount."
+	::= { io 2 }
+
+ioEntry OBJECT-TYPE
+	SYNTAX		IOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular I/O."
+	INDEX		{ ioIndex }
+	::= { ioTable 1 }
+
+IOEntry ::=
+	SEQUENCE {
+	ioIndex	INTEGER,
+	ioSystemName	DisplayString,
+	ioName		DisplayString,
+	ioType		DisplayString,
+	ioBidirectional INTEGER,
+	ioState	DisplayString,
+	ioInput	INTEGER,
+	ioInverted	INTEGER,
+	ioCurrent	DisplayString,
+	ioPercentage	DisplayString,
+	ioStateNumeric	INTEGER
+	}
+
+ioIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each session."
+	::= { ioEntry 1 }
+
+ioSystemName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the I/O."
+	::= { ioEntry 2 }
+
+ioName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the I/O, as displayed in WebUI."
+	::= { ioEntry 3 }
+
+ioType OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A description of I/O type."
+	::= { ioEntry 4 }
+
+ioBidirectional OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is I/O bidirectional?"
+	::= { ioEntry 5 }
+
+ioState OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"State of I/O."
+	::= { ioEntry 6 }
+
+ioInput OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is I/O an input?"
+	::= { ioEntry 7 }
+
+ioInverted OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Is value of I/O inverted?"
+	::= { ioEntry 8 }
+
+ioCurrent OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current amount flowing though ACL."
+	::= { ioEntry 9 }
+
+ioPercentage OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Percentage of ACL."
+	::= { ioEntry 10 }
+
+ioStateNumeric OBJECT-TYPE
+	SYNTAX		INTEGER {na(-1), low(0), high(1)}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Numeric state of I/O."
+	::= { ioEntry 11 }
+
+-- Wireless --
+
+-- Wireless Radios
+
+radioGroup OBJECT-GROUP
+	OBJECTS { radioCount,
+		  radioIndex,
+		  radioName,
+		  radioUpState,
+		  radioDisabledState,
+		  radioChannel }
+	STATUS current
+	DESCRIPTION "Radio SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 7 }
+
+radioCount  OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Amount of wireless radios"
+	::= { wireless 1 }
+
+radioTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF RadioEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "A list of wireless radios."
+	::= { wireless 2 }
+
+radioEntry OBJECT-TYPE
+	SYNTAX      RadioEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "An entry containing information of a particular wireless radio."
+	INDEX   { radioIndex }
+	::= { radioTable 1 }
+
+RadioEntry ::=
+	SEQUENCE {
+		radioIndex         INTEGER,
+		radioName          DisplayString,
+		radioUpState       INTEGER,
+		radioDisabledState INTEGER,
+		radioChannel       DisplayString
+	}
+
+radioIndex OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "A unique value, greater than zero, for each wireless radio."
+	::= { radioEntry 1 }
+
+radioName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The name of the wireless radio."
+	::= { radioEntry 2 }
+
+radioUpState OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Is the radio currently turned on?"
+	::= { radioEntry 3 }
+
+radioDisabledState OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Is the radio currently disabled?"
+	::= { radioEntry 4 }
+
+radioChannel OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Current active channel of the wireless radio."
+	::= { radioEntry 5 }
+
+-- Wireless Interfaces
+
+wIfaceGroup OBJECT-GROUP
+	OBJECTS { wIfaceCount,
+		  wIfaceIndex,
+		  wIfaceSSID,
+		  wIfaceHidden,
+		  wIfaceEncryption,
+		  wIfaceMode }
+	STATUS current
+	DESCRIPTION "Wireless interface SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 8 }
+
+wIfaceCount OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Amount of wireless interfaces"
+	::= { wireless 3 }
+
+wIfaceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF WIfaceEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "A list of wireless interfaces."
+	::= { wireless 4 }
+
+wIfaceEntry OBJECT-TYPE
+	SYNTAX WIfaceEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "An entry containing information of a particular wireless interface."
+	INDEX   { wIfaceIndex }
+	::= { wIfaceTable 1 }
+
+WIfaceEntry ::=
+	SEQUENCE {
+	wIfaceIndex        INTEGER,
+	wIfaceSSID         DisplayString,
+	wIfaceHidden       INTEGER,
+	wIfaceEncryption   DisplayString,
+	wIfaceMode         DisplayString
+	}
+
+wIfaceIndex OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "A unique value, greater than zero, for each wireless interface."
+	::= { wIfaceEntry 1 }
+
+wIfaceSSID OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The SSID of a wireless interface."
+	::= { wIfaceEntry 2 }
+
+wIfaceHidden OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Is the wireless interface hidden?"
+	::= { wIfaceEntry 3 }
+
+wIfaceEncryption OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The encryption used by the wireless interface"
+	::= { wIfaceEntry 4 }
+
+wIfaceMode OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The mode of the wireless interface."
+	::= { wIfaceEntry 5 }
+
+-- Interface-based VLAN --
+
+iVlanGroup OBJECT-GROUP
+	OBJECTS { iVlanCount,
+		  iVlanIndex,
+		  iVlanName,
+		  iVlanType,
+		  iVlanIfName,
+		  iVlanVID }
+	STATUS current
+	DESCRIPTION "Interface-based VLAN SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 9 }
+
+iVlanCount OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Amount of interface-based virtual networks."
+	::= { vlan 3 }
+
+iVlanTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF IVlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "A list interface-based virtual networks."
+	::= { vlan 4 }
+
+iVlanEntry OBJECT-TYPE
+	SYNTAX      IVlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "An entry containing information about an interface-based VLAN."
+	INDEX   { iVlanIndex }
+	::= { iVlanTable 1 }
+
+IVlanEntry ::=
+	SEQUENCE {
+	iVlanIndex  INTEGER,
+	iVlanName   DisplayString,
+	iVlanType   DisplayString,
+	iVlanIfName DisplayString,
+	iVlanVID    INTEGER
+	}
+
+iVlanIndex OBJECT-TYPE
+	SYNTAX     INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "The index of an iface-based VLAN."
+	::= { iVlanEntry 1 }
+
+iVlanName OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "The name of an iface-based VLAN."
+	::= { iVlanEntry 2 }
+
+iVlanType OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "The type of an iface-based VLAN."
+	::= { iVlanEntry 3 }
+
+iVlanIfName OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "The interface name of an iface-based VLAN."
+	::= { iVlanEntry 4 }
+
+iVlanVID OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "The VLAN ID of an iface-based VLAN."
+	::= { iVlanEntry 5 }
+
+-- Port-based VLAN --
+
+pVlanGroup OBJECT-GROUP
+	OBJECTS { pVlanCount,
+		  pVlanIndex,
+		  pVlanNum,
+		  pVlanPorts,
+		  pVlanVID }
+	STATUS current
+	DESCRIPTION "Port-based VLAN SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 10 }
+
+pVlanCount OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Amount of port-based virtual networks."
+	::= { vlan 1 }
+
+pVlanTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF PVlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "A list port-based virtual networks."
+	::= { vlan 2 }
+
+pVlanEntry OBJECT-TYPE
+	SYNTAX      PVlanEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "An entry containing information about a port-based VLAN"
+	INDEX   { pVlanIndex }
+	::= { pVlanTable 1 }
+
+PVlanEntry ::=
+	SEQUENCE {
+	pVlanIndex  INTEGER,
+	pVlanNum   INTEGER,
+	pVlanPorts  DisplayString,
+	pVlanVID DisplayString
+	}
+
+pVlanIndex OBJECT-TYPE
+	SYNTAX      INTEGER (0..65535)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The index of the port-based VLAN"
+	::= { pVlanEntry 1 }
+
+pVlanNum OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vlan number of the port-based VLAN"
+	::= { pVlanEntry 2 }
+
+pVlanPorts OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The assigned ports of the port-based VLAN"
+	::= { pVlanEntry 3 }
+
+pVlanVID OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vlan device of the port-based VLAN"
+	::= { pVlanEntry 4 }
+
+-- SQM --
+
+queueVlanGroup OBJECT-GROUP
+	OBJECTS { queueCount,
+		  queueIndex,
+		  queueName,
+		  queueEnabled,
+		  queueIface,
+		  queueDownLimit,
+		  queueUpLimit,
+		  queueQdisk,
+		  queueScript }
+	STATUS current
+	DESCRIPTION "SQM SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 11 }
+
+queueCount  OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Amount of traffic shaping configs"
+	::= { sqm 1 }
+
+queueTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF QueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "A list of traffic shaping configs."
+	::= { sqm 2 }
+
+queueEntry OBJECT-TYPE
+	SYNTAX      QueueEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Entry containg info of a traffic shaping config."
+	INDEX   { queueIndex }
+	::= { queueTable 1 }
+
+QueueEntry ::=
+	SEQUENCE {
+	queueIndex     INTEGER,
+	queueName      DisplayString,
+	queueEnabled   INTEGER,
+	queueIface     DisplayString,
+	queueDownLimit INTEGER,
+	queueUpLimit   INTEGER,
+	queueQdisk     DisplayString,
+	queueScript    DisplayString
+	}
+
+
+queueIndex     OBJECT-TYPE
+	SYNTAX INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The index of the queue"
+	::={ queueEntry 1 }
+
+queueName      OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The internal name of the queue"
+	::={ queueEntry 2 }
+
+queueEnabled   OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "Is the queue enabled?"
+	::={ queueEntry 3 }
+
+queueIface OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The assigned interface of the queue"
+	::={ queueEntry 4 }
+
+queueDownLimit OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The download limit of the queue"
+	::={ queueEntry 5 }
+
+queueUpLimit OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The upload limit of the queue"
+	::={ queueEntry 6 }
+
+queueQdisk OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The queuing discipline in use for this queue"
+	::={ queueEntry 7 }
+
+queueScript OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION "The queuing discipline setup script used in this queue"
+	::={ queueEntry 8 }
+
+-- Port --
+
+portGroup OBJECT-GROUP
+	OBJECTS { portCount,
+		  pIndex,
+		  pName,
+		  pNumber,
+		  pPosition,
+		  pState,
+		  pSpeed,
+		  pDuplex }
+	STATUS current
+	DESCRIPTION "Port SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 12 }
+
+portCount OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of ports on the device"
+	::= { port 1 }
+
+-- Port table
+
+portTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF PortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of port entries. The number of entries is given by the value of portCount"
+	::= { port 2 }
+
+portEntry OBJECT-TYPE
+	SYNTAX		PortEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular port"
+	INDEX		{ pIndex }
+	::= { portTable 1 }
+
+PortEntry ::=
+	SEQUENCE {
+	pIndex	  INTEGER,
+	pName	  DisplayString,
+	pNumber	  INTEGER,
+	pPosition INTEGER,
+	pState	  DisplayString,
+	pSpeed	  INTEGER,
+	pDuplex	  DisplayString
+	}
+
+pIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A unique value, greater than zero, for each port"
+	::= { portEntry 1 }
+
+pName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Port's name"
+	::= { portEntry 2 }
+
+pNumber OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Port's number"
+	::= { portEntry 3 }
+
+pPosition OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Port's physical position"
+	::= { portEntry 4 }
+
+pState OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Port's state"
+	::= { portEntry 5 }
+
+pSpeed OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Port's speed"
+	::= { portEntry 6 }
+
+pDuplex OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Boolean value whether port is duplex or not"
+	::= { portEntry 7 }
+
+-- MWAN3 --
+
+mwan3Group OBJECT-GROUP
+	OBJECTS { mwan3Count,
+		  mwan3Index,
+		  mwan3Name,
+		  mwan3Enabled,
+		  mwan3Uptime,
+		  mwan3Status,
+		  mwan3Ip }
+	STATUS current
+	DESCRIPTION "MWAN3 SNMP group defined according to RFC 2580"
+	::= { teltonikaSnmpGroups 12 }
+
+mwan3Count OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Count of Multiwan interfaces"
+	::= { mwan3 1 }
+
+-- MWAN3 table
+
+mwan3Table OBJECT-TYPE
+	SYNTAX		SEQUENCE OF MWAN3Entry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of Multiwan interfaces. The number of entries is given by the value of mwan3Count."
+	::= { mwan3 2 }
+
+mwan3Entry OBJECT-TYPE
+	SYNTAX		MWAN3Entry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry containing information of a particular Multiwan interface."
+	INDEX		{ mwan3Index }
+	::= { mwan3Table 1 }
+
+MWAN3Entry ::=
+	SEQUENCE {
+	mwan3Index	INTEGER,
+	mwan3Name	DisplayString,
+	mwan3Enabled	INTEGER,
+	mwan3Uptime	INTEGER,
+	mwan3Status	DisplayString,
+	mwan3Ip		DisplayString
+	}
+
+mwan3Index OBJECT-TYPE
+	SYNTAX		INTEGER (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Unique value, greater than zero, for each session."
+	::= { mwan3Entry 1 }
+
+mwan3Name OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Name of Multiwan interface."
+	::= { mwan3Entry 2 }
+
+mwan3Enabled OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Numeric value indicating if interface is enabled or not."
+	::= { mwan3Entry 3 }
+
+mwan3Uptime OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Multiwan interface uptime."
+	::= { mwan3Entry 4 }
+
+mwan3Status OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Status of Multiwan interface."
+	::= { mwan3Entry 5 }
+
+mwan3Ip OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"IP addresses that Multiwan interface tracks."
+	::= { mwan3Entry 6 }
+
+
+END

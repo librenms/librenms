@@ -14,13 +14,13 @@
 */
 
 function show_device_group($device_group_id) {
-    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name');
+    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
     ?>
     <div class="panel-heading">
         <span class="devices-font-bold">
         <?php
         if ($device_group_id == 'none') {
-            echo "ungrouped Devices";
+            echo "Ungrouped Devices";
         } elseif ($device_group_id) {
             echo "Device Group: ";
         }
@@ -92,8 +92,8 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     $headeroptions .= '<option value="' .
         \LibreNMS\Util\Url::generate($vars, [
             'format' => 'graph_' . $avail_type,
-            'from' => $vars['from'] ?? \LibreNMS\Config::get('time.day'),
-            'to' => $vars['to'] ?? \LibreNMS\Config::get('time.now'),
+            'from' => $vars['from'] ?? \App\Facades\LibrenmsConfig::get('time.day'),
+            'to' => $vars['to'] ?? \App\Facades\LibrenmsConfig::get('time.now'),
         ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
@@ -118,12 +118,12 @@ $no_refresh = $format == 'list';
 
 if ($format == 'graph') {
     if (empty($vars['from'])) {
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     } else {
         $graph_array['from'] = $vars['from'];
     }
     if (empty($vars['to'])) {
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     } else {
         $graph_array['to'] = $vars['to'];
     }
@@ -232,9 +232,9 @@ if ($format == 'graph') {
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
         if (is_integer($row / 2)) {
-            $row_colour = \LibreNMS\Config::get('list_colour.even');
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
-            $row_colour = \LibreNMS\Config::get('list_colour.odd');
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
         if (device_permitted($device['device_id'])) {
@@ -278,7 +278,7 @@ if ($format == 'graph') {
     $state = isset($vars['state']) ? $vars['state'] : '';
     $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
         "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
-        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option><select>';
+        "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option></select>';
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
@@ -288,7 +288,7 @@ if ($format == 'graph') {
 
     $os_selected = '""';
     if (isset($vars['os'])) {
-        $os_selected = json_encode(['id' => $vars['os'], 'text' => \LibreNMS\Config::getOsSetting($vars['os'], 'text', $vars['os'])]);
+        $os_selected = json_encode(['id' => $vars['os'], 'text' => \App\Facades\LibrenmsConfig::getOsSetting($vars['os'], 'text', $vars['os'])]);
     }
 
     $location_selected = '""';
@@ -307,8 +307,9 @@ if ($format == 'graph') {
         </div>
     </div>
     <div class="table-responsive">
-        <?php show_device_group($vars['group']); ?>
-        <table id="devices" class="table table-hover table-condensed table-striped">
+        <?php show_device_group($vars['group'] ?? 0); ?>
+        <table id="devices" class="table table-hover table-condensed table-striped"
+               data-url="<?php echo route('table.device') ?>">
             <thead>
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false"><?php echo $detailed ? 'S.' : 'Status'; ?></th>
@@ -337,7 +338,7 @@ if ($format == 'graph') {
                     return "<span title=\"Status: " + row.status + " : " + row.extra.replace(/^label-/,'') + "\" class=\"<?php echo $detailed ? 'alert-status' : 'alert-status-small' ?> " + row.extra + "\"></span>";
                 },
                 "icon": function (column, row) {
-                    return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                    return "<span class=\"device-table-icon tw:dark:bg-gray-50 tw:dark:rounded-lg tw:dark:p-2\">" + row.icon + "</span>";
                 },
                 "maintenance": function (column, row) {
                     if (row.maintenance) {
@@ -380,7 +381,6 @@ if ($format == 'graph') {
                     device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 };
             },
-            url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php

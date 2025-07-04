@@ -32,10 +32,11 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
-use LibreNMS\Config;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -135,7 +136,7 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
@@ -196,7 +197,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
+        $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
@@ -249,9 +250,9 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        if (Config::get('alert.fixed-contacts') == false) {
+        if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
-                $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
             $sql = $alert['query'];
             $qry = dbFetchRows($sql, [$alert['device_id']]);
@@ -261,7 +262,7 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
                 $this->extTransports($obj);
             }
             echo "\r\n";
@@ -307,7 +308,7 @@ class RunAlerts
                 }
 
                 if (empty($alert['query'])) {
-                    $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                    $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later
@@ -442,16 +443,17 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
+
+            $alert['alert_id'] = $alert_status['id'];
 
             if (empty($alert['rule_id']) || ! $this->isRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
                 echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
                 // Alert-Rule does not exist anymore, let's remove the alert-state.
                 dbDelete('alerts', 'rule_id = ? && device_id = ?', [$alert_status['rule_id'], $alert_status['device_id']]);
             } else {
-                $alert['alert_id'] = $alert_status['id'];
                 $alert['state'] = $alert_status['state'];
                 $alert['alerted'] = $alert_status['alerted'];
                 $alert['note'] = $alert_status['note'];
@@ -494,7 +496,7 @@ class RunAlerts
                 $noiss = true;
             }
 
-            $tolerence_window = Config::get('alert.tolerance_window');
+            $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             if (! empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
@@ -599,10 +601,11 @@ class RunAlerts
         }
 
         // alerting for default contacts, etc
-        if (Config::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
+                'transport_name' => 'Default Mail',
             ];
         }
 

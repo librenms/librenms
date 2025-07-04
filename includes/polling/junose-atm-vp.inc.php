@@ -54,7 +54,7 @@ if (count($vp_rows)) {
             'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'],
         ];
 
-        $tags = compact('ifIndex', 'vp_id', 'rrd_name', 'rrd_def');
+        $tags = ['ifIndex' => $ifIndex, 'vp_id' => $vp_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'atm-vp', $tags, $fields);
     }//end foreach
 

@@ -4,12 +4,12 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\ValidationException;
 use JsonSchema\Validator;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,12 +34,7 @@ class SetConfigCommand extends LnmsCommand
         $this->addOption('ignore-checks');
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle(DynamicConfig $definition)
+    public function handle(DynamicConfig $definition): int
     {
         $setting = $this->argument('setting');
         $value = $this->argument('value');
@@ -90,7 +85,7 @@ class SetConfigCommand extends LnmsCommand
         // handle appending to arrays
         if (Str::endsWith($setting, '.+')) {
             $setting = substr($setting, 0, -2);
-            $sub_data = Config::get($setting, []);
+            $sub_data = LibrenmsConfig::get($setting, []);
             if (! is_array($sub_data)) {
                 $this->error(trans('commands.config:set.errors.append'));
 
@@ -103,7 +98,7 @@ class SetConfigCommand extends LnmsCommand
 
         // handle setting value inside multi-dimensional array
         if ($parent && $parent !== $setting) {
-            $parent_data = Config::get($parent);
+            $parent_data = LibrenmsConfig::get($parent);
             Arr::set($parent_data, $this->getChildPath($setting, $parent), $value);
             $value = $parent_data;
             $setting = $parent;
@@ -122,7 +117,7 @@ class SetConfigCommand extends LnmsCommand
             return 2;
         }
 
-        if (Config::persist($setting, $value)) {
+        if (LibrenmsConfig::persist($setting, $value)) {
             return 0;
         }
 
@@ -162,7 +157,7 @@ class SetConfigCommand extends LnmsCommand
     private function erase($setting, $parent = null)
     {
         if ($parent) {
-            $data = Config::get($parent);
+            $data = LibrenmsConfig::get($parent);
 
             if (preg_match("/^$parent\.?(?<sub>.+)\\.(?<index>\\d+)\$/", $setting, $matches)) {
                 // nested inside the parent setting, update just the required part
@@ -174,10 +169,10 @@ class SetConfigCommand extends LnmsCommand
                 $this->forgetWithIndex($data, $this->getChildPath($setting, $parent));
             }
 
-            return Config::persist($parent, $data);
+            return LibrenmsConfig::persist($parent, $data);
         }
 
-        return Config::erase($setting);
+        return LibrenmsConfig::erase($setting);
     }
 
     private function getChildPath($setting, $parent = null): string
@@ -214,7 +209,7 @@ class SetConfigCommand extends LnmsCommand
     private function validateOsSetting(string $os, string $setting, $value)
     {
         // prep data to be validated
-        $os_data = Config::get("os.$os");
+        $os_data = LibrenmsConfig::get("os.$os");
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
         }
@@ -234,21 +229,21 @@ class SetConfigCommand extends LnmsCommand
         $validator = new Validator;
         $validator->validate(
             $os_data,
-            (object) ['$ref' => 'file://' . base_path('/misc/os_schema.json')],
+            (object) ['$ref' => 'file://' . resource_path('definitions/schema/os_schema.json')],
             Constraint::CHECK_MODE_TYPE_CAST
         );
 
         $code = 0;
 
         $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
-            if ($error['constraint'] == 'additionalProp') {
+            if ($error['constraint']['name'] == 'additionalProp') {
                 $code = 1;
 
                 return true;
             }
 
             // only check type if value is set (otherwise we are unsetting it)
-            if (! empty($value) && $error['constraint'] == 'type') {
+            if (! empty($value) && $error['constraint']['name'] == 'type') {
                 if ($code === 0) {
                     $code = 2; // wrong path takes precedence over wrong type
                 }

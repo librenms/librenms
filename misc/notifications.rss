@@ -7,97 +7,6 @@
  <lastBuildDate>Mon, 02 May 2016 20:00:00 +0000</lastBuildDate>
  <pubDate>Mon, 02 Mar 2016 20:00:00 +0000</pubDate>
  <ttl>1800</ttl>
- <item>
-  <title>Hello World!</title>
-  <description>This is the first notification. We will post these whenever an upcoming major change is about to happen.</description>
-  <pubDate>Tue, 19 Jan 2016 12:00:00 +0000</pubDate>
- </item>
- <item>
-  <title>Cisco syslog parsing changes</title>
-  <description>We have overhauled the Cisco syslog parsing.  Please monitor your syslog entries from Cisco IOS, IOSXR, and CatOS devices.  If you notice any issues please open a new issue on GitHub and include the original syslog message.</description>
-  <pubDate>Thu, 03 Mar 2016 12:00:00 +0000</pubDate>
- </item>
- <item>
-   <title>Billing Data Changes</title>
-   <description>We have updated the method for storing billing data, removing a lot of information stored in
-   the database which was not used.  Please check that your billing data is updating as expected, and
-   if you notice any problems open an issue on GitHub.</description>
-   <pubDate>Mon, 07 Mar 2016 12:00:00 +0000</pubDate>
- </item>
- <item>
-   <title>Introduction of default purge interval or alert history</title>
-   <description>We have introduced a purge setting for alert history which is set to 365 days as default. If you would like to update this then please
-   set $config['alert_log_purge'] to a custom value (set in days).</description>
-   <pubDate>Mon, 02 May 2016 20:00:00 +0000</pubDate>
- </item>
- <item>
-   <title>The Alerts Menu has moved</title>
-   <description>The Alerts menu has been relocated to a top level menu on the far right.  To make room for this, Plugins have been moved
-   to the overview menu.</description>
-   <pubDate>Mon, 12 Sep 2016 20:00:00 +0000</pubDate>
- </item>
- <item>
-   <title>Wireless Section in Beta</title>
-   <description>The new wireless section is under development. Please visit our community to discuss these changes and help improve LibreNMS.
-   https://t.libren.ms/5fglp</description>
-   <pubDate>Mon, 1 May 2017 20:00:00 +0000</pubDate>
- </item>
- <item>
-   <title>Update to alerting to normal users</title>
-   <description>We have released an update to fix normal users receiving alerts with no ability to turn this off. An option is now available within the General alert settings section to
-   enable this. Please note that the default is off to match with the other default contact settings. If you expect normal users to receive alerts then you should enable this new option.</description>
-   <pubDate>Mon, 15 May 2017 23:00:00 +0000</pubDate>
- </item>
-  <item>
-    <title>Legacy Alert Templates and Transports removed</title>
-    <description>As described previously, Legacy Alert Templates and Transports have been removed.  You can find more info here: https://community.librenms.org/t/deprecation-notice-alerting-legacy-transports-and-templates/5915</description>
-    <pubDate>Fri, 15 Feb 2017 23:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>Cisco Temperature Sensor Threshold Values Stored as High Limits</title>
-    <description>During discovery, some temperature sensors discovered on Cisco devices had their highest temperature value stored as warning high limit. For new discovered devices, this value is now stored as high limit.</description>
-    <pubDate>Sun, 17 Mar 2019 21:00:00 +0100</pubDate>
-  </item>
-   <item>
-    <title>LibreNMS Python Dispatcher Service V2 (breaking change)</title>
-    <description>Version two of the LibreNMS python dispatcher service is merged. This code now requires Redis 5.x and redis-py 3.x to operate (if using distributed polling). If you are using the dispatcher service with Redis and have not updated, polling will stop functioning.</description>
-    <pubDate>Mon, 20 May 2019 00:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>RutOS 2xx pinState renamed</title>
-    <description>RutOS 2xx pinState renamed to rutos2xx_pinState.  Update any alert rules you may have.</description>
-    <pubDate>Thu, 10 Oct 2019 00:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>Cisco Wireless Controller classified as Wireless</title>
-    <description>Cisco WLC is now classified as type "Wireless" instead of "Network".  Update any alert rules you may have.</description>
-    <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>nobulk is now called snmp_bulk</title>
-    <description>The config option "nobulk" is now called "snmp_bulk" to align better with other options.  Update any local configs you might have.  See https://github.com/librenms/librenms/pull/13098 for more information</description>
-    <pubDate>Wed, 01 Sep 2021 18:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>Mikrotik routeros wireless changes</title>
-    <description>Improvements to routeros wireless polling will lose historical data for 60GHz rate, frequency, and distance wireless sensors. See https://github.com/librenms/librenms/pull/12976 for more information.</description>
-    <pubDate>Wed, 19 Oct 2021 18:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>ADSL discovery and polling moved to a new module</title>
-    <description>Adsl statistics are now discovered and polled in a new module. Vdsl stats were also added. `lnms config:set enable_ports_adsl true`is not supported anymore. See https://github.com/librenms/librenms/pull/14207 for more information.</description>
-    <pubDate>Wed, 7 Sept 2022 18:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>Memcached application compatibility break</title>
-    <description>Due to a security vulnerability, you must upgrade your memcached application scripts to the latest version. (1.1)</description>
-    <pubDate>Fri, 10 Oct 2022 18:00:00 +0000</pubDate>
-  </item>
-  <item>
-    <title>Manually set port speeds reset</title>
-    <description>Due to a bug, all manually set port speeds will need to be reconfigured. Likely they are set to 1 instead of the expected value. See https://github.com/librenms/librenms/pull/15238 for more information.</description>
-    <pubDate>Mon, 21 Aug 2023 15:00:00 +0000</pubDate>
-  </item>
   <item>
     <title>Alerting packet loss macro</title>
     <description>The packet loss macros were broken recently. The quick fix is to have them resemble device up/down, which is similar to how they would function if fping_options.count=1. Hopefully, they can be fixed in the future, but be aware their functionality is degraded in the meantime.</description>
@@ -117,6 +26,11 @@
     <title>cisco-access OS removal</title>
     <description>We will be merging the cisco-access (C1200/C1300 based devices) OS into the ciscosb OS. This will be done on the 20th of March 2025. If you have any alert rules or groups that reference this old OS then please update them include ciscosb as soon as possible.</description>
     <pubDate>Sun, 2 Mar 2025 22:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>OS Definitions and discovery yaml file relocation</title>
+    <description>As part of the continued effort to improve LibreNMS, it's code base and associated files, we will be migrating the yaml files used for OS detection and support. Please see https://community.librenms.org/t/os-definitions-and-discovery-file-relocation/27646 for further information.</description>
+    <pubDate>Wed, 16 Apr 2025 22:00:00 +0000</pubDate>
   </item>
 </channel>
 </rss>

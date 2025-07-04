@@ -56,7 +56,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         ];
     }
 } else {
-    echo "file missing: $file";
+    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
 }
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'incoming']);
@@ -94,16 +94,12 @@ $array = [
     'ixfr',
     'opt',
 ];
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds) {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => strtoupper($ds),
-            'ds' => $ds,
-        ];
-    }
-} else {
-    echo "file missing: $file";
+foreach ($array as $ds) {
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => strtoupper($ds),
+        'ds' => $ds,
+    ];
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

@@ -26,13 +26,13 @@
 
 namespace App;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Notification;
 use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Validations\Php;
 
@@ -44,11 +44,11 @@ class Checks
     public static function postAuth()
     {
         // limit popup messages frequency
-        if (Cache::get('checks_popup_timeout') || ! Auth::check()) {
+        if (! Auth::check() || Cache::get('checks_popup_timeout')) {
             return;
         }
 
-        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5) * 60);
+        Cache::put('checks_popup_timeout', true, LibrenmsConfig::get('checks_popup_timer', 5) * 60);
 
         /** @var User $user */
         $user = Auth::user();
@@ -64,19 +64,19 @@ class Checks
                 toast()->warning('PHP unsupported', $message);
             }
 
-            $warn_sec = Config::get('rrd.step', 300) * 3;
+            $warn_sec = LibrenmsConfig::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
                 toast()->warning('Devices unpolled', '<a href="poller/log?filter=unpolled">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>');
             }
 
             // Directory access checks
-            $rrd_dir = Config::get('rrd_dir');
+            $rrd_dir = LibrenmsConfig::get('rrd_dir');
             if (! is_dir($rrd_dir)) {
                 toast()->error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             }
 
-            $temp_dir = Config::get('temp_dir');
+            $temp_dir = LibrenmsConfig::get('temp_dir');
             if (! is_dir($temp_dir)) {
                 toast()->error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             } elseif (! is_writable($temp_dir)) {

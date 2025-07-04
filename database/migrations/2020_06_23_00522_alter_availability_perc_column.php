@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('availability', function (Blueprint $table) {
-            $table->float('availability_perc', 6, 6)->default(0)->change();
+            $table->double('availability_perc')->default(0)->change();
         });
     }
 };

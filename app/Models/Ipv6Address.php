@@ -44,6 +44,9 @@ class Ipv6Address extends PortRelatedModel implements Keyable
         'context_name',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ipv6Network, $this>
+     */
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv6Network::class, 'ipv6_network_id', 'ipv6_network_id');

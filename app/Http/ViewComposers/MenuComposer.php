@@ -26,6 +26,7 @@
 
 namespace App\Http\ViewComposers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
 use App\Models\CustomMap;
@@ -45,7 +46,6 @@ use App\Models\WirelessSensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
@@ -64,7 +64,7 @@ class MenuComposer
         $vars = [];
         /** @var User $user */
         $user = Auth::user();
-        $site_style = Config::get('applied_site_style');
+        $site_style = session('applied_site_style');
 
         //global Settings
         $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
@@ -73,8 +73,7 @@ class MenuComposer
         //TODO: should be handled via CSS Themes
         $vars['navbar'] = in_array($site_style, ['mono']) ? 'navbar-inverse' : '';
 
-        $vars['project_name'] = Config::get('project_name', 'LibreNMS');
-        $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
+        $vars['project_name'] = LibrenmsConfig::get('project_name', 'LibreNMS');
 
         //Dashboards
         $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
@@ -86,7 +85,7 @@ class MenuComposer
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
         $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
-        $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
+        $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
@@ -98,18 +97,18 @@ class MenuComposer
         $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
 
         // Service menu
-        if (Config::get('show_services')) {
+        if (LibrenmsConfig::get('show_services')) {
             $vars['service_counts'] = ObjectCache::serviceCounts(['warning', 'critical']);
         }
 
         // Port menu
         $vars['port_counts'] = ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
-        $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
+        $vars['port_counts']['pseudowire'] = LibrenmsConfig::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
 
         $custom_descr = [];
-        foreach ((array) Config::get('custom_descr', []) as $descr) {
+        foreach ((array) LibrenmsConfig::get('custom_descr', []) as $descr) {
             $custom_descr_name = is_array($descr) ? $descr[0] : $descr;
             if (empty($custom_descr_name)) {
                 continue;
@@ -119,11 +118,11 @@ class MenuComposer
             ];
         }
         $vars['custom_port_descr'] = collect($custom_descr)->filter();
-        $vars['port_groups_exist'] = Config::get('int_customers') ||
-            Config::get('int_transit') ||
-            Config::get('int_peering') ||
-            Config::get('int_core') ||
-            Config::get('int_l2tp') ||
+        $vars['port_groups_exist'] = LibrenmsConfig::get('int_customers') ||
+            LibrenmsConfig::get('int_transit') ||
+            LibrenmsConfig::get('int_peering') ||
+            LibrenmsConfig::get('int_core') ||
+            LibrenmsConfig::get('int_l2tp') ||
             $vars['custom_port_descr']->isNotEmpty();
 
         $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
@@ -214,7 +213,7 @@ class MenuComposer
             }
 
             if ($routing_count['bgp']) {
-                $vars['show_peeringdb'] = Config::get('peeringdb.enabled', false);
+                $vars['show_peeringdb'] = LibrenmsConfig::get('peeringdb.enabled', false);
                 $vars['bgp_alerts'] = BgpPeer::hasAccess($user)->inAlarm()->count();
                 $routing_menu[] = [
                     [
@@ -278,7 +277,7 @@ class MenuComposer
         $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
 
         // Search bar
-        $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+        $vars['typeahead_limit'] = LibrenmsConfig::get('webui.global_search_result_limit');
         $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins

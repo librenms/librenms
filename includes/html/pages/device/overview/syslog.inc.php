@@ -1,7 +1,7 @@
 <?php
 
-if (\LibreNMS\Config::get('enable_syslog')) {
-    $syslog = dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", [$device['device_id']]);
+if (\App\Facades\LibrenmsConfig::get('enable_syslog')) {
+    $syslog = dbFetchRows("SELECT *, DATE_FORMAT(timestamp, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') AS date from syslog WHERE device_id = ? ORDER BY timestamp DESC LIMIT 20", [$device['device_id']]);
     if (count($syslog)) {
         echo '<div class="row">
           <div class="col-md-12">

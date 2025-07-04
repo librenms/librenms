@@ -2,6 +2,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Str;
@@ -11,12 +12,12 @@ class Billing
 {
     public static function formatBytes($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'));
+        return Number::formatBase($value, LibrenmsConfig::get('billing.base'));
     }
 
     public static function formatBytesShort($value): string
     {
-        return Number::formatBase($value, Config::get('billing.base'), 2, 0, '');
+        return Number::formatBase($value, LibrenmsConfig::get('billing.base'), 2, 0, '');
     }
 
     public static function getDates($dayofmonth, $months = 0): array
@@ -452,7 +453,7 @@ class Billing
             exit("Unknown graph type $imgtype");
         }//end if
 
-        $average = ($average / $ave_count);
+        $average = $ave_count ? ($average / $ave_count) : 0;
         $tot_data_size = count($tot_data);
         for ($x = 0; $x <= $tot_data_size; $x++) {
             array_push($ave_data, $average);

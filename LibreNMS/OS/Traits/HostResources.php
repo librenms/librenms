@@ -151,7 +151,7 @@ trait HostResources
 
             $old_name = ['hrProcessor', $index];
             $new_name = ['processor', 'hr', $index];
-            Rrd::renameFile($this->getDeviceArray(), $old_name, $new_name);
+            Rrd::renameFile($this->getDevice(), $old_name, $new_name);
 
             $processor = Processor::discover(
                 'hr',
@@ -258,6 +258,12 @@ trait HostResources
 
     protected function memValid($storage): bool
     {
+        if (! isset($storage['hrStorageIndex'])) {
+            Log::debug('hrStorage invalid: missing hrStorageIndex');
+
+            return false;
+        }
+
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
             Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: empty hrStorageType or hrStorageDescr");
 

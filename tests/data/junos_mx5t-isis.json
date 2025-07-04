@@ -12211,5 +12211,25 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.99.252.252",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "10.99.252.252/31",
+                    "ifIndex": 572
+                },
+                {
+                    "ipv4_address": "10.99.252.254",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "10.99.252.254/31",
+                    "ifIndex": 559
+                }
+            ]
+        }
     }
 }

@@ -492,7 +492,7 @@ class Routeros extends OS implements
                 'leases' => $leases,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
             $this->enableGraph('routeros_leases');
         }
@@ -506,7 +506,7 @@ class Routeros extends OS implements
                 'pppoe_sessions' => $pppoe_sessions,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
