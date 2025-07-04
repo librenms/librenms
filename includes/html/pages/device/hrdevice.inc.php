@@ -2,11 +2,11 @@
 
 echo '<h3>Inventory</h3>';
 echo '<hr>';
-echo '<table class="table table-condensed">';
+echo '<table class="table table-hover">';
 
-echo "<tr class='list'><th>Index</th><th>Description</th><th></th><th>Type</th><th>Status</th><th>Errors</th><th>Load</th></tr>";
+echo "<tr><th>Index</th><th>Description</th><th></th><th>Type</th><th>Status</th><th>Errors</th><th>Load</th></tr>";
 foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`', [$device['device_id']]) as $hrdevice) {
-    echo "<tr class='list'><td>" . $hrdevice['hrDeviceIndex'] . '</td>';
+    echo "<tr><td>" . $hrdevice['hrDeviceIndex'] . '</td>';
 
     if ($hrdevice['hrDeviceType'] == 'hrDeviceProcessor') {
         $proc_id = dbFetchCell("SELECT processor_id FROM processors WHERE device_id = '" . $device['device_id'] . "' AND hrDeviceIndex = '" . $hrdevice['hrDeviceIndex'] . "'");
