@@ -1737,6 +1737,44 @@ function list_oxidized(Illuminate\Http\Request $request)
     return response()->json($return, 200, [], JSON_PRETTY_PRINT);
 }
 
+function get_oxidized_state(Illuminate\Http\Request $request): JsonResponse
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? (int)$hostname : getidbyname($hostname);
+    $oxidized_disabled = DeviceCache::get($device_id)->getAttrib('override_Oxidized_disable');
+    $result = match ($oxidized_disabled) {
+        'true' => true, // Oxidized is disabled if the override is True
+        'false' => false, // Oxidized is not disabled if the override is False
+        default => false  // Attrib is not set, so Oxidized can't be disabled
+    };
+    return api_success($result, 'oxidized_disabled');
+}
+
+function set_oxidized_state(Illuminate\Http\Request $request): JsonResponse
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? (int)$hostname : getidbyname($hostname);
+    $data = json_decode($request->getContent(), true);
+    $content = $data['oxidized_disabled'];
+    if (empty($data)) {
+        return api_error(400, 'The new Oxidized state has not been supplied.');
+    }
+
+    // convert boolean type to string type, as used in database
+    $new_state = $content ? 'true' : 'false';
+
+    if (DeviceCache::get($device_id)->setAttrib('override_Oxidized_disable', value: $new_state))
+    {
+        $msg = match ($content) {
+            true => 'Device ' . $hostname . ' has been excluded from Oxidized',
+            false => 'Device ' . $hostname . ' is no longer excluded from Oxidized'
+        };
+        return api_success_noresult(200, $msg);
+    } else {
+        return api_error(500, 'Failed to set Oxidized state for ' . $hostname);
+    }
+}
+
 function list_bills(Illuminate\Http\Request $request)
 {
     $bills = [];
