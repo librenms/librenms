@@ -47,6 +47,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
+use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -525,9 +526,13 @@ function maintenance_device(Illuminate\Http\Request $request)
 
     empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
     $title = $data['title'] ?? $device->displayName();
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
 
@@ -579,9 +584,7 @@ function device_under_maintenance(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function () use ($model) {
-        $maintenance = $model->isUnderMaintenance() ?? false;
-
-        return api_success($maintenance, 'is_under_maintenance');
+        return api_success($model->isUnderMaintenance(), 'is_under_maintenance');
     });
 }
 
@@ -2540,9 +2543,13 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
 
     $notes = $data['notes'] ?? '';
     $title = $data['title'] ?? $device_group->name;
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
 

@@ -1,5 +1,5 @@
 {
-    "Warning!": "Please don't edit this file -- make changes to the config database table or the configuration array in config.php",
+    "Warning!": "Please don't edit this file for the purpose of changing your local config -- make changes to the config database table or the configuration array in config.php",
     "config": {
         "active_directory.users_purge": {
             "default": 0,
@@ -36,6 +36,18 @@
                  "value": "array",
                  "value.*": "string"
              }
+        },
+        "alert.scheduled_maintenance_default_behavior": {
+            "default": "1",
+            "order": 5,
+            "type": "select",
+            "group": "alerting",
+            "section": "scheduled-maintenance",
+            "options": {
+                "1": "Skip alerts",
+                "2": "Mute alerts",
+                "3": "Run alerts"
+            }
         },
         "alert_colour.ok": {
             "default": "#00ff00",
