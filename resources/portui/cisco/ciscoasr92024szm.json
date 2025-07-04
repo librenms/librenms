@@ -1,0 +1,63 @@
+{
+  "front": [
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "0",
+      "count": "1",
+      "type": "ac",
+      "start": "ac1"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "1",
+      "count": "1",
+      "type": "ac",
+      "start": "ac2"
+    },
+    {
+      "height": "1",
+      "inverse": "0",
+      "block": "2",
+      "count": "1",
+      "type": "cu",
+      "start": "Gi0"
+    },
+    {
+      "height": "2",
+      "inverse": "1",
+      "block": "3",
+      "count": "4",
+      "type": "sfp",
+      "start": "Gi0/0/0"
+    },
+    {
+      "height": "2",
+      "inverse": "1",
+      "block": "4",
+      "count": "8",
+      "type": "sfp",
+      "start": "Gi0/0/4"
+    },
+    {
+      "height": "2",
+      "inverse": "1",
+      "block": "4",
+      "count": "8",
+      "type": "cu",
+      "start": "Gi0/0/4"
+    },
+    {
+      "height": "2",
+      "inverse": "1",
+      "block": "5",
+      "count": "2",
+      "type": "sfp",
+      "start": "Te0/0/12"
+    }
+  ],
+  "rear": [
+    []
+  ]
+}
