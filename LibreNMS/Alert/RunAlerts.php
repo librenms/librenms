@@ -38,6 +38,7 @@ use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -548,7 +549,15 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id'])) {
+            $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
+            // Do not send alert notifications for these types of scheduled maintenance
+            if ($maintenance_status == MaintenanceStatus::MUTE_ALERTS) {
+                $noiss = true;
+            }
+
+            // If alert rule checks are to be skipped, ensure that this alert is
+            // not to be handled again by this method again (by changing open to 0 later)
+            if ($maintenance_status == MaintenanceStatus::SKIP_ALERTS) {
                 $noiss = true;
                 $noacc = true;
             }

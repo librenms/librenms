@@ -32,6 +32,7 @@ use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
@@ -205,11 +206,11 @@ class AlertUtil
      * Check if device is under maintenance
      *
      * @param  int  $device_id  Device-ID
-     * @return bool
+     * @return MaintenanceStatus
      */
-    public static function isMaintenance($device_id)
+    public static function getMaintenanceStatus($device_id): MaintenanceStatus
     {
-        return DeviceCache::get($device_id)->isUnderMaintenance();
+        return DeviceCache::get($device_id)->getMaintenanceStatus();
     }
 
     /**

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -36,6 +37,8 @@ use Permissions;
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory;
+
+    private ?MaintenanceStatus $maintenanceStatus = null;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -240,13 +243,23 @@ class Device extends BaseModel
         return '';
     }
 
-    public function isUnderMaintenance()
+    public function isUnderMaintenance(): bool
+    {
+        return $this->getMaintenanceStatus() !== MaintenanceStatus::NONE;
+    }
+
+    public function getMaintenanceStatus(): MaintenanceStatus
     {
         if (! $this->device_id) {
-            return false;
+            return MaintenanceStatus::NONE;
         }
 
-        $query = AlertSchedule::isActive()
+        // use cached status
+        if ($this->maintenanceStatus !== null) {
+            return $this->maintenanceStatus;
+        }
+
+        $behavior = AlertSchedule::isActive()
             ->where(function (Builder $query) {
                 $query->whereHas('devices', function (Builder $query) {
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
@@ -263,9 +276,12 @@ class Device extends BaseModel
                         $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
-            });
+            })
+            ->value('behavior');
 
-        return $query->exists();
+        $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
+
+        return $this->maintenanceStatus;
     }
 
     /**

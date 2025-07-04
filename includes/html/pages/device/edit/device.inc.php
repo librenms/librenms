@@ -287,7 +287,19 @@ if (\App\Facades\LibrenmsConfig::get('distributed_poller') === true) {
     <div class="form-group">
       <label for="maintenance" class="col-sm-2 control-label"></label>
       <div class="col-sm-6">
-      <button type="button" id="maintenance" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
+        <button type="button"
+                id="maintenance"
+                data-device_id="<?php echo $device['device_id']; ?>"
+                <?= DeviceCache::get($device['device_id'])->isUnderMaintenance()
+                  ? 'disabled class="btn btn-warning"'
+                  : 'class="btn btn-success"'
+                ?>
+                name="maintenance">
+          <?= DeviceCache::get($device['device_id'])->isUnderMaintenance()
+            ? '<i class="fa fa-wrench"></i> Device already in Maintenance'
+            : '<i class="fa fa-wrench"></i> Maintenance Mode';
+          ?>
+        </button>
       </div>
     </div>
 
