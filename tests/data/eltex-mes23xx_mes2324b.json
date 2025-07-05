@@ -17693,5 +17693,21 @@
                 }
             ]
         }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "02:64:32:9f:bc:02",
+                    "ipv6_address": "fdfd:0000:0002:0255:0000:0000:0000:0001",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "52:39:b9:92:96:30",
+                    "ipv6_address": "fdfd:0000:0002:0255:0000:0000:0000:1221",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }
