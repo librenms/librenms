@@ -65,6 +65,11 @@ class Links implements Module
         }
 
         $links->each(function (Link $link) use ($os) {
+            $link->remote_hostname = substr((string) $link->remote_hostname, 0, 127);
+            $link->remote_port = substr((string) $link->remote_port, 0, 127);
+            $link->remote_version = substr((string) $link->remote_version, 0, 255);
+            $link->remote_platform = substr((string) $link->remote_platform, 0, 255);
+
             $tmp = explode('#', $link->protocol);
             $link->protocol = $dp = $tmp[0];
             $ip = $tmp[1] ?? '';
@@ -140,6 +145,10 @@ class Links implements Module
         $lldpLocPortId = (! empty($lldpLocPortId)) ? array_shift($lldpLocPortId) : [];
         $lldpRows = SnmpQuery::hideMib()->enumStrings()->walk('LLDP-MIB::lldpRemTable')->table(3);
         $oidsv2 = SnmpQuery::hideMib()->enumStrings()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
+
+        if ($this->array_depth($lldpRows) != 4 && empty($oidsv2)) {
+            return $links;
+        }
 
         if (! empty($lldpRows)) {
             $oidsremadd = SnmpQuery::hideMib()->numeric()->walk('LLDP-MIB::lldpRemManAddrIfSubtype')->values();
@@ -228,7 +237,7 @@ class Links implements Module
                         // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
                         $data['localPortId'] = PortCache::getIdFromIfIndex($data['lldpLocPortId'], $device);
                     }
-                    $data['lldpRemSysName'] = substr($data['lldpRemSysName'], 0, 64);
+
                     $remoteMac = $remotePortName = '';
 
                     if ($data['lldpRemPortIdSubtype'] == 'interfaceName'
@@ -288,5 +297,21 @@ class Links implements Module
         }
 
         return $links->filter();
+    }
+
+    private function array_depth($array): int
+    {
+        $max_indentation = 1;
+        $array_str = print_r($array, true);
+        $lines = explode("\n", $array_str);
+
+        foreach ($lines as $line) {
+            $indentation = (strlen($line) - strlen(ltrim($line))) / 4;
+            if ($indentation > $max_indentation) {
+                $max_indentation = $indentation;
+            }
+        }
+
+        return (int) ceil(($max_indentation - 1) / 2) + 1;
     }
 }
