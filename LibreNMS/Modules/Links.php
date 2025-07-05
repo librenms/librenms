@@ -2,13 +2,13 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\LinkDiscovery;
@@ -54,13 +54,14 @@ class Links implements Module
     public function discover(OS $os): void
     {
         $links = new Collection;
+        $group = $os->os_group ?? '';
 
         if ($os instanceof LinkDiscovery) {
             $links = $os->discoverLinks();
         }
 
-        if ($links->isEmpty()) {
-            $links = $this->discoverLldp($os->getDevice());
+        if ($links->isEmpty() || $group == 'cisco') {
+            $links = $links->merge($this->discoverLldp($os->getDevice()));
         }
 
         $links->each(function (Link $link) use ($os) {
@@ -71,15 +72,15 @@ class Links implements Module
             if (empty($link->remote_device_id) &&
                 \LibreNMS\Util\Validate::hostname($link->remote_hostname) &&
                 ! can_skip_discovery($link->remote_hostname, $link->remote_version) &&
-                Config::get('autodiscovery.xdp') === true) {
+                LibrenmsConfig::get('autodiscovery.xdp') === true) {
                 $link->remote_device_id = discover_new_device(
                     $link->remote_hostname, $os->getDeviceArray(), strtoupper($dp), Port::where('port_id', $link->local_port_id)->first()->toArray()
                 ) ?: 0;
             }
             if (empty($link->remote_device_id) &&
                 ! empty($ip) &&
-                Config::get('discovery_by_ip', false) &&
-                Config::get('autodiscovery.xdp') === true) { //name lookup failed, try with IP
+                LibrenmsConfig::get('discovery_by_ip', false) &&
+                LibrenmsConfig::get('autodiscovery.xdp') === true) { //name lookup failed, try with IP
                 $link->remote_device_id = discover_new_device(
                     $ip, $os->getDeviceArray(), strtoupper($dp), Port::where('port_id', $link->local_port_id)->first()->toArray()
                 ) ?: 0;
@@ -191,13 +192,19 @@ class Links implements Module
                     $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
                     // Fix devices returning lldpRemPortId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace([':', '-'], ' ', $data['lldpRemPortId']))) {
-                        $data['lldpRemPortId'] = StringHelpers::hexToAscii($data['lldpRemPortId'], ':');
+                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName') {
+                        $tmpName = str_replace([':', '-', ' '], '', $data['lldpRemPortId']);
+                        if (StringHelpers::isHex($tmpName, '')) {
+                            $data['lldpRemPortId'] = StringHelpers::hexToAscii($tmpName, '');
+                        }
                     }
 
                     // Fix devices returning lldpRemChassisId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress' && preg_match('/(:..:3a:..){5}/is', $data['lldpRemChassisId'])) {
-                        $data['lldpRemChassisId'] = StringHelpers::hexToAscii($data['lldpRemChassisId'], ':');
+                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress') {
+                        $tmpName = str_replace([':', '-', ' '], '', $data['lldpRemChassisId']);
+                        if (StringHelpers::isHex($tmpName, '') && strlen($tmpName) != 12) {
+                            $data['lldpRemChassisId'] = StringHelpers::hexToAscii($tmpName, '');
+                        }
                     }
 
                     // lldpRemLocalPortNum is a local index for LLDP, not an ifIndex

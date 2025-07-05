@@ -709,7 +709,7 @@ class Routeros extends OS implements
                     $remote_port_mac = Mac::parse($data['lldpRemPortId'] ?? '')->hex();
                 }
 
-                $remote_device_id = find_device_id($data['lldpRemSysName'], $data['lldpRemManAddr'], $remote_port_mac);
+                $remote_device_id = find_device_id($data['lldpRemSysName'] ?? '', $data['lldpRemManAddr'] ?? '', $remote_port_mac);
                 $remote_chassis_id = Mac::parse($data['lldpRemChassisId'] ?? '')->hex();
 
                 if ($interface['port_id'] && $data['lldpRemSysName'] && $data['lldpRemPortId']) {
