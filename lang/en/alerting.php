@@ -13,5 +13,5 @@ return [
         - Mute alerts: Alerts will created and resolved as usual, but any kind of user notification (like e-mail) is suppressed
         - Run alerts: Alerts are run as usual, users are notified. This option leads essentially to a 'cosmetic only' maintenance",
         ],
-    ]
+    ],
 ];
