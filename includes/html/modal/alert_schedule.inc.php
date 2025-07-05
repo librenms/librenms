@@ -117,13 +117,13 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         <div class="col-sm-8">
                             <select id="behavior" name="behavior" class="form-control">
                                 <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
-                                    <?= __('maintenance.behavior.options.skip_alerts') ?>
+                                    <?= __('alerting.maintenance.behavior.options.skip_alerts') ?>
                                 </option>
                                 <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
-                                    <?= __('maintenance.behavior.options.mute_alerts') ?>
+                                    <?= __('alerting.maintenance.behavior.options.mute_alerts') ?>
                                 </option>
                                 <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
-                                    <?= __('maintenance.behavior.options.run_alerts') ?>
+                                    <?= __('alerting.maintenance.behavior.options.run_alerts') ?>
                                 </option>
                             </select>
                         </div>
