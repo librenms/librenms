@@ -1,4 +1,7 @@
 modules:
+    os:
+        version: SITE-MONITORING-MIB::siteV1DescControllerSoftwareRevision.0
+
     sensors:
         voltage:
             data:
