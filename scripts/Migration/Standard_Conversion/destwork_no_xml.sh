@@ -15,8 +15,6 @@
 # Script Written by - Dan Brown - http://vlan50.com               #
 ###################################################################
 
-# Enter path to LibreNMS addhost module
-ADDHOST=/opt/librenms/addhost.php
 # Enter your unique SNMP String
 SNMPSTRING=cisconetwork
 # Enter SNMP version of all clients in nodelist text file
@@ -26,9 +24,9 @@ NODELIST=/tmp/nodelist.txt
 # Enter user and group of LibreNMS installation
 L_USRGRP=librenms
 
-while read line
+while read -r line
 	# Change ownership to LibreNMS user and group
 	chown -R $L_USRGRP:$L_USRGRP .;
 	# Add each host from the node list file to LibreNMS
-	do php $ADDHOST "${line%/*}" $SNMPSTRING $SNMPVERSION;
+	do lnms device:add --$SNMPVERSION -c$SNMPSTRING "${line%/*}"
 done < $NODELIST

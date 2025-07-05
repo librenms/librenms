@@ -27,11 +27,11 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\UDP;
-use LibreNMS\Config;
 use Log;
 
 class InfluxDB extends BaseDatastore
@@ -54,36 +54,24 @@ class InfluxDB extends BaseDatastore
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'InfluxDB';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
-        return Config::get('influxdb.enable', false);
+        return LibrenmsConfig::get('influxdb.enable', false);
     }
 
     /**
-     * Datastore-independent function which should be used for all polled metrics.
-     *
-     * RRD Tags:
-     *   rrd_def     RrdDefinition
-     *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
-     *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
-     *   rrd_step             int: rrd step, defaults to 300
-     *
-     * @param  array  $device
-     * @param  string  $measurement  Name of this measurement
-     * @param  array  $tags  tags for the data (or to control rrdtool)
-     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
-     *                               single values are allowed and will be paired with $measurement
+     * @inheritDoc
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $stat = Measurement::start('write');
         $tmp_fields = [];
-        $tmp_tags['hostname'] = $device['hostname'];
+        $tmp_tags['hostname'] = $this->getDevice($meta)->hostname;
         foreach ($tags as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
@@ -137,14 +125,14 @@ class InfluxDB extends BaseDatastore
      */
     public static function createFromConfig()
     {
-        $host = Config::get('influxdb.host', 'localhost');
-        $transport = Config::get('influxdb.transport', 'http');
-        $port = Config::get('influxdb.port', 8086);
-        $db = Config::get('influxdb.db', 'librenms');
-        $username = Config::get('influxdb.username', '');
-        $password = Config::get('influxdb.password', '');
-        $timeout = Config::get('influxdb.timeout', 0);
-        $verify_ssl = Config::get('influxdb.verifySSL', false);
+        $host = LibrenmsConfig::get('influxdb.host', 'localhost');
+        $transport = LibrenmsConfig::get('influxdb.transport', 'http');
+        $port = LibrenmsConfig::get('influxdb.port', 8086);
+        $db = LibrenmsConfig::get('influxdb.db', 'librenms');
+        $username = LibrenmsConfig::get('influxdb.username', '');
+        $password = LibrenmsConfig::get('influxdb.password', '');
+        $timeout = LibrenmsConfig::get('influxdb.timeout', 0);
+        $verify_ssl = LibrenmsConfig::get('influxdb.verifySSL', false);
 
         $client = new Client($host, $port, $username, $password, $transport == 'https', $verify_ssl, $timeout, $timeout);
 
@@ -152,7 +140,8 @@ class InfluxDB extends BaseDatastore
             $client->setDriver(new UDP($host, $port));
         }
 
-        return $client->selectDB($db);
+        // Suppress InfluxDB\Database::create(): Implicitly marking parameter $retentionPolicy as nullable is deprecated
+        return @$client->selectDB($db);
     }
 
     private function forceType($data)
@@ -169,15 +158,5 @@ class InfluxDB extends BaseDatastore
         }
 
         return $data === 'U' ? null : $data;
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
-    {
-        return false;
     }
 }

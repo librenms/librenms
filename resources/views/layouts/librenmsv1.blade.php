@@ -53,7 +53,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
@@ -78,13 +77,13 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=21052025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=30062025') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         window.siteStyle = '{{ session('applied_site_style') }}';
-        window.siteStylePreference = '{{ session('preferences.site_style') }}';
+        window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
 
         // Apply color scheme
         applySiteStyle(window.siteStylePreference);

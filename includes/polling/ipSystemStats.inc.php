@@ -108,7 +108,7 @@ if ($data) {
             $fields[$oid_ds] = $stats[$oid];
         }
 
-        $tags = compact('af', 'rrd_name', 'rrd_def');
+        $tags = ['af' => $af, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?

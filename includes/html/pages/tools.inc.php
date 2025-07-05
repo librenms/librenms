@@ -36,5 +36,5 @@ $tools_type = basename($vars['tool']);
 if (file_exists("includes/html/pages/tools/$tools_type.inc.php")) {
     include "includes/html/pages/tools/$tools_type.inc.php";
 } else {
-    echo report_this("Unknown tool type $tools_type");
+    echo 'Unknown tool type';
 }

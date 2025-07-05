@@ -3168,5 +3168,131 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 768,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 15
+                },
+                {
+                    "hrDeviceIndex": 1025,
+                    "hrDeviceDescr": "network interface WAN",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 2908,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1026,
+                    "hrDeviceDescr": "network interface LAN1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1027,
+                    "hrDeviceDescr": "network interface DMZ",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1028,
+                    "hrDeviceDescr": "network interface LAN2",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1029,
+                    "hrDeviceDescr": "network interface LAN3",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1030,
+                    "hrDeviceDescr": "network interface LAN4",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1031,
+                    "hrDeviceDescr": "network interface LAN5",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1032,
+                    "hrDeviceDescr": "network interface LAN6",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1033,
+                    "hrDeviceDescr": "network interface LAN7",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1034,
+                    "hrDeviceDescr": "network interface LAN8",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1035,
+                    "hrDeviceDescr": "network interface eth10",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1036,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1037,
+                    "hrDeviceDescr": "network interface tunl0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 3072,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
     }
 }

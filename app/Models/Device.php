@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -36,6 +37,8 @@ use Permissions;
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory;
+
+    private ?MaintenanceStatus $maintenanceStatus = null;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -216,7 +219,7 @@ class Device extends BaseModel
     {
         $hostname_is_ip = IP::isValid($this->hostname);
 
-        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+        return SimpleTemplate::parse($this->display ?: \App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'), [
             'hostname' => $this->hostname,
             'sysName' => $this->sysName ?: $this->hostname,
             'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
@@ -240,13 +243,23 @@ class Device extends BaseModel
         return '';
     }
 
-    public function isUnderMaintenance()
+    public function isUnderMaintenance(): bool
+    {
+        return $this->getMaintenanceStatus() !== MaintenanceStatus::NONE;
+    }
+
+    public function getMaintenanceStatus(): MaintenanceStatus
     {
         if (! $this->device_id) {
-            return false;
+            return MaintenanceStatus::NONE;
         }
 
-        $query = AlertSchedule::isActive()
+        // use cached status
+        if ($this->maintenanceStatus !== null) {
+            return $this->maintenanceStatus;
+        }
+
+        $behavior = AlertSchedule::isActive()
             ->where(function (Builder $query) {
                 $query->whereHas('devices', function (Builder $query) {
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
@@ -263,9 +276,12 @@ class Device extends BaseModel
                         $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
-            });
+            })
+            ->value('behavior');
 
-        return $query->exists();
+        $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
+
+        return $this->maintenanceStatus;
     }
 
     /**
@@ -284,7 +300,7 @@ class Device extends BaseModel
             return $name;
         }
 
-        $length = \LibreNMS\Config::get('shorthost_target_length', $length);
+        $length = \App\Facades\LibrenmsConfig::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
             $take = max(substr_count($name, '.', 0, $length), 1);
 

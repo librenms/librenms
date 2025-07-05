@@ -45888,7 +45888,7 @@
                     "vrf_oid": "14",
                     "vrf_name": null,
                     "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "0:0",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }

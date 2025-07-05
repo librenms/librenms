@@ -49,7 +49,9 @@ echo "<div style='margin: 0px; width: 100%'><table class='iftable'>";
 echo view('device.tabs.ports.includes.port_row', [
     'port' => $port,
     'data' => [
+        'tab' => 'detail',
         'neighbors' => [$port->port_id => (new \App\Http\Controllers\Device\Tabs\PortsController())->findPortNeighbors($port)],
+        'neighbor_ports' => null,
         'graphs' => [
             'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
@@ -264,7 +266,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port
     }
 }//end if
 
-if (Auth::user()->hasGlobalAdmin() && \LibreNMS\Config::get('enable_billing') == 1) {
+if (Auth::user()->hasGlobalAdmin() && \App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
     $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port->port_id]);
     if (count($bills) === 1) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";

@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use App\Models\Storage;
 
@@ -350,10 +351,10 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = LibreNMS\Config::get('time.now');
+                $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = LibreNMS\Config::get('time.day');
+                $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;
@@ -611,26 +612,42 @@ if ($app_data['has']['sock']) {
     ];
 }
 if ($app_data['has']['linux_mem_stats']) {
-    $graphs[] = [
-        'type' => 'cgroups_pg',
-        'description' => 'Linux Pg Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_mem_misc',
-        'description' => 'Misc Linux Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap',
-        'description' => 'Zswap Size',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap_activity',
-        'description' => 'Zswap Activity',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_workingset',
-        'description' => 'Workingset Stats',
-    ];
+    if (LibrenmsConfig::get('apps.oslv_monitor.linux_pg_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_pg',
+            'description' => 'Linux Pg Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.misc_linux_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_mem_misc',
+            'description' => 'Misc Linux Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_size')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap',
+            'description' => 'Zswap Size',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap_activity',
+            'description' => 'Zswap Activity',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.workingset_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_workingset',
+            'description' => 'Workingset Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.thp_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_thp_activity',
+            'description' => 'THP Activity',
+        ];
+    }
 }
 if ($app_data['has']['throttled_time']) {
     $graphs[] = [

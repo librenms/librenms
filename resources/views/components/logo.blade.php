@@ -1,11 +1,14 @@
-@props([
-    'responsive' => false, // crop text at given breakpoint sm,md,lg,xl, etc
-])
-
-@if(LibrenmsConfig::get('title_image'))
-    <img {{ $attributes }} src="{{ asset(LibrenmsConfig::get('title_image')) }}" alt="{{ LibrenmsConfig::get('project_name') }}">
+@if($image)
+    {{-- Include svgs inline so they can use currentColor for light/dark mode, but only if they are hosted on the same server (browser will reject it otherwise) --}}
+    @if($is_svg)
+        <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600']) }}>
+            <use href="{{ asset($image) }}"></use>
+        </svg>
+    @else
+        <img {{ $attributes }} src="{{ asset($image) }}" alt="{{ $text }}">
+    @endif
 @else
-    <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600'])->class($responsive ? ['tw:hidden', "tw:$responsive:inline-block"] : []) }}
+    <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600'])->class($responsive ? ['tw:hidden', $logo_show_class] : []) }}
          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 32.275086">
         <defs>
             <clipPath id="a">
@@ -41,7 +44,7 @@
             fill="#db202e"/>
     </svg>
     @if($responsive)
-    <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600', 'tw:inline-block', "tw:$responsive:hidden"]) }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 77.558 77.558">
+    <svg {{ $attributes->class(['tw:dark:text-white', 'tw:text-gray-600', 'tw:inline-block', $logo_hide_class]) }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 77.558 77.558">
         <path
             d="m43.334 26.774 7.45 7.45-2.932 2.98-7.45-7.45zM56.96 13.171l7.45 7.45-2.956 2.98-7.45-7.45zm-.48 26.774 7.498 7.45-2.956 2.98-7.691-7.45zM70.107 26.34l7.45 7.451-2.932 2.98-7.45-7.45zm-29.49-5.527 7.498-7.451 2.957 2.956-7.451 7.45zm13.17 13.17 7.451-7.45 2.98 2.932-7.45 7.45zm13.147 13.171 7.45-7.499 2.981 2.957-7.69 7.45zM26.99 34.489l7.451-7.45 2.98 2.932-7.45 7.45zm13.147 13.147 7.499-7.45 2.932 2.931-7.45 7.45zm13.17 13.17 7.451-7.498 2.98 2.956-7.498 7.69z"
             fill="currentColor"/>

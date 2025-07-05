@@ -22,7 +22,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         'NUMCLIENTS' => $aruba_stats['WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0'],
     ];
 
-    $tags = compact('rrd_name', 'rrd_def');
+    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
     app('Datastore')->put($device, 'aruba-controller', $tags, $fields);
 
     // get AP data

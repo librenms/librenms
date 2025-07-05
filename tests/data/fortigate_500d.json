@@ -6674,7 +6674,7 @@
             "ospf_areas": [
                 {
                     "ospfAreaId": "0.0.0.16",
-                    "ospfAuthType": "NULL",
+                    "ospfAuthType": null,
                     "ospfImportAsExtern": "importNssa",
                     "ospfSpfRuns": 19,
                     "ospfAreaBdrRtrCount": 2,

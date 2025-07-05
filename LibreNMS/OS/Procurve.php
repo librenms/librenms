@@ -52,7 +52,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
                 'value' => $FdbAddressCount,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fdb_count', $tags, $fields);
 
             $this->enableGraph('fdb_count');

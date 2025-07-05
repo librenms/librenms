@@ -90,7 +90,11 @@ trait SyncsModels
     {
         $filter = function ($models, $params) {
             foreach ($params as $key => $value) {
-                $models = $models->where($key, '=', $value);
+                if (is_array($value)) {
+                    $models = $models->where(...$value);
+                } else {
+                    $models = $models->where($key, '=', $value);
+                }
             }
 
             return $models;

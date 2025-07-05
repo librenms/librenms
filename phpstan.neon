@@ -21,6 +21,8 @@ parameters:
 
     excludePaths:
         - tests/phpstan/
+        - tests/Unit/Data/KafkaDBStoreTest.php
+        - LibreNMS/Data/Store/Kafka.php
 
     scanDirectories:
         - includes

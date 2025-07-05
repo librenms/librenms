@@ -6,6 +6,10 @@ if ($device['os_group'] == 'cisco') {
     $datas = snmp_walk($device, 'cipMacSwitchedBytes', '-Oqn', 'CISCO-IP-STAT-MIB');
 
     foreach (explode("\n", $datas) as $data) {
+        if (empty($data)) {
+            continue;
+        }
+
         [$oid] = explode(' ', $data);
         $oid = str_replace('.1.3.6.1.4.1.9.9.84.1.2.1.1.4.', '', $oid);
         [$if, $direction, $a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode('.', $oid);

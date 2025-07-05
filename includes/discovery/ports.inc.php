@@ -1,8 +1,8 @@
 <?php
 
 // Build SNMP Cache Array
+use App\Facades\LibrenmsConfig;
 use App\Models\PortGroup;
-use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 
@@ -96,7 +96,7 @@ d_echo($port_stats);
 // The port association configuration allows to choose between association via ifIndex, ifName,
 // or maybe other means in the future. The default port association mode still is ifIndex for
 // compatibility reasons.
-$port_association_mode = Config::get('default_port_association_mode');
+$port_association_mode = LibrenmsConfig::get('default_port_association_mode');
 if ($device['port_association_mode']) {
     $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
@@ -112,7 +112,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
         $old_rrd_name = "port-$ifIndex$suffix.rrd";
         $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
 
-        \Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
+        \Rrd::renameFile(DeviceCache::get($device['device_id']), $old_rrd_name, $new_rrd_name);
     }
 }
 
@@ -126,7 +126,7 @@ if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
-$default_port_group = Config::get('default_port_group');
+$default_port_group = LibrenmsConfig::get('default_port_group');
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {

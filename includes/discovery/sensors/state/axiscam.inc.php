@@ -11,7 +11,7 @@ foreach ($oids_tmp as $key_oids_tmp => $val_oids_tmp) {
     $oids[str_replace('common.', '', $key_oids_tmp)] = $val_oids_tmp;
 }
 
-if (is_array($oids)) {
+if (isset($oids) && is_array($oids)) {
     //Create State Index
     $state_name = 'tempSensorStatusState';
     $states = [

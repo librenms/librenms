@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -37,7 +37,7 @@ class DevicePing extends LnmsCommand
             $devices = [new Device(['hostname' => $spec])];
         }
 
-        Config::set('icmp_check', true); // ignore icmp disabled, this is an explicit user action
+        LibrenmsConfig::set('icmp_check', true); // ignore icmp disabled, this is an explicit user action
 
         /** @var Device $device */
         foreach ($devices as $device) {

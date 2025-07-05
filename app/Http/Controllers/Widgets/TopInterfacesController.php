@@ -33,7 +33,7 @@ use Illuminate\View\View;
 
 class TopInterfacesController extends WidgetController
 {
-    protected $title = 'Top Interfaces';
+    protected string $name = 'top-interfaces';
     protected $defaults = [
         'interface_count' => 5,
         'time_interval' => 15,
@@ -46,7 +46,7 @@ class TopInterfacesController extends WidgetController
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
 
@@ -78,7 +78,7 @@ class TopInterfacesController extends WidgetController
         return view('widgets.top-interfaces', $data);
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         return view('widgets.settings.top-interfaces', $this->getSettings(true));
     }

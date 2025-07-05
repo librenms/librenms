@@ -67,7 +67,7 @@ class Ospfv3 implements Module
      */
     public function discover(OS $os): void
     {
-        Log::info('Processes: ');
+        ModuleModelObserver::observe(Ospfv3Instance::class, 'Processes');
         $instances = new Collection;
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
             // Check for instance data
@@ -96,11 +96,10 @@ class Ospfv3 implements Module
             return;
         }
 
-        ModuleModelObserver::observe(Ospfv3Instance::class);
         $this->syncModels($os->getDevice(), 'ospfv3Instances', $instances);
         Log::info(' (Total processes: ' . $instances->count() . ')');
 
-        Log::info('Areas: ');
+        ModuleModelObserver::observe(Ospfv3Area::class, 'Areas');
         $ospf_areas = $instances->map(function (Ospfv3Instance $instance) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -110,11 +109,10 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Area::class);
         $ospf_areas = $this->syncModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
         Log::info(' (Total areas: ' . $ospf_areas->count() . ')');
 
-        Log::info('Ports: ');
+        ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');
         $ospf_ports = $instances->map(function (Ospfv3Instance $instance) use ($ospf_areas) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -124,11 +122,10 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Port::class);
         $this->syncModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
         Log::info(' (Total ports: ' . $ospf_ports->count() . ')');
 
-        Log::info('Neighbors: ');
+        ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');
         $ospf_neighbors = $instances->map(function (Ospfv3Instance $instance) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -138,7 +135,6 @@ class Ospfv3 implements Module
                 });
         })->flatten(); // flatten one level
 
-        ModuleModelObserver::observe(Ospfv3Nbr::class);
         $this->syncModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
     }
@@ -161,8 +157,7 @@ class Ospfv3 implements Module
         }
 
         // go through each instance (unique context) and fetch values displayed in ui
-        Log::info('Instances: ');
-        ModuleModelObserver::observe(Ospfv3Instance::class);
+        ModuleModelObserver::observe(Ospfv3Instance::class, 'Instances');
         $instances->each(function (Ospfv3Instance $instance) {
             $instanceValues = SnmpQuery::context($instance->context_name)->enumStrings()->get([
                 'OSPFV3-MIB::ospfv3AdminStatus.0',
@@ -174,8 +169,10 @@ class Ospfv3 implements Module
             $instance->ospfv3ASBdrRtrStatus = $instanceValues->value('OSPFV3-MIB::ospfv3ASBdrRtrStatus');
             $instance->save();
         });
+        ModuleModelObserver::done();
 
         // Areas
+        ModuleModelObserver::observe(Ospfv3Area::class, 'Areas');
         $ospf_areas = $instances->map(function (Ospfv3Instance $instance) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->walk([
@@ -188,11 +185,11 @@ class Ospfv3 implements Module
 
         // fill data in new areas
         Ospfv3Area::creating([$this, 'fetchAndFillArea']);
-        Log::info("\nAreas: ");
-        ModuleModelObserver::observe(Ospfv3Area::class);
         $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
+        ModuleModelObserver::done();
 
         // Ports
+        ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');
         $ospf_ports = $instances->map(function (Ospfv3Instance $instance) use ($ospf_areas) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -208,11 +205,11 @@ class Ospfv3 implements Module
         })->flatten();
 
         Ospfv3Port::creating([$this, 'fetchAndFillPort']);
-        Log::info("\nPorts: ");
-        ModuleModelObserver::observe(Ospfv3Port::class);
         $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
+        ModuleModelObserver::done();
 
         // Neighbors
+        ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');
         $ospf_neighbors = $instances->map(function (Ospfv3Instance $instance) {
             return SnmpQuery::context($instance->context_name)
                 ->hideMib()->enumStrings()
@@ -225,9 +222,8 @@ class Ospfv3 implements Module
         })->flatten();
 
         Ospfv3Nbr::creating([$this, 'fetchAndFillNeighbor']);
-        Log::info("\nNeighbors: ");
-        ModuleModelObserver::observe(Ospfv3Nbr::class);
         $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
+        ModuleModelObserver::done();
 
         // Create device-wide statistics RRD
         $rrd_def = RrdDefinition::make()

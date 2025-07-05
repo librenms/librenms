@@ -1,9 +1,9 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
@@ -131,14 +131,14 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == '') {
-        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
+        $check_cmd = LibrenmsConfig::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
         $check_cmd .= ' ' . $service['service_param'];
     }
 
@@ -182,9 +182,9 @@ function poll_service($service)
             $fields[$k] = $v['value'];
         }
 
-        $tags = compact('service_id', 'rrd_name', 'rrd_def');
+        $tags = ['service_id' => $service_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         //TODO not sure if we have $device at this point, if we do replace faked $device
-        app('Datastore')->put(['hostname' => $service['hostname']], 'services', $tags, $fields);
+        app('Datastore')->put($service, 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {
@@ -260,7 +260,7 @@ function check_service($command)
     // Loop through the perf string extracting our metric data
     foreach ($perf_arr as $string) {
         // Separate the DS and value: DS=value
-        [$ds,$values] = explode('=', trim($string));
+        [$ds,$values] = array_pad(explode('=', trim($string)), 2, '');
 
         // Keep the first value, discard the others.
         $value = $values ? explode(';', trim($values)) : [];

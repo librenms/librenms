@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\ConfigRepository;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Eloquent;
@@ -35,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '25.5.0';
+    public const VERSION = '25.6.0';
 
     /** @var Git convenience instance */
     public $git;
@@ -185,6 +186,27 @@ class Version
         $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
 
         return implode(' ', $only);
+    }
+
+    public static function registerAboutCommand(): void
+    {
+        // spaces affect sorting, but not output
+        AboutCommand::add('LibreNMS', fn () => [
+            '  Version' => Version::get()->name(),
+            ' Last Update' => Version::get()->date(),
+            ' Update Channel' => Version::get()->release(),
+
+        ]);
+        AboutCommand::add('Environment', fn () => ['OS' => Version::get()->os()]);
+        AboutCommand::add('Drivers', fn () => [
+            'Database  Server' => Version::get()->databaseServer(),
+            'Database Migrations' => Version::get()->database(),
+        ]);
+        AboutCommand::add('External Tools', fn () => [
+            'Python' => Version::get()->python(),
+            'RRDTool' => Version::get()->rrdtool(),
+            'SNMP' => Version::get()->netSnmp(),
+        ]);
     }
 
     /**

@@ -29,7 +29,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                 $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'], $device['device_id']);
             }
 
-            foreach ((array) $fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
+            foreach ((array) ($fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] ?? []) as $mac => $dot1dBasePort) {
                 $mac_address = Mac::parse($mac)->hex();
                 if (strlen($mac_address) != 12) {
                     d_echo("MAC address padding failed for $mac\n");

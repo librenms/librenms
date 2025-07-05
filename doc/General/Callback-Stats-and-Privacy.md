@@ -55,8 +55,8 @@ sent us will be removed!
 ## Questions?
 
 ### How often is data submitted?
-We submit the data once a day according to running daily.sh via cron.
-If you disable this then opting in will not have any affect.
+We submit the data once a day as part of daily.sh.
+If you disable daily.sh then opting in will not have any affect.
 
 ### Where can I see the data I submitted?
 You can't see the data raw, but we collate all of the data together and provide a

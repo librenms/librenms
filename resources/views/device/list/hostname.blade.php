@@ -1,5 +1,3 @@
-<x-device-link :device="$device"></x-device-link>
-@if($detailed)
-    <br />
-    {{ $device->name() }}
-@endif
+<a href="{{ route('device', $device->device_id) }}" class="{{ $class }}" x-data="deviceLink()">{{ $device->displayName() }}</a>
+<br />
+{{ $extra }}

@@ -6,13 +6,9 @@ $descr = 'EXThdr Dupl HH';
 $ds = 'data';
 
 if (isset($vars['sinstance'])) {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__exthdr_dupl_hh']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__exthdr_dupl_hh']);
 } else {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv6__exthdr_dupl_hh']);
-}
-
-if (Rrd::checkRrdExists($filename)) {
-    d_echo('RRD "' . $filename . '" not found');
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv6__exthdr_dupl_hh']);
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

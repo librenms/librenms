@@ -25,13 +25,13 @@
 
 namespace LibreNMS\Cache;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 
 class PermissionsCache
 {
@@ -282,7 +282,7 @@ class PermissionsCache
         return DB::table('devices_group_perms')
         ->select('devices_group_perms.user_id', 'device_group_device.device_id')
         ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
-        ->when(! Config::get('permission.device_group.allow_dynamic'), function ($query) {
+        ->when(! LibrenmsConfig::get('permission.device_group.allow_dynamic'), function ($query) {
             return $query
                 ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
                 ->where('device_groups.type', 'static');

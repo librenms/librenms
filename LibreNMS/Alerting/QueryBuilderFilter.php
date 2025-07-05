@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Alerting;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 
 class QueryBuilderFilter implements \JsonSerializable
@@ -61,7 +61,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
     private function generateMacroFilter($config_location)
     {
-        $macros = Config::get($config_location, []);
+        $macros = LibrenmsConfig::get($config_location, []);
         krsort($macros);
 
         foreach ($macros as $key => $value) {

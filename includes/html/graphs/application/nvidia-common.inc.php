@@ -11,10 +11,6 @@ $int = 0;
 $rrd_list = [];
 $rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id, $int]);
 
-if (! Rrd::checkRrdExists($rrd_filename)) {
-    echo "file missing: $rrd_filename";
-}
-
 while (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,

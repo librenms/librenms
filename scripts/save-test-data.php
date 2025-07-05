@@ -31,6 +31,7 @@ require $install_dir . '/includes/init.php';
 Debug::setVerbose(
     Debug::set(isset($options['d']) || isset($options['debug']))
 );
+\Log::setDefaultDriver('console');
 
 if (isset($options['h'])
     || isset($options['help'])

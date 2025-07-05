@@ -50,3 +50,12 @@
   }
 }
 
+.device-link-up {
+    @apply tw:font-bold tw:text-blue-900 tw:visited:text-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100
+}
+.device-link-down {
+    @apply tw:font-bold tw:text-red-600 tw:visited:text-red-600 tw:dark:!text-red-500 tw:dark:visited:!text-red-500
+}
+.device-link-disabled {
+    @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:!text-gray-500 tw:dark:visited:!text-gray-500
+}

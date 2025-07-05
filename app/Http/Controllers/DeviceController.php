@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Carbon\Carbon;
@@ -11,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
@@ -96,27 +96,44 @@ class DeviceController extends Controller
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);
-        $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
+        $primary_device_link_name = LibrenmsConfig::get('html.device.primary_link', 'edit');
         if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
         unset($device_links[$primary_device_link_name], $primary_device_link_name);
 
+        $data_array = [
+            'title' => $title,
+            'device' => $device,
+            'device_id' => $device_id,
+            'data' => $data,
+            'vars' => $vars,
+            'alert_class' => $alert_class,
+            'parent_id' => $parent_id,
+            'overview_graphs' => $overview_graphs,
+            'tabs' => $tabs,
+            'current_tab' => $current_tab,
+            'page_links' => $page_links,
+            'device_links' => $device_links,
+            'primary_device_link' => $primary_device_link,
+            'request' => $request,
+        ];
+
         if (view()->exists('device.tabs.' . $current_tab)) {
-            return view('device.tabs.' . $current_tab, get_defined_vars());
+            return view('device.tabs.' . $current_tab, $data_array);
         }
 
-        $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+        $data_array['tab_content'] = $this->renderLegacyTab($current_tab, $device, $data);
 
-        return view('device.tabs.legacy', get_defined_vars());
+        return view('device.tabs.legacy', $data_array);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)
     {
         ob_start();
         $device = $device->toArray();
-        $device['os_group'] = Config::get("os.{$device['os']}.group");
+        $device['os_group'] = LibrenmsConfig::get("os.{$device['os']}.group");
         Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];
@@ -190,7 +207,7 @@ class DeviceController extends Controller
         }
 
         // User defined device links
-        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
+        foreach (array_values(Arr::wrap(LibrenmsConfig::get('html.device.links'))) as $index => $link) {
             $device_links['custom' . ($index + 1)] = [
                 'icon' => $link['icon'] ?? 'fa-external-link',
                 'url' => Blade::render($link['url'], ['device' => $device]),
@@ -222,8 +239,8 @@ class DeviceController extends Controller
 
         // SSH
         $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
-        $ssh_url = Config::get('gateone.server')
-            ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
+        $ssh_url = LibrenmsConfig::get('gateone.server')
+            ? LibrenmsConfig::get('gateone.server') . '?ssh=ssh://' . (LibrenmsConfig::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
             : 'ssh://' . $device->hostname . $ssh_port;
         $device_links['ssh'] = [
             'icon' => 'fa-lock',

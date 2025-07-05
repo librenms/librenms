@@ -1,8 +1,8 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
-if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
+if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     $pws_db = [];
     // Pre-cache the existing state of pseudowires for this device from the database
     $pws_db_raw = dbFetchRows('SELECT * FROM `pseudowires` WHERE `device_id` = ?', [$device['device_id']]);

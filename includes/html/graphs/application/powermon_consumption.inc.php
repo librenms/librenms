@@ -116,10 +116,10 @@ foreach ($ds_list as $ds_item) {
     if (isset($ds_item['colour'])) {
         $colour = $ds_item['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$i")) {
+        if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$i")) {
             $i = 0;
         }
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$i");
+        $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$i");
         $i++;
     }
 

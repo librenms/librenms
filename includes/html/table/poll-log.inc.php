@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $param = [];
 $sql = ' FROM `devices` AS D ';
@@ -28,7 +28,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
 }
 
 if ($vars['type'] == 'unpolled') {
-    $overdue = (int) (Config::get('rrd.step', 300) * 1.2);
+    $overdue = (int) (LibrenmsConfig::get('rrd.step', 300) * 1.2);
     $sql .= " AND `last_polled` <= DATE_ADD(NOW(), INTERVAL - $overdue SECOND)";
 }
 

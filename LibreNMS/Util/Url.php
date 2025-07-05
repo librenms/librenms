@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
@@ -33,7 +34,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -88,7 +88,7 @@ class Url
         }
 
         if ($device->os) {
-            $devinfo .= ($devinfo ? ' - ' : '') . Config::getOsSetting($device->os, 'text');
+            $devinfo .= ($devinfo ? ' - ' : '') . LibrenmsConfig::getOsSetting($device->os, 'text');
         }
 
         if ($device->version) {
@@ -308,7 +308,7 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(Config::get('base_url', true) . $vars['page'] . '');
+        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
@@ -365,11 +365,12 @@ class Url
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = $args['from'];
+        $original_from = isset($args['from']) ? $args['from'] : '';
+        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
-        $popup = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $popup = "<div class='list-large'>$popup_title</div>";
         $popup .= '<div style="width: 850px">';
         $args['width'] = 340;
         $args['height'] = 100;
@@ -401,7 +402,7 @@ class Url
 
         $tag = '<img class="graph-image img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
-        if (Config::get('enable_lazy_load', true)) {
+        if (LibrenmsConfig::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
         }
 
@@ -418,8 +419,8 @@ class Url
             $output = '<a class="' . $class . '" href="' . $url . '"';
         }
 
-        if (Config::get('web_mouseover', true)) {
-            $defaults = Config::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
+        if (LibrenmsConfig::get('web_mouseover', true)) {
+            $defaults = LibrenmsConfig::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
             $output .= " onmouseover=\"return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
         } else {
             $output .= '>';
@@ -549,13 +550,13 @@ class Url
                     $possibilities[] = "$distro.png";
                 }
             }
-            $os_icon = Config::getOsSetting($os, 'icon', $os);
+            $os_icon = LibrenmsConfig::getOsSetting($os, 'icon', $os);
             $possibilities[] = "$os_icon.svg";
             $possibilities[] = "$os_icon.png";
         }
 
         foreach ($possibilities as $file) {
-            if (is_file(Config::get('html_dir') . "/$dir" . $file)) {
+            if (is_file(LibrenmsConfig::get('html_dir') . "/$dir" . $file)) {
                 return $file;
             }
         }
@@ -624,7 +625,7 @@ class Url
         }
 
         // don't parse the subdirectory, if there is one in the path
-        $base_url = parse_url(Config::get('base_url'))['path'] ?? '';
+        $base_url = parse_url(LibrenmsConfig::get('base_url'))['path'] ?? '';
         if (strlen($base_url) > 1) {
             $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
         } else {

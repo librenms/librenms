@@ -26,7 +26,7 @@
 
 namespace LibreNMS\RRD;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
 class RrdDefinition
@@ -68,7 +68,7 @@ class RrdDefinition
         $this->dataSets[$name] = [
             'name' => $name,
             'type' => $this->checkType($type),
-            'hb' => is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
+            'hb' => is_null($heartbeat) ? LibrenmsConfig::get('rrd.heartbeat') : $heartbeat,
             'min' => is_null($min) ? 'U' : $min,
             'max' => is_null($max) ? 'U' : $max,
             'source_ds' => $source_ds,

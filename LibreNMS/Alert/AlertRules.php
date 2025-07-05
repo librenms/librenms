@@ -36,7 +36,9 @@ use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use PDO;
 use PDOException;
@@ -46,7 +48,7 @@ class AlertRules
     public function runRules($device_id)
     {
         //Check to see if under maintenance
-        if (AlertUtil::isMaintenance($device_id) > 0) {
+        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SKIP_ALERTS) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;
@@ -72,7 +74,7 @@ class AlertRules
             }
             d_echo(PHP_EOL);
             if (empty($rule['query'])) {
-                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
 

@@ -1,6 +1,6 @@
 <?php
 
-// Graphs are printed in the order they exist in \LibreNMS\Config::get('graph_types')
+// Graphs are printed in the order they exist in \App\Facades\LibrenmsConfig::get('graph_types')
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -17,7 +17,7 @@ echo "<span style='font-weight: bold;'>Graphs</span> &#187; ";
 
 $graph_enable = [];
 foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device['device_id']]) as $graph) {
-    $section = \LibreNMS\Config::get("graph_types.device.{$graph['graph']}.section");
+    $section = \App\Facades\LibrenmsConfig::get("graph_types.device.{$graph['graph']}.section");
     if ($section != '') {
         $graph_enable[$section][$graph['graph']] = $graph['graph'];
     }
@@ -64,7 +64,7 @@ if (($group != 'customoid') && is_file("includes/html/pages/device/graphs/$group
         if ($graph_enable[$graph]) {
             if ($graph == 'customoid') {
                 foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', [$device['device_id']]) as $graph_entry) {
-                    $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr") . ': ' . $graph_entry['customoid_descr'];
+                    $graph_title = \App\Facades\LibrenmsConfig::get("graph_types.device.$graph.descr") . ': ' . $graph_entry['customoid_descr'];
                     $graph_array['type'] = 'customoid_' . $graph_entry['customoid_descr'];
                     if (! empty($graph_entry['customoid_unit'])) {
                         $graph_array['unit'] = $graph_entry['customoid_unit'];
@@ -74,7 +74,7 @@ if (($group != 'customoid') && is_file("includes/html/pages/device/graphs/$group
                     include 'includes/html/print-device-graph.php';
                 }
             } else {
-                $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
+                $graph_title = \App\Facades\LibrenmsConfig::get("graph_types.device.$graph.descr");
                 $graph_array['type'] = 'device_' . $graph;
                 include 'includes/html/print-device-graph.php';
             }

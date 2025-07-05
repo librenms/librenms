@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -121,7 +121,7 @@ $init_modules = ['nodb'];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
-if (! file_exists(Config::get('install_dir') . '/.env')) {
+if (! file_exists(LibrenmsConfig::get('install_dir') . '/.env')) {
     $suggested = realpath(__DIR__);
     print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
     exit(1);
@@ -148,10 +148,14 @@ $validator->validate($modules, isset($options['s']) || ! empty($modules));
 
 exit($validator->getStatus() ? 0 : 1);
 
-function print_header()
+function print_header(): void
 {
-    $output = ob_get_clean();
-    @ob_end_clean();
+    $output = '';
+
+    if (ob_get_level() > 0) {
+        $output = ob_get_contents();
+        ob_end_clean();
+    }
 
     echo \LibreNMS\Util\Version::get()->header() . PHP_EOL;
     echo $output;

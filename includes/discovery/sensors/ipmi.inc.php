@@ -1,8 +1,8 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
@@ -12,8 +12,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
 
-    $cmd = [Config::get('ipmitool', 'ipmitool')];
-    if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
+    $cmd = [LibrenmsConfig::get('ipmitool', 'ipmitool')];
+    if (LibrenmsConfig::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
         if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         } else {
@@ -21,7 +21,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         }
     }
 
-    foreach (Config::get('ipmi.type', []) as $ipmi_type) {
+    foreach (LibrenmsConfig::get('ipmi.type', []) as $ipmi_type) {
         // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
         try {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
@@ -50,10 +50,10 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
-        if ($current != 'na' && Config::has("ipmi_unit.$unit")) {
+        if ($current != 'na' && LibrenmsConfig::has("ipmi_unit.$unit")) {
             discover_sensor(
                 null,
-                Config::get("ipmi_unit.$unit"),
+                LibrenmsConfig::get("ipmi_unit.$unit"),
                 $device,
                 $desc,
                 $index,

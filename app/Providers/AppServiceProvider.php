@@ -16,6 +16,7 @@ use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
+use LibreNMS\Util\Version;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
@@ -74,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
+        Version::registerAboutCommand();
 
         $this->bootAuth();
     }

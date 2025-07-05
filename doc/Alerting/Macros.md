@@ -10,7 +10,6 @@ Example for adding a a macro that returns the delta of a sensor:
 lnms config:set alert.macros.rule.sensor_delta_current 'ABS(%sensors.sensor_current - %sensors.sensor_prev)'
 ```
 
-
 Example for adding macro through `config.php` that is a boolean test:
 
 ```php
@@ -19,7 +18,7 @@ $config['alert']['macros']['rule']['is_debian'] = '%devices.features ~ "@debian@
 
 These rules can then be used in the alerting rules. Example:
 
-```
+```bash
 ... macros.sensor_delta_current > 10 AND macros.rule.is_debian = 1 ...
 ```
 

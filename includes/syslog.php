@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 function get_cache($host, $value)
 {
@@ -46,14 +46,14 @@ function process_syslog($entry, $update)
 {
     global $dev_cache;
 
-    foreach (Config::get('syslog_filter') as $bi) {
+    foreach (LibrenmsConfig::get('syslog_filter') as $bi) {
         if (strpos($entry['msg'], $bi) !== false) {
             return $entry;
         }
     }
 
     $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
-    $syslog_xlate = Config::get('syslog_xlate');
+    $syslog_xlate = LibrenmsConfig::get('syslog_xlate');
     if (! empty($syslog_xlate[$entry['host']])) {
         $entry['host'] = $syslog_xlate[$entry['host']];
     }
@@ -62,8 +62,8 @@ function process_syslog($entry, $update)
         $os = get_cache($entry['host'], 'os');
         $hostname = get_cache($entry['host'], 'hostname');
 
-        if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
-            foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
+        if (LibrenmsConfig::get('enable_syslog_hooks') && is_array(LibrenmsConfig::getOsSetting($os, 'syslog_hook'))) {
+            foreach (LibrenmsConfig::getOsSetting($os, 'syslog_hook') as $k => $v) {
                 $syslogprogmsg = $entry['program'] . ': ' . $entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && preg_match($v['regex'], $syslogprogmsg)) {
                     shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg($hostname) . ' ' . escapeshellarg($os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
@@ -130,7 +130,7 @@ function process_syslog($entry, $update)
         } elseif ($os == 'zywall') {
             // Zwwall sends messages without all the fields, so the offset is wrong
             $msg = preg_replace('/" /', '";', stripslashes($entry['program'] . ':' . $entry['msg']));
-            $msg = str_getcsv($msg, ';');
+            $msg = str_getcsv($msg, ';', escape: '\\');
             $entry['program'] = null;
             foreach ($msg as $param) {
                 [$var, $val] = explode('=', $param);

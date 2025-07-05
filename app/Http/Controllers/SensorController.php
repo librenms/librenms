@@ -101,7 +101,7 @@ class SensorController
             'printer-supply' => [
                 'text' => __('sensors.printer-supply.long'),
                 'link' => route('sensor.index', $request->all() + ['metric' => 'printer-supply']),
-                'icon' => 'fa-printer',
+                'icon' => 'fa-print',
             ],
         ];
 

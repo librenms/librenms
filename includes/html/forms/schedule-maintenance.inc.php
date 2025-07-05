@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\UserPref;
-use Illuminate\Support\Str;
-
 /*
  * LibreNMS
  *
@@ -14,6 +11,11 @@ use Illuminate\Support\Str;
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use App\Facades\LibrenmsConfig;
+use App\Models\UserPref;
+use Illuminate\Support\Str;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
@@ -35,16 +37,18 @@ if ($sub_type == 'new-maintenance') {
 
     $title = $_POST['title'];
     $notes = $_POST['notes'];
-    $recurring = $_POST['recurring'] ? 1 : 0;
+    $recurring = empty($_POST['recurring']) ? 0 : 1;
     $start_recurring_dt = $_POST['start_recurring_dt'];
     $end_recurring_dt = $_POST['end_recurring_dt'];
     $start_recurring_hr = $_POST['start_recurring_hr'];
     $end_recurring_hr = $_POST['end_recurring_hr'];
-    $recurring_day = $_POST['recurring_day'];
     $start = $_POST['start'];
-    [$duration_hour, $duration_min] = explode(':', $_POST['duration']);
+    [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
     $end = $_POST['end'];
-    $maps = $_POST['maps'];
+    $behavior = isset($_POST['behavior'])
+        ? $_POST['behavior']
+        : LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+    $maps = $_POST['maps'] ?? null;
 
     if (isset($duration_hour) && isset($duration_min)) {
         $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
@@ -111,7 +115,13 @@ if ($sub_type == 'new-maintenance') {
         $end_recurring_hr = '00:00:00';
     }
 
-    if (! is_array($_POST['maps'])) {
+    if (empty($_POST['behavior'])) {
+        $message .= 'Missing behavior<br />';
+    } elseif (MaintenanceBehavior::tryFrom((int) $behavior) === null) {
+        $message .= 'Invalid behavior<br />';
+    }
+
+    if (! is_array($maps)) {
         $message .= 'Not mapped to any groups or devices<br />';
     }
 
@@ -119,6 +129,7 @@ if ($sub_type == 'new-maintenance') {
         $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
         $alert_schedule->title = $title;
         $alert_schedule->notes = $notes;
+        $alert_schedule->behavior = $behavior;
         $alert_schedule->recurring = $recurring;
         $alert_schedule->start = $start;
         $alert_schedule->end = $end;
@@ -140,7 +151,7 @@ if ($sub_type == 'new-maintenance') {
                 dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
             }
 
-            foreach ($_POST['maps'] as $target) {
+            foreach ($maps as $target) {
                 $type = 'device';
                 if (Str::startsWith($target, 'l')) {
                     $type = 'location';

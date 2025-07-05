@@ -59,7 +59,7 @@ class Fortigate extends Fortinet implements
                 'sessions' => $sessions,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fortigate_sessions', $tags, $fields);
             $this->enableGraph('fortigate_sessions');
         }
@@ -73,7 +73,7 @@ class Fortigate extends Fortinet implements
                 'LOAD' => $cpu_usage,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fortigate_cpu', $tags, $fields);
             $this->enableGraph('fortigate_cpu');
         }

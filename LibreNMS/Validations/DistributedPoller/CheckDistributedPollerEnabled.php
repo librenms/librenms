@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationFixer;
 use LibreNMS\ValidationResult;
@@ -38,7 +38,7 @@ class CheckDistributedPollerEnabled implements Validation, ValidationFixer
      */
     public function validate(): ValidationResult
     {
-        if (! Config::get('distributed_poller')) {
+        if (! LibrenmsConfig::get('distributed_poller')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckDistributedPollerEnabled.not_enabled'))
                 ->setFix('lnms config:set distributed_poller true')
                 ->setFixer(__CLASS__);
@@ -64,7 +64,7 @@ class CheckDistributedPollerEnabled implements Validation, ValidationFixer
 
     public function fix(): bool
     {
-        Config::persist('distributed_poller', true);
+        LibrenmsConfig::persist('distributed_poller', true);
 
         return true;
     }

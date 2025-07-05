@@ -2,16 +2,16 @@
 
 namespace LibreNMS\Alert;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertTransport;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 
 abstract class Transport implements TransportInterface
 {
-    protected ?array $config;
+    protected array $config;
     protected string $name = '';
 
     public static function make(string $type): TransportInterface
@@ -41,7 +41,7 @@ abstract class Transport implements TransportInterface
 
     public function __construct(?AlertTransport $transport = null)
     {
-        $this->config = $transport ? $transport->transport_config : [];
+        $this->config = (array) ($transport ? $transport->transport_config : []);
     }
 
     /**
@@ -87,12 +87,12 @@ abstract class Transport implements TransportInterface
     public static function getColorForState($state)
     {
         $colors = [
-            AlertState::CLEAR => Config::get('alert_colour.ok'),
-            AlertState::ACTIVE => Config::get('alert_colour.bad'),
-            AlertState::ACKNOWLEDGED => Config::get('alert_colour.acknowledged'),
-            AlertState::WORSE => Config::get('alert_colour.worse'),
-            AlertState::BETTER => Config::get('alert_colour.better'),
-            AlertState::CHANGED => Config::get('alert_colour.changed'),
+            AlertState::CLEAR => LibrenmsConfig::get('alert_colour.ok'),
+            AlertState::ACTIVE => LibrenmsConfig::get('alert_colour.bad'),
+            AlertState::ACKNOWLEDGED => LibrenmsConfig::get('alert_colour.acknowledged'),
+            AlertState::WORSE => LibrenmsConfig::get('alert_colour.worse'),
+            AlertState::BETTER => LibrenmsConfig::get('alert_colour.better'),
+            AlertState::CHANGED => LibrenmsConfig::get('alert_colour.changed'),
         ];
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';
@@ -114,7 +114,7 @@ abstract class Transport implements TransportInterface
                 continue;
             }
 
-            $val = $this->config[$item['name']];
+            $val = $this->config[$item['name']] ?? '';
             if ($item['type'] == 'password') {
                 $val = '********';
             } elseif ($item['type'] == 'select') {

@@ -1,7 +1,7 @@
 <?php
 
 use App\Facades\DeviceCache;
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Rewrite;
 
 if (! Auth::user()->hasGlobalRead()) {
@@ -118,15 +118,15 @@ if (! Auth::user()->hasGlobalRead()) {
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
                 if ($i % 2) {
                     if ($x % 2) {
-                        $dev_colour = Config::get('list_colour.even_alt');
+                        $dev_colour = LibrenmsConfig::get('list_colour.even_alt');
                     } else {
-                        $dev_colour = Config::get('list_colour.even_alt2');
+                        $dev_colour = LibrenmsConfig::get('list_colour.even_alt2');
                     }
                 } else {
                     if ($x % 2) {
-                        $dev_colour = Config::get('list_colour.odd_alt2');
+                        $dev_colour = LibrenmsConfig::get('list_colour.odd_alt2');
                     } else {
-                        $dev_colour = Config::get('list_colour.odd_alt');
+                        $dev_colour = LibrenmsConfig::get('list_colour.odd_alt');
                     }
                 }
 
@@ -152,12 +152,12 @@ if (! Auth::user()->hasGlobalRead()) {
                         case 'errors':
                             $port['width'] = '130';
                             $port['height'] = '30';
-                            $port['from'] = Config::get('time.day');
-                            $port['to'] = Config::get('time.now');
+                            $port['from'] = LibrenmsConfig::get('time.day');
+                            $port['to'] = LibrenmsConfig::get('time.now');
                             $port['bg'] = '#' . $bg;
                             $port['graph_type'] = 'port_' . $vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
-                            text-align: center; float: left; background-color: " . Config::get('list_colour.odd_alt2') . ";'>
+                            text-align: center; float: left; background-color: " . LibrenmsConfig::get('list_colour.odd_alt2') . ";'>
                                 <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
                             print_port_thumbnail($port);
                             echo "<div style='font-size: 9px;'>" . substr(short_port_descr($port['ifAlias']), 0, 22) . '</div>

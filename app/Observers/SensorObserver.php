@@ -2,11 +2,11 @@
 
 namespace App\Observers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class SensorObserver
@@ -35,7 +35,7 @@ class SensorObserver
             [$sensor->sensor_limit_warn, $sensor->sensor_limit_low_warn] = [$sensor->sensor_limit_low_warn, $sensor->sensor_limit_warn];
         }
 
-        if (Config::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
+        if (LibrenmsConfig::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
             $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
         }
 

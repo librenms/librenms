@@ -91,7 +91,6 @@ class CheckDatabaseConnected implements Validation
     private function tryToGenerateFix(): ?string
     {
         $host = config('database.connections.database.' . config('database.default') . '.host');
-        $fix = null;
         if (empty($host) || $host == 'localhost' || str_starts_with($host, '127.')) {
             $finder = new ExecutableFinder;
             $systemctl = $finder->find('systemctl');

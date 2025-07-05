@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Exceptions;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Throwable;
 
@@ -65,7 +65,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
      */
     public function render(Request $request): Response
     {
-        $log_file = config('app.log') ?: Config::get('log_file', base_path('logs/librenms.log'));
+        $log_file = config('app.log') ?: LibrenmsConfig::get('log_file', base_path('logs/librenms.log'));
         $commands = $this->generateCommands($log_file);
 
         // use pre-compiled template because we probably can't compile it.
@@ -89,8 +89,8 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         $dirs = [
             base_path('bootstrap/cache'),
             base_path('storage'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
+            LibrenmsConfig::get('log_dir', base_path('logs')),
+            LibrenmsConfig::get('rrd_dir', base_path('rrd')),
         ];
 
         // check if folders are missing
@@ -99,8 +99,8 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             base_path('storage/framework/sessions'),
             base_path('storage/framework/views'),
             base_path('storage/framework/cache'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
+            LibrenmsConfig::get('log_dir', base_path('logs')),
+            LibrenmsConfig::get('rrd_dir', base_path('rrd')),
         ];
 
         $mk_dirs = array_filter($mkdirs, function ($file) {

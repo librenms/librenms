@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,12 @@ class LoadUserPreferences
                 $request->session()->put('preferences.timezone', $timezone);
                 $request->session()->put('preferences.timezone_static', true);
             });
+        } elseif (! $request->session()->has('applied_site_style')) {
+            // set applied_site_style for unauth sessions (once)
+            $site_style = LibrenmsConfig::get('site_style');
+            if ($site_style !== 'device') {
+                $request->session()->put('applied_site_style', $site_style);
+            }
         }
 
         return $next($request);

@@ -648,21 +648,18 @@ function http_fallback(link) {
 }
 
 function init_select2(selector, type, data, selected, placeholder, config) {
-    var $select = $(selector);
+    const $select = $(selector);
 
     // allow function to be assigned to pass data
-    var data_function = function(params) {
+    const data_function = $.isFunction(data) ? data : function (params) {
         data.term = params.term;
         data.page = params.page || 1;
         return data;
     };
-    if ($.isFunction(data)) {
-        data_function = data;
-    }
 
-    var init = {
+    const init = {
         theme: "bootstrap",
-        dropdownAutoWidth : true,
+        dropdownAutoWidth: true,
         width: "auto",
         placeholder: placeholder,
         allowClear: true,
@@ -744,36 +741,3 @@ function applySiteStyle(newStyle) {
         });
     }
 }
-
-// popup component javascript.  Hopefully temporary.
-document.addEventListener("alpine:init", () => {
-    Alpine.data("popup", () => ({
-        popupShow: false,
-        showTimeout: null,
-        hideTimeout: null,
-        ignoreNextShownEvent: false,
-        delay: 300,
-        show(timeout) {
-            clearTimeout(this.hideTimeout);
-            this.showTimeout = setTimeout(() => {
-                this.popupShow = true;
-                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
-                    padding: 8
-                });
-
-                // close other popups, except this one
-                this.ignoreNextShownEvent = true;
-                this.$dispatch('librenms-popup-shown', this.$el);
-            }, timeout);
-        },
-        hide(timeout) {
-            if (this.ignoreNextShownEvent) {
-                this.ignoreNextShownEvent = false;
-                return;
-            }
-
-            clearTimeout(this.showTimeout);
-            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout)
-        }
-    }));
-});

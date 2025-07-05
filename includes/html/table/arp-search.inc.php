@@ -64,8 +64,8 @@ foreach ($pag->items() as $arp) {
 
     if ($arp->remote_ports_maybe) {
         $remote_port = $arp->remote_ports_maybe->first();
-        if ($remote_port->port_id != $arp->port_id) {
-            $arp_name = Url::deviceLink($remote_port->device);
+        if ($remote_port?->port_id != $arp->port_id) {
+            $arp_name = Url::deviceLink($remote_port?->device);
             $arp_if = Url::portLink($remote_port);
         } else {
             $arp_name = 'Localhost';

@@ -64,7 +64,7 @@ class Storage implements Module
         $saved = $this->syncModels($os->getDevice(), 'storage', $storages);
 
         Log::info('');
-        $storages->each($this->printStorage(...));
+        $saved->each($this->printStorage(...));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool

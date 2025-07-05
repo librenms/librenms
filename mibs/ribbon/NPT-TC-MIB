@@ -1,0 +1,85 @@
+
+-- File Name : NPT-TC-MIB
+-- Date      : Tue May 31 10:41:34 CST 2011
+-- Author    : AdventNet Agent Toolkit C Edition - MibEditor 6
+
+
+
+NPT-TC-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		eciNpti
+			FROM NPT-ROOT-MIB
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, Integer32, enterprises
+			FROM SNMPv2-SMI;
+
+	nptTextualConventions	MODULE-IDENTITY
+		LAST-UPDATED	"201105240945Z"
+		ORGANIZATION	"Ribbon Communications Inc."
+		CONTACT-INFO	"on.support@rbbn.com 
+                         Ribbon Communications Inc.,China
+                         Dongxin Tower, No.398 Wensan Road, 
+                         Hangzhou, 310012 P.R.China"
+		DESCRIPTION		"The MIB module for Npt series products."
+		REVISION		"201105240945Z"
+		DESCRIPTION		""
+		::=  {  eciNpti  1  }
+
+-- TEXTUAL-CONVENTIONS --
+	NPTSfpOperStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { up ( 0 ) , down ( 1 )} 
+
+	NPTSfpLaserTrStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { off ( 0 ) , on ( 1 )}  
+		
+	NPTSfpLOSStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { nolos ( 0 ) , los ( 1 ) , notpresent ( 2 )}
+		
+	NPTSfpFiberType ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { smf ( 0 ) , om1 ( 1 ) , om2 ( 2 ) , om3 ( 3 ) , om4 ( 4 ) , unknown ( 15 ) , invalid (-1)} 		
+		
+	NPTSfpLineCode ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { nrz ( 0 ) , dpdqpsk ( 1 ) , dpqpsk ( 2 ) , dp8qam ( 3 ) , dp16qam ( 4 ) , pam4 ( 5 ) , invalid (-1)} 
+
+	NPTSNMPYesOrNo ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER   { no ( 0 ) , yes ( 1 ) }  
+	
+	NPTSNMPEnable ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER  { disable ( 0 ) , enable ( 1 ) } 
+
+    String512 ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	"512a"
+		STATUS			current
+		DESCRIPTION
+			"Max length is 512 characters"
+		SYNTAX       OCTET STRING (SIZE (0..512)) 
+		
+	NPTStatisticsTunnelType ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"TC Description"
+		SYNTAX 			INTEGER   { ingress ( 0 ) , transit ( 1 ) } 
+
+END

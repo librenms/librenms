@@ -54,7 +54,7 @@ if (! empty($fdbPort_table)) {
     }
 
     // Build VLAN fdb index to real VLAN ID dictionary
-    $vlan_cur_table = snmpwalk_group($device, 'dot1qVlanFdbId', 'Q-BRIDGE-MIB', 2);
+    $vlan_cur_table = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table(2);
     $vlan_fdb_dict = [];
 
     // Indexed first by dot1qVlanTimeMark, which we ignore

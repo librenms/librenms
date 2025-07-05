@@ -26,11 +26,11 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -106,7 +106,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 20,
             'width' => 80,
         ];
@@ -121,7 +121,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 150,
             'width' => 400,
         ];
