@@ -2,13 +2,13 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\LinkDiscovery;
@@ -54,16 +54,22 @@ class Links implements Module
     public function discover(OS $os): void
     {
         $links = new Collection;
+        $group = $os->getDeviceArray()['os_group'] ?? '';
 
         if ($os instanceof LinkDiscovery) {
             $links = $os->discoverLinks();
         }
 
-        if ($links->isEmpty()) {
-            $links = $this->discoverLldp($os->getDevice());
+        if ($links->isEmpty() || $group == 'cisco') {
+            $links = $links->merge($this->discoverLldp($os->getDevice()));
         }
 
         $links->each(function (Link $link) use ($os) {
+            $link->remote_hostname = substr((string) $link->remote_hostname, 0, 127);
+            $link->remote_port = substr((string) $link->remote_port, 0, 127);
+            $link->remote_version = substr((string) $link->remote_version, 0, 255);
+            $link->remote_platform = substr((string) $link->remote_platform, 0, 255);
+
             $tmp = explode('#', $link->protocol);
             $link->protocol = $dp = $tmp[0];
             $ip = $tmp[1] ?? '';
@@ -71,15 +77,15 @@ class Links implements Module
             if (empty($link->remote_device_id) &&
                 \LibreNMS\Util\Validate::hostname($link->remote_hostname) &&
                 ! can_skip_discovery($link->remote_hostname, $link->remote_version) &&
-                Config::get('autodiscovery.xdp') === true) {
+                LibrenmsConfig::get('autodiscovery.xdp') === true) {
                 $link->remote_device_id = discover_new_device(
                     $link->remote_hostname, $os->getDeviceArray(), strtoupper($dp), Port::where('port_id', $link->local_port_id)->first()->toArray()
                 ) ?: 0;
             }
             if (empty($link->remote_device_id) &&
                 ! empty($ip) &&
-                Config::get('discovery_by_ip', false) &&
-                Config::get('autodiscovery.xdp') === true) { //name lookup failed, try with IP
+                LibrenmsConfig::get('discovery_by_ip', false) &&
+                LibrenmsConfig::get('autodiscovery.xdp') === true) { //name lookup failed, try with IP
                 $link->remote_device_id = discover_new_device(
                     $ip, $os->getDeviceArray(), strtoupper($dp), Port::where('port_id', $link->local_port_id)->first()->toArray()
                 ) ?: 0;
@@ -140,6 +146,10 @@ class Links implements Module
         $lldpRows = SnmpQuery::hideMib()->enumStrings()->walk('LLDP-MIB::lldpRemTable')->table(3);
         $oidsv2 = SnmpQuery::hideMib()->enumStrings()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
 
+        if ($this->array_depth($lldpRows) != 4 && empty($oidsv2)) {
+            return $links;
+        }
+
         if (! empty($lldpRows)) {
             $oidsremadd = SnmpQuery::hideMib()->numeric()->walk('LLDP-MIB::lldpRemManAddrIfSubtype')->values();
             foreach ($oidsremadd as $key => $tmp1) {
@@ -191,13 +201,19 @@ class Links implements Module
                     $data['lldpRemTimeMark'] = $lldpRemTimeMark;
 
                     // Fix devices returning lldpRemPortId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName' && StringHelpers::isHex(str_replace([':', '-'], ' ', $data['lldpRemPortId']))) {
-                        $data['lldpRemPortId'] = StringHelpers::hexToAscii($data['lldpRemPortId'], ':');
+                    if (! empty($data['lldpRemPortId']) && ! empty($data['lldpRemPortIdSubtype']) && $data['lldpRemPortIdSubtype'] == 'interfaceName') {
+                        $tmpName = str_replace([':', '-', ' '], '', $data['lldpRemPortId']);
+                        if (StringHelpers::isHex($tmpName, '')) {
+                            $data['lldpRemPortId'] = StringHelpers::hexToAscii($tmpName, '');
+                        }
                     }
 
                     // Fix devices returning lldpRemChassisId in HEX (Panos for instances does it)
-                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress' && preg_match('/(:..:3a:..){5}/is', $data['lldpRemChassisId'])) {
-                        $data['lldpRemChassisId'] = StringHelpers::hexToAscii($data['lldpRemChassisId'], ':');
+                    if (! empty($data['lldpRemChassisId']) && ! empty($data['lldpRemChassisIdSubtype']) && $data['lldpRemChassisIdSubtype'] == 'macAddress') {
+                        $tmpName = str_replace([':', '-', ' '], '', $data['lldpRemChassisId']);
+                        if (StringHelpers::isHex($tmpName, '') && strlen($tmpName) != 12) {
+                            $data['lldpRemChassisId'] = StringHelpers::hexToAscii($tmpName, '');
+                        }
                     }
 
                     // lldpRemLocalPortNum is a local index for LLDP, not an ifIndex
@@ -221,7 +237,7 @@ class Links implements Module
                         // $data['lldpLocPortId'] should not be an ifIndex according to MIB but let's try...
                         $data['localPortId'] = PortCache::getIdFromIfIndex($data['lldpLocPortId'], $device);
                     }
-                    $data['lldpRemSysName'] = substr($data['lldpRemSysName'], 0, 64);
+
                     $remoteMac = $remotePortName = '';
 
                     if ($data['lldpRemPortIdSubtype'] == 'interfaceName'
@@ -281,5 +297,21 @@ class Links implements Module
         }
 
         return $links->filter();
+    }
+
+    private function array_depth($array): int
+    {
+        $max_indentation = 1;
+        $array_str = print_r($array, true);
+        $lines = explode("\n", $array_str);
+
+        foreach ($lines as $line) {
+            $indentation = (strlen($line) - strlen(ltrim($line))) / 4;
+            if ($indentation > $max_indentation) {
+                $max_indentation = $indentation;
+            }
+        }
+
+        return (int) ceil(($max_indentation - 1) / 2) + 1;
     }
 }

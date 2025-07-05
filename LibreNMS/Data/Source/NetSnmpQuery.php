@@ -365,7 +365,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             array_push($cmd, '-v3', '-l', $this->device->authlevel);
             array_push($cmd, '-n', $this->context);
 
-            switch (strtolower($this->device->authlevel)) {
+            switch (strtolower((string) $this->device->authlevel)) {
                 case 'authpriv':
                     array_push($cmd, '-x', $this->device->cryptoalgo);
                     array_push($cmd, '-X', $this->device->cryptopass);

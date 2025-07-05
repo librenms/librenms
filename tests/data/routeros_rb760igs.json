@@ -3041,5 +3041,110 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-mkt",
+                    "remote_port": "lan1",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether2",
+                    "ifDescr": "ether2",
+                    "ifName": "ether2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-sw02",
+                    "remote_port": "gigabitEthernet 1/0/1",
+                    "remote_platform": "",
+                    "remote_version": "JetStream 8-Port Gigabit L2+ Managed Switch with 2 SFP Slots",
+                    "ifAlias": "ether2",
+                    "ifDescr": "ether2",
+                    "ifName": "ether2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MikroTik",
+                    "remote_port": "ether2",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "sfp1",
+                    "ifDescr": "sfp1",
+                    "ifName": "sfp1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-mkt",
+                    "remote_port": "lan1",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "sfp1",
+                    "ifDescr": "sfp1",
+                    "ifName": "sfp1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-sw02",
+                    "remote_port": "gigabitEthernet 1/0/9",
+                    "remote_platform": "",
+                    "remote_version": "JetStream 8-Port Gigabit L2+ Managed Switch with 2 SFP Slots",
+                    "ifAlias": "sfp1",
+                    "ifDescr": "sfp1",
+                    "ifName": "sfp1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-mkt",
+                    "remote_port": "lan254",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "vlan254",
+                    "ifDescr": "vlan254",
+                    "ifName": "vlan254"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-wr01",
+                    "remote_port": "br-lan254",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "vlan254",
+                    "ifDescr": "vlan254",
+                    "ifName": "vlan254"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-wr02",
+                    "remote_port": "br-lan254",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "vlan254",
+                    "ifDescr": "vlan254",
+                    "ifName": "vlan254"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "peca-wr253",
+                    "remote_port": "br-lan254",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "vlan254",
+                    "ifDescr": "vlan254",
+                    "ifName": "vlan254"
+                }
+            ]
+        }
     }
 }

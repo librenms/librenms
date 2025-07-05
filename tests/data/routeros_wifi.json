@@ -1426,5 +1426,33 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Jizak",
+                    "remote_port": "eth1-kupeckeho_lan",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "wlan60-station-1",
+                    "ifDescr": "wlan60-station-1",
+                    "ifName": "wlan60-station-1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Spoj Jizak-Kupeckeho-60G",
+                    "remote_port": "wlan60-1",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.48.2 (stable) RBLHGG-60ad",
+                    "ifAlias": "wlan60-station-1",
+                    "ifDescr": "wlan60-station-1",
+                    "ifName": "wlan60-station-1"
+                }
+            ]
+        }
     }
 }

@@ -676,30 +676,44 @@ class Routeros extends OS implements
     {
         $links = new Collection;
 
+        $lldp_ports = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
+        $lldp_ports_num = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
+
+        if (empty($lldp_ports) || empty($lldp_ports_num)) {
+            return $links;
+        }
+
         $lldp_array = SnmpQuery::hideMib()->walk([
             'LLDP-MIB::lldpRemEntry',
             'LLDP-MIB::lldpRemManAddrEntry',
         ])->table(3);
 
+        // mikrotik broken LLDP implementation v6/v7
+        $lldpRows = [];
         if (! empty($lldp_array)) {
-            if (version_compare($this->getDevice()->version, '7.7', '>')) {
-                foreach ($lldp_array[0] as $tmpData) {
-                    foreach ($tmpData as $tmpKey => $lldpData) {
-                        $tmpArray[0][0][$tmpKey] = $lldpData;
+            foreach ($lldp_array as $key => $data) {
+                if (isset($data['lldpRemChassisIdSubtype'])) {
+                    $lldpRows[$key] = $data;
+                } else {
+                    foreach ($data as $key1 => $data1) {
+                        if (isset($data1['lldpRemChassisIdSubtype'])) {
+                            $lldpRows[$key1] = $data1;
+                        } else {
+                            foreach ($data1 as $key2 => $data2) {
+                                if (isset($data2['lldpRemChassisIdSubtype'])) {
+                                    $lldpRows[$key2] = $data2;
+                                }
+                            }
+                        }
                     }
                 }
-                $lldp_array = $tmpArray ?? [];
             }
-            $lldp_array = array_shift($lldp_array);
-            $lldp_array = array_shift($lldp_array);
+        }
 
-            $lldp_ports = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
-            $lldp_ports_num = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
-
-            foreach ($lldp_array as $key => $data) {
+        if (! empty($lldpRows)) {
+            foreach ($lldpRows as $key => $data) {
                 $data['lldpRemSysName'] = StringHelpers::linksRemSysName($data['lldpRemSysName']);
                 $data['lldpRemPortId'] = StringHelpers::linksRemPortName($data['lldpRemSysDesc'], $data['lldpRemPortId']);
-
                 $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec($lldp_ports_num['mtxrNeighborInterfaceID'][$key])];
                 $local_port_id = PortCache::getIdFromIfName($local_port_ifName);
                 $interface = PortCache::get($local_port_id);
@@ -709,7 +723,7 @@ class Routeros extends OS implements
                     $remote_port_mac = Mac::parse($data['lldpRemPortId'] ?? '')->hex();
                 }
 
-                $remote_device_id = find_device_id($data['lldpRemSysName'], $data['lldpRemManAddr'], $remote_port_mac);
+                $remote_device_id = find_device_id($data['lldpRemSysName'] ?? '', $data['lldpRemManAddr'] ?? '', $remote_port_mac);
                 $remote_chassis_id = Mac::parse($data['lldpRemChassisId'] ?? '')->hex();
 
                 if ($interface['port_id'] && $data['lldpRemSysName'] && $data['lldpRemPortId']) {
