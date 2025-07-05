@@ -1906,12 +1906,12 @@ ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: vlan, Type: int, 'Null': false, Extra: '' }
-    - { Field: baseport, Type: int, 'Null': false, Extra: '' }
-    - { Field: priority, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: state, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: cost, Type: int, 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: baseport, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: priority, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: state, Type: varchar(16), 'Null': false, Extra: '', Default: unknown }
+    - { Field: cost, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: untagged, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }

@@ -12986,48 +12986,6 @@
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 2,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 5,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 10,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 112,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                }
             ]
         }
     },
