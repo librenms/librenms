@@ -14,6 +14,7 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.12148.10
     -
+        sysObjectID_regex: '/^$/'
         snmpget:
             oid: .1.3.6.1.4.1.12148.10.2.6.0
             op: '!='

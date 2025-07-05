@@ -9,7 +9,9 @@ over:
     - { graph: device_temperature, text: 'Temperatures' }
     - { graph: device_fanspeed, text: 'Fan Speed' }
 discovery:
-    - snmpget:
+    -   sysObjectID:
+            - .1.3.6.1.4.1. # could be any server os
+        snmpget:
           oid: ATEN-IPMI-MIB::bmcMajorVesion.0
           op: '!='
           value: false
