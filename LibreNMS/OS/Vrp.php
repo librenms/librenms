@@ -22,6 +22,7 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
@@ -31,6 +32,7 @@ use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use App\Models\Transceiver;
@@ -44,6 +46,7 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -58,8 +61,10 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
 class Vrp extends OS implements
+    FdbTableDiscovery,
     MempoolsDiscovery,
     OSPolling,
     ProcessorDiscovery,
@@ -698,5 +703,60 @@ class Vrp extends OS implements
             d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
             d_echo($collected);
         }
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $fdbPort_table = SnmpQuery::hideMib()->walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table();
+
+        if (! empty($fdbPort_table)) {
+            Log::info('HUAWEI-L2MAM-MIB:');
+            foreach ($fdbPort_table['hwDynFdbPort'] as $hwDynFdbMac => $macData) {
+                foreach ($macData as $hwDynFdbVlanId => $basePort) {
+                    $ifIndex = reset($basePort); // $baseport can be ['' => '119'] or ['0' => '119']
+                    if (! empty($ifIndex)) {
+                        $fdbt->push(new PortsFdb([
+                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
+                            'mac_address' => $hwDynFdbMac,
+                            'vlan_id' => $hwDynFdbVlanId,
+                        ]));
+                    }
+                }
+            }
+        }
+
+        return $fdbt->filter();
+
+        /*
+        * todo
+        * $hwCfgMacAddrQueryIfIndex = SnmpQuery::hideMib()->walk('HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex')->table(10);
+        * Static (sticky) mac addresses are not stored in the same table.
+        * if (! empty($hwCfgMacAddrQueryIfIndex)) {
+        * echo 'HUAWEI-L2MAM-MIB (static):' . PHP_EOL;
+        * foreach ($hwCfgMacAddrQueryIfIndex as $vlan => $data) {
+        *    if (! empty($data[0][0][0])) {
+        *        foreach ($data[0][0][0] as $mac => $data_next) {
+        *            if (! empty($data_next['showall'][0][0][0][0]['hwCfgMacAddrQueryIfIndex'])) {
+        *                $basePort = $data_next['showall'][0][0][0][0]['hwCfgMacAddrQueryIfIndex'];
+        *                $ifIndex = reset($basePort);
+        *                if (! $ifIndex) {
+        *                    continue;
+        *                }
+        *                $port_id = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
+        *                $mac_address = Mac::parse($mac)->hex();
+        *                if (strlen($mac_address) != 12) {
+        *                    Log::debug("MAC address padding failed for $mac\n");
+        *                    continue;
+        *                }
+        *                $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+        *                $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+        *                Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
+        *            }
+        *        }
+        *    }
+        *}
+        */
     }
 }
