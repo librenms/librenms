@@ -9814,6 +9814,28 @@
                     "ifAlias": "Ethernet1/49",
                     "ifDescr": "Ethernet1/49",
                     "ifName": "Ethernet1/49"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "<private>",
+                    "remote_port": "Ethernet1/49",
+                    "remote_platform": "N3K-C3064PQ-10GE",
+                    "remote_version": "Cisco Nexus Operating System (NX-OS) Software, Version 7.0(3)I7(8)",
+                    "ifAlias": "Ethernet1/49",
+                    "ifDescr": "Ethernet1/49",
+                    "ifName": "Ethernet1/49"
+                },
+                {
+                    "active": 1,
+                    "protocol": "cdp",
+                    "remote_hostname": "<private>",
+                    "remote_port": "GigabitEthernet0/0",
+                    "remote_platform": "<private>",
+                    "remote_version": "Some OS",
+                    "ifAlias": "mgmt0",
+                    "ifDescr": "mgmt0",
+                    "ifName": "mgmt0"
                 }
             ]
         }

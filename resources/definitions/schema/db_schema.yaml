@@ -106,6 +106,7 @@ alert_schedule:
     - { Field: recurring_day, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: notes, Type: text, 'Null': false, Extra: '' }
+    - { Field: behavior, Type: int, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [schedule_id], Unique: true, Type: BTREE }
 alert_templates:
@@ -811,9 +812,9 @@ hrDevice:
     - { Field: hrDevice_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: hrDeviceIndex, Type: int, 'Null': false, Extra: '' }
-    - { Field: hrDeviceDescr, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: hrDeviceDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: hrDeviceType, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
-    - { Field: hrDeviceErrors, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: hrDeviceErrors, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: hrDeviceStatus, Type: varchar(32), 'Null': false, Extra: '', Default: unknown }
     - { Field: hrProcessorLoad, Type: tinyint, 'Null': true, Extra: '' }
   Indexes:
@@ -2315,7 +2316,7 @@ stp:
     - { Field: timeSinceTopologyChange, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: topChanges, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: rootCost, Type: mediumint, 'Null': false, Extra: '' }
+    - { Field: rootCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: rootPort, Type: int, 'Null': true, Extra: '' }
     - { Field: maxAge, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: helloTime, Type: mediumint, 'Null': false, Extra: '' }

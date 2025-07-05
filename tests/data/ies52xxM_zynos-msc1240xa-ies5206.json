@@ -20009,7 +20009,7 @@
                 {
                     "vlan": null,
                     "rootBridge": 0,
-                    "bridgeAddress": "",
+                    "bridgeAddress": "feeddeadbeef",
                     "protocolSpecification": "ieee8021d",
                     "priority": 32768,
                     "timeSinceTopologyChange": "0",

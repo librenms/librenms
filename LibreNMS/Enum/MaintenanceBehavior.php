@@ -1,9 +1,9 @@
 <?php
 
-/**
- * Siteboss.php
+/*
+ * MaintenanceAlertBehavior.php
  *
- * Asentria Siteboss
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
+ * @package    LibreNMS
  * @link       https://www.librenms.org
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\Enum;
 
-use App\Models\Device;
-use LibreNMS\OS;
-
-class Siteboss extends OS
+enum MaintenanceBehavior: int
 {
-    public function discoverOS(Device $device): void
-    {
-        parent::discoverOS($device); // yaml
-        $device->sysName = snmp_get($this->getDeviceArray(), 'siteName.0', '-Osqnv', 'SITEBOSS-530-STD-MIB');
-    }
+    case SKIP_ALERTS = 1;
+    case MUTE_ALERTS = 2;
+    case RUN_ALERTS = 3;
 }
