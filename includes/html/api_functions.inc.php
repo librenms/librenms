@@ -3503,3 +3503,155 @@ function server_info()
         $versions,
     ], 'system');
 }
+
+/**
+ * Get all tags for a device or a specific tag if key is provided
+ * GET /api/v0/devices/{hostname}/tags/{key}
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function get_device_tags(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $key = $request->route('key', null);
+
+    $device = ctype_digit($hostname) ? \App\Models\Device::find($hostname)
+                                     : \App\Models\Device::findByHostname($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+    try {
+        $tags = $device->getTag($key);
+    } catch (Exception $e) {
+        return api_error(422, $e->getMessage());
+    }
+
+    return api_success($tags, 'tags');
+}
+
+/**
+ * Set or update tags for a device.
+ * POST /api/v0/devices/{hostname}/tags
+ * Body: { "key1": "value1", ... }
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function set_device_tags(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $tags = $request->json()->all();
+
+    $device = ctype_digit($hostname) ? \App\Models\Device::find($hostname)
+                                     : \App\Models\Device::findByHostname($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    try {
+        $device->setTag($tags);
+    } catch (Exception $e) {
+        return api_error(422, $e->getMessage());
+    }
+
+    return api_success($tags, 'tags');
+}
+
+/**
+ * Delete a tag from a device.
+ * DELETE /api/v0/devices/{hostname}/tags/{key}
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function delete_device_tag(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $key = $request->route('key');
+
+    $device = ctype_digit($hostname) ? \App\Models\Device::find($hostname)
+                                     : \App\Models\Device::findByHostname($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    try {
+        $tags = $device->deleteTag($key);
+    } catch (Exception $e) {
+        return api_error(422, $e->getMessage());
+    }
+
+    return api_success(null, 'tags');
+}
+
+/**
+ * Define a tag key with a type.
+ * POST /api/v0/devices/{hostname}/tags/define
+ * Body: { "key": "mykey", "type": "string", "visible": true }
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function define_device_tag_key(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $tags = $request->json()->all();
+
+    $result = [];
+    foreach ($tags as $tag) {
+        $tagKey = \App\Models\DeviceTagKey::updateOrCreate(
+            ['key' => $tag['key']],
+            ['type' => $tag['type'] ?? 'string', 'visible' => $tag['visible'] ?? true]
+        );
+        $result[] = [
+            'key' => $tagKey->key,
+            'type' => $tagKey->type,
+            'visible' => $tagKey->visible ? 'true' : 'false',
+        ];
+    }
+
+    return api_success($result, 'tag_key');
+}
+
+/**
+ * List all devices with specified tag and optional value
+ * GET /api/v0/tags/{key}
+ * GET /api/v0/tags/{key}/{value}
+ *
+ * @param  Illuminate\Http\Request  $request
+ * @return Illuminate\Http\JsonResponse
+ */
+function list_device_tag(Illuminate\Http\Request $request)
+{
+    $key = $request->route('key');
+    $value = $request->route('value', null);
+
+    $tagKey = \App\Models\DeviceTagKey::where('key', $key)->first();
+    if (! $tagKey) {
+        return api_error(404, "Tag $key not found");
+    }
+
+    $tagQuery = \App\Models\DeviceTag::query()->where('tag_key_id', $tagKey->tag_key_id);
+    if ($value !== null) {
+        $tagQuery->where('value', $value);
+    }
+
+    $tags = $tagQuery->with('parentDevice')->get();
+
+    $result = [];
+    foreach ($tags as $tag) {
+        if ($tag->parentDevice) {
+            $result[] = [
+                'hostname' => $tag->parentDevice->hostname,
+                'key' => $tag->tagKey->key,
+                'value' => $tag->value,
+            ];
+        }
+    }
+
+    return api_success($result, 'devices');
+}
