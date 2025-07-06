@@ -45,7 +45,13 @@
                     "snmpwalk": {"$ref": "#/$defs/snmpget"}
                 },
                 "minProperties": 1,
-                "additionalProperties": false
+                "additionalProperties": false,
+                "anyOf": [
+                    {"required": ["sysObjectID"]},
+                    {"required": ["sysObjectID_regex"]},
+                    {"required": ["sysDescr"]},
+                    {"required": ["sysDescr_regex"]}
+                ]
             }
         },
         "group": {

@@ -4,8 +4,8 @@
             "devices": [
                 {
                     "sysName": null,
-                    "sysObjectID": null,
-                    "sysDescr": null,
+                    "sysObjectID": ".1.3.6.1.4.1.1166.1.621",
+                    "sysDescr": "DSR-6404  1.13.2.10",
                     "sysContact": null,
                     "version": "000292",
                     "hardware": "DSR-4410MD",
