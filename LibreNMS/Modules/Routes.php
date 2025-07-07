@@ -90,12 +90,11 @@ class Routes implements Module
 
         if ($routesFromOs->isEmpty()) {
             try {
-                // fetch VPN routes first so we get VPN routes even if we hit max routes
-                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes));
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverInetCidrRoutes($os->getDevice(), $max_routes));
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpCidrRoutes($os->getDevice(), $max_routes));
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverIpv6MibRoutes($os->getDevice(), $max_routes));
                 $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverRfcRoutes($os->getDevice()));
+                $routesFromDiscovery = $routesFromDiscovery->merge($this->discoverVpnVrfRoutes($os->getDevice(), $max_routes)); // max_routes useless here
             } catch (TooManyRoutes $e) {
                 Log::error("More than $max_routes, skipping routes. " . $e->getMessage());
             }
