@@ -50,41 +50,41 @@
             </tr>
             <tr>
                 <th><span class="grey">{{ __('Alert disabled') }}</span></th>
-                <td><a href="{{ url('devices/format=list_detail/disable_notify=1') }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
-                <td><span class="grey"> -</span></a></td>
+                <td><a href="{{ url('devices/format=list_detail/disable_notify=1') }}"><span class="--color-dark-gray-100"> {{ $devices['disable_notify'] }}</span></a></td>
+                <td><span class="--color-dark-gray-100"> -</span></a></td>
                 @if($show_services)
-                    <td><span class="grey"> -</span></a></td>
+                    <td><span class="--color-dark-gray-100"> -</span></a></td>
                 @endif
                 @if($show_sensors)
-                    <td><a href="{{ url('health') }}"><span class="grey"> {{ $sensors['disable_notify'] }}</span></a></td>
+                    <td><a href="{{ url('health') }}"><span class="--color-dark-gray-100"> {{ $sensors['disable_notify'] }}</span></a></td>
                 @endif
             </tr>
             <tr>
                 <th><span class="black">{{ __('Disabled') }}/{{ __('Shutdown') }}</span></th>
-                <td><a href="{{ url('devices/format=list_detail/disabled=1') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
-                <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
+                <td><a href="{{ url('devices/format=list_detail/disabled=1') }}"><span class="--color-dark-gray-100"> {{ $devices['disabled'] }}</span></a></td>
+                <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="--color-dark-gray-100"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services/view=details/disabled=1') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
+                    <td><a href="{{ url('services/view=details/disabled=1') }}"><span class="--color-dark-gray-100"> {{ $services['disabled'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
-                    <td><span class="grey"> -</span></td>
+                    <td><span class="--color-dark-gray-100"> -</span></td>
                 @endif
             </tr>
             @if($summary_errors)
             <tr>
-                <th><span class="black">{{ __('Errored') }}</span></th>
+                <th><span class="--color-dark-gray-100">{{ __('Errored') }}</span></th>
                 <td>-</td>
-                <td><a href="{{ url('ports/format=list_detail/errors=1') }}"><span class="black">  {{ $ports['errored'] }}</span></a></td>
+                <td><a href="{{ url('ports/format=list_detail/errors=1') }}"><span class="--color-dark-gray-100">  {{ $ports['errored'] }}</span></a></td>
                 @if($show_services)
                     <td>-</td>
                 @endif
                 @if($show_sensors)
-                    <td><span class="grey"> -</span></td>
+                    <td><span class="--color-dark-gray-100"> -</span></td>
                 @endif
             </tr>
             @endif
             <tr>
-                <th><span class="grey">{{ __('Total') }}</span></th>
+                <th><span class="--color-dark-gray-100">{{ __('Total') }}</span></th>
                 <td><a href="{{ url('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
                 <td><a href="{{ url('ports') }}"><span> {{ $ports['total'] }}</span></a></td>
                 @if($show_services)
