@@ -223,15 +223,6 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                 default => 'unknown',
             };
 
-            $date = $data['IPI-CMM-CHASSIS-MIB::cmmTransDateCode'] ?? '0000-00-00';
-            if (preg_match('/^(\d{2,4})(\d{2})(\d{2})$/', $date, $date_matches)) {
-                $year = $date_matches[1];
-                if (strlen($year) == 2) {
-                    $year = '20' . $year;
-                }
-                $date = $year . '-' . $date_matches[2] . '-' . $date_matches[3];
-            }
-
             $cmmTransType = $data['IPI-CMM-CHASSIS-MIB::cmmTransType'] ?? 'missing';
 
             return new Transceiver([
@@ -243,7 +234,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
                 'model' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorPartNumber'] ?? 'missing',
                 'revision' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorRevision'] ?? 'missing',
                 'serial' => $data['IPI-CMM-CHASSIS-MIB::cmmTransVendorSerialNumber'] ?? 'missing',
-                'date' => $date,
+                'date' => $data['IPI-CMM-CHASSIS-MIB::cmmTransDateCode'] ?? null,
                 'ddm' => isset($data['IPI-CMM-CHASSIS-MIB::cmmTransDDMSupport']) && $data['IPI-CMM-CHASSIS-MIB::cmmTransDDMSupport'] == 'yes',
                 'encoding' => $data['IPI-CMM-CHASSIS-MIB::cmmTransEncoding'] ?? 'missing',
                 'distance' => $distance,
