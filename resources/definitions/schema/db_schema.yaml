@@ -2419,7 +2419,7 @@ transceivers:
     - { Field: model, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: revision, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: serial, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: date, Type: date, 'Null': true, Extra: '' }
+    - { Field: date, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ddm, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: encoding, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: cable, Type: varchar(255), 'Null': true, Extra: '' }
