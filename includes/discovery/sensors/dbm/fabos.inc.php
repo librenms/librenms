@@ -1,58 +1,33 @@
 <?php
 
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Oid;
 
-$fabosSfpRxPower = snmpwalk_array_num($device, '.1.3.6.1.4.1.1588.2.1.1.1.28.1.1.4'); // FA-EXT-MIB::swSfpRxPower
-$fabosSfpTxPower = snmpwalk_array_num($device, '.1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5'); // FA-EXT-MIB::swSfpTxPower
-if (! empty($fabosSfpRxPower) || ! empty($fabosSfpTxPower)) {
-    $ifDescr = snmpwalk_group($device, 'ifDescr', 'IF-MIB', 0)['ifDescr'] ?? [];
-    $ifAdminStatus = snmpwalk_group($device, 'ifAdminStatus', 'IF-MIB', 0)['ifAdminStatus'] ?? [];
+$fabosSfpRxPower = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->numericIndex()->walk('FA-EXT-MIB::swSfpRxPower')->valuesByIndex();
+$fabosSfpTxPower = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->numericIndex()->walk('FA-EXT-MIB::swSfpTxPower')->valuesByIndex();
+
+$fabosSfpPower = array_merge_recursive($fabosSfpTxPower, $fabosSfpRxPower);
+
+if (! empty($fabosSfpPower)) {
+    $ifDescr = SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('IF-MIB::ifDescr')->table(1) ?? [];
+    $ifAdminStatus = SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('IF-MIB::ifAdminStatus')->table(1) ?? [];
 }
 
-foreach ($fabosSfpRxPower as $oid => $entry) {
-    foreach ($entry as $index => $current) {
+foreach ($fabosSfpPower as $fullIndex => $entry) {
+    foreach ($entry as $oid => $current) {
         if (is_numeric($current)) {
+            $index = array_slice(explode('.', $fullIndex), -1)[0];
             $ifIndex = $index + 1073741823;
-            if ($ifAdminStatus[$ifIndex] == '1') {
+            $num_oid =  Oid::of($oid . '.' . $fullIndex)->toNumeric('FA-EXT-MIB');
+            if ($ifAdminStatus[$ifIndex]['ifAdminStatus'] == '1') {
                 discover_sensor(
                     null,
                     'dbm',
                     $device,
-                    ".$oid.$index",
-                    'swSfpRxPower.' . $index,
+                    "$num_oid",
+                    "$oid.$index",
                     'brocade',
-                    Rewrite::shortenIfName($ifDescr[$ifIndex]) . ' RX',
-                    1,
-                    1,
-                    -5,
-                    null,
-                    null,
-                    1,
-                    $current,
-                    'snmp',
-                    $ifIndex,
-                    'ports',
-                    null,
-                    'transceiver'
-                );
-            }
-        }
-    }
-}
-
-foreach ($fabosSfpTxPower as $oid => $entry) {
-    foreach ($entry as $index => $current) {
-        if (is_numeric($current)) {
-            $ifIndex = $index + 1073741823;
-            if ($ifAdminStatus[$ifIndex] == '1') {
-                discover_sensor(
-                    null,
-                    'dbm',
-                    $device,
-                    ".$oid.$index",
-                    'swSfpTxPower.' . $index,
-                    'brocade',
-                    Rewrite::shortenIfName($ifDescr[$ifIndex]) . ' TX',
+                    Rewrite::shortenIfName($ifDescr[$ifIndex]['ifDescr']) . ($oid == 'swSfpRxPower' ? ' RX' : ' TX'),
                     1,
                     1,
                     -5,
