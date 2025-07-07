@@ -17,3 +17,36 @@ modules:
                 num_oid: '.1.3.6.1.4.1.1916.1.32.1.2.{{ $index }}'
                 index: 0
                 type: extreme-cpu
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - EXTREME-SYSTEM-MIB::extremeFanNumber
+        temperature:
+            data:
+                -
+                    oid: EXTREME-SYSTEM-MIB::extremeCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.8.0'
+                    descr: 'Chassis Temperature'
+                    index: 1
+                    high_limit: 65
+                    warn_limit: 55
+                    low_warn_limit: 15
+                    low_limit: 5
+        power:
+            data:
+                -
+                    oid: EXTREME-SYSTEM-MIB::extremeSystemPowerUsageValue
+                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.40.1.0'
+                    descr: 'Power Usage'
+                    index: 1
+                    divisor: 1000
+        fanspeed:
+            data:
+                -
+                    oid: EXTREME-SYSTEM-MIB::extremeFanStatusTable
+                    value: EXTREME-SYSTEM-MIB::extremeFanSpeed
+                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.9.1.4.{{ $index }}'
+                    descr: 'Fan Speed {{ $EXTREME-SYSTEM-MIB::extremeFanNumber }}'
+                    index: '{{ $index }}'
+                    divisor: 1
