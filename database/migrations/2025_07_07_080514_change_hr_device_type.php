@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('hrDevice', function (Blueprint $table) {
-        $table->string('hrDeviceType', 32)->change();
+            $table->string('hrDeviceType', 32)->change();
         });
     }
 };
