@@ -762,6 +762,7 @@ class Cisco extends OS implements
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
+                'date' => $ent['entPhysicalMfgDate'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
                 'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
