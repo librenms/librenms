@@ -13,6 +13,10 @@ if (! isset($vars['view'])) {
     $vars['view'] = 'lsp';
 }
 
+if (! isset($vars['device-state'])) {
+    $vars['device-state'] = '';
+}
+
 echo '<span style="font-weight: bold;">MPLS</span> &#187; ';
 
 if ($vars['view'] == 'lsp') {
@@ -79,9 +83,20 @@ if ($vars['view'] == 'saps') {
     echo '</span>';
 }
 
+echo '<span style="font-weight: bold; padding-left:2em;">Devices</span> &#187; ';
+
+if ($vars['device-state'] == 'disabled') {
+    echo "<span class='pagemenu-selected'>";
+    echo generate_link('Disabled', $vars, ['device-state' => null]);
+    echo '</span>';
+} else {
+    echo generate_link('Disabled', $vars, ['device-state' => 'disabled']);
+}
+
 print_optionbar_end();
 
 echo '<div id="content">
+
     <table  border="0" cellspacing="0" cellpadding="5" width="100%">';
 if ($vars['view'] == 'lsp') {
     echo '<tr><th><a title="Device">Device</a></th>
@@ -247,6 +262,11 @@ if ($vars['view'] == 'sdps') {
 
     foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid`') as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
+
+        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
+            continue;
+        }
+
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
@@ -265,7 +285,7 @@ if ($vars['view'] == 'sdps') {
             $operstate_status_color = 'danger';
         }
 
-        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$sdp['sdpFarEndInetAddress']]);
+        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id AND D.disabled = 0', [$sdp['sdpFarEndInetAddress']]);
         $destination = $sdp['sdpFarEndInetAddress'];
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
@@ -320,6 +340,11 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
     foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` ORDER BY `sdp_oid`, `svc_oid`') as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
+
+        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
+            continue;
+        }
+
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
@@ -388,6 +413,11 @@ vprn services are up when the service is administratively up however routing fun
 
     foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
         $device = device_by_id_cache($svc['device_id']);
+
+        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
+            continue;
+        }
+
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
@@ -460,6 +490,11 @@ if ($vars['view'] == 'saps') {
         $port = cleanPort($port);
 
         $device = device_by_id_cache($sap['device_id']);
+
+        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
+            continue;
+        }
+
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
