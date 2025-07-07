@@ -28,7 +28,6 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Device;
-use App\Models\Component;
 use App\Models\Sensors;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
