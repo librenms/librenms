@@ -1,7 +1,7 @@
 <?php
 
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\Rewrite;
 
 $fabosSfpRxPower = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->numericIndex()->walk('FA-EXT-MIB::swSfpRxPower')->valuesByIndex();
 $fabosSfpTxPower = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->numericIndex()->walk('FA-EXT-MIB::swSfpTxPower')->valuesByIndex();
@@ -18,7 +18,7 @@ foreach ($fabosSfpPower as $fullIndex => $entry) {
         if (is_numeric($current)) {
             $index = array_slice(explode('.', $fullIndex), -1)[0];
             $ifIndex = $index + 1073741823;
-            $num_oid =  Oid::of($oid . '.' . $fullIndex)->toNumeric('FA-EXT-MIB');
+            $num_oid = Oid::of($oid . '.' . $fullIndex)->toNumeric('FA-EXT-MIB');
             if ($ifAdminStatus[$ifIndex]['ifAdminStatus'] == '1') {
                 discover_sensor(
                     null,
