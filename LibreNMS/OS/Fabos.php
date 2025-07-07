@@ -26,24 +26,16 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use App\Facades\PortCache;
-#use App\Models\Component;
-#use App\Models\Storage;
-use App\Models\Ports;
+use App\Models\Device;
+use App\Models\Component;
 use App\Models\Sensors;
 use App\Models\Transceiver;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-#use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
-#use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
-use LibreNMS\OS\Traits\YamlOSDiscovery;
-use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
 class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
@@ -141,34 +133,33 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
         $sensorCollection = $this->getDevice()->sensors()->get();
 
         $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk('FA-EXT-MIB::swConnUnitPortTable')->table(1);
-        $snmpData = SnmpQuery::hideMib()->mibs(['FCMGMT-MIB'])->enumStrings()->walk('FCMGMT-MIB::connUnitPortTable')->table(1,$snmpData);
+        $snmpData = SnmpQuery::hideMib()->mibs(['FCMGMT-MIB'])->enumStrings()->walk('FCMGMT-MIB::connUnitPortTable')->table(1, $snmpData);
 
         $snmpData = array_shift($snmpData);
 
         Log::info('Transceivers discovery started');
 
         $data = $portCollection->map(function ($port) use ($sensorCollection) {
-
             $ifIndex = $port->ifIndex;
 
             // Filter sensors matching this ifIndex
             $filterSensors = $sensorCollection->filter(function ($value, $key) use ($ifIndex) {
-                    //d_echo($key);d_echo($value);
-                    return $value['entPhysicalIndex'] == $ifIndex && $value['entPhysicalIndex_measured'] == 'ports';
+                return $value['entPhysicalIndex'] == $ifIndex && $value['entPhysicalIndex_measured'] == 'ports';
             });
 
             $port['has_sensors_attached'] = $filterSensors->count();
-            return $port;
 
+            return $port;
         });
 
         $data = $data->reject(function ($value, $key) {
-            return ($value['has_sensors_attached'] < 1);
+            return $value['has_sensors_attached'] < 1;
         });
 
         return $data->map(function ($entry, $index) use ($snmpData) {
             $ifIndex = $entry['ifIndex'] ?? null;
             $portIndex = $index - 5;
+
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $index,
@@ -177,9 +168,8 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
                 'vendor' => $snmpData['connUnitPortVendor'][$portIndex] ?? null,
                 'revision' => $snmpData['connUnitPortRevision'][$portIndex] ?? null,
                 'cable' => $snmpData['connUnitPortTransmitterType'][$portIndex] ?? null,
-                'entity_physical_index' => $ifIndex
+                'entity_physical_index' => $ifIndex,
             ]);
         });
     }
-
 }
