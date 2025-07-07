@@ -40,7 +40,6 @@ foreach ($fabosSfpRxPower as $oid => $entry) {
     }
 }
 
-
 foreach ($fabosSfpTxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
         if (is_numeric($current)) {
