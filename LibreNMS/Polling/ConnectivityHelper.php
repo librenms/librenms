@@ -26,12 +26,13 @@
 
 namespace LibreNMS\Polling;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use SnmpQuery;
 use Symfony\Component\Process\Process;
@@ -135,7 +136,7 @@ class ConnectivityHelper
 
     public function traceroute(): array
     {
-        $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', '-I', $this->target];
+        $command = [LibrenmsConfig::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', '-I', $this->target];
         if ($this->ipFamily() == 'ipv6') {
             $command[] = '-6';
         }
@@ -157,7 +158,7 @@ class ConnectivityHelper
 
     public function canPing(): bool
     {
-        return Config::get('icmp_check') && ! ($this->device->exists && $this->device->getAttrib('override_icmp_disable') === 'true');
+        return LibrenmsConfig::get('icmp_check') && ! ($this->device->exists && $this->device->getAttrib('override_icmp_disable') === 'true');
     }
 
     public function ipFamily(): string
@@ -171,7 +172,9 @@ class ConnectivityHelper
 
     private function updateAvailability(bool $previous, bool $status): void
     {
-        if (Config::get('graphing.availability_consider_maintenance') && $this->device->isUnderMaintenance()) {
+        // skip update if we are considering maintenance and skipping alerts
+        if (LibrenmsConfig::get('graphing.availability_consider_maintenance')
+            && $this->device->getMaintenanceStatus() == MaintenanceStatus::SKIP_ALERTS) {
             return;
         }
 

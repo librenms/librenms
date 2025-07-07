@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -73,7 +73,7 @@ class Availability implements Module
         $os->enableGraph('availability');
 
         $valid_ids = [];
-        foreach (Config::get('graphing.availability') as $duration) {
+        foreach (LibrenmsConfig::get('graphing.availability') as $duration) {
             // update database with current calculation
             $avail = \App\Models\Availability::updateOrCreate([
                 'device_id' => $os->getDeviceId(),

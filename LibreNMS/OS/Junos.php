@@ -226,7 +226,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                         ->addDataset('StdDevRttUs', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $icmp);
                     $collected = array_merge($collected, $icmp);
                     break;

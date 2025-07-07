@@ -9,7 +9,7 @@
     <span class="label label-warning label-font-border label-border">{{ __('warn') }}: {{ $device_totals['warn'] }}</span>
     <a href="{{ url('devices/state=down') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-danger label-font-border label-border">{{ __('down') }}: {{ $device_totals['down'] }}</span></a>
     @if($device_totals['maintenance'])
-    <span class="label label-default label-font-border label-border">{{ __('maintenance') }}: {{ $device_totals['maintenance'] }}</span>
+    <span class="label label-default label-font-border label-border">{{ __('alerting.maintenance.maintenance') }}: {{ $device_totals['maintenance'] }}</span>
     @endif
 </div>
 @endif

@@ -25,10 +25,10 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
 use Log;
 
 trait GeocodingHelper
@@ -44,7 +44,7 @@ trait GeocodingHelper
      */
     public function getCoordinates($address)
     {
-        if (! Config::get('geoloc.latlng', true)) {
+        if (! LibrenmsConfig::get('geoloc.latlng', true)) {
             Log::debug('Geocoding disabled');
 
             return [];

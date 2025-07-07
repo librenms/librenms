@@ -28,8 +28,8 @@
  * @param  array  $modules  Which modules to initialize
  */
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
@@ -76,8 +76,6 @@ if (module_selected('polling', $init_modules)) {
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
-Debug::set($debug ?? false); // disable debug initially
-
 // Boot Laravel
 if (module_selected('web', $init_modules)) {
     Laravel::bootWeb(module_selected('auth', $init_modules));
@@ -100,8 +98,8 @@ if (! module_selected('nodb', $init_modules)) {
 }
 \LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
 
-if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
-    ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
+if (is_numeric(LibrenmsConfig::get('php_memory_limit')) && LibrenmsConfig::get('php_memory_limit') > 128) {
+    ini_set('memory_limit', LibrenmsConfig::get('php_memory_limit') . 'M');
 }
 
 try {

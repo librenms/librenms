@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use LibreNMS\Config;
 use LibreNMS\Util\Module;
 
 class ModuleController extends Controller
@@ -41,8 +41,8 @@ class ModuleController extends Controller
 
         // return the module status
         return response()->json([
-            'discovery' => (bool) $device->getAttrib('discover_' . $module, Config::getCombined($device->os, 'discovery_modules')[$module] ?? false),
-            'polling' => (bool) $device->getAttrib('poll_' . $module, Config::getCombined($device->os, 'poller_modules')[$module] ?? false),
+            'discovery' => (bool) $device->getAttrib('discover_' . $module, LibrenmsConfig::getCombined($device->os, 'discovery_modules')[$module] ?? false),
+            'polling' => (bool) $device->getAttrib('poll_' . $module, LibrenmsConfig::getCombined($device->os, 'poller_modules')[$module] ?? false),
         ]);
     }
 

@@ -75,7 +75,6 @@ alert_log:
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: rule, Type: text, 'Null': false, Extra: '' }
     - { Field: severity, Type: "enum('ok','warning','critical')", 'Null': false, Extra: '' }
     - { Field: extra, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '' }
@@ -107,6 +106,7 @@ alert_schedule:
     - { Field: recurring_day, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: notes, Type: text, 'Null': false, Extra: '' }
+    - { Field: behavior, Type: int, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [schedule_id], Unique: true, Type: BTREE }
 alert_templates:
@@ -812,9 +812,9 @@ hrDevice:
     - { Field: hrDevice_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: hrDeviceIndex, Type: int, 'Null': false, Extra: '' }
-    - { Field: hrDeviceDescr, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: hrDeviceType, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: hrDeviceErrors, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: hrDeviceDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: hrDeviceType, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
+    - { Field: hrDeviceErrors, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: hrDeviceStatus, Type: varchar(32), 'Null': false, Extra: '', Default: unknown }
     - { Field: hrProcessorLoad, Type: tinyint, 'Null': true, Extra: '' }
   Indexes:
@@ -2316,7 +2316,7 @@ stp:
     - { Field: timeSinceTopologyChange, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: topChanges, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: rootCost, Type: mediumint, 'Null': false, Extra: '' }
+    - { Field: rootCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: rootPort, Type: int, 'Null': true, Extra: '' }
     - { Field: maxAge, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: helloTime, Type: mediumint, 'Null': false, Extra: '' }
@@ -2372,19 +2372,19 @@ transceivers:
     - { Field: port_id, Type: bigint, 'Null': false, Extra: '' }
     - { Field: index, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: entity_physical_index, Type: int, 'Null': true, Extra: '' }
-    - { Field: type, Type: varchar(128), 'Null': true, Extra: '' }
-    - { Field: vendor, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: oui, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: model, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: revision, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: serial, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: type, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: vendor, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: oui, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: model, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: revision, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: serial, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: date, Type: date, 'Null': true, Extra: '' }
     - { Field: ddm, Type: tinyint, 'Null': true, Extra: '' }
-    - { Field: encoding, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: cable, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: encoding, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: cable, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: distance, Type: int, 'Null': true, Extra: '' }
     - { Field: wavelength, Type: int, 'Null': true, Extra: '' }
-    - { Field: connector, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: connector, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: channels, Type: smallint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }

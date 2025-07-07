@@ -317,10 +317,10 @@ class Cisco extends OS implements
         $processors = [];
 
         foreach ($processors_data as $index => $entry) {
-            if (is_numeric($entry['cpmCPUTotal5minRev'])) {
+            if (isset($entry['cpmCPUTotal5minRev']) && is_numeric($entry['cpmCPUTotal5minRev'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
                 $usage = $entry['cpmCPUTotal5minRev'];
-            } elseif (is_numeric($entry['cpmCPUTotal5min'])) {
+            } elseif (isset($entry['cpmCPUTotal5min']) && is_numeric($entry['cpmCPUTotal5min'])) {
                 $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
                 $usage = $entry['cpmCPUTotal5min'];
             } else {
@@ -599,7 +599,7 @@ class Cisco extends OS implements
                         ->addDataset('OWAvgDS', 'GAUGE', 0)
                         ->addDataset('AvgSDJ', 'GAUGE', 0)
                         ->addDataset('AvgDSJ', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $jitter);
                     $collected = array_merge($collected, $jitter);
                     // Additional rrd for total number packet in sla
@@ -609,7 +609,7 @@ class Cisco extends OS implements
                     $rrd_name = ['sla', $sla_nr, 'NumPackets'];
                     $rrd_def = RrdDefinition::make()
                         ->addDataset('NumPackets', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $numPackets);
                     $collected = array_merge($collected, $numPackets);
                     break;
@@ -643,7 +643,7 @@ class Cisco extends OS implements
                         ->addDataset('LatencyOWAvgDS', 'GAUGE', 0)
                         ->addDataset('JitterIAJOut', 'GAUGE', 0)
                         ->addDataset('JitterIAJIn', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $icmpjitter);
                     $collected = array_merge($collected, $icmpjitter);
                     break;

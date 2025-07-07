@@ -59,10 +59,10 @@ if (isset($_POST['create-default'])) {
             $extra = array_replace($extra, json_decode($add_rule['extra'], true));
         }
 
-        $qb = QueryBuilderParser::fromOld($add_rule['rule']);
+        $qb = QueryBuilderParser::fromJson($add_rule['builder']);
+        
         $insert = [
-            'rule' => '',
-            'builder' => json_encode($qb),
+            'builder' => json_encode($add_rule['builder']),
             'query' => $qb->toSql(),
             'severity' => 'critical',
             'extra' => json_encode($extra),
@@ -372,9 +372,7 @@ foreach ($rule_list as $rule) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    if (empty($rule['builder'])) {
-        $rule_display = $rule['rule'];
-    } elseif ($rule_extra['options']['override_query'] === 'on') {
+    if (isset($rule_extra['options']['override_query']) && $rule_extra['options']['override_query'] === 'on') {
         $rule_display = 'Custom SQL Query';
     } else {
         $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);

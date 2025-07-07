@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Validator;
 
 class WebServer extends BaseValidation
@@ -46,7 +46,7 @@ class WebServer extends BaseValidation
     {
         if (! app()->runningInConsole()) {
             $url = $this->removeStandardPorts(request()->url());
-            $base_url = Config::get('base_url');
+            $base_url = LibrenmsConfig::get('base_url');
             $expected = $this->removeStandardPorts(Str::finish($base_url, '/') . 'validate/results');
             $correct_base = str_replace('/validate/results', '', $url);
 

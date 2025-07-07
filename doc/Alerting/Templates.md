@@ -80,7 +80,6 @@ been up for 30344 seconds`.
   this is the equivalent of the default used and must be encased in `{{ }}`
 - State: `$alert->state`
 - Severity: `$alert->severity`
-- Rule: `$alert->rule`
 - Rule-Name: `$alert->name`
 - Procedure URL: `$alert->proc`
 - Timestamp: `$alert->timestamp`

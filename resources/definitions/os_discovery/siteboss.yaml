@@ -2,6 +2,7 @@ mib: SITEBOSS-530-STD-MIB
 modules:
     os:
         sysDescr_regex: '/(?<hardware>SiteBoss \S+) (?<version>.*)/'
+        sysName: SITEBOSS-530-STD-MIB::siteName.0
     sensors:
         temperature:
             data:

@@ -1,12 +1,12 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
-use LibreNMS\Config;
 
-if (Config::get('discover_services_templates')) {
+if (LibrenmsConfig::get('discover_services_templates')) {
     (new ServiceTemplateController())->applyDeviceAll($device['device_id']); // FIXME applyAll() should not be on a controller
 }
-if (Config::get('discover_services')) {
+if (LibrenmsConfig::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [
         22 => 'ssh',

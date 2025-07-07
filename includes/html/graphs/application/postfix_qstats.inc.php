@@ -14,35 +14,31 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Incoming',
-            'ds' => 'incomingq',
-            'colour' => '582A72',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Active',
-            'ds' => 'activeq',
-            'colour' => '28774F',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Deferred',
-            'ds' => 'deferredq',
-            'colour' => '88CC88',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'Hold',
-            'ds' => 'holdq',
-            'colour' => 'D46A6A',
-        ],
-    ];
-} else {
-    echo "file missing: $rrd_filename";
-}
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Incoming',
+        'ds' => 'incomingq',
+        'colour' => '582A72',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Active',
+        'ds' => 'activeq',
+        'colour' => '28774F',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Deferred',
+        'ds' => 'deferredq',
+        'colour' => '88CC88',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Hold',
+        'ds' => 'holdq',
+        'colour' => 'D46A6A',
+    ],
+];
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

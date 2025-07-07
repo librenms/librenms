@@ -132,7 +132,7 @@ class Menu extends MenuEntryHook
 By default hooks are always shown, but you may control when the user is authorized to view the hook content.
 
 As an example, you could imagine that the device-overview.blade.php should only be displayed when the
-device is in maintanence mode and the current user has the admin role. 
+device is in a maintenance mode and the current user has the admin role.
 
 ```php
 class DeviceOverview extends DeviceOverviewHook

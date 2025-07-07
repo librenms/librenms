@@ -24,6 +24,10 @@
                 <div class="mb-3">
                     <span>{{ __('settings.settings.site_style.description') }}</span>
                     <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="site_style_device" name="site_style" class="custom-control-input" value="device" @config('site_style', 'device') checked @endconfig>
+                        <label class="custom-control-label" for="site_style_device">{{ __('settings.settings.site_style.options.device') }}</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
                         <input type="radio" id="site_style_light" name="site_style" class="custom-control-input" value="light" @config('site_style', 'light') checked @endconfig>
                         <label class="custom-control-label" for="site_style_light">{{ __('settings.settings.site_style.options.light') }}</label>
                     </div>
