@@ -20,12 +20,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.9.{{ $index }}'
                     descr: 'PSU {{ $index }} Temperature 1'
                     index: 'temperature1.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: psuStatus
+                            op: '='
+                            value: 0
                 -
                     oid: temperature2
                     value: temperature2
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.10.{{ $index }}'
                     descr: 'PSU {{ $index }} Temperature 2'
                     index: 'temperature2.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: psuStatus
+                            op: '='
+                            value: 0
                 -
                     oid: sensorTable
                     value: sensorReading
@@ -88,6 +98,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.3.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Voltage'
                     index: 'inputVoltage.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: psuStatus
+                            op: '='
+                            value: 0
                 -
                     oid: sensorTable
                     value: sensorReading
@@ -119,6 +134,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.4.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Current'
                     index: 'inputCurrent.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: psuStatus
+                            op: '='
+                            value: 0
         power:
             data:
                 -
@@ -127,7 +147,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.5.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Power'
                     index: 'inputPower.{{ $index }}'
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: psuStatus
+                            op: '='
+                            value: 0
+                    
         state:
             data:
                 -
