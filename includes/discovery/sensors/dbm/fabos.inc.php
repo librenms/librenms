@@ -27,18 +27,19 @@ foreach ($fabosSfpRxPower as $oid => $entry) {
                     -5,
                     null,
                     null,
-                    0,
+                    1,
                     $current,
                     'snmp',
                     $ifIndex,
                     'ports',
                     null,
-                    'Receive Power'
+                    'transceiver'
                 );
             }
         }
     }
 }
+
 
 foreach ($fabosSfpTxPower as $oid => $entry) {
     foreach ($entry as $index => $current) {
@@ -58,13 +59,13 @@ foreach ($fabosSfpTxPower as $oid => $entry) {
                     -5,
                     null,
                     null,
-                    0,
+                    1,
                     $current,
                     'snmp',
                     $ifIndex,
                     'ports',
                     null,
-                    'Transmit Power'
+                    'transceiver'
                 );
             }
         }
