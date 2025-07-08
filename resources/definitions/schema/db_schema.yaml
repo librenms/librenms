@@ -2322,7 +2322,7 @@ stp:
     - { Field: helloTime, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: holdTime, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: forwardDelay, Type: mediumint, 'Null': false, Extra: '' }
-    - { Field: bridgeMaxAge, Type: smallint, 'Null': false, Extra: '' }
+    - { Field: bridgeMaxAge, Type: 'mediumint unsigned', 'Null': false, Extra: '' }
     - { Field: bridgeHelloTime, Type: smallint, 'Null': false, Extra: '' }
     - { Field: bridgeForwardDelay, Type: smallint, 'Null': false, Extra: '' }
   Indexes:
