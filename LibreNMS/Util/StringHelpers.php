@@ -216,7 +216,6 @@ class StringHelpers
     public static function bitsToIndices(string $hex_data): array
     {
         $hex_data = str_replace([' ', "\n"], '', $hex_data);
-//        dump($hex_data);
 
         // we need an even number of digits for hex2bin
         if (strlen($hex_data) % 2 === 1) {
@@ -224,6 +223,11 @@ class StringHelpers
         }
 
         if (! StringHelpers::isHex($hex_data)) {
+            // could be malformed
+            if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
+                return explode(',', $matches[0]);
+            }
+
             return [];
         }
 

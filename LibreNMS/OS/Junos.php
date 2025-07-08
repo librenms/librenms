@@ -404,13 +404,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             return $vlans;
         }
 
-        return SnmpQuery::walk([
-                'JUNIPER-L2ALD-MIB::jnxL2aldVlanName',
-                'JUNIPER-L2ALD-MIB::jnxL2aldVlanTag',
-            ])->mapTable(function ($data) {
+        return SnmpQuery::enumStrings()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTable')
+            ->mapTable(function ($data) {
                 return new Vlan([
                     'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'],
                     'vlan_domain' => 1,
+                    'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'],
                     'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'],
                 ]);
         });
@@ -420,9 +419,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
     {
         // JUNIPER-VLAN-MIB
         $legacyPortData = SnmpQuery::walk('JUNIPER-VLAN-MIB::jnxExVlanPortGroupTable')->table(2);
+        $legacyPorts = new Collection;
 
         if (! empty($legacyPortData)) {
-            $legacyPorts = new Collection;
             $legacyVlanByGroup = $vlans->groupBy('vlan_domain');
             foreach ($legacyPortData as $jnxExVlanPortGroupIndex => $groupData) {
                 foreach ($groupData as $jnxExVlanPort => $portData) {
@@ -441,66 +440,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                     }
                 }
             }
-
-            return $legacyPorts;
         }
 
-        // JUNIPER-L2ALD-MIB
-        $vlan_tag = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->table(1);
-        dd($untag, $vlan_tag);
-
-        if (empty($untag)) {
-            dd($vlan_tag);
-            $tmp_tag = 'jnxL2aldVlanTag';
-            $tmp_name = 'jnxL2aldVlanName';
-            $temp_vlan = [];
-            foreach ($vlan_tag as $key => $value) {
-                $temp_vlan[$key] = $value['jnxL2aldVlanTag'];
-            }
-            //set all port vlan relationships to be tagged
-            foreach ($taganduntag as $key => $taganduntag) {
-                if (empty($taganduntag['dot1qVlanStaticEgressPorts'])) {
-                    continue;
-                }
-
-                $vlan_index = array_search($key, $temp_vlan);
-                $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
-                foreach ($port_on_vlan as $port) {
-                    if (isset($dot1dBasePortIfIndex[$port])) {
-                        $tagness_by_vlan_index[$vlan_index][$dot1dBasePortIfIndex[$port]]['tag'] = 0;
-                    }
-
-                    unset($tagness_by_vlan_index[$vlan_index]['']);
-                }
-            }
-            // correct all untagged ports to be untagged
-            foreach ($untag as $key => $untag) {
-                if (empty($untag['dot1qVlanStaticUntaggedPorts'])) {
-                    continue;
-                }
-
-                $vlan_index = array_search($key, $temp_vlan);
-                $port_on_vlan = explode(',', $untag['dot1qVlanStaticUntaggedPorts']);
-                foreach ($port_on_vlan as $port) {
-                    if (isset($dot1dBasePortIfIndex[$port])) {
-                        $tagness_by_vlan_index[$vlan_index][$dot1dBasePortIfIndex[$port]]['tag'] = 1;
-                    }
-                    unset($tagness_by_vlan_index[$vlan_index]['']);
-                }
-            }
-        } else {
-            foreach ($untag as $key => $tagness) {
-                $key = explode('.', $key);
-                $base = $dot1dBasePortIfIndex[$key[1]] ?? '';
-                if ($tagness['jnxExVlanPortTagness'] == 2) {
-                    $tagness_by_vlan_index[$key[0]][$base]['tag'] = 1;
-                } else {
-                    $tagness_by_vlan_index[$key[0]][$base]['tag'] = 0;
-                }
-            }
-        }
-
-
-        return $ret;
+        return $legacyPorts;  // if no legacy data, use Q-BRIDGE-MIB
     }
 }

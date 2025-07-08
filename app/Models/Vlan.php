@@ -19,7 +19,7 @@ class Vlan extends DeviceRelatedModel
 
     public function ports(): HasMany
     {
-        return $this->hasMany(PortVlan::class, 'vlan', 'vlan_vlan');
+        return $this->hasMany(PortVlan::class, 'vlan', 'vlan_vlan')->where('ports_vlans.device_id', 'ports_vlans.device_id');
     }
 
     public function getCompositeKey(): string
