@@ -30626,6 +30626,30 @@
                 },
                 {
                     "vlan": 1,
+                    "baseport": 3,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 4,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 5,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
                     "baseport": 47,
                     "priority": 0,
                     "state": "unknown",
@@ -30690,6 +30714,22 @@
                 },
                 {
                     "vlan": 1,
+                    "baseport": 115,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 116,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
                     "baseport": 161,
                     "priority": 0,
                     "state": "unknown",
@@ -30715,9 +30755,9 @@
                 {
                     "vlan": 1,
                     "baseport": 456,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 10000,
                     "untagged": 1
                 },
                 {
@@ -31673,7 +31713,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {

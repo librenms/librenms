@@ -3865,17 +3865,17 @@
                 {
                     "vlan": 1,
                     "baseport": 1,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 11,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -3943,7 +3943,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {
