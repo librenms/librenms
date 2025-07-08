@@ -96,8 +96,8 @@ class Vlans implements Module
 
         // ports vlan data, try in order
         $ports = $os instanceof PortVlanDiscovery ? $os->discoverPortVlanData($vlans) : new Collection;
-        $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData($os->getDevice()) : $ports;
-        $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData8021($os->getDevice()) : $ports;
+        $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData($os) : $ports;
+        $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData8021($os) : $ports;
 
         $ports = $ports->filter(function (PortVlan $data) {
             return ! empty($data->vlan) && !empty($data->port_id);
@@ -174,7 +174,7 @@ class Vlans implements Module
             });
     }
 
-    private function discoverPortVlanData(Device $device): Collection
+    private function discoverPortVlanData(OS $os): Collection
     {
         $ports = new Collection;
 
@@ -218,7 +218,7 @@ class Vlans implements Module
                     'vlan' => $vlan_id,
                     'baseport' => $baseport,
                     'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex(PortCache::ifIndexFromBridgePort($baseport), $device->device_id) ?? 0, // ifIndex from device
+                    'port_id' => PortCache::getIdFromIfIndex($os->ifIndexFromBridgePort($baseport), $os->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
         }
@@ -226,7 +226,7 @@ class Vlans implements Module
         return $ports;
     }
 
-    private function discoverPortVlanData8021(Device $device): Collection
+    private function discoverPortVlanData8021(OS $os): Collection
     {
         $ports = new Collection;
 
@@ -252,7 +252,7 @@ class Vlans implements Module
                         'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
-                        'port_id' => PortCache::getIdFromIfIndex(PortCache::ifIndexFromBridgePort($baseport), $device->device_id) ?? 0, // ifIndex from device
+                        'port_id' => PortCache::getIdFromIfIndex($os->ifIndexFromBridgePort($baseport), $os->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }

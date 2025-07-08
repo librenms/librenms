@@ -56,7 +56,7 @@ class Aos7 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
             ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex) {
                 return new Portvlan([
                     'vlan' => $vpaVlanNumber,
-                    'baseport' => PortCache::bridgePortFromIfIndex($vpaIfIndex),
+                    'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
                     'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);

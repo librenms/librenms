@@ -433,7 +433,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                     foreach ($legacyVlanByGroup->get($jnxExVlanPortGroupIndex, []) as $vlan) {
                         $legacyPorts->push(new PortVlan([
                             'vlan' => $vlan->vlan_id,
-                            'baseport' => PortCache::bridgePortFromIfIndex($jnxExVlanPort),
+                            'baseport' => $this->bridgePortFromIfIndex($jnxExVlanPort),
                             'untagged' => isset($portData['JUNIPER-VLAN-MIB::jnxExVlanPortTagness']) && $portData['JUNIPER-VLAN-MIB::jnxExVlanPortTagness'] == '2' ? 1 : 0,
                             'port_id' => PortCache::getIdFromIfIndex($jnxExVlanPort, $this->getDeviceId()) ?? 0,
                         ]));

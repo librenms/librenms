@@ -728,7 +728,7 @@ class Routeros extends OS implements
 
                     $ports->push(new PortVlan([
                         'vlan' => $vlanId,
-                        'baseport' => PortCache::bridgePortFromIfIndex($ifIndex),
+                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
                         'untagged' => ($mtType == 'U') ? 1 : 0,
                         'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));

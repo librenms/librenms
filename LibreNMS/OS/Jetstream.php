@@ -174,7 +174,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
                     $ifIndex = $portConfig[$port] ?? 0;
                     $ret->push(new PortVlan([
                         'vlan' => $vlan_id,
-                        'baseport' => PortCache::bridgePortFromIfIndex($ifIndex),
+                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
                         'untagged' => $tag,
                         'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
