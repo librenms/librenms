@@ -36,24 +36,24 @@ use LibreNMS\RRD\RrdDefinition;
 if ($device['os_group'] == 'cisco') {
     if ($data = snmpwalk_cache_oid($device, 'cipSecGlobalStats', null, 'CISCO-IPSEC-FLOW-MONITOR-MIB')) {
         $data = $data[0];
-    
+
         // Use HC Counters if they exist
         if (is_numeric($data['cipSecGlobalHcInOctets'])) {
             $data['cipSecGlobalInOctets'] = $data['cipSecGlobalHcInOctets'];
         }
-    
+
         if (is_numeric($data['cipSecGlobalHcOutOctets'])) {
             $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets'];
         }
-    
+
         if (is_numeric($data['cipSecGlobalHcInDecompOctets'])) {
             $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets'];
         }
-    
+
         if (is_numeric($data['cipSecGlobalHcOutUncompOctets'])) {
             $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets'];
         }
-    
+
         if ($data['cipSecGlobalActiveTunnels']) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('Tunnels', 'GAUGE', 0)
@@ -77,7 +77,7 @@ if ($device['os_group'] == 'cisco') {
                 ->addDataset('ProtocolUseFails', 'COUNTER', 0, 100000000000)
                 ->addDataset('NoSaFails', 'COUNTER', 0, 100000000000)
                 ->addDataset('SysCapFails', 'COUNTER', 0, 100000000000);
-    
+
             $fields = [
                 'Tunnels' => $data['cipSecGlobalActiveTunnels'],
                 'InOctets' => $data['cipSecGlobalInOctets'],
@@ -101,15 +101,15 @@ if ($device['os_group'] == 'cisco') {
                 'NoSaFails' => $data['cipSecGlobalNoSaFails'],
                 'SysCapFails' => $data['cipSecGlobalSysCapFails'],
             ];
-    
+
             $tags = ['rrd_def' => $rrd_def];
             app('Datastore')->put($device, 'cipsec_flow', $tags, $fields);
-    
+
             $os->enableGraph('cipsec_flow_tunnels');
             $os->enableGraph('cipsec_flow_pkts');
             $os->enableGraph('cipsec_flow_bits');
             $os->enableGraph('cipsec_flow_stats');
-    
+
             echo ' cipsec_flow';
         }//end if
     }
