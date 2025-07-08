@@ -447,7 +447,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 }
 
                 $remote_port_id = find_port_id(
-                    $lldp['lldpRemPortDesc'],
+                    $lldp['lldpRemPortDesc'] ?? null,
                     $remote_port_name,
                     $remote_device_id,
                     $remote_port_mac
