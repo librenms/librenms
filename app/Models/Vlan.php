@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Vlan extends DeviceRelatedModel
 {
     protected $primaryKey = 'vlan_id';
@@ -14,6 +16,11 @@ class Vlan extends DeviceRelatedModel
         'vlan_type',
         'vlan_mtu',
     ];
+
+    public function ports(): HasMany
+    {
+        return $this->hasMany(PortVlan::class, 'vlan', 'vlan_vlan');
+    }
 
     public function getCompositeKey(): string
     {
