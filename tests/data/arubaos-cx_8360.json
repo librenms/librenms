@@ -16234,7 +16234,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {

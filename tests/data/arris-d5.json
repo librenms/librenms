@@ -11133,7 +11133,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

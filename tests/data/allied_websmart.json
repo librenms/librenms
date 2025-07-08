@@ -4848,7 +4848,8 @@
                     "vlan_mtu": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {

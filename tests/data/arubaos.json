@@ -19914,7 +19914,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "wireless": {
         "discovery": {
