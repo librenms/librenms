@@ -452,7 +452,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     $remote_device_id,
                     $remote_port_mac
                 );
-                if ($remote_port_id == 0) { //We did not find it
+                if ($remote_port_id == 0 && (! empty($remote_port_mac) && $remote_port_mac != '000000000000')) { //We did not find it
                     $remote_port_name = $remote_port_name . ' (' . $remote_port_mac . ')';
                 }
                 if (empty($lldp['lldpRemSysName']) && isset($remote_device)) {
