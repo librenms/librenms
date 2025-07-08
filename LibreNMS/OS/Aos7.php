@@ -54,12 +54,17 @@ class Aos7 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
     {
         return SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex) {
+                $baseport = $this->bridgePortFromIfIndex($vpaIfIndex);
+                if (! $baseport) {
+                    return null;
+                }
+
                 return new Portvlan([
                     'vlan' => $vpaVlanNumber,
-                    'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
-                    'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
+                    'baseport' => $baseport,
+                    'untagged' => $data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] === '1' ? 1 : 0,
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);
-            });
+            })->filter();
     }
 }
