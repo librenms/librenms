@@ -28340,61 +28340,6 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet0",
-                    "ifName": "Eth6/3(Port1)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet1",
-                    "ifName": "Eth6/2(Port2)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet2",
-                    "ifName": "Eth6/4(Port3)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet3",
-                    "ifName": "Eth7/4(Port4)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet4",
-                    "ifName": "Eth7/3(Port5)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
                     "remote_hostname": "removed",
                     "remote_port": "Eth44/1(Port44)",
                     "remote_platform": null,
@@ -28450,17 +28395,6 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
-                    "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "HPE ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet5",
-                    "ifName": "Eth6/1(Port6)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
                     "remote_hostname": "removed",
                     "remote_port": "Eth50(Port50)",
                     "remote_platform": null,
@@ -28483,28 +28417,6 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
-                    "remote_hostname": "ProLiant DL380 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "ProLiant DL380 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet6",
-                    "ifName": "Eth7/1(Port7)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "ProLiant DL380 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "ProLiant DL380 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet7",
-                    "ifName": "Eth11/4(Port8)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
                     "remote_hostname": "removed",
                     "remote_port": "Eth56(Port56)",
                     "remote_platform": null,
@@ -28512,61 +28424,6 @@
                     "ifAlias": "removed",
                     "ifDescr": "Ethernet76",
                     "ifName": "Eth56(Port56)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "ProLiant DL360 Gen10",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "ProLiant DL360 Gen10",
-                    "ifAlias": "removed",
-                    "ifDescr": "Ethernet8",
-                    "ifName": "Eth7/2(Port9)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "ifAlias": "Server: removed",
-                    "ifDescr": "Ethernet13",
-                    "ifName": "Eth18/2(Port14)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "ifAlias": "Server: removed",
-                    "ifDescr": "Ethernet14",
-                    "ifName": "Eth18/4(Port15)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "ifAlias": "Server: removed",
-                    "ifDescr": "Ethernet15",
-                    "ifName": "Eth19/4(Port16)"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": "",
-                    "remote_platform": null,
-                    "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "ifAlias": "Server: removed",
-                    "ifDescr": "Ethernet16",
-                    "ifName": "Eth19/3(Port17)"
                 }
             ]
         }

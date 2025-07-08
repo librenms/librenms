@@ -11596,17 +11596,6 @@
                     "ifAlias": "RMON Port 49 on Unit 1",
                     "ifDescr": "RMON Port 49 on Unit 1",
                     "ifName": "1/49"
-                },
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "PCM B4 WLAN SW 138.78",
-                    "remote_port": " ()",
-                    "remote_platform": null,
-                    "remote_version": "Gigabit Ethernet Switch",
-                    "ifAlias": "RMON Port 50 on Unit 1",
-                    "ifDescr": "RMON Port 50 on Unit 1",
-                    "ifName": "1/50"
                 }
             ]
         }
