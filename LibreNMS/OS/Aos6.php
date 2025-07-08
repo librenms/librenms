@@ -56,7 +56,7 @@ class Aos6 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
     {
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex = null) {
-                new Portvlan([
+                return new Portvlan([
                     'vlan' => $vpaVlanNumber,
                     'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
                     'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
