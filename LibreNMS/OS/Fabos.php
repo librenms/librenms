@@ -133,8 +133,10 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
         $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk('FA-EXT-MIB::swConnUnitPortTable')->table(1);
         $snmpData = SnmpQuery::hideMib()->mibs(['FCMGMT-MIB'])->enumStrings()->walk('FCMGMT-MIB::connUnitPortTable')->table(1, $snmpData);
+        // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
+        // connUnitPortVendor['..8...K.........'][1] = "BROCADE         "
 
-        $snmpData = array_shift($snmpData);
+        $snmpData = array_shift($snmpData); // remove 'connUnitPortUnitId'
 
         Log::info('Transceivers discovery started');
 
@@ -157,16 +159,16 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
         return $data->map(function ($entry, $index) use ($snmpData) {
             $ifIndex = $entry['ifIndex'] ?? null;
-            $portIndex = $index - 5;
+            $connUnitPortIndex = $index - 5;
 
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $index,
-                'type' => $snmpData['connUnitPortModuleType'][$portIndex] ?? null,
-                'serial' => $snmpData['connUnitPortSn'][$portIndex] ?? null,
-                'vendor' => $snmpData['connUnitPortVendor'][$portIndex] ?? null,
-                'revision' => $snmpData['connUnitPortRevision'][$portIndex] ?? null,
-                'cable' => $snmpData['connUnitPortTransmitterType'][$portIndex] ?? null,
+                'index' => $connUnitPortIndex,
+                'type' => $snmpData['connUnitPortModuleType'][$connUnitPortIndex] ?? null,
+                'serial' => $snmpData['connUnitPortSn'][$connUnitPortIndex] ?? null,
+                'vendor' => $snmpData['connUnitPortVendor'][$connUnitPortIndex] ?? null,
+                'revision' => $snmpData['connUnitPortRevision'][$connUnitPortIndex] ?? null,
+                'cable' => $snmpData['connUnitPortTransmitterType'][$connUnitPortIndex] ?? null,
                 'entity_physical_index' => $ifIndex,
             ]);
         });
