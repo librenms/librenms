@@ -23,9 +23,6 @@ class Port
     /** @var array<int, array<string, array<string, string>>> */
     private array $ipMaps = [];
 
-    /** @var int[]|string[]|null */
-    private ?array $ifIndexToBridgePort = null;
-
     /**
      * Get a port by id and cache it so future calls will avoid a db query
      * Tries to check the primary device's port relationship to save a db query

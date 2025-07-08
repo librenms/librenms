@@ -70,8 +70,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
-        "phpunit/phpunit": "^11.5.3",
-        "rector/rector": "^2.0"
+        "phpunit/phpunit": "^11.5.3"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",

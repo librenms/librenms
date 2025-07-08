@@ -41,7 +41,6 @@ abstract class SnmpFetch extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
         $this->validate([
             'output' => ['nullable', Rule::in(['value', 'values', 'table', 'index-table'])],
         ]);

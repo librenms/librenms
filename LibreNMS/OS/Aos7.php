@@ -21,7 +21,9 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;

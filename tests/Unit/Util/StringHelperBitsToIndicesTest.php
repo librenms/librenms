@@ -69,6 +69,15 @@ class StringHelperBitsToIndicesTest extends TestCase
         $this->assertEquals([5, 7, 9, 11, 12, 13, 14], $result);
     }
 
+    public function testCommaSeparatedPorts(): void
+    {
+        $result = StringHelpers::bitsToIndices('143,343,1024');
+        $this->assertEquals([143, 343, 1024], $result);
+
+        $result = StringHelpers::bitsToIndices('143,343,a1024');
+        $this->assertEquals([], $result);
+    }
+
     /**
      * Test with spaces in hex string
      */
