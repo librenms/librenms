@@ -413,7 +413,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
                     'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'],
                     'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'],
                 ]);
-        });
+            });
     }
 
     public function discoverPortVlanData(Collection $vlans): Collection

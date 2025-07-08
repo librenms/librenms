@@ -100,7 +100,7 @@ class Vlans implements Module
         $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData8021($os) : $ports;
 
         $ports = $ports->filter(function (PortVlan $data) {
-            return ! empty($data->vlan) && !empty($data->port_id);
+            return ! empty($data->vlan) && ! empty($data->port_id);
         })->each(function (PortVlan $data) {
             $data->priority ??= 0;
             $data->state ??= 'unknown';
@@ -154,12 +154,12 @@ class Vlans implements Module
     {
         return SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
             ->mapTable(function ($data, $vlan_id) {
-            return new Vlan([
-                'vlan_vlan' => $vlan_id,
-                'vlan_domain' => 1,
-                'vlan_name' => $data['dot1qVlanStaticName'] ?? '',
-            ]);
-        });
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_domain' => 1,
+                    'vlan_name' => $data['dot1qVlanStaticName'] ?? '',
+                ]);
+            });
     }
 
     private function discoverBasicVlanData8021(): Collection
@@ -233,7 +233,7 @@ class Vlans implements Module
         $port_data = SnmpQuery::hideMib()->walk([
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts',
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts',
-            ])->table(2);
+        ])->table(2);
 
         if (empty($port_data)) {
             return $ports;

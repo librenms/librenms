@@ -211,6 +211,7 @@ class StringHelpers
     /**
      * Convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+     *
      * @return int[]
      */
     public static function bitsToIndices(string $hex_data): array

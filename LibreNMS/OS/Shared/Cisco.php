@@ -1030,7 +1030,7 @@ class Cisco extends OS implements
                         'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
                         'untagged' => 0,
                         'port_id' => PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0,
-                                $this->getDeviceId()) ?? 0, // ifIndex from device
+                            $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }

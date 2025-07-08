@@ -712,7 +712,7 @@ class Vrp extends OS implements
     {
         return SnmpQuery::enumStrings()->walk([
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
-//            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
+            //            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
         ])->mapTable(function ($vlanArray, $vlanId) {
             return new Vlan([
