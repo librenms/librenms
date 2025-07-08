@@ -716,7 +716,7 @@ class Vrp extends OS implements
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
         ])->mapTable(function ($vlanArray, $vlanId) {
             return new Vlan([
-                'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB:LhwL2VlanDescr'] ?? '',
+                'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::LhwL2VlanDescr'] ?? '',
                 'vlan_vlan' => $vlanId,
                 'vlan_domain' => 1,
                 'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
