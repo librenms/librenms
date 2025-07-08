@@ -3,7 +3,7 @@
 /**
  * Vlans.php
  *
- * Vlans discovery module
+ * VLANs discovery module
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -152,24 +152,24 @@ class Vlans implements Module
 
     private function discoverBasicVlanData(): Collection
     {
-        return SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
+        return SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
             ->mapTable(function ($data, $vlan_id) {
                 return new Vlan([
                     'vlan_vlan' => $vlan_id,
                     'vlan_domain' => 1,
-                    'vlan_name' => $data['dot1qVlanStaticName'] ?? '',
+                    'vlan_name' => $data['Q-BRIDGE-MIB::dot1qVlanStaticName'] ?? '',
                 ]);
             });
     }
 
     private function discoverBasicVlanData8021(): Collection
     {
-        return SnmpQuery::hideMib()->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
+        return SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
             ->mapTable(function ($data, $vlan_domain_id, $vlan_id) {
                 return new Vlan([
                     'vlan_vlan' => $vlan_id,
                     'vlan_domain' => $vlan_domain_id,
-                    'vlan_name' => $data['ieee8021QBridgeVlanStaticName'] ?? '',
+                    'vlan_name' => $data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName'] ?? '',
                 ]);
             });
     }
@@ -185,14 +185,14 @@ class Vlans implements Module
         }
 
         // fetch vlan data
-        $port_data = SnmpQuery::hideMib()->walk([
+        $port_data = SnmpQuery::walk([
             'Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts',
             'Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts',
         ])->table(2);
 
         if (empty($port_data)) {
             // fall back to static
-            $port_data = SnmpQuery::hideMib()->walk([
+            $port_data = SnmpQuery::walk([
                 'Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts',
                 'Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts',
             ])->table(1);
@@ -209,15 +209,17 @@ class Vlans implements Module
 
         foreach ($port_data as $vlan_id => $vlan) {
             //portmap for untagged ports
-            $untagged_ids = StringHelpers::bitsToIndices($vlan['dot1qVlanCurrentUntaggedPorts'] ?? $vlan['dot1qVlanStaticUntaggedPorts'] ?? '');
+            $untagged = $vlan['Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts'] ?? '';
+            $untagged_ids = StringHelpers::bitsToIndices($untagged);
             //portmap for members ports (might be tagged)
-            $egress_ids = StringHelpers::bitsToIndices($vlan['dot1qVlanCurrentEgressPorts'] ?? $vlan['dot1qVlanStaticEgressPorts'] ?? '');
+            $all = $vlan['Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts'] ?? '';
+            $egress_ids = StringHelpers::bitsToIndices($all);
 
             foreach ($egress_ids as $baseport) {
                 $ports->push(new PortVlan([
                     'vlan' => $vlan_id,
                     'baseport' => $baseport,
-                    'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
+                    'untagged' => in_array($baseport, $untagged_ids) ? 1 : 0,
                     'port_id' => PortCache::getIdFromIfIndex($os->ifIndexFromBridgePort($baseport), $os->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
@@ -230,7 +232,7 @@ class Vlans implements Module
     {
         $ports = new Collection;
 
-        $port_data = SnmpQuery::hideMib()->walk([
+        $port_data = SnmpQuery::walk([
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts',
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts',
         ])->table(2);
@@ -242,10 +244,10 @@ class Vlans implements Module
         foreach ($port_data as $vlan_domain_id => $vlan_domains) {
             foreach ($vlan_domains as $vlan_id => $data) {
                 //portmap for untagged ports
-                $untagged_ids = StringHelpers::bitsToIndices($data['ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');
+                $untagged_ids = StringHelpers::bitsToIndices($data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');
 
                 //portmap for members ports (might be tagged)
-                $egress_ids = StringHelpers::bitsToIndices($data['ieee8021QBridgeVlanStaticEgressPorts'] ?? '');
+                $egress_ids = StringHelpers::bitsToIndices($data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts'] ?? '');
 
                 foreach ($egress_ids as $baseport) {
                     $ports->push(new PortVlan([
