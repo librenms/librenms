@@ -715,7 +715,6 @@ class Vrp extends OS implements
             //            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
         ])->mapTable(function ($vlanArray, $vlanId) {
-dump($vlanArray);
             return new Vlan([
                 'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
                 'vlan_vlan' => $vlanId,
