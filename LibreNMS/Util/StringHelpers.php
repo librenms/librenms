@@ -226,7 +226,7 @@ class StringHelpers
         if (! StringHelpers::isHex($hex_data)) {
             // could be malformed
             if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
-                return array_map(fn($v) => intval($v), explode(',', $matches[0]));
+                return array_map(fn ($v) => intval($v), explode(',', $matches[0]));
             }
 
             return [];
