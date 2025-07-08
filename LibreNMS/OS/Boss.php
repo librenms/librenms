@@ -154,7 +154,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
                 $ports->push(new PortVlan([
                     'vlan' => $vlan_id,
                     'baseport' => $baseport - 1, // why -1?
-                    'untagged' => $pvid_untagged[$vlan_id][$baseport  - 1] ?? 0,
+                    'untagged' => $pvid_untagged[$vlan_id][$baseport - 1] ?? 0,
                     'port_id' => PortCache::getIdFromIfIndex($this->ifIndexFromBridgePort($baseport - 1), $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
