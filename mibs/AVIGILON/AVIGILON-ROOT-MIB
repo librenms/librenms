@@ -1,0 +1,40 @@
+--
+-- The Avigilon Root MIB, common for all Avigilon devices
+--
+
+AVIGILON-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+		FROM SNMPv2-SMI;
+
+avigilon MODULE-IDENTITY
+	LAST-UPDATED "201607041000Z"
+	ORGANIZATION "Avigilon Corporation"
+	CONTACT-INFO
+		"Postal:  Avigilon Corporation
+				  Box 378
+				  #101-1001 West Broadway
+				  Vancouver, British Columbia
+				  V6H 4E4
+				  Canada
+				  Phone: +1 604 629 5182
+				  Fax:	 +1 604 629 5183
+				  E-Mail: 
+				  Web: www.avigilon.com"
+	DESCRIPTION
+		"Avigilon Root MIB Module"
+	REVISION	  "201607041000Z"
+	DESCRIPTION
+		"Avigilon Root MIB Module, Version 1.0
+
+	Copyright (C) 2015-2016"
+	::= { enterprises 46202 } 
+
+avigCommonMIB OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The root of the Avigilon Common MIB module"
+	::= { avigilon 1 }
+
+END
