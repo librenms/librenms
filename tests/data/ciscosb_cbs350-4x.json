@@ -16030,6 +16030,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 0E 1E D6 82 68 (000e1ed68268)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "mars-main",
+                    "ifDescr": "TenGigabitEthernet2/0/2",
+                    "ifName": "te2/0/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "marvin",
                     "remote_port": "00 90 0B A2 5C 6E (00900ba25c6e)",
                     "remote_platform": null,
@@ -16048,6 +16059,17 @@
                     "ifAlias": "marvin-v",
                     "ifDescr": "GigabitEthernet2/0/14",
                     "ifName": "gi2/0/14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 0E 1E D6 82 69 (000e1ed68269)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "mc",
+                    "ifDescr": "TenGigabitEthernet1/0/2",
+                    "ifName": "te1/0/2"
                 },
                 {
                     "active": 1,

@@ -11601,7 +11601,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "PCM B4 WLAN SW 138.78",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "RMON Port 50 on Unit 1",

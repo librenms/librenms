@@ -23087,6 +23087,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "2C F4 C5 E9 98 1A (2cf4c5e9981a)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "cdc.wc1",
+                    "ifDescr": "Extreme Networks Virtual Services Platform 8608 Module 8624XS - 10GbSR Port 3/24",
+                    "ifName": "3/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "chr.can1",
                     "remote_port": "2/16 (646a52c18000)",
                     "remote_platform": null,

@@ -8064,6 +8064,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "94 C6 91 12 D2 77 (94c69112d277)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Port on unit 1, port 10",
+                    "ifDescr": "Ethernet Port on unit 1, port 10",
+                    "ifName": "Port10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "GS1900-ModemSide",
                     "remote_port": "8 (60319781e864)",
                     "remote_platform": null,
@@ -8071,6 +8082,17 @@
                     "ifAlias": "Ethernet Port on unit 1, port 12",
                     "ifDescr": "Ethernet Port on unit 1, port 12",
                     "ifName": "Port12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "3C 52 82 17 63 35 (3c5282176335)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Port on unit 1, port 9",
+                    "ifDescr": "Ethernet Port on unit 1, port 9",
+                    "ifName": "Port9"
                 },
                 {
                     "active": 1,
@@ -8142,6 +8164,177 @@
                     "context_name": "",
                     "ipv4_network": "192.168.32.0/24",
                     "ifIndex": 1032
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1030,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1032,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
                 }
             ]
         }
