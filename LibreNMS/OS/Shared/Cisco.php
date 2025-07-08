@@ -1012,12 +1012,12 @@ class Cisco extends OS implements
         }
 
         foreach ($vlans as $vlan) {
-            $vlan_id = (int) $vlan->vlan_vlan;
+            $vlan_id = $vlan->vlan_vlan;
 
             // Ignore reserved VLAN IDs
             if ($vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
                 $snmpQuery = SnmpQuery::abortOnFailure();
-                if ($vlan_id !== 1) {
+                if ($vlan_id !== '1') {
                     $snmpQuery->context($vlan_id, 'vlan-');
                 }
 
