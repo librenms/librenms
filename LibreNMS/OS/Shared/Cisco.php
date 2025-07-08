@@ -1016,27 +1016,25 @@ class Cisco extends OS implements
 
             // Ignore reserved VLAN IDs
             if ($vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
-                $snmpQuery = SnmpQuery::abortOnFailure();
-                if ($vlan_id !== 1) {
-                    $snmpQuery->context((string) $vlan_id, 'vlan-');
-                }
-
-                $tmp_vlan_data = $snmpQuery->walk([
-                    'BRIDGE-MIB::dot1dStpPortPriority',
-                    'BRIDGE-MIB::dot1dStpPortPathCost',
-                    'BRIDGE-MIB::dot1dBasePortIfIndex',
-                ])->table(1);
+                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
+                    ->enumStrings()
+                    ->abortOnFailure()
+                    ->walk([
+                        'BRIDGE-MIB::dot1dStpPortPriority',
+                        'BRIDGE-MIB::dot1dStpPortState',
+                        'BRIDGE-MIB::dot1dStpPortPathCost',
+                        'BRIDGE-MIB::dot1dBasePortIfIndex',
+                    ])->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
-                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? '',
+                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'untagged' => 0,
-                        'port_id' => PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0,
-                            $this->getDeviceId()) ?? 0, // ifIndex from device
+                        'untagged' => 1, // bridge mib only deals with untagged
+                        'port_id' => PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }
