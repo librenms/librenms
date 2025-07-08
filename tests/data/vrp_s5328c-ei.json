@@ -6216,221 +6216,245 @@
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0001",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-1",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 34,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-2",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-3",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 36,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-4",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 37,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-5",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 38,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-6",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-7",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-8",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-9",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-10",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 43,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-11",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 44,
                     "vlan_domain": 1,
                     "vlan_name": "DTV",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 50,
                     "vlan_domain": 1,
                     "vlan_name": "SAN",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 60,
                     "vlan_domain": 1,
                     "vlan_name": "blade_management",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 61,
                     "vlan_domain": 1,
                     "vlan_name": "esxi_management_1",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 62,
                     "vlan_domain": 1,
                     "vlan_name": "esxi_management_2",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 74,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 74",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 76,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 76",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 77,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 77",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 100",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 171,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 171",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 200",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 202,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 202",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 215,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 215",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 255,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 255",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 530,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 530",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 548,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 548",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 587,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 587",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2941,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 2941",
-                    "vlan_type": "2",
+                    "vlan_type": "commonVlan",
                     "vlan_mtu": null
                 }
             ],
             "ports_vlans": [
                 {
                     "vlan": 1,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 3,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
                     "baseport": 4,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6438,7 +6462,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6446,7 +6470,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6454,7 +6478,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6462,7 +6486,23 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 9,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6470,7 +6510,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6478,7 +6518,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6486,7 +6526,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6494,7 +6534,23 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 15,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 16,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -6502,7 +6558,55 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 18,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 19,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 20,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 21,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 23,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 24,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
                 {
                     "vlan": 33,
@@ -6887,6 +6991,14 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
+                },
+                {
+                    "vlan": 76,
+                    "baseport": 22,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
                 },
                 {
                     "vlan": 77,
@@ -6993,6 +7105,28 @@
                     "untagged": 0
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2011.2.23.95",
+                    "sysDescr": "S5328C-EI\nHuawei Versatile Routing Platform Software \r\n VRP (R) software,Version 5.110 (S5300 V200R001C00SPC300) \r\n Copyright (C) 2007 Huawei Technologies Co., Ltd.",
+                    "sysContact": "<private>",
+                    "version": "5.110 (V200R001C00SPC300) [V200R001SPH005]",
+                    "hardware": "S5300",
+                    "features": null,
+                    "location": null,
+                    "os": "vrp",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "huawei.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
