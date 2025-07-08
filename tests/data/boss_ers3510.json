@@ -2729,7 +2729,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2737,7 +2737,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2753,7 +2753,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2761,7 +2761,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2769,7 +2769,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2777,7 +2777,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 1,
@@ -2785,7 +2785,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -2924,7 +2924,8 @@
                     "untagged": 0
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

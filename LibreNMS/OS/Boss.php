@@ -108,7 +108,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
 
     public function discoverBasicVlanData(): Collection
     {
-        return SnmpQuery::cache()->walk('RC-VLAN-MIB::rcVlanName')
+        return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
             ->mapTable(function ($vlan, $vlan_id) {
                 return new Vlan([
                     'vlan_vlan' => $vlan_id,
@@ -120,36 +120,46 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
 
     public function discoverPortVlanData(Collection $vlans): Collection
     {
-        $ret = new Collection;
+        $ports = new Collection;
 
-        $tagoruntag = SnmpQuery::walk('RC-VLAN-MIB::rcVlanPortMembers')->table(1);
-        $port_pvids = SnmpQuery::enumStrings()->walk([
+        $egress_vlans = SnmpQuery::walk('RC-VLAN-MIB::rcVlanPortMembers')->pluck();
+
+        if (empty($egress_vlans)) {
+            return $ports;
+        }
+
+        // find default vlans (untagged or otherwise)
+        $port_data = SnmpQuery::walk([
             'RC-VLAN-MIB::rcVlanPortDefaultVlanId',
             'RC-VLAN-MIB::rcVlanPortPerformTagging',
         ])->table(1);
+        $pvid_untagged = [];
+        foreach ($port_data as $rcVlanPortIndex => $data) {
+            $vlan_id = $data['RC-VLAN-MIB::rcVlanPortDefaultVlanId'] ?? '';
+            // 2 false, 4 untagPvidOnly from RC-VLAN-MIB
+            $untagged = in_array($data['RC-VLAN-MIB::rcVlanPortPerformTagging'] ?? '', ['2', '4']) ? 1 : 0;
+
+            $pvid_untagged[$vlan_id][$rcVlanPortIndex] = $untagged;
+        }
 
         foreach ($vlans as $vlan) {
             $vlan_id = $vlan->vlan_vlan;
-            $egress_ids = StringHelpers::bitsToIndices($tagoruntag[$vlan_id]['RC-VLAN-MIB::rcVlanPortMembers']);
-            $untagged_ids = [];
-
-            foreach ($port_pvids as $port => $port_data) {
-                if ($port_data['RC-VLAN-MIB::rcVlanPortDefaultVlanId'] == $vlan_id &&
-                ($port_data['RC-VLAN-MIB::rcVlanPortPerformTagging'] == 'false' || $port_data['RC-VLAN-MIB::rcVlanPortPerformTagging'] == 4)) {
-                    $untagged_ids[] = $port;
-                }
+            if (empty($egress_vlans[$vlan_id])) {
+                continue;
             }
 
+            $egress_ids = StringHelpers::bitsToIndices($egress_vlans[$vlan_id]);
+
             foreach ($egress_ids as $baseport) {
-                $ret->push(new PortVlan([
+                $ports->push(new PortVlan([
                     'vlan' => $vlan_id,
                     'baseport' => $baseport - 1, // why -1?
-                    'untagged' => (in_array($baseport - 1, $untagged_ids) ? 1 : 0),
+                    'untagged' => $pvid_untagged[$vlan_id][$baseport  - 1] ?? 0,
                     'port_id' => PortCache::getIdFromIfIndex($this->ifIndexFromBridgePort($baseport - 1), $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
         }
 
-        return $ret;
+        return $ports;
     }
 }
