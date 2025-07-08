@@ -1012,10 +1012,16 @@ class Cisco extends OS implements
         }
 
         foreach ($vlans as $vlan) {
+            $vlan_id = (int) $vlan->vlan_vlan;
+
             // Ignore reserved VLAN IDs
-            if ($vlan->vlan_vlan && ($vlan->vlan_vlan < 1002 || $vlan->vlan_vlan > 1005)) {
-                $context = 'vlan-' . $vlan->vlan_vlan; // get dot1dStpPortEntry within the vlan context
-                $tmp_vlan_data = SnmpQuery::context($context)->abortOnFailure()->walk([
+            if ($vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+                $snmpQuery = SnmpQuery::abortOnFailure();
+                if ($vlan_id !== 1) {
+                    $snmpQuery->context($vlan_id, 'vlan-');
+                }
+
+                $tmp_vlan_data = $snmpQuery->walk([
                     'BRIDGE-MIB::dot1dStpPortPriority',
                     'BRIDGE-MIB::dot1dStpPortPathCost',
                     'BRIDGE-MIB::dot1dBasePortIfIndex',
@@ -1023,7 +1029,7 @@ class Cisco extends OS implements
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     $ports->push(new PortVlan([
-                        'vlan' => $vlan->vlan_vlan,
+                        'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? '',
