@@ -767,14 +767,14 @@ class Vrp extends OS implements
             }
         }
 
-        $portsData = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfPVID')->table(1);
+        $portsData = SnmpQuery::walk('HUAWEI-L2IF-MIB::hwL2IfPVID')->table(1);
         foreach ($portsData as $baseport => $data) {
-            if (! empty($data['hwL2IfPVID'])) {
+            if (! empty($data['HUAWEI-L2IF-MIB::hwL2IfPVID'])) {
                 $ports->push(new PortVlan([
-                    'vlan' => $data['hwL2IfPVID'],
+                    'vlan' => $data['HUAWEI-L2IF-MIB::hwL2IfPVID'],
                     'baseport' => $baseport,
                     'untagged' => 1,
-                    'port_id' => PortCache::getIdFromIfIndex($data['hwL2IfPortIfIndex'] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
         }
