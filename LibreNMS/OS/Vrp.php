@@ -63,6 +63,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Vrp extends OS implements
@@ -708,9 +709,9 @@ class Vrp extends OS implements
 
     public function discoverBasicVlanData(): Collection
     {
-        return SnmpQuery::walk([
+        return SnmpQuery::enumStrings()->walk([
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
-//            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus',
+//            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
         ])->mapTable(function ($vlanArray, $vlanId) {
             return new Vlan([
@@ -722,35 +723,38 @@ class Vrp extends OS implements
         });
     }
 
-    public function discoverPortVlanData(Colleciton $vlans): Collection
+    public function discoverPortVlanData(Collection $vlans): Collection
     {
-        if (empty($vlans)) {
+        if ($vlans->isEmpty()) {
             return new Collection;
         }
 
-        $ret = new Collection;
+        $ports = new Collection;
         $maxVlanId = $vlans->max('vlan_vlan');
 
-        $portsIndexes = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfPortIfIndex')->table();
-        $portsIndexes = $portsIndexes['hwL2IfPortIfIndex'] ?? [];
+        $portsIndexes = SnmpQuery::walk('HUAWEI-L2IF-MIB::hwL2IfPortIfIndex')->pluck();
 
-        $tagged = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListLow')->table(1);
-        $tagged = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListLow')->table(1, $tagged);
+        $tagged = SnmpQuery::walk([
+            'HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListLow',
+            'HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListLow',
+        ])->table(1);
         // high table
         if ($maxVlanId > 2047) {
-            $tagged = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListHigh')->table(1, $tagged);
-            $tagged = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListHigh')->table(1, $tagged);
+            $tagged = SnmpQuery::walk([
+                'HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListHigh',
+                'HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListHigh',
+            ])->table(1, $tagged);
         }
 
         foreach ($tagged as $baseport => $vlanArray) {
             foreach (['Low', 'High'] as $hilo) {
                 foreach (['TrunkAllowPass', 'HybridTagged'] as $pType) {
-                    $oid = 'hwL2If' . $pType . 'VlanList' . $hilo;
+                    $oid = 'HUAWEI-L2IF-MIB::hwL2If' . $pType . 'VlanList' . $hilo;
                     if (! empty($vlanArray[$oid])) {
                         $vlansOnPort = StringHelpers::bitsToIndices($vlanArray[$oid]);
                         foreach ($vlansOnPort as $vlanIdOnPort) {
                             $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
-                            $ret->push(new PortVlan([
+                            $ports->push(new PortVlan([
                                 'vlan' => $vlanIdOnPort,
                                 'baseport' => $baseport,
                                 'untagged' => 0,
@@ -765,7 +769,7 @@ class Vrp extends OS implements
         $portsData = SnmpQuery::hideMib()->walk('HUAWEI-L2IF-MIB::hwL2IfPVID')->table(1);
         foreach ($portsData as $baseport => $data) {
             if (! empty($data['hwL2IfPVID'])) {
-                $ret->push(new PortVlan([
+                $ports->push(new PortVlan([
                     'vlan' => $data['hwL2IfPVID'],
                     'baseport' => $baseport,
                     'untagged' => 1,
@@ -774,6 +778,6 @@ class Vrp extends OS implements
             }
         }
 
-        return $ret;
+        return $ports;
     }
 }
