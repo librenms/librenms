@@ -9,7 +9,7 @@ $fabosSfpTxPower = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->numericIndex()->w
 $fabosSfpPower = array_merge_recursive($fabosSfpTxPower, $fabosSfpRxPower);
 
 if (! empty($fabosSfpPower)) {
-    $ifMib = SnmpQuery::mibs(['IF-MIB'])->walk(['IF-MIB::ifDescr','IF-MIB::ifAdminStatus'])->table(1) ?? [];
+    $ifMib = SnmpQuery::mibs(['IF-MIB'])->walk(['IF-MIB::ifDescr', 'IF-MIB::ifAdminStatus'])->table(1) ?? [];
 }
 
 foreach ($fabosSfpPower as $fullIndex => $entry) {
