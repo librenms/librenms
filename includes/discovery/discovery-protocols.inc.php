@@ -397,7 +397,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 // add device if configured to do so
                 if (! $remote_device_id && LibrenmsConfig::get('autodiscovery.xdp') && ! can_skip_discovery($lldp['lldpRemSysName'] ?? null, $lldp['lldpRemSysDesc'] ?? null)) {
                     if (isset($lldp['lldpRemSysName'])) {
-                      $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+                        $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                     }
                     if (! $remote_device_id && LibrenmsConfig::get('discovery_by_ip', false)) {
                         $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
