@@ -391,13 +391,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverBasicVlanData(): Collection
     {
-        $vlans = SnmpQuery::walk([
-            'JUNIPER-VLAN-MIB::jnxExVlanName',
-            'JUNIPER-VLAN-MIB::jnxExVlanTag',
-        ])->mapTable(function ($data) {
-            new Vlan([
+        $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(function ($data, $vlanId) {
+            return new Vlan([
                 'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
-                'vlan_domain' => 1,
+                'vlan_domain' => $data['JUNIPER-VLAN-MIB::jnxExVlanPortGroupInstance'],
+                'vlan_type' => $data['JUNIPER-VLAN-MIB::jnxExVlanType'],
                 'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
             ]);
         });
@@ -420,36 +418,34 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverPortVlanData(Collection $vlans): Collection
     {
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-        $index2base = array_flip($dot1dBasePortIfIndex);
+        // JUNIPER-VLAN-MIB
+        $legacyPortData = SnmpQuery::walk('JUNIPER-VLAN-MIB::jnxExVlanPortGroupTable')->table(2);
 
-        $jVlans = SnmpQuery::walk('JUNIPER-VLAN-MIB::jnxExVlanPortTagness')
-            ->mapTable(function ($data, $jnxExVlanPortGroupIndex, $jnxExVlanPort) use ($index2base) {
-                new PortVlan([
-                    'vlan' => $vlan_id,
-                    'baseport' => $index2base[$jnxExVlanPort] ?? 0,
-                    'untagged' => $tag['tag'],
-                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                ])
-            });
+        if (! empty($legacyPortData)) {
+            $legacyPorts = new Collection;
+            $legacyVlanByGroup = $vlans->groupBy('vlan_domain');
+            foreach ($legacyPortData as $jnxExVlanPortGroupIndex => $groupData) {
+                foreach ($groupData as $jnxExVlanPort => $portData) {
+                    // 1. autoActive or 3. allowedActive only
+                    if (! in_array($portData['JUNIPER-VLAN-MIB::jnxExVlanPortStatus'] ?? '', ['1', '3'])) {
+                        continue;
+                    }
 
-        foreach ($vlans as $vlan_index => $vlan) {
-            dd($vlan_tag);
-            $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
-            if (isset($tagness_by_vlan_index[$vlan_index])) {
-                foreach ($tagness_by_vlan_index[$vlan_index] as $ifIndex => $tag) {
-                    $f_portType = $tag['tag'] ? 'access' : 'trunk';
-                    $ret->push(new PortVlan([
-                        'vlan' => $vlan_id,
-                        'baseport' => $index2base[$ifIndex] ?? 0,
-                        'untagged' => $tag['tag'],
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                    ]));
+                    foreach ($legacyVlanByGroup->get($jnxExVlanPortGroupIndex, []) as $vlan) {
+                        $legacyPorts->push(new PortVlan([
+                            'vlan' => $vlan->vlan_id,
+                            'baseport' => PortCache::bridgePortFromIfIndex($jnxExVlanPort),
+                            'untagged' => isset($portData['JUNIPER-VLAN-MIB::jnxExVlanPortTagness']) && $portData['JUNIPER-VLAN-MIB::jnxExVlanPortTagness'] == '2' ? 1 : 0,
+                            'port_id' => PortCache::getIdFromIfIndex($jnxExVlanPort, $this->getDeviceId()) ?? 0,
+                        ]));
+                    }
                 }
             }
+
+            return $legacyPorts;
         }
 
-
+        // JUNIPER-L2ALD-MIB
         $vlan_tag = SnmpQuery::hideMib()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTag')->table(1);
         dd($untag, $vlan_tag);
 

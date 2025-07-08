@@ -21,7 +21,9 @@
  * @link       http://librenms.org
  *
  * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Modules;
@@ -80,8 +82,8 @@ class Vlans implements Module
         $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData() : $basic;
         $basic = ($basic->isEmpty()) ? $this->discoverBasicVlanData8021() : $basic;
 
-        $basic = $basic->filter(function (Vlan $data) {
-            return !empty($data->vlan_vlan);
+        $basic = $basic->filter(function (?Vlan $data) {
+            return ! empty($data->vlan_vlan);
         })->each(function (Vlan $data) {
             if (empty($data->vlan_name)) {
                 $data->vlan_name = 'VLAN ' . $data->vlan_vlan; // default VLAN name
@@ -98,7 +100,7 @@ class Vlans implements Module
         $ports = ($ports->isEmpty()) ? $this->discoverPortVlanData8021($os->getDevice()) : $ports;
 
         $ports = $ports->filter(function (PortVlan $data) {
-            return !empty($data->vlan) && !empty($data->port_id);
+            return ! empty($data->vlan) && !empty($data->port_id);
         })->each(function (PortVlan $data) {
             $data->priority ??= 0;
             $data->state ??= 'unknown';
@@ -182,8 +184,6 @@ class Vlans implements Module
             return $ports;
         }
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-
         // fetch vlan data
         $port_data = SnmpQuery::hideMib()->walk([
             'Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts',
@@ -218,7 +218,7 @@ class Vlans implements Module
                     'vlan' => $vlan_id,
                     'baseport' => $baseport,
                     'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $device->device_id) ?? 0, // ifIndex from device
+                    'port_id' => PortCache::getIdFromIfIndex(PortCache::ifIndexFromBridgePort($baseport), $device->device_id) ?? 0, // ifIndex from device
                 ]));
             }
         }
@@ -239,8 +239,6 @@ class Vlans implements Module
             return $ports;
         }
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-
         foreach ($port_data as $vlan_domain_id => $vlan_domains) {
             foreach ($vlan_domains as $vlan_id => $data) {
                 //portmap for untagged ports
@@ -254,7 +252,7 @@ class Vlans implements Module
                         'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'untagged' => (in_array($baseport, $untagged_ids) ? 1 : 0),
-                        'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $device->device_id) ?? 0, // ifIndex from device
+                        'port_id' => PortCache::getIdFromIfIndex(PortCache::ifIndexFromBridgePort($baseport), $device->device_id) ?? 0, // ifIndex from device
                     ]));
                 }
             }

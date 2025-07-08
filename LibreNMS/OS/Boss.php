@@ -127,8 +127,6 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
             'RC-VLAN-MIB::rcVlanPortPerformTagging',
         ])->table(1);
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-
         foreach ($vlans as $vlan) {
             $vlan_id = $vlan->vlan_vlan;
             $egress_ids = StringHelpers::bitsToIndices($tagoruntag[$vlan_id]['RC-VLAN-MIB::rcVlanPortMembers']);
@@ -144,9 +142,9 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
             foreach ($egress_ids as $baseport) {
                 $ret->push(new PortVlan([
                     'vlan' => $vlan_id,
-                    'baseport' => $baseport - 1,
+                    'baseport' => $baseport - 1, // why -1?
                     'untagged' => (in_array($baseport - 1, $untagged_ids) ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport - 1] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    'port_id' => PortCache::getIdFromIfIndex(PortCache::ifIndexFromBridgePort($baseport - 1), $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
         }

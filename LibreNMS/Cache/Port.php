@@ -8,6 +8,7 @@ use App\Models\Ipv6Address;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
+use SnmpQuery;
 
 class Port
 {
@@ -22,6 +23,9 @@ class Port
 
     /** @var array<int, array<string, array<string, string>>> */
     private array $ipMaps = [];
+
+    /** @var int[]|string[]|null */
+    private ?array $ifIndexToBridgePort = null;
 
     /**
      * Get a port by id and cache it so future calls will avoid a db query
@@ -155,6 +159,28 @@ class Port
         }
 
         return $this->ifNameMaps[$device_id][$ifIndex] ?? null;
+    }
+
+    public function bridgePortFromIfIndex(int|string|null $ifIndex): int
+    {
+        if (! $ifIndex) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) (array_flip($this->ifIndexToBridgePort)[$ifIndex] ?? 0);
+    }
+
+    public function ifIndexFromBridgePort(int|string|null $bridgePort): int
+    {
+        if (! $bridgePort) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
     }
 
     private function cachePort(int $port_id): void

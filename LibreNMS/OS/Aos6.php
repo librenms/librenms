@@ -21,7 +21,9 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
@@ -52,14 +54,11 @@ class Aos6 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
 
     public function discoverPortVlanData(Collection $vlans): Collection
     {
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-        $index2base = array_flip($dot1dBasePortIfIndex);
-
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
-            ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex) use ($index2base) {
+            ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex = null) {
                 new Portvlan([
                     'vlan' => $vpaVlanNumber,
-                    'baseport' => $index2base[$vpaIfIndex] ?? 0,
+                    'baseport' => PortCache::bridgePortFromIfIndex($vpaIfIndex),
                     'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);

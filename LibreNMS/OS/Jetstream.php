@@ -160,9 +160,6 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
     {
         $ret = new Collection;
 
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-        $index2base = array_flip($dot1dBasePortIfIndex);
-
         $vlanPortConfigTable = SnmpQuery::walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
         foreach ($vlanPortConfigTable as $ifIndex => $data) {
             $portConfig[$data['TPLINK-DOT1Q-VLAN-MIB::vlanPortNumber']] = $ifIndex;
@@ -175,12 +172,11 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
                 $expand = $this->jetstreamExpand($data[$type] ?? []);
                 foreach ($expand as $key => $port) {
                     $ifIndex = $portConfig[$port] ?? 0;
-                    $baseport = $index2base[$ifIndex] ?? 0;
                     $ret->push(new PortVlan([
                         'vlan' => $vlan_id,
-                        'baseport' => $baseport,
+                        'baseport' => PortCache::bridgePortFromIfIndex($ifIndex),
                         'untagged' => $tag,
-                        'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }
