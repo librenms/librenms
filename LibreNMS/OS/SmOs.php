@@ -3,7 +3,6 @@
 namespace LibreNMS\OS;
 
 use App\Models\Transceiver;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -277,7 +276,7 @@ class SmOs extends OS implements
                 'entity_physical_index' => $ifIndex,
                 'type' => null,
                 'vendor' => $data['SIAE-SFP-MIB::sfpVendorName'] ?? null,
-                'date' => empty($data['SIAE-SFP-MIB::sfpVendorDateCode']) ? null : Carbon::createFromFormat('ymd', $data['SIAE-SFP-MIB::sfpVendorDateCode'])->toDateString(),
+                'date' => $data['SIAE-SFP-MIB::sfpVendorDateCode'] ?? null,
                 'model' => $data['SIAE-SFP-MIB::sfpVendorPartNumber'] ?? null,
                 'serial' => $data['SIAE-SFP-MIB::sfpVendorSN'] ?? null,
                 'ddm' => empty($data['SIAE-SFP-MIB::sfpDiagMonitorCode']) ? 0 : 1,
