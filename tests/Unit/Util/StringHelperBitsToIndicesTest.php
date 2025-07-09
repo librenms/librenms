@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit\Util;
 
 use LibreNMS\Util\StringHelpers;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 include_once 'includes/functions.php';
@@ -212,9 +213,13 @@ class StringHelperBitsToIndicesTest extends TestCase
         $this->assertEquals([1, 17, 25], $result);
     }
 
-    /**
-     * Data provider for testing various hex values and their expected indices
-     */
+    #[DataProvider('hexDataProvider')]
+    public function testWithDataProvider(string $hex, array $expected): void
+    {
+        $result = StringHelpers::bitsToIndices($hex);
+        $this->assertEquals($expected, $result);
+    }
+
     public static function hexDataProvider(): array
     {
         return [
@@ -224,14 +229,5 @@ class StringHelperBitsToIndicesTest extends TestCase
             'three_bytes_pattern' => ['f0f0f0', [1, 2, 3, 4, 9, 10, 11, 12, 17, 18, 19, 20]],
             'zero_byte_in_middle' => ['ff00ff', array_merge(range(1, 8), range(17, 24))],
         ];
-    }
-
-    /**
-     * @dataProvider hexDataProvider
-     */
-    public function testWithDataProvider(string $hex, array $expected): void
-    {
-        $result = StringHelpers::bitsToIndices($hex);
-        $this->assertEquals($expected, $result);
     }
 }
