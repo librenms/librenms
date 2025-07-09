@@ -78,7 +78,10 @@ trait SyncsModels
             $parentModel->$relationship()->saveMany($new);
         }
 
-        return $existing->map->first()->merge($new);
+        $savedModels = $existing->map->first()->merge($new);
+        $parentModel->setRelation($relationship, $savedModels);
+
+        return $savedModels;
     }
 
     /**
