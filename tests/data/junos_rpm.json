@@ -12989,7 +12989,7 @@
             ],
             "ports_vlans": [
                 {
-                    "vlan": 370,
+                    "vlan": 1,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -12997,7 +12997,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 370,
+                    "vlan": 1,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13005,7 +13005,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 371,
+                    "vlan": 2,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13013,7 +13013,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 371,
+                    "vlan": 2,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13021,7 +13021,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 372,
+                    "vlan": 5,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13029,7 +13029,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 372,
+                    "vlan": 5,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13037,7 +13037,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 373,
+                    "vlan": 10,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13045,7 +13045,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 373,
+                    "vlan": 10,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13053,7 +13053,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 374,
+                    "vlan": 112,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13061,7 +13061,7 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 374,
+                    "vlan": 112,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
