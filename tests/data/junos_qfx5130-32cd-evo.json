@@ -16707,11 +16707,12 @@
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
                     "vlan_name": "default",
-                    "vlan_type": null,
+                    "vlan_type": "",
                     "vlan_mtu": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ospf": {
         "poller": {
