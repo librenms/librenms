@@ -107,7 +107,11 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml location data:', $data);
 
-        $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+        $locOid = snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+        preg_match('/^((\w+\s?)+)\D+(\d{1,2}\.\d{1,6})\D+(\d{1,2}\.\d{1,6})/', (string) $locOid, $tmp);
+        $locOut = (isset($tmp[4])) ? trim($tmp[1]) . ' [' . $tmp[3] . ', ' . $tmp[4] . ']' : $locOid;
+
+        $location = $this->findFirst($data, $name, $numeric) ?? $locOut;
 
         return new Location([
             'location' => StringHelpers::inferEncoding($location),
