@@ -408,10 +408,10 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return SnmpQuery::enumStrings()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTable')
             ->mapTable(function ($data) {
                 return new Vlan([
-                    'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'],
+                    'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'] ?? 0,
                     'vlan_domain' => 1,
-                    'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'],
-                    'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'],
+                    'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'] ?? '',
+                    'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'] ?? '',
                 ]);
             });
     }
