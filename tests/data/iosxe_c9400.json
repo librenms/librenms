@@ -28876,17 +28876,17 @@
                 {
                     "vlan": 1,
                     "baseport": 97,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 2,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 98,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -28956,17 +28956,17 @@
                 {
                     "vlan": 1,
                     "baseport": 193,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 2,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 194,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -29418,7 +29418,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "stp": {
         "discovery": {
