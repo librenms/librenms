@@ -18,7 +18,7 @@ from datetime import datetime
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_IGN
 from uuid import uuid1
 from os import utime
 
@@ -449,17 +449,13 @@ class Service:
         # Speed things up by only looking at direct zombie children
         for p in psutil.Process().children(recursive=False):
             try:
-                cmd = (
-                    p.cmdline()
-                )  # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
 
                 if status == psutil.STATUS_ZOMBIE:
                     pid = p.pid
                     r = os.waitpid(p.pid, os.WNOHANG)
                     logger.warning(
-                        'Reaped long running job "%s" in state %s with PID %d - job returned %d',
-                        cmd,
+                        "Reaped long running job in state %s with PID %d - job returned %d",
                         status,
                         r[0],
                         r[1],
@@ -685,7 +681,7 @@ class Service:
 
         self._lm.unlock("schema-update", self.config.unique_name)
 
-        self.restart()
+        self.reload_flag = True
 
     def create_lock_manager(self):
         """
@@ -740,6 +736,9 @@ class Service:
         """
         Stop then recreate this entire process by re-calling the original script.
         Has the effect of reloading the python files from disk.
+
+        This should only ever be called from the main thread and never directly.
+        In all other cases, set `reload_flag` to `True`.
         """
         if sys.version_info < (3, 4, 0):
             logger.warning(
@@ -757,6 +756,8 @@ class Service:
             self._stop_managers()
         self._release_master()
 
+        # Set the SIGCHLD signal handler to ignore so remaining processes don't fail to report in and become zombies
+        signal(SIGCHLD, SIG_IGN)
         python = sys.executable
         sys.stdout.flush()
         os.execl(python, python, *sys.argv)
@@ -946,7 +947,7 @@ class Service:
                 ),
                 exc_info=True,
             )
-            self.restart()
+            self.reload_flag = True
         else:
             logger.info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
