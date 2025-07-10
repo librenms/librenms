@@ -7110,8 +7110,7 @@
                     "untagged": 1
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "stp": {
         "discovery": {
@@ -7127,25 +7126,6 @@
                     "designatedRoot": "7483c2fa99d8",
                     "rootCost": 8004,
                     "rootPort": 80,
-                    "maxAge": 20,
-                    "helloTime": 2,
-                    "holdTime": 1,
-                    "forwardDelay": 15,
-                    "bridgeMaxAge": 20,
-                    "bridgeHelloTime": 2,
-                    "bridgeForwardDelay": 15
-                },
-                {
-                    "vlan": 98,
-                    "rootBridge": 0,
-                    "bridgeAddress": "0c8525ffff00",
-                    "protocolSpecification": "rapidPvstPlus",
-                    "priority": 32866,
-                    "timeSinceTopologyChange": "6930",
-                    "topChanges": 1,
-                    "designatedRoot": "0c85255ce500",
-                    "rootCost": 0,
-                    "rootPort": 0,
                     "maxAge": 20,
                     "helloTime": 2,
                     "holdTime": 1,
@@ -7209,20 +7189,6 @@
                     "designatedCost": 8000,
                     "designatedBridge": "7483c2fa9a6b",
                     "designatedPort": 14,
-                    "forwardTransitions": 1,
-                    "ifIndex": 10624
-                },
-                {
-                    "vlan": 98,
-                    "port_index": 80,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 4,
-                    "designatedRoot": "0c85255ce500",
-                    "designatedCost": 0,
-                    "designatedBridge": "0c85255ce500",
-                    "designatedPort": 80,
                     "forwardTransitions": 1,
                     "ifIndex": 10624
                 }
