@@ -109,7 +109,7 @@ trait YamlOSDiscovery
 
         $locOid = snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
         preg_match('/^((\w+\s?)+)\D+(\d{1,2}\.\d{1,6})\D+(\d{1,2}\.\d{1,6})/', (string) $locOid, $tmp);
-        $locOut = (isset($tmp[4])) ? trim($tmp[1]) . ' [' . $tmp[3] . ', ' . $tmp[4] . ']' : $locOid;
+        $locOut = (isset($tmp[4])) ? trim($tmp[1]) . ' [' . number_format((float) $tmp[3], 6, '.', '') . ', ' . number_format((float) $tmp[4], 6, '.', '') . ']' : $locOid;
 
         $location = $this->findFirst($data, $name, $numeric) ?? $locOut;
 
