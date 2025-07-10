@@ -45,7 +45,6 @@ class LegacyModule implements Module
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'cisco-mac-accounting' => ['ports'],
-        'fdb-table' => ['ports', 'vlans'],
         'vlans' => ['ports'],
         'vrf' => ['ports'],
     ];
