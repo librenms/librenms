@@ -39,4 +39,7 @@
       <directory suffix=".php">LibreNMS</directory>
     </include>
   </source>
+  <logging>
+    <junit outputFile=".phpunit.report.xml"/>
+  </logging>
 </phpunit>
