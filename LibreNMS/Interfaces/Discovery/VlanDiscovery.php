@@ -4,10 +4,10 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use Illuminate\Support\Collection;
 
-interface BasicVlanDiscovery
+interface VlanDiscovery
 {
     /**
      * @return Collection<\App\Models\Vlan>
      */
-    public function discoverBasicVlanData(): Collection;
+    public function discoverVlans(): Collection;
 }

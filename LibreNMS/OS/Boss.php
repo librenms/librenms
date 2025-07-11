@@ -35,15 +35,15 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDiscovery, PortVlanDiscovery
+class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -106,8 +106,12 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
         return $processors;
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
             ->mapTable(function ($vlan, $vlan_id) {
                 return new Vlan([
@@ -118,9 +122,12 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, BasicVlanDisco
             });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $ports = new Collection;
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
 
         $egress_vlans = SnmpQuery::walk('RC-VLAN-MIB::rcVlanPortMembers')->pluck();
 

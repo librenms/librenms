@@ -45,16 +45,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -77,8 +77,8 @@ class Cisco extends OS implements
     SlaPolling,
     StorageDiscovery,
     TransceiverDiscovery,
-    BasicVlanDiscovery,
-    PortVlanDiscovery
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -957,8 +957,12 @@ class Cisco extends OS implements
         }
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         $vtpversion = SnmpQuery::enumStrings()->get('CISCO-VTP-MIB::vtpVersion.0')->value();
         if (! in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
             return new Collection;
@@ -979,17 +983,17 @@ class Cisco extends OS implements
                     'vlan_name' => $vlan['CISCO-VTP-MIB::vtpVlanName'] ?? '',
                     'vlan_domain' => $vtpdomain_id,
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
-                    'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) &&  $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
+                    'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
             });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $ports = new Collection;
-
-        $dot1dBasePortIfIndex = SnmpQuery::cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
-        $index2base = array_flip($dot1dBasePortIfIndex);
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
 
         $native_vlans = SnmpQuery::abortOnFailure()->walk([
             'CISCO-VTP-MIB::vlanTrunkPortNativeVlan',
@@ -999,10 +1003,9 @@ class Cisco extends OS implements
         foreach ($native_vlans as $ifIndex => $data) {
             $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? 0;
             $vlan_id = (empty($vlan_id)) ? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] : $vlan_id;
-            $baseport = $index2base[$ifIndex] ?? 0; // ifIndex to baseport
             $ports->push(new PortVlan([
                 'vlan' => $vlan_id,
-                'baseport' => $baseport,
+                'baseport' => $this->bridgePortFromIfIndex($ifIndex),
                 'untagged' => 1,
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
                 // ifIndex from device
@@ -1021,7 +1024,6 @@ class Cisco extends OS implements
                     ->walk([
                         'BRIDGE-MIB::dot1dStpPortState',
                         'BRIDGE-MIB::dot1dStpPortPriority',
-                        'BRIDGE-MIB::dot1dBasePortIfIndex',
                         'BRIDGE-MIB::dot1dStpPortPathCost',
                     ])->table(1);
 
@@ -1033,7 +1035,7 @@ class Cisco extends OS implements
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
                         'untagged' => 1, // bridge mib only deals with untagged
-                        'port_id' => PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        'port_id' => PortCache::getIdFromIfIndex($this->ifIndexFromBridgePort($baseport), $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
             }

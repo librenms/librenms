@@ -41,6 +41,8 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -54,6 +56,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
+use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -75,7 +78,9 @@ class OS implements
     StpInstancePolling,
     StpPortPolling,
     TcpNetstatsPolling,
-    UdpNetstatsPolling
+    UdpNetstatsPolling,
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -93,6 +98,7 @@ class OS implements
     use NetstatsPolling;
     use BridgeMib;
     use EntityMib;
+    use QBridgeMib;
 
     /**
      * @var float|null
@@ -391,5 +397,31 @@ class OS implements
     public function hasYamlDiscovery(?string $module = null): bool
     {
         return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlans(): Collection
+    {
+        $vlans = $this->discoverIeeeQBridgeMibVlans();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIetfQBridgeMibVlans();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $vlans = $this->discoverIeeeQBridgeMibPorts();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIetfQBridgeMibPorts();
     }
 }

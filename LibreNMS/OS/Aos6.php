@@ -32,15 +32,19 @@ use App\Facades\PortCache;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Aos6 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
+class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery
 {
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
             ->mapTable(function ($vlans, $vlan_id) {
                 return new Vlan([
@@ -52,8 +56,12 @@ class Aos6 extends OS implements BasicVlanDiscovery, PortVlanDiscovery
             });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
+        if (($QBridgeMibPorts = parent::discoverVlanPorts($vlans))->isNotEmpty()) {
+            return $QBridgeMibPorts;
+        }
+
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex = null) {
                 return new Portvlan([

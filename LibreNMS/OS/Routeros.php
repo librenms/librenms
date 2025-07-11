@@ -36,8 +36,6 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -51,6 +49,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
@@ -59,9 +59,9 @@ use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Routeros extends OS implements
-    BasicVlanDiscovery,
+    VlanDiscovery,
     OSPolling,
-    PortVlanDiscovery,
+    VlanPortDiscovery,
     QosDiscovery,
     QosPolling,
     TransceiverDiscovery,
@@ -675,9 +675,12 @@ class Routeros extends OS implements
         });
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
-        $vlans = new Collection;
+        $vlans = parent::discoverVlans(); // Q-BRIDGE-MIB
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
 
         $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
         $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
@@ -710,9 +713,12 @@ class Routeros extends OS implements
         return $vlans;
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $ports = new Collection;
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
 
         $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
         $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;

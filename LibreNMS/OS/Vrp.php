@@ -48,15 +48,15 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -78,8 +78,8 @@ class Vrp extends OS implements
     SlaPolling,
     TransceiverDiscovery,
     OSDiscovery,
-    BasicVlanDiscovery,
-    PortVlanDiscovery
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use SyncsModels;
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
@@ -708,8 +708,12 @@ class Vrp extends OS implements
         }
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         return SnmpQuery::enumStrings()->walk([
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
             //            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
@@ -724,13 +728,13 @@ class Vrp extends OS implements
         });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
-        if ($vlans->isEmpty()) {
-            return new Collection;
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
         }
 
-        $ports = new Collection;
         $maxVlanId = $vlans->max('vlan_vlan');
 
         $portsIndexes = SnmpQuery::walk('HUAWEI-L2IF-MIB::hwL2IfPortIfIndex')->pluck();

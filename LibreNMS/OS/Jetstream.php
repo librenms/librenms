@@ -34,15 +34,15 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, BasicVlanDiscovery, PortVlanDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -146,8 +146,12 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
         return $routes->filter();
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
             ->mapTable(function ($data, $vlan_id) {
                 return new Vlan([
@@ -158,9 +162,12 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
             });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $ret = new Collection;
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
 
         $vlanPortConfigTable = SnmpQuery::walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
         foreach ($vlanPortConfigTable as $ifIndex => $data) {
@@ -174,7 +181,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
                 $expand = $this->jetstreamExpand($data[$type] ?? []);
                 foreach ($expand as $key => $port) {
                     $ifIndex = $portConfig[$port] ?? 0;
-                    $ret->push(new PortVlan([
+                    $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'baseport' => $this->bridgePortFromIfIndex($ifIndex),
                         'untagged' => $tag,
@@ -184,7 +191,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Basi
             }
         }
 
-        return $ret;
+        return $ports;
     }
 
     private function jetstreamExpand($var): array

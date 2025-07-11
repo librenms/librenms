@@ -4,11 +4,11 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use Illuminate\Support\Collection;
 
-interface PortVlanDiscovery
+interface VlanPortDiscovery
 {
     /**
      * @param  Collection<\App\Models\Vlan>  $vlans
      * @return Collection<\App\Models\PortVlan>
      */
-    public function discoverPortVlanData(Collection $vlans): Collection;
+    public function discoverVlanPorts(Collection $vlans): Collection;
 }

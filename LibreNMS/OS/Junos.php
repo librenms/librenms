@@ -39,17 +39,17 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\BasicVlanDiscovery;
-use LibreNMS\Interfaces\Discovery\PortVlanDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, BasicVlanDiscovery, PortVlanDiscovery
+class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -390,8 +390,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         return [];
     }
 
-    public function discoverBasicVlanData(): Collection
+    public function discoverVlans(): Collection
     {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
         $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(function ($data, $vlanId) {
             return new Vlan([
                 'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
@@ -416,8 +420,12 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             });
     }
 
-    public function discoverPortVlanData(Collection $vlans): Collection
+    public function discoverVlanPorts(Collection $vlans): Collection
     {
+        if (($QBridgeMibPorts = parent::discoverVlanPorts($vlans))->isNotEmpty()) {
+            return $QBridgeMibPorts;
+        }
+
         // JUNIPER-VLAN-MIB
         $legacyPortData = SnmpQuery::walk('JUNIPER-VLAN-MIB::jnxExVlanPortGroupTable')->table(2);
         $legacyPorts = new Collection;
