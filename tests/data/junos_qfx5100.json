@@ -10782,56 +10782,56 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 23,
                     "vlan_domain": 1,
                     "vlan_name": "noc-mgmt",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "UNUSED",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3856,
                     "vlan_domain": 1,
                     "vlan_name": "vlan3856",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3884,
                     "vlan_domain": 1,
                     "vlan_name": "vlan3884",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4002,
                     "vlan_domain": 1,
                     "vlan_name": "vlan4002",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4004,
                     "vlan_domain": 1,
                     "vlan_name": "vlan4004",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4005,
                     "vlan_domain": 1,
                     "vlan_name": "vlan4005",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

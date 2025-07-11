@@ -2838,35 +2838,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 20",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 30",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 40",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 100",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

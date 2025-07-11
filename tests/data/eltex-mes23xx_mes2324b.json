@@ -15920,147 +15920,147 @@
                     "vlan_domain": 1,
                     "vlan_name": "guest@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "skupstina@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 19,
                     "vlan_domain": 1,
                     "vlan_name": "fin@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "sofka@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "jum@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "gradjevinska@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "kam@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "ler@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "mkr@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "lpa@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "mobile@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "pos@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "prn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "lan@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 255,
                     "vlan_domain": 1,
                     "vlan_name": "mgmn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1000,
                     "vlan_domain": 1,
                     "vlan_name": "srv@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1001,
                     "vlan_domain": 1,
                     "vlan_name": "docker@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2000,
                     "vlan_domain": 1,
                     "vlan_name": "pub@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2010,
                     "vlan_domain": 1,
                     "vlan_name": "route10@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2601,
                     "vlan_domain": 1,
                     "vlan_name": "tlk_mfin@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3200,
                     "vlan_domain": 1,
                     "vlan_name": "tlk_wan@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

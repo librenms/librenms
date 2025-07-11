@@ -12006,140 +12006,140 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0002",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0003",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "DC-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "1-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "2-A-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "DC-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "1-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "2-A-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "DC-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "1-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
                     "vlan_name": "2-B-Private",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "DC-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "1-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "2-B-Open",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 178,
                     "vlan_domain": 1,
                     "vlan_name": "LAN-Thuis",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "token-ring-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trnet-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

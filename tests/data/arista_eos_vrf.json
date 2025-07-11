@@ -7505,35 +7505,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "vlanname1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "vlanname2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 50,
                     "vlan_domain": 1,
                     "vlan_name": "Management",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 139,
                     "vlan_domain": 1,
                     "vlan_name": "vlanname3",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "MLAG-PO1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

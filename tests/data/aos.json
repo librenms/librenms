@@ -7074,35 +7074,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "CFP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 310,
                     "vlan_domain": 1,
                     "vlan_name": "Puertas",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 614,
                     "vlan_domain": 1,
                     "vlan_name": "APS-I1I2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "Gestion",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2065,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-NEXUS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

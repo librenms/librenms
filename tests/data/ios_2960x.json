@@ -30569,42 +30569,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0099",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "trcrf-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trbrf-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

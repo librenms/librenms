@@ -67989,602 +67989,602 @@
                     "vlan_domain": 1,
                     "vlan_name": "GESTION_V1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "Servers",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\D&D + PROD\\\\rox-lugoj-11",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "WB & NB\\\\PROD\\\\rox-lugoj-12 & 20",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
                     "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-13",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 8,
                     "vlan_domain": 1,
                     "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-14",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\PROD + AP\\\\rox-lugoj-15",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\LOGISTICS + PROD\\\\rox-lugoj-16",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\SMT\\\\rox-lugoj-17",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\AOI\\\\rox-lugoj-18",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 14,
                     "vlan_domain": 1,
                     "vlan_name": "NB\\\\PROD\\\\rox-lugoj-21",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 15,
                     "vlan_domain": 1,
                     "vlan_name": "NB\\\\PROD\\\\rox-lugoj-22",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 16,
                     "vlan_domain": 1,
                     "vlan_name": "NB3",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 17,
                     "vlan_domain": 1,
                     "vlan_name": "Data iTAC Injection",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "Prod Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "SISTEMAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 81,
                     "vlan_domain": 1,
                     "vlan_name": "ETSIAMN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "ASIC_CAU",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 102,
                     "vlan_domain": 1,
                     "vlan_name": "DCAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-10",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 104,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-11 & 23",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 106,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-12 & 19",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 107,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-13",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 108,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-14",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 109,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-15",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 110,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-16",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 116,
                     "vlan_domain": 1,
                     "vlan_name": "NB3-VoIP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 135,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Carbonell",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 148,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Gandia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 175,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS_CASA_ALUMNO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 190,
                     "vlan_domain": 1,
                     "vlan_name": "CONCESIONES",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "P2P SWITCHES",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 220,
                     "vlan_domain": 1,
                     "vlan_name": "Crosslink WAN Routers",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 223,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS_BIB",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 225,
                     "vlan_domain": 1,
                     "vlan_name": "RECTORADO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 233,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-Int_Hella",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 234,
                     "vlan_domain": 1,
                     "vlan_name": "SERVICIOS_CENTRO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 245,
                     "vlan_domain": 1,
                     "vlan_name": "OSAG PtP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 248,
                     "vlan_domain": 1,
                     "vlan_name": "WAN-Primary",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 249,
                     "vlan_domain": 1,
                     "vlan_name": "Firewall-LAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 252,
                     "vlan_domain": 1,
                     "vlan_name": "ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 301,
                     "vlan_domain": 1,
                     "vlan_name": "EXT-RECT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 310,
                     "vlan_domain": 1,
                     "vlan_name": "PUERTAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 317,
                     "vlan_domain": 1,
                     "vlan_name": "Barreras",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 318,
                     "vlan_domain": 1,
                     "vlan_name": "CTRL-REMOTO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 320,
                     "vlan_domain": 1,
                     "vlan_name": "ALARMAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 322,
                     "vlan_domain": 1,
                     "vlan_name": "CTRL-PERIMETRAL",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 324,
                     "vlan_domain": 1,
                     "vlan_name": "Segurvera",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 327,
                     "vlan_domain": 1,
                     "vlan_name": "GAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 328,
                     "vlan_domain": 1,
                     "vlan_name": "FICHAJE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 333,
                     "vlan_domain": 1,
                     "vlan_name": "VoIP-Phones",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 351,
                     "vlan_domain": 1,
                     "vlan_name": "GABM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 360,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-SIP_Provider",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 410,
                     "vlan_domain": 1,
                     "vlan_name": "ONO-SIG",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 420,
                     "vlan_domain": 1,
                     "vlan_name": "RTUPV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 444,
                     "vlan_domain": 1,
                     "vlan_name": "INCUBADORA",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 450,
                     "vlan_domain": 1,
                     "vlan_name": "Videoapuntes",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 451,
                     "vlan_domain": 1,
                     "vlan_name": "Apple_TV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 478,
                     "vlan_domain": 1,
                     "vlan_name": "TV_ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 600,
                     "vlan_domain": 1,
                     "vlan_name": "Firewall-DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 700,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Office",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 730,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Production",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 750,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Mobile",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 770,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 809,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 809",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 827,
                     "vlan_domain": 1,
                     "vlan_name": "BIB-PORT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 830,
                     "vlan_domain": 1,
                     "vlan_name": "GUIFINET_Valencia_2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 845,
                     "vlan_domain": 1,
                     "vlan_name": "VIDEOCONFERENCIAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 900,
                     "vlan_domain": 1,
                     "vlan_name": "Video_1_Gate",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 901,
                     "vlan_domain": 1,
                     "vlan_name": "Pruebas",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 990,
                     "vlan_domain": 1,
                     "vlan_name": "APS_CENTRO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 998,
                     "vlan_domain": 1,
                     "vlan_name": "ISP Ariesul Inet",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "GESTION",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1225,
                     "vlan_domain": 1,
                     "vlan_name": "Prueba_Telefonia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1234,
                     "vlan_domain": 1,
                     "vlan_name": "FWSIPSL",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2000,
                     "vlan_domain": 1,
                     "vlan_name": "OXE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2001,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-VERA",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2030,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-REC1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2043,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-SERCEN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2044,
                     "vlan_domain": 1,
                     "vlan_name": "TIP_ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2433,
                     "vlan_domain": 1,
                     "vlan_name": "KIOSCO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2450,
                     "vlan_domain": 1,
                     "vlan_name": "Transparent OSAG PtP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2480,
                     "vlan_domain": 1,
                     "vlan_name": "Transparent TSI MPLS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "VCM IPC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

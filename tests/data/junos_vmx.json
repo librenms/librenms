@@ -12933,14 +12933,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Backend",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Frontend",
                     "vlan_type": "",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         },

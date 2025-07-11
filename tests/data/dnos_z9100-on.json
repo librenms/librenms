@@ -15397,14 +15397,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 16,
                     "vlan_domain": 1,
                     "vlan_name": "MGM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

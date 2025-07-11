@@ -6850,21 +6850,21 @@
                     "vlan_domain": 1,
                     "vlan_name": "guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 254,
                     "vlan_domain": 1,
                     "vlan_name": "mgmn",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 518,
                     "vlan_domain": 1,
                     "vlan_name": "mcast",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

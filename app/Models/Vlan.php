@@ -14,7 +14,7 @@ class Vlan extends DeviceRelatedModel
         'vlan_domain',
         'vlan_name',
         'vlan_type',
-        'vlan_mtu',
+        'vlan_state',
     ];
 
     public function ports(): HasMany

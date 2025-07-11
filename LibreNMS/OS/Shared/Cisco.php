@@ -967,22 +967,21 @@ class Cisco extends OS implements
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
 
-        return SnmpQuery::enumStrings()->walk([
-            'CISCO-VTP-MIB::vtpVlanType',
-            'CISCO-VTP-MIB::vtpVlanName',
-        ])->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
-            if ($current_domain != $vtpdomain_id) {
-                $current_domain = $vtpdomain_id;
-                Log::info('VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomains[$vtpdomain_id]);
-            }
+        return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+                if ($current_domain != $vtpdomain_id) {
+                    $current_domain = $vtpdomain_id;
+                    Log::info('VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomains[$vtpdomain_id]);
+                }
 
-            return new Vlan([
-                'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan['CISCO-VTP-MIB::vtpVlanName'] ?? '',
-                'vlan_domain' => $vtpdomain_id,
-                'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
-            ]);
-        });
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_name' => $vlan['CISCO-VTP-MIB::vtpVlanName'] ?? '',
+                    'vlan_domain' => $vtpdomain_id,
+                    'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
+                    'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) &&  $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
+                ]);
+            });
     }
 
     public function discoverPortVlanData(Collection $vlans): Collection

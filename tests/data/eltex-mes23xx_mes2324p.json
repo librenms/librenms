@@ -16864,350 +16864,350 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 94",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 95,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 95",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 96,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 96",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 97,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 97",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 98",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 99",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 331,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 331",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 480,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 480",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 481,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 481",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3003,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3003",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3103,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3103",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3601,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3601",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3602,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3602",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3603,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3603",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3604,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3604",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3605,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3605",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3606,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3606",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3607,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3607",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3608,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3608",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3609,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3609",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3610,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3610",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3611,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3611",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3612,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3612",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3613,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3613",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3701,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3701",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3702,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3702",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3703,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3703",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3704,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3704",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3705,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3705",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3706,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3706",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3707,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3707",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3708,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3708",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3709,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3709",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3710,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3710",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3711,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3711",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3712,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3712",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3713,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3713",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3801,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3801",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3802,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3802",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3803,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3803",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3804,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3804",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3805,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3805",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3806,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3806",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3807,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3807",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3808,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3808",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3809,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3809",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3810,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3810",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3811,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3811",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3812,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3812",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3813,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3813",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

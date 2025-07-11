@@ -25,7 +25,7 @@
                             <th data-column-id="name">{{ __('Local Name') }}</th>
                             <th data-column-id="domain" data-visible="false">{{ __('Domain') }}</th>
                             <th data-column-id="type">{{ __('Type') }}</th>
-                            <th data-column-id="mtu">{{ __('MTU') }}</th>
+                            <th data-column-id="state" data-formatter="boolean">{{ __('State') }}</th>
                         </tr>
                         </thead>
                     </table>

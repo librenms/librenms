@@ -12956,35 +12956,35 @@
                     "vlan_domain": 3,
                     "vlan_name": "default",
                     "vlan_type": "static",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 5,
                     "vlan_name": "servers",
                     "vlan_type": "static",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 6,
                     "vlan_name": "voip",
                     "vlan_type": "static",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 4,
                     "vlan_name": "lan",
                     "vlan_type": "static",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 112,
                     "vlan_domain": 2,
                     "vlan_name": "colo",
                     "vlan_type": "static",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

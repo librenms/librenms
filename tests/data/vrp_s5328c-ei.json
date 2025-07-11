@@ -6217,210 +6217,210 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0001",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-1",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 34,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-2",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-3",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 36,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-4",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 37,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-5",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 38,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-6",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-7",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-8",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-9",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-10",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 43,
                     "vlan_domain": 1,
                     "vlan_name": "dmz-11",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 44,
                     "vlan_domain": 1,
                     "vlan_name": "DTV",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 50,
                     "vlan_domain": 1,
                     "vlan_name": "SAN",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 60,
                     "vlan_domain": 1,
                     "vlan_name": "blade_management",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 61,
                     "vlan_domain": 1,
                     "vlan_name": "esxi_management_1",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 62,
                     "vlan_domain": 1,
                     "vlan_name": "esxi_management_2",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 74,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 74",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 76,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 76",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 77,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 77",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 100",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 171,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 171",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 200",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 202,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 202",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 215,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 215",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 255,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 255",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 530,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 530",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 548,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 548",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 587,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 587",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2941,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 2941",
                     "vlan_type": "commonVlan",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

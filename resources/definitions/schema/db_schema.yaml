@@ -2462,7 +2462,7 @@ vlans:
     - { Field: vlan_domain, Type: int, 'Null': true, Extra: '' }
     - { Field: vlan_name, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: vlan_type, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: vlan_mtu, Type: int, 'Null': true, Extra: '' }
+    - { Field: vlan_state, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [vlan_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id, vlan_vlan], Unique: false, Type: BTREE }
