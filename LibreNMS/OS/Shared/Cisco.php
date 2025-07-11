@@ -1014,15 +1014,15 @@ class Cisco extends OS implements
             $vlan_id = (int) $vlan->vlan_vlan;
 
             // Ignore reserved VLAN IDs
-            if ($vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
                 $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
                     ->walk([
-                        'BRIDGE-MIB::dot1dStpPortPriority',
                         'BRIDGE-MIB::dot1dStpPortState',
-                        'BRIDGE-MIB::dot1dStpPortPathCost',
+                        'BRIDGE-MIB::dot1dStpPortPriority',
                         'BRIDGE-MIB::dot1dBasePortIfIndex',
+                        'BRIDGE-MIB::dot1dStpPortPathCost',
                     ])->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
