@@ -2232,6 +2232,9 @@
             "type": "boolean"
         },
         "enable_ports_etherlike": {
+            "group": "webui",
+            "section": "device",
+            "order": 23,
             "default": false,
             "type": "boolean"
         },
@@ -6141,11 +6144,25 @@
         "ports_page_default": {
             "default": "details",
             "type": "select",
+            "group": "webui",
+            "section": "device",
+            "order": 21,
             "options":{
                 "basic": "Basic",
                 "details": "Details",
                 "arp": "ARP",
                 "fdb": "FDB"
+            }
+        },
+        "ports_ipv4_neighbours": {
+            "default": "subnet",
+            "type": "select",
+            "group": "webui",
+            "section": "device",
+            "order": 22,
+            "options":{
+                "subnet": "Subnet",
+                "arp": "ARP"
             }
         },
         "ports_purge": {
