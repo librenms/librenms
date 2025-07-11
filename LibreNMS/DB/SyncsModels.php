@@ -78,8 +78,11 @@ trait SyncsModels
             $parentModel->$relationship()->saveMany($new);
         }
 
+        // get the saved model list and set it to the relation unless we were given an existing list as this is likely filtered
         $savedModels = $existing->map->first()->merge($new);
-        $parentModel->setRelation($relationship, $savedModels);
+        if (! $existing) {
+            $parentModel->setRelation($relationship, $savedModels);
+        }
 
         return $savedModels;
     }
