@@ -404,12 +404,12 @@ class OS implements
      */
     public function discoverVlans(): Collection
     {
-        $vlans = $this->discoverIeeeQBridgeMibVlans();
+        $vlans = $this->discoverIetfQBridgeMibVlans();
         if ($vlans->isNotEmpty()) {
             return $vlans;
         }
 
-        return $this->discoverIetfQBridgeMibVlans();
+        return $this->discoverIeeeQBridgeMibVlans();
     }
 
     /**
@@ -417,11 +417,11 @@ class OS implements
      */
     public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $vlans = $this->discoverIeeeQBridgeMibPorts();
+        $vlans = $this->discoverIetfQBridgeMibPorts();
         if ($vlans->isNotEmpty()) {
             return $vlans;
         }
 
-        return $this->discoverIetfQBridgeMibPorts();
+        return $this->discoverIeeeQBridgeMibPorts();
     }
 }
