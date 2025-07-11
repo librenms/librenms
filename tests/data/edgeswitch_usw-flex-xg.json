@@ -3305,7 +3305,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "<private>",
-                    "remote_port": "<private>",
+                    "remote_port": "<private> (10da43da3c41)",
                     "remote_platform": null,
                     "remote_version": "<private>",
                     "ifAlias": "<private>",
