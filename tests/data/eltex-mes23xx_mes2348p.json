@@ -16851,7 +16851,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "Zapad",
-                    "remote_port": "eth0/0/3 ()",
+                    "remote_port": "eth0/0/3",
                     "remote_platform": null,
                     "remote_version": "Bosch Communication Systems,IPX_TGX,OMNEO7.01.8012 P0.0.0",
                     "ifAlias": "xxx",
