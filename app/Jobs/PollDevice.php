@@ -207,12 +207,12 @@ class PollDevice implements ShouldQueue
     private function printDeviceInfo(?string $group): void
     {
         Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
+Hostname:  %s %s %s
 ID:        %s
 OS:        %s
 IP:        %s
 
-EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+EOH, $this->device->hostname, $group ? "($group)" : '', $this->device->status ? '' : '%RDOWN%n', $this->device->device_id, $this->device->os, $this->device->ip), ['color' => true]);
     }
 
     private function recordPerformance(Measurement $measurement): void
