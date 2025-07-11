@@ -975,7 +975,7 @@ class Cisco extends OS implements
             ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
-                    Log::info('VTP Domain ' . $vtpdomain_id . ' ' . $vtpdomains[$vtpdomain_id]);
+                    Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
                 }
 
                 return new Vlan([
