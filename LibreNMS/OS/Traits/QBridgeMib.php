@@ -36,7 +36,6 @@ use SnmpQuery;
 
 trait QBridgeMib
 {
-
     private function discoverIetfQBridgeMibVlans(): Collection
     {
         return SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
