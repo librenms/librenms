@@ -175,3 +175,9 @@ jobs:
         name: Dump context
         if: always()
         uses: crazy-max/ghaction-dump-context@v1
+      -
+        name: Upload PHPUnit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-report
+          path: .phpunit.report.xml
