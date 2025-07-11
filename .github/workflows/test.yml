@@ -14,7 +14,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
@@ -65,7 +64,6 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: composer,php-cs-fixer
           coverage: none
-          ini-values: max_execution_time=10800
       -
         name: Get composer cache directory
         id: composer-cache
