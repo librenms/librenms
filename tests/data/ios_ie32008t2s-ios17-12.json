@@ -3809,28 +3809,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "client-thinclient",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "netw-mgmt-prd",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "PLC",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 888,
                     "vlan_domain": 1,
                     "vlan_name": "dummy",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1002,

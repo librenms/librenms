@@ -5754,7 +5754,8 @@
                     "untagged": 1
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports-stack": {
         "discovery": {

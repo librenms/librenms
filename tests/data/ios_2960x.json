@@ -30576,35 +30576,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0099",
                     "vlan_type": "ethernet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "trcrf-default",
                     "vlan_type": "tokenRing",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trbrf-default",
                     "vlan_type": "trNet",
-                    "vlan_state": 1
+                    "vlan_state": 0
                 }
             ],
             "ports_vlans": [
