@@ -20,7 +20,9 @@
  * @see https://laravel.com/docs/eloquent
  */
 
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Event;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Laravel;
 
@@ -247,10 +249,17 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = [])
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
+        $startTime = microtime(true);
+        $connection = DB::connection();
 
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $all = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $all;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
@@ -268,9 +277,15 @@ function dbFetchRows($sql, $parameters = [])
 function dbFetchRow($sql = null, $parameters = []): ?array
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
         $row = $query->fetch(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
 
         return $row === false ? null : $row;
     } catch (PDOException $pdoe) {
@@ -289,9 +304,15 @@ function dbFetchRow($sql = null, $parameters = []): ?array
 function dbFetchCell($sql, $parameters = [])
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
         $value = $query->fetchColumn();
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
 
         return $value === false ? null : $value;
     } catch (PDOException $pdoe) {
@@ -311,10 +332,17 @@ function dbFetchCell($sql, $parameters = [])
 function dbFetchColumn($sql, $parameters = [])
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
+        $startTime = microtime(true);
+        $connection = DB::connection();
 
-        return $query->fetchAll(PDO::FETCH_COLUMN, 0);
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $column = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $column;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
