@@ -67,7 +67,6 @@ class Version
     {
         $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
         if (preg_match($regex, $this->git->tag(), $matches)) {
-
             // guess the next version
             $year = (int) $matches['year'];
             $month = (int) $matches['month'] + 1;
