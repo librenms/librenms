@@ -11883,42 +11883,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "x-connect_INFRASTRUCTURE_Net",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 120,
                     "vlan_domain": 1,
                     "vlan_name": "x-connect_PPPOE_Net",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 121,
                     "vlan_domain": 1,
                     "vlan_name": "x-connect_PPPOE_Net_fixed_IP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 122,
                     "vlan_domain": 1,
                     "vlan_name": "Vorleistungspartner1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 130,
                     "vlan_domain": 1,
                     "vlan_name": "x-connect_PPPOE_priorisiert",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2013,
                     "vlan_domain": 1,
                     "vlan_name": "Mgmt_Access_2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

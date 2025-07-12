@@ -79,7 +79,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this; // ignore, always cached
     }
 
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
         $this->context = $context;
 

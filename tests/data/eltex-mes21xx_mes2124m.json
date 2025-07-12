@@ -6846,32 +6846,25 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 254,
                     "vlan_domain": 1,
                     "vlan_name": "mgmn",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 518,
                     "vlan_domain": 1,
                     "vlan_name": "mcast",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -7060,14 +7053,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 2,
                     "baseport": 49,
                     "priority": 0,
@@ -7078,14 +7063,6 @@
                 {
                     "vlan": 2,
                     "baseport": 63,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 2,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -7106,14 +7083,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 254,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 518,
@@ -7150,14 +7119,6 @@
                 {
                     "vlan": 518,
                     "baseport": 72,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 518,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,

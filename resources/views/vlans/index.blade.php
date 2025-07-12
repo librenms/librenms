@@ -25,7 +25,7 @@
                             <th data-column-id="name">{{ __('Local Name') }}</th>
                             <th data-column-id="domain" data-visible="false">{{ __('Domain') }}</th>
                             <th data-column-id="type">{{ __('Type') }}</th>
-                            <th data-column-id="mtu">{{ __('MTU') }}</th>
+                            <th data-column-id="state" data-formatter="state">{{ __('State') }}</th>
                         </tr>
                         </thead>
                     </table>
@@ -63,7 +63,17 @@
             post: function () {
                 return {vlan: vlan_id}
             },
-            url: "{{ route('table.vlan-devices') }}"
+            url: "{{ route('table.vlan-devices') }}",
+            formatters: {
+                state: function(column, row) {
+                    console.log(column, row);
+                    const isOperational = row[column.id];
+                    const statusText = isOperational ? "operational" : "suspended";
+                    const cssClass = isOperational ? "text-success" : "text-danger";
+
+                    return `<span class="${cssClass}">${statusText}</span>`;
+                }
+            }
         });
 
         $('#vlan-select').on('change', function () {

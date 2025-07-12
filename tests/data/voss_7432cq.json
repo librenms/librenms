@@ -8309,28 +8309,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 706,
                     "vlan_domain": 1,
                     "vlan_name": "vist",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4051,
                     "vlan_domain": 1,
                     "vlan_name": "pri-bvlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4052,
                     "vlan_domain": 1,
                     "vlan_name": "sec-bvlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

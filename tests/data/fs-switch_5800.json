@@ -4883,21 +4883,21 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 797,
                     "vlan_domain": 1,
                     "vlan_name": "INT-Link-VXO-MLM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 800,
                     "vlan_domain": 1,
                     "vlan_name": "Link-VXO-MLM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }

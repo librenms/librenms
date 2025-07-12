@@ -46668,49 +46668,49 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0001",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 27,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0027",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0100",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 500,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0500",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 501,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0501",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 505,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0505",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1000,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1000",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

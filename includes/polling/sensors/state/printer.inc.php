@@ -16,7 +16,7 @@ if ($device['os_group'] == 'printer') {
             ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning, multiple issues'],
             ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'],
         ];
-        $bit_flags = q_bridge_bits2indices($sensor_value);
+        $bit_flags = \LibreNMS\Util\StringHelpers::bitsToIndices($sensor_value);
         $is_critical = false;
         if (count($bit_flags) == 0) {
             $sensor_value = 0;

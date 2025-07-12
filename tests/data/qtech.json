@@ -5856,35 +5856,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "default.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "Network.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 28,
                     "vlan_domain": 1,
                     "vlan_name": "Int..",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 29,
                     "vlan_domain": 1,
                     "vlan_name": "Int.2.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "Int.3.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

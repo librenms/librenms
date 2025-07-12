@@ -6703,7 +6703,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }

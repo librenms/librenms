@@ -56,7 +56,7 @@ interface SnmpQueryInterface
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SnmpQueryInterface;
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface;
 
     /**
      * Set an additional MIB directory to search for MIBs.

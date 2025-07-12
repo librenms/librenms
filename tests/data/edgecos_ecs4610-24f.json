@@ -15883,371 +15883,371 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 199,
                     "vlan_domain": 1,
                     "vlan_name": "Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 251,
                     "vlan_domain": 1,
                     "vlan_name": "SWControl",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1503,
                     "vlan_domain": 1,
                     "vlan_name": "zd-cementnikiv12-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1504,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1504",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1505,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1505",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1506,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska2a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1507,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1507",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1508,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1508",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1509,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1509",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1510,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska2-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1511,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1511",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1512,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska4-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1513,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1513",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1514,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska6-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1515,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1515",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1516,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska8-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1517,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1517",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1518,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska10-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1519,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1519",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1520,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska12-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1521,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1521",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1522,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1523,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1523",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1524,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska18a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1525,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1525",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1526,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska18a-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1527,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1527",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1528,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska1-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1529,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1529",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1530,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska3-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1531,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1531",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1532,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska3-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1533,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1533",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1534,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska9-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1535,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1535",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1536,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1536",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1537,
                     "vlan_domain": 1,
                     "vlan_name": "zd-cementnikiv12a-1-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1538,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1538",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1539,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1539",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1540,
                     "vlan_domain": 1,
                     "vlan_name": "zd-festivalna2-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1541,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1541",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1542,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1542",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1543,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1543",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1544,
                     "vlan_domain": 1,
                     "vlan_name": "zd-kotlarevskogo2-3-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1545,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1545",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1546,
                     "vlan_domain": 1,
                     "vlan_name": "zavodska3-4-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1547,
                     "vlan_domain": 1,
                     "vlan_name": "zavodska3-4-2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1548,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-1-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1549,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1550,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1550",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1551,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-4-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1552,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

@@ -8304,28 +8304,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 89,
                     "vlan_domain": 1,
                     "vlan_name": "ITV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 200",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -8404,14 +8404,6 @@
                 {
                     "vlan": 1,
                     "baseport": 10,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 25,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -8578,14 +8570,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 89,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 99,
                     "baseport": 1,
                     "priority": 0,
@@ -8730,14 +8714,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 99,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 200,
                     "baseport": 1,
                     "priority": 0,
@@ -8816,14 +8792,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 200,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
