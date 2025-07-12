@@ -322,9 +322,9 @@
                 {
                     "vlan": 1,
                     "baseport": 1,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "cost": 4,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
                     "untagged": 1
                 }
             ]
