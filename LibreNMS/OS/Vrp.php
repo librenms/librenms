@@ -710,13 +710,9 @@ class Vrp extends OS implements
 
     public function discoverVlans(): Collection
     {
-        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
-            return $QBridgeMibVlans;
-        }
-
-        return SnmpQuery::enumStrings()->walk([
+        $vlansData = SnmpQuery::enumStrings()->walk([
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
-            //            'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
+            // 'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
         ])->mapTable(function ($vlanArray, $vlanId) {
             return new Vlan([
@@ -726,6 +722,12 @@ class Vrp extends OS implements
                 'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
             ]);
         });
+
+        if ($vlansData->isEmpty()) { // try standard QBridge Vlan data
+            $vlansData = parent::discoverVlans();
+        }
+
+        return $vlansData;
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
