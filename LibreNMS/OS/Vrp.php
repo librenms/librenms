@@ -732,10 +732,7 @@ class Vrp extends OS implements
 
     public function discoverVlanPorts(Collection $vlans): Collection
     {
-        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
-        if ($ports->isNotEmpty()) {
-            return $ports;
-        }
+        $ports = new Collection;
 
         $maxVlanId = $vlans->max('vlan_vlan');
 
@@ -783,6 +780,10 @@ class Vrp extends OS implements
                     'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]));
             }
+        }
+
+        if ($ports->isEmpty()) { // try standard Q-BRIDGE-MIB
+            $ports = parent::discoverVlanPorts($vlans);
         }
 
         return $ports;
