@@ -8,7 +8,7 @@ if (! empty($agent_data['app'][$name])) {
     $nginx = $agent_data['app'][$name];
 } else {
     // Polls nginx statistics from script via SNMP
-    $oid =  '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120';
     $nginx = SnmpQuery::get($oid)->value();
 }
 $nginx_data = array_map('rtrim', explode("\n", trim($nginx, '"')));
