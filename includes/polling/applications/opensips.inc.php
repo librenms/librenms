@@ -11,7 +11,7 @@ if (! empty($agent_data[$name])) {
     $mib = 'NET-SNMP-EXTEND-MIB';
 
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.111.112.101.110.115.105.112.115';
-    $rawdata = snmp_get($device, $oid, $options, $mib);
+    $rawdata = SnmpQuery::get($oid)->value();
 }
 
 // Format Data
