@@ -144,14 +144,49 @@ users won't be removed.
     lnms config:set auth_ad_debug false
     lnms config:set active_directory.users_purge 30
     lnms config:set auth_ad_require_groupmembership true
-    lnms config:set auth_ad_groups.ad-admingroup.roles ["admin"]
-    lnms config:set auth_ad_groups.ad-usergroup.roles ["global-read"]
+    lnms config:set auth_ad_groups.ad-admingroup.roles '["admin"]'
+    lnms config:set auth_ad_groups.ad-usergroup.roles '["global-read"]'
     ```
 
-Replace `ad-admingroup` with your Active Directory admin-user group
-and `ad-usergroup` with your standard user group. It is __highly
-suggested__ to create a bind user, otherwise "remember me", alerting
-users, and the API will not work.
+It is __highly suggested__ to create a bind user, otherwise "remember me",
+alerting users, and the API will not work.
+
+#### Group Naming
+
+From the sample config, replace `ad-admingroup` with your Active Directory
+admin-user group and `ad-usergroup` with your standard user group. Multi
+groups can be individually assigned to the 'admin', 'global-read' and 'user'
+roles.
+
+To use groups with long names or special characters, enclose in single
+quotes and escape special characters such as brackets, for example:
+
+```bash
+lnms config:set auth_ad_groups.'LibreNMS User Group \(Global Read\)'.roles '["global-read"]'
+```
+
+The above will display via config:get as follows:
+
+```bash
+~$ lnms config:get auth_ad_groups
+}
+    "LibreNMS User Group \\(Global Read\\)": {
+        "roles": [
+            "global-read"
+        ]
+    }
+}
+```
+
+Individual groups entries can be removed by using just their name with no
+futher options for example:
+
+```bash
+~$ lnms config:set auth_ad_groups.'LibreNMS User Group \(Global Read\)'
+
+ Forget LibreNMS User Group \(Global Read\) from auth_ad_groups? (yes/no) [no]:
+ > yes
+```
 
 ### Active Directory redundancy
 
