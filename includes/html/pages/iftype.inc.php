@@ -4,10 +4,7 @@
 $types_array = explode(',', strip_tags($vars['type']));
 $ports = get_ports_from_type($types_array);
 
-foreach ($ports as $port) {
-    $if_list[] = $port['port_id'];
-}
-$if_list = implode(',', $if_list);
+$if_list = implode(',', array_map(fn ($port) => $port['port_id'], $ports));
 
 // show title from config file (but ucwords it)
 $ctypes = collect(\App\Facades\LibrenmsConfig::get('custom_descr', []))->keyBy(function ($descr) {

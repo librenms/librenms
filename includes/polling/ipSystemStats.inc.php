@@ -102,7 +102,7 @@ if ($data) {
         foreach ($oids as $oid) {
             $oid_ds = str_replace('ipSystemStats', '', $oid);
             $rrd_def->addDataset($oid_ds, 'COUNTER');
-            if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
+            if (! isset($stats[$oid]) || (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's'))) {
                 $stats[$oid] = '0';
             }
             $fields[$oid_ds] = $stats[$oid];

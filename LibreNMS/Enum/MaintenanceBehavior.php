@@ -1,7 +1,9 @@
 <?php
 
-/**
- * DanthermOs.php
+/*
+ * MaintenanceAlertBehavior.php
+ *
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +16,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
+ * @package    LibreNMS
  * @link       https://www.librenms.org
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\Enum;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-
-class DanthermOs extends \LibreNMS\OS implements OSDiscovery
+enum MaintenanceBehavior: int
 {
-    public function discoverOS(Device $device): void
-    {
-        parent::discoverOS($device); // yaml
-
-        $device->sysName = \SnmpQuery::get('DANTHERM-COOLING-MIB::hostName.0')->value() ?: $device->sysName;
-    }
+    case SKIP_ALERTS = 1;
+    case MUTE_ALERTS = 2;
+    case RUN_ALERTS = 3;
 }

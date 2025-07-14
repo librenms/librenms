@@ -19,9 +19,9 @@ class Logo extends Component
         ?string $image = null,
         public ?string $text = null,
     ) {
-        $this->image ??= (string) LibrenmsConfig::get('title_image');
+        $this->image = $image ?? (string) LibrenmsConfig::get('title_image');
         $this->text ??= LibrenmsConfig::get('project_name');
-        $this->is_svg = str_ends_with($image, '.svg') && ! str_contains($image, '//');
+        $this->is_svg = str_ends_with($this->image, '.svg') && ! str_contains($this->image, '//');
 
         [$this->logo_hide_class, $this->logo_show_class] = match ($this->responsive) {
             'sm' => ['tw:sm:hidden', 'tw:sm:inline-block'],

@@ -1,9 +1,9 @@
 <?php
 
-/**
- * Siteboss.php
+/*
+ * IbmImm.php
  *
- * Asentria Siteboss
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
+ * @package    LibreNMS
  * @link       https://www.librenms.org
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\OS;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use SnmpQuery;
 
-class Siteboss extends OS
+class IbmImm extends \LibreNMS\OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->sysName = snmp_get($this->getDeviceArray(), 'siteName.0', '-Osqnv', 'SITEBOSS-530-STD-MIB');
+
+        $device->features = implode(' ', SnmpQuery::walk('IMM-MIB::immVpdType')->pluck());
     }
 }

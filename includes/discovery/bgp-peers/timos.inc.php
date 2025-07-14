@@ -46,7 +46,7 @@ if ($device['os'] == 'timos') {
         $map_vrf['byOid'][$vrf['vrf_oid']]['vrf_id'] = $vrf['vrf_id'];
     }
 
-    foreach ($bgpPeers as $vrfOid => $vrf) {
+    foreach ($bgpPeers ?? [] as $vrfOid => $vrf) {
         $vrfId = $map_vrf['byOid'][$vrfOid]['vrf_id'] ?? null;
 
         d_echo($vrfId);
@@ -95,7 +95,7 @@ if ($device['os'] == 'timos') {
     }
 
     // clean up peers
-    if (! is_null($seenPeerID)) {
+    if (isset($seenPeerID) && ! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }
