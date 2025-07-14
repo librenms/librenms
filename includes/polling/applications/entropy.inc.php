@@ -3,14 +3,12 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'entropy';
-$options = '-Oqv';
-$mib = 'NET-SNMP-EXTEND-MIB';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.101.110.116.114.111.112.121.1';
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()->addDataset('entropy', 'GAUGE', 0);
 
-$entropy_avail = snmp_get($device, $oid, $options, $mib);
+$entropy_avail = SnmpQuery::get($oid)->value();
 
 $fields = ['entropy' => $entropy_avail];
 
