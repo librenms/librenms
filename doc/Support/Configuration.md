@@ -141,7 +141,7 @@ lnms config:get snmp.community | jq -c
 ["public","testing"]
 ```
 
-Alernatively, if leaving multi-line items exactly as returned by `lnms config:get` for easier reading, you can use the following format:
+Alternatively, if leaving multi-line items exactly as returned by `lnms config:get` for easier reading, you can use the following format:
 ```bash
 lnms config:set snmp.community \
 '

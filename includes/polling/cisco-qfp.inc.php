@@ -31,8 +31,9 @@ $options = [
 ];
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], $options);
-$components = $components[$device['device_id']];
+if ($components = $component->getComponents($device['device_id'], $options)) {
+    $components = $components[$device['device_id']];
+}
 
 /*
  * SNMP makes available multiple datapoints dependnet on the time interval
