@@ -1,6 +1,6 @@
 <?php
 
-$oids = SnmpQuery($device, 'sysChassisFanSpeed', '-OsqU', 'F5-BIGIP-SYSTEM-MIB');
+$oids = snmp_walk($device, 'sysChassisFanSpeed', '-OsqU', 'F5-BIGIP-SYSTEM-MIB');
 
 if ($oids) {
     d_echo($oids . "\n");
