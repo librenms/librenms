@@ -144,33 +144,47 @@ users won't be removed.
     lnms config:set auth_ad_debug false
     lnms config:set active_directory.users_purge 30
     lnms config:set auth_ad_require_groupmembership true
-    lnms config:set auth_ad_groups.ad-admingroup.roles '["admin"]'
-    lnms config:set auth_ad_groups.ad-usergroup.roles '["global-read"]'
+    lnms config:set auth_ad_groups.ad-admingroup-cn.roles '["admin"]'
+    lnms config:set auth_ad_groups.ad-usergroup-cn.roles '["global-read"]'
     ```
 
 It is __highly suggested__ to create a bind user, otherwise "remember me",
 alerting users, and the API will not work.
 
-#### Group Naming
+### Groups Configuration
 
-From the sample config, replace `ad-admingroup` with your Active Directory
-admin-user group and `ad-usergroup` with your standard user group. Multi
-groups can be individually assigned to the 'admin', 'global-read' and 'user'
+Groups are referenced using their Common Name (CN). From the sample
+config, replace `ad-admingroup-cn` with your Active Directory CN
+and `ad-usergroup-cn` with your standard user group CN. Multi groups
+can be individually assigned to the 'admin', 'global-read' and 'user'
 roles.
 
-To use groups with long names or special characters, enclose in single
-quotes and escape special characters such as brackets, for example:
+To enter group CNs with spaces or special characters on the CLI, single
+quote the name to prevent the shell interpreting it as extra arguments.
+
+Special characters such as brackets need literal escaping `\` to be
+processed correctly by the Authentication code. On the CLI, enclose in
+single quotes to preserve the escaping. For example:
 
 ```bash
-lnms config:set auth_ad_groups.'LibreNMS User Group \(Global Read\)'.roles '["global-read"]'
+lnms config:set auth_ad_groups.'LibreNMS User Group with Spaces'.roles '["global-read"]'
+lnms config:set auth_ad_groups.'LibreNMS User Group \(with Brackets\)'.roles '["global-read"]'
 ```
+
+In the WebUI these are entered literally without the single quotes:
+`LibreNMS User Group with Spaces` and `LibreNMS User Group \(with Brackets\)`
 
 The above will display via config:get as follows:
 
 ```bash
 ~$ lnms config:get auth_ad_groups
 }
-    "LibreNMS User Group \\(Global Read\\)": {
+    "LibreNMS User Group with Spaces": {
+        "roles": [
+            "global-read"
+        ]
+    }
+    "LibreNMS User Group \\(with Brackets\\)": {
         "roles": [
             "global-read"
         ]
@@ -179,12 +193,12 @@ The above will display via config:get as follows:
 ```
 
 Individual groups entries can be removed by using just their name with no
-futher options for example:
+further options for example:
 
 ```bash
-~$ lnms config:set auth_ad_groups.'LibreNMS User Group \(Global Read\)'
+~$ lnms config:set auth_ad_groups.'LibreNMS User Group \(with Brackets\)'
 
- Forget LibreNMS User Group \(Global Read\) from auth_ad_groups? (yes/no) [no]:
+ Forget LibreNMS User Group \(with Brackets\) from auth_ad_groups? (yes/no) [no]:
  > yes
 ```
 
