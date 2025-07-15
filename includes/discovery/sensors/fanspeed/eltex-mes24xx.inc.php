@@ -1,6 +1,6 @@
 <?php
 
-$tmp_eltex = snmp_walk($device, 'eltMesIssEnvFanTable eltMesIssEnvFanEntry eltMesIssEnvFanSpeed eltMesIssEnvFanSpeedLevel eltMesIssEnvFanThresholdTable eltMesIssEnvFanThresholdEntry eltMesIssEnvFanThresholdLevel eltMesIssEnvFanThresholdMin eltMesIssEnvFanThresholdMax', '-OUQn', 'ELTEX-MES-ISS-ENV-MIB');
+$tmp_eltex = SnmpQuery($device, 'eltMesIssEnvFanTable eltMesIssEnvFanEntry eltMesIssEnvFanSpeed eltMesIssEnvFanSpeedLevel eltMesIssEnvFanThresholdTable eltMesIssEnvFanThresholdEntry eltMesIssEnvFanThresholdLevel eltMesIssEnvFanThresholdMin eltMesIssEnvFanThresholdMax', '-OUQn', 'ELTEX-MES-ISS-ENV-MIB');
 
 $min_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.139.12.1.5.2.1.2.1.1'] ?? null;
 $max_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.139.12.1.5.2.1.2.1.4'] ?? null;
