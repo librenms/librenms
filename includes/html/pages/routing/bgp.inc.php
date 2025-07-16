@@ -309,7 +309,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
         unset($sep);
         foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
-            if ( !isset($afisafi['afi']) || !isset($afisafi['safi'])) {
+            if ( ! isset($afisafi['afi']) || ! isset($afisafi['safi'])) {
                 continue;
             }
             $afi = $afisafi['afi'];
@@ -321,7 +321,7 @@ if (! Auth::user()->hasGlobalRead()) {
             // Build a list of valid AFI/SAFI for this peer
 
         }
-        if (!isset($peer['afi'])){
+        if (! isset($peer['afi'])){
             $peer['afi'] = '';
         }
         unset($sep);
