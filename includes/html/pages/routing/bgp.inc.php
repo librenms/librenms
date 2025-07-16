@@ -319,7 +319,6 @@ if (! Auth::user()->hasGlobalRead()) {
             $sep = '<br />';
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
-
         }
         if (! isset($peer['afi'])) {
             $peer['afi'] = '';
