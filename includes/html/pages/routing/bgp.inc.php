@@ -309,6 +309,9 @@ if (! Auth::user()->hasGlobalRead()) {
 
         unset($sep);
         foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
+            if ( !isset($afisafi['afi']) || !isset($afisafi['safi'])) {
+                continue;
+            }
             $afi = $afisafi['afi'];
             $safi = $afisafi['safi'];
             $this_afisafi = $afi . $safi;
@@ -316,8 +319,11 @@ if (! Auth::user()->hasGlobalRead()) {
             $sep = '<br />';
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
-        }
 
+        }
+        if (!isset($peer['afi'])){
+            $peer['afi'] = '';
+        }
         unset($sep);
 
         echo '  <td></td>
@@ -325,7 +331,7 @@ if (! Auth::user()->hasGlobalRead()) {
             <td width=30><b>&#187;</b></td>
             <td width=150>' . $peeraddresslink . '<br />' . Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
-            <td width=50>" . $peer['afi'] ?? '' . '</td>
+            <td width=50>" . $peer['afi'] . '</td>
             <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
             <td>' . $peer['bgpPeerDescr'] . "</td>
             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "</span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
