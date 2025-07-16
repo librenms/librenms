@@ -10,7 +10,7 @@
                     "version": "TSW2_R_00.01.02.2",
                     "hardware": "TSW21200XXXX",
                     "features": null,
-                    "location": "location[72.682576,34.574544]",
+                    "location": "location [72.682576, 34.574544]",
                     "os": "witchos",
                     "type": "network",
                     "serial": "6001244780",
