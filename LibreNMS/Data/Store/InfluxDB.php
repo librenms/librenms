@@ -79,7 +79,6 @@ class InfluxDB extends BaseDatastore
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
-
         // Check if this measurement is enabled
         if (! empty($this->measurements) && ! in_array($measurement, $this->measurements)) {
             return;
@@ -117,7 +116,6 @@ class InfluxDB extends BaseDatastore
         ]);
 
         try {
-
             // Add timestamp to points if batch size is > 0
             $timestamp = null;
             if ($this->batchSize > 0) {
