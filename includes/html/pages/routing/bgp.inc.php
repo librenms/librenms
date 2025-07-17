@@ -309,7 +309,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
         $sep = '';
         $peer['afi'] = '';
-        foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
+        foreach (dbFetchRows("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ? AND (afi != '' AND safi != '')", [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
             $afi = $afisafi['afi'] ?? '';
             $safi = $afisafi['safi'] ?? '';
             $this_afisafi = $afi . $safi;
