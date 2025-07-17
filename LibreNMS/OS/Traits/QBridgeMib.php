@@ -103,11 +103,22 @@ trait QBridgeMib
             $egress_ids = StringHelpers::bitsToIndices($all);
 
             foreach ($egress_ids as $baseport) {
+                $ifIndex = $this->ifIndexFromBridgePort($baseport);
+                if ($ifIndex === 0) {
+                    // debug statements intentionally omitted due to possible high vlan/port counts
+                    continue;
+                }
+
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+                if ($port_id === null) {
+                    continue;
+                }
+
                 $ports->push(new PortVlan([
                     'vlan' => $vlan_id,
                     'baseport' => $baseport,
                     'untagged' => in_array($baseport, $untagged_ids) ? 1 : 0,
-                    'port_id' => PortCache::getIdFromIfIndex($this->ifIndexFromBridgePort($baseport), $this->getDeviceId()) ?? 0, // ifIndex from device
+                    'port_id' => $port_id,
                 ]));
             }
         }
