@@ -63,7 +63,7 @@ class Vlans implements Module
      */
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice());
+        return false;
     }
 
     /**
