@@ -46,9 +46,9 @@ class InfluxDB extends BaseDatastore
     {
         parent::__construct();
         $this->connection = $influx;
-        $this->batchSize = Config::get('influxdb.batch_size', 0);
+        $this->batchSize = LibrenmsConfig::get('influxdb.batch_size', 0);
 
-        $measurements = Config::get('influxdb.measurements', '');
+        $measurements = LibrenmsConfig::get('influxdb.measurements', '');
         $this->measurements = $measurements === '' ? [] : explode(',', $measurements);
 
         // if the database doesn't exist, create it.
