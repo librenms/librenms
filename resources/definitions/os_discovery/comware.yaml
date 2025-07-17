@@ -1,6 +1,18 @@
 modules:
     os:
         sysDescr_regex: '/Version (?<version>[0-9.]+).*(Release|ESS) (?<features>[R0-9P]+).*[\n ](HPE |HPE FF |HP |H3C )(?<hardware>.*)[\r ][\n ]/'
+    processors:
+        pre-cache:
+            oids:
+                - ENTITY-MIB::entPhysicalName
+        data:
+            -
+                oid: HH3C-ENTITY-EXT-MIB::hh3cEntityExtCpuUsage
+                num_oid: '.1.3.6.1.4.1.25506.2.6.1.1.1.1.6.{{ $index }}'
+                descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                entPhysicalIndex: '{{ $index }}'
+                skip_values: 0
+
     sensors:
         additional_oids:
             data:

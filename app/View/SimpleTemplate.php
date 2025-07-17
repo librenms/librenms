@@ -189,6 +189,7 @@ class SimpleTemplate implements \Stringable
             // String manipulation
             'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
             'slice' => $this->sliceFilter($value, $args),
+            'pad' => $this->padFilter($value, $args),
 
             // Encoding/escaping
             'escape' => $this->escapeFilter($value, $args),
@@ -264,6 +265,17 @@ class SimpleTemplate implements \Stringable
         }
 
         return date($format, $timestamp);
+    }
+
+    private function padFilter(string $value, array $args): string
+    {
+        $direction = match($args[2] ?? 'left') {
+            'right' => STR_PAD_RIGHT,
+            'both' => STR_PAD_BOTH,
+            default => STR_PAD_LEFT,
+        };
+
+        return str_pad($value, $args[0] ?? 0, $args[1] ?? ' ', $direction);
     }
 
     public function __toString(): string

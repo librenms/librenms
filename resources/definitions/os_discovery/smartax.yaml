@@ -3,8 +3,22 @@ modules:
         additional_oids:
             oids:
                 - HWMUSA-DEV-MIB::hwMusaBoardSlotDesc
+    processors:
         data:
             -
+                oid: HWMUSA-DEV-MIB::hwMusaSlotConfExtTable
+                value: HWMUSA-DEV-MIB::hwMusaBoardCpuRate
+                num_oid: '.1.3.6.1.4.1.2011.2.6.7.1.1.2.1.{{ $index }}'
+                descr: '{{ HWMUSA-DEV-MIB::hwMusaBoardSlotDesc }} processor'
+                skip_values:
+                    -
+                        oid: HWMUSA-DEV-MIB::hwMusaBoardCpuRate
+                        op: '='
+                        value: -1
+    mempools:
+        data:
+            -
+                oid: HWMUSA-DEV-MIB::hwMusaSlotConfExtTable
                 percent_used: HWMUSA-DEV-MIB::hwMusaBoardRamUseRate
                 descr: 'Slot {{ $subindex1 }} {{ HWMUSA-DEV-MIB::hwMusaBoardSlotDesc }}'
                 skip_values:

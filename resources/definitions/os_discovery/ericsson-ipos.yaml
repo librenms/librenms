@@ -7,12 +7,12 @@ modules:
     processors:
         data:
             -
-                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterMIBObjects
+                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuProcTable
                 value: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterFiveMinuteAvg
                 num_oid: '.1.3.6.1.4.1.193.218.2.6.1.3.{{ $index }}'
                 descr: '5 minute average'
             -
-                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterMIBObjects
+                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuProcTable
                 value: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterFiveMinutePeak
                 num_oid: '.1.3.6.1.4.1.193.218.2.6.1.6.{{ $index }}'
                 descr: '5 minute peak'

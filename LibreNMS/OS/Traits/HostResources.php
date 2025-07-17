@@ -27,14 +27,12 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use App\Models\Processor;
 use App\Models\Storage;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
 use LibreNMS\Util\Number;
-use Rrd;
 use SnmpQuery;
 
 trait HostResources
@@ -98,80 +96,35 @@ trait HostResources
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
         Log::info('Host Resources: ');
-        $processors = [];
 
-        try {
-            $hrProcessorLoad = $this->getCacheByIndex('hrProcessorLoad', 'HOST-RESOURCES-MIB');
-
-            if (empty($hrProcessorLoad)) {
-                // no hr data, return
-                return [];
+        return SnmpQuery::abortOnFailure()->walk([
+            'HOST-RESOURCES-MIB::hrProcessorLoad',
+            'HOST-RESOURCES-MIB::hrDeviceDescr',
+        ])->mapTable(function ($data, $hrDeviceIndex) {
+            if (! isset($data['HOST-RESOURCES-MIB::hrProcessorLoad']) || ! is_numeric($data['HOST-RESOURCES-MIB::hrProcessorLoad'])) {
+                return null;
             }
 
-            $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (Exception) {
-            return [];
-        }
-
-        foreach ($hrProcessorLoad as $index => $usage) {
-            $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
-            $descr = $hrDeviceDescr[$index] ?? null;
-
-            if (! is_numeric($usage)) {
-                continue;
+            // FIXME ? use skip_values
+            if ($this->getName() == 'arista-eos' && $hrDeviceIndex == '1') {
+                return null;
             }
 
-            $device = $this->getDeviceArray();
-            if ($device['os'] == 'arista-eos' && $index == '1') {
-                continue;
-            }
-
-            if (empty($descr)
-                || $descr == 'Unknown Processor Type' // Windows: Unknown Processor Type
-                || $descr == 'An electronic chip that makes the computer work.'
-            ) {
-                $descr = 'Processor';
-            } else {
-                // Make the description a bit shorter
-                $remove_strings = [
-                    'GenuineIntel: ',
-                    'AuthenticAMD: ',
-                    'CPU ',
-                    '(TM)',
-                    '(R)',
-                ];
-                $descr = str_replace($remove_strings, '', $descr);
-                $descr = str_replace('  ', ' ', $descr);
-            }
-
-            $old_name = ['hrProcessor', $index];
-            $new_name = ['processor', 'hr', $index];
-            Rrd::renameFile($this->getDevice(), $old_name, $new_name);
-
-            $processor = Processor::discover(
-                'hr',
-                $this->getDeviceId(),
-                $usage_oid,
-                $index,
-                $descr,
-                1,
-                $usage,
-                null,
-                null,
-                $index
-            );
-
-            if ($processor->isValid()) {
-                $processors[] = $processor;
-            }
-        }
-
-        return $processors;
+            return new Processor([
+                'hrDeviceIndex' => $hrDeviceIndex,
+                'processor_oid' => '.1.3.6.1.2.1.25.3.3.1.2.' . $hrDeviceIndex,
+                'processor_index' => $hrDeviceIndex,
+                'processor_type' => 'hr',
+                'processor_precision' => 1,
+                'processor_usage' => $data['HOST-RESOURCES-MIB::hrProcessorLoad'],
+                'processor_descr' => $data['HOST-RESOURCES-MIB::hrDeviceDescr'] ?? null,
+            ]);
+        })->filter();
     }
 
     public function discoverMempools(): Collection

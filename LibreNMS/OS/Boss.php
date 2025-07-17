@@ -33,17 +33,15 @@ use App\Models\Device;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery
+class Boss extends OS implements OSDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -75,35 +73,6 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
         if ($stack_size > 1) {
             $device->features = "Stack of $stack_size units";
         }
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $data = snmpwalk_group($this->getDeviceArray(), 's5ChasUtilCPUUsageLast10Minutes', 'S5-CHASSIS-MIB');
-
-        $processors = [];
-        $count = 1;
-        foreach ($data as $index => $entry) {
-            $processors[] = Processor::discover(
-                'avaya-ers',
-                $this->getDeviceId(),
-                ".1.3.6.1.4.1.45.1.6.3.8.1.1.6.$index",
-                Str::padLeft((string) $count, 2, '0'),
-                "Unit $count processor",
-                1,
-                $entry['sgProxyCpuCoreBusyPerCent'] ?? null
-            );
-
-            $count++;
-        }
-
-        return $processors;
     }
 
     public function discoverVlans(): Collection

@@ -29,9 +29,9 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Processor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -73,9 +73,9 @@ class ArubaInstant extends OS implements
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors(): array
+    public function discoverProcessors(): Collection
     {
         return SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')
             ->mapTable(function ($data, $aiAPMACAddress) {
@@ -83,8 +83,16 @@ class ArubaInstant extends OS implements
                 $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.' . $mac->oid();
                 $description = $data['AI-AP-MIB::aiAPSerialNum'];
 
-                return Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $mac->hex(), $description, 1, $data['AI-AP-MIB::aiAPCPUUtilization']);
-            })->all();
+                return new Processor([
+                    'processor_type' => 'aruba-instant',
+                    'processor_oid' => $oid,
+                    'processor_index' => $mac->hex(),
+                    'processor_descr' => $description,
+                    'processor_precision' => 1,
+                    'entPhysicalIndex' => 0,
+                    'processor_usage' => $data['AI-AP-MIB::aiAPCPUUtilization'],
+                ]);
+            });
     }
 
     /**

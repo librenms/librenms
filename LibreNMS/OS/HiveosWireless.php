@@ -26,7 +26,7 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -51,12 +51,12 @@ class HiveosWireless extends OS implements
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors(): array
+    public function discoverProcessors(): \Illuminate\Support\Collection: array
     {
         return [
-            Processor::discover(
+            Processor::discoverModel(
                 $this->getName(),
                 $this->getDeviceId(),
                 '1.3.6.1.4.1.26928.1.2.3.0', // AH-SYSTEM-MIB::ahCpuUtilization

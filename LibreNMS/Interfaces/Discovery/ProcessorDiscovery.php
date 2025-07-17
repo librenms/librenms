@@ -26,13 +26,16 @@
 
 namespace LibreNMS\Interfaces\Discovery;
 
+use App\Models\Processor;
+use Illuminate\Support\Collection;
+
 interface ProcessorDiscovery
 {
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor> Processors
      */
-    public function discoverProcessors();
+    public function discoverProcessors(): Collection;
 }

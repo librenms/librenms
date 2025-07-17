@@ -1,5 +1,6 @@
 <?php
 
-use LibreNMS\Device\Processor;
+use LibreNMS\OS;
 
-Processor::runDiscovery($os);
+$os ??= OS::make($device);
+(new \LibreNMS\Modules\Processors())->discover($os);

@@ -11,9 +11,14 @@ modules:
             - HUAWEI-DEVICE-EXT-MIB::hwDeviceEsn.0
             - ENTITY-MIB::entPhysicalSerialNum.9
     processors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName
         data:
             -
-                oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateEntry
+                oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateTable
                 value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityCpuUsage
                 num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
                 descr: '{{ ENTITY-MIB::entPhysicalName }} Processor'

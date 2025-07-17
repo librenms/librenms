@@ -26,7 +26,8 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
@@ -36,7 +37,7 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
     private string $procOid = '1.3.6.1.4.1.2356.14.1.1.1.24.0';
 
     // OID string value example: 100ms:87%, 1s:49%, 10s:42%
-    private function convertProcessorData(array $input)
+    private function convertProcessorData(array $input): array
     {
         $data = [];
         $cpuList = explode(',', (string) reset($input)[0]);
@@ -50,49 +51,54 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
         return $data;
     }
 
-    public function discoverProcessors()
+    /**
+     * @return Collection<Processor>
+     */
+    public function discoverProcessors(): Collection
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
         if ($data === false) {
-            return [];
+            return new Collection;
         }
 
         $processors = [];
         $count = 0;
         foreach ($this->convertProcessorData($data) as $cpuName => $cpuPerc) {
-            $processors[] = Processor::discover(
-                'lcossx',
-                $this->getDeviceId(),
-                $this->procOid,
-                $count,
-                'Processor ' . $cpuName,
-                1,
-                $cpuPerc,
-                100
-            );
+            $processors[] = new Processor([
+                'processor_type' => 'lcossx',
+                'processor_oid' => $this->procOid,
+                'processor_index' => $count,
+                'processor_descr' => 'Processor ' . $cpuName,
+                'processor_precision' => 1,
+                'entPhysicalIndex' => 0,
+                'hrDeviceIndex' => null,
+                'processor_perc_warn' => 100,
+                'processor_usage' => $cpuPerc,
+            ]);
             $count++;
         }
 
-        return $processors;
+        return collect($processors);
     }
 
-    public function pollProcessors(array $processors)
+    /**
+     * @param  Collection<Processor>  $processors
+     * @return Collection<Processor>
+     */
+    public function pollProcessors(Collection $processors): Collection
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
         if (get_debug_type($data) != 'array') {
-            return [];
+            return new Collection;
         }
 
         $cpuList = $this->convertProcessorData($data);
 
-        $data = [];
         foreach ($processors as $processor) {
-            $processor_id = $processor['processor_id'];
-            $key = explode(' ', (string) $processor['processor_descr'])[1];
-            $value = $cpuList[$key];
-            $data[$processor_id] = $value;
+            $key = explode(' ',(string) $processor->processor_descr)[1];
+            $processor->processor_usage = $cpuList[$key] ?? 0;
         }
 
-        return $data;
+        return $processors;
     }
 }

@@ -37,6 +37,7 @@ use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
+use App\Models\Processor;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use App\Models\Vlan;
@@ -47,7 +48,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -434,9 +434,9 @@ class Vrp extends OS implements
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
         $device = $this->getDeviceArray();
 
@@ -462,19 +462,17 @@ class Vrp extends OS implements
                     continue;
                 }
 
-                $processors[] = Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $usage_oid,
-                    $index,
-                    $descr,
-                    1,
-                    $usage
-                );
+                $processors[] = new Processor([
+                    'processor_type' => $this->getName(),
+                    'processor_oid' => $usage_oid,
+                    'processor_index' => $index,
+                    'processor_descr' => $descr,
+                    'processor_usage' => $usage,
+                ]);
             }
         }
 
-        return $processors;
+        return collect($processors);
     }
 
     /**

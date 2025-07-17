@@ -26,9 +26,11 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class MoxaEtherdevice extends OS implements ProcessorDiscovery
 {
@@ -36,24 +38,23 @@ class MoxaEtherdevice extends OS implements ProcessorDiscovery
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $device = $this->getDeviceArray();
-
         // Moxa people enjoy creating MIBs for each model!
         // .1.3.6.1.4.1.8691.7.116.1.54.0 = MOXA-IKS6726A-MIB::cpuLoading30s.0
         // .1.3.6.1.4.1.8691.7.69.1.54.0 = MOXA-EDSG508E-MIB::cpuLoading30s.0
-        $oid = $device['sysObjectID'] . '.1.54.0';
+        $oid = $this->getDevice()->sysObjectID . '.1.54.0';
+        $value = SnmpQuery::get($oid)->value();
 
-        return [
-            Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                $oid,
-                0
-            ),
-        ];
+        return collect([
+            new Processor([
+                'processor_type' => $this->getName(),
+                'processor_oid' => $oid,
+                'processor_index' => 0,
+                'processor_usage' => $value,
+            ]),
+        ]);
     }
 }

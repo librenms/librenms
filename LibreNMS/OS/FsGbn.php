@@ -26,7 +26,8 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
 
@@ -36,27 +37,29 @@ class FsGbn extends OS implements ProcessorDiscovery
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $processors = [];
+        $response = \SnmpQuery::get([
+            'GBNPlatformOAM-MIB::cpuDescription.0',
+            'GBNPlatformOAM-MIB::cpuIdle.0',
+        ]);
 
-        // Test first pair of OIDs from GBNPlatformOAM-MIB
-        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuDescription', [], 'GBNPlatformOAM-MIB', 'fs');
-        $processors_data = snmpwalk_cache_oid($this->getDeviceArray(), 'cpuIdle', $processors_data, 'GBNPlatformOAM-MIB', 'fs');
-        foreach ($processors_data as $index => $entry) {
-            $processors[] = Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.13464.1.2.1.1.2.11.' . $index, //GBNPlatformOAM-MIB::cpuIdle.0 = INTEGER: 95
-                $index,
-                $entry['cpuDescription'],
-                -1,
-                100 - $entry['cpuIdle']
-            );
+        $idle = $response->value('GBNPlatformOAM-MIB::cpuIdle');
+        if (is_numeric($idle)) {
+            $description = $response->value('GBNPlatformOAM-MIB::cpuDescription');
+
+            return collect([new Processor([
+                'processor_type' => $this->getName(),
+                'processor_oid' => '.1.3.6.1.4.1.13464.1.2.1.1.2.11.0',
+                'processor_index' => '0',
+                'processor_descr' => $description,
+                'processor_precision' => -1,
+                'processor_usage' => 100 - $idle,
+            ])]);
         }
 
-        return $processors;
+        return new Collection;
     }
 }

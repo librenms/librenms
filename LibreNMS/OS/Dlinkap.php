@@ -28,11 +28,12 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use App\Models\Processor;
 use Illuminate\Support\Collection;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
 {
@@ -49,29 +50,36 @@ class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        return [
-            Processor::discover(
-                'dlinkap-cpu',
-                $this->getDeviceId(),
-                $this->getDevice()->sysObjectID . '.5.1.3.0',  // different OID for each model
-                0,
-                'Processor',
-                100
-            ),
-        ];
+        $oid = $this->getDevice()->sysObjectID . '.5.1.3.0';
+        $value = SnmpQuery::get($oid)->value();
+
+        if (! is_numeric($value)) {
+            return new Collection;
+        }
+
+        return collect([
+            new Processor([
+                'processor_type' => 'dlinkap-cpu',
+                'processor_oid' => $oid,
+                'processor_index' => 0,
+                'processor_descr' => 'Processor',
+                'processor_precision' => 100,
+                'processor_usage' => $value,
+            ]),
+        ]);
     }
 
     public function discoverMempools()
     {
         $oid = $this->getDevice()->sysObjectID . '.5.1.4.0';
-        $memory = snmp_get($this->getDeviceArray(), $oid, '-OQv');
+        $memory = SnmpQuery::get($oid)->value();
 
-        if ($memory === false) {
-            return new Collection();
+        if (! is_numeric($memory)) {
+            return new Collection;
         }
 
         return collect()->push((new Mempool([

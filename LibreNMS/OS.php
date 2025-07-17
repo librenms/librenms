@@ -67,6 +67,7 @@ use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlProcessorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
@@ -106,6 +107,7 @@ class OS implements
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlProcessorDiscovery;
     use YamlStorageDiscovery;
     use NetstatsPolling;
     use Bgp4Mib;
@@ -359,17 +361,23 @@ class OS implements
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $processors = $this->discoverHrProcessors();
-
-        if (empty($processors)) {
-            $processors = $this->discoverUcdProcessors();
+        if ($this->hasYamlDiscovery('processors')) {
+            $processors = $this->discoverYamlProcessors();
+            if ($processors->isNotEmpty()) {
+                return collect($processors);
+            }
         }
 
-        return $processors;
+        $processors = $this->discoverHrProcessors();
+        if ($processors->isNotEmpty()) {
+            return collect($processors);
+        }
+
+        return $this->discoverUcdProcessors();
     }
 
     public function discoverMempools()

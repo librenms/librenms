@@ -26,7 +26,8 @@
 
 namespace LibreNMS\OS\Traits;
 
-use LibreNMS\Device\Processor;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 
 trait FrogfootResources
 {
@@ -34,17 +35,24 @@ trait FrogfootResources
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        return [
-            Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2',
-                0
-            ),
-        ];
+        $oid = '1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2';
+        $value = \SnmpQuery::get($oid)->value();
+
+        if (! is_numeric($value)) {
+            return new Collection;
+        }
+
+        return collect([
+            new Processor([
+                'processor_type' => $this->getName(),
+                'processor_oid' => $oid,
+                'processor_index' => 0,
+                'processor_usage' => $value,
+            ]),
+        ]);
     }
 }

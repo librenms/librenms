@@ -28,9 +28,9 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\PortsNac;
+use App\Models\Processor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
@@ -50,9 +50,9 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
         $device = $this->getDeviceArray();
         if (Str::startsWith($device['sysObjectID'], [
@@ -64,14 +64,23 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         ])) {
             d_echo('Dell Powerconnect 55xx');
 
-            return [
-                Processor::discover(
-                    'powerconnect-nv',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.89.1.7.0',
-                    0
-                ),
-            ];
+            $usage = SnmpQuery::get('.1.3.6.1.4.1.89.1.7.0')->value();
+            $processors = new Collection;
+            if (is_numeric($usage)) {
+                $processors->push(new Processor([
+                    'processor_type' => 'powerconnect-nv',
+                    'processor_oid' => '.1.3.6.1.4.1.89.1.7.0',
+                    'processor_index' => 0,
+                    'processor_descr' => 'Processor',
+                    'processor_precision' => 1,
+                    'entPhysicalIndex' => 0,
+                    'hrDeviceIndex' => null,
+                    'processor_perc_warn' => null,
+                    'processor_usage' => $usage,
+                ]));
+            }
+
+            return $processors;
         } elseif (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3024',
             '.1.3.6.1.4.1.674.10895.3042',
@@ -101,22 +110,21 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
     /**
      * Poll processor data.  This can be implemented if custom polling is needed.
      *
-     * @param  array  $processors  Array of processor entries from the database that need to be polled
-     * @return array of polled data
+     * @param  Collection<Processor>  $processors  Array of processor entries from the database that need to be polled
+     * @return Collection<Processor> of polled data
      */
-    public function pollProcessors(array $processors)
+    public function pollProcessors(Collection $processors): Collection
     {
-        $data = [];
-
         foreach ($processors as $processor) {
-            if ($processor['processor_type'] == 'powerconnect-nv') {
-                $data[$processor['processor_id']] = snmp_get($this->getDeviceArray(), $processor['processor_oid'], '-Oqv');
+            $value = SnmpQuery::get($processor->processor_oid)->value();
+            if ($processor->processor_type == 'powerconnect-nv') {
+                $processor->processor_usage = $value;
             } else {
-                $data += $this->pollVxworksProcessors([$processor]);
+                $processor->processor_usage = $this->parseCpuUsageString($value);
             }
         }
 
-        return $data;
+        return $processors;
     }
 
     private static function decode_string(string $s): string

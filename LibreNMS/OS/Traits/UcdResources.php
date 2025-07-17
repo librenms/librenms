@@ -27,11 +27,12 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use App\Models\Processor;
 use App\Models\Storage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Device\Processor;
 use LibreNMS\Util\Number;
+use SnmpQuery;
 
 trait UcdResources
 {
@@ -39,22 +40,28 @@ trait UcdResources
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
         Log::info('UCD Resources: ');
 
-        return [
-            Processor::discover(
-                'ucd-old',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.2021.11.11.0',
-                0,
-                'CPU',
-                -1
-            ),
-        ];
+        $value = SnmpQuery::get('.1.3.6.1.4.1.2021.11.11.0')->value();
+
+        if (! is_numeric($value)) {
+            return new Collection;
+        }
+
+        return collect([
+            new Processor([
+                'processor_type' => 'ucd-old',
+                'processor_oid' => '.1.3.6.1.4.1.2021.11.11.0',
+                'processor_index' => 0,
+                'processor_descr' => 'CPU',
+                'processor_precision' => -1,
+                'processor_usage' => $value,
+            ]),
+        ]);
     }
 
     public function discoverMempools()

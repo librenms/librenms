@@ -50,6 +50,8 @@ class YamlDiscoveryField
     {
         if (array_key_exists($this->key, $yaml)) {
             $key = $this->key;
+        } elseif ($this->key === 'value' && ! array_key_exists('value', $yaml) && array_key_exists('oid', $yaml)) {
+            $key = 'oid';
         } else {
             $key = is_int($this->default) ? $this->default : (string) $this->default;
             $yaml = [$key => $this->default];
@@ -74,11 +76,32 @@ class YamlDiscoveryField
         $this->setValue($value);
     }
 
+    /**
+     * Get the numeric oid field name in yaml and the numeric oid database column name
+     *
+     * @return string[]
+     */
+    public function getNumericNames(): array
+    {
+        if ($this->key === 'value') {
+            // only one oid
+            $prefix = strstr($this->model_column, '_', true) ?: $this->model_column;
+            return [
+                'num_oid',
+                $prefix . '_oid',
+            ];
+        }
+
+        return [
+            $this->key . '_num_oid',
+            $this->model_column . '_oid',
+        ];
+    }
+
     private function setValue(mixed $value): void
     {
         if (is_callable($this->callback)) {
             $this->value = call_user_func($this->callback, $value);
-
             return;
         }
 
