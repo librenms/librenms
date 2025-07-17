@@ -71,6 +71,10 @@ class Vlans implements Module
      */
     public function discover(OS $os): void
     {
+
+dump("START", $os->getDevice()->os, $os->getDevice()->hardware);
+$ST1 = time();
+
         $vlans = $os->discoverVlans()->filter(function (?Vlan $data) {
             return ! empty($data->vlan_vlan);
         })->each(function (Vlan $data) {
@@ -83,6 +87,9 @@ class Vlans implements Module
         $vlans = $this->syncModels($os->getDevice(), 'vlans', $vlans);
         ModuleModelObserver::done();
 
+dump("Basic Vlan discovery: " . time() - $ST1);
+$ST2 = time();
+
         $ports = $os->discoverVlanPorts($vlans)->filter(function (PortVlan $data) {
             return ! empty($data->vlan) && ! empty($data->port_id);
         })->each(function (PortVlan $data) {
@@ -94,6 +101,8 @@ class Vlans implements Module
         ModuleModelObserver::observe(PortVlan::class, 'VLAN Ports');
         $this->syncModels($os->getDevice(), 'portsVlan', $ports);
         ModuleModelObserver::done();
+
+dump("Port Vlan discovery: " . time() - $ST2);
     }
 
     /**
