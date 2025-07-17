@@ -1003,13 +1003,20 @@ class Cisco extends OS implements
         foreach ($native_vlans as $ifIndex => $data) {
             $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? 0;
             $vlan_id = (empty($vlan_id)) ? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] : $vlan_id;
+            $baseport = $this->bridgePortFromIfIndex($ifIndex);
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+
+            if (empty($baseport) && empty($port_id)) {
+                Log::debug("Skipping ifIndex: $ifIndex for vlan $vlan_id: Could not find port");
+                continue;
+            }
+
             $ports->push(new PortVlan([
                 'vlan' => $vlan_id,
-                'baseport' => $this->bridgePortFromIfIndex($ifIndex),
+                'baseport' => $baseport,
                 'untagged' => 1,
-                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
-                // ifIndex from device
-
+                'state' => 'unknown',
+                'port_id' => $port_id,
             ]));
         }
 
