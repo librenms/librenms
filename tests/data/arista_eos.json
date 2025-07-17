@@ -8635,8 +8635,7 @@
                     "untagged": 0
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "entity-physical": {
         "discovery": {

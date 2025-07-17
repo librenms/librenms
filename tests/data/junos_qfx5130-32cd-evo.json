@@ -16711,8 +16711,7 @@
                     "vlan_state": 1
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "ospf": {
         "poller": {

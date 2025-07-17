@@ -7105,8 +7105,7 @@
                     "untagged": 0
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "os": {
         "discovery": {

@@ -75349,8 +75349,7 @@
                     "untagged": 1
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "bgp-peers": {
         "discovery": {

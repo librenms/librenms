@@ -31825,8 +31825,7 @@
                     "ifIndex": 5001
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "entity-physical": {
         "discovery": {

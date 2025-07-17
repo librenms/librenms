@@ -59453,8 +59453,7 @@
                     "untagged": 1
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "ipv4-addresses": {
         "discovery": {

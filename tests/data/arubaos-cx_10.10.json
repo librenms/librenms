@@ -4698,8 +4698,7 @@
                     "untagged": 0
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "stp": {
         "discovery": {
