@@ -313,7 +313,7 @@ if (! Auth::user()->hasGlobalRead()) {
             $afi = $afisafi['afi'] ?? '';
             $safi = $afisafi['safi'] ?? '';
             $this_afisafi = $afi . $safi;
-            $peer['afi'] .= '$sep . $afi . '.' . $safi';
+            $peer['afi'] .= $sep . $afi . '.' . $safi;
             $sep = '<br />';
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
