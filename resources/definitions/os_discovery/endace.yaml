@@ -1,0 +1,127 @@
+mib: ENDACE-SYSTEM-MIB:ENDACE-HWMON-MIB:ENDACE-MODULE-MIB
+modules:
+    os:
+        hardware:
+            - ENDACE-SYSTEM-MIB::systemModel.0 
+        version:
+            - ENDACE-SYSTEM-MIB::systemVersion.0
+        version_regex: '/endace OSm(?<version>\S+)/'
+        serial:
+            - ENDACE-SYSTEM-MIB::systemSerial.0
+    sensors:
+        voltage:
+            skip_values:
+                -
+                    oid: modoptDetect
+                    op: "="
+                    value: false
+            data:
+                -
+                    oid: modoptTable
+                    value: modoptVolt
+                    descr: "{{ modoptName }} Voltage"
+                    index: "modoptVolt.{{ $index }}"
+                    group: "DAG Module(s)"
+        dbm:
+            skip_values:
+                -
+                    oid: modoptDetect
+                    op: "="
+                    value: false
+            data:
+                -
+                    oid: modoptTable
+                    value: modoptRxPower
+                    descr: "{{ modoptName }} RX Power"
+                    index: "modoptRxPower.{{ $index }}"
+                    group: "DAG Module(s)"
+                -
+                    oid: modoptTable
+                    value: modoptTxPower
+                    descr: "{{ modoptName }} TX Power"
+                    index: "modoptTxPower.{{ $index }}"
+                    group: "DAG Module(s)"
+        temperature:
+            options:
+                skip_values:
+                    -
+                        oid: modoptDetect
+                        op: "="
+                        value: false
+            data:
+                -
+                    oid: hwmonSystemTemp
+                    descr: "System Temperature (C)"
+                    index: 0
+                -
+                    oid: modoptTable
+                    value: modoptTemp
+                    descr: "{{ modoptName }} Temperature"
+                    index: "modoptTemp.{{ $index }}"
+                    group: "DAG Module(s)"
+        state:
+            data:
+                -
+                    oid: hwmonFanRedundancy
+                    descr: "Fan Redundancy"
+                    index: 0
+                    state_name: hwmonFanRedundancy
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'fault' }
+                -
+                    oid: hwmonPsuRedundancy
+                    descr: "PSU Redundancy"
+                    index: 0
+                    state_name: hwmonPsuRedundancy
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'fault' }
+                -
+                    oid: hwmonIntrusionStatus
+                    descr: "Intrusion Status"
+                    index: 0
+                    state_name: hwmonIntrusionStatus
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: 'alarm' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'normal' }
+                -
+                    oid: modoptTable
+                    value: modoptRxPowerOk
+                    descr: "{{ modoptName }} RX Power Ok"
+                    index: "modoptRxPowerOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptRxPowerOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: modoptTable
+                    value: modoptTxPowerOk
+                    descr: "{{ modoptName }} TX Power Ok"
+                    index: "modoptTxPowerOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptTxPowerOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: modoptTable
+                    value: modoptVoltOk
+                    descr: "{{ modoptName }} Voltage Ok"
+                    index: "modoptVoltOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptVoltOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: modoptTable
+                    value: modoptTempOk
+                    descr: "{{ modoptName }} Temperature Ok"
+                    index: "modoptTempOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptTempOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
