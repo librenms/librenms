@@ -156,4 +156,15 @@ trait QBridgeMib
 
         return $ports;
     }
+
+    public function dot1qTpFdbPort(): array
+    {
+        $dot1qTpFdbPort = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
+        $dot1qTpFdbPort = $dot1qTpFdbPort['Q-BRIDGE-MIB::dot1qTpFdbPort'] ?? [];
+        if (empty($dot1qTpFdbPort)) {
+            $dot1qTpFdbPort[0] = $this->dot1dTpFdbPort();
+        }
+
+        return $dot1qTpFdbPort;
+    }
 }

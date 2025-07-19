@@ -20,8 +20,9 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 

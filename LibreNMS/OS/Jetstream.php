@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Jetstream.php
  *
@@ -23,13 +24,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
-use App\Models\PortVlan;
 use App\Models\PortsFdb;
+use App\Models\PortVlan;
 use App\Models\Route;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
@@ -214,8 +214,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
     {
         $fdbt = new Collection;
 
-        $dot1qTpFdbPort = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
-        $dot1qTpFdbPort = $dot1qTpFdbPort['dot1qTpFdbPort'] ?? [];
+        $dot1qTpFdbPort = $this->dot1qTpFdbPort();
 
         foreach ($dot1qTpFdbPort as $realVlan => $macData) {
             foreach ($macData as $mac_address => $idx) {

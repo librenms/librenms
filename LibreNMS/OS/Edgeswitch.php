@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
 class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery, FdbTableDiscovery
 {
@@ -56,7 +57,7 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
     {
         $fdbt = new Collection;
 
-        $binding = \SnmpQuery::hideMib()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')->table(1);
+        $binding = SnmpQuery::hideMib()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')->table(1);
         foreach ($binding as $mac_address => $data) {
             $fdbt->push(new PortsFdb([
                 'port_id' => PortCache::getIdFromIfIndex($data['agentDynamicDsBindingIfIndex'], $this->getDeviceId()) ?? 0,

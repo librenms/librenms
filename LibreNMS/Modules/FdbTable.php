@@ -84,7 +84,7 @@ class FdbTable implements Module
         }
 
         if ($fdbt->isEmpty()) {
-            $fdbt = $this->discoverFdb($os->getDevice());
+            $fdbt = $this->discoverFdb($os);
         }
 
         $fdbt = $fdbt->filter(function ($data) use ($vlansDb) {
@@ -160,19 +160,11 @@ class FdbTable implements Module
         ];
     }
 
-    private function discoverFdb(Device $device): Collection
+    private function discoverFdb(OS $os): Collection
     {
         $fdbt = new Collection;
 
-        $dot1qTpFdbPort = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
-        $dot1qTpFdbPort = $dot1qTpFdbPort['dot1qTpFdbPort'] ?? [];
-        if (empty($dot1qTpFdbPort)) {
-            $oids = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
-            $dot1qTpFdbPort[0] = $oids['dot1dTpFdbPort'] ?? [];
-        }
-
-        $dot1dBasePortIfIndex = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['dot1dBasePortIfIndex'] ?? [];
+        $dot1qTpFdbPort = $os->dot1qTpFdbPort();
 
         $dot1qVlanFdbId = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table();
         $dot1qVlanFdbId = $tmp = $dot1qVlanFdbId['dot1qVlanFdbId'] ?? [];
@@ -187,8 +179,8 @@ class FdbTable implements Module
             foreach ($macData as $mac_address => $portIdx) {
                 if (is_array($portIdx)) {
                     foreach ($portIdx as $key => $idx) { //multiple port for one mac ???
-                        $ifIndex = $dot1dBasePortIfIndex[$idx] ?? 0;
-                        $port_id = PortCache::getIdFromIfIndex($ifIndex, $device->device_id) ?? 0;
+                        $ifIndex = $os->ifIndexFromBridgePort($idx);
+                        $port_id = PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId()) ?? 0;
                         $fdbt->push(new PortsFdb([
                             'port_id' => $port_id,
                             'mac_address' => $mac_address,
@@ -196,8 +188,8 @@ class FdbTable implements Module
                         ]));
                     }
                 } else {
-                    $ifIndex = $dot1dBasePortIfIndex[$portIdx] ?? 0;
-                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $device->device_id) ?? 0;
+                    $ifIndex = $os->ifIndexFromBridgePort($portIdx);
+                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId()) ?? 0;
                     $fdbt->push(new PortsFdb([
                         'port_id' => $port_id,
                         'mac_address' => $mac_address,
