@@ -62,6 +62,24 @@ class Port extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
+    public static function findPortId($findMe = [], $device_id = null): int
+    {
+        $findMe = (is_array($findMe)) ? $findMe : [0 => $findMe];
+        $portId = 0;
+        foreach ($findMe as $key => $search) {
+            if (! empty($device_id)) {
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfDescr($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfName($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfAlias($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfPhysAddress($search, $device_id) : $portId;
+            } else {
+                $portId = (empty($portId)) ? Port::where('ifPhysAddress', $search)->value('port_id') ?? 0 : $portId;
+            }
+        }
+
+        return intval($portId);
+    }
+
     /**
      * Returns a human readable label for this port
      *
