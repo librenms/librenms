@@ -20,8 +20,10 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS;
@@ -35,6 +37,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -423,5 +426,13 @@ class OS implements
         }
 
         return $this->discoverIeeeQBridgeMibPorts();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverFdbTable(): Collection
+    {
+        return $this->discoverFdb();
     }
 }
