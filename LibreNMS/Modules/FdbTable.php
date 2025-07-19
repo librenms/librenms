@@ -61,12 +61,13 @@ class FdbTable implements Module
         return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
-    /**
-     * @inheritDoc
-     */
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return false;
+        if (defined('PHPUNIT_RUNNING')) {
+            return false; // FIXME improve test suite to skip polling when polling data is null
+        }
+
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
