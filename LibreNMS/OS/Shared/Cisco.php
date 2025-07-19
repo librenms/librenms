@@ -1099,8 +1099,11 @@ class Cisco extends OS implements
 
     public function discoverFdbTable(): Collection
     {
+        if (($QBridgeFdbTable = parent::discoverFdbTable())->isNotEmpty()) {
+            return $QBridgeFdbTable;
+        }
+
         $fdbt = new Collection;
-        return $fdbt;
 
         $fdbPort_table = $this->dot1dTpFdbPort();
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->table();

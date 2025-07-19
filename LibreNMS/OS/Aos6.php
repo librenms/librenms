@@ -104,6 +104,10 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
             }
         }
 
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
         return $fdbt;
     }
 }

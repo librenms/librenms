@@ -34,12 +34,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Mac;
-use SnmpQuery;
 
 class FdbTable implements Module
 {
@@ -80,13 +78,7 @@ class FdbTable implements Module
 
         $fdbt = new Collection;
 
-        if ($os instanceof FdbTableDiscovery) {
-            $fdbt = $os->discoverFdbTable();
-        }
-
-        if ($fdbt->isEmpty()) {
-            $fdbt = $this->discoverFdb($os);
-        }
+        $fdbt = $os->discoverFdbTable();
 
         $fdbt = $fdbt->filter(function ($data) use ($vlansDb) {
             $data->vlan_id = $vlansDb[$data->vlan_id]['vlan_id'] ?? 0; //convert raw_vlan to vlan_id from 'vlans' database
@@ -116,6 +108,7 @@ class FdbTable implements Module
 
         ModuleModelObserver::observe(PortsFdb::class);
         $this->syncModels($os->getDevice(), 'portsFdb', $fdbt);
+        ModuleModelObserver::done();
     }
 
     /**
@@ -159,47 +152,5 @@ class FdbTable implements Module
                 ->orderBy('port_id')->orderBy('vlan_vlan')->orderBy('mac_address')
                 ->get()->map->makeHidden(['ports_fdb_id', 'port_id', 'device_id', 'created_at', 'updated_at', 'vlan_id']),
         ];
-    }
-
-    private function discoverFdb(OS $os): Collection
-    {
-        $fdbt = new Collection;
-
-        $dot1qTpFdbPort = $os->dot1qTpFdbPort();
-
-        $dot1qVlanFdbId = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table();
-        $dot1qVlanFdbId = $tmp = $dot1qVlanFdbId['Q-BRIDGE-MIB::dot1qVlanFdbId'] ?? [];
-        if (! empty($tmp)) {
-            if (! empty(array_shift($tmp))) {
-                $dot1qVlanFdbId = array_shift($dot1qVlanFdbId);
-            }
-            $dot1qVlanFdbId = array_flip($dot1qVlanFdbId);
-        }
-
-        foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
-            foreach ($macData as $mac_address => $portIdx) {
-                if (is_array($portIdx)) {
-                    foreach ($portIdx as $key => $idx) { //multiple port for one mac ???
-                        $ifIndex = $os->ifIndexFromBridgePort($idx);
-                        $port_id = PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId()) ?? 0;
-                        $fdbt->push(new PortsFdb([
-                            'port_id' => $port_id,
-                            'mac_address' => $mac_address,
-                            'vlan_id' => $dot1qVlanFdbId[$vlanIdx] ?? $vlanIdx,
-                        ]));
-                    }
-                } else {
-                    $ifIndex = $os->ifIndexFromBridgePort($portIdx);
-                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId()) ?? 0;
-                    $fdbt->push(new PortsFdb([
-                        'port_id' => $port_id,
-                        'mac_address' => $mac_address,
-                        'vlan_id' => $dot1qVlanFdbId[$vlanIdx] ?? $vlanIdx,
-                    ]));
-                }
-            }
-        }
-
-        return $fdbt;
     }
 }

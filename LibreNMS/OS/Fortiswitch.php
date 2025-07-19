@@ -55,6 +55,10 @@ class Fortiswitch extends OS implements FdbTableDiscovery
             ]));
         }
 
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
         return $fdbt;
     }
 }

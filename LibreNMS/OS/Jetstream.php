@@ -233,6 +233,10 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
             }
         }
 
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
         return $fdbt;
     }
 }

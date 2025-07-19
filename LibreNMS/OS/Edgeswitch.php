@@ -55,6 +55,10 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
 
     public function discoverFdbTable(): Collection
     {
+        if (($QBridgeFdbTable = parent::discoverFdbTable())->isNotEmpty()) {
+            return $QBridgeFdbTable;
+        }
+
         $fdbt = new Collection;
 
         return SnmpQuery::walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
