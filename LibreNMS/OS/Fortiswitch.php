@@ -20,6 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
+ * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
@@ -30,7 +31,6 @@ use App\Models\PortsFdb;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\OS;
-use SnmpQuery;
 
 class Fortiswitch extends OS implements FdbTableDiscovery
 {
@@ -38,18 +38,18 @@ class Fortiswitch extends OS implements FdbTableDiscovery
     {
         $fdbt = new Collection;
 
-        $macTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->table();
-        $portTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
-        $basePortTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePort')->table();
-        $basePortIfIndexTable = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $macTable = $this->dot1dTpFdbAddress();
+        $portTable = $this->dot1dTpFdbPort();
+        $basePortTable = $this->dot1dBasePort();
 
-        foreach ($macTable['dot1dTpFdbAddress'] ?? [] as $dot1dTpFdbPort => $mac_address) {
-            $fdbPort = $portTable['dot1dTpFdbPort'][$dot1dTpFdbPort];
-            $dot1dBasePort = array_search($fdbPort, $basePortTable['dot1dBasePort']);
-            $dot1dBasePortIfIndex = $basePortIfIndexTable['dot1dBasePortIfIndex'][$dot1dBasePort];
+        foreach ($macTable as $dot1dTpFdbPort => $mac_address) {
+            $fdbPort = $portTable[$dot1dTpFdbPort];
+            $dot1dBasePort = array_search($fdbPort, $basePortTable);
+            $ifIndex = $this->ifIndexFromBridgePort($dot1dBasePort);
+
             $vlan_id = 0; // Bug 9239914
             $fdbt->push(new PortsFdb([
-                'port_id' => PortCache::getIdFromIfIndex($dot1dBasePortIfIndex) ?? 0,
+                'port_id' => PortCache::getIdFromIfIndex($ifIndex) ?? 0,
                 'mac_address' => $mac_address,
                 'vlan_id' => $vlan_id,
             ]));
