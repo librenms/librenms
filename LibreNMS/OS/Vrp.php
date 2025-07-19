@@ -24,7 +24,6 @@
  * @copyright  2025 Tony Murray
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  * @author     Tony Murray <murraytony@gmail.com>
- * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
@@ -95,7 +94,7 @@ class Vrp extends OS implements
         $inventory = $this->discoverBaseEntityPhysical();
 
         // add additional data from Huawei MIBs
-        $extra = \SnmpQuery::walk([
+        $extra = SnmpQuery::walk([
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
@@ -121,7 +120,7 @@ class Vrp extends OS implements
         $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
         // Walk through the MIB table for transceiver information
-        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
+        return SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
             // Skip inactive transceivers
             if (isset($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType']) && $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
                 return null;

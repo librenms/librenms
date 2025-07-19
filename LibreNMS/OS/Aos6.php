@@ -29,8 +29,8 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
-use App\Models\PortVlan;
 use App\Models\PortsFdb;
+use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
@@ -73,7 +73,6 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
                     'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
                 ]);
             });
-
     }
 
     public function discoverFdbTable(): Collection
@@ -99,12 +98,9 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
         }
 
         if (! empty($fdbPort_table)) {
-            $dot1dBasePortIfIndex = SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-            $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
-
             foreach ($fdbPort_table as $vlanIdx => $macData) {
                 foreach ($macData['dot1qTpFdbPort'] as $mac_address => $portIdx) {
-                    $ifIndex = $dot1dBasePortIfIndex[$portIdx] ?? 0;
+                    $ifIndex = $this->ifIndexFromBridgePort($portIdx);
                     $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
                     $fdbt->push(new PortsFdb([
                         'port_id' => $port_id,

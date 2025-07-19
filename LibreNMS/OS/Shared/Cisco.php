@@ -1101,7 +1101,7 @@ class Cisco extends OS implements
     {
         $fdbt = new Collection;
 
-        $fdbPort_table = SnmpQuery::walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
+        $fdbPort_table = $this->dot1dTpFdbPort();
         $vtpdomains = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::managementDomainName')->table();
         $vtpdomains = $vtpdomains['managementDomainName'] ?? [];
         $vlans = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::vtpVlanEntry')->table(2);

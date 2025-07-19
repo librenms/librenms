@@ -229,12 +229,8 @@ class Arubaos extends OS implements
     {
         $fdbt = new Collection;
 
-        $dot1qTpFdbPort = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
-        $dot1qTpFdbPort = $dot1qTpFdbPort['dot1qTpFdbPort'] ?? [];
-        if (empty($dot1qTpFdbPort)) {
-            $oids = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
-            $dot1qTpFdbPort[0] = $oids['dot1dTpFdbPort'] ?? [];
-        }
+        $dot1qTpFdbPort = $this->dot1qTpFdbPort();
+
         $dot1dBasePortIfIndex = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
         $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['dot1dBasePortIfIndex'] ?? [];
 
