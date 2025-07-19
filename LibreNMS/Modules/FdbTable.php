@@ -167,8 +167,8 @@ class FdbTable implements Module
 
         $dot1qTpFdbPort = $os->dot1qTpFdbPort();
 
-        $dot1qVlanFdbId = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table();
-        $dot1qVlanFdbId = $tmp = $dot1qVlanFdbId['dot1qVlanFdbId'] ?? [];
+        $dot1qVlanFdbId = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table();
+        $dot1qVlanFdbId = $tmp = $dot1qVlanFdbId['Q-BRIDGE-MIB::dot1qVlanFdbId'] ?? [];
         if (! empty($tmp)) {
             if (! empty(array_shift($tmp))) {
                 $dot1qVlanFdbId = array_shift($dot1qVlanFdbId);
@@ -200,6 +200,6 @@ class FdbTable implements Module
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }

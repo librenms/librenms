@@ -231,8 +231,8 @@ class Arubaos extends OS implements
 
         $dot1qTpFdbPort = $this->dot1qTpFdbPort();
 
-        $dot1dBasePortIfIndex = SnmpQuery::hideMib()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
-        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['dot1dBasePortIfIndex'] ?? [];
+        $dot1dBasePortIfIndex = SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
 
         foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
             Log::info('FdbTable -> get Context: ' . $vlanIdx);
@@ -253,6 +253,6 @@ class Arubaos extends OS implements
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }

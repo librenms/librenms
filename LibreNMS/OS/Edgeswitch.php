@@ -66,6 +66,6 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
             ]));
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }

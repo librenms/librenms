@@ -218,14 +218,21 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
 
         foreach ($dot1qTpFdbPort as $realVlan => $macData) {
             foreach ($macData as $mac_address => $idx) {
+                $port_id = \App\Models\Port::findPortId([
+                    'gigabitEthernet 1/0/' . $idx,
+                    'gigabitEthernet 1/0/' . $idx . ' : copper',
+                    'gigabitEthernet 1/0/' . $idx . ' : fiber',
+                    'gigabitEthernet1/0/' . $idx,
+                ], $this->getDeviceId());
+
                 $fdbt->push(new PortsFdb([
-                    'port_id' => find_port_id('gigabitEthernet 1/0/' . $idx, 'gigabitEthernet1/0/' . $idx, $this->getDeviceId()) ?? 0,
+                    'port_id' => $port_id,
                     'mac_address' => $mac_address,
                     'vlan_id' => $realVlan,
                 ]));
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }

@@ -795,11 +795,11 @@ class Vrp extends OS implements
     {
         $fdbt = new Collection;
 
-        $fdbPort_table = SnmpQuery::hideMib()->walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table();
+        $fdbPort_table = SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table();
 
         if (! empty($fdbPort_table)) {
             Log::info('HUAWEI-L2MAM-MIB:');
-            foreach ($fdbPort_table['hwDynFdbPort'] as $hwDynFdbMac => $macData) {
+            foreach ($fdbPort_table['HUAWEI-L2MAM-MIB::hwDynFdbPort'] as $hwDynFdbMac => $macData) {
                 foreach ($macData as $hwDynFdbVlanId => $basePort) {
                     $ifIndex = reset($basePort); // $baseport can be ['' => '119'] or ['0' => '119']
                     if (! empty($ifIndex)) {
@@ -813,7 +813,7 @@ class Vrp extends OS implements
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
 
         /*
         * todo

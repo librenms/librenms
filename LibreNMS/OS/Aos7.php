@@ -82,12 +82,11 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
     {
         $fdbt = new Collection;
 
-        $dot1d = SnmpQuery::mibDir('nokia/aos7')->hideMib()->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')->table();
+        $dot1d = SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')->table();
 
         if (! empty($dot1d)) {
-            echo 'AOS7+ MAC-ADDRESS-MIB:';
             $fdbPort_table = [];
-            foreach ($dot1d['slMacAddressGblManagement'] as $slMacDomain => $data) {
+            foreach ($dot1d['ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement'] as $slMacDomain => $data) {
                 foreach ($data as $slLocaleType => $data2) {
                     foreach ($data2 as $portLocal => $data3) {
                         foreach ($data3 as $vlanLocal => $data4) {
@@ -105,8 +104,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
 
         if (! empty($fdbPort_table)) {
             foreach ($fdbPort_table as $vlanIdx => $macData) {
-                foreach ($macData['dot1qTpFdbPort'] as $mac_address => $portIdx) {
-                    $ifIndex = $this->ifIndexFromBridgePort($portIdx);
+                foreach ($macData['dot1qTpFdbPort'] as $mac_address => $ifIndex) {
                     $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
                     $fdbt->push(new PortsFdb([
                         'port_id' => $port_id,
@@ -117,6 +115,6 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }

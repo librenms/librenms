@@ -95,6 +95,6 @@ class Zynos extends Zyxel implements OSDiscovery, FdbTableDiscovery
             }
         }
 
-        return $fdbt->filter();
+        return $fdbt;
     }
 }
