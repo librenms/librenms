@@ -1100,10 +1100,11 @@ class Cisco extends OS implements
     public function discoverFdbTable(): Collection
     {
         $fdbt = new Collection;
+        return $fdbt;
 
         $fdbPort_table = $this->dot1dTpFdbPort();
-        $vtpdomains = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::managementDomainName')->table();
-        $vtpdomains = $vtpdomains['managementDomainName'] ?? [];
+        $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->table();
+        $vtpdomains = $vtpdomains['CISCO-VTP-MIB::managementDomainName'] ?? [];
         $vlans = SnmpQuery::hideMib()->walk('CISCO-VTP-MIB::vtpVlanEntry')->table(2);
 
         foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
