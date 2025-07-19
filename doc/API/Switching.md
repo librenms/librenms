@@ -27,7 +27,7 @@ Output:
             "vlan_domain": "1",
             "vlan_name": "default",
             "vlan_type": "ethernet",
-            "vlan_mtu": null
+            "vlan_state": 1
         },
         ...
     ],
@@ -65,7 +65,7 @@ Output:
    "vlan_domain": "1",
    "vlan_name": "default",
    "vlan_type": "ethernet",
-   "vlan_mtu": null
+   "vlan_state": 1
     }
   ]
 }

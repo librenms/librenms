@@ -20,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -36,6 +36,8 @@ use SnmpQuery;
 
 trait BridgeMib
 {
+    private ?array $ifIndexToBridgePort = null;
+
     public function discoverStpInstances(?string $vlan = null): Collection
     {
         $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
@@ -216,5 +218,27 @@ trait BridgeMib
         }
 
         return (int) hexdec($dp);
+    }
+
+    public function bridgePortFromIfIndex(int|string|null $ifIndex): int
+    {
+        if (! $ifIndex) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) (array_flip($this->ifIndexToBridgePort)[$ifIndex] ?? 0);
+    }
+
+    public function ifIndexFromBridgePort(int|string|null $bridgePort): int
+    {
+        if (! $bridgePort) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
     }
 }
