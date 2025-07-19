@@ -37,6 +37,8 @@ continue to function as normal.
     lnms config:set influxdb.username 'admin'
     lnms config:set influxdb.password 'admin'
     lnms config:set influxdb.timeout 0
+    lnms config:set influxdb.batch_size 0
+    lnms config:set influxdb.measurements ''
     lnms config:set influxdb.verifySSL false
     ```
 

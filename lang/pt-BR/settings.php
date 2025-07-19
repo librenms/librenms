@@ -1034,6 +1034,14 @@ return [
                 'description' => 'Nome de Usuário',
                 'help' => 'Nome de usuário para conectar ao InfluxDB, se necessário',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'Comma separated list of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verificar SSL',
                 'help' => 'Verificar se o certificado SSL é válido e confiável',
