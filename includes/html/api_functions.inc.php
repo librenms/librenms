@@ -650,7 +650,7 @@ function get_vlans(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', [$device_id]);
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device_id]);
 
         return api_success($vlans, 'vlans');
     });
