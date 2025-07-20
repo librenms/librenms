@@ -82,38 +82,15 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
     {
         $fdbt = new Collection;
 
-        $dot1d = SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')->table();
-
-        if (! empty($dot1d)) {
-            $fdbPort_table = [];
-            foreach ($dot1d['ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement'] as $slMacDomain => $data) {
-                foreach ($data as $slLocaleType => $data2) {
-                    foreach ($data2 as $portLocal => $data3) {
-                        foreach ($data3 as $vlanLocal => $data4) {
-                            if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
-                                $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
-                            }
-                            foreach ($data4[0] as $macLocal => $one) {
-                                $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (! empty($fdbPort_table)) {
-            foreach ($fdbPort_table as $vlanIdx => $macData) {
-                foreach ($macData['dot1qTpFdbPort'] as $mac_address => $ifIndex) {
-                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
-                    $fdbt->push(new PortsFdb([
-                        'port_id' => $port_id,
-                        'mac_address' => $mac_address,
-                        'vlan_id' => $vlanIdx,
-                    ]));
-                }
-            }
-        }
+        $fdbt = SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')
+            ->mapTable(function ($data, $vlan, $default, $ifIndex, $vlanIdx, $timestamp, $mac_address) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+                return new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $vlanIdx,
+                ]);
+            });
 
         if ($fdbt->isEmpty()) {
             $fdbt = parent::discoverFdbTable();

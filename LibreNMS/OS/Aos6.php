@@ -75,34 +75,15 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
     {
         $fdbt = new Collection;
 
-        // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-        $dot1d = SnmpQuery::mibDir('nokia')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition')->table();
-        if (! empty($dot1d)) {
-            $fdbPort_table = [];
-            foreach ($dot1d['ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition'] as $portLocal => $data) {
-                foreach ($data as $vlanLocal => $data2) {
-                    if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {
-                        $fdbPort_table[$vlanLocal] = ['dot1qTpFdbPort' => []];
-                    }
-                    foreach ($data2 as $macLocal => $one) {
-                        $fdbPort_table[$vlanLocal]['dot1qTpFdbPort'][$macLocal] = $portLocal;
-                    }
-                }
-            }
-        }
-
-        if (! empty($fdbPort_table)) {
-            foreach ($fdbPort_table as $vlanIdx => $macData) {
-                foreach ($macData['dot1qTpFdbPort'] as $mac_address => $ifIndex) {
-                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
-                    $fdbt->push(new PortsFdb([
-                        'port_id' => $port_id,
-                        'mac_address' => $mac_address,
-                        'vlan_id' => $vlanIdx,
-                    ]));
-                }
-            }
-        }
+        $fdbt = SnmpQuery::mibDir('nokia')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition')
+            ->mapTable(function ($data, $ifIndex, $vlanIdx, $mac_address) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+                return new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $vlanIdx,
+                ]);
+            });
 
         if ($fdbt->isEmpty()) {
             $fdbt = parent::discoverFdbTable();
