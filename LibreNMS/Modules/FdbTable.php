@@ -84,23 +84,24 @@ class FdbTable implements Module
             $data->vlan_id = $vlansDb[$data->vlan_id]['vlan_id'] ?? 0; //convert raw_vlan to vlan_id from 'vlans' database
             $data->mac_address = Mac::parse($data->mac_address)->hex(); //convert mac address
 
-            if (empty($data->port_id)) {
-                Log::info('Drop MAC: ' . $data->mac_address . ' because of missing port');
+            if (strlen($data->mac_address) != 12) {
+                Log::debug('Drop MAC: ' . $data->mac_address . ' because of invalid MAC value');
 
-                return null;
+                return false;
             }
 
-            if (strlen($data->mac_address) != 12) {
-                Log::info('Drop MAC: ' . $data->mac_address . ' because of invalid MAC value');
+            if (empty($data->port_id)) {
+                Log::debug('Drop MAC: ' . $data->mac_address . ' because of missing port');
 
-                return null;
+                return false;
             }
 
             if (empty($data->vlan_id)) {
                 $port = PortCache::get($data->port_id);
                 Log::info('Missing VLAN for MAC: ' . $data->mac_address . ' on port ' . $port->ifName);
 
-                //return null;
+                //return false;
+                //will leave this as it is, if we drop vlan_vlan = 0 then we break 'dot1dTpFdbPort' devices which have no vlan data
             }
 
             return true;
