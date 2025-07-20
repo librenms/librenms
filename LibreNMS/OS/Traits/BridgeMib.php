@@ -242,12 +242,12 @@ trait BridgeMib
 
     public function dot1dTpFdbAddress(): array
     {
-        return SnmpQuery::walk('BRIDGE-MIB::dot1dTpFdbAddress')->pluck();
+        return SnmpQuery::numericIndex()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->pluck();
     }
 
     public function dot1dTpFdbPort(): array
     {
-        return SnmpQuery::walk('BRIDGE-MIB::dot1dTpFdbPort')->pluck();
+        return SnmpQuery::numericIndex()->walk('BRIDGE-MIB::dot1dTpFdbPort')->pluck();
     }
 
     public function dot1dBasePort(): array

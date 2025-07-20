@@ -78,6 +78,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
         $fdbt = SnmpQuery::mibDir('nokia')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition')
             ->mapTable(function ($data, $ifIndex, $vlanIdx, $mac_address) {
                 $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+
                 return new PortsFdb([
                     'port_id' => $port_id,
                     'mac_address' => $mac_address,

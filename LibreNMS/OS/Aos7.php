@@ -85,6 +85,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, FdbTableDisco
         $fdbt = SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')
             ->mapTable(function ($data, $vlan, $default, $ifIndex, $vlanIdx, $timestamp, $mac_address) {
                 $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+
                 return new PortsFdb([
                     'port_id' => $port_id,
                     'mac_address' => $mac_address,
