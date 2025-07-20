@@ -1670,7 +1670,7 @@ Output:
 
 ### `list_parents_of_host`
 
-This is not a seperate API call.  Instead, you obtain the list of parents
+This is not a separate API call.  Instead, you obtain the list of parents
 from `list_devices`.  See that entry point for more detailed information.
 
 Example:

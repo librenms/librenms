@@ -20,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -209,13 +209,52 @@ class StringHelpers
     }
 
     /**
+     * Convert hex string to an array of 1-based indices of the nonzero bits
+     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+     *
+     * @return int[]
+     */
+    public static function bitsToIndices(string $hex_data): array
+    {
+        $hex_data = str_replace([' ', "\n"], '', $hex_data);
+
+        // we need an even number of digits for hex2bin
+        if (strlen($hex_data) % 2 === 1) {
+            $hex_data = '0' . $hex_data;
+        }
+
+        if (! StringHelpers::isHex($hex_data)) {
+            // could be malformed
+            if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
+                return array_map(fn ($v) => intval($v), explode(',', $matches[0]));
+            }
+
+            return [];
+        }
+
+        $value = hex2bin($hex_data);
+        $length = strlen($value);
+        $indices = [];
+        for ($i = 0; $i < $length; $i++) {
+            $byte = ord($value[$i]);
+            for ($j = 7; $j >= 0; $j--) {
+                if ($byte & (1 << $j)) {
+                    $indices[] = 8 * $i + 8 - $j;
+                }
+            }
+        }
+
+        return $indices;
+    }
+
+    /**
      * Remove artefacts from LLDP remoteSysName coming from jetstream devices
      */
     public static function linksRemSysName($sysName = ''): string
     {
         $sysName = str_replace(['.MP.', '.TS.', "\n", '"'], '', $sysName);
-        $sysName = trim($sysName);
         $sysName = rtrim($sysName, '.');
+        $sysName = trim($sysName);
 
         return $sysName;
     }

@@ -12929,43 +12929,18 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 0,
-                    "vlan_domain": 1,
-                    "vlan_name": "____juniper_private1____",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Backend",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Frontend",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ],
-            "ports_vlans": [
-                {
-                    "vlan": 10,
-                    "baseport": 4098,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 11,
-                    "baseport": 4099,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "vlan_type": "",
+                    "vlan_state": 1
                 }
             ]
         }

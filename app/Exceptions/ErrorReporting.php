@@ -172,7 +172,7 @@ class ErrorReporting
         // in production, don't halt execution on non-fatal errors
         set_error_handler(function ($severity, $message, $file, $line) {
             // If file is from a package, find the first non-vendor frame
-            if (str_contains($file, '/vendor/')) {
+            if (self::isUndesirableTracePath($file)) {
                 // add vendor file to message
                 $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
                 [$file, $line] = self::findFirstNonVendorFrame();
@@ -195,7 +195,7 @@ class ErrorReporting
     {
         foreach (debug_backtrace() as $trace) {
             // not vendor frames
-            if (isset($trace['file']) && str_contains($trace['file'], '/vendor/')) {
+            if (isset($trace['file']) && self::isUndesirableTracePath($trace['file'])) {
                 continue;
             }
             // not this class
@@ -207,5 +207,13 @@ class ErrorReporting
         }
 
         return ['', ''];
+    }
+
+    private static function isUndesirableTracePath(string $path): bool
+    {
+        return Str::contains($path, [
+            '/vendor/',
+            '/storage/framework/views/',
+        ]);
     }
 }

@@ -1,24 +1,52 @@
 <?php
 
+/**
+ * Jetstream.php
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link       http://librenms.org
+ *
+ * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
 use App\Models\Link;
+use App\Models\PortVlan;
 use App\Models\Route;
+use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, LinkDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery, LinkDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -122,6 +150,70 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Link
         return $routes->filter();
     }
 
+    public function discoverVlans(): Collection
+    {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
+        return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
+            ->mapTable(function ($data, $vlan_id) {
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_domain' => 1,
+                    'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
+                ]);
+            });
+    }
+
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
+
+        $vlanPortConfigTable = SnmpQuery::walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
+        foreach ($vlanPortConfigTable as $ifIndex => $data) {
+            $portConfig[$data['TPLINK-DOT1Q-VLAN-MIB::vlanPortNumber']] = $ifIndex;
+        }
+
+        $vlanConfigTable = SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
+        foreach ($vlanConfigTable as $vlan_id => $data) {
+            $types = ['TPLINK-DOT1Q-VLAN-MIB::vlanTagPortMemberAdd' => 0, 'TPLINK-DOT1Q-VLAN-MIB::vlanUntagPortMemberAdd' => 1];
+            foreach ($types as $type => $tag) {
+                $expand = $this->jetstreamExpand($data[$type] ?? []);
+                foreach ($expand as $key => $port) {
+                    $ifIndex = $portConfig[$port] ?? 0;
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
+                        'untagged' => $tag,
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+        }
+
+        return $ports;
+    }
+
+    private function jetstreamExpand($var): array
+    {
+        $result = [];
+
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
+
+        foreach ($lags[2] as $index => $start) {
+            $end = $lags[3][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
+            }
+        }
+
+        return $result;
+    }
+
     public function discoverLinks(): Collection
     {
         $links = new Collection;
@@ -163,6 +255,6 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Link
             }
         }
 
-        return $links->filter();
+        return $links;
     }
 }

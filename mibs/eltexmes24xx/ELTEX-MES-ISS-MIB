@@ -18,12 +18,15 @@ IMPORTS
 
 eltMesIss MODULE-IDENTITY
         LAST-UPDATED "202304100000Z"
-        ORGANIZATION "Eltex Enterprise, Ltd."
+        ORGANIZATION "Eltex Enterprise, Ltd." 
         CONTACT-INFO
                 "eltex-co.ru"
         DESCRIPTION
                 "The Structure of Management Information for Eltex MES
                 products based on the ISS platform."
+        REVISION "202409110000Z"
+        DESCRIPTION
+                "Added eltMesIssUserMgmMIB object identifier."
         REVISION "202304100000Z"
         DESCRIPTION
                 "Added eltMesIssDhcpSrvMIB object identifier."
@@ -42,8 +45,8 @@ eltMesIss MODULE-IDENTITY
         REVISION "202103090000Z"
         DESCRIPTION
                 "Added eltMesIssArpMIB object identifier."
-        REVISION "201811130000Z"
-        DESCRIPTION "Initial revision."
+        REVISION "201811130000Z" 
+        DESCRIPTION "Initial revision." 
     ::= { elHardware 139 }
 
 eltMesIssAclMIB  OBJECT IDENTIFIER               ::= { eltMesIss 1 }
@@ -144,4 +147,14 @@ eltMesIssDhcpSnoopMIB OBJECT IDENTIFIER          ::= { eltMesIss 32 }
 
 eltMesIssDhcpSrvMIB OBJECT IDENTIFIER            ::= { eltMesIss 33 }
 -- see ELTEX-MES-ISS-DHCP-SRV-MIB.mib
+
+eltMesIssLbdMIB OBJECT IDENTIFIER                ::= { eltMesIss 34 }
+-- see ELTEX-MES-ISS-LBD-MIB.mib
+
+eltMesIssRadiusMIB OBJECT IDENTIFIER             ::= { eltMesIss 35 }
+-- see ELTEX-MES-RADIUS-MIB.mib
+
+eltMesIssUserMgmMIB OBJECT IDENTIFIER            ::= { eltMesIss 36 }
+-- see ELTEX-MES-ISS-USERMGM-MIB.mib
+
 END
