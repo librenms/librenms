@@ -116,11 +116,10 @@ class InfluxDB extends BaseDatastore
         ]);
 
         try {
-            // Add timestamp to points if batch size is > 0
-            $timestamp = null;
-            if ($this->batchSize > 0) {
-                $timestamp = (int) floor(microtime(true) * 1000); // Convert timestamp to milliseconds
-            }
+            // Add timestamp to points as current time in milliseconds
+            // This is important for InfluxDB to correctly order and store the data
+            // This is especially important for batch writes to ensure data is aggregated correctly
+            $timestamp = (int) floor(microtime(true) * 1000); // Convert timestamp to milliseconds
 
             $this->batchPoints[] = new \InfluxDB\Point(
                 $measurement,
