@@ -42,7 +42,7 @@ class InfluxDBStoreTest extends TestCase
         $influx = new InfluxDB(InfluxDB::createFromConfig());
 
         \Log::shouldReceive('debug');
-        \Log::shouldReceive('error')->once()->with('InfluxDB exception: Unable to parse URI: http://:0'); // the important one
+        \Log::shouldReceive('error')->once()->with('InfluxDB batch write failed: Unable to parse URI: http://:0');
         $influx->write('fake', ['one' => 1]);
     }
 
