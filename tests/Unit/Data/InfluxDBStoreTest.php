@@ -62,7 +62,7 @@ class InfluxDBStoreTest extends TestCase
 
         $expected = [new Point($measurement, null, ['hostname' => $device->hostname] + $tags, $fields)];
 
-        $mock->shouldReceive('writePoints')->withArgs([$expected, "ms"])->once();
+        $mock->shouldReceive('writePoints')->withArgs([$expected, 'ms'])->once();
         $influx->write($measurement, $fields, $tags, $meta);
     }
 }
