@@ -155,7 +155,6 @@ class InfluxDB extends BaseDatastore
 
         // Continue flushing until all points are written
         while (! empty($this->batchPoints)) {
-
             // Take up to $batchSize points from the batch for this write
             $pointsToWrite = array_splice($this->batchPoints, 0, $batchSize);
 
