@@ -8597,6 +8597,50 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 78 8E (00809f85788e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 86 0D D8 (00809f860dd8)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 71 53 (00809f857153)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 78 87 (00809f857887)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "ar1-nexus6go2e",
                     "remote_port": "AC A3 1E C3 4B E6 (aca31ec34be6)",
                     "remote_platform": null,
@@ -8615,6 +8659,72 @@
                     "ifAlias": "Ethernet Interface",
                     "ifDescr": "Ethernet Interface",
                     "ifName": "e23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 77 45 (00809f857745)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 86 0D D1 (00809f860dd1)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 71 26 (00809f857126)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e6"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 70 F7 (00809f8570f7)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 80 9F 85 70 0C (00809f85700c)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "BC AE C5 39 45 32 (bcaec5394532)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Interface",
+                    "ifDescr": "Ethernet Interface",
+                    "ifName": "e9"
                 },
                 {
                     "active": 1,
@@ -8639,6 +8749,347 @@
                     "context_name": "",
                     "ipv4_network": "172.31.36.0/22",
                     "ifIndex": 100998
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 100613,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 100613,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 100309,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100309,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100613,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 100998,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 49,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100227,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100309,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100613,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 100998,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 50,
+                    "low_ifIndex": 102064,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 51,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 52,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1000,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1001,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1003,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1004,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1005,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1006,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1007,
+                    "low_ifIndex": 100000,
+                    "ifStackStatus": "active"
                 }
             ]
         }
