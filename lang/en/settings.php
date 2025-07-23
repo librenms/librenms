@@ -780,7 +780,7 @@ return [
                 'description' => 'UCD DiskIO',
             ],
             'vlans' => [
-                'description' => 'VLans',
+                'description' => 'VLANs',
             ],
             'vminfo' => [
                 'description' => 'Hypervisor VM Info',
@@ -1663,6 +1663,9 @@ return [
             ],
             'bgp-peers' => [
                 'description' => 'BGP Peers',
+            ],
+            'vlans' => [
+                'description' => 'VLANs',
             ],
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',

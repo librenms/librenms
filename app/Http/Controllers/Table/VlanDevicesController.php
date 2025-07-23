@@ -17,7 +17,7 @@ class VlanDevicesController extends TableController
             'domain' => 'vlans.vlan_domain',
             'name' => 'vlans.vlan_name',
             'type' => 'vlans.vlan_type',
-            'mtu' => 'vlans.vlan_mtu',
+            'state' => 'vlans.vlan_state',
         ];
     }
 
@@ -35,7 +35,7 @@ class VlanDevicesController extends TableController
                 'devices.*',
                 'vlans.vlan_name',
                 'vlans.vlan_type',
-                'vlans.vlan_mtu',
+                'vlans.vlan_state',
             ])
             ->withCount(['ports' => function ($query) {
                 $query->distinct()->where('ifVlan', $this->vlanId)
@@ -63,7 +63,7 @@ class VlanDevicesController extends TableController
             'domain' => $model['vlan_domain'],
             'name' => $model['vlan_name'],
             'type' => $model['vlan_type'],
-            'mtu' => $model['vlan_mtu'],
+            'state' => $model['vlan_state'],
         ];
     }
 }
