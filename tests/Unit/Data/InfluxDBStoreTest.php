@@ -63,8 +63,11 @@ class InfluxDBStoreTest extends TestCase
 
         $mock->shouldReceive('writePoints')
             ->with(\Mockery::on(function ($points) use ($measurement, $tags, $fields, $device) {
-                if (!is_array($points) || count($points) !== 1) return false;
+                if (! is_array($points) || count($points) !== 1) {
+                    return false;
+                }
                 $point = $points[0];
+
                 return $point instanceof Point
                     && $point->getMeasurement() === $measurement
                     && $point->getTags() == (['hostname' => $device->hostname] + $tags)
