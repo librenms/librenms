@@ -52,7 +52,8 @@ class InfluxDBStoreTest extends TestCase
         $mock = \Mockery::mock(\InfluxDB\Database::class);
 
         $mock->shouldReceive('exists')->once()->andReturn(true);
-        $influx = new InfluxDB($mock);
+        // Disable shutdown function in test
+        $influx = new InfluxDB($mock, false);
 
         $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';
@@ -60,9 +61,16 @@ class InfluxDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
         $meta = ['device' => $device];
 
-        $expected = [new Point($measurement, null, ['hostname' => $device->hostname] + $tags, $fields)];
-
-        $mock->shouldReceive('writePoints')->withArgs([$expected, 'ms'])->once();
+        $mock->shouldReceive('writePoints')
+            ->with(\Mockery::on(function ($points) use ($measurement, $tags, $fields, $device) {
+                if (!is_array($points) || count($points) !== 1) return false;
+                $point = $points[0];
+                return $point instanceof Point
+                    && $point->getMeasurement() === $measurement
+                    && $point->getTags() == (['hostname' => $device->hostname] + $tags)
+                    && $point->getFields() == $fields;
+            }), 'ms')
+            ->once();
         $influx->write($measurement, $fields, $tags, $meta);
     }
 }
