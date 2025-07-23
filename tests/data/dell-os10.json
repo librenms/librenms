@@ -7946,14 +7946,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "vlan1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "vlan4094",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

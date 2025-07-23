@@ -7070,46 +7070,39 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 228,
                     "vlan_domain": 1,
                     "vlan_name": "CFP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 310,
                     "vlan_domain": 1,
                     "vlan_name": "Puertas",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 614,
                     "vlan_domain": 1,
                     "vlan_name": "APS-I1I2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "Gestion",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2065,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-NEXUS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -7146,14 +7139,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 228,
                     "baseport": 1,
                     "priority": 0,
@@ -7338,14 +7323,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 228,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 310,
                     "baseport": 24,
                     "priority": 0,
@@ -7368,14 +7345,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 310,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 614,
@@ -7410,14 +7379,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 614,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 999,
                     "baseport": 49,
                     "priority": 0,
@@ -7432,14 +7393,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 999,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 2065,
@@ -7624,14 +7577,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 2065,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }

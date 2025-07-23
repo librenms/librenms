@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '25.6.0';
+    public const VERSION = '25.7.0';
 
     /** @var Git convenience instance */
     public $git;
