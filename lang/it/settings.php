@@ -871,6 +871,10 @@ return [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
             ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',

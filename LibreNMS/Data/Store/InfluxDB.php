@@ -111,11 +111,13 @@ class InfluxDB extends BaseDatastore
             return;
         }
 
-        Log::debug('InfluxDB data: ', [
-            'measurement' => $measurement,
-            'tags' => $tmp_tags,
-            'fields' => $tmp_fields,
-        ]);
+        if (LibrenmsConfig::get('influxdb.debug', false) === true) {
+            Log::debug('InfluxDB data: ', [
+                'measurement' => $measurement,
+                'tags' => $tmp_tags,
+                'fields' => $tmp_fields,
+            ]);
+        }
 
         try {
             // Add timestamp to points as current time in milliseconds
@@ -150,7 +152,9 @@ class InfluxDB extends BaseDatastore
         if (! empty($this->batchPoints)) {
             try {
                 $this->connection->writePoints($this->batchPoints, 'ms'); // Added timestamps are in milliseconds
-                Log::debug('Flushed batch of ' . count($this->batchPoints) . ' points to InfluxDB');
+                if (LibrenmsConfig::get('influxdb.debug', false) === true) {
+                    Log::debug('Flushed batch of ' . count($this->batchPoints) . ' points to InfluxDB');
+                }
                 $this->batchPoints = []; // Clear batch after writing
             } catch (\InfluxDB\Exception $e) {
                 Log::error('InfluxDB batch write failed: ' . $e->getMessage());

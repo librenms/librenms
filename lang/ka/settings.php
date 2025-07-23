@@ -1064,6 +1064,10 @@ return [
                 'description' => 'SSL-ის გადამოწმება',
                 'help' => 'SSL სერტიფიკატების გადამოწმება მათ სანდოობაზე და სისწორეზე',
             ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
         ],
         'influxdbv2' => [
             'bucket' => [

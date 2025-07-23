@@ -862,6 +862,10 @@ return [
                 'description' => 'Перевіряти SSL',
                 'help' => 'Перевіряти чи сертифікат SSL валідний та довірений',
             ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
         ],
         'ipmitool' => [
             'description' => 'Шлях до ipmitool',

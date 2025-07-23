@@ -1046,6 +1046,10 @@ return [
                 'description' => 'Verificar SSL',
                 'help' => 'Verificar se o certificado SSL é válido e confiável',
             ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
         ],
         'influxdbv2' => [
             'bucket' => [

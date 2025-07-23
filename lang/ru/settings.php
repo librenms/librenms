@@ -1035,6 +1035,10 @@ return [
                 'description' => 'Проверка SSL',
                 'help' => 'Проверяет, что SSL-сертификат действителен и доверен',
             ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
+            ],
         ],
         'influxdbv2' => [
             'bucket' => [

@@ -40,6 +40,7 @@ continue to function as normal.
     lnms config:set influxdb.batch_size 0
     lnms config:set influxdb.measurements ''
     lnms config:set influxdb.verifySSL false
+    lnms config:set influxdb.debug false
     ```
 
 No credentials are needed if you don't use InfluxDB authentication.
