@@ -521,7 +521,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     if (isset($data['multiplier'])) {
                         $multiplier = YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache);
                     } elseif (isset($sensor_options['multiplier'])) {
-                        $multipler = $sensor_options['multiplier'];
+                        $multiplier = $sensor_options['multiplier'];
                     } else {
                         $multiplier = 1;
                     }
