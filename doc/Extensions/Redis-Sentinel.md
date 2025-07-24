@@ -16,16 +16,28 @@ To configure the Web UI to use a Redis Sentinel cluster, add the following param
 
 ```
 # Configure these values according to your environment
-REDIS_SENTINEL=192.168.1.10:26379,192.168.1.11:26379,192.168.1.12:26379
+REDIS_SENTINEL_HOSTS=redis://192.168.1.10:26379,redis://192.168.1.11:26379,redis://192.168.1.12:26379
 REDIS_SENTINEL_SERVICE=mymaster
-REDIS_SENTINEL_PASSWORD=your_sentinel_password
+# optionally set password if your redis-backend has it enabled, this is not for sentinel.
 REDIS_PASSWORD=your_redis_password
 
 # These values tell the web app to use Sentinel as the Redis backend - do not change
 REDIS_BROADCAST_CONNECTION=sentinel_cache
 REDIS_CACHE_CONNECTION=sentinel_cache
 REDIS_LOCK_CACHE_CONNECTION=sentinel_cache
+SESSION_DRIVER=redis
 SESSION_CONNECTION=sentinel_session
+```
+
+### Redis Sentinel Authentication
+
+If your Redis Sentinel cluster is password-protected, you need to append `password=your_redis_password` to each Redis Sentinel URL in the `REDIS_SENTINEL_HOSTS` variable.
+Optionally, if you are using ACLs, you must also include `username=your_redis_username` in the URL.
+
+For example:
+
+```
+REDIS_SENTINEL_HOSTS=redis://192.168.1.10:26379?password=your_redis_password,redis://192.168.1.11:26379?password=your_redis_password,redis://192.168.1.12:26379?password=your_redis_password
 ```
 
 ### Poller Configuration
