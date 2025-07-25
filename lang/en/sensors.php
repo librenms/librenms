@@ -197,4 +197,10 @@ return [
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
+    'span_loss' => [
+        'short' => 'SL',
+        'long' => 'Span Loss',
+        'unit' => 'dB',
+        'unit_long' => 'Decibels',
+    ],
 ];
