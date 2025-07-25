@@ -1,0 +1,5 @@
+modules:
+  os:
+    hardware: ENLOGIC-PDU2-MIB::pduNamePlatePartNumber.1
+    serial: ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1
+    version: ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
