@@ -26,11 +26,18 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\Sensors;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Fabos extends OS implements OSDiscovery
+class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -117,5 +124,53 @@ class Fabos extends OS implements OSDiscovery
         ];
 
         return $models[$model] ?? 'Unknown Brocade FC Switch';
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $portCollection = $this->getDevice()->ports()->get();
+        $sensorCollection = $this->getDevice()->sensors()->get();
+
+        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk('FA-EXT-MIB::swConnUnitPortTable')->table(1);
+        $snmpData = SnmpQuery::hideMib()->mibs(['FCMGMT-MIB'])->enumStrings()->walk('FCMGMT-MIB::connUnitPortTable')->table(1, $snmpData);
+        // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
+        // connUnitPortVendor['..8...K.........'][1] = "BROCADE         "
+
+        $snmpData = array_shift($snmpData); // remove 'connUnitPortUnitId'
+
+        Log::info('Transceivers discovery started');
+
+        $data = $portCollection->map(function ($port) use ($sensorCollection) {
+            $ifIndex = $port->ifIndex;
+
+            // Filter sensors matching this ifIndex
+            $filterSensors = $sensorCollection->filter(function ($value, $key) use ($ifIndex) {
+                return $value['entPhysicalIndex'] == $ifIndex && $value['entPhysicalIndex_measured'] == 'ports';
+            });
+
+            $port['has_sensors_attached'] = $filterSensors->count();
+
+            return $port;
+        });
+
+        $data = $data->reject(function ($value, $key) {
+            return $value['has_sensors_attached'] < 1;
+        });
+
+        return $data->map(function ($entry, $index) use ($snmpData) {
+            $ifIndex = $entry['ifIndex'] ?? null;
+            $connUnitPortIndex = $index - 5;
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $connUnitPortIndex,
+                'type' => $snmpData['connUnitPortModuleType'][$connUnitPortIndex] ?? null,
+                'serial' => $snmpData['connUnitPortSn'][$connUnitPortIndex] ?? null,
+                'vendor' => $snmpData['connUnitPortVendor'][$connUnitPortIndex] ?? null,
+                'revision' => $snmpData['connUnitPortRevision'][$connUnitPortIndex] ?? null,
+                'cable' => $snmpData['connUnitPortTransmitterType'][$connUnitPortIndex] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }
