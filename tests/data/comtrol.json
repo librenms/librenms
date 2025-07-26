@@ -2238,14 +2238,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN1........",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3002,
                     "vlan_domain": 1,
                     "vlan_name": "fm-cc........",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

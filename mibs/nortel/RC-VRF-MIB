@@ -1,0 +1,569 @@
+--
+-- RC-VRF-MIB
+--
+
+RC-VRF-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        InterfaceIndex
+            FROM IF-MIB
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, 
+        NOTIFICATION-TYPE,  mib-2, Integer32
+            FROM SNMPv2-SMI
+        TruthValue, DisplayString, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        rcVrf, IdList, EnableValue
+            FROM RAPID-CITY;
+
+    rcVrfMib MODULE-IDENTITY
+
+        LAST-UPDATED "200809090000Z"
+
+        ORGANIZATION "Nortel Networks"
+        CONTACT-INFO "Alka Malik
+             Postal:  Nortel Networks, Inc. 
+                      600 Technology Park
+                      Billerica, MA 01821
+              email:  alka@nortel.com
+                     "
+        DESCRIPTION  "The MIB module is the definition of the managed
+                      objects for the Virtual Router."
+
+       REVISION "200809090000Z" -- 09 September 2008
+       DESCRIPTION "Version 11: added values isis(3) and pim(4) to VrfRpTriggerBitCode."
+
+       REVISION "200805180000Z" -- 18 May 2008
+       DESCRIPTION "Version 10: corrected the enum values for rcVrfIpVpnSvcLblAllocOpt."
+
+       REVISION "200805160000Z" -- 16 May 2008
+       DESCRIPTION "Version 9: Updated default value for rcVrfRpTrigger and removed vrrp bit from VrfRpTriggerBitCode."
+
+       REVISION "200805130000Z" -- 13 May 2008
+       DESCRIPTION "Version 8: Updated default value for rcVrfRpTrigger."
+
+       REVISION "200805090000Z" -- 09 May 2008
+       DESCRIPTION "Version 7: Fixed smilint errors."
+
+       REVISION "200805080000Z" -- 08 May 2008
+       DESCRIPTION "Version 6: Removed embedded control characters
+                               (was causing compile errors)."
+
+       REVISION "200804280000Z" -- 28 April 2008
+       DESCRIPTION "Version 5: Fixed smilint issues."
+
+       REVISION "200803130000Z" -- 13 March 2008
+       DESCRIPTION "Version 4: Changed module name to 'RC-VRF-MIB'
+from 'RC-VIRTUAL-ROUTING-MIB'."
+
+       REVISION "200712180000Z" -- 18 Dec 2007
+       DESCRIPTION "Version 3: Changed syntax of rcVrfIpVpnStatus from TruthValue to EnableValue"
+
+       REVISION "200705030000Z" -- 03 May 2007
+       DESCRIPTION "Version 2: Add rcVrfIpVpnTableSize, rcVrfIpVpnTable."
+
+       REVISION "200701240000Z" -- 24 Jan 2007
+       DESCRIPTION "Version 1: Initial version"
+
+       ::= { rcVrf 1 }
+
+
+    VrfIdentifier ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+            "Virtual Router Identifier.
+             VRFID 0 is reserved for the Administrative VRF
+             and cannot be used to create VRF's.
+            "
+    SYNTAX Unsigned32 (0..4294967295)
+    
+    VPNId ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "The purpose of a VPN-ID is to uniquely identify a VPN.
+             The Global VPN Identifier format is:
+             3 octet VPN Authority, Organizationally Unique Identifier
+             followed by 4 octet VPN index identifying VPN according
+             to OUI"
+        REFERENCE
+            "Fox, B. and Gleeson, B., 'Virtual Private Networks
+             Identifier', RFC 2685, September 1999."
+        SYNTAX    OCTET STRING (SIZE (7))
+    
+    VrfRpTriggerBitCode ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This object represents Routing Protocol (RP)
+             Triggers on a Virtual Router.  The BITS
+             represent an Action-code that specifies the
+             action on the Routing Protocols.
+
+             The actions are:  initiate or shutdown.
+
+             When encoding the RP using the BITS construct,
+             the value is encoded as an OCTET STRING where
+             the first bit (bit 0) is the highest bit of the
+             octet.
+
+             Bits 0-3 may be specified in any combination to
+             allow multiple Routing Protocols to be acted on
+             simultaneously or individually.
+            "
+        SYNTAX BITS {
+                 rip (0),
+                 ospf(1),
+                 bgp (2),
+                 isis(3), -- not supported in 8600
+                 pim (4)
+               }
+
+rcVrfNotifications OBJECT IDENTIFIER ::= { rcVrfMib 0 }
+rcVrfObjects       OBJECT IDENTIFIER ::= { rcVrfMib 1 }
+rcVrfNotificationObjects OBJECT IDENTIFIER ::= { rcVrfMib 2 }
+
+--
+-- Node definitions
+--
+
+    rcVrfConfig OBJECT IDENTIFIER ::= { rcVrfObjects 1 }
+
+    rcVrfConfigScalars OBJECT IDENTIFIER ::= { rcVrfConfig 1 }
+
+    rcVrfConfigNextAvailableVrfId OBJECT-TYPE
+        SYNTAX VrfIdentifier
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The next available Virtual Router Id (index).
+            This object provides a hint for the rcVrfId value
+            to use when administratively creating a new
+            rcVrfConfigEntry.
+
+            A GET of this object returns the next available rcVrfId
+            value to be used to create an entry in the associated
+            rcVrfConfigTable; or zero, if no valid rcVrfId
+            value is available. A value of zero(0) indicates that
+            it is not possible to create a new rcVrfConfigEntry.
+            This object also returns a value of zero when it is the
+            lexicographic successor of a varbind presented in an
+            SNMP GETNEXT or GETBULK request, for which circumstance
+            it is assumed that ifIndex allocation is unintended.
+
+            Successive GETs will typically return different
+            values, thus avoiding collisions among cooperating
+            management clients seeking to create table entries
+            simultaneously.
+
+            Unless specified otherwise by its MAX-ACCESS and
+            DESCRIPTION clauses, an object of this type is read-only,
+            and a SET of such an object returns a notWritable error."
+        ::= { rcVrfConfigScalars 1 }
+
+    rcVrfConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcVrfConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is for creating the new Virtual Routers."
+        ::= { rcVrfConfig 2 }
+
+    rcVrfConfigEntry OBJECT-TYPE
+        SYNTAX RcVrfConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entries in this table can be added/deleted
+            using the rcVrfRowStatus."
+        INDEX { rcVrfId }
+        ::= { rcVrfConfigTable 1 }
+
+    RcVrfConfigEntry ::=
+        SEQUENCE {
+            rcVrfId
+                VrfIdentifier,
+            rcVrfRowStatus
+                RowStatus,
+            rcVrfName
+                DisplayString,
+            rcVrfContextName
+                SnmpAdminString,
+            rcVrfTrapEnable
+                TruthValue,
+            rcVrfMaxRoutes
+                Unsigned32,
+            rcVrfAdminStatus
+                INTEGER,
+            rcVrfVpnId
+                VPNId,
+            rcVrfRpTrigger
+                VrfRpTriggerBitCode,
+            rcVrfMaxRoutesTrapEnable
+                TruthValue
+        }
+
+    rcVrfId OBJECT-TYPE
+        SYNTAX VrfIdentifier
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The unique id of this virtual router instance. A Virtual
+             Router cannot not be created with rcVrfId = 0.
+             VRFID 0 is reserved for the Administrative VRF.
+            "
+    ::= { rcVrfConfigEntry 1 }
+
+    rcVrfRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status column has three defined values:
+
+            - `active', which indicates that the conceptual row is
+            available for use by the managed device;
+            - `createAndGo', which is supplied by a management
+            station wishing to create a new instance of a
+            conceptual row and to have its status automatically set
+            to active, making it available for use by the managed
+            device;
+
+            - `destroy', which is supplied by a management station
+            wishing to delete all of the instances associated with
+            an existing conceptual row."
+    ::= { rcVrfConfigEntry 2 }
+
+    rcVrfName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Name of the Virtual Router."
+    ::= { rcVrfConfigEntry 3 }
+
+    rcVrfContextName OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The SNMPv2 Community String or SNMPv3 contextName
+            denotes the VRF 'context' and is used to logically
+            separate the MIB module management."
+    ::= { rcVrfConfigEntry 4 }
+
+    rcVrfTrapEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This objects is used to enable the generation
+            of the VrfUp and VrfDown traps.
+                true(1)     - VRF Traps Enabled
+                false(2)    - VRF Traps Disabled"
+        DEFVAL { true }
+    ::= { rcVrfConfigEntry 5 }
+
+    rcVrfMaxRoutes OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object specifies the maximum number of routes that
+            this VRF can support. The default value is 10000."
+        DEFVAL { 10000 }
+    ::= { rcVrfConfigEntry 6 }
+
+    rcVrfAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                 up(1),
+                 down(2),
+                 testing(3),
+                 unknown(4)
+                }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The administrative state of the Virtual Router."
+        DEFVAL { down }
+    ::= { rcVrfConfigEntry 7 }
+
+    rcVrfVpnId OBJECT-TYPE
+        SYNTAX  VPNId
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The Virtual Private Network Identifier of the Virtual
+             Router."
+    ::= { rcVrfConfigEntry 8 }
+
+    rcVrfRpTrigger OBJECT-TYPE
+        SYNTAX  VrfRpTriggerBitCode
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object represents Routing Protocol (RP)
+             Triggers on a Virtual Router and it meant to
+             be used to initiate or shutdown routing
+             protocols on a VRF.  Multiple RPs can be acted
+             on simultaneously.  Also, individual RPs can
+             be brought up in steps, which should not
+             affect the RPs that were running. The BITS
+             represent an Action-code that specifies what
+             action is to be performed for the RPs.
+             The actions are:  initiate(1) or shutdown(0).
+
+             The running status of an RP shall be available
+             in the VRF stats table's rcVrfRpStatus, which has
+             a similar format, but represents the status.
+
+             Bits 0-3 may be specified in any combination.
+             Individual routing protocols may be enabled
+             and disabled independently.  Protocols are
+             enabled by setting the respective BIT and are
+             disabled by resetting the BIT.
+
+             So, for example, to enable RIP and BGP protocols
+             the rcVrfRpTrigger bits 0 and 2 need to be set, and
+             as encoded as 10100000.
+             All zeros should be interpreted as all protocols
+             disable.
+            "
+        DEFVAL {{ rip, ospf }}
+    ::= { rcVrfConfigEntry 9 }
+
+     rcVrfMaxRoutesTrapEnable  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This objects is used to enable the generation
+             of the VRF Max Routes Exceeded traps.
+                true(1)     - VRF Max Routes Exceeded Traps Enabled
+                false(2)    - VRF Max Routes Exceeded Traps Disabled"
+        DEFVAL { true }
+    ::= { rcVrfConfigEntry 10 }
+
+    rcVrfStat OBJECT IDENTIFIER ::= { rcVrfObjects 2 }
+
+    rcVrfStatScalars OBJECT IDENTIFIER ::= { rcVrfStat 1 }
+
+    rcVrfConfiguredVRFs OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of VRFs configured on this network element."
+        ::= { rcVrfStatScalars 1 }
+
+    rcVrfActiveVRFs OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of VRFs that are active on the network element.
+            These are VRFs for which the
+            rcVrfStatOperStatus  = up(1)"
+        ::= { rcVrfStatScalars 2 }
+
+    rcVrfStatTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RcVrfStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains statistics for the Virtual Router."
+        ::= { rcVrfStat 2 }
+
+    rcVrfStatEntry OBJECT-TYPE
+        SYNTAX RcVrfStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entries in this table are per rcVrfId."
+        INDEX { rcVrfId }
+        ::= { rcVrfStatTable 1 }
+
+    RcVrfStatEntry ::=
+        SEQUENCE {
+            rcVrfStatRouteEntries
+                Unsigned32,
+            rcVrfStatFIBEntries
+                Unsigned32,
+            rcVrfStatUpTime
+                TimeTicks,
+            rcVrfOperStatus
+                INTEGER,
+            rcVrfRpStatus
+                VrfRpTriggerBitCode,
+            rcVrfRouterAddressType
+                InetAddressType,
+            rcVrfRouterAddress
+                InetAddress
+         }
+
+    rcVrfStatRouteEntries OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of routes for this VRF."
+        ::= { rcVrfStatEntry 1 }
+
+    rcVrfStatFIBEntries OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of FIB Entries for this VRF."
+        ::= { rcVrfStatEntry 2 }
+
+    rcVrfStatUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The time in (in hundredths of a second) since
+            this VRF entry has been operational."
+        ::= { rcVrfStatEntry 3 }
+
+    rcVrfOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                 up(1),
+                 down(2),
+                 unknown(3)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The operational status of the Virtual Router."
+        ::= { rcVrfStatEntry 4 }
+
+    rcVrfRpStatus OBJECT-TYPE
+        SYNTAX  VrfRpTriggerBitCode
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object represents the status of Routing
+             Protocols on this VRF corresponding to the list
+             of RP specified in rcVrfRpTrigger.
+
+             The BITS represent an Action-code that specifies
+             the status of the RPs.
+             The status are:  initiated (1) or shutdown (0).
+             Initiated status is indicated when the respective
+             BIT value is 1 and indicates shutdown when the
+             respective BIT value is 0.
+
+             Bits 0-3 may appear in any combination to
+             indicate that RPs may be enabled and disabled
+             independently or that multiple RP are acted on
+             simultaneously.
+            "
+        ::= { rcVrfStatEntry 5 }
+
+    rcVrfRouterAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Router Address Type of this VRF."
+        ::= { rcVrfStatEntry 6 }
+
+    rcVrfRouterAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Router Address of this VRF.  It is derived from one of the
+            interfaces. If loopback interface is present, the loopback
+            interface address can be used. However, loopback interface
+            is optional."
+        ::= { rcVrfStatEntry 7 }
+
+rcVrfIpVpnTableSize OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Size of Vrf IpVpn Table"
+        ::= { rcVrfObjects 3 }
+
+rcVrfIpVpnTable   OBJECT-TYPE
+    SYNTAX        SEQUENCE OF RcVrfIpVpnTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table required to configure vpn under ip."
+    ::= { rcVrfObjects 4 }
+
+rcVrfIpVpnTableEntry  OBJECT-TYPE
+    SYNTAX         RcVrfIpVpnTableEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Entries in this table are per rcVrfId."
+    INDEX          { rcVrfIpVpnVrfId }
+    ::= { rcVrfIpVpnTable 1 }
+
+RcVrfIpVpnTableEntry ::=
+    SEQUENCE {
+              rcVrfIpVpnVrfId  VrfIdentifier,
+              rcVrfIpVpnStatus EnableValue,
+              rcVrfIpVpnImportRTList           IdList,
+              rcVrfIpVpnExportRTList           IdList,
+              rcVrfIpVpnSvcLblAllocOpt      INTEGER,
+              rcVrfIpVpnRowStatus      RowStatus
+             }
+
+rcVrfIpVpnVrfId OBJECT-TYPE
+    SYNTAX        VrfIdentifier
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The VrfId serves as the Index for the rcIpVpnVrfTable and
+                   also for the rcIpVpnRouteDistinguisherTable. It allows to
+                   connect to the vrf table to obtain other attributes like the
+                   vrf name, rcVrfMaxRoutesTrapEnable etc."
+    ::= { rcVrfIpVpnTableEntry 1 }
+
+rcVrfIpVpnStatus  OBJECT-TYPE
+    SYNTAX        EnableValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "The status of IpVpn."
+    DEFVAL        { disable }
+    ::= { rcVrfIpVpnTableEntry 2 }
+
+rcVrfIpVpnImportRTList  OBJECT-TYPE
+    SYNTAX        IdList
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "The Import RT list is a list of all the route-targets
+                   attached to a particular vrf behaving in the import mode."
+    ::= { rcVrfIpVpnTableEntry 3 }
+
+rcVrfIpVpnExportRTList  OBJECT-TYPE
+    SYNTAX        IdList
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "The Export RT list is a list of all the route-targets
+                   attached to a particular vrf in the export mode."
+    ::= { rcVrfIpVpnTableEntry 4 }
+
+rcVrfIpVpnSvcLblAllocOpt OBJECT-TYPE
+    SYNTAX        INTEGER {
+                                perVrfperNexthop(1),
+                    		perVrf(2)
+                  }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "The service label allocation option for the ipvpn"
+    ::= { rcVrfIpVpnTableEntry 5 }
+
+rcVrfIpVpnRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION  "RowStatus for the Vpn Entry."
+    ::= { rcVrfIpVpnTableEntry 6 }
+
+END

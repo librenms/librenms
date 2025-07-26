@@ -3465,21 +3465,21 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 99",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 600,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 600",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

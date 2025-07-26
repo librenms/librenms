@@ -8315,49 +8315,49 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "1002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2002,
                     "vlan_domain": 1,
                     "vlan_name": "2002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3166,
                     "vlan_domain": 1,
                     "vlan_name": "3166",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3972,
                     "vlan_domain": 1,
                     "vlan_name": "3972",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4002,
                     "vlan_domain": 1,
                     "vlan_name": "4002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4003,
                     "vlan_domain": 1,
                     "vlan_name": "4003",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

@@ -10094,7 +10094,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0001",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
