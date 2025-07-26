@@ -307,18 +307,16 @@ if (! Auth::user()->hasGlobalRead()) {
 
         echo '<tr class="bgp"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . '>';
 
-        unset($sep);
+        $sep = '';
         foreach (dbFetchRows('SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$peer['device_id'], $peer['bgpPeerIdentifier']]) as $afisafi) {
             $afi = $afisafi['afi'];
             $safi = $afisafi['safi'];
             $this_afisafi = $afi . $safi;
-            $peer['afi'] .= $sep . $afi . '.' . $safi;
+            $peer['afi'] = ($peer['afi'] ?? '') . $sep . $afi . '.' . $safi;
             $sep = '<br />';
             $peer['afisafi'][$this_afisafi] = 1;
             // Build a list of valid AFI/SAFI for this peer
         }
-
-        unset($sep);
 
         echo '  <td></td>
             <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
