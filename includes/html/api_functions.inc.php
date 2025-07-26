@@ -650,7 +650,7 @@ function get_vlans(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', [$device_id]);
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device_id]);
 
         return api_success($vlans, 'vlans');
     });
@@ -1719,7 +1719,7 @@ function list_oxidized(Illuminate\Http\Request $request)
                 }
 
                 foreach ($fields as $field) {
-                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', $value)) {
+                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', (string) $value)) {
                         $output[$maps_column] = $field['value'] ?? $field[$maps_column];  // compatibility with old format
                         break;
                     } elseif (isset($field['match']) && $field['match'] == $value) {

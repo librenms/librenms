@@ -6838,59 +6838,59 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "routing",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "token-ring-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trnet-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 }
             ],
             "ports_vlans": [
                 {
                     "vlan": 1,
                     "baseport": 57,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 19,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 58,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 19,
                     "untagged": 1
                 },
                 {
@@ -6904,9 +6904,9 @@
                 {
                     "vlan": 1,
                     "baseport": 60,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -7064,9 +7064,9 @@
                 {
                     "vlan": 1,
                     "baseport": 80,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -7107,7 +7107,7 @@
                     "priority": 128,
                     "state": "forwarding",
                     "cost": 4,
-                    "untagged": 0
+                    "untagged": 1
                 }
             ]
         }
@@ -7126,25 +7126,6 @@
                     "designatedRoot": "7483c2fa99d8",
                     "rootCost": 8004,
                     "rootPort": 80,
-                    "maxAge": 20,
-                    "helloTime": 2,
-                    "holdTime": 1,
-                    "forwardDelay": 15,
-                    "bridgeMaxAge": 20,
-                    "bridgeHelloTime": 2,
-                    "bridgeForwardDelay": 15
-                },
-                {
-                    "vlan": 98,
-                    "rootBridge": 0,
-                    "bridgeAddress": "0c8525ffff00",
-                    "protocolSpecification": "rapidPvstPlus",
-                    "priority": 32866,
-                    "timeSinceTopologyChange": "6930",
-                    "topChanges": 1,
-                    "designatedRoot": "0c85255ce500",
-                    "rootCost": 0,
-                    "rootPort": 0,
                     "maxAge": 20,
                     "helloTime": 2,
                     "holdTime": 1,
@@ -7208,20 +7189,6 @@
                     "designatedCost": 8000,
                     "designatedBridge": "7483c2fa9a6b",
                     "designatedPort": 14,
-                    "forwardTransitions": 1,
-                    "ifIndex": 10624
-                },
-                {
-                    "vlan": 98,
-                    "port_index": 80,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 4,
-                    "designatedRoot": "0c85255ce500",
-                    "designatedCost": 0,
-                    "designatedBridge": "0c85255ce500",
-                    "designatedPort": 80,
                     "forwardTransitions": 1,
                     "ifIndex": 10624
                 }
