@@ -25,6 +25,7 @@
 
 namespace App\View\Components\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Closure;
@@ -36,15 +37,16 @@ class Page extends Component
 {
     public string $alertClass;
     public ?int $parentDeviceId;
-
+    public ?string $typeIcon = null;
+    public string $typeText = '';
 
     public function __construct(
         public readonly Device $device,
         public readonly array $dropdownLinks = [],
-    )
-    {
+    ) {
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
+        $this->populateTypeFields();
     }
 
     public function overviewGraphs(): array
@@ -77,4 +79,14 @@ class Page extends Component
         return view('components.device.page');
     }
 
+    private function populateTypeFields(): void
+    {
+        foreach (LibrenmsConfig::get('device_types', []) as $type) {
+            if (isset($type['type']) && $type['type'] == $this->device->type) {
+                $this->typeIcon = $type['icon'] ?? null;
+                $this->typeText = $type['text'] ?? $this->device->type;
+                break;
+            }
+        }
+    }
 }

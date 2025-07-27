@@ -11,7 +11,13 @@
             @if($device->isUnderMaintenance())
                 <span title="{{ __('Scheduled Maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
             @endif
-            <span style="font-size: 20px;"><x-device-link :device="$device"/></span><br/>
+            <span style="font-size: 20px;">
+                <x-device-link :device="$device"/>
+                @if($typeIcon)
+                    <i class="fa-solid fa-{{ $typeIcon }}" title="{{ $typeText }}"></i>
+                @endif
+            </span>
+            <br/>
             <a href="{{ url('/devices/location=' . urlencode($device->location)) }}">{{ $device->location }}</a>
         </div>
         <div class="pull-right">
