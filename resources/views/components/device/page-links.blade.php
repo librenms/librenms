@@ -18,9 +18,9 @@
                        @if($link['external'])target="_blank" rel="noopener" @endif
                     ><i class="fa {{ $link['icon'] }} fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ $link['title'] }}</a></li>
             @endforeach
-            @if($pageLinks)
+            @if($dropdownLinks)
                 <li role="presentation" class="divider"></li>
-                @foreach($pageLinks as $link)
+                @foreach($dropdownLinks as $link)
                     <li><a href="{{ $link['url'] }}"
                            @if(isset($link['onclick']))onclick="{{ $link['onclick'] }}" @endif
                            @if($link['external'])target="_blank" rel="noopener" @endif

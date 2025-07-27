@@ -44,13 +44,11 @@ class PageLinks extends Component
     public function __construct(
         public readonly Device $device,
         public readonly string $currentTab = '',
-        public readonly array $pageLinks = [],
-    )
-    {
-
+        public readonly array $dropdownLinks = [],
+    ) {
         $this->deviceLinks = $this->deviceLinkMenu($device, $currentTab);
         $primary_device_link_name = LibrenmsConfig::get('html.device.primary_link', 'edit');
-        if (! isset($device_links[$primary_device_link_name])) {
+        if (! isset($this->deviceLinks[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($this->deviceLinks);
         }
         $this->primaryDeviceLink = $this->deviceLinks[$primary_device_link_name];

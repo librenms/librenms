@@ -1,7 +1,7 @@
 @extends('layouts.librenmsv1')
 
 @section('content')
-    <x-device.page :device="$device">
+    <x-device.page :device="$device" :dropdown-links="$data['dropdownLinks'] ?? []">
     @isset($data['submenu'])
         <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
     @endisset

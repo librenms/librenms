@@ -26,7 +26,7 @@
         </div>
     </x-panel>
 
-    <x-device.page-tabs :device="$device" />
+    <x-device.page-tabs :device="$device" :dropdown-links="$dropdownLinks"/>
 
     <div class="tab-content tw:mt-4">
         <div class="tab-pane active">

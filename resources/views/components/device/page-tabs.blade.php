@@ -9,5 +9,5 @@
             </li>
         @endif
     @endforeach
-    <x-device.page-links :device="$device" :current-tab="$currentTab" />
+    <x-device.page-links :device="$device" :current-tab="$currentTab" :dropdown-links="$dropdownLinks"/>
 </ul>

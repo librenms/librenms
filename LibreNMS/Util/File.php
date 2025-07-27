@@ -34,7 +34,7 @@ class File
     public static function getFolderSize(string $directory): array
     {
         $totalSize = 0;
-        $files = \Illuminate\Support\Facades\File::allFiles(base_path('rrd/amorbis'));
+        $files = \Illuminate\Support\Facades\File::allFiles($directory);
 
         foreach ($files as $file) {
             $totalSize += $file->getSize();

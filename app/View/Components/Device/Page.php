@@ -40,6 +40,7 @@ class Page extends Component
 
     public function __construct(
         public readonly Device $device,
+        public readonly array $dropdownLinks = [],
     )
     {
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');

@@ -77,6 +77,7 @@ class PageTabs extends Component
 
     public function __construct(
         public readonly Device $device,
+        public readonly array $dropdownLinks = [],
     ) {
         $this->currentTab = Request::segment(3, 'overview');
 

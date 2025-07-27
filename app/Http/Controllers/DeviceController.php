@@ -37,7 +37,6 @@ class DeviceController extends Controller
         $tab_controller = PageTabs::getTab($current_tab);
         $title = $tab_controller->name();
         $data = $tab_controller->data($device, $request);
-        $page_links = $data['page_links'] ?? [];
 
         $data_array = [
             'title' => $title,
@@ -46,7 +45,6 @@ class DeviceController extends Controller
             'data' => $data,
             'vars' => $vars,
             'current_tab' => $current_tab,
-            'page_links' => $page_links,
             'request' => $request,
         ];
 
