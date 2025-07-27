@@ -93,6 +93,10 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
         'sneck_time' => 'Time Difference',
     ];
 
+    if (isset($app->data['data']['checks'])) {
+        $graphs['sneck_run_time'] = 'Run Time';
+    }
+
     foreach ($graphs as $key => $text) {
         $graph_type = $key;
         $graph_array['height'] = '100';
