@@ -79,3 +79,5 @@ $sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'current', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'load', poller_type: 'ipmi');
