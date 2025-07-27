@@ -7,9 +7,8 @@ $name = 'freeradius';
 if (! empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
 } else {
-    $options = '-Oqv';
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.102.114.101.101.114.97.100.105.117.115';
-    $rawdata = snmp_get($device, $oid, $options);
+    $mib = 'NET-SNMP-EXTEND-MIB';
+    $rawdata = SnmpQuery::get($mib . '::' . Oid::encodeString($name))->value();
 }
 
 //Format Data
