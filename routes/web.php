@@ -109,7 +109,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('nac', [NacController::class, 'index']);
 
     // Device Tabs
-    Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
+    Route::middleware('can:admin')->group(function () {
+        Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
+    });
+
     Route::prefix('device/{device}')->name('device.')->group(function () {
         Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');

@@ -97,4 +97,13 @@ class PageTabs extends Component
     {
         return $this->tabs[$this->currentTab];
     }
+
+    public static function getTab(string $tab): DeviceTab
+    {
+        if (! isset(self::$tabsClasses[$tab])) {
+            abort(404);
+        }
+
+        return app()->make(self::$tabsClasses[$tab]);
+    }
 }
