@@ -7,10 +7,11 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\View\Components\Device\PageTabs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Url;
 
-class DeviceController extends Controller
+class DeviceController
 {
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
@@ -29,9 +30,9 @@ class DeviceController extends Controller
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
             $port = $device->ports()->findOrFail($vars->get('port'));
-            $this->authorize('view', $port);
+            Gate::authorize('view', $port);
         } else {
-            $this->authorize('view', $device);
+            Gate::authorize('view', $device);
         }
 
         $tab_controller = PageTabs::getTab($current_tab);
