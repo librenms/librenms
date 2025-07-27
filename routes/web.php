@@ -109,6 +109,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('nac', [NacController::class, 'index']);
 
     // Device Tabs
+    Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::prefix('device/{device}')->name('device.')->group(function () {
         Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
@@ -116,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
+    // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->name('device')->where('vars', '.*');
 
