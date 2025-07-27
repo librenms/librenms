@@ -1719,7 +1719,7 @@ function list_oxidized(Illuminate\Http\Request $request)
                 }
 
                 foreach ($fields as $field) {
-                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', $value)) {
+                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', (string) $value)) {
                         $output[$maps_column] = $field['value'] ?? $field[$maps_column];  // compatibility with old format
                         break;
                     } elseif (isset($field['match']) && $field['match'] == $value) {
