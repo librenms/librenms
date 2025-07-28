@@ -87,12 +87,14 @@ if (isset($json_return['data']) and isset($json_return['data']['run_time']) and 
 
     $rrd_name = ['app', $name, $app->app_id, 'run_time'];
 
-    $fields = [
+    // $fields is also used for storing metrics, so don't stomp it
+    $run_time_fields = [
         'data' => $json_return['data']['run_time'],
     ];
+    $fields['run_time'] = $json_return['data']['run_time'];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    app('Datastore')->put($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $run_time_fields);
 
     // if this is over 300, it took 300+ seconds to run, meaning we are currently ingesting data for a previous time slot
     if ($json_return['data']['run_time'] >= 300) {
