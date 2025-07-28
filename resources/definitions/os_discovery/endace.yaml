@@ -45,7 +45,6 @@ modules:
                             op: "="
                             value: false
         temperature:
-            options:
             data:
                 -
                     oid: hwmonSystemTemp
