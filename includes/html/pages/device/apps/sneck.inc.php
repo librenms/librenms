@@ -70,6 +70,10 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     if (isset($app->data['data'][$type][$type_name]['ran'])) {
         echo '<b>Ran:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['ran']) . "<br>\n";
     }
+    // run time
+    if (isset($app->data['data'][$type][$type_name]['run_time'])) {
+        echo '<b>Run Time:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
+    }
     // exit code
     if (isset($app->data['data'][$type][$type_name]['exit'])) {
         echo '<b>Exit:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['exit']) . "<br>\n";
