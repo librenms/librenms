@@ -27,6 +27,8 @@ namespace App\Http\Controllers\Device;
 
 use App\Models\Device;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class EditDeviceController
 {
@@ -35,5 +37,28 @@ class EditDeviceController
         return view('device.edit.device', [
             'device' => $device,
         ]);
+    }
+
+    public function update(Request $request, Device $device): JsonResponse
+    {
+        $validated = $request->validate([
+            'display' => 'nullable|string',
+            'overwrite_ip' => 'nullable|string',
+            'descr' => 'nullable|string',
+            'type' => 'nullable|string',
+            'parent_id' => 'nullable|array',
+            'parent_id.*' => 'integer',
+            'override_sysLocation' => 'nullable|boolean',
+            'sysLocation' => 'nullable|string',
+            'override_sysContact' => 'nullable|boolean',
+            'sysContact' => 'nullable|string',
+            'disable_notify' => 'nullable|boolean',
+            'ignore' => 'nullable|boolean',
+            'ignore_status' => 'nullable|boolean',
+        ]);
+
+        dd($request->all(), $validated);
+
+        return response()->json([]);
     }
 }

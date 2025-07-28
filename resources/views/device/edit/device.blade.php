@@ -126,8 +126,8 @@
         </div>
         <br>
         <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
-            <?php echo csrf_field() ?>
-            <input type=hidden name="editing" value="yes">
+            @method('PUT')
+            @csrf
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
                 <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname / IP</label>
                 <div class="col-sm-6">
@@ -137,24 +137,28 @@
                     <button type="button" name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger" onclick="toggleHostnameEdit()"> <i class="fa fa-pencil"></i> </button>
                 </div>
             </div>
+
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip (e.g. '@{{ $sysName }}')" >
                 <label for="edit-display-input" class="col-sm-2 control-label" >Display Name</label>
                 <div class="col-sm-6">
                     <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="<?php echo htmlentities($device->display ?? ''); ?>">
                 </div>
             </div>
+
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
                 <label for="edit-overwrite_ip-input" class="col-sm-2 control-label text-danger" >Overwrite IP (do not use)</label>
                 <div class="col-sm-6">
                     <input type="text" id="edit-overwrite_ip-input" name="overwrite_ip" class="form-control" value="<?php echo htmlentities($device->overwrite_ip ?? ''); ?>">
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="descr" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-6">
                     <textarea id="descr" name="descr" class="form-control"><?php echo \LibreNMS\Util\Clean::html($device->purpose, []); ?></textarea>
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="type" class="col-sm-2 control-label">Type</label>
                 <div class="col-sm-6">
