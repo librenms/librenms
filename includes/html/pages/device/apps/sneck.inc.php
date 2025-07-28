@@ -48,6 +48,10 @@ if (isset($sneck_data)) {
                 }
             }
         }
+        // run time
+        if (isset($app->data['data']['run_time'])) {
+            echo '<b>Run Time:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
+        }
         print_optionbar_end();
     }
 }
