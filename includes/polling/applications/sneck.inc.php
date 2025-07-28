@@ -100,7 +100,7 @@ if (isset($json_return['data']) and isset($json_return['data']['run_time']) and 
     if ($json_return['data']['run_time'] >= 300) {
         $log_message = 'Sneck took ' . $json_return['data']['run_time'] . ' seconds to run';
         Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
-    };
+    }
 }
 
 // save the return status for each alerting possibilities
