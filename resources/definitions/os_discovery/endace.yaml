@@ -10,68 +10,69 @@ modules:
             - ENDACE-SYSTEM-MIB::systemSerial.0
     sensors:
         voltage:
-            skip_values:
-                -
-                    oid: modoptDetect
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
-                    op: "="
-                    value: false
             data:
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.11.{{ $index }}'
                     value: modoptVolt
                     descr: "{{ modoptName }} Voltage"
                     index: "modoptVolt.{{ $index }}"
                     group: "DAG Module(s)"
         dbm:
-            skip_values:
-                -
-                    oid: modoptDetect
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
-                    op: "="
-                    value: false
             data:
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.5.{{ $index }}'
                     value: modoptRxPower
                     descr: "{{ modoptName }} RX Power"
                     index: "modoptRxPower.{{ $index }}"
                     group: "DAG Module(s)"
+                    skip_values:
+                        -
+                            oid: modoptDetect
+                            num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                            op: "="
+                            value: false
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.7.{{ $index }}'
                     value: modoptTxPower
                     descr: "{{ modoptName }} TX Power"
                     index: "modoptTxPower.{{ $index }}"
                     group: "DAG Module(s)"
+                    skip_values:
+                        -
+                            oid: modoptDetect
+                            num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                            op: "="
+                            value: false
         temperature:
             options:
-                skip_values:
-                -
-                    oid: modoptDetect
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
-                    op: "="
-                    value: false
             data:
                 -
                     oid: hwmonSystemTemp
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.4'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.4.0'
                     descr: "System Temperature (C)"
                     index: 0
+                    state_name: hwmonSystemTemp
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.9.{{ $index }}'
                     value: modoptTemp
                     descr: "{{ modoptName }} Temperature"
                     index: "modoptTemp.{{ $index }}"
                     group: "DAG Module(s)"
+                    skip_values:
+                        -
+                            oid: modoptDetect
+                            num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                            op: "="
+                            value: false
         state:
             data:
                 -
                     oid: hwmonFanRedundancy
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.1'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.1.0'
                     descr: "Fan Redundancy"
                     index: 0
                     state_name: hwmonFanRedundancy
@@ -80,7 +81,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
                     oid: hwmonPsuRedundancy
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.2'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.2.0'
                     descr: "PSU Redundancy"
                     index: 0
                     state_name: hwmonPsuRedundancy
@@ -89,7 +90,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
                     oid: hwmonIntrusionStatus
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.3'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.3.0'
                     descr: "Intrusion Status"
                     index: 0
                     state_name: hwmonIntrusionStatus
@@ -98,7 +99,7 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: 'normal' }
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.6.{{ $index }}'
                     value: modoptRxPowerOk
                     descr: "{{ modoptName }} RX Power Ok"
                     index: "modoptRxPowerOk.{{ $index }}"
@@ -109,7 +110,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'false' }
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.8.{{ $index }}'
                     value: modoptTxPowerOk
                     descr: "{{ modoptName }} TX Power Ok"
                     index: "modoptTxPowerOk.{{ $index }}"
@@ -120,7 +121,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'false' }
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.12.{{ $index }}'
                     value: modoptVoltOk
                     descr: "{{ modoptName }} Voltage Ok"
                     index: "modoptVoltOk.{{ $index }}"
@@ -131,7 +132,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'false' }
                 -
                     oid: modoptTable
-                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.10.{{ $index }}'
                     value: modoptTempOk
                     descr: "{{ modoptName }} Temperature Ok"
                     index: "modoptTempOk.{{ $index }}"
@@ -140,3 +141,4 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'true' }
                         - { value: 2, generic: 2, graph: 0, descr: 'false' }
+
