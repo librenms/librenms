@@ -174,11 +174,14 @@ class SnmpResponse
                 $value = stripslashes($value);
             }
 
-            if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
-                // unformatted string from net-snmp, remove extra escapes
-                $this->values[$oid] = trim(stripslashes($value), "\" \n\r");
-            } else {
-                $this->values[$oid] = trim($value);
+            // prevents specially formatted SNMP data from stomping previously seen OIDs
+            if (!isset($this->values[$oid])) {
+                if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+                    // unformatted string from net-snmp, remove extra escapes
+                    $this->values[$oid] = trim(stripslashes($value), "\" \n\r");
+                } else {
+                    $this->values[$oid] = trim($value);
+                }
             }
         }
 
