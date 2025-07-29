@@ -373,8 +373,8 @@ function list_devices(Illuminate\Http\Request $request)
         $select .= ',p.* ';
         $param = [$query, $query];
     } elseif ($type == 'sysName') {
-        $sql = '`d`.`sysName`=?';
-        $param[] = $query;
+        $sql = '`d`.`sysName` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'location_id') {
         $sql = '`d`.`location_id`=?';
         $param[] = $query;
