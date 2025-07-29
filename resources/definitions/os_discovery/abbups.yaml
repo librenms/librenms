@@ -1,0 +1,5 @@
+mib: ABBMODULARUPS-MIB 
+modules:
+    os:
+        hardware: ABBMODULARUPS-MIB::upsIdentModel.0
+        version: ABBMODULARUPS-MIB::upsIdentUPSSoftwareVersion.0
