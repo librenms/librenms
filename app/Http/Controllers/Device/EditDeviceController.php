@@ -27,11 +27,11 @@ namespace App\Http\Controllers\Device;
 
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
 use App\Models\PollerGroup;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Util\File;
 use LibreNMS\Util\Number;
@@ -61,38 +61,20 @@ class EditDeviceController
         ]);
     }
 
-    public function update(Request $request, Device $device): RedirectResponse
+    public function update(UpdateDeviceRequest $request, Device $device): RedirectResponse
     {
-        $validated = $request->validate([
-            'hostname' => 'nullable|ip_or_hostname',
-            'display' => 'nullable|string',
-            'overwrite_ip' => 'nullable|string',
-            'purpose' => 'nullable|string',
-            'type' => 'nullable|string',
-            'parent_id' => 'nullable|array',
-            'parent_id.*' => 'integer',
-            'override_sysLocation' => 'nullable|boolean',
-            'sysLocation' => 'nullable|string',
-            'override_sysContact' => 'nullable|boolean',
-            'sysContact' => 'nullable|string',
-            'disable_notify' => 'nullable|boolean',
-            'ignore' => 'nullable|boolean',
-            'ignore_status' => 'nullable|boolean',
-        ]);
+        $device->fill($request->validated());
 
         // sync parent ids
-        if (isset($validated['parent_id'])) {
-            $parents = array_diff((array) $validated['parent_id'], ['0']);
+        if ($request->has('parent_id')) {
+            $parents = array_diff((array) $request->get('parent_id'), ['0']);
             // TODO avoid loops!
             $device->parents()->sync($parents);
         }
 
-        // fill validated fields
-         $device->fill($validated);
-
         // handle sysLocation update
         if ($device->override_sysLocation) {
-            $device->setLocation($validated['sysLocation'], true, true);
+            $device->setLocation($request->get('sysLocation'), true, true);
             $device->location?->save();
         } elseif ($device->isDirty('override_sysLocation')) {
             // no longer overridden, clear location
@@ -105,10 +87,9 @@ class EditDeviceController
         }
 
         // check if sysContact is overridden
-        dd($validated['override_sysContact']);
-        if ($validated['override_sysContact']) {
+        if ($request->get('override_sysContact')) {
             $device->setAttrib('override_sysContact_bool', true);
-            $device->setAttrib('override_sysContact_string', $validated['sysContact']);
+            $device->setAttrib('override_sysContact_string', $request->get('sysContact'));
         } else {
             $device->forgetAttrib('override_sysContact_bool');
         }
