@@ -149,24 +149,19 @@ class InfluxDB extends BaseDatastore
      */
     public function flushBatch()
     {
-        // Determine the batch size to use for writing
-        // If batchSize is not set (0), write all points at once
-        $batchSize = $this->batchSize > 0 ? $this->batchSize : count($this->batchPoints);
-
-        // Continue flushing until all points are written
-        while (! empty($this->batchPoints)) {
-            // Take up to $batchSize points from the batch for this write
-            $pointsToWrite = array_splice($this->batchPoints, 0, $batchSize);
-
-            try {
-                $this->connection->writePoints($pointsToWrite, 'ms'); // Added timestamps are in milliseconds
-                if (LibrenmsConfig::get('influxdb.debug', false) === true) {
-                    Log::debug('Flushed batch of ' . count($pointsToWrite) . ' points to InfluxDB');
-                }
-            } catch (\InfluxDB\Exception $e) {
-                Log::error('InfluxDB batch write failed: ' . $e->getMessage());
-            }
+        if (empty($this->batchPoints)) {
+            // No points to write, nothing to do
+            return;
         }
+        if (LibrenmsConfig::get('influxdb.debug', false) === true) {
+            Log::debug('Flushing InfluxDB batch of ' . count($this->batchPoints) . ' points');
+        }
+        try {
+            $this->connection->writePoints($this->batchPoints, 'ms'); // Added timestamps are in milliseconds
+        } catch (\InfluxDB\Exception $e) {
+            Log::error('InfluxDB batch write failed: ' . $e->getMessage());
+        }
+        $this->batchPoints = []; // Clear the batch after writing
     }
 
     /**
