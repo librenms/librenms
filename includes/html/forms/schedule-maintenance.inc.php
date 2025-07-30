@@ -30,7 +30,7 @@ if ($sub_type == 'new-maintenance') {
     $update = 0;
     $message = '';
 
-    $schedule_id = $_POST['schedule_id'];
+    $schedule_id = $_POST['schedule_id'] ?? 0;
     if ($schedule_id > 0) {
         $update = 1;
     }
@@ -38,13 +38,13 @@ if ($sub_type == 'new-maintenance') {
     $title = $_POST['title'];
     $notes = $_POST['notes'];
     $recurring = empty($_POST['recurring']) ? 0 : 1;
-    $start_recurring_dt = $_POST['start_recurring_dt'];
-    $end_recurring_dt = $_POST['end_recurring_dt'];
-    $start_recurring_hr = $_POST['start_recurring_hr'];
-    $end_recurring_hr = $_POST['end_recurring_hr'];
-    $start = $_POST['start'];
+    $start_recurring_dt = $_POST['start_recurring_dt'] ?? null;
+    $end_recurring_dt = $_POST['end_recurring_dt'] ?? null;
+    $start_recurring_hr = $_POST['start_recurring_hr'] ?? null;
+    $end_recurring_hr = $_POST['end_recurring_hr'] ?? null;
+    $start = $_POST['start'] ?? null;
     [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
-    $end = $_POST['end'];
+    $end = $_POST['end'] ?? null;
     $behavior = isset($_POST['behavior'])
         ? $_POST['behavior']
         : LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');

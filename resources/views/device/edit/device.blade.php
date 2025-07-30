@@ -1,6 +1,8 @@
 @extends('layouts.librenmsv1')
 
 @section('content')
+    @include('device.edit.maintenance')
+
     <x-device.page :device="$device">
         <x-device.edit-tabs :device="$device" />
 
@@ -164,10 +166,11 @@
                             id="maintenance"
                             name="maintenance"
                             data-device_id="{{ $device->device_id }}"
-                            {{ $maintenance ? 'disabled' : '' }}
+                            data-maintenance-id="{{ $exclusive_maintenance_id }}"
+                            {{ $maintenance && ! $exclusive_maintenance_id ? 'disabled' : '' }}
                             class="btn {{ $maintenance ? 'btn-warning' : 'btn-success' }}"
                             >
-                        <i class="fa fa-wrench"></i> {{ $maintenance ? 'Device already in Maintenance' : 'Maintenance Mode' }}
+                        <i class="fa fa-wrench"></i> {{ $maintenance ? 'Device under Maintenance' : 'Maintenance Mode' }}
                     </button>
                 </div>
             </div>

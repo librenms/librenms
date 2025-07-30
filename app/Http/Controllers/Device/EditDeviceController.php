@@ -32,6 +32,8 @@ use App\Models\Device;
 use App\Models\PollerGroup;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Exceptions\HostRenameException;
 use LibreNMS\Util\File;
 use LibreNMS\Util\Number;
@@ -46,6 +48,17 @@ class EditDeviceController
         }
         [$rrd_size, $rrd_num] = File::getFolderSize(Rrd::dirFromHost($device->hostname));
 
+        $alertSchedules = $device->alertSchedules()->isActive()->get();
+        $isUnderMaintenance = $alertSchedules->isNotEmpty();
+        $exclusiveSchedules = $alertSchedules->filter(function ($schedule) {
+            $totalMappings = DB::table('alert_schedulables')
+                ->where('schedule_id', $schedule->schedule_id)
+                ->count();
+
+            return $totalMappings === 1; // only exclusive schedules
+        });
+        $exclusive_schedule_id = $exclusiveSchedules->count() === 1 ? $exclusiveSchedules->first()->schedule_id : null;
+
         return view('device.edit.device', [
             'device' => $device,
             'types' => $types,
@@ -53,9 +66,17 @@ class EditDeviceController
             'devices' => Device::orderBy('hostname')->whereNot('device_id', $device->device_id)->select(['device_id', 'hostname', 'sysName'])->get(),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
-            'maintenance' => $device->isUnderMaintenance(),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
             'override_sysContact_string' => $device->getAttrib('override_sysContact_bool') ? $device->getAttrib('override_sysContact_string') : $device->sysContact,
+            'maintenance' => $isUnderMaintenance,
+            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior')),
+            'maintenance_behaviors' => [
+                MaintenanceBehavior::SKIP_ALERTS,
+                MaintenanceBehavior::MUTE_ALERTS,
+                MaintenanceBehavior::RUN_ALERTS,
+            ],
+            'maintenance_duration_list' => $this->getMaintenanceDurationList(),
+            'exclusive_maintenance_id' => $exclusive_schedule_id,
             'rrd_size' => Number::formatBi($rrd_size),
             'rrd_num' => $rrd_num,
         ]);
@@ -103,5 +124,23 @@ class EditDeviceController
         }
 
         return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
+    }
+
+    private function getMaintenanceDurationList(): array
+    {
+        $durations = [];
+        $minute_steps = [0, 30];
+
+        for ($hour = 0; $hour <= 23; $hour++) {
+            foreach ($minute_steps as $minute) {
+                if ($hour === 0 && $minute === 0) {
+                    continue; // Skip 0:00
+                }
+
+                $durations[] = sprintf('%d:%02d', $hour, $minute);
+            }
+        }
+
+        return $durations;
     }
 }
