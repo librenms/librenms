@@ -3824,5 +3824,110 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MikroTik",
+                    "remote_port": "1 managment",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether2",
+                    "ifDescr": "ether2",
+                    "ifName": "ether2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "2530-blue_shed",
+                    "remote_port": "8",
+                    "remote_platform": "",
+                    "remote_version": "HP J9774A 2530-8G-PoEP Switch, revision YA.16.04.0008, ROM YA.15.19 (/ws/swbuildm/rel_ukiah_qaoff/code/build/lakes(swbuildm_rel_ukiah_qaoff_rel_ukiah))",
+                    "ifAlias": "ether3",
+                    "ifDescr": "ether3",
+                    "ifName": "ether3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "S5120-Tech",
+                    "remote_port": "GigabitEthernet1/0/17",
+                    "remote_platform": "",
+                    "remote_version": "H3C Comware Platform Software, Software Version 5.20 Release 2221P04-US\nH3C S5120-28C-PWR-EI\r\nCopyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.",
+                    "ifAlias": "ether3",
+                    "ifDescr": "ether3",
+                    "ifName": "ether3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MikroTik",
+                    "remote_port": "200 curric",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether4",
+                    "ifDescr": "ether4",
+                    "ifName": "ether4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Tech-wirelesswire",
+                    "remote_port": "vlan200",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether4",
+                    "ifDescr": "ether4",
+                    "ifName": "ether4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "blue_shed-wirelesswire",
+                    "remote_port": "vlan200",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether5",
+                    "ifDescr": "ether5",
+                    "ifName": "ether5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MikroTik",
+                    "remote_port": "200 curric",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "ether5",
+                    "ifDescr": "ether5",
+                    "ifName": "ether5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "MikroTik",
+                    "remote_port": "1 managment",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "wlan1",
+                    "ifDescr": "wlan1",
+                    "ifName": "wlan1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Tech-wirelesswire",
+                    "remote_port": "vlan200",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.43.2 (stable) RBwAPG-60ad",
+                    "ifAlias": "wlan1",
+                    "ifDescr": "wlan1",
+                    "ifName": "wlan1"
+                }
+            ]
+        }
     }
 }
