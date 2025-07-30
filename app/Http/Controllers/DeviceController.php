@@ -6,6 +6,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\View\Components\Device\PageTabs;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Debug;
@@ -77,5 +78,16 @@ class DeviceController
         ob_end_clean();
 
         return $output;
+    }
+
+    public function rediscover(Device $device): JsonResponse
+    {
+        $device->last_discovered = null;
+        $saved = $device->save();
+
+        return response()->json([
+            'message' => $saved ? 'Device scheduled for discovery' : 'Failed to schedule device for discovery',
+            'status' => $saved ? 'ok' : 'error',
+        ]);
     }
 }

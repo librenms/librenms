@@ -475,17 +475,17 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  Location|string  $new_location  location data
+     * @param  string|Location  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
-     * @param  bool  $force  Ignore user override and update the location anyway
+     * @param  bool  $user_override  Ignore user override and update the location anyway
      */
-    public function setLocation($new_location, bool $doLookup = false, bool $force = false)
+    public function setLocation(Location|string $new_location, bool $doLookup = false, bool $user_override = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
         $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        if ($force || ! $this->override_sysLocation) {
+        if ($user_override || ! $this->override_sysLocation) {
             if (! $new_location->location) { // disassociate if the location name is empty
                 $this->location()->dissociate();
 

@@ -16,15 +16,13 @@
 
         <div class="row">
             <!-- Bootstrap 3 doesn't support mediaqueries for text aligns (e.g. text-md-left), which makes these buttons stagger on sm or xs screens -->
-            <div class="col-md-2 col-md-offset-2">
-                <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+            <div class="col-md-6 col-md-offset-2 tw:justify-between tw:flex">
+                <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="tw:inline-block">
                     @csrf
                     <input type="hidden" name="id" value="{{ $device->device_id }}">
                     <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
                 </form>
-            </div>
 
-            <div class="col-md-2 text-center">
                 @if(LibrenmsConfig::get('enable_clear_discovery') && ! $device->snmp_disable)
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
                             class="btn btn-primary" name="rediscover" title="Schedule the device for immediate rediscovery by the poller">
@@ -32,17 +30,10 @@
                     </button>
                 @endif
             </div>
-
-            <div class="col-md-2 text-right">
-                <button type="submit" id="reset_port_state" data-device_id="{{ $device->device_id }}" class="btn btn-info" name="reset_ports"
-                        title="Reset interface speed, admin up/down, and link up/down history, clearing associated alarms">
-                    <i class="fa fa-recycle"></i> Reset Port State
-                </button>
-            </div>
         </div>
         <br>
 
-        <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+        <form id="edit" name="edit" method="post" action="{{ route('device.edit.update', [$device->device_id]) }}" role="form" class="form-horizontal">
             @method('PUT')
             @csrf
             <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
@@ -72,7 +63,7 @@
             <div class="form-group">
                 <label for="descr" class="col-sm-2 control-label">Description</label>
                 <div class="col-sm-6">
-                    <textarea id="descr" name="purpose" class="form-control">{{ \LibreNMS\Util\Clean::html(old('purpose', $device->purpose)) }}</textarea>
+                    <textarea id="descr" name="purpose" class="form-control">{{ old('purpose', $device->purpose) }}</textarea>
                 </div>
             </div>
 
@@ -88,6 +79,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation</label>
                 <div class="col-sm-6">
@@ -102,13 +94,14 @@
                 <div class="col-sm-6">
                     <input id="sysLocation" name="sysLocation" class="form-control"
                            {{ old('override_sysLocation', $device->override_sysLocation) ? '' : 'disabled' }}
-                             value="{{ old('sysLocation', $device->location) }}" />
+                             value="{{ old('sysLocation', $device->location?->location) }}" />
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
                 <div class="col-sm-6">
-                    <input onChange="edit.sysContact.disabled=!edit.override_sysContact.checked"
+                    <input onChange="edit.override_sysContact_string.disabled=!edit.override_sysContact.checked"
                            type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
                             {{ old('override_sysContact', $override_sysContact_bool) ? 'checked' : '' }}
                     />
@@ -118,12 +111,13 @@
                 <div class="col-sm-2">
                 </div>
                 <div class="col-sm-6">
-                    <input id="sysContact" class="form-control" name="sysContact" size="32"
+                    <input id="override_sysContact_string" class="form-control" name="override_sysContact_string" size="32"
                            {{ old('override_sysContact', $override_sysContact_bool) ? '' : 'disabled' }}
-                           value="{{ old('sysContact', $override_sysContact_string) }}"
+                           value="{{ old('override_sysContact_string', $override_sysContact_string) }}"
                     />
                 </div>
             </div>
+
             <div class="form-group">
                 <label for="parent_id" class="col-sm-2 control-label">This device depends on</label>
                 <div class="col-sm-6">
@@ -236,40 +230,24 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             var device_id = $(this).data("device_id");
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
-                data: { type: "rediscover-device", device_id: device_id },
+                url: '{{ route('device.rediscover', [$device->device_id]) }}',
+                data: {
+
+                },
                 dataType: "json",
                 success: function(data){
-                    if(data['status'] == 'ok') {
+                    if(data['status'] === 'ok') {
                         toastr.success(data['message']);
                     } else {
                         toastr.error(data['message']);
                     }
                 },
                 error:function(){
-                    toastr.error('An error occured setting this device to be rediscovered');
+                    toastr.error('An error occurred setting this device to be rediscovered');
                 }
             });
         });
-        $("#reset_port_state").on("click", function() {
-            var device_id = $(this).data("device_id");
-            $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: { type: "reset-port-state", device_id: device_id },
-                dataType: "json",
-                success: function(data){
-                    if(data['status'] == 'ok') {
-                        toastr.success(data['message']);
-                    } else {
-                        toastr.error(data['message']);
-                    }
-                },
-                error:function(){
-                    toastr.error('An error occured while attempting to reset port state alarms');
-                }
-            });
-        });
+
         function toggleHostnameEdit() {
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }

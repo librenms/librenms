@@ -55,7 +55,7 @@ class EditDeviceController
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'maintenance' => $device->isUnderMaintenance(),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
-            'override_sysContact_string' => $device->getAttrib('override_sysContact_string', $device->sysContact),
+            'override_sysContact_string' => $device->getAttrib('override_sysContact_bool') ? $device->getAttrib('override_sysContact_string') : $device->sysContact,
             'rrd_size' => Number::formatBi($rrd_size),
             'rrd_num' => $rrd_num,
         ]);
@@ -65,12 +65,7 @@ class EditDeviceController
     {
         $device->fill($request->validated());
 
-        // sync parent ids
-        if ($request->has('parent_id')) {
-            $parents = array_diff((array) $request->get('parent_id'), ['0']);
-            // TODO avoid loops!
-            $device->parents()->sync($parents);
-        }
+        $device->parents()->sync($request->get('parent_id', [])); // TODO avoid loops!
 
         // handle sysLocation update
         if ($device->override_sysLocation) {
@@ -81,17 +76,17 @@ class EditDeviceController
             $device->location()->dissociate();
         }
 
-        // check if type was overridden
-        if ($device->isDirty('type')) {
-            $device->setAttrib('override_device_type', true);
-        }
-
         // check if sysContact is overridden
         if ($request->get('override_sysContact')) {
             $device->setAttrib('override_sysContact_bool', true);
-            $device->setAttrib('override_sysContact_string', $request->get('sysContact'));
+            $device->setAttrib('override_sysContact_string', $request->get('override_sysContact_string'));
         } else {
             $device->forgetAttrib('override_sysContact_bool');
+        }
+
+        // check if type was overridden
+        if ($device->isDirty('type')) {
+            $device->setAttrib('override_device_type', true);
         }
 
         // save it, no message if no changes

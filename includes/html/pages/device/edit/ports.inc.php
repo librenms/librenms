@@ -187,7 +187,10 @@
         });
     });
 
-    var grid = $("#edit-ports").bootgrid({
+
+
+
+var grid = $("#edit-ports").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {
@@ -206,7 +209,8 @@
                                 </span>\
                                 <span class="action_group">\
                                 <button id="save-form" type="submit" value="Save" class="btn btn-success btn-sm" title="Save current port disable/ignore settings">Save Toggles</button>\
-                                <button type="submit" value="Reset" class="btn btn-danger btn-sm" id="form-reset" title="Reset form to previously-saved settings">Reset</button>\
+                                <button type="submit" value="Reset" class="btn btn-danger btn-sm" id="form-reset" title="Reset form to previously-saved settings">Revert Changes</button>\
+                                <button type="button" id="reset_port_state" data-device_id="<?php echo $device['device_id']; ?>" class="btn btn-info btn-sm" name="reset_ports" title="Reset interface speed, admin up/down, and link up/down history, clearing associated alarms"><i class="fa fa-recycle"></i> Reset Ports State</button>\
                                 </span>\
                             </span>\
                         </div>\
@@ -253,6 +257,26 @@
                     toastr.error(data.responseJSON.message)
                 }
             });
+        });
+    });
+    $("#reset_port_state").on("click", function() {
+        var device_id = $(this).data("device_id");
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "reset-port-state", device_id: device_id },
+            dataType: "json",
+            success: function(data){
+                if(data['status'] === 'ok') {
+                    toastr.success(data['message']);
+                    location.reload();
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occurred while attempting to reset port state alarms');
+            }
         });
     });
 </script>
