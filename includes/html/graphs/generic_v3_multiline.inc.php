@@ -17,6 +17,8 @@ if ($printtotal === 1) {
 
 $unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
+$stack = '';
+
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
     if ($printtotal === 1) {
@@ -89,8 +91,6 @@ foreach ($rrd_list as $rrd) {
 
     if ($i && ($dostack === 1)) {
         $stack = ':STACK';
-    } else {
-        $stack = '';
     }
 
     $rrd_options .= ' LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
