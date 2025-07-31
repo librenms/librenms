@@ -265,7 +265,7 @@ main () {
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\\033[0;93mWARNING\\033[0m: You must run this script as %s\\n" "${LIBRENMS_USER}"
+            printf "\\033[0;91mERROR\\033[0m: You must run this script as %s\\n" "${LIBRENMS_USER}"
             exit 1
         fi
     fi
