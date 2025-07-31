@@ -132,11 +132,7 @@ if (! isset($colour1w)) {
 
 $graph_stat_percentile_disable = \App\Facades\LibrenmsConfig::get('graph_stat_percentile_disable');
 
-if (isset($descr)) {
-    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
-} else {
-    $descr = '';
-}
+ $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr ?? '', $descr_len);
 
 if ($height > 25) {
     if (! $no_hourly) {
