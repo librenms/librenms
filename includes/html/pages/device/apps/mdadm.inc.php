@@ -16,7 +16,7 @@ $array_list = [];
 foreach ($mdadm_arrays as $label) {
     $array = $label;
 
-    if (array_key_exists('array', $vars) && ($vars['array'] == $array)) {
+    if (isset($vars['array'] ) && ($vars['array'] == $array)) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
