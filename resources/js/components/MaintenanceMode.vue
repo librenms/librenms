@@ -1,5 +1,5 @@
 <template>
-  <div class="tw:text-gray-900 tw:dark:text-white">
+  <div class="tw:text-white">
     <button
       type="button"
       id="maintenance"
@@ -95,7 +95,7 @@
                     name="notes"
                     placeholder="Maintenance notes"
                     v-model="notes"
-                    class="tw:w-full tw:px-4 tw:py-3 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:dark:text-white tw:placeholder-gray-400 tw:dark:placeholder-gray-300 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:dark:focus:ring-blue-400"
+                    class="tw:w-full tw:px-4 tw:py-3 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:placeholder-gray-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:dark:focus:ring-blue-400"
                     rows="3"
                   ></textarea>
                 </div>
