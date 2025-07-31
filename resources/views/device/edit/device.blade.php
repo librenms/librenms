@@ -15,8 +15,7 @@
         @endif
 
         <div class="row">
-            <!-- Bootstrap 3 doesn't support mediaqueries for text aligns (e.g. text-md-left), which makes these buttons stagger on sm or xs screens -->
-            <div class="col-md-6 col-md-offset-2 tw:justify-between tw:flex">
+            <div class="col-sm-6 col-sm-offset-2 tw:justify-between tw:flex tw:flex-wrap">
                 <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="tw:inline-block">
                     @csrf
                     <input type="hidden" name="id" value="{{ $device->device_id }}">
@@ -223,24 +222,15 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
     <script>
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
         $("#rediscover").on("click", function() {
-            $.ajax({
-                type: 'POST',
-                url: '{{ route('device.rediscover', [$device->device_id]) }}',
-                data: {
-
-                },
-                dataType: "json",
-                success: function(data){
-                    if(data['status'] === 'ok') {
-                        toastr.success(data['message']);
-                    } else {
-                        toastr.error(data['message']);
+                fetch('{{ route('device.rediscover', [$device->device_id]) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=\'csrf-token\']').content
                     }
-                },
-                error:function(){
-                    toastr.error('An error occurred setting this device to be rediscovered');
-                }
-            });
+                })
+                    .then(r => r.json())
+                    .then(d => toastr[d.status === 'ok' ? 'success' : 'error'](d.message))
+                    .catch(() => toastr.error('An error occurred setting this device to be rediscovered'));
         });
 
         function toggleHostnameEdit() {
