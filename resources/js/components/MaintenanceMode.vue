@@ -128,7 +128,7 @@
                     v-model="behavior"
                     class="tw:w-full tw:px-4 tw:py-3 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:dark:text-white tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:dark:focus:ring-blue-400"
                   >
-                    <option v-for="option in getMaintenanceBehaviorList()" :key="option.value" :value="option.value">
+                    <option v-for="option in behaviors" :key="option.value" :value="option.value">
                       {{ option.text }}
                     </option>
                   </select>
@@ -171,7 +171,8 @@ export default {
   props: {
     deviceId: {
       type: Number,
-      required: true
+      required: true,
+      validator: (value) => value > 0
     },
     deviceName: {
       type: String,
@@ -179,40 +180,34 @@ export default {
     },
     maintenanceId: {
       type: Number,
-      default: null
+      default: 0
     },
     defaultMaintenanceBehavior: {
         type: Number,
-        default: 1
+        default: 1,
+        validator: (value) => [1, 2, 3].includes(value)
     },
     maintenance: {
-        type: String,
-        default: 'false'
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       notes: '',
-      duration: '',
+      duration: '0:30',
       behavior: this.defaultMaintenanceBehavior,
-      localMaintenanceId: this.maintenanceId === '' ? null : this.maintenanceId,
-      isInMaintenance: this.maintenance === 'true',
+      behaviors: [
+          { value: 1, text: 'Skip alerts' },
+          { value: 2, text: 'Mute alerts' },
+          { value: 3, text: 'Run alerts' }
+      ],
+      localMaintenanceId: this.maintenanceId,
+      isInMaintenance: this.maintenance,
       isLoading: false,
       isModalVisible: false,
       isConfirmationVisible: false
     };
-  },
-  mounted() {
-    // Set initial maintenance status from the maintenance prop
-    this.isInMaintenance = this.maintenance === 'true';
-
-    // Set default value for duration if empty
-    if (!this.duration) {
-      const durations = this.getMaintenanceDurationList();
-      if (durations.length > 0) {
-        this.duration = durations[0];
-      }
-    }
   },
   methods: {
     getMaintenanceDurationList() {
@@ -230,13 +225,6 @@ export default {
       }
 
       return durations;
-    },
-    getMaintenanceBehaviorList() {
-      return [
-        { value: 1, text: 'Skip alerts' },
-        { value: 2, text: 'Mute alerts' },
-        { value: 3, text: 'Run alerts' }
-      ];
     },
     showModal() {
       // If device is in maintenance mode, show confirmation dialog instead of full form
@@ -278,7 +266,7 @@ export default {
           notes: this.notes,
           behavior: this.behavior,
           recurring: 0,
-          start: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          start: new Date().toISOString(),
           duration: this.duration,
           'maps[]': this.deviceId
         })
@@ -318,7 +306,7 @@ export default {
         body: new URLSearchParams({
           type: 'schedule-maintenance',
           sub_type: 'end-maintenance',
-          del_schedule_id: this.localMaintenanceId
+          schedule_id: this.localMaintenanceId
         })
       })
       .then(response => response.json())

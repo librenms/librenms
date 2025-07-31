@@ -162,11 +162,11 @@
                 <div class="col-sm-6">
                     <div id="app">
                         <maintenance-mode
-                            device-id="{{ $device->device_id }}"
+                            :device-id="{{ $device->device_id }}"
                             device-name="{{ $device->displayName() }}"
-                            maintenance-id="{{ $exclusive_maintenance_id }}"
-                            default-maintenance-behavior="{{ $default_maintenance_behavior }}"
-                            maintenance="{{ $maintenance ? 'true' : 'false' }}"
+                            :maintenance-id="{{ $exclusive_maintenance_id }}"
+                            :default-maintenance-behavior="{{ $default_maintenance_behavior }}"
+                            :maintenance="{{ $maintenance ? 'true' : 'false' }}"
                         ></maintenance-mode>
                     </div>
                 </div>
