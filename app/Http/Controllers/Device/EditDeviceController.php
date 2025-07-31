@@ -57,7 +57,7 @@ class EditDeviceController
 
             return $totalMappings === 1; // only exclusive schedules
         });
-        $exclusive_schedule_id = $exclusiveSchedules->count() === 1 ? $exclusiveSchedules->first()->schedule_id : null;
+        $exclusive_schedule_id = $exclusiveSchedules->count() === 1 ? $exclusiveSchedules->first()->schedule_id : 0;
 
         return view('device.edit.device', [
             'device' => $device,

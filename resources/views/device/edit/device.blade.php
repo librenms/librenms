@@ -164,7 +164,7 @@
                         <maintenance-mode
                             device-id="{{ $device->device_id }}"
                             device-name="{{ $device->displayName() }}"
-                            maintenance-id="{{ $exclusive_maintenance_id ?? '' }}"
+                            maintenance-id="{{ $exclusive_maintenance_id }}"
                             default-maintenance-behavior="{{ $default_maintenance_behavior }}"
                         ></maintenance-mode>
                     </div>
