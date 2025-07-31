@@ -20,6 +20,7 @@ $stacked = generate_stacked_graphs();
 $filename ??= $rrd_filename; // use $rrd_filename
 $units ??= '';
 $unit_text ??= '';
+$unitlen ??= 0;
 $rrd_optionsb = '';
 $float_precision ??= 0;
 
@@ -131,7 +132,11 @@ if (! isset($colour1w)) {
 
 $graph_stat_percentile_disable = \App\Facades\LibrenmsConfig::get('graph_stat_percentile_disable');
 
-$descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
+if (isset($descr)) {
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
+} else {
+    $descr = '';
+}
 
 if ($height > 25) {
     if (! $no_hourly) {

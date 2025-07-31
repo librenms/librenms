@@ -47,7 +47,7 @@ foreach ($rrd_list as $rrd) {
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
-    if ($simple_rrd) {
+    if (isset($simple_rrd) && $simple_rrd) {
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
     } else {
@@ -69,12 +69,12 @@ foreach ($rrd_list as $rrd) {
     }
 
     $g_defname = $rrd['ds'];
-    if (is_numeric($multiplier)) {
+    if (isset($multiplier) && is_numeric($multiplier)) {
         $g_defname = $rrd['ds'] . '_cdef';
         $rrd_options .= ' CDEF:' . $g_defname . $i . '=' . $rrd['ds'] . $i . ',' . $multiplier . ',*';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'min=' . $rrd['ds'] . $i . 'min,' . $multiplier . ',*';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'max=' . $rrd['ds'] . $i . 'max,' . $multiplier . ',*';
-    } elseif (is_numeric($divider)) {
+    } elseif (isset($divider) && is_numeric($divider)) {
         $g_defname = $rrd['ds'] . '_cdef';
         $rrd_options .= ' CDEF:' . $g_defname . $i . '=' . $rrd['ds'] . $i . ',' . $divider . ',/';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'min=' . $rrd['ds'] . $i . 'min,' . $divider . ',/';
@@ -89,6 +89,8 @@ foreach ($rrd_list as $rrd) {
 
     if ($i && ($dostack === 1)) {
         $stack = ':STACK';
+    } else {
+        $stack = '';
     }
 
     $rrd_options .= ' LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";

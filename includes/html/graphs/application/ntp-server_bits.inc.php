@@ -3,7 +3,7 @@
 $nototal = 1;
 $ds_in = 'packets_recv';
 $ds_out = 'packets_sent';
-$graph_title .= '::packets';
+$graph_title = '::packets';
 $unit_text = 'Packets';
 $colour_line_in = '330033';
 $colour_line_out = 'FF6600';

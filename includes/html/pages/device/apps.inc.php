@@ -21,7 +21,7 @@ $apps = DeviceCache::getPrimary()->applications
 foreach ($apps as $current_app) {
     echo $sep;
 
-    if (! $vars['app']) {
+    if (! array_key_exists('app', $vars)) {
         $vars['app'] = $current_app->app_type;
     }
 

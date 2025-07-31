@@ -20,16 +20,22 @@ if (isset($app_data['disks']) && is_array($app_data['disks'])) {
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;
 
-    if ($vars['disk'] == $disk) {
+    if (array_key_exists('disk', $vars) && ($vars['disk'] == $disk)) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     if (isset($app_data['disks'][$disk]['health_pass'])) {
         if ($app_data['disks'][$disk]['health_pass'] == 1) {
-            $health_status = '(OK)';
+            $health_status_text = '(OK)';
+            $health_status_color = 'green';
         } else {
-            $health_status = '(FAIL)';
+            $health_status_text = '(FAIL)';
+            $health_status_color = 'red';
         }
+
+        $health_status = '<font color="' . $health_status_color. '">' . $health_status_text . '</font>';
+    } else {
+        $health_status = '';
     }
 
     array_push($drives, generate_link($label, $link_array, ['disk' => $disk]) . $health_status);
