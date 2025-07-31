@@ -20,7 +20,7 @@ if (isset($app_data['disks']) && is_array($app_data['disks'])) {
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;
 
-    if (array_key_exists('disk', $vars) && ($vars['disk'] == $disk)) {
+    if (isset($vars['disk']) && $vars['disk'] == $disk) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
