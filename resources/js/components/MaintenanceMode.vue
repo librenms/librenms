@@ -19,6 +19,50 @@
       <span>{{ isInMaintenance ? 'Device under Maintenance' : 'Maintenance Mode' }}</span>
     </button>
 
+    <!-- Confirmation Dialog -->
+    <div
+      v-if="isConfirmationVisible"
+      class="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:bg-black/50 tw:dark:bg-black/70"
+      @keydown.esc="hideConfirmation"
+      role="dialog"
+      aria-labelledby="confirmation-dialog-title"
+      aria-modal="true"
+    >
+      <div class="tw:bg-white tw:dark:bg-gray-800 tw:rounded-lg tw:shadow-xl tw:w-full tw:max-w-md tw:mx-auto">
+        <div class="tw:flex tw:justify-between tw:items-center tw:px-5 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
+          <h5 id="confirmation-dialog-title" class="tw:text-2xl tw:font-medium tw:dark:text-white">End Maintenance</h5>
+          <button
+            type="button"
+            class="tw:text-gray-400 tw:hover:text-gray-500 tw:dark:text-gray-300 tw:dark:hover:text-white"
+            @click="hideConfirmation"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="tw:p-6">
+          <p class="tw:mb-6 tw:text-gray-700 tw:dark:text-gray-300">Are you sure you want to end maintenance for this device?</p>
+          <div class="tw:flex tw:justify-end tw:gap-3">
+            <button
+              type="button"
+              class="tw:px-4 tw:py-2 tw:rounded tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-white tw:dark:hover:bg-gray-600"
+              @click="hideConfirmation"
+            >
+              No
+            </button>
+            <button
+              type="button"
+              class="tw:px-4 tw:py-2 tw:rounded tw:bg-amber-500 tw:text-white tw:hover:bg-amber-600 tw:dark:bg-amber-600 tw:dark:hover:bg-amber-700"
+              @click="disableMaintenance"
+              :disabled="isLoading"
+            >
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Maintenance Modal -->
     <div
       v-if="isModalVisible"
@@ -140,6 +184,10 @@ export default {
     defaultMaintenanceBehavior: {
         type: Number,
         default: 1
+    },
+    maintenance: {
+        type: String,
+        default: 'false'
     }
   },
   data() {
@@ -148,14 +196,15 @@ export default {
       duration: '',
       behavior: this.defaultMaintenanceBehavior,
       localMaintenanceId: this.maintenanceId === '' ? null : this.maintenanceId,
-      isInMaintenance: false,
+      isInMaintenance: this.maintenance === 'true',
       isLoading: false,
-      isModalVisible: false
+      isModalVisible: false,
+      isConfirmationVisible: false
     };
   },
   mounted() {
-    // Set initial maintenance status
-    this.isInMaintenance = this.localMaintenanceId !== null && this.localMaintenanceId !== '';
+    // Set initial maintenance status from the maintenance prop
+    this.isInMaintenance = this.maintenance === 'true';
 
     // Set default value for duration if empty
     if (!this.duration) {
@@ -190,12 +239,21 @@ export default {
       ];
     },
     showModal() {
-      // Show the modal using Vue's reactive state
-      this.isModalVisible = true;
+      // If device is in maintenance mode, show confirmation dialog instead of full form
+      if (this.isInMaintenance && this.localMaintenanceId) {
+        this.isConfirmationVisible = true;
+      } else {
+        // Show the full modal using Vue's reactive state
+        this.isModalVisible = true;
+      }
     },
     hideModal() {
       // Hide the modal using Vue's reactive state
       this.isModalVisible = false;
+    },
+    hideConfirmation() {
+      // Hide the confirmation dialog
+      this.isConfirmationVisible = false;
     },
     toggleMaintenance() {
       if (this.isInMaintenance) {
@@ -259,7 +317,7 @@ export default {
         },
         body: new URLSearchParams({
           type: 'schedule-maintenance',
-          sub_type: 'del-maintenance',
+          sub_type: 'end-maintenance',
           del_schedule_id: this.localMaintenanceId
         })
       })
@@ -271,16 +329,18 @@ export default {
           this.isInMaintenance = false;
           this.localMaintenanceId = null;
           toastr.success(data.message);
-          // Close the modal
           this.hideModal();
+          this.hideConfirmation();
         } else {
           toastr.error(data.message);
+          this.hideConfirmation();
         }
       })
       .catch(error => {
         this.isLoading = false;
         toastr.error('An error occurred disabling maintenance mode');
         console.error('Error:', error);
+        this.hideConfirmation();
       });
     },
     getButtonText() {

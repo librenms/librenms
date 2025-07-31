@@ -166,6 +166,7 @@
                             device-name="{{ $device->displayName() }}"
                             maintenance-id="{{ $exclusive_maintenance_id }}"
                             default-maintenance-behavior="{{ $default_maintenance_behavior }}"
+                            maintenance="{{ $maintenance ? 'true' : 'false' }}"
                         ></maintenance-mode>
                     </div>
                 </div>
@@ -222,7 +223,6 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
     <script>
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
         $("#rediscover").on("click", function() {
-            var device_id = $(this).data("device_id");
             $.ajax({
                 type: 'POST',
                 url: '{{ route('device.rediscover', [$device->device_id]) }}',
