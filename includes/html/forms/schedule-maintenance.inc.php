@@ -193,6 +193,7 @@ if ($sub_type == 'new-maintenance') {
     $response = [
         'status' => $status,
         'message' => $message,
+        'schedule_id' => $alert_schedule->schedule_id ?? null,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
     $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);

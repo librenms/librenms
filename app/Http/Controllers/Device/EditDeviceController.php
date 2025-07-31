@@ -69,13 +69,7 @@ class EditDeviceController
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
             'override_sysContact_string' => $device->getAttrib('override_sysContact_bool') ? $device->getAttrib('override_sysContact_string') : $device->sysContact,
             'maintenance' => $isUnderMaintenance,
-            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior')),
-            'maintenance_behaviors' => [
-                MaintenanceBehavior::SKIP_ALERTS,
-                MaintenanceBehavior::MUTE_ALERTS,
-                MaintenanceBehavior::RUN_ALERTS,
-            ],
-            'maintenance_duration_list' => $this->getMaintenanceDurationList(),
+            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
             'rrd_size' => Number::formatBi($rrd_size),
             'rrd_num' => $rrd_num,
@@ -124,23 +118,5 @@ class EditDeviceController
         }
 
         return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
-    }
-
-    private function getMaintenanceDurationList(): array
-    {
-        $durations = [];
-        $minute_steps = [0, 30];
-
-        for ($hour = 0; $hour <= 23; $hour++) {
-            foreach ($minute_steps as $minute) {
-                if ($hour === 0 && $minute === 0) {
-                    continue; // Skip 0:00
-                }
-
-                $durations[] = sprintf('%d:%02d', $hour, $minute);
-            }
-        }
-
-        return $durations;
     }
 }

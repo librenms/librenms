@@ -1,8 +1,6 @@
 @extends('layouts.librenmsv1')
 
 @section('content')
-    @include('device.edit.maintenance')
-
     <x-device.page :device="$device">
         <x-device.edit-tabs :device="$device" />
 
@@ -162,16 +160,14 @@
             <div class="form-group">
                 <label for="maintenance" class="col-sm-2 control-label"></label>
                 <div class="col-sm-6">
-                    <button type="button"
-                            id="maintenance"
-                            name="maintenance"
-                            data-device_id="{{ $device->device_id }}"
-                            data-maintenance-id="{{ $exclusive_maintenance_id }}"
-                            {{ $maintenance && ! $exclusive_maintenance_id ? 'disabled' : '' }}
-                            class="btn {{ $maintenance ? 'btn-warning' : 'btn-success' }}"
-                            >
-                        <i class="fa fa-wrench"></i> {{ $maintenance ? 'Device under Maintenance' : 'Maintenance Mode' }}
-                    </button>
+                    <div id="app">
+                        <maintenance-mode
+                            device-id="{{ $device->device_id }}"
+                            device-name="{{ $device->displayName() }}"
+                            maintenance-id="{{ $exclusive_maintenance_id ?? '' }}"
+                            default-maintenance-behavior="{{ $default_maintenance_behavior }}"
+                        ></maintenance-mode>
+                    </div>
                 </div>
             </div>
 
@@ -225,10 +221,6 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 @push('scripts')
     <script>
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
-
-        $("#maintenance").on("click", function() {
-            $("#device_maintenance_modal").modal('show');
-        });
         $("#rediscover").on("click", function() {
             var device_id = $(this).data("device_id");
             $.ajax({
