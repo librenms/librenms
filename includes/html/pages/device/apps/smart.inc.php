@@ -33,7 +33,7 @@ foreach ($app_data['disks'] as $label => $disk_data) {
             $health_status_color = 'red';
         }
 
-        $health_status = '<font color="' . $health_status_color. '">' . $health_status_text . '</font>';
+        $health_status = '<font color="' . $health_status_color . '">' . $health_status_text . '</font>';
     } else {
         $health_status = '';
     }

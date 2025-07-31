@@ -241,7 +241,7 @@ class GraphController extends WidgetController
         $type = explode('_', $graph_type, 2)[0];
 
         if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
-           return 'aggregate';
+            return 'aggregate';
         }
 
         return $type;
