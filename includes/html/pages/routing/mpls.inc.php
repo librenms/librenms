@@ -97,7 +97,7 @@ print_optionbar_end();
 
 echo '<div id="content">
 
-    <table  border="0" cellspacing="0" cellpadding="5" width="100%">';
+    <table style="margin-bottom:1em;" border="0" cellspacing="0" cellpadding="5" width="100%">';
 if ($vars['view'] == 'lsp') {
     echo '<tr><th><a title="Device">Device</a></th>
         <th><a title="Administrative name for this Labeled Switch Path">Name</a></th>
@@ -116,7 +116,19 @@ if ($vars['view'] == 'lsp') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT *, `vrf_name` FROM `mpls_lsps` AS l, `vrfs` AS v WHERE `l`.`vrf_oid` = `v`.`vrf_oid` AND `l`.`device_id` = `v`.`device_id` ORDER BY `l`.`device_id`, `l`.`mplsLspName`') as $lsp) {
+    $sql = 'SELECT `l`.*, `v`.`vrf_name`';
+    $sql .= ' FROM `mpls_lsps` AS l, `vrfs` AS v  LEFT JOIN `devices` AS d ON `v`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE `l`.`vrf_oid` = `v`.`vrf_oid`';
+    $sql .= ' AND `l`.`device_id` = `v`.`device_id`';
+    $sql .= ' AND (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY `d`.hostname, `l`.`mplsLspName`';
+    $query = dbFetchRows($sql);
+
+    foreach ($query as $lsp) {
         $device = device_by_id_cache($lsp['device_id']);
 
         if (! is_integer($i / 2)) {
@@ -170,6 +182,9 @@ if ($vars['view'] == 'lsp') {
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' LSPs</span> ';
+    echo '</div>';
 } // endif lsp view
 
 if ($vars['view'] == 'paths') {
@@ -192,7 +207,18 @@ if ($vars['view'] == 'paths') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT *, `mplsLspName` FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` WHERE `p`.`lsp_id` = `l`.`lsp_id` ORDER BY `p`.`device_id`, `l`.`mplsLspName`') as $path) {
+    $sql = 'SELECT `p`.*, `l`.`mplsLspName`';
+    $sql .= ' FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` LEFT JOIN `devices` AS d ON `l`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE `p`.`lsp_id` = `l`.`lsp_id`';
+    $sql .= ' AND (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY `d`.`hostname`, `p`.`device_id`, `l`.`mplsLspName`';
+    $query = dbFetchRows($sql);
+
+    foreach ($query as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -241,6 +267,9 @@ if ($vars['view'] == 'paths') {
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' Paths</span> ';
+    echo '</div>';
 } // end paths view
 
 if ($vars['view'] == 'sdps') {
@@ -260,12 +289,18 @@ if ($vars['view'] == 'sdps') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_sdps` ORDER BY `sdp_oid`') as $sdp) {
-        $device = device_by_id_cache($sdp['device_id']);
+    $sql = 'SELECT `s`.* ';
+    $sql .= ' FROM `mpls_sdps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY d.`hostname`, s.`sdp_oid`';
+    $query = dbFetchRows($sql);
 
-        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
-            continue;
-        }
+    foreach ($query as $sdp) {
+        $device = device_by_id_cache($sdp['device_id']);
 
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -308,6 +343,9 @@ if ($vars['view'] == 'sdps') {
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' SDPs</span> ';
+    echo '</div>';
 } // end sdps view
 
 if ($vars['view'] == 'sdpbinds') {
@@ -338,12 +376,18 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` ORDER BY `sdp_oid`, `svc_oid`') as $sdpbind) {
+    $sql = 'SELECT b.*, s.svc_oid AS svcId';
+    $sql .= ' FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id`  LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY d.`hostname`, `sdp_oid`, `svc_oid`';
+    $query = dbFetchRows($sql);
+    
+    foreach ($query as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
-
-        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
-            continue;
-        }
 
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -382,6 +426,9 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' SDP Binds</span> ';
+    echo '</div>';
 } // end sdpbinds view
 
 if ($vars['view'] == 'services') {
@@ -410,13 +457,19 @@ vprn services are up when the service is administratively up however routing fun
         </tr>';
 
     $i = 0;
-
-    foreach (dbFetchRows('SELECT s.*, v.vrf_name FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` ORDER BY `svc_oid`') as $svc) {
+    
+    $sql = 'SELECT s.*, v.vrf_name ';
+    $sql .= ' FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE `s`.`device_id` = `d`.`device_id`';
+    $sql .= ' AND (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY d.`hostname`, s.`svc_oid`';
+    $query = dbFetchRows($sql);
+    foreach ($query as $svc) {
         $device = device_by_id_cache($svc['device_id']);
-
-        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
-            continue;
-        }
 
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -468,6 +521,9 @@ vprn services are up when the service is administratively up however routing fun
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' Services</span> ';
+    echo '</div>';
 } // end services view
 
 if ($vars['view'] == 'saps') {
@@ -485,15 +541,21 @@ if ($vars['view'] == 'saps') {
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_saps` ORDER BY `device_id`, `svc_oid`, `sapPortId`, `sapEncapValue`') as $sap) {
+    $sql = 'SELECT `s`.*';
+    $sql .= ' FROM `mpls_saps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
+    $sql .= ' WHERE (`d`.disabled = 0';
+    if ($vars['device-state'] == 'disabled') {
+      $sql .= ' OR `d`.disabled = 1';
+    }
+    $sql .= ')';
+    $sql .= ' ORDER BY d.`hostname`, `svc_oid`, `sapPortId`, `sapEncapValue`';
+    
+    $query = dbFetchRows($sql);
+    foreach ($query as $sap) {
         $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
         $port = cleanPort($port);
 
         $device = device_by_id_cache($sap['device_id']);
-
-        if ($vars['device-state'] != 'disabled' && $device['disabled'] == 1) {
-            continue;
-        }
 
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -529,4 +591,8 @@ if ($vars['view'] == 'saps') {
         $i++;
     }
     echo '</table></div>';
+    echo "<div>";
+    echo '<span class=badge badge-primary">' . count($query) . ' SAPs</span> ';
+    echo '</div>';
+    
 } // end sap view
