@@ -122,7 +122,7 @@ if ($vars['view'] == 'lsp') {
     $sql .= ' AND `l`.`device_id` = `v`.`device_id`';
     $sql .= ' AND (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY `d`.hostname, `l`.`mplsLspName`';
@@ -212,7 +212,7 @@ if ($vars['view'] == 'paths') {
     $sql .= ' WHERE `p`.`lsp_id` = `l`.`lsp_id`';
     $sql .= ' AND (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY `d`.`hostname`, `p`.`device_id`, `l`.`mplsLspName`';
@@ -293,7 +293,7 @@ if ($vars['view'] == 'sdps') {
     $sql .= ' FROM `mpls_sdps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, s.`sdp_oid`';
@@ -380,7 +380,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     $sql .= ' FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id`  LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, `sdp_oid`, `svc_oid`';
@@ -463,7 +463,7 @@ vprn services are up when the service is administratively up however routing fun
     $sql .= ' WHERE `s`.`device_id` = `d`.`device_id`';
     $sql .= ' AND (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, s.`svc_oid`';
@@ -545,7 +545,7 @@ if ($vars['view'] == 'saps') {
     $sql .= ' FROM `mpls_saps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
     if ($vars['device-state'] == 'disabled') {
-      $sql .= ' OR `d`.disabled = 1';
+        $sql .= ' OR `d`.disabled = 1';
     }
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, `svc_oid`, `sapPortId`, `sapEncapValue`';
