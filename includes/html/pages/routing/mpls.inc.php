@@ -182,7 +182,7 @@ if ($vars['view'] == 'lsp') {
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' LSPs</span> ';
     echo '</div>';
 } // endif lsp view
@@ -267,7 +267,7 @@ if ($vars['view'] == 'paths') {
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' Paths</span> ';
     echo '</div>';
 } // end paths view
@@ -343,7 +343,7 @@ if ($vars['view'] == 'sdps') {
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' SDPs</span> ';
     echo '</div>';
 } // end sdps view
@@ -426,7 +426,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' SDP Binds</span> ';
     echo '</div>';
 } // end sdpbinds view
@@ -521,7 +521,7 @@ vprn services are up when the service is administratively up however routing fun
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' Services</span> ';
     echo '</div>';
 } // end services view
@@ -591,7 +591,7 @@ if ($vars['view'] == 'saps') {
         $i++;
     }
     echo '</table></div>';
-    echo "<div>";
+    echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' SAPs</span> ';
     echo '</div>';
     
