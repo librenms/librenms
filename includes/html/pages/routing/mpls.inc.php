@@ -115,7 +115,6 @@ if ($vars['view'] == 'lsp') {
         </tr>';
 
     $i = 0;
-
     $sql = 'SELECT `l`.*, `v`.`vrf_name`';
     $sql .= ' FROM `mpls_lsps` AS l, `vrfs` AS v  LEFT JOIN `devices` AS d ON `v`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE `l`.`vrf_oid` = `v`.`vrf_oid`';
@@ -127,7 +126,6 @@ if ($vars['view'] == 'lsp') {
     $sql .= ')';
     $sql .= ' ORDER BY `d`.hostname, `l`.`mplsLspName`';
     $query = dbFetchRows($sql);
-
     foreach ($query as $lsp) {
         $device = device_by_id_cache($lsp['device_id']);
 
@@ -206,7 +204,6 @@ if ($vars['view'] == 'paths') {
         </tr>';
 
     $i = 0;
-
     $sql = 'SELECT `p`.*, `l`.`mplsLspName`';
     $sql .= ' FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` LEFT JOIN `devices` AS d ON `l`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE `p`.`lsp_id` = `l`.`lsp_id`';
@@ -217,7 +214,6 @@ if ($vars['view'] == 'paths') {
     $sql .= ')';
     $sql .= ' ORDER BY `d`.`hostname`, `p`.`device_id`, `l`.`mplsLspName`';
     $query = dbFetchRows($sql);
-
     foreach ($query as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (! is_integer($i / 2)) {
@@ -288,7 +284,6 @@ if ($vars['view'] == 'sdps') {
         </tr>';
 
     $i = 0;
-
     $sql = 'SELECT `s`.* ';
     $sql .= ' FROM `mpls_sdps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
@@ -298,7 +293,6 @@ if ($vars['view'] == 'sdps') {
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, s.`sdp_oid`';
     $query = dbFetchRows($sql);
-
     foreach ($query as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
 
@@ -375,7 +369,6 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         </tr>';
 
     $i = 0;
-
     $sql = 'SELECT b.*, s.svc_oid AS svcId';
     $sql .= ' FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id`  LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
@@ -385,7 +378,6 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, `sdp_oid`, `svc_oid`';
     $query = dbFetchRows($sql);
-    
     foreach ($query as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
 
@@ -457,7 +449,6 @@ vprn services are up when the service is administratively up however routing fun
         </tr>';
 
     $i = 0;
-    
     $sql = 'SELECT s.*, v.vrf_name ';
     $sql .= ' FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE `s`.`device_id` = `d`.`device_id`';
@@ -540,7 +531,6 @@ if ($vars['view'] == 'saps') {
         </tr>';
 
     $i = 0;
-
     $sql = 'SELECT `s`.*';
     $sql .= ' FROM `mpls_saps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
     $sql .= ' WHERE (`d`.disabled = 0';
@@ -549,7 +539,6 @@ if ($vars['view'] == 'saps') {
     }
     $sql .= ')';
     $sql .= ' ORDER BY d.`hostname`, `svc_oid`, `sapPortId`, `sapEncapValue`';
-    
     $query = dbFetchRows($sql);
     foreach ($query as $sap) {
         $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
@@ -594,5 +583,5 @@ if ($vars['view'] == 'saps') {
     echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' SAPs</span> ';
     echo '</div>';
-    
+
 } // end sap view
