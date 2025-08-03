@@ -583,5 +583,4 @@ if ($vars['view'] == 'saps') {
     echo '<div>';
     echo '<span class=badge badge-primary">' . count($query) . ' SAPs</span> ';
     echo '</div>';
-
 } // end sap view
