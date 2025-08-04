@@ -19,8 +19,9 @@ if (isset($app_data['disks']) && is_array($app_data['disks'])) {
 
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;
+    $health_status = '';
 
-    if ($vars['disk'] == $disk) {
+    if (isset($vars['disk']) && $vars['disk'] == $disk) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
