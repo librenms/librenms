@@ -153,7 +153,10 @@ class User extends Authenticatable
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
-            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->where(function ($query) use ($user_id) {
+                $query->whereJsonContains('transport_config->user', 0)
+                      ->orWhereJsonContains('transport_config->user', $user_id);
+            })
             ->exists();
     }
 
