@@ -42,7 +42,7 @@
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=25052501" rel="stylesheet">
-    <link href="{{ asset('css/tw_dark.css?ver=03052025') }}" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=31072025') }}" rel="stylesheet">
     @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
     <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
     @endif
