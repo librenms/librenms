@@ -232,7 +232,13 @@ class GraphController extends WidgetController
 
     private function getGraphType($summarize = true)
     {
-        $type = explode('_', $this->getSettings()['graph_type'], 2)[0];
+        $graph_type = $this->getSettings()['graph_type'];
+
+        if (empty($graph_type)) {
+            return $graph_type;
+        }
+
+        $type = explode('_', $graph_type, 2)[0];
 
         if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
             return 'aggregate';
