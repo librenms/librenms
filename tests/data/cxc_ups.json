@@ -7,13 +7,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.7309.5",
                     "sysDescr": "System Controller, SW: v8.30, OS: v6.30, HW: S1.I21.P3, SN: 252028189",
                     "sysContact": "<private>",
-                    "version": null,
+                    "version": "v8.30",
                     "hardware": null,
                     "features": null,
                     "location": "<private>",
                     "os": "cxc",
                     "type": "power",
-                    "serial": null,
+                    "serial": "252028189",
                     "icon": "alpha.png"
                 }
             ]
