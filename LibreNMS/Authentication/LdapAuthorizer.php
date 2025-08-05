@@ -260,6 +260,7 @@ class LdapAuthorizer extends AuthorizerBase
                 return $userobj['dn'];
             }
         }
+
         // if dn autodiscovery is off or dn cannot be found in ldap response, construct dn from ldap prefix, username and ldap suffix. this is default.
         return LibrenmsConfig::get('auth_ldap_prefix', '') . $username . LibrenmsConfig::get('auth_ldap_suffix', '');
     }
