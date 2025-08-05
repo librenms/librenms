@@ -32,7 +32,7 @@ if (is_array($ipmi_rows)) {
         // so we dont use wrong arguments for ipmitool
         if ($ipmi['type'] != '') {
             array_push($cmd, '-I', $ipmi['type'], '-c', 'sdr');
-            $results = external_exec($cmd);
+            $results = trim(external_exec($cmd));
             d_echo($results);
             echo " done.\n";
         } else {

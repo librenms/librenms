@@ -8038,70 +8038,70 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 51,
                     "vlan_domain": 1,
                     "vlan_name": "management1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 201,
                     "vlan_domain": 1,
                     "vlan_name": "data201",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 231,
                     "vlan_domain": 1,
                     "vlan_name": "prepajaky1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 268,
                     "vlan_domain": 1,
                     "vlan_name": "garant:kia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 301,
                     "vlan_domain": 1,
                     "vlan_name": "mcast301",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 501,
                     "vlan_domain": 1,
                     "vlan_name": "data501",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2005,
                     "vlan_domain": 1,
                     "vlan_name": "wifi:msumi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3001,
                     "vlan_domain": 1,
                     "vlan_name": "kamery:msumi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4024,
                     "vlan_domain": 1,
                     "vlan_name": "battery",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

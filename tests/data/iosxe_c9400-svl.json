@@ -35761,35 +35761,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "token-ring-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trnet-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -35804,6 +35804,38 @@
                 {
                     "vlan": 1,
                     "baseport": 1163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 4094,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 4094,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 4094,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 4094,
+                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,

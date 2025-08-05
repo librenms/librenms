@@ -2979,28 +2979,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 99",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 510,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 510",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 516,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 516",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1000,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1000",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }
