@@ -256,7 +256,7 @@ class LdapAuthorizer extends AuthorizerBase
             // if dn autodiscovery is on, lookup user object in ldap and find dn of object.
             $userobj = '';
             $userobj = $this->getUser($this->getUserid($username));
-            if (!empty($userobj)) {
+            if (! empty($userobj)) {
                 return $userobj['dn'];
             }
         } else {
