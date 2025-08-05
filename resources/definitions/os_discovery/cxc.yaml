@@ -1,8 +1,8 @@
 mib:  ALPHA-RECTIFIER-SYS-MIB:ALPHA-RESOURCE-MIB
 modules:
     os:
-        serial: ALPHA-RESOURCE-MIB:componentListSerialNumber.1.1
-        version: ALPHA-RESOURCE-MIB:controllerInfoSoftwareVersion.0
+        serial: ALPHA-RESOURCE-MIB::componentListSerialNumber.1.1
+        version: ALPHA-RESOURCE-MIB::controllerInfoSoftwareVersion.0
     sensors:
         voltage:
             data:
