@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
 class Openwrt extends OS implements
     OSDiscovery,
@@ -43,6 +44,8 @@ class Openwrt extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
+    private $aps = [];
+
     /**
      * Retrieve basic information about the OS / device
      */
@@ -50,6 +53,7 @@ class Openwrt extends OS implements
     {
         [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
         $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
+        $this->aps = SnmpQuery::walk('.1.3.6.1.4.1.2021.255.87.76.1')->values();
     }
 
     /**
@@ -121,6 +125,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
+        if (!empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.2.' . $index;
+                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('clients', '', true, false);
     }
 
