@@ -79,7 +79,7 @@ class InfluxDBStoreTest extends TestCase
 
     public function testFilteredMeasurementsAllowed(): void
     {
-        LibrenmsConfig::set('influxdb.measurements', ["testmeasure", "anothermeasure"]);
+        LibrenmsConfig::set('influxdb.measurements', ['testmeasure', 'anothermeasure']);
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
@@ -101,7 +101,7 @@ class InfluxDBStoreTest extends TestCase
 
     public function testFilteredMeasurementsRejected(): void
     {
-        LibrenmsConfig::set('influxdb.measurements', ["anothermeasure", "yetanothermeasure"]);
+        LibrenmsConfig::set('influxdb.measurements', ['anothermeasure', 'yetanothermeasure']);
 
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
