@@ -151,6 +151,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessFrequency()
     {
+        if (!empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.3.' . $index;
+                $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('frequency', '', false, false);
     }
 
