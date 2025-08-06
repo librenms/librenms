@@ -1029,7 +1029,7 @@ return [
             ],
             'measurements' => [
                 'description' => 'Measurements',
-                'help' => 'Comma separated list of measurements to send to InfluxDB, leave empty to send all',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
             ],
             'verifySSL' => [
                 'description' => 'Проверка SSL',
