@@ -96,7 +96,6 @@ class InfluxDBStoreTest extends TestCase
 
         $mock->shouldReceive('writePoints')->once();
         $influx->write($measurement, $fields, $tags, $meta);
-
     }
 
     public function testFilteredMeasurementsRejected(): void
@@ -118,7 +117,5 @@ class InfluxDBStoreTest extends TestCase
 
         $mock->shouldReceive('writePoints')->never();
         $influx->write($measurement, $fields, $tags, $meta);
-
     }
-    
 }
