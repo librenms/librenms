@@ -4632,8 +4632,12 @@
             "order": 9
         },
         "influxdb.measurements": {
-            "default": "",
-            "type": "text",
+            "default": [],
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            },
             "group": "poller",
             "section": "influxdb",
             "order": 10

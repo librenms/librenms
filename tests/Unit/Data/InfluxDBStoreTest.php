@@ -76,4 +76,49 @@ class InfluxDBStoreTest extends TestCase
             ->once();
         $influx->write($measurement, $fields, $tags, $meta);
     }
+
+    public function testFilteredMeasurementsAllowed(): void
+    {
+        LibrenmsConfig::set('influxdb.measurements', ["testmeasure", "anothermeasure"]);
+
+        // Create a mock of the Random Interface
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $mock->shouldReceive('exists')->once()->andReturn(true);
+
+        // Disable shutdown function in test
+        $influx = new InfluxDB($mock, false);
+
+        $device = new Device(['hostname' => 'testhost']);
+        $measurement = 'testmeasure';
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
+        $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
+
+        $mock->shouldReceive('writePoints')->once();
+        $influx->write($measurement, $fields, $tags, $meta);
+
+    }
+
+    public function testFilteredMeasurementsRejected(): void
+    {
+        LibrenmsConfig::set('influxdb.measurements', ["anothermeasure", "yetanothermeasure"]);
+
+        // Create a mock of the Random Interface
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $mock->shouldReceive('exists')->once()->andReturn(true);
+
+        // Disable shutdown function in test
+        $influx = new InfluxDB($mock, false);
+
+        $device = new Device(['hostname' => 'testhost']);
+        $measurement = 'testmeasure';
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
+        $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
+
+        $mock->shouldReceive('writePoints')->never();
+        $influx->write($measurement, $fields, $tags, $meta);
+
+    }
+    
 }
