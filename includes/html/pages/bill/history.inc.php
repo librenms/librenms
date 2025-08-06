@@ -125,7 +125,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             $img['bw_day'] = showDetails($bill_id, 'day', $history['bill_hist_id']);
             $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '
-                <tr style="background: #fff; border-top: 1px solid ' . $row_colour . '; border-bottom: 1px solid #ccc;">
+                <tr style="background: #fff; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
                     <td colspan="11">
                     <!-- <b>Accuate Graph</b><br /> //-->
                     ' . $img['bitrate'] . '<br />
