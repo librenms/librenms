@@ -177,6 +177,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
+        if (!empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.4.' . $index;
+                $sensors[] = new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('noise-floor', '', false, false);
     }
 
