@@ -9,7 +9,7 @@ modules:
         data:
           -
             oid:
-              - pduCircuitBreakerLabel
+              - ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel
       power:
         data:
           -
