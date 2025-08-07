@@ -32,19 +32,19 @@
                 @endforeach
             </div>
         @endif
-        <div class="tw:flex tw:gap-3 tw:mb-3">
+        <div class="tw:flex tw:flex-wrap tw:gap-3 tw:mb-3">
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">From</label>
-                <div class="tw:flex tw:gap-1">
+                <div class="tw:flex tw:flex-wrap tw:gap-1">
                     <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
-                    <input type="time" x-model="startTime" class="tw:w-24 tw:px-2 tw:py-1 tw:border tw:rounded">
+                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:rounded">
                 </div>
             </div>
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">To</label>
-                <div class="tw:flex tw:gap-1">
+                <div class="tw:flex tw:flex-wrap tw:gap-1">
                     <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
-                    <input type="time" x-model="endTime" class="tw:w-24 tw:px-2 tw:py-1 tw:border tw:rounded">
+                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:rounded">
                 </div>
             </div>
         </div>
