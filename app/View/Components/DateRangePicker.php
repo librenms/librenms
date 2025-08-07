@@ -7,10 +7,8 @@ use Illuminate\View\Component;
 
 class DateRangePicker extends Component
 {
-    public string $componentId;
     /** @var array array */
     public array $availablePresets;
-
 
     public function __construct(
         public string $name = 'date_range',
@@ -21,7 +19,6 @@ class DateRangePicker extends Component
         public string $class = 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md',
         public bool $presets = true
     ) {
-        $this->componentId = 'date-range-' . uniqid();
         $this->availablePresets = $this->getPresets();
     }
 

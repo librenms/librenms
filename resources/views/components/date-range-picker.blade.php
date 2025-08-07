@@ -1,4 +1,4 @@
-<div id="{{ $componentId }}" class="tw:relative"
+<div class="tw:relative"
      x-data="dateRangePicker"
      @click.outside="open = false">
     <div
