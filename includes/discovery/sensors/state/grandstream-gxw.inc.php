@@ -1,4 +1,5 @@
 <?php
+
 /**
  * grandstream-gxw.inc.php
  *
@@ -22,7 +23,6 @@
  * @copyright  2025 LibreNMS
  * @author     LibreNMS Contributors
  */
-
 echo 'Grandstream GXW: ';
 
 $state_name = 'hookStatus';
@@ -39,7 +39,7 @@ $state_lookup = array_column($states, 'value', 'descr');
 $status_oid = '.1.3.6.1.4.1.42397.1.1.2.1'; // GS-GXW42XX-MIB::hookStatus
 $statuses = SnmpQuery::hideMib()->walk([
     'GS-GXW42XX-MIB::hookStatus',
-])->table(2)[0][0];// Results from a walk are hookStatus.1.0.0!
+])->table(2)[0][0]; // Results from a walk are hookStatus.1.0.0!
 
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
@@ -48,7 +48,7 @@ if (is_array($statuses)) {
         preg_match('/(\d+)/', $index, $matches);
         $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Hook Status";
-        
+
         discover_sensor(
             null,
             'state',
@@ -87,7 +87,7 @@ $state_lookup = array_column($states, 'value', 'descr');
 $status_oid = '.1.3.6.1.4.1.42397.1.1.2.2'; // GS-GXW42XX-MIB::regStatus
 $statuses = SnmpQuery::hideMib()->walk([
     'GS-GXW42XX-MIB::regStatus',
-])->table(2)[0][0];// Results from a walk are regStatus.1.0.0!
+])->table(2)[0][0]; // Results from a walk are regStatus.1.0.0!
 
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
@@ -96,7 +96,7 @@ if (is_array($statuses)) {
         preg_match('/(\d+)/', $index, $matches);
         $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Reg Status";
-        
+
         discover_sensor(
             null,
             'state',
