@@ -1,4 +1,4 @@
-mib: AC-ANALOG-MIB:AcGateway:AC-PSTN-MIB:DS1-MIB:AC-PM-PSTN-MIB
+mib: AC-ANALOG-MIB:AC-GATEWAY-MIB:AC-PSTN-MIB:DS1-MIB:AC-PM-PSTN-MIB:AC-BOARD-MIB:AC-SYSTEM-MIB:AUDIOCODES-TYPES-MIB
 modules:
     os:
         hardware: AC-SYSTEM-MIB::acSysIdName.0
@@ -18,9 +18,60 @@ modules:
         state:
             data:
                 -
+                    oid: acSysStateOperational
+                    value: acSysStateOperational
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.10.2.5.2'
+                    descr: 'System operational'
+                    states:
+                        - { descr: disabled, graph: 0, value: 1, generic: 2 }
+                        - { descr: enabled, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: acSysStateGWSeverity
+                    value: acSysStateGWSeverity
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.10.2.5.4'
+                    descr: 'System GW status'
+                    states:
+                        - { descr: noAlarm, graph: 0, value: 0, generic: 0 }
+                        - { descr: indeterminate, graph: 0, value: 1, generic: 0 }
+                        - { descr: warning, graph: 0, value: 2, generic: 1 }
+                        - { descr: minor, graph: 0, value: 3, generic: 1 }
+                        - { descr: major, graph: 0, value: 4, generic: 2 }
+                        - { descr: critical, graph: 0, value: 5, generic: 2 }
+                -
+                    oid: acSysHAStatusReady
+                    value: acSysHAStatusReady
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.10.2.10.1'
+                    descr: 'System HA status ready'
+                    states:
+                        - { descr: no, graph: 0, value: 3, generic: 2 }
+                        - { descr: yes, graph: 0, value: 2, generic: 0 }
+                        - { descr: notAppicable, graph: 0, value: 1, generic: 3 }
+                -
+                    oid: accountTable
+                    value: accountRowStatus
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.3.1.1.22.21.{{ $index }}.2'
+                    descr: 'System Account Status {{ $index }}'
+                    states:
+                        - { descr: active, graph: 0, value: 1, generic: 0 }
+                        - { descr: notInService, graph: 0, value: 2, generic: 2 }
+                        - { descr: notReady, graph: 0, value: 3, generic: 2 }
+                        - { descr: createAndGo, graph: 0, value: 4, generic: 1 }
+                        - { descr: createAndWait, graph: 0, value: 5, generic: 1 }
+                        - { descr: destroy, graph: 0, value: 6, generic: 2 }
+                -
+                    oid: channelStatusTable
+                    value: rTPActive
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.1.{{ $index }}'
+                    descr: 'SBC SIP Channel {{ $index }} active'
+                    index: 'hookStatus{{ $index }}'
+                    state_name: channelHookState
+                    states:
+                        - { descr: offHook, graph: 0, value: 0, generic: 0 }
+                        - { descr: onHook, graph: 0, value: 1, generic: 0 }
+                -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
                     descr: 'FXO {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -32,10 +83,11 @@ modules:
                             oid: acAnalogFxsFxoType
                             op: '!='
                             value: 0
+
                 -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
                     descr: 'FXS {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -50,7 +102,7 @@ modules:
                 -
                     oid: acAnalogFxsFxoTable
                     value: acAnalogFxsFxoHookState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
                     descr: 'E&M {{ $index }} ({{ $callerDisplayCallerDisplay }}, {{ $channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
@@ -65,7 +117,7 @@ modules:
                 -
                     oid: acTrunkTable
                     value: acTrunkAdministrativeState
-                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2.{{ $index }}'
                     descr: 'Trunk {{ $index }} AdminStatus ({{ $acTrunkDialPlanName }})'
                     index: 'trunkAdminStatus{{ $index }}'
                     state_name: acTrunkAdministrativeState
@@ -75,7 +127,7 @@ modules:
                 -
                     oid: acTrunkTable
                     value: acTrunkProtocolType
-                    num_oid: .1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3.{{ $index }}'
                     descr: 'Trunk {{ $index }} Type ({{ $acTrunkDialPlanName }})'
                     index: 'trunkProtocolType{{ $index }}'
                     state_name: acTrunkProtocolType
@@ -128,7 +180,7 @@ modules:
                 -
                     oid: dsx1ConfigTable
                     value: dsx1LoopbackConfig
-                    num_oid: .1.3.6.1.2.1.10.18.6.1.9.{{ $index }}
+                    num_oid: '.1.3.6.1.2.1.10.18.6.1.9.{{ $index }}'
                     descr: 'DS1 LoopbackConfig ({{ $dsx1CircuitIdentifier }}){{ $index }}'
                     index: 'DS1loopback{{ $index }}'
                     state_name: dsx1LoopbackConfig
@@ -142,7 +194,7 @@ modules:
                 -
                     oid: acTrunkStatusTable
                     value: acTrunkStatusAlarm
-                    num_oid: .1.3.6.1.4.1.5003.9.10.9.2.1.1.1.7.{{ $index }}
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.9.2.1.1.1.7.{{ $index }}'
                     descr: 'Trunk Status {{ $index }})'
                     index: 'trunkStatus{{ $index }}'
                     high_limit: acPMTrunkUtilizationAttributesHighThreshold
