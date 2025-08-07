@@ -69,8 +69,25 @@
 
             init() {
                 this.presets = @js($availablePresets);
-                // Initialize from existing value if available
-                if (this.displayValue) {
+
+                // Initialize from start and end attributes if available
+                const start = @js($start);
+                const end = @js($end);
+
+                if (start) {
+                    this.parseDateTime(start, 'start');
+                }
+
+                if (end) {
+                    this.parseDateTime(end, 'end');
+                }
+
+                // If start and end are set, update display value
+                if (start || end) {
+                    this.updateDisplayValue();
+                }
+                // Fallback to existing value if available and start/end not provided
+                else if (this.displayValue) {
                     // Try to parse the display value to set start/end dates and times
                     if (this.displayValue.includes(' to ')) {
                         const [start, end] = this.displayValue.split(' to ');
@@ -153,7 +170,7 @@
                 }
             },
 
-            applyRange() {
+            updateDisplayValue() {
                 let rangeText = '';
                 let startDisplay = this.startDate;
                 let endDisplay = this.endDate;
@@ -176,6 +193,10 @@
                 }
 
                 this.displayValue = rangeText;
+            },
+
+            applyRange() {
+                this.updateDisplayValue();
                 this.updateHiddenInputs();
                 this.open = false;
 

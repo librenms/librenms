@@ -12,6 +12,8 @@ class DateRangePicker extends Component
 
     public function __construct(
         public string $name = 'date_range',
+        public string $start = '',
+        public string $end = '',
         public string $value = '',
         public string $placeholder = 'Select date range...',
         public bool $required = false,

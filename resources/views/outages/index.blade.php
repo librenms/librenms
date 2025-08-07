@@ -15,9 +15,30 @@ $refresh = request()->get('refresh', 30);
                 <div class="panel-heading">
                     <strong>Outages</strong>
                 </div>
-            <div>
-                <x-date-range-picker></x-date-range-picker>
-            </div>
+                <template id="filter-container">
+                    <form method="get" action="{{ route('outages') }}" class="form-inline tw:float-left tw:inline-block" role="form" id="result_form">
+                        <div class="form-group">
+                            @if($show_device_list)
+                                <select name="device" id="device" class="form-control">
+                                    <option value="">All Devices</option>
+                                </select>
+                            @else
+                                <input type="hidden" name="device" id="device" value="{{ $device?->device_id }}">
+                            @endif
+                        </div>
+                        <div class="form-group">
+                            <select name="status" class="form-control">
+                                <option value="current">Current</option>
+                                <option value="previous">Previous</option>
+                                <option value="all">All</option>
+                            </select>
+                        </div>
+                        <div class="form-group tw:text-left">
+                            <x-date-range-picker name="date_range" start="{{ $from }}" end="{{ $to }}" class="form-control tw:min-w-64"></x-date-range-picker>
+                        </div>
+                        <button type="submit" class="btn btn-default">Filter</button>
+                    </form>
+                </template>
 
                 <div class="table-responsive">
                     <table id="outages" class="table table-hover table-condensed table-striped"
@@ -58,95 +79,50 @@ $refresh = request()->get('refresh', 30);
         },
         post: function ()
         {
-            // Get the "to" date value
-            var toDate = $("#dtpickerto").val();
+            // Get the hidden input values from the date-range-picker
+            var fromInput = document.querySelector('input[name="from"]');
+            var toInput = document.querySelector('input[name="to"]');
+
+            var fromDate = fromInput ? fromInput.value : '';
+            var toDate = toInput ? toInput.value : '';
 
             // If "to" date is empty or not user-set and Countdown.refreshNum > 0, use current time
             if (toDate === "" || (!userSetToDate && Countdown.refreshNum > 0)) {
                 return {
                     device: $('#device').val(),
                     to: moment().format('YYYY-MM-DD HH:mm'),
-                    from: $("#dtpickerfrom").val(),
+                    from: fromDate,
                 };
             } else {
                 return {
                     device: $('#device').val(),
                     to: toDate,
-                    from: $("#dtpickerfrom").val(),
+                    from: fromDate,
                 };
             }
         },
+    }).on("loaded.rs.jquery.bootgrid", function() {
+        var filterTemplate = document.getElementById("filter-container");
+        var actionBar = $(".actionBar");
+
+        if (actionBar.length) {
+            while (filterTemplate.content.firstChild) {
+                actionBar.prepend(filterTemplate.content.firstChild);
+            }
+        }
     });
 
-    $('.actionBar').append(
-        "<div class=\"pull-left\">" +
-        "<form method=\"get\" action=\"{{ route('outages') }}\" class=\"form-inline\" role=\"form\" id=\"result_form\">" +
-        "<div class=\"form-group\">" +
-        @if($show_device_list)
-        "<select name=\"device\" id=\"device\" class=\"form-control\">" +
-        "<option value=\"\">All Devices</option>" +
-        "</select>" +
-        @else
-        "&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"{{ $device?->device_id }}\">" +
-        @endif
-        "</div>" +
-        "&nbsp;&nbsp;<div class=\"form-group\">" +
-        {{--       "<x-date-range-picker></x-date-range-picker>" + --}}
-        "<input name=\"from\" type=\"text\" class=\"form-control\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"{{ $from }}\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">" +
-        "</div>" +
-        "<div class=\"form-group\">" +
-        "&nbsp;&nbsp;<input name=\"to\" type=\"text\" class=\"form-control\" id=\"dtpickerto\" maxlength=\"16\" value=\"{{ $to }}\" placeholder=\"now\" data-date-format=\"YYYY-MM-DD HH:mm\">" +
-        "</div>" +
-        "&nbsp;&nbsp;<button type=\"submit\" class=\"btn btn-default\">Filter</button>" +
-        "</form>" +
-        "</div>"
-    );
-
-    $(function () {
-        $("#dtpickerfrom").datetimepicker({
-            icons: {
-                time: 'fa fa-clock-o',
-                date: 'fa fa-calendar',
-                up: 'fa fa-chevron-up',
-                down: 'fa fa-chevron-down',
-                previous: 'fa fa-chevron-left',
-                next: 'fa fa-chevron-right',
-                today: 'fa fa-calendar-check-o',
-                clear: 'fa fa-trash-o',
-                close: 'fa fa-close'
-            },
-            defaultDate: '{{ $default_start_date }}'
-        });
-        $("#dtpickerfrom").on("dp.change", function (e) {
-            $("#dtpickerto").data("DateTimePicker").minDate(e.date);
-        });
-        $("#dtpickerto").datetimepicker({
-            icons: {
-                time: 'fa fa-clock-o',
-                date: 'fa fa-calendar',
-                up: 'fa fa-chevron-up',
-                down: 'fa fa-chevron-down',
-                previous: 'fa fa-chevron-left',
-                next: 'fa fa-chevron-right',
-                today: 'fa fa-calendar-check-o',
-                clear: 'fa fa-trash-o',
-                close: 'fa fa-close'
+    // Listen for changes to the date-range-picker
+    document.addEventListener('change', function(event) {
+        console.log(event.target);
+        // Check if the change event is from the date-range-picker
+        if (event.target.closest('div[x-data="dateRangePicker"]')) {
+            // Update userSetToDate if the "to" input has a value
+            var toInput = document.querySelector('input[name="to"]');
+            if (toInput && toInput.value) {
+                userSetToDate = true;
             }
-            // No default date - initially blank
-        });
-        $("#dtpickerto").on("dp.change", function (e) {
-            $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
-            // User has manually set the "to" date
-            userSetToDate = true;
-        });
-        if ($("#dtpickerfrom").val() != "") {
-            $("#dtpickerto").data("DateTimePicker").minDate($("#dtpickerfrom").val());
         }
-        if ($("#dtpickerto").val() != "") {
-            $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
-            userSetToDate = true;
-        }
-        // No maxDate constraint for "to" date picker when it's blank
     });
 
     @if($show_device_list)
