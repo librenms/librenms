@@ -10,7 +10,7 @@
         readonly
         @if($required) required @endif
         @if($disabled) disabled @endif
-        @click="toggleDropdown()"
+        @click="toggleDropdown"
     />
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:border tw:border-gray-300 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1"
@@ -35,17 +35,23 @@
         <div class="tw:flex tw:gap-3 tw:mb-3">
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">From</label>
-                <input type="date" x-model="startDate" class="tw:w-full tw:px-2 tw:py-1 tw:border tw:rounded">
+                <div class="tw:flex tw:gap-1">
+                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
+                    <input type="time" x-model="startTime" class="tw:w-24 tw:px-2 tw:py-1 tw:border tw:rounded">
+                </div>
             </div>
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">To</label>
-                <input type="date" x-model="endDate" class="tw:w-full tw:px-2 tw:py-1 tw:border tw:rounded">
+                <div class="tw:flex tw:gap-1">
+                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
+                    <input type="time" x-model="endTime" class="tw:w-24 tw:px-2 tw:py-1 tw:border tw:rounded">
+                </div>
             </div>
         </div>
         <div class="tw:flex tw:justify-between">
-            <button type="button" @click="clearRange()"
+            <button type="button" @click="clearRange"
                     class="tw:px-3 tw:py-1 tw:text-sm tw:text-gray-500 hover:tw:text-gray-700">Clear</button>
-            <button type="button" @click="applyRange()"
+            <button type="button" @click="applyRange"
                     class="tw:px-3 tw:py-1 tw:text-sm tw:bg-blue-500 tw:text-white tw:rounded hover:tw:bg-blue-600">Apply</button>
         </div>
     </div>
@@ -58,6 +64,8 @@
             open: false,
             startDate: '',
             endDate: '',
+            startTime: '',
+            endTime: '',
             displayValue: initialValue,
             presets: null,
             activePreset: null,
@@ -66,15 +74,38 @@
                 this.presets = @js($availablePresets);
                 // Initialize from existing value if available
                 if (this.displayValue) {
-                    // Try to parse the display value to set start/end dates
+                    // Try to parse the display value to set start/end dates and times
                     if (this.displayValue.includes(' to ')) {
                         const [start, end] = this.displayValue.split(' to ');
-                        this.startDate = start.trim();
-                        this.endDate = end.trim();
+                        this.parseDateTime(start.trim(), 'start');
+                        this.parseDateTime(end.trim(), 'end');
                     } else if (this.displayValue.startsWith('From ')) {
-                        this.startDate = this.displayValue.replace('From ', '').trim();
+                        this.parseDateTime(this.displayValue.replace('From ', '').trim(), 'start');
                     } else if (this.displayValue.startsWith('Until ')) {
-                        this.endDate = this.displayValue.replace('Until ', '').trim();
+                        this.parseDateTime(this.displayValue.replace('Until ', '').trim(), 'end');
+                    }
+                }
+            },
+
+            parseDateTime(value, type) {
+                if (!value) return;
+
+                // Check if the value contains time (contains a space followed by time)
+                if (value.includes(' ')) {
+                    const [date, time] = value.split(' ');
+                    if (type === 'start') {
+                        this.startDate = date;
+                        this.startTime = time;
+                    } else {
+                        this.endDate = date;
+                        this.endTime = time;
+                    }
+                } else {
+                    // Only date without time
+                    if (type === 'start') {
+                        this.startDate = value;
+                    } else {
+                        this.endDate = value;
                     }
                 }
 
@@ -110,18 +141,41 @@
                 const fromInput = document.getElementById(`${this.$el.id}-from-hidden`);
                 const toInput = document.getElementById(`${this.$el.id}-to-hidden`);
 
-                if (fromInput) fromInput.value = this.startDate;
-                if (toInput) toInput.value = this.endDate;
+                if (fromInput) {
+                    fromInput.value = this.startDate;
+                    if (this.startTime) {
+                        fromInput.value += ` ${this.startTime}`;
+                    }
+                }
+
+                if (toInput) {
+                    toInput.value = this.endDate;
+                    if (this.endTime) {
+                        toInput.value += ` ${this.endTime}`;
+                    }
+                }
             },
 
             applyRange() {
                 let rangeText = '';
-                if (this.startDate && this.endDate) {
-                    rangeText = `${this.startDate} to ${this.endDate}`;
-                } else if (this.startDate) {
-                    rangeText = `From ${this.startDate}`;
-                } else if (this.endDate) {
-                    rangeText = `Until ${this.endDate}`;
+                let startDisplay = this.startDate;
+                let endDisplay = this.endDate;
+
+                // Add time to display if available
+                if (this.startDate && this.startTime) {
+                    startDisplay = `${this.startDate} ${this.startTime}`;
+                }
+
+                if (this.endDate && this.endTime) {
+                    endDisplay = `${this.endDate} ${this.endTime}`;
+                }
+
+                if (startDisplay && endDisplay) {
+                    rangeText = `${startDisplay} to ${endDisplay}`;
+                } else if (startDisplay) {
+                    rangeText = `From ${startDisplay}`;
+                } else if (endDisplay) {
+                    rangeText = `Until ${endDisplay}`;
                 }
 
                 this.displayValue = rangeText;
@@ -135,6 +189,8 @@
             clearRange() {
                 this.startDate = '';
                 this.endDate = '';
+                this.startTime = '';
+                this.endTime = '';
                 this.displayValue = '';
                 this.activePreset = null;
                 this.updateHiddenInputs();
@@ -163,12 +219,24 @@
 
                 if (startDate) {
                     this.startDate = startDate.toISOString().split('T')[0];
+
+                    // Set time if hours are specified
+                    if (preset.hours) {
+                        // Format time as HH:MM
+                        const hours = startDate.getHours().toString().padStart(2, '0');
+                        const minutes = startDate.getMinutes().toString().padStart(2, '0');
+                        this.startTime = `${hours}:${minutes}`;
+                    } else {
+                        this.startTime = '';
+                    }
                 } else {
                     this.startDate = '';
+                    this.startTime = '';
                 }
 
-                // End date is always empty for these presets
+                // End date and time are always empty for these presets
                 this.endDate = '';
+                this.endTime = '';
 
                 // Set the display value
                 this.displayValue = preset.text;
