@@ -125,14 +125,14 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
-        if (!empty($this->aps)) {
+        if (! empty($this->aps)) {
             $sensors = [];
             $index = 1;
             $count = 1;
 
             foreach ($this->aps as $ap) {
                 $oid = '.1.3.6.1.4.1.2021.255.87.76.2.' . $index;
-                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
                 $index += 1;
                 $count += 1;
             }
@@ -151,14 +151,14 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        if (!empty($this->aps)) {
+        if (! empty($this->aps)) {
             $sensors = [];
             $index = 1;
             $count = 1;
 
             foreach ($this->aps as $ap) {
                 $oid = '.1.3.6.1.4.1.2021.255.87.76.3.' . $index;
-                $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
                 $index += 1;
                 $count += 1;
             }
@@ -177,14 +177,14 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        if (!empty($this->aps)) {
+        if (! empty($this->aps)) {
             $sensors = [];
             $index = 1;
             $count = 1;
 
             foreach ($this->aps as $ap) {
                 $oid = '.1.3.6.1.4.1.2021.255.87.76.4.' . $index;
-                $sensors[] = new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, "openwrt", $count, "$ap");
+                $sensors[] = new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
                 $index += 1;
                 $count += 1;
             }
@@ -203,7 +203,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessRate()
     {
-        if (!empty($this->aps)) {
+        if (! empty($this->aps)) {
             $sensors = [];
             $index = 1;
             $count = 1;
@@ -212,7 +212,7 @@ class Openwrt extends OS implements
                 foreach (['TX', 'RX'] as $dirId => $dir) {
                     foreach (['SUM', 'AVG', 'MIN', 'MAX'] as $typeId => $type) {
                         $oid = '.1.3.6.1.4.1.2021.255.87.76.5.' . ($dirId + 1) . '.' . ($typeId + 1) . '.' . $index;
-                        $sensors[] = new WirelessSensor('rate', $this->getDeviceId(), $oid, "openwrt$dir", $count, "$ap $dir $type");
+                        $sensors[] = new WirelessSensor('rate', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap $dir $type");
                         $count += 1;
                     }
                 }
