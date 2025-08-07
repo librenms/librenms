@@ -1,9 +1,9 @@
 <?php
 
 /**
- * grandstream-gxw.inc.php
+ * grandstream-ht.inc.php
  *
- * LibreNMS state sensor discovery for Grandstream GXW devices
+ * LibreNMS state sensor discovery for Grandstream HT devices
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
