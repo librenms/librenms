@@ -203,6 +203,25 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessRate()
     {
+        if (!empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                foreach (['TX', 'RX'] as $dirId => $dir) {
+                    foreach (['SUM', 'AVG', 'MIN', 'MAX'] as $typeId => $type) {
+                        $oid = '.1.3.6.1.4.1.2021.255.87.76.5.' . ($dirId + 1) . '.' . ($typeId + 1) . '.' . $index;
+                        $sensors[] = new WirelessSensor('rate', $this->getDeviceId(), $oid, "openwrt$dir", $count, "$ap $dir $type");
+                        $count += 1;
+                    }
+                }
+                $index += 1;
+            }
+
+            return $sensors;
+        }
+
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
 
