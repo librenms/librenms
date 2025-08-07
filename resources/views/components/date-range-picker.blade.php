@@ -1,16 +1,16 @@
 <div class="tw:relative"
      x-data="dateRangePicker"
-     @click.outside="open = false">
+     x-on:click.outside="open = false">
     <div
         x-text="displayValue || '{{ $placeholder }}'"
-        class="{{ $class }} tw:border tw:border-gray-300 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white"
-        :class="{'tw:text-gray-500': !displayValue}"
-        @click="toggleDropdown"
+        class="{{ $class }} tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white tw:dark:text-gray-800"
+        :class="{'tw:text-gray-500 tw:dark:text-gray-400': !displayValue}"
+        x-on:click="toggleDropdown"
         tabindex="0"
     ></div>
     <input type="hidden" name="{{ $name }}" x-model="displayValue" @if($required) required @endif @if($disabled) disabled @endif />
 
-    <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:border tw:border-gray-300 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1"
+    <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
          x-transition:enter="tw:transition tw:ease-out tw:duration-200"
          x-transition:enter-start="tw:opacity-0 tw:transform tw:-translate-y-2"
@@ -23,33 +23,33 @@
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3">
                 @foreach($availablePresets as $key => $preset)
                 <button type="button"
-                        class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 hover:tw:bg-gray-200 tw:rounded-md tw:transition-colors tw:min-w-[40px]"
+                        class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 tw:dark:bg-gray-700 tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
                         :class="{'tw:bg-blue-500 tw:text-white': activePreset === '{{ $key }}'}"
-                        @click="setPreset('{{ $key }}')">{{ $preset['label'] }}</button>
+                        x-on:click="setPreset('{{ $key }}')">{{ $preset['label'] }}</button>
                 @endforeach
             </div>
         @endif
         <div class="tw:mb-3">
             <div class="tw:flex-1">
-                <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">From</label>
-                <div class="tw:flex tw:flex-wrap tw:gap-1">
-                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
-                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:rounded">
+                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
+                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
             <div class="tw:flex-1">
-                <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">To</label>
-                <div class="tw:flex tw:flex-wrap tw:gap-1">
-                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:rounded">
-                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:rounded">
+                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
+                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
         </div>
         <div class="tw:flex tw:justify-between">
-            <button type="button" @click="clearRange"
-                    class="tw:px-3 tw:py-1 tw:text-sm tw:text-gray-500 hover:tw:text-gray-700">Clear</button>
-            <button type="button" @click="applyRange"
-                    class="tw:px-3 tw:py-1 tw:text-sm tw:bg-blue-500 tw:text-white tw:rounded hover:tw:bg-blue-600">Apply</button>
+            <button type="button" x-on:click="clearRange"
+                    class="tw:px-3 tw:py-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-700 tw:dark:hover:text-gray-300">Clear</button>
+            <button type="button" x-on:click="applyRange"
+                    class="tw:px-3 tw:py-1 tw:text-sm tw:bg-blue-500 tw:text-white tw:rounded tw:hover:bg-blue-600 tw:dark:bg-blue-600 tw:dark:hover:bg-blue-700">Apply</button>
         </div>
     </div>
 </div>

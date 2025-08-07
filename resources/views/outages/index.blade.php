@@ -91,7 +91,7 @@ $refresh = request()->get('refresh', 30);
         @endif
         "</div>" +
         "&nbsp;&nbsp;<div class=\"form-group\">" +
-        "<x-date-range-picker></x-date-range-picker>" +
+        {{--       "<x-date-range-picker></x-date-range-picker>" + --}}
         "<input name=\"from\" type=\"text\" class=\"form-control\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"{{ $from }}\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">" +
         "</div>" +
         "<div class=\"form-group\">" +
