@@ -16,11 +16,11 @@
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:border tw:border-gray-300 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1"
          x-show="open"
          x-transition:enter="tw:transition tw:ease-out tw:duration-200"
-         x-transition:enter-start="tw:opacity-0 tw:scale-95"
-         x-transition:enter-end="tw:opacity-100 tw:scale-100"
+         x-transition:enter-start="tw:opacity-0 tw:transform tw:-translate-y-2"
+         x-transition:enter-end="tw:opacity-100 tw:transform tw:translate-y-0"
          x-transition:leave="tw:transition tw:ease-in tw:duration-150"
-         x-transition:leave-start="tw:opacity-100 tw:scale-100"
-         x-transition:leave-end="tw:opacity-0 tw:scale-95"
+         x-transition:leave-start="tw:opacity-100 tw:transform tw:translate-y-0"
+         x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="display: none;">
         @if($presets)
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3">
