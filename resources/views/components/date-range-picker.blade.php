@@ -1,5 +1,5 @@
 <div id="{{ $componentId }}" class="tw:relative"
-     x-data="dateRangePicker('{{ old($name, $value) }}')"
+     x-data="dateRangePicker"
      @click.outside="open = false">
     <div
         x-text="displayValue || '{{ $placeholder }}'"
@@ -57,13 +57,13 @@
 @pushOnce('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('dateRangePicker', (initialValue) => ({
+        Alpine.data('dateRangePicker', () => ({
             open: false,
             startDate: '',
             endDate: '',
             startTime: '',
             endTime: '',
-            displayValue: initialValue,
+            displayValue: '',
             presets: null,
             activePreset: null,
 

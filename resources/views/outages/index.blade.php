@@ -79,26 +79,27 @@ $refresh = request()->get('refresh', 30);
     });
 
     $('.actionBar').append(
-        '<div class="pull-left">' +
-        '<form method="get" action="{{ route('outages') }}" class="form-inline" role="form" id="result_form">' +
-        '<div class="form-group">' +
+        "<div class=\"pull-left\">" +
+        "<form method=\"get\" action=\"{{ route('outages') }}\" class=\"form-inline\" role=\"form\" id=\"result_form\">" +
+        "<div class=\"form-group\">" +
         @if($show_device_list)
-        '<select name="device" id="device" class="form-control">' +
-        '<option value="">All Devices</option>' +
-        '</select>' +
+        "<select name=\"device\" id=\"device\" class=\"form-control\">" +
+        "<option value=\"\">All Devices</option>" +
+        "</select>" +
         @else
-        '&nbsp;&nbsp;<input type="hidden" name="device" id="device" value="{{ $device?->device_id }}">' +
+        "&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"{{ $device?->device_id }}\">" +
         @endif
-        '</div>' +
-        '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="{{ $from }}" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
-        '</div>' +
-        '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="{{ $to }}" placeholder="now" data-date-format="YYYY-MM-DD HH:mm">' +
-        '</div>' +
-        '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
-        '</form>' +
-        '</div>'
+        "</div>" +
+        "&nbsp;&nbsp;<div class=\"form-group\">" +
+        "<x-date-range-picker></x-date-range-picker>" +
+        "<input name=\"from\" type=\"text\" class=\"form-control\" id=\"dtpickerfrom\" maxlength=\"16\" value=\"{{ $from }}\" placeholder=\"From\" data-date-format=\"YYYY-MM-DD HH:mm\">" +
+        "</div>" +
+        "<div class=\"form-group\">" +
+        "&nbsp;&nbsp;<input name=\"to\" type=\"text\" class=\"form-control\" id=\"dtpickerto\" maxlength=\"16\" value=\"{{ $to }}\" placeholder=\"now\" data-date-format=\"YYYY-MM-DD HH:mm\">" +
+        "</div>" +
+        "&nbsp;&nbsp;<button type=\"submit\" class=\"btn btn-default\">Filter</button>" +
+        "</form>" +
+        "</div>"
     );
 
     $(function () {
