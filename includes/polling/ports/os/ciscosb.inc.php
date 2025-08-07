@@ -16,7 +16,7 @@ foreach ($vlan_port_mode_state_array as $index => $vlan_port_mode_state) {
       15 (Customer)
           (according to "Cisco Business 350 Series Switches Administration Guide")
     */
-    Log::debug(print_r($index,true) . '=>' . print_r($vlan_port_mode_state, true));
+    Log::debug(print_r($index, true) . '=>' . print_r($vlan_port_mode_state, true));
     if ($vlan_port_mode_state == 12 && isset($port_stats[$index])) {
         $port_stats[$index]['ifTrunk'] = 'dot1Q';
     }
