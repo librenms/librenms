@@ -2,6 +2,11 @@
 
 @section('title', __('Outages'))
 
+@php
+// Default refresh rate is 30 seconds (30000ms)
+$refresh = request()->get('refresh', 30);
+@endphp
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -10,6 +15,9 @@
                 <div class="panel-heading">
                     <strong>Outages</strong>
                 </div>
+            <div>
+                <x-date-range-picker></x-date-range-picker>
+            </div>
 
                 <div class="table-responsive">
                     <table id="outages" class="table table-hover table-condensed table-striped"
@@ -32,7 +40,16 @@
 @endsection
 
 @section('scripts')
+<x-refresh-timer :refresh="$refresh" callback="refreshOutagesGrid"></x-refresh-timer>
 <script>
+    // Function to refresh the outages grid
+    function refreshOutagesGrid() {
+        outages_grid.bootgrid('reload');
+    }
+
+    // Flag to track if user has manually set the "to" date
+    var userSetToDate = {{ $to ? 'true' : 'false' }};
+
     var outages_grid = $("#outages").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
@@ -41,11 +58,23 @@
         },
         post: function ()
         {
-            return {
-                device: $('#device').val(),
-                to: $("#dtpickerto").val(),
-                from: $("#dtpickerfrom").val(),
-            };
+            // Get the "to" date value
+            var toDate = $("#dtpickerto").val();
+
+            // If "to" date is empty or not user-set and Countdown.refreshNum > 0, use current time
+            if (toDate === "" || (!userSetToDate && Countdown.refreshNum > 0)) {
+                return {
+                    device: $('#device').val(),
+                    to: moment().format('YYYY-MM-DD HH:mm'),
+                    from: $("#dtpickerfrom").val(),
+                };
+            } else {
+                return {
+                    device: $('#device').val(),
+                    to: toDate,
+                    from: $("#dtpickerfrom").val(),
+                };
+            }
         },
     });
 
@@ -56,9 +85,6 @@
         @if($show_device_list)
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
-            @if($device)
-            '<option value="{{ $device->device_id }}" selected>{{ $device->displayName() }}</option>' +
-            @endif
         '</select>' +
         @else
         '&nbsp;&nbsp;<input type="hidden" name="device" id="device" value="{{ $device?->device_id }}">' +
@@ -68,7 +94,7 @@
         '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="{{ $from }}" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="{{ $to }}" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="{{ $to }}" placeholder="now" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
@@ -104,20 +130,22 @@
                 today: 'fa fa-calendar-check-o',
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
-            },
-            defaultDate: '{{ $default_end_date }}'
+            }
+            // No default date - initially blank
         });
         $("#dtpickerto").on("dp.change", function (e) {
             $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
+            // User has manually set the "to" date
+            userSetToDate = true;
         });
         if ($("#dtpickerfrom").val() != "") {
             $("#dtpickerto").data("DateTimePicker").minDate($("#dtpickerfrom").val());
         }
         if ($("#dtpickerto").val() != "") {
             $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
-        } else {
-            $("#dtpickerto").data("DateTimePicker").maxDate('{{ $default_end_date }}');
+            userSetToDate = true;
         }
+        // No maxDate constraint for "to" date picker when it's blank
     });
 
     @if($show_device_list)
