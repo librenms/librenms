@@ -16,7 +16,7 @@ $refresh = request()->get('refresh', 30);
                     <strong>Outages</strong>
                 </div>
                 <template id="filter-container">
-                    <form method="get" action="{{ route('outages') }}" class="form-inline tw:float-left tw:inline-block" role="form" id="result_form">
+                    <form method="get" action="{{ route('outages') }}" class="form-inline tw:float-left tw:inline-block" role="form" id="filter-form">
                         <div class="form-group">
                             @if($show_device_list)
                                 <select name="device" id="device" class="form-control">
@@ -27,14 +27,19 @@ $refresh = request()->get('refresh', 30);
                             @endif
                         </div>
                         <div class="form-group">
-                            <select name="status" class="form-control">
+                            <select id="status" name="status" class="form-control">
                                 <option value="current">Current</option>
                                 <option value="previous">Previous</option>
                                 <option value="all">All</option>
                             </select>
                         </div>
                         <div class="form-group tw:text-left">
-                            <x-date-range-picker name="date_range" start="{{ $from }}" end="{{ $to }}" class="form-control tw:min-w-64"></x-date-range-picker>
+                            <x-date-range-picker
+                                id="date_range" name="date_range"
+                                start="{{ $from }}" end="{{ $to }}"
+                                class="form-control tw:min-w-64"
+                                x-on:date-range-changed="refreshOutagesGrid"
+                            ></x-date-range-picker>
                         </div>
                         <button type="submit" class="btn btn-default">Filter</button>
                     </form>
@@ -63,13 +68,9 @@ $refresh = request()->get('refresh', 30);
 @section('scripts')
 <x-refresh-timer :refresh="$refresh" callback="refreshOutagesGrid"></x-refresh-timer>
 <script>
-    // Function to refresh the outages grid
     function refreshOutagesGrid() {
         outages_grid.bootgrid('reload');
     }
-
-    // Flag to track if user has manually set the "to" date
-    var userSetToDate = {{ $to ? 'true' : 'false' }};
 
     var outages_grid = $("#outages").bootgrid({
         ajax: true,
@@ -79,55 +80,36 @@ $refresh = request()->get('refresh', 30);
         },
         post: function ()
         {
-            // Get the hidden input values from the date-range-picker
-            var fromInput = document.querySelector('input[name="from"]');
-            var toInput = document.querySelector('input[name="to"]');
+            const picker = document.querySelector('#date_range');
 
-            var fromDate = fromInput ? fromInput.value : '';
-            var toDate = toInput ? toInput.value : '';
-
-            // If "to" date is empty or not user-set and Countdown.refreshNum > 0, use current time
-            if (toDate === "" || (!userSetToDate && Countdown.refreshNum > 0)) {
-                return {
-                    device: $('#device').val(),
-                    to: moment().format('YYYY-MM-DD HH:mm'),
-                    from: fromDate,
-                };
-            } else {
-                return {
-                    device: $('#device').val(),
-                    to: toDate,
-                    from: fromDate,
-                };
+            if (!picker) {
+                return {};
             }
+
+            const range = picker.dateRangePicker.get();
+            return {
+                device: document.getElementById('device').value,
+                status: document.getElementById('status').value,
+                to: range.endValue,
+                from: range.startValue,
+            };
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
         var filterTemplate = document.getElementById("filter-container");
-        var actionBar = $(".actionBar");
 
-        if (actionBar.length) {
+        if (filterTemplate.content.hasChildNodes()) {
+            var actionBar = document.querySelector(".actionBar");
+
             while (filterTemplate.content.firstChild) {
-                actionBar.prepend(filterTemplate.content.firstChild);
+                actionBar.insertBefore(filterTemplate.content.firstChild, actionBar.firstChild);
             }
+
+            document.getElementById("status").addEventListener("change", refreshOutagesGrid);
+            @if($show_device_list)
+            init_select2("#device", "device", {}, {{ \Illuminate\Support\Js::from($selected_device) }} , "All Devices");
+            document.getElementById("device").addEventListener("change", refreshOutagesGrid);
+            @endif
         }
     });
-
-    // Listen for changes to the date-range-picker
-    document.addEventListener('change', function(event) {
-        console.log(event.target);
-        // Check if the change event is from the date-range-picker
-        if (event.target.closest('div[x-data="dateRangePicker"]')) {
-            // Update userSetToDate if the "to" input has a value
-            var toInput = document.querySelector('input[name="to"]');
-            if (toInput && toInput.value) {
-                userSetToDate = true;
-            }
-        }
-    });
-
-    @if($show_device_list)
-    init_select2("#device", "device", {}, {{ \Illuminate\Support\Js::from($selected_device) }} , "All Devices");
-    $('#device').on('change', () => outages_grid.bootgrid('reload'));
-    @endif
 </script>
 @endsection

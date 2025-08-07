@@ -1,14 +1,20 @@
-<div class="tw:relative"
+<div {{ $attributes }}
+    class="tw:relative"
      x-data="dateRangePicker"
-     x-on:click.outside="open = false">
+     x-on:click.outside="open = false"
+     data-start="{{ $start }}"
+     data-end="{{ $end }}"
+     data-placeholder="{{ $placeholder }}">
     <div
-        x-text="displayValue || '{{ $placeholder }}'"
+        x-text="displayText"
         class="{{ $class }} tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white tw:dark:text-gray-800"
-        :class="{'tw:text-gray-500 tw:dark:text-gray-400': !displayValue}"
+        :class="{'tw:text-gray-500 tw:dark:text-gray-400': !hasValue}"
         x-on:click="toggleDropdown"
         tabindex="0"
     ></div>
-    <input type="hidden" name="{{ $name }}" x-model="displayValue" @if($required) required @endif @if($disabled) disabled @endif />
+
+    <input type="hidden" name="from" :value="startValue">
+    <input type="hidden" name="to" :value="endValue">
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
@@ -20,7 +26,7 @@
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="display: none;">
         @if($presets)
-            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3">
+            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
                 @foreach($availablePresets as $key => $preset)
                 <button type="button"
                         class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 tw:dark:bg-gray-700 tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
@@ -45,7 +51,7 @@
                 </div>
             </div>
         </div>
-        <div class="tw:flex tw:justify-between">
+        <div class="tw:flex tw:justify-between tw:dark:text-white">
             <button type="button" x-on:click="clearRange"
                     class="tw:px-3 tw:py-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-700 tw:dark:hover:text-gray-300">Clear</button>
             <button type="button" x-on:click="applyRange"
@@ -63,145 +69,82 @@
             endDate: '',
             startTime: '',
             endTime: '',
-            displayValue: '',
-            presets: null,
+            placeholder: 'Select date range...',
             activePreset: null,
 
+            // Computed properties
+            get startValue() {
+                if (!this.startDate) return '';
+                return this.startTime ? `${this.startDate} ${this.startTime}` : this.startDate;
+            },
+
+            get endValue() {
+                if (!this.endDate) return '';
+                return this.endTime ? `${this.endDate} ${this.endTime}` : this.endDate;
+            },
+
+            get hasValue() {
+                return !!(this.startValue || this.endValue);
+            },
+
+            get displayText() {
+                if (!this.hasValue) return this.placeholder;
+
+                if (this.startValue && this.endValue) {
+                    return `${this.startValue} to ${this.endValue}`;
+                } else if (this.startValue) {
+                    return `From ${this.startValue}`;
+                } else if (this.endValue) {
+                    return `Until ${this.endValue}`;
+                }
+
+                return this.placeholder;
+            },
+
             init() {
-                this.presets = @js($availablePresets);
+                // Attach API for external JS control
+                this.$el.dateRangePicker = {
+                    get: () => this.getValue(),
+                    set: (values) => this.setValue(values),
+                    clear: () => this.clearRange(),
+                    open: () => this.open = true,
+                    close: () => this.open = false,
+                };
 
-                // Initialize from start and end attributes if available
-                const start = @js($start);
-                const end = @js($end);
-
-                if (start) {
-                    this.parseDateTime(start, 'start');
-                }
-
-                if (end) {
-                    this.parseDateTime(end, 'end');
-                }
-
-                // If start and end are set, update display value
-                if (start || end) {
-                    this.updateDisplayValue();
-                }
-                // Fallback to existing value if available and start/end not provided
-                else if (this.displayValue) {
-                    // Try to parse the display value to set start/end dates and times
-                    if (this.displayValue.includes(' to ')) {
-                        const [start, end] = this.displayValue.split(' to ');
-                        this.parseDateTime(start.trim(), 'start');
-                        this.parseDateTime(end.trim(), 'end');
-                    } else if (this.displayValue.startsWith('From ')) {
-                        this.parseDateTime(this.displayValue.replace('From ', '').trim(), 'start');
-                    } else if (this.displayValue.startsWith('Until ')) {
-                        this.parseDateTime(this.displayValue.replace('Until ', '').trim(), 'end');
-                    }
-                }
+                if (this.$el.dataset.start) this.parseDateTime(this.$el.dataset.start, 'start');
+                if (this.$el.dataset.end) this.parseDateTime(this.$el.dataset.end, 'end');
+                if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
             },
 
             parseDateTime(value, type) {
                 if (!value) return;
-
-                // Check if the value contains time (contains a space followed by time)
                 if (value.includes(' ')) {
                     const [date, time] = value.split(' ');
-                    if (type === 'start') {
-                        this.startDate = date;
-                        this.startTime = time;
-                    } else {
-                        this.endDate = date;
-                        this.endTime = time;
-                    }
+                    if (type === 'start') { this.startDate = date; this.startTime = time; }
+                    else { this.endDate = date; this.endTime = time; }
                 } else {
-                    // Only date without time
-                    if (type === 'start') {
-                        this.startDate = value;
-                    } else {
-                        this.endDate = value;
-                    }
+                    if (type === 'start') { this.startDate = value; this.startTime = ''; }
+                    else { this.endDate = value; this.endTime = ''; }
                 }
-
-                // Add hidden inputs for form submission
-                this.$nextTick(() => {
-                    // Create hidden inputs if they don't exist
-                    if (!document.getElementById(`${this.$el.id}-from-hidden`)) {
-                        const fromInput = document.createElement('input');
-                        fromInput.type = 'hidden';
-                        fromInput.name = 'from';
-                        fromInput.id = `${this.$el.id}-from-hidden`;
-                        this.$el.appendChild(fromInput);
-                    }
-
-                    if (!document.getElementById(`${this.$el.id}-to-hidden`)) {
-                        const toInput = document.createElement('input');
-                        toInput.type = 'hidden';
-                        toInput.name = 'to';
-                        toInput.id = `${this.$el.id}-to-hidden`;
-                        this.$el.appendChild(toInput);
-                    }
-
-                    // Update hidden inputs with initial values
-                    this.updateHiddenInputs();
-                });
             },
 
             toggleDropdown() {
                 this.open = !this.open;
             },
 
-            updateHiddenInputs() {
-                const fromInput = document.getElementById(`${this.$el.id}-from-hidden`);
-                const toInput = document.getElementById(`${this.$el.id}-to-hidden`);
-
-                if (fromInput) {
-                    fromInput.value = this.startDate;
-                    if (this.startTime) {
-                        fromInput.value += ` ${this.startTime}`;
-                    }
-                }
-
-                if (toInput) {
-                    toInput.value = this.endDate;
-                    if (this.endTime) {
-                        toInput.value += ` ${this.endTime}`;
-                    }
-                }
+            // API alias per issue description
+            toggle() {
+                this.toggleDropdown();
             },
 
-            updateDisplayValue() {
-                let rangeText = '';
-                let startDisplay = this.startDate;
-                let endDisplay = this.endDate;
-
-                // Add time to display if available
-                if (this.startDate && this.startTime) {
-                    startDisplay = `${this.startDate} ${this.startTime}`;
-                }
-
-                if (this.endDate && this.endTime) {
-                    endDisplay = `${this.endDate} ${this.endTime}`;
-                }
-
-                if (startDisplay && endDisplay) {
-                    rangeText = `${startDisplay} to ${endDisplay}`;
-                } else if (startDisplay) {
-                    rangeText = `From ${startDisplay}`;
-                } else if (endDisplay) {
-                    rangeText = `Until ${endDisplay}`;
-                }
-
-                this.displayValue = rangeText;
+            updateValues() {
+                // Clear preset when manually changing values
+                this.activePreset = null;
             },
 
             applyRange() {
-                this.updateDisplayValue();
-                this.updateHiddenInputs();
                 this.open = false;
-
-                // Dispatch a change event for parent forms
-                this.$el.dispatchEvent(new Event('change', {bubbles: true}));
+                this.emitChange();
             },
 
             clearRange() {
@@ -209,41 +152,38 @@
                 this.endDate = '';
                 this.startTime = '';
                 this.endTime = '';
-                this.displayValue = '';
                 this.activePreset = null;
-                this.updateHiddenInputs();
                 this.open = false;
-
-                // Dispatch a change event for parent forms
-                this.$el.dispatchEvent(new Event('change', {bubbles: true}));
+                this.emitChange();
             },
 
-            setPreset(key) {
-                const preset = this.presets[key];
-                if (!preset) {
-                    console.error(`Preset ${key} not found`);
-                    return;
-                }
+            setPresetFromDataset(ds) {
+                const key = ds.presetKey || null;
+                const preset = {
+                    hours: ds.hours ? parseInt(ds.hours, 10) : null,
+                    days: ds.days ? parseInt(ds.days, 10) : null,
+                };
+                this.setPreset(key, preset);
+            },
 
-                this.activePreset = key;
-                const today = new Date();
-
+            // New API: set a preset by key and object {hours|days}
+            setPreset(key, preset) {
+                this.activePreset = key || null;
+                const now = new Date();
                 let startDate = null;
-                if (preset.hours) {
-                    startDate = new Date(today.getTime() - preset.hours * 60 * 60 * 1000);
-                } else if (preset.days) {
-                    startDate = new Date(today.getTime() - preset.days * 24 * 60 * 60 * 1000);
+                if (preset && Number.isInteger(preset.hours)) {
+                    startDate = new Date(now.getTime() - preset.hours * 60 * 60 * 1000);
+                } else if (preset && Number.isInteger(preset.days)) {
+                    startDate = new Date(now.getTime() - preset.days * 24 * 60 * 60 * 1000);
+                    // For day presets, set to start of day
+                    startDate.setHours(0, 0, 0, 0);
                 }
-
                 if (startDate) {
                     this.startDate = startDate.toISOString().split('T')[0];
-
-                    // Set time if hours are specified
-                    if (preset.hours) {
-                        // Format time as HH:MM
-                        const hours = startDate.getHours().toString().padStart(2, '0');
-                        const minutes = startDate.getMinutes().toString().padStart(2, '0');
-                        this.startTime = `${hours}:${minutes}`;
+                    if (preset && Number.isInteger(preset.hours)) {
+                        const hh = startDate.getHours().toString().padStart(2, '0');
+                        const mm = startDate.getMinutes().toString().padStart(2, '0');
+                        this.startTime = `${hh}:${mm}`;
                     } else {
                         this.startTime = '';
                     }
@@ -251,17 +191,40 @@
                     this.startDate = '';
                     this.startTime = '';
                 }
-
-                // End date and time are always empty for these presets
+                // Clear end for presets
                 this.endDate = '';
                 this.endTime = '';
-
-                // Set the display value
-                this.displayValue = preset.text;
-
-                // Apply the range automatically
                 this.applyRange();
-            }
+            },
+
+            emitChange() {
+                const detail = this.getValue();
+
+                this.$el.dispatchEvent(new CustomEvent('date-range-changed', {
+                    detail,
+                    bubbles: true
+                }));
+            },
+
+            getValue() {
+                return {
+                    startValue: this.startValue,
+                    endValue: this.endValue,
+                    startDate: this.startDate,
+                    startTime: this.startTime,
+                    endDate: this.endDate,
+                    endTime: this.endTime,
+                    hasValue: this.hasValue,
+                    activePreset: this.activePreset,
+                };
+            },
+
+            setValue(start = '', end = '') {
+                this.parseDateTime(start, 'start');
+                this.parseDateTime(end, 'end');
+                this.activePreset = null;
+                this.emitChange();
+            },
         }));
     });
 </script>
