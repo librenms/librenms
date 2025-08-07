@@ -1,17 +1,14 @@
 <div id="{{ $componentId }}" class="tw:relative"
      x-data="dateRangePicker('{{ old($name, $value) }}')"
      @click.outside="open = false">
-    <input
-        type="text"
-        name="{{ $name }}"
-        x-model="displayValue"
-        placeholder="{{ $placeholder }}"
-        class="{{ $class }}"
-        readonly
-        @if($required) required @endif
-        @if($disabled) disabled @endif
+    <div
+        x-text="displayValue || '{{ $placeholder }}'"
+        class="{{ $class }} tw:border tw:border-gray-300 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white"
+        :class="{'tw:text-gray-500': !displayValue}"
         @click="toggleDropdown"
-    />
+        tabindex="0"
+    ></div>
+    <input type="hidden" name="{{ $name }}" x-model="displayValue" @if($required) required @endif @if($disabled) disabled @endif />
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:border tw:border-gray-300 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1"
          x-show="open"
@@ -32,7 +29,7 @@
                 @endforeach
             </div>
         @endif
-        <div class="tw:flex tw:flex-wrap tw:gap-3 tw:mb-3">
+        <div class="tw:mb-3">
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:mb-1">From</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1">
