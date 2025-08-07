@@ -1,6 +1,6 @@
 <?php
 
-$class = 'span_loss';
+$class = 'signal_loss';
 $unit = 'dB';
 $unit_long = 'Decibels';
 

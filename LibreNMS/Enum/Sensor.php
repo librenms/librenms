@@ -38,7 +38,7 @@ enum Sensor: string
     case TV_SIGNAL = 'tv_signal';
     case VOLTAGE = 'voltage';
     case WATERFLOW = 'waterflow';
-    case SPAN_LOSS = 'span_loss';
+    case SIGNAL_LOSS = 'signal_loss';
 
     public function unit(): string
     {
@@ -73,7 +73,7 @@ enum Sensor: string
             self::TV_SIGNAL => 'dBmV',
             self::VOLTAGE => 'V',
             self::WATERFLOW => 'l/m',
-            self::SPAN_LOSS => 'dB',
+            self::SIGNAL_LOSS => 'dB',
         };
     }
 
@@ -110,7 +110,7 @@ enum Sensor: string
             self::TV_SIGNAL => 'signal',
             self::VOLTAGE => 'bolt',
             self::WATERFLOW => 'tint',
-            self::SPAN_LOSS => 'wave-square'
+            self::SIGNAL_LOSS => 'wave-square'
         };
     }
 }
