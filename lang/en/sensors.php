@@ -199,7 +199,7 @@ return [
     ],
     'span_loss' => [
         'short' => 'SL',
-        'long' => 'Span Loss',
+        'long' => 'Signal Loss',
         'unit' => 'dB',
         'unit_long' => 'Decibels',
     ],

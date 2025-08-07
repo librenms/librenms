@@ -38,7 +38,7 @@ the values we expect to see the data in:
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
-| span_loss                       | dB                          |
+| signal_loss                       | dB                          |
 
 ### Simple health discovery
 
@@ -502,7 +502,7 @@ Ber:
 Eer:
 Waterflow:
 Percent:
-Span_loss:
+Signal_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

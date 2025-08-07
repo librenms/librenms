@@ -75,7 +75,7 @@ modules:
                     entPhysicalIndex_measured: 'ports'
                     group: '{{ $ifName }}'
                     divisor: 100
-        span_loss:
+        signal_loss:
             data:
                 -
                     oid: INFINERA-PM-BANDCTP-MIB::bandCtpPmRealTable

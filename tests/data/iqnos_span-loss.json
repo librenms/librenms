@@ -804,7 +804,7 @@
                 },
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "span_loss",
+                    "sensor_class": "signal_loss",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.21296.2.2.2.3.1.1.1.1.8388643",
                     "sensor_index": "bandCtpPmRealOchSpanLoss.8388643",

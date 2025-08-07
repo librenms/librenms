@@ -1,8 +1,8 @@
 <?php
 
-$graph_type = 'sensor_span_loss';
-$sensor_class = 'span_loss';
+$graph_type = 'sensor_signal_loss';
+$sensor_class = 'signal_loss';
 $sensor_unit = 'dB';
-$sensor_type = 'Span Loss';
+$sensor_type = 'Signal Loss';
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';
