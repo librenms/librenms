@@ -22,6 +22,12 @@ modules:
                     descr: wtWebioAn1GraphPortText
                     index: wtWebioAn1GraphSensorNo.{{ $index }}
                 -
+                    oid: wtWebioAn8Graph
+                    value: wtWebioAn8GraphBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.6.1.4.1.1.{{ $index }}'
+                    descr: wtWebioAn8GraphPortText
+                    index: wtWebioAn8GraphSensorNo.{{ $index }}
+                -
                     oid: wtWebGraphThermHygro
                     value: wtWebGraphThermHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
