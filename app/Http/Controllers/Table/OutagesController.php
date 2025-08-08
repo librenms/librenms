@@ -41,6 +41,7 @@ class OutagesController extends TableController
             'device' => 'nullable|int',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+            'status' => 'nullable|in:current,previous,all',
         ];
     }
 
@@ -66,11 +67,20 @@ class OutagesController extends TableController
     {
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
-            ->when($request->from, function ($query) use ($request) {
-                $query->where('going_down', '>=', Carbon::parse($request->from, session('preferences.timezone'))->getTimestamp());
+            ->when($request->from, function ($query, $from) {
+                $query->where('going_down', '>=', Carbon::parse($from)->getTimestamp());
             })
-            ->when($request->to, function ($query) use ($request) {
-                $query->where('going_down', '<=', Carbon::parse($request->to, session('preferences.timezone'))->getTimestamp());
+            ->when($request->to, function ($query, $to) {
+                $query->where('going_down', '<=', Carbon::parse($to)->getTimestamp());
+            })
+            ->when($request->status === 'current', function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('up_again')
+                      ->orWhere('up_again', 0);
+                });
+            })
+            ->when($request->status === 'previous', function ($query) {
+                $query->where('up_again', '>', 0);
             });
     }
 

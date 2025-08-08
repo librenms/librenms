@@ -1,7 +1,7 @@
 <div {{ $attributes }}
     class="tw:relative"
      x-data="dateRangePicker"
-     x-on:click.outside="open = false"
+     x-on:click.outside="closeDropdown"
      data-start="{{ $start }}"
      data-end="{{ $end }}"
      data-placeholder="{{ $placeholder }}">
@@ -27,12 +27,14 @@
          style="display: none;">
         @if($presets)
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
-                @foreach($availablePresets as $key => $preset)
-                <button type="button"
-                        class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 tw:dark:bg-gray-700 tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
-                        :class="{'tw:bg-blue-500 tw:text-white': activePreset === '{{ $key }}'}"
-                        x-on:click="setPreset('{{ $key }}')">{{ $preset['label'] }}</button>
-                @endforeach
+                <template x-for="(data, preset) in presets">
+                    <button type="button"
+                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 tw:dark:bg-gray-700 tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
+                            :class="{'tw:bg-blue-500 tw:text-white': preset === activePreset}"
+                            x-on:click="setPreset(preset)"
+                            x-text="data.label"
+                    ></button>
+                </template>
             </div>
         @endif
         <div class="tw:mb-3">
@@ -71,15 +73,73 @@
             endTime: '',
             placeholder: 'Select date range...',
             activePreset: null,
+            presets: {
+                "6h": {
+                    "label": "6h",
+                    "text": "Last 6 hours",
+                    "seconds": 21600
+                },
+                "24h": {
+                    "label": "24h",
+                    "text": "Last 24 hours",
+                    "seconds": 86400
+                },
+                "48h": {
+                    "label": "48h",
+                    "text": "Last 48 hours",
+                    "seconds": 172800
+                },
+                "1w": {
+                    "label": "1w",
+                    "text": "Last week",
+                    "seconds": 604800
+                },
+                "2w": {
+                    "label": "2w",
+                    "text": "Last 2 weeks",
+                    "seconds": 1209600
+                },
+                "1m": {
+                    "label": "1m",
+                    "text": "Last month",
+                    "seconds": 2592000
+                },
+                "2m": {
+                    "label": "2m",
+                    "text": "Last 2 months",
+                    "seconds": 5184000
+                },
+                "1y": {
+                    "label": "1y",
+                    "text": "Last year",
+                    "seconds": 31536000
+                },
+                "2y": {
+                    "label": "2y",
+                    "text": "Last 2 years",
+                    "seconds": 63072000
+                }
+            },
 
             // Computed properties
             get startValue() {
-                if (!this.startDate) return '';
+                if (this.activePreset) {
+                    const newTimeInMilliseconds = new Date().getTime() - (this.presets[this.activePreset].seconds * 1000);
+                    return new Date(newTimeInMilliseconds).toISOString();
+                }
+
+                if (!this.startDate) {
+                    return '';
+                }
+
                 return this.startTime ? `${this.startDate} ${this.startTime}` : this.startDate;
             },
 
             get endValue() {
-                if (!this.endDate) return '';
+                if (this.activePreset) {
+                    return '';
+                }
+
                 return this.endTime ? `${this.endDate} ${this.endTime}` : this.endDate;
             },
 
@@ -88,6 +148,10 @@
             },
 
             get displayText() {
+                if (this.activePreset) {
+                    return this.presets[this.activePreset].text;
+                }
+
                 if (!this.hasValue) return this.placeholder;
 
                 if (this.startValue && this.endValue) {
@@ -128,13 +192,12 @@
                 }
             },
 
-            toggleDropdown() {
-                this.open = !this.open;
+            closeDropdown() {
+                this.open = false;
             },
 
-            // API alias per issue description
-            toggle() {
-                this.toggleDropdown();
+            toggleDropdown() {
+                this.open = !this.open;
             },
 
             updateValues() {
@@ -165,9 +228,13 @@
                 };
                 this.setPreset(key, preset);
             },
+            setPreset(preset) {
+                this.activePreset = preset;
+                this.closeDropdown();
+            },
 
             // New API: set a preset by key and object {hours|days}
-            setPreset(key, preset) {
+            oldsetPreset(key, preset) {
                 this.activePreset = key || null;
                 const now = new Date();
                 let startDate = null;
@@ -208,6 +275,7 @@
 
             getValue() {
                 return {
+                    start: this.startDate,
                     startValue: this.startValue,
                     endValue: this.endValue,
                     startDate: this.startDate,

@@ -30,47 +30,47 @@ class DateRangePicker extends Component
             '6h' => [
                 'label' => '6h',
                 'text' => 'Last 6 hours',
-                'hours' => 6,
+                'seconds' => 6 * 60 * 60,
             ],
             '24h' => [
                 'label' => '24h',
                 'text' => 'Last 24 hours',
-                'hours' => 24,
+                'seconds' => 24 * 60 * 60,
             ],
             '48h' => [
                 'label' => '48h',
                 'text' => 'Last 48 hours',
-                'hours' => 48,
+                'seconds' => 48 * 60 * 60,
             ],
             '1w' => [
                 'label' => '1w',
                 'text' => 'Last week',
-                'days' => 7,
+                'seconds' => 7 * 24 * 60 * 60,
             ],
             '2w' => [
                 'label' => '2w',
                 'text' => 'Last 2 weeks',
-                'days' => 14,
+                'seconds' => 14 * 24 * 60 * 60,
             ],
             '1m' => [
                 'label' => '1m',
                 'text' => 'Last month',
-                'days' => 30,
+                'seconds' => 30 * 24 * 60 * 60,
             ],
             '2m' => [
                 'label' => '2m',
                 'text' => 'Last 2 months',
-                'days' => 60,
+                'seconds' => 60 * 24 * 60 * 60,
             ],
             '1y' => [
                 'label' => '1y',
                 'text' => 'Last year',
-                'days' => 365,
+                'seconds' => 365 * 24 * 60 * 60,
             ],
             '2y' => [
                 'label' => '2y',
                 'text' => 'Last 2 years',
-                'days' => 730,
+                'seconds' => 730 * 24 * 60 * 60,
             ],
         ];
     }
