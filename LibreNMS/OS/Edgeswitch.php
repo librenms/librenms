@@ -22,26 +22,30 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv4Mac;
+use App\Models\PortsFdb;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Mac;
+use SnmpQuery;
 
-class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery
+class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery, FdbTableDiscovery
 {
     use Traits\VxworksProcessorUsage;
 
     public function discoverArpTable(): Collection
     {
-        return \SnmpQuery::walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
+        return SnmpQuery::cache()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
             ->mapTable(function ($data) {
                 return new Ipv4Mac([
                     'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDevice()),
@@ -49,5 +53,23 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
                     'ipv4_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIpAddr'],
                 ]);
             });
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = SnmpQuery::cache()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
+            ->mapTable(function ($data) {
+                return new PortsFdb([
+                    'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDeviceId()),
+                    'mac_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'],
+                    'vlan_id' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'],
+                ]);
+            });
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
     }
 }
