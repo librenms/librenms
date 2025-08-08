@@ -1,4 +1,4 @@
-mib:  WebGraph-Thermo-Hygrometer-MIB:WebGraph-Thermo-Hygro-Barometer-MIB:WebGraph-Thermo-Hygrometer-US-MIB:WebGraph-Thermometer-MIB:WebGraph-Thermometer-NTC-MIB
+mib:  WebGraph-Thermo-Hygrometer-MIB:WebGraph-Thermo-Hygro-Barometer-MIB:WebGraph-Thermo-Hygrometer-US-MIB:WebGraph-Thermometer-MIB:WebGraph-Thermometer-NTC-MIB:WebGraph-8xThermometer-US-MIB
 modules:
     os:
         hardware:
