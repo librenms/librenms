@@ -1,5 +1,5 @@
-os: endace
-text: 'Endace OSm'
+os: OSm
+text: 'endace OSm'
 type: appliance
 icon: endace
 poller_modules:
@@ -12,4 +12,4 @@ mib_dir: endace
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.18418.2.1
+            - .1.3.6.1.4.1.18418

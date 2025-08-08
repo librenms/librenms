@@ -1,21 +1,30 @@
 mib: ENDACE-SYSTEM-MIB:ENDACE-HWMON-MIB:ENDACE-MODULE-MIB
+
 modules:
     os:
         hardware:
-            - ENDACE-SYSTEM-MIB::systemModel.0 
+            - ENDACE-SYSTEM-MIB::systemModel.0
         version:
             - ENDACE-SYSTEM-MIB::systemVersion.0
         version_regex: '/endace OSm(?<version>\S+)/'
         serial:
             - ENDACE-SYSTEM-MIB::systemSerial.0
+
     sensors:
         voltage:
-            data:
+           options: {}
+           table: modoptTable
+           values:
+                - modoptVolt
+                - modoptName
+           data:
                 -
                     oid: modoptTable
                     num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.11.{{ $index }}'
                     value: modoptVolt
-                    descr: "{{ modoptName }} Voltage"
+                    regex: '/([0-9.]+)/'
+                    unit: V
+                    descr: "{{ $modoptName }} Voltage"
                     index: "modoptVolt.{{ $index }}"
                     group: "DAG Module(s)"
         dbm:
@@ -45,14 +54,14 @@ modules:
                             op: "="
                             value: false
         temperature:
+            options: {}
             data:
-                -
-                    oid: hwmonSystemTemp
+            -
+                    oid: ENDACE-HWMON-MIB::hwmonSystemTemp
                     num_oid: '.1.3.6.1.4.1.18418.16.1.4.0'
-                    value: hwmonSystemTemp
                     descr: "System Temperature (C)"
                     index: 0
-                -
+            -
                     oid: modoptTable
                     num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.9.{{ $index }}'
                     value: modoptTemp
@@ -67,7 +76,7 @@ modules:
         state:
             data:
                 -
-                    oid: hwmonFanRedundancy
+                    oid: ENDACE-HWMON-MIB::hwmonFanRedundancy
                     num_oid: '.1.3.6.1.4.1.18418.16.1.1.0'
                     descr: "Fan Redundancy"
                     index: 0
@@ -76,7 +85,7 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
-                    oid: hwmonPsuRedundancy
+                    oid: ENDACE-HWMON-MIB::hwmonPsuRedundancy
                     num_oid: '.1.3.6.1.4.1.18418.16.1.2.0'
                     descr: "PSU Redundancy"
                     index: 0
@@ -85,7 +94,7 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
-                    oid: hwmonIntrusionStatus
+                    oid: ENDACE-HWMON-MIB::hwmonIntrusionStatus
                     num_oid: '.1.3.6.1.4.1.18418.16.1.3.0'
                     descr: "Intrusion Status"
                     index: 0
@@ -137,4 +146,3 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'true' }
                         - { value: 2, generic: 2, graph: 0, descr: 'false' }
-
