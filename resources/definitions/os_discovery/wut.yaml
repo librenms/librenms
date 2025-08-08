@@ -8,6 +8,7 @@ modules:
         temperature:
             options:
                 divisor: 10
+                skip_value_gt: 32760
             data:
                 -
                     oid: wtWebioAn1GraphNtc
