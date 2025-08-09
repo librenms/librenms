@@ -37,8 +37,8 @@
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
                 <template x-for="(data, preset) in presets">
                     <button type="button"
-                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:bg-gray-100 tw:dark:bg-gray-700 tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
-                            :class="{'tw:bg-blue-500 tw:text-white': preset === activePreset}"
+                            class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
+                            :class="preset === activePreset ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
                             x-on:click="setPreset(preset)"
                             x-text="data.label"
                     ></button>
@@ -258,8 +258,12 @@
             },
 
             parseDateTime(dateInput) {
+                if (typeof dateInput !== 'string') {
+                    return ['', ''];
+                }
+
                 if (dateInput.includes(' ')) {
-                    return value.split(' ');
+                    return dateInput.split(' ');
                 }
 
                 return [dateInput, ''];
