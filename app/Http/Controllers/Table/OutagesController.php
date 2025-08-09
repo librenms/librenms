@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
 
 class OutagesController extends TableController
@@ -65,13 +66,23 @@ class OutagesController extends TableController
      */
     public function baseQuery($request)
     {
+        $from_ts = $request->from ? Carbon::parse($request->from)->getTimestamp() : null;
+        $to_ts = $request->to ? Carbon::parse($request->to)->getTimestamp() : null;
+
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
-            ->when($request->from, function ($query, $from) {
-                $query->where('going_down', '>=', Carbon::parse($from)->getTimestamp());
-            })
-            ->when($request->to, function ($query, $to) {
-                $query->where('going_down', '<=', Carbon::parse($to)->getTimestamp());
+            ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts) {
+                $query->where(function ($q) use ($from_ts, $to_ts) {
+                    // Outage starts within range
+                    $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
+
+                    // OR outage ends within range (if it has ended)
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                        $subQuery->whereNotNull('up_again')
+                            ->where('up_again', '>', 0);
+                        $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
+                    });
+                });
             })
             ->when($request->status === 'current', function ($query) {
                 $query->where(function ($q) {
@@ -170,5 +181,16 @@ class OutagesController extends TableController
             $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
             $this->formatTime(($outage->up_again ?: time()) - $outage->going_down),
         ];
+    }
+
+    private function applyDateRangeCondition(Builder $query, string $column, ?int $from_ts, ?int $to_ts): void
+    {
+        if ($from_ts && $to_ts) {
+            $query->whereBetween($column, [$from_ts, $to_ts]);
+        } elseif ($from_ts) {
+            $query->where($column, '>=', $from_ts);
+        } elseif ($to_ts) {
+            $query->where($column, '<=', $to_ts);
+        }
     }
 }

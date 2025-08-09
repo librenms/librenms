@@ -13,8 +13,8 @@
         tabindex="0"
     ></div>
 
-    <input type="hidden" name="from" :value="startValue">
-    <input type="hidden" name="to" :value="endValue">
+    <input type="hidden" name="from" :value="startString">
+    <input type="hidden" name="to" :value="endString">
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
@@ -122,29 +122,41 @@
             },
 
             // Computed properties
-            get startValue() {
+            get start() {
                 if (this.activePreset) {
-                    const newTimeInMilliseconds = new Date().getTime() - (this.presets[this.activePreset].seconds * 1000);
-                    return new Date(newTimeInMilliseconds).toISOString();
+                    return this.dateAddSeconds(new Date(), this.presets[this.activePreset].seconds);
                 }
 
-                if (!this.startDate) {
-                    return '';
+                if (this.startDate) {
+                    return new Date(`${this.startDate} ${this.startTime}`);
                 }
 
-                return this.startTime ? `${this.startDate} ${this.startTime}` : this.startDate;
+                return null;
             },
 
-            get endValue() {
-                if (this.activePreset) {
-                    return '';
+            get end() {
+                if (this.activePreset || !this.endDate) {
+                    return null
                 }
 
-                return this.endTime ? `${this.endDate} ${this.endTime}` : this.endDate;
+                // if no end time, we want to include the entire day
+                if (!this.endTime) {
+                    return this.dateAddSeconds(new Date(this.endDate), 86400);
+                }
+
+                return new Date(`${this.endDate} ${this.endTime}`);
+            },
+
+            get startString() {
+                return this.formatDate(this.start, this.startTime);
+            },
+
+            get endString() {
+                return this.formatDate(this.end, this.endTime);
             },
 
             get hasValue() {
-                return !!(this.startValue || this.endValue);
+                return !!(this.start || this.end);
             },
 
             get displayText() {
@@ -152,14 +164,12 @@
                     return this.presets[this.activePreset].text;
                 }
 
-                if (!this.hasValue) return this.placeholder;
-
-                if (this.startValue && this.endValue) {
-                    return `${this.startValue} to ${this.endValue}`;
-                } else if (this.startValue) {
-                    return `From ${this.startValue}`;
-                } else if (this.endValue) {
-                    return `Until ${this.endValue}`;
+                if (this.startString && this.endString) {
+                    return `${this.startString} to ${this.endString}`;
+                } else if (this.startString) {
+                    return `From ${this.startString}`;
+                } else if (this.endString) {
+                    return `Until ${this.endString}`;
                 }
 
                 return this.placeholder;
@@ -168,11 +178,12 @@
             init() {
                 // Attach API for external JS control
                 this.$el.dateRangePicker = {
-                    get: () => this.getValue(),
-                    set: (values) => this.setValue(values),
+                    get: () => this.getRange(),
+                    set: (start, end) => this.setRange(start, end),
+                    setPreset: (preset) => this.setPreset(preset),
                     clear: () => this.clearRange(),
-                    open: () => this.open = true,
-                    close: () => this.open = false,
+                    open: () => this.openDropdown(),
+                    close: () => this.closeDropdown(),
                 };
 
                 if (this.$el.dataset.start) this.parseDateTime(this.$el.dataset.start, 'start');
@@ -180,34 +191,43 @@
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
             },
 
-            parseDateTime(value, type) {
-                if (!value) return;
-                if (value.includes(' ')) {
-                    const [date, time] = value.split(' ');
-                    if (type === 'start') { this.startDate = date; this.startTime = time; }
-                    else { this.endDate = date; this.endTime = time; }
-                } else {
-                    if (type === 'start') { this.startDate = value; this.startTime = ''; }
-                    else { this.endDate = value; this.endTime = ''; }
-                }
-            },
-
             closeDropdown() {
                 this.open = false;
+            },
+
+            openDropdown() {
+                this.open = true;
             },
 
             toggleDropdown() {
                 this.open = !this.open;
             },
 
-            updateValues() {
-                // Clear preset when manually changing values
-                this.activePreset = null;
+            applyRange() {
+                this.closeDropdown();
+                this.emitChange();
             },
 
-            applyRange() {
-                this.open = false;
-                this.emitChange();
+            setRange(start = null, end = null) {
+                if (start === null && end === null) {
+                    return;
+                }
+
+                if (start !== null) {
+                    [this.startDate, this.startTime] = this.parseDateTime(start);
+                }
+
+                if (end !== null) {
+                    [this.endDate, this.endTime] = this.parseDateTime(end);
+                }
+
+                this.activePreset = null;
+                this.applyRange();
+            },
+
+            setPreset(preset) {
+                this.activePreset = preset;
+                this.applyRange();
             },
 
             clearRange() {
@@ -216,83 +236,59 @@
                 this.startTime = '';
                 this.endTime = '';
                 this.activePreset = null;
-                this.open = false;
-                this.emitChange();
-            },
-
-            setPresetFromDataset(ds) {
-                const key = ds.presetKey || null;
-                const preset = {
-                    hours: ds.hours ? parseInt(ds.hours, 10) : null,
-                    days: ds.days ? parseInt(ds.days, 10) : null,
-                };
-                this.setPreset(key, preset);
-            },
-            setPreset(preset) {
-                this.activePreset = preset;
-                this.closeDropdown();
-            },
-
-            // New API: set a preset by key and object {hours|days}
-            oldsetPreset(key, preset) {
-                this.activePreset = key || null;
-                const now = new Date();
-                let startDate = null;
-                if (preset && Number.isInteger(preset.hours)) {
-                    startDate = new Date(now.getTime() - preset.hours * 60 * 60 * 1000);
-                } else if (preset && Number.isInteger(preset.days)) {
-                    startDate = new Date(now.getTime() - preset.days * 24 * 60 * 60 * 1000);
-                    // For day presets, set to start of day
-                    startDate.setHours(0, 0, 0, 0);
-                }
-                if (startDate) {
-                    this.startDate = startDate.toISOString().split('T')[0];
-                    if (preset && Number.isInteger(preset.hours)) {
-                        const hh = startDate.getHours().toString().padStart(2, '0');
-                        const mm = startDate.getMinutes().toString().padStart(2, '0');
-                        this.startTime = `${hh}:${mm}`;
-                    } else {
-                        this.startTime = '';
-                    }
-                } else {
-                    this.startDate = '';
-                    this.startTime = '';
-                }
-                // Clear end for presets
-                this.endDate = '';
-                this.endTime = '';
                 this.applyRange();
             },
 
+            getRange() {
+                return {
+                    start: this.start,
+                    end: this.end,
+                    preset: this.activePreset
+                };
+            },
+
+            parseDateTime(dateInput) {
+                if (dateInput.includes(' ')) {
+                    return value.split(' ');
+                }
+
+                return [dateInput, ''];
+            },
+
+            formatDate(fullDate, time) {
+                if (!fullDate) {
+                    return '';
+                }
+
+                let options = {
+                    month: 'numeric',
+                    day: 'numeric',
+                    year: 'numeric',
+                };
+
+                if (time) {
+                    options['hour'] = 'numeric';
+                    options['minute'] = 'numeric';
+                }
+
+                return fullDate.toLocaleDateString(undefined, options);
+            },
+
+            dateAddSeconds(date, seconds) {
+                console.log('dateAddSeconds', date, seconds);
+
+                const newTimeInMilliseconds = date.getTime() - (seconds * 1000);
+                return new Date(newTimeInMilliseconds);
+            },
+
             emitChange() {
-                const detail = this.getValue();
+                const detail = this.getRange();
 
                 this.$el.dispatchEvent(new CustomEvent('date-range-changed', {
                     detail,
                     bubbles: true
                 }));
-            },
-
-            getValue() {
-                return {
-                    start: this.startDate,
-                    startValue: this.startValue,
-                    endValue: this.endValue,
-                    startDate: this.startDate,
-                    startTime: this.startTime,
-                    endDate: this.endDate,
-                    endTime: this.endTime,
-                    hasValue: this.hasValue,
-                    activePreset: this.activePreset,
-                };
-            },
-
-            setValue(start = '', end = '') {
-                this.parseDateTime(start, 'start');
-                this.parseDateTime(end, 'end');
-                this.activePreset = null;
-                this.emitChange();
-            },
+            }
         }));
     });
 </script>
