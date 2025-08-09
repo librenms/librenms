@@ -63,7 +63,6 @@ modules:
                     oid: OG-STATUSv2-MIB::ogPowerSupplyTable
                     value: OG-STATUSv2-MIB::ogPowerSupplyTemperature
                     descr: OG-STATUSv2-MIB::ogPowerSupplyName
-                    index: 'ogPowerSupplyTemperature.{{ $index }}'
                     skip_values:
                         -   oid: OG-STATUSv2-MIB::ogPowerSupplyName
                             op: 'exists'
