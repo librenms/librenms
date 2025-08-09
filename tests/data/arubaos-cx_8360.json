@@ -16349,5 +16349,54 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 9
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 8
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 6
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 8
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "ec:67:94:50:4d:00",
+                    "ipv6_address": "fe80:0000:0000:0000:ec67:9483:f650:4d00",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }
