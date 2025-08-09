@@ -196,8 +196,7 @@
 
                 console.log(this.$el.dataset);
 
-                if (this.$el.dataset.start) this.parseDateTime(this.$el.dataset.start, 'start');
-                if (this.$el.dataset.end) this.parseDateTime(this.$el.dataset.end, 'end');
+                this.setRange(this.$el.dataset.start, this.$el.dataset.end);
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
                 if (this.$el.dataset.preset) this.activePreset = this.$el.dataset.preset;
             },
