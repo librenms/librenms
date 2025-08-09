@@ -42,7 +42,7 @@ $refresh = request()->get('refresh', 30);
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
                         </div>
-                        <button type="submit" class="btn btn-default">Filter</button>
+                        <button type="button" id="apply-filters" class="btn btn-default">Filter</button>
                     </form>
                 </template>
 
@@ -85,10 +85,10 @@ $refresh = request()->get('refresh', 30);
 
             if (!picker) {
                 return {
-                    device: {{ $device?->device_id ?: 'null' }},
-                    status: '{{ $status }}',
-                    to: {{ $to ?: 'null' }},
-                    from: {{ $from ?: 'null' }}
+                    device: @js($device?->device_id),
+                    status: @js($status),
+                    to: @js($to),
+                    from: @js($from),
                 };
             }
 
@@ -115,6 +115,24 @@ $refresh = request()->get('refresh', 30);
             init_select2("#device", "device", {}, {{ \Illuminate\Support\Js::from($selected_device) }} , "All Devices");
             $('#device').on('change', refreshOutagesGrid);
             @endif
+
+            // update url on filter click
+            document.getElementById('apply-filters').addEventListener('click', function (e) {
+                var params = new URLSearchParams(window.location.search);
+                var formData = new FormData(document.getElementById('filter-form'));
+
+                for (var [key, value] of formData.entries()) {
+                    if (value) {
+                        params.set(key, value);
+                    } else {
+                        params.delete(key);
+                    }
+                }
+
+                var newUrl = window.location.pathname + (params.toString() ? ('?' + params.toString()) : '');
+                window.history.pushState({}, '', newUrl);
+                refreshOutagesGrid();
+            });
         }
     });
 </script>
