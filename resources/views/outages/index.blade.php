@@ -3,7 +3,6 @@
 @section('title', __('Outages'))
 
 @php
-// Default refresh rate is 30 seconds (30000ms)
 $refresh = request()->get('refresh', 30);
 @endphp
 
@@ -16,7 +15,7 @@ $refresh = request()->get('refresh', 30);
                     <strong>Outages</strong>
                 </div>
                 <template id="filter-container">
-                    <form method="get" action="{{ route('outages') }}" class="form-inline tw:float-left tw:inline-block" role="form" id="filter-form">
+                    <form id="filter-form" method="get" action="{{ route('outages') }}" class="form-inline tw:float-left tw:inline-block" role="form">
                         <div class="form-group">
                             @if($show_device_list)
                                 <select name="device" id="device" class="form-control">
@@ -28,15 +27,17 @@ $refresh = request()->get('refresh', 30);
                         </div>
                         <div class="form-group">
                             <select id="status" name="status" class="form-control">
-                                <option value="current">Current</option>
-                                <option value="previous">Previous</option>
-                                <option value="all">All</option>
+                                <option value="current" {{ $status == 'current' ? 'selected' : '' }}>Current</option>
+                                <option value="previous" {{ $status == 'previous' ? 'selected' : '' }}>Previous</option>
+                                <option value="all" {{ $status == 'all' ? 'selected' : '' }}>All</option>
                             </select>
                         </div>
                         <div class="form-group tw:text-left">
                             <x-date-range-picker
                                 id="date_range" name="date_range"
-                                start="{{ $from }}" end="{{ $to }}"
+                                start="{{ $from }}"
+                                end="{{ $to }}"
+                                :preset="$preset"
                                 class="form-control tw:min-w-64"
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
@@ -83,7 +84,12 @@ $refresh = request()->get('refresh', 30);
             const picker = document.querySelector('#date_range');
 
             if (!picker) {
-                return {};
+                return {
+                    device: {{ $device?->device_id ?: 'null' }},
+                    status: '{{ $status }}',
+                    to: {{ $to ?: 'null' }},
+                    from: {{ $from ?: 'null' }}
+                };
             }
 
             const range = picker.dateRangePicker.get();
@@ -107,7 +113,7 @@ $refresh = request()->get('refresh', 30);
             document.getElementById("status").addEventListener("change", refreshOutagesGrid);
             @if($show_device_list)
             init_select2("#device", "device", {}, {{ \Illuminate\Support\Js::from($selected_device) }} , "All Devices");
-            document.getElementById("device").addEventListener("change", refreshOutagesGrid);
+            $('#device').on('change', refreshOutagesGrid);
             @endif
         }
     });
