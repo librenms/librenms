@@ -1,9 +1,17 @@
-<div {{ $attributes }}
-    class="tw:relative"
+@props([
+    'start' => '',
+    'end' => '',
+    'preset' => true, // true, false, or a preset name
+    'placeholder' => 'Select date range...',
+    'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
+])
+
+<div {{ $attributes->merge(['class' => 'tw:relative']) }}
      x-data="dateRangePicker"
      x-on:click.outside="closeDropdown"
      data-start="{{ $start }}"
      data-end="{{ $end }}"
+     data-preset="{{ is_string($preset) ? $preset : '' }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -25,7 +33,7 @@
          x-transition:leave-start="tw:opacity-100 tw:transform tw:translate-y-0"
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="display: none;">
-        @if($presets)
+        @if($preset)
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
                 <template x-for="(data, preset) in presets">
                     <button type="button"
@@ -186,9 +194,12 @@
                     close: () => this.closeDropdown(),
                 };
 
+                console.log(this.$el.dataset);
+
                 if (this.$el.dataset.start) this.parseDateTime(this.$el.dataset.start, 'start');
                 if (this.$el.dataset.end) this.parseDateTime(this.$el.dataset.end, 'end');
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
+                if (this.$el.dataset.preset) this.activePreset = this.$el.dataset.preset;
             },
 
             closeDropdown() {
