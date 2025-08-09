@@ -15,98 +15,107 @@ modules:
             data:
                 -
                     oid:
-                        - ogCellModemTable
+                        - OG-STATUSv2-MIB::ogCellModemTable
         current:
             data:
                 -
-                    oid: ogOmPowerSupplyTable
-                    value: ogOmPowerSupplyOutputCurrent
+                    oid: OG-OMTELEM-MIB::ogOmPowerSupplyTable
+                    value: OG-OMTELEM-MIB::ogOmPowerSupplyOutputCurrent
                     divisor: 1000
-                    num_oid: '.1.3.6.1.4.1.25049.10.19.8.1.1.5.{{ $index }}'
                     descr: 'PSU {{ $index }} Output Current'
+                    index: 'ogOmPowerSupplyOutputCurrent.{{ $index }}'
                 -
-                    oid: ogPowerSupplytable
-                    value: ogPowerSupplyOutputCurrent
+                    oid: OG-STATUSv2-MIB::ogPowerSupplyTable
+                    value: OG-STATUSv2-MIB::ogPowerSupplyOutputCurrent
                     divisor: 100
-                    num_oid: '.1.3.6.1.4.1.25049.17.13.1.4.{{ $index }}'
-                    descr: '{{ ogPowerSupplyName }} Output Current'
+                    descr: '{{ OG-STATUSv2-MIB::ogPowerSupplyName }} Output Current'
+                    index: 'ogPowerSupplyOutputCurrent.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: OG-STATUSv2-MIB::ogPowerSupplyName
+                            op: 'exists'
+                            value: false
 
         voltage:
             data:
                 -
-                    oid: ogOmPowerSupplyTable
-                    value: ogOmPowerSupplyInputVoltage
+                    oid: OG-OMTELEM-MIB::ogOmPowerSupplyTable
+                    value: OG-OMTELEM-MIB::ogOmPowerSupplyInputVoltage
                     divisor: 1000
-                    num_oid: '.1.3.6.1.4.1.25049.10.19.8.1.1.4.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Voltage'
+                    index: 'ogOmPowerSupplyInputVoltage.{{ $index }}'
                 -
-                    oid: ogPowerSupplytable
-                    value: ogPowerSupplyInputVoltage
-                    num_oid: '.1.3.6.1.4.1.25049.17.13.1.3.{{ $index }}'
-                    descr: '{{ ogPowerSupplyName }} Input Voltage'
+                    oid: OG-STATUSv2-MIB::ogPowerSupplyTable
+                    value: OG-STATUSv2-MIB::ogPowerSupplyInputVoltage
+                    descr: '{{ OG-STATUSv2-MIB::ogPowerSupplyName }} Input Voltage'
+                    index: 'ogPowerSupplyInputVoltage.{{ $index }}'
+                    skip_values:
+                        -   oid: OG-STATUSv2-MIB::ogPowerSupplyName
+                            op: 'exists'
+                            value: false
+
         power:
             data:
                 -
-                    oid: ogOmPowerSupplyTable
-                    value: ogOmPowerSupplyOutputPower
-                    num_oid: '.1.3.6.1.4.1.25049.10.19.8.1.1.6.{{ $index }}'
+                    oid: OG-OMTELEM-MIB::ogOmPowerSupplyTable
+                    value: OG-OMTELEM-MIB::ogOmPowerSupplyOutputPower
                     descr: 'PSU {{ $index }} Output Power'
+                    index: 'ogOmPowerSupplyOutputPower.{{ $index }}'
+
         temperature:
             data:
                 -
-                    oid: ogPowerSupplytable
-                    value: ogPowerSupplyTemperature
-                    num_oid: '.1.3.6.1.4.1.25049.17.13.1.5.{{ $index }}'
-                    descr: ogPowerSupplyName
+                    oid: OG-STATUSv2-MIB::ogPowerSupplyTable
+                    value: OG-STATUSv2-MIB::ogPowerSupplyTemperature
+                    descr: OG-STATUSv2-MIB::ogPowerSupplyName
+                    index: 'ogPowerSupplyTemperature.{{ $index }}'
+                    skip_values:
+                        -   oid: OG-STATUSv2-MIB::ogPowerSupplyName
+                            op: 'exists'
+                            value: false
                 -
-                    oid: ogEmdTemperatureTable
-                    value: ogEmdTemperatureValue
-                    num_oid: '.1.3.6.1.4.1.25049.17.9.1.5.{{ $index }}'
-                    descr: ogEmdTemperatureName
+                    oid: OG-STATUSv2-MIB::ogEmdTemperatureTable
+                    value: OG-STATUSv2-MIB::ogEmdTemperatureValue
+                    descr: OG-STATUSv2-MIB::ogEmdTemperatureName
                     index: 'ogEmdTemperatureValue.{{ $index }}'
                 -
-                    oid: ogOmTempSensorTable
-                    value: ogOmTempSensorValue
+                    oid: OG-OMTELEM-MIB::ogOmTempSensorTable
+                    value: OG-OMTELEM-MIB::ogOmTempSensorValue
                     divisor: 1000
-                    num_oid: '.1.3.6.1.4.1.25049.10.19.9.1.1.4.{{ $index }}'
-                    descr: ogOmTempSensorName
+                    descr: OG-OMTELEM-MIB::ogOmTempSensorName
+                    index: 'ogOmTempSensorName.{{ $index }}'
 
         humidity:
             data:
                 -
-                    oid: ogEmdHumidityTable
-                    value: ogEmdHumidityValue
-                    num_oid: '.1.3.6.1.4.1.25049.17.10.1.5.{{ $index }}'
-                    descr: ogEmdHumidityName
+                    oid: OG-STATUSv2-MIB::ogEmdHumidityTable
+                    value: OG-STATUSv2-MIB::ogEmdHumidityValue
+                    descr: OG-STATUSv2-MIB::ogEmdHumidityName
                     index: 'ogEmdHumidityValue.{{ $index }}'
         signal:
             data:
                 -
-                    oid: ogCellModemTable
-                    value: ogCellModem3gRssi
-                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.11.{{ $index }}'
+                    oid: OG-STATUSv2-MIB::ogCellModemTable
+                    value: OG-STATUSv2-MIB::ogCellModem3gRssi
                     descr: 'Cellular 3G Modem RSSI'
-                    index: '11.{{ $index }}'
+                    index: 'ogCellModem3gRssi.{{ $index }}'
                 -
-                    oid: ogCellModemTable
-                    value: ogCellModem4gRssi
-                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.12.{{ $index }}'
+                    oid: OG-STATUSv2-MIB::ogCellModemTable
+                    value: OG-STATUSv2-MIB::ogCellModem4gRssi
                     descr: 'Cellular 4G Modem RSSI'
-                    index: '12.{{ $index }}'
+                    index: 'ogCellModem4gRssi.{{ $index }}'
         count:
             data:
                 -
-                    oid: ogCellModemTable
-                    value: ogCellModemSelectedSimCard
-                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.14.{{ $index }}'
+                    oid: OG-STATUSv2-MIB::ogCellModemTable
+                    value: OG-STATUSv2-MIB::ogCellModemSelectedSimCard
                     descr: 'Selected Active SIM Card'
                     index: 'ogCellModemSelectedSimCard.{{ $index }}'
         state:
             data:
                 -
-                    oid: ogCellModemTable
-                    value: ogCellModemConnected
-                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.5.{{ $index }}'
+                    oid: OG-STATUSv2-MIB::ogCellModemTable
+                    value: OG-STATUSv2-MIB::ogCellModemConnected
                     descr: 'Modem Connection State'
                     index: 'ogCellModemConnected.{{ $index }}'
                     state_name: ogCellModemConnected
@@ -115,13 +124,12 @@ modules:
                         - { value: 2, descr: Disconnected, graph: 2, generic: 2 }
                     skip_values:
                          -
-                            oid: 'ogCellModemEnabled.{{ $index }}'
+                            oid: OG-STATUSv2-MIB::ogCellModemEnabled
                             op: '!='
                             value: enabled
                 -
-                    oid: ogCellModemTable
-                    value: ogCellModemRadioTechnology
-                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.9.{{ $index }}'
+                    oid: OG-STATUSv2-MIB::ogCellModemTable
+                    value: OG-STATUSv2-MIB::ogCellModemRadioTechnology
                     descr: 'Radio Access Technology'
                     index: 'ogCellModemRadioTechnology.{{ $index }}'
                     skip_values: 1
