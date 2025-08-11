@@ -14,10 +14,9 @@ class OutagesController extends Controller
     {
         $request->validate([
             'device' => 'nullable|int',
-            'from' => 'nullable|date',
-            'to' => 'nullable|date',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
             'status' => ['nullable', Rule::in(['current', 'previous', 'all'])],
-            'preset' => ['nullable', Rule::in(['6h', '24h', '48h', '1w', '2w', '1m', '2m', '1y'])],
         ]);
 
         $device_id = (int) $request->input('device');

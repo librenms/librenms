@@ -37,7 +37,6 @@ $refresh = request()->get('refresh', 30);
                                 id="date_range" name="date_range"
                                 start="{{ $from }}"
                                 end="{{ $to }}"
-                                :preset="$preset"
                                 class="form-control tw:min-w-64"
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
@@ -87,8 +86,8 @@ $refresh = request()->get('refresh', 30);
                 return {
                     device: @js($device?->device_id),
                     status: @js($status),
-                    to: @js($to),
                     from: @js($from),
+                    to: @js($to),
                 };
             }
 
@@ -120,16 +119,22 @@ $refresh = request()->get('refresh', 30);
             // update url on filter click
             document.getElementById('apply-filters').addEventListener('click', function (e) {
                 let params = new URLSearchParams(window.location.search);
+                const before = params.toString();
                 const formData = new FormData(document.getElementById('filter-form'));
 
                 for (let [key, value] of formData.entries()) {
                     value ? params.set(key, value) : params.delete(key);
                 }
 
-                let newUrl = new URL(window.location.pathname, window.location.origin);
-                newUrl.search = params.toString();
-                window.history.pushState({}, '', newUrl);
-                refreshOutagesGrid();
+                const after = params.toString();
+
+                // Only update the URL and refresh if something actually changed
+                if (before !== after) {
+                    let newUrl = new URL(window.location.pathname, window.location.origin);
+                    newUrl.search = after;
+                    window.history.pushState({}, '', newUrl);
+                    refreshOutagesGrid();
+                }
             });
         }
     });

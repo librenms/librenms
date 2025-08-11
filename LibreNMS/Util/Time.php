@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use Carbon\CarbonInterface;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
 
 class Time
@@ -52,7 +53,6 @@ class Time
 
         return $conversion[$description] ?? 0;
     }
-
     /**
      * Format seconds as a human readable interval.  Negative seconds will say "ago".
      */
@@ -102,6 +102,40 @@ class Time
         }
 
         return (int) strtotime($time);
+    }
+
+    /**
+     * Parse flexible time input into a Unix timestamp (seconds).
+     * Accepts:
+     * - null/empty: returns null
+     * - Numeric seconds or milliseconds since epoch
+     * - Relative offsets like 6h, -1d, +2w, 1m, 1y (sign optional => defaults to past)
+     * - Parsable date/time strings (Carbon::parse)
+     * Returns null on invalid input.
+     */
+    public static function parseInput(string|int|null $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return Carbon::createFromTimestampUTC($value)->getTimestamp();
+        }
+
+        // adapt relative like 6h, -1d, +2m, 1y
+        if (preg_match('/^([+-])?\d+[hdmwy]$/', $value, $matches)) {
+            if (empty($matches[1])) { // default to subtractive
+                $value = '-' . $value;
+            }
+            $value = str_replace(['w', 'm', 'h', 'y', 'd'], ['week', 'minute', 'hour', 'year', 'day'], $value);
+        }
+
+        try {
+            return Carbon::parse($value)->getTimestamp();
+        } catch (InvalidFormatException) {
+            return null;
+        }
     }
 
     /**

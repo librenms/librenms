@@ -21,8 +21,8 @@
         tabindex="0"
     ></div>
 
-    <input type="hidden" name="from" :value="startString">
-    <input type="hidden" name="to" :value="endString">
+    <input type="hidden" name="from" :value="activePreset ? activePreset : startString">
+    <input type="hidden" name="to" :value="activePreset ? '' : endString">
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
@@ -97,22 +97,22 @@
                     "text": "Last 48 hours",
                     "seconds": 172800
                 },
-                "1w": {
+                "7d": {
                     "label": "1w",
                     "text": "Last week",
                     "seconds": 604800
                 },
-                "2w": {
+                "14d": {
                     "label": "2w",
                     "text": "Last 2 weeks",
                     "seconds": 1209600
                 },
-                "1m": {
+                "30d": {
                     "label": "1m",
                     "text": "Last month",
                     "seconds": 2592000
                 },
-                "2m": {
+                "60d": {
                     "label": "2m",
                     "text": "Last 2 months",
                     "seconds": 5184000
@@ -196,7 +196,13 @@
 
                 console.log(this.$el.dataset);
 
-                this.setRange(this.$el.dataset.start, this.$el.dataset.end);
+                const start = this.$el.dataset.start;
+                if (this.presets[start]) {
+                    this.activePreset = start;
+                } else {
+                    this.setRange(start, this.$el.dataset.end);
+                }
+
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
                 if (this.$el.dataset.preset) this.activePreset = this.$el.dataset.preset;
             },

@@ -31,6 +31,7 @@ use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
+use LibreNMS\Util\Time;
 
 class OutagesController extends TableController
 {
@@ -40,8 +41,8 @@ class OutagesController extends TableController
     {
         return [
             'device' => 'nullable|int',
-            'to' => 'nullable|date',
-            'from' => 'nullable|date',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
             'status' => 'nullable|in:current,previous,all',
         ];
     }
@@ -66,8 +67,8 @@ class OutagesController extends TableController
      */
     public function baseQuery($request)
     {
-        $from_ts = $request->from ? Carbon::parse($request->from)->getTimestamp() : null;
-        $to_ts = $request->to ? Carbon::parse($request->to)->getTimestamp() : null;
+        $from_ts = Time::parseInput($request->from);
+        $to_ts = Time::parseInput($request->to);
 
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
