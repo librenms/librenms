@@ -9,7 +9,7 @@ $refresh = request()->get('refresh', 30);
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 col-lg-8 col-lg-offset-2">
             <div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <strong>Outages</strong>
@@ -51,7 +51,7 @@ $refresh = request()->get('refresh', 30);
                            data-url="{{ route('table.outages') }}">
                         <thead>
                         <tr>
-                            <th data-column-id="status" data-sortable="false"></th>
+                            <th data-column-id="status" data-sortable="false" data-visible-in-selection="false"></th>
                             <th data-column-id="going_down" data-order="desc">Start</th>
                             <th data-column-id="up_again" data-visible="false">End</th>
                             <th data-column-id="device_id">Hostname</th>
@@ -110,6 +110,7 @@ $refresh = request()->get('refresh', 30);
                 actionBar.insertBefore(filterTemplate.content.firstChild, actionBar.firstChild);
             }
 
+            // init the filter bar js
             document.getElementById("status").addEventListener("change", refreshOutagesGrid);
             @if($show_device_list)
             init_select2("#device", "device", {}, {{ \Illuminate\Support\Js::from($selected_device) }} , "All Devices");
@@ -118,18 +119,15 @@ $refresh = request()->get('refresh', 30);
 
             // update url on filter click
             document.getElementById('apply-filters').addEventListener('click', function (e) {
-                var params = new URLSearchParams(window.location.search);
-                var formData = new FormData(document.getElementById('filter-form'));
+                let params = new URLSearchParams(window.location.search);
+                const formData = new FormData(document.getElementById('filter-form'));
 
-                for (var [key, value] of formData.entries()) {
-                    if (value) {
-                        params.set(key, value);
-                    } else {
-                        params.delete(key);
-                    }
+                for (let [key, value] of formData.entries()) {
+                    value ? params.set(key, value) : params.delete(key);
                 }
 
-                var newUrl = window.location.pathname + (params.toString() ? ('?' + params.toString()) : '');
+                let newUrl = new URL(window.location.pathname, window.location.origin);
+                newUrl.search = params.toString();
                 window.history.pushState({}, '', newUrl);
                 refreshOutagesGrid();
             });
