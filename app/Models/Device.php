@@ -306,9 +306,11 @@ class Device extends BaseModel
      */
     public function getCurrentOutage(): ?DeviceOutage
     {
-        return $this->relationLoaded('outages')
-            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
-            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        if ($this->relationLoaded('outages')) {
+            return $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first();
+        }
+
+        return $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
     }
 
     /**
