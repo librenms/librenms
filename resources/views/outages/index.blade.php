@@ -53,7 +53,7 @@ $refresh = request()->get('refresh', 30);
                         <tr>
                             <th data-column-id="status" data-sortable="false"></th>
                             <th data-column-id="going_down" data-order="desc">Start</th>
-                            <th data-column-id="up_again">End</th>
+                            <th data-column-id="up_again" data-visible="false">End</th>
                             <th data-column-id="device_id">Hostname</th>
                             <th data-column-id="duration" data-sortable="false">Duration</th>
                         </tr>

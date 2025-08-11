@@ -102,36 +102,29 @@ class OutagesController extends TableController
     {
         $start = $this->formatDatetime($outage->going_down);
         $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
-        $duration = ($outage->up_again ?: time()) - $outage->going_down;
 
         return [
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
-            'duration' => $this->formatTime($duration),
+            'duration' => $this->formatDuration($outage),
         ];
     }
 
-    private function formatTime($duration)
+    private function formatDuration(DeviceOutage $outage): string
     {
-        $day_seconds = 86400;
+        $start = Carbon::createFromTimestamp($outage->going_down);
+        $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Carbon::now();
+        $duration = $end->diffAsCarbonInterval($start);
 
-        $duration_days = (int) ($duration / $day_seconds);
-
-        $output = '';
-        if ($duration_days) {
-            $output .= $duration_days . 'd ';
-        }
-        $output .= (new Carbon($duration))->format(LibrenmsConfig::get('dateformat.time'));
-
-        return $output;
+        return $duration->forHumans(['parts' => 2]);
     }
 
-    private function formatDatetime($timestamp)
+    private function formatDatetime(?int $timestamp): string
     {
         if (! $timestamp) {
-            $timestamp = 0;
+            return '';
         }
 
         // Convert epoch to local time
