@@ -124,11 +124,19 @@ class Time
         }
 
         // adapt relative like 6h, -1d, +2m, 1y
-        if (preg_match('/^([+-])?\d+[hdmwy]$/', $value, $matches)) {
-            if (empty($matches[1])) { // default to subtractive
-                $value = '-' . $value;
-            }
-            $value = str_replace(['w', 'm', 'h', 'y', 'd'], ['week', 'minute', 'hour', 'year', 'day'], $value);
+        if (preg_match('/^([+-])?(\d+)([hdmwys]|mo)$/', $value, $matches)) {
+            $sign = $matches[1] ?: '-';
+            $unit = match($matches[3]) {
+                's' => 'second',
+                'm' => 'minute',
+                'h' => 'hour',
+                'd' => 'day',
+                'w' => 'week',
+                'mo' => 'month',
+                'y' => 'year',
+            };
+
+            $value = "$sign$matches[2] $unit";
         }
 
         try {

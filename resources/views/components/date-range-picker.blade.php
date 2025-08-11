@@ -1,7 +1,7 @@
 @props([
     'start' => '',
     'end' => '',
-    'preset' => true, // true, false, or a preset name
+    'presets' => true,
     'placeholder' => 'Select date range...',
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
 ])
@@ -11,7 +11,7 @@
      x-on:click.outside="closeDropdown"
      data-start="{{ $start }}"
      data-end="{{ $end }}"
-     data-preset="{{ is_string($preset) ? $preset : '' }}"
+     data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -21,8 +21,8 @@
         tabindex="0"
     ></div>
 
-    <input type="hidden" name="from" :value="activePreset ? activePreset : startString">
-    <input type="hidden" name="to" :value="activePreset ? '' : endString">
+    <input type="hidden" name="from" :value="relativeStartSeconds !== null ? toShortOffset(relativeStartSeconds) : startString">
+    <input type="hidden" name="to" :value="relativeEndSeconds !== null ? toShortOffset(relativeEndSeconds) : (relativeStartSeconds !== null ? '' : endString)">
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
@@ -35,12 +35,12 @@
          style="display: none;">
         @if($preset)
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
-                <template x-for="(data, preset) in presets">
+                <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
-                            :class="preset === activePreset ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
+                            :class="isPresetSelected(preset) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
                             x-on:click="setPreset(preset)"
-                            x-text="data.label"
+                            x-text="preset"
                     ></button>
                 </template>
             </div>
@@ -80,59 +80,24 @@
             startTime: '',
             endTime: '',
             placeholder: 'Select date range...',
-            activePreset: null,
-            presets: {
-                "6h": {
-                    "label": "6h",
-                    "text": "Last 6 hours",
-                    "seconds": 21600
-                },
-                "24h": {
-                    "label": "24h",
-                    "text": "Last 24 hours",
-                    "seconds": 86400
-                },
-                "48h": {
-                    "label": "48h",
-                    "text": "Last 48 hours",
-                    "seconds": 172800
-                },
-                "7d": {
-                    "label": "1w",
-                    "text": "Last week",
-                    "seconds": 604800
-                },
-                "14d": {
-                    "label": "2w",
-                    "text": "Last 2 weeks",
-                    "seconds": 1209600
-                },
-                "30d": {
-                    "label": "1m",
-                    "text": "Last month",
-                    "seconds": 2592000
-                },
-                "60d": {
-                    "label": "2m",
-                    "text": "Last 2 months",
-                    "seconds": 5184000
-                },
-                "1y": {
-                    "label": "1y",
-                    "text": "Last year",
-                    "seconds": 31536000
-                },
-                "2y": {
-                    "label": "2y",
-                    "text": "Last 2 years",
-                    "seconds": 63072000
-                }
-            },
+            relativeStartSeconds: null,
+            relativeEndSeconds: null,
+            presets: [
+                '6h',
+                '24h',
+                '48h',
+                '1w',
+                '2w',
+                '1mo',
+                '2mo',
+                '1y',
+                '2y',
+            ],
 
             // Computed properties
             get start() {
-                if (this.activePreset) {
-                    return this.dateAddSeconds(new Date(), this.presets[this.activePreset].seconds);
+                if (this.relativeStartSeconds !== null) {
+                    return this.dateAddSeconds(new Date(), this.relativeStartSeconds);
                 }
 
                 if (this.startDate) {
@@ -143,7 +108,7 @@
             },
 
             get end() {
-                if (this.activePreset || !this.endDate) {
+                if (this.relativeStartSeconds !== null || !this.endDate) {
                     return null
                 }
 
@@ -168,8 +133,11 @@
             },
 
             get displayText() {
-                if (this.activePreset) {
-                    return this.presets[this.activePreset].text;
+                if (this.relativeStartSeconds !== null) {
+                    const rel = this.formatRelative(this.relativeStartSeconds);
+                    if (rel) {
+                        return `${rel} to now`;
+                    }
                 }
 
                 if (this.startString && this.endString) {
@@ -188,23 +156,14 @@
                 this.$el.dateRangePicker = {
                     get: () => this.getRange(),
                     set: (start, end) => this.setRange(start, end),
-                    setPreset: (preset) => this.setPreset(preset),
                     clear: () => this.clearRange(),
                     open: () => this.openDropdown(),
                     close: () => this.closeDropdown(),
                 };
 
-                console.log(this.$el.dataset);
-
-                const start = this.$el.dataset.start;
-                if (this.presets[start]) {
-                    this.activePreset = start;
-                } else {
-                    this.setRange(start, this.$el.dataset.end);
-                }
-
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
-                if (this.$el.dataset.preset) this.activePreset = this.$el.dataset.preset;
+
+                this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },
 
             closeDropdown() {
@@ -230,19 +189,43 @@
                 }
 
                 if (start !== null) {
-                    [this.startDate, this.startTime] = this.parseDateTime(start);
+                    if (this.isRelative(start)) {
+                        const sec = this.parseRelativeOffset(start);
+                        this.relativeStartSeconds = sec !== null ? sec : null;
+                        this.startDate = '';
+                        this.startTime = '';
+                    } else {
+                        [this.startDate, this.startTime] = this.parseDateTime(start);
+                        this.relativeStartSeconds = null;
+                    }
                 }
 
                 if (end !== null) {
-                    [this.endDate, this.endTime] = this.parseDateTime(end);
+                    if (this.isRelative(end)) {
+                        const sec = this.parseRelativeOffset(end);
+                        this.relativeEndSeconds = sec !== null ? sec : null;
+                        this.endDate = '';
+                        this.endTime = '';
+                    } else {
+                        [this.endDate, this.endTime] = this.parseDateTime(end);
+                        this.relativeEndSeconds = null;
+                    }
                 }
 
-                this.activePreset = null;
                 this.applyRange();
             },
 
             setPreset(preset) {
-                this.activePreset = preset;
+                if (this.isRelative(preset)) {
+                    const sec = this.parseRelativeOffset(preset);
+                    this.relativeStartSeconds = sec !== null ? sec : null;
+                } else {
+                    this.relativeStartSeconds = null;
+                }
+                this.startDate = '';
+                this.startTime = '';
+                this.endDate = '';
+                this.endTime = '';
                 this.applyRange();
             },
 
@@ -251,7 +234,8 @@
                 this.endDate = '';
                 this.startTime = '';
                 this.endTime = '';
-                this.activePreset = null;
+                this.relativeStartSeconds = null;
+                this.relativeEndSeconds = null;
                 this.applyRange();
             },
 
@@ -259,7 +243,8 @@
                 return {
                     start: this.start,
                     end: this.end,
-                    preset: this.activePreset
+                    relativeStartSeconds: this.relativeStartSeconds,
+                    relativeEndSeconds: this.relativeEndSeconds,
                 };
             },
 
@@ -273,6 +258,80 @@
                 }
 
                 return [dateInput, ''];
+            },
+
+            // Determine if a string is a relative time like 10m, -2h, 7d, 1w, 1y
+            isRelative(input) {
+                if (!input || typeof input !== 'string') return false;
+                const trimmed = input.trim();
+                return /^[-+]?\d+\s*(s|m|h|d|w|mo|y)$/.test(trimmed);
+            },
+
+            // Returns seconds offset from now: positive for past (e.g., 10m => 600), negative for future (+1h => -3600)
+            parseRelativeOffset(input) {
+                if (!this.isRelative(input)) return null;
+                const m = input.trim().match(/^([-+]?)(\d+)\s*(s|m|h|d|w|mo|y)$/);
+                if (!m) return null;
+                const sign = m[1];
+                const num = parseInt(m[2], 10);
+                const unit = m[3];
+                const map = { s: 1, m: 60, h: 3600, d: 86400, w: 604800, mo: 2592000, y: 31536000 };
+                const seconds = num * (map[unit] || 0);
+                if (sign === '+') return -seconds; // future
+                return seconds; // past (or explicit '-')
+            },
+
+            // Select and format a human relative string using Intl.RelativeTimeFormat
+            formatRelative(seconds) {
+                if (seconds == null) return '';
+                const units = [
+                    { unit: 'year', sec: 31536000 },
+                    { unit: 'month', sec: 2592000 },
+                    { unit: 'week', sec: 604800 },
+                    { unit: 'day', sec: 86400 },
+                    { unit: 'hour', sec: 3600 },
+                    { unit: 'minute', sec: 60 },
+                    { unit: 'second', sec: 1 },
+                ];
+                const abs = Math.abs(seconds);
+                const u = units.find(u => abs % u.sec === 0 && abs >= u.sec) || units.find(u => abs >= u.sec) || units[units.length - 1];
+                const value = Math.max(1, Math.round(abs / u.sec));
+                try {
+                    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+                    // rtf: negative = past, positive = future
+                    return rtf.format(seconds > 0 ? -value : value, u.unit);
+                } catch (e) {
+                    // Fallback simple formatting
+                    if (seconds > 0) {
+                        return `${value} ${u.unit}${value > 1 ? 's' : ''} ago`;
+                    }
+                    return `in ${value} ${u.unit}${value > 1 ? 's' : ''}`;
+                }
+            },
+
+            // Convert signed seconds to a short offset label like -1d or +3h
+            toShortOffset(seconds) {
+                if (seconds === 0) return '0s';
+                const units = [
+                    { label: 'y', sec: 31536000 },
+                    { label: 'mo', sec: 2592000 },
+                    { label: 'w', sec: 604800 },
+                    { label: 'd', sec: 86400 },
+                    { label: 'h', sec: 3600 },
+                    { label: 'm', sec: 60 },
+                    { label: 's', sec: 1 },
+                ];
+                const abs = Math.abs(seconds);
+                const u = units.find(u => abs % u.sec === 0) || units[units.length - 1];
+                const value = Math.round(abs / u.sec) || 0;
+                const sign = seconds > 0 ? '-' : '+'; // positive seconds => past => '-'
+                return `${sign}${value}${u.label}`;
+            },
+
+            // Check if a preset is selected based on seconds value
+            isPresetSelected(preset) {
+                const sec = this.parseRelativeOffset(preset);
+                return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.endDate && !this.endTime;
             },
 
             formatDate(fullDate, time) {
@@ -295,8 +354,6 @@
             },
 
             dateAddSeconds(date, seconds) {
-                console.log('dateAddSeconds', date, seconds);
-
                 const newTimeInMilliseconds = date.getTime() - (seconds * 1000);
                 return new Date(newTimeInMilliseconds);
             },
