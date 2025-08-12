@@ -97,7 +97,7 @@
             // Computed properties
             get start() {
                 if (this.relativeStartSeconds !== null) {
-                    return this.dateAddSeconds(new Date(), this.relativeStartSeconds);
+                    return new Date(Date.now() - (this.relativeStartSeconds * 1000));
                 }
 
                 if (this.startDate) {
@@ -114,7 +114,7 @@
 
                 // if no end time, we want to include the entire day
                 if (!this.endTime) {
-                    return this.dateAddSeconds(new Date(this.endDate), 86400);
+                    return new Date(new Date(this.endDate).getTime() + 86400000);
                 }
 
                 return new Date(`${this.endDate} ${this.endTime}`);
@@ -284,17 +284,9 @@
                 const abs = Math.abs(seconds);
                 const u = units.find(u => abs % u.sec === 0 && abs >= u.sec) || units.find(u => abs >= u.sec) || units[units.length - 1];
                 const value = Math.max(1, Math.round(abs / u.sec));
-                try {
-                    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
-                    // rtf: negative = past, positive = future
-                    return rtf.format(seconds > 0 ? -value : value, u.unit);
-                } catch (e) {
-                    // Fallback simple formatting
-                    if (seconds > 0) {
-                        return `${value} ${u.unit}${value > 1 ? 's' : ''} ago`;
-                    }
-                    return `in ${value} ${u.unit}${value > 1 ? 's' : ''}`;
-                }
+                const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+                // rtf: negative = past, positive = future
+                return rtf.format(seconds > 0 ? -value : value, u.unit);
             },
 
             // Convert signed seconds to a short offset label like -1d or +3h
@@ -341,16 +333,9 @@
                 return fullDate.toLocaleDateString(undefined, options);
             },
 
-            dateAddSeconds(date, seconds) {
-                const newTimeInMilliseconds = date.getTime() - (seconds * 1000);
-                return new Date(newTimeInMilliseconds);
-            },
-
             emitChange() {
-                const detail = this.getRange();
-
                 this.$el.dispatchEvent(new CustomEvent('date-range-changed', {
-                    detail,
+                    detail: this.getRange(),
                     bubbles: true
                 }));
             }
