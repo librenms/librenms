@@ -16,7 +16,7 @@
       @click="showModal"
     >
       <i class="fa fa-wrench"></i>
-      <span>{{ isInMaintenance ? 'Device under Maintenance' : 'Maintenance Mode' }}</span>
+      <span>{{ isInMaintenance ? $t('components.maintenance-mode.button.device_under_maintenance') : $t('components.maintenance-mode.button.maintenance_mode') }}</span>
     </button>
 
     <!-- Confirmation Dialog -->
@@ -30,7 +30,7 @@
     >
       <div class="tw:bg-white tw:dark:bg-gray-800 tw:rounded-lg tw:shadow-xl tw:w-full tw:max-w-md tw:mx-auto">
         <div class="tw:flex tw:justify-between tw:items-center tw:px-5 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
-          <h5 id="confirmation-dialog-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">End Maintenance</h5>
+          <h5 id="confirmation-dialog-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">{{$t('components.maintenance-mode.titles.end_maintenance')}}</h5>
           <button
             type="button"
             class="tw:text-gray-400 tw:hover:text-gray-500 tw:dark:text-gray-300 tw:dark:hover:text-white"
@@ -41,14 +41,14 @@
           </button>
         </div>
         <div class="tw:p-6">
-          <p class="tw:mb-6 tw:text-gray-700 tw:dark:text-gray-300">Are you sure you want to end maintenance for this device?</p>
+          <p class="tw:mb-6 tw:text-gray-700 tw:dark:text-gray-300">{{$t('components.maintenance-mode.confirm.end_prompt')}}</p>
           <div class="tw:flex tw:justify-end tw:gap-3">
             <button
               type="button"
               class="tw:px-4 tw:py-2 tw:rounded tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 tw:dark:bg-gray-700 tw:dark:text-white tw:dark:hover:bg-gray-600"
               @click="hideConfirmation"
             >
-              No
+              {{$t('No')}}
             </button>
             <button
               type="button"
@@ -56,7 +56,7 @@
               @click="disableMaintenance"
               :disabled="isLoading"
             >
-              Yes
+              {{$t('Yes')}}
             </button>
           </div>
         </div>
@@ -74,7 +74,7 @@
     >
       <div class="tw:bg-white tw:dark:bg-gray-800 tw:rounded-lg tw:shadow-xl tw:w-full tw:max-w-xl tw:mx-auto">
         <div class="tw:flex tw:justify-between tw:items-center tw:px-5 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
-          <h5 id="maintenance-modal-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">Device Maintenance</h5>
+          <h5 id="maintenance-modal-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">{{$t('components.maintenance-mode.titles.device_maintenance')}}</h5>
           <button
             type="button"
             class="tw:text-gray-400 tw:hover:text-gray-500 tw:dark:text-gray-300 tw:dark:hover:text-white"
@@ -88,12 +88,12 @@
           <form id="sched-form">
             <div class="tw:mb-6">
               <div class="tw:grid tw:grid-cols-5 tw:gap-6 tw:items-start">
-                <label for="notes" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300 tw:pt-2">Notes: </label>
+                <label for="notes" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300 tw:pt-2">{{$t('components.maintenance-mode.form.notes_label')}} </label>
                 <div class="tw:col-span-4">
                   <textarea
                     id="notes"
                     name="notes"
-                    placeholder="Maintenance notes"
+                    :placeholder="$t('components.maintenance-mode.form.notes_placeholder')"
                     v-model="notes"
                     class="tw:w-full tw:px-4 tw:py-3 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:placeholder-gray-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:dark:focus:ring-blue-400"
                     rows="3"
@@ -103,7 +103,7 @@
             </div>
             <div class="tw:mb-6">
               <div class="tw:grid tw:grid-cols-5 tw:gap-6 tw:items-center">
-                <label for="duration" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300">Duration: </label>
+                <label for="duration" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300">{{$t('components.maintenance-mode.form.duration_label')}} </label>
                 <div class="tw:col-span-4">
                   <select
                     name="duration"
@@ -120,7 +120,7 @@
             </div>
             <div class="tw:mb-6">
               <div class="tw:grid tw:grid-cols-5 tw:gap-6 tw:items-center">
-                <label for="behavior" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300">Behavior: </label>
+                <label for="behavior" class="tw:col-span-1 tw:font-medium tw:text-gray-700 tw:dark:text-gray-300">{{$t('components.maintenance-mode.form.behavior_label')}} </label>
                 <div class="tw:col-span-4">
                   <select
                     name="behavior"
@@ -129,7 +129,7 @@
                     class="tw:w-full tw:px-4 tw:py-3 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:dark:text-white tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:dark:focus:ring-blue-400"
                   >
                     <option v-for="option in behaviors" :key="option.value" :value="option.value">
-                      {{ option.text }}
+                      {{ getBehaviorText(option.value) }}
                     </option>
                   </select>
                 </div>
@@ -290,7 +290,7 @@ export default {
       })
       .catch(error => {
         this.isLoading = false;
-        toastr.error('An error occurred setting this device into maintenance mode');
+        toastr.error(this.$t('components.maintenance-mode.errors.enable'));
         console.error('Error:', error);
       });
     },
@@ -326,13 +326,25 @@ export default {
       })
       .catch(error => {
         this.isLoading = false;
-        toastr.error('An error occurred disabling maintenance mode');
+        toastr.error(this.$t('components.maintenance-mode.errors.disable'));
         console.error('Error:', error);
         this.hideConfirmation();
       });
     },
     getButtonText() {
-      return this.isInMaintenance ? 'End Maintenance' : 'Start Maintenance';
+      return this.isInMaintenance ? this.$t('components.maintenance-mode.form.end_maintenance') : this.$t('components.maintenance-mode.form.start_maintenance');
+    },
+    getBehaviorText(value) {
+      switch (value) {
+        case 1:
+          return this.$t('alerting.maintenance.behavior.options.skip_alerts');
+        case 2:
+          return this.$t('alerting.maintenance.behavior.options.mute_alerts');
+        case 3:
+          return this.$t('alerting.maintenance.behavior.options.run_alerts');
+        default:
+          return '';
+      }
     },
     isButtonDisabled() {
       return this.isLoading;

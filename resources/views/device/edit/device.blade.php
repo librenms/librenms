@@ -238,4 +238,5 @@
             width: 'resolve'
         });
     </script>
+    @vuei18n
 @endpush
