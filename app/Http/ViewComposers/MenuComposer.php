@@ -90,8 +90,8 @@ class MenuComposer
             ->where('type', '!=', '')
             ->orderBy('type')
             ->pluck('type')
-            ->keyBy(fn($type) => $type)
-            ->map(fn($type) => $configDeviceTypes[$type]['icon'] ?? 'angle-double-right');
+            ->keyBy(fn ($type) => $type)
+            ->map(fn ($type) => $configDeviceTypes[$type]['icon'] ?? 'angle-double-right');
         $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EditTabs.php
  *
@@ -48,104 +49,104 @@ class EditTabs extends Component
             ],
             'snmp' => [
                 'text' => 'SNMP',
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=snmp/')
-            ]
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=snmp/'),
+            ],
         ];
 
         if (! $device->snmp_disable) {
             $this->tabs['ports'] = [
                 'text' => __('Port Settings'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ports/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ports/'),
             ];
         }
 
         if ($device->bgppeers()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=routing/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=routing/'),
             ];
         }
 
         if (count(LibrenmsConfig::get("os.{$device->os}.icons", []))) {
             $this->tabs['icon'] = [
                 'text' => __('Icon'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=icon/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=icon/'),
             ];
         }
 
         if (! $device->snmp_disable) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
             ];
         }
 
         $this->tabs['alert-rules'] = [
             'text' => __('Alert Rules'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/')
+            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
         ];
 
         if (! $device->snmp_disable) {
             $this->tabs['modules'] = [
                 'text' => __('Modules'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
             ];
         }
 
         if (LibrenmsConfig::get('show_services')) {
             $this->tabs['services'] = [
                 'text' => __('Services'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
             ];
         }
 
         $this->tabs['ipmi'] = [
             'text' => __('IPMI'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ipmi/')
+            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ipmi/'),
         ];
 
         if ($this->device->sensors()->exists()) {
             $this->tabs['health'] = [
                 'text' => __('Health'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=health/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=health/'),
             ];
         }
 
         if ($this->device->wirelessSensors()->exists()) {
             $this->tabs['wireless-sensors'] = [
                 'text' => __('Wireless Sensors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/'),
             ];
         }
 
         if (! $device->snmp_disable) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/'),
             ];
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=processors/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=processors/'),
             ];
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=mempools/')
+                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=mempools/'),
             ];
         }
 
         $this->tabs['misc'] = [
             'text' => __('Misc'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=misc/')
+            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=misc/'),
         ];
 
         $this->tabs['component'] = [
             'text' => __('Components'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=component/')
+            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=component/'),
         ];
 
         $this->tabs['customoid'] = [
             'text' => __('Custom OID'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=customoid/')
+            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=customoid/'),
         ];
     }
 
