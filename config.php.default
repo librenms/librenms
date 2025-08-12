@@ -44,7 +44,3 @@
 # Enable the in-built services support (Nagios plugins)
 #$config['show_services'] = 1;
 
-# Enable distinguished name (dn) autodiscovery for LDAP authentication (instead of dn mangling via prefix + username + suffix).
-# required for openldap and 389ds to work properly when not using dn's that don't start with "uid=..."
-#$config['auth_ldap_use_dn_autodiscovery'] = 1;
-
