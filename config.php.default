@@ -43,4 +43,3 @@
 
 # Enable the in-built services support (Nagios plugins)
 #$config['show_services'] = 1;
-
