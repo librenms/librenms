@@ -102,6 +102,7 @@ $graphs['powerdns'] = [
 $graphs['sneck'] = [
     'results',
     'time',
+    'run_time',
 ];
 $graphs['ntp-client'] = [
     'stats',
