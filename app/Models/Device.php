@@ -97,6 +97,12 @@ class Device extends BaseModel
             'last_polled' => 'datetime',
             'last_ping' => 'datetime',
             'status' => 'boolean',
+            'ignore' => 'boolean',
+            'ignore_status' => 'boolean',
+            'disabled' => 'boolean',
+            'snmp_disable' => 'boolean',
+            'disable_notify' => 'boolean',
+            'override_sysLocation' => 'boolean',
         ];
     }
 

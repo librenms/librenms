@@ -53,6 +53,7 @@ class UpdateDeviceRequest extends FormRequest
             'disable_notify' => $this->boolean('disable_notify'),
             'ignore' => $this->boolean('ignore'),
             'ignore_status' => $this->boolean('ignore_status'),
+            'type' => $this->input('type') ?? '',
         ]);
     }
 }
