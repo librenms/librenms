@@ -481,6 +481,10 @@ return [
             'description' => 'Unique ID attribute',
             'help' => 'LDAP attribute to use to identify users, must be numeric',
         ],
+        'auth_ldap_use_dn_autodiscovery' => [
+            'description' => 'Use DN autodiscovery',
+            'help' => "Enable distinguished name (dn) autodiscovery for LDAP authentication (instead of dn mangling via prefix + username + suffix). Required for openldap and 389ds to work properly when not using DN's that don't start with 'uid=...'",
+        ],
         'auth_ldap_userdn' => [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
