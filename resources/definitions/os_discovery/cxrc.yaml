@@ -1,5 +1,8 @@
 mib:  Argus-MIB
 modules:
+    os:
+        version: Argus-MIB::dcPwrSysSoftwareVersion.0
+        hardware: Argus-MIB::dcPwrSysSystemType.0
     sensors:
         charge:
             data:
