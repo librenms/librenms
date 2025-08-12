@@ -33,13 +33,13 @@
          x-transition:leave-start="tw:opacity-100 tw:transform tw:translate-y-0"
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="display: none;">
-        @if($preset)
+        @if($presets)
             <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
                             :class="isPresetSelected(preset) ? 'tw:bg-blue-500 tw:text-white tw:dark:text-white' : 'tw:bg-gray-100 tw:dark:bg-gray-700'"
-                            x-on:click="setPreset(preset)"
+                            x-on:click="setRange(preset, 'now')"
                             x-text="preset"
                     ></button>
                 </template>
@@ -179,6 +179,8 @@
             },
 
             applyRange() {
+                this.relativeStartSeconds = null;
+                this.relativeEndSeconds = null;
                 this.closeDropdown();
                 this.emitChange();
             },
@@ -212,21 +214,8 @@
                     }
                 }
 
-                this.applyRange();
-            },
-
-            setPreset(preset) {
-                if (this.isRelative(preset)) {
-                    const sec = this.parseRelativeOffset(preset);
-                    this.relativeStartSeconds = sec !== null ? sec : null;
-                } else {
-                    this.relativeStartSeconds = null;
-                }
-                this.startDate = '';
-                this.startTime = '';
-                this.endDate = '';
-                this.endTime = '';
-                this.applyRange();
+                this.closeDropdown();
+                this.emitChange();
             },
 
             clearRange() {
@@ -236,7 +225,8 @@
                 this.endTime = '';
                 this.relativeStartSeconds = null;
                 this.relativeEndSeconds = null;
-                this.applyRange();
+                this.closeDropdown();
+                this.emitChange();
             },
 
             getRange() {
