@@ -191,27 +191,11 @@
                 }
 
                 if (start !== null) {
-                    if (this.isRelative(start)) {
-                        const sec = this.parseRelativeOffset(start);
-                        this.relativeStartSeconds = sec !== null ? sec : null;
-                        this.startDate = '';
-                        this.startTime = '';
-                    } else {
-                        [this.startDate, this.startTime] = this.parseDateTime(start);
-                        this.relativeStartSeconds = null;
-                    }
+                    [this.startDate, this.startTime, this.relativeStartSeconds] = this.parseDateTime(start);
                 }
 
                 if (end !== null) {
-                    if (this.isRelative(end)) {
-                        const sec = this.parseRelativeOffset(end);
-                        this.relativeEndSeconds = sec !== null ? sec : null;
-                        this.endDate = '';
-                        this.endTime = '';
-                    } else {
-                        [this.endDate, this.endTime] = this.parseDateTime(end);
-                        this.relativeEndSeconds = null;
-                    }
+                    [this.endDate, this.endTime, this.relativeEndSeconds] = this.parseDateTime(end);
                 }
 
                 this.closeDropdown();
@@ -239,15 +223,29 @@
             },
 
             parseDateTime(dateInput) {
+                // Returns [date, time, relativeSeconds]
                 if (typeof dateInput !== 'string') {
-                    return ['', ''];
+                    return ['', '', null];
                 }
 
-                if (dateInput.includes(' ')) {
-                    return dateInput.split(' ');
+                const input = dateInput.trim();
+
+                if (input === 'now') {
+                    return ['', '', null];
                 }
 
-                return [dateInput, ''];
+                // If relative, return empty date/time and seconds
+                if (this.isRelative(input)) {
+                    return ['', '', this.parseRelativeOffset(input)];
+                }
+
+                // Absolute date/time handling
+                if (input.includes(' ')) {
+                    const [date, time = ''] = input.split(' ');
+                    return [date, time, null];
+                }
+
+                return [input, '', null];
             },
 
             // Determine if a string is a relative time like 10m, -2h, 7d, 1w, 1y
