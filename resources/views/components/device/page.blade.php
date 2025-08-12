@@ -5,11 +5,11 @@
              style="max-height: 100px">
         <div class="pull-left" style="margin-top: 5px;">
             @if($parentDeviceId)
-                <a href="{{ route('device', $parentDeviceId) }}" title="{{ __('VM Host') }}"><i
+                <a href="{{ route('device', $parentDeviceId) }}" title="{{ __('device.vm_host') }}"><i
                         class="fa fa-server fa-fw fa-lg"></i></a>
             @endif
             @if($device->isUnderMaintenance())
-                <span title="{{ __('Scheduled Maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
+                <span title="{{ __('device.scheduled_maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
             @endif
             <span style="font-size: 20px;">
                 <x-device-link :device="$device"/>

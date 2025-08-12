@@ -19,13 +19,13 @@
                 <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form" class="tw:inline-block">
                     @csrf
                     <input type="hidden" name="id" value="{{ $device->device_id }}">
-                    <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
+                    <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> {{ __('device.edit.delete_device') }}</button>
                 </form>
 
                 @if(LibrenmsConfig::get('enable_clear_discovery') && ! $device->snmp_disable)
                     <button type="submit" id="rediscover" data-device_id="{{ $device->device_id }}"
-                            class="btn btn-primary" name="rediscover" title="Schedule the device for immediate rediscovery by the poller">
-                        <i class="fa fa-retweet"></i> Rediscover device
+                            class="btn btn-primary" name="rediscover" title="{{ __('device.edit.rediscover_title') }}">
+                        <i class="fa fa-retweet"></i> {{ __('device.edit.rediscover') }}
                     </button>
                 @endif
             </div>
@@ -35,8 +35,8 @@
         <form id="edit" name="edit" method="post" action="{{ route('device.edit.update', [$device->device_id]) }}" role="form" class="form-horizontal">
             @method('PUT')
             @csrf
-            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
-                <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname / IP</label>
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.hostname_title') }}" >
+                <label for="edit-hostname-input" class="col-sm-2 control-label" >{{ __('device.edit.hostname_ip') }}</label>
                 <div class="col-sm-6">
                     <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value="{{ old('hostname', $device->hostname) }}" />
                 </div>
@@ -45,29 +45,29 @@
                 </div>
             </div>
 
-            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip (e.g. '@{{ $sysName }}')" >
-                <label for="edit-display-input" class="col-sm-2 control-label" >Display Name</label>
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.display_title', ['sysName' => $device->sysName]) }}" >
+                <label for="edit-display-input" class="col-sm-2 control-label" >{{ __('device.edit.display_name') }}</label>
                 <div class="col-sm-6">
-                    <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="{{ old('display', $device->display) }}">
+                    <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="{{ __('device.edit.system_default') }}" value="{{ old('display', $device->display) }}">
                 </div>
             </div>
 
-            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
-                <label for="edit-overwrite_ip-input" class="col-sm-2 control-label text-danger" >Overwrite IP (do not use)</label>
+            <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="{{ __('device.edit.overwrite_ip_title') }}" >
+                <label for="edit-overwrite_ip-input" class="col-sm-2 control-label text-danger" >{{ __('device.edit.overwrite_ip') }}</label>
                 <div class="col-sm-6">
                     <input type="text" id="edit-overwrite_ip-input" name="overwrite_ip" class="form-control" value="{{ old('overwrite_ip', $device->overwrite_ip) }}">
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="descr" class="col-sm-2 control-label">Description</label>
+                <label for="descr" class="col-sm-2 control-label">{{ __('device.edit.description') }}</label>
                 <div class="col-sm-6">
                     <textarea id="descr" name="purpose" class="form-control">{{ old('purpose', $device->purpose) }}</textarea>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="type" class="col-sm-2 control-label">Type</label>
+                <label for="type" class="col-sm-2 control-label">{{ __('device.edit.type') }}</label>
                 <div class="col-sm-6">
                     <select id="type" name="type" class="form-control">
                         @foreach($types as $type => $text)
@@ -80,7 +80,7 @@
             </div>
 
             <div class="form-group">
-                <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation</label>
+                <label for="sysLocation" class="col-sm-2 control-label">{{ __('device.edit.override_sysLocation') }}</label>
                 <div class="col-sm-6">
                     <input onChange="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()"
                            type="checkbox" name="override_sysLocation" data-size="small"
@@ -88,7 +88,7 @@
                     />
                 </div>
             </div>
-            <div class="form-group" title="To set coordinates, include [latitude,longitude]">
+            <div class="form-group" title="{{ __('device.edit.coordinates_title') }}">
                 <div class="col-sm-2"></div>
                 <div class="col-sm-6">
                     <input id="sysLocation" name="sysLocation" class="form-control"
@@ -98,7 +98,7 @@
             </div>
 
             <div class="form-group">
-                <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
+                <label for="override_sysContact" class="col-sm-2 control-label">{{ __('device.edit.override_sysContact') }}</label>
                 <div class="col-sm-6">
                     <input onChange="edit.override_sysContact_string.disabled=!edit.override_sysContact.checked"
                            type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
@@ -118,10 +118,10 @@
             </div>
 
             <div class="form-group">
-                <label for="parent_id" class="col-sm-2 control-label">This device depends on</label>
+                <label for="parent_id" class="col-sm-2 control-label">{{ __('device.edit.depends_on') }}</label>
                 <div class="col-sm-6">
                     <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
-                        <option value="0" {{ empty($parents) ? 'selected' : '' }}>None</option>
+                        <option value="0" {{ empty($parents) ? 'selected' : '' }}>{{ __('device.edit.none') }}</option>
                         @foreach ($devices as $dev)
                             <option value="{{ $dev->device_id }}" {{ $parents->contains($dev->device_id) ? 'selected' : '' }}>
                                 {{ $dev->hostname }} ({{ $dev->sysName }})
@@ -133,13 +133,13 @@
 
             @config('distributed_poller')
             <div class="form-group">
-                <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
+                <label for="poller_group" class="col-sm-2 control-label">{{ __('device.edit.poller_group') }}</label>
                 <div class="col-sm-6">
                     <select name="poller_group" id="poller_group" class="form-control input-sm">
-                        <option value="0">General{{$default_poller_group == 0 ? ' (default poller)' : ''}}</option>
+                        <option value="0">{{ __('device.edit.poller_group_general') }}{{$default_poller_group == 0 ? ' ' . __('device.edit.default_poller') : ''}}</option>
                         @foreach($poller_groups as $group_id => $group_name)
                             <option value="{{ $group_id }}" {{ old('poller_group', $device->poller_group) == $group_id ? 'selected' : '' }}>
-                                {{ $group_name }}{{ $default_poller_group == $group_id ? ' (default poller)' : '' }}
+                                {{ $group_name }}{{ $default_poller_group == $group_id ? ' ' . __('device.edit.default_poller') : '' }}
                             </option>
                         @endforeach
                     </select>
@@ -148,7 +148,7 @@
             @endconfig
 
             <div class="form-group">
-                <label for="disabled" class="col-sm-2 control-label">Disable polling and alerting</label>
+                <label for="disabled" class="col-sm-2 control-label">{{ __('device.edit.disable_polling_alerting') }}</label>
                 <div class="col-sm-6">
                     <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
                        {{ old('disabled', $device->disabled) ? 'checked' : '' }}
@@ -172,7 +172,7 @@
             </div>
 
             <div class="form-group">
-                <label for="disable_notify" class="col-sm-2 control-label">Disable alerting</label>
+                <label for="disable_notify" class="col-sm-2 control-label">{{ __('device.edit.disable_alerting') }}</label>
                 <div class="col-sm-6">
                     <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
                        {{ old('disable_notify', $device->disable_notify) ? 'checked' : '' }}
@@ -180,9 +180,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="ignore" class="col-sm-2 control-label" title="Tag device to ignore alerts. Alert checks will still run.
-However, ignore tag can be read in alert rules.
-If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore alert tag is on, the alert rule won't match.">Ignore alert tag</label>
+                <label for="ignore" class="col-sm-2 control-label" title="{{ __('device.edit.ignore_alert_tag_title') }}">{{ __('device.edit.ignore_alert_tag') }}</label>
                 <div class="col-sm-6">
                     <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                        {{ old('ignore', $device->ignore) ? 'checked' : '' }}
@@ -190,7 +188,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
                 </div>
             </div>
             <div class="form-group">
-                <label for="ignore_status" class="col-sm-2 control-label" title="Tag device to ignore Status. It will always be shown as online.">Ignore Device Status</label>
+                <label for="ignore_status" class="col-sm-2 control-label" title="{{ __('device.edit.ignore_device_status_title') }}">{{ __('device.edit.ignore_device_status') }}</label>
                 <div class="col-sm-6">
                     <input name="ignore_status" type="checkbox" id="ignore_status" value="1" data-size="small"
                        {{ old('ignore_status', $device->ignore_status) ? 'checked' : '' }}
@@ -199,7 +197,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             </div>
             <div class="row">
                 <div class="col-md-1 col-md-offset-2">
-                    <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+                    <button type="submit" name="Submit"  class="btn btn-default"><i class="fa fa-check"></i> {{ __('device.edit.save') }}</button>
                 </div>
             </div>
         </form>
@@ -207,11 +205,11 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
         <div class="panel panel-default">
             <div class="panel-heading">
                 @if($rrd_num)
-                Size on Disk: <b>{{ $rrd_size }}</b> in <b>{{ $rrd_num }}</b> RRD files |
+                {{ __('device.edit.size_on_disk') }}: <b>{{ $rrd_size }}</b> in <b>{{ $rrd_num }}</b> {{ __('device.edit.rrd_files') }} |
                 @endif
-                Last polled: <b>{{ $device->last_polled }}</b>
+                {{ __('device.edit.last_polled') }}: <b>{{ $device->last_polled }}</b>
                 @if($device->last_discovered)
-                    | Last discovered: <b>{{ $device->last_discovered }}</b>
+                    | {{ __('device.edit.last_discovered') }}: <b>{{ $device->last_discovered }}</b>
                 @endif
             </div>
         </div>
