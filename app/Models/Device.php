@@ -481,7 +481,7 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  string|Location  $new_location  location data
+     * @param  Location|string  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
      * @param  bool  $user_override  Ignore user override and update the location anyway
      */

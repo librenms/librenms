@@ -30,7 +30,7 @@
     >
       <div class="tw:bg-white tw:dark:bg-gray-800 tw:rounded-lg tw:shadow-xl tw:w-full tw:max-w-md tw:mx-auto">
         <div class="tw:flex tw:justify-between tw:items-center tw:px-5 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
-          <h5 id="confirmation-dialog-title" class="tw:text-2xl tw:font-medium tw:dark:text-white">End Maintenance</h5>
+          <h5 id="confirmation-dialog-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">End Maintenance</h5>
           <button
             type="button"
             class="tw:text-gray-400 tw:hover:text-gray-500 tw:dark:text-gray-300 tw:dark:hover:text-white"
@@ -74,7 +74,7 @@
     >
       <div class="tw:bg-white tw:dark:bg-gray-800 tw:rounded-lg tw:shadow-xl tw:w-full tw:max-w-xl tw:mx-auto">
         <div class="tw:flex tw:justify-between tw:items-center tw:px-5 tw:py-3 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
-          <h5 id="maintenance-modal-title" class="tw:text-2xl tw:font-medium tw:dark:text-white">Device Maintenance</h5>
+          <h5 id="maintenance-modal-title" class="tw:text-2xl tw:font-medium tw:text-black tw:dark:text-white">Device Maintenance</h5>
           <button
             type="button"
             class="tw:text-gray-400 tw:hover:text-gray-500 tw:dark:text-gray-300 tw:dark:hover:text-white"
