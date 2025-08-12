@@ -1,6 +1,7 @@
 @props([
     'start' => '',
     'end' => '',
+    'outputFormat' => '', // iso, timestamp, or format string
     'presets' => true,
     'placeholder' => 'Select date range...',
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
@@ -12,6 +13,7 @@
      data-start="{{ $start }}"
      data-end="{{ $end }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
+     data-output-format="{{ $outputFormat }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -21,8 +23,8 @@
         tabindex="0"
     ></div>
 
-    <input type="hidden" name="from" :value="relativeStartSeconds !== null ? toShortOffset(relativeStartSeconds) : startString">
-    <input type="hidden" name="to" :value="relativeEndSeconds !== null ? toShortOffset(relativeEndSeconds) : (relativeStartSeconds !== null ? '' : endString)">
+    <input type="hidden" name="from" :value="outStartString">
+    <input type="hidden" name="to" :value="outEndString">
 
     <div class="tw:absolute tw:top-full tw:left-0 tw:right-0 tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-md tw:shadow-lg tw:z-10 tw:p-4 tw:mt-1 tw:dark:text-gray-400"
          x-show="open"
@@ -82,6 +84,7 @@
             placeholder: 'Select date range...',
             relativeStartSeconds: null,
             relativeEndSeconds: null,
+            outputFormat: '',
             presets: [
                 '6h',
                 '24h',
@@ -120,12 +123,24 @@
                 return new Date(`${this.endDate} ${this.endTime}`);
             },
 
-            get startString() {
-                return this.formatDate(this.start, this.startTime);
+            get outStartString() {
+                if (this.relativeStartSeconds !== null) {
+                    return this.toShortOffset(this.relativeStartSeconds)
+                }
+
+                return this.formatDate(this.start, this.startTime, this.outputFormat);
             },
 
-            get endString() {
-                return this.formatDate(this.end, this.endTime);
+            get outEndString() {
+                if (this.relativeEndSeconds !== null) {
+                    return this.toShortOffset(this.relativeEndSeconds)
+                }
+
+                if (this.relativeStartSeconds !== null) {
+                    return '';
+                }
+
+                return this.formatDate(this.end, this.endTime, this.outputFormat);
             },
 
             get hasValue() {
@@ -140,12 +155,15 @@
                     }
                 }
 
-                if (this.startString && this.endString) {
-                    return `${this.startString} to ${this.endString}`;
-                } else if (this.startString) {
-                    return `From ${this.startString}`;
+                const startString = this.formatDate(this.start, this.startTime);
+                const endString = this.formatDate(this.end, this.endTime);
+
+                if (startString && endString) {
+                    return `${startString} to ${endString}`;
+                } else if (startString) {
+                    return `From ${startString}`;
                 } else if (this.endString) {
-                    return `Until ${this.endString}`;
+                    return `Until ${endString}`;
                 }
 
                 return this.placeholder;
@@ -162,6 +180,7 @@
                 };
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
+                if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },
@@ -234,21 +253,32 @@
                     return ['', '', null];
                 }
 
-                // If relative, return empty date/time and seconds
                 if (this.isRelative(input)) {
                     return ['', '', this.parseRelativeOffset(input)];
                 }
 
-                // Absolute date/time handling
-                const d = new Date(input);
+                let d;
+                let includeTime = false;
+
+                // Check for Unix timestamp
+                if (/^\d{10,}$/.test(input)) {
+                    const timestamp = parseInt(input);
+                    // If less than 13 digits, it's in seconds, otherwise milliseconds
+                    d = new Date(input.length < 13 ? timestamp * 1000 : timestamp);
+                    // For Unix timestamps, include time unless it's midnight
+                    includeTime = !(d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0);
+                } else {
+                    d = new Date(input);
+                    includeTime = /\d{1,2}:\d{2}/.test(input);
+                }
+
                 if (isNaN(d.getTime())) {
                     return ['', '', null];
                 }
 
                 // output the correct formats for the input fields
                 const date = d.toLocaleDateString('en-CA');
-                const time = /\d{1,2}:\d{2}/.test(input) ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
-
+                const time = includeTime ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
                 return [date, time, null];
             },
 
@@ -318,9 +348,17 @@
                 return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.endDate && !this.endTime;
             },
 
-            formatDate(fullDate, time) {
+            formatDate(fullDate, time, format = 'local') {
                 if (!fullDate) {
                     return '';
+                }
+
+                if (format === 'iso') {
+                    return fullDate.toISOString();
+                }
+
+                if (format === 'timestamp') {
+                    return Math.floor(fullDate.getTime() / 1000).toString();
                 }
 
                 let options = {

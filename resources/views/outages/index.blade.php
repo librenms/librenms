@@ -37,6 +37,7 @@ $refresh = request()->get('refresh', 30);
                                 id="date_range" name="date_range"
                                 start="{{ $from }}"
                                 end="{{ $to }}"
+                                output-format="timestamp"
                                 class="form-control tw:min-w-64"
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
