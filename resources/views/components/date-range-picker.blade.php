@@ -240,12 +240,16 @@
                 }
 
                 // Absolute date/time handling
-                if (input.includes(' ')) {
-                    const [date, time = ''] = input.split(' ');
-                    return [date, time, null];
+                const d = new Date(input);
+                if (isNaN(d.getTime())) {
+                    return ['', '', null];
                 }
 
-                return [input, '', null];
+                // output the correct formats for the input fields
+                const date = d.toLocaleDateString('en-CA');
+                const time = /\d{1,2}:\d{2}/.test(input) ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
+
+                return [date, time, null];
             },
 
             // Determine if a string is a relative time like 10m, -2h, 7d, 1w, 1y
