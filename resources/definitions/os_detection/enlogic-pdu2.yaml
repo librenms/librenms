@@ -13,4 +13,4 @@ discovery:
         snmpget:
           oid: ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
           op: starts
-          value: 2.0
+          value: '2.0'
