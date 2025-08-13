@@ -16,7 +16,7 @@ $cert_name_list = [];
 foreach ($domain_list as $label) {
     $cert_name = $label;
 
-    if ($vars['cert_name'] == $cert_name) {
+    if (isset($vars['cert_name']) && ($vars['cert_name'] == $cert_name)) {
         $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
