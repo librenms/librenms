@@ -481,11 +481,11 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  Location|string  $new_location  location data
+     * @param  Location|string|null  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
      * @param  bool  $user_override  Ignore user override and update the location anyway
      */
-    public function setLocation(Location|string $new_location, bool $doLookup = false, bool $user_override = false): void
+    public function setLocation(Location|string|null $new_location, bool $doLookup = false, bool $user_override = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
