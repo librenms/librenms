@@ -1,5 +1,7 @@
 modules:
     os:
+        hardware: ISILON-MIB::chassisModel.1
+        serial: ISILON-MIB::chassisSerialNumber.1
         sysDescr_regex: '/Isilon OneFS (?<version>\S+)( (?<hardware>\S+)\(RELEASE\))?/'
     storage:
         data:

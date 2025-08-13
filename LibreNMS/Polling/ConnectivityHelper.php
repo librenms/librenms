@@ -76,7 +76,6 @@ class ConnectivityHelper
      */
     public function isUp(): bool
     {
-        $previous = $this->device->status;
         $ping_response = $this->isPingable();
 
         // calculate device status
@@ -100,7 +99,7 @@ class ConnectivityHelper
             if ($this->canPing()) {
                 $ping_response->saveStats($this->device);
             }
-            $this->updateAvailability($previous, $this->device->status);
+            $this->updateAvailability($this->device->status);
 
             $this->device->save(); // confirm device is saved
         }
@@ -170,25 +169,26 @@ class ConnectivityHelper
         return $this->family;
     }
 
-    private function updateAvailability(bool $previous, bool $status): void
+    private function updateAvailability(bool $current_status): void
     {
-        // skip update if we are considering maintenance and skipping alerts
+        // skip update if we are considering maintenance
         if (LibrenmsConfig::get('graphing.availability_consider_maintenance')
-            && $this->device->getMaintenanceStatus() == MaintenanceStatus::SKIP_ALERTS) {
+            && $this->device->getMaintenanceStatus() !== MaintenanceStatus::NONE) {
             return;
         }
 
-        // check for open outage
-        $open_outage = $this->device->getCurrentOutage();
+        if ($current_status) {
+            // Device is up, close any open outages
+            $this->device->outages()->whereNull('up_again')->get()->each(function (DeviceOutage $outage) {
+                $outage->up_again = time();
+                $outage->save();
+            });
 
-        if ($status) {
-            if ($open_outage) {
-                $open_outage->up_again = time();
-                $open_outage->save();
-            }
-        } elseif ($previous || $open_outage === null) {
-            // status changed from up to down or there is no open outage
-            // open new outage
+            return;
+        }
+
+        // Device is down, only open a new outage if none is currently open
+        if ($this->device->getCurrentOutage() === null) {
             $this->device->outages()->save(new DeviceOutage(['going_down' => time()]));
         }
     }
