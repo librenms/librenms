@@ -11,7 +11,7 @@
                     "hardware": "model",
                     "features": null,
                     "location": "<private>",
-                    "os": "endace",
+                    "os": "endace-osm",
                     "type": "appliance",
                     "serial": "serialno",
                     "icon": "endace.svg"
