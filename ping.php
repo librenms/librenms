@@ -10,8 +10,6 @@ require __DIR__ . '/includes/init.php';
 
 $options = getopt('fhdvrg:');
 
-Log::setDefaultDriver('console');
-
 if (isset($options['h'])) {
     echo <<<'END'
 ping.php: Usage ping.php [-d] [-v] [-r] [-g group(s)]
