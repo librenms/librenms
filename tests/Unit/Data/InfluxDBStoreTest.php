@@ -50,10 +50,8 @@ class InfluxDBStoreTest extends TestCase
     {
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-
         $mock->shouldReceive('exists')->once()->andReturn(true);
-        // Disable shutdown function in test
-        $influx = new InfluxDB($mock, false);
+        $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';
@@ -84,9 +82,7 @@ class InfluxDBStoreTest extends TestCase
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
         $mock->shouldReceive('exists')->once()->andReturn(true);
-
-        // Disable shutdown function in test
-        $influx = new InfluxDB($mock, false);
+        $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';
@@ -105,9 +101,7 @@ class InfluxDBStoreTest extends TestCase
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
         $mock->shouldReceive('exists')->once()->andReturn(true);
-
-        // Disable shutdown function in test
-        $influx = new InfluxDB($mock, false);
+        $influx = new InfluxDB($mock);
 
         $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';

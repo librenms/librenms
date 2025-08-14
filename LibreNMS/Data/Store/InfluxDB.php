@@ -42,7 +42,7 @@ class InfluxDB extends BaseDatastore
     private $batchSize = 0; // Number of points to write at once
     private $measurements = []; // List of measurements to write
 
-    public function __construct(Database $influx, $registerShutdown = true)
+    public function __construct(Database $influx)
     {
         parent::__construct();
         $this->connection = $influx;
@@ -57,11 +57,12 @@ class InfluxDB extends BaseDatastore
         } catch (\Exception $e) {
             Log::warning('InfluxDB: Could not create database');
         }
+    }
 
-        // Ensure batch is flushed on script exit, unless disabled (for tests)
-        if ($registerShutdown) {
-            register_shutdown_function([$this, 'flushBatch']);
-        }
+    public function terminate(): void
+    {
+        // Ensure any remaining points are written before the script ends
+        $this->flushBatch();
     }
 
     public function getName(): string
