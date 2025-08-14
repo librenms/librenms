@@ -60,7 +60,7 @@ if (isset($_POST['create-default'])) {
         }
 
         $qb = QueryBuilderParser::fromJson($add_rule['builder']);
-        
+
         $insert = [
             'builder' => json_encode($add_rule['builder']),
             'query' => $qb->toSql(),
@@ -363,12 +363,12 @@ foreach ($rule_list as $rule) {
 
     // Extra
 
-    echo '<td><small>Max: ' . $rule_extra['count'] . '<br />Delay: ' . $rule_extra['delay'] . '<br />Interval: ' . $rule_extra['interval'] . '</small></td>';
+    echo '<td><small>Max: ' . $rule_extra['count'] . '<br />Delay: ' . $rule_extra['delay'] . '<br />Interval: ' . ($rule_extra['interval'] ?? '') . '</small></td>';
 
     // Rule
 
     echo "<td class='col-sm-4'>";
-    if ($rule_extra['invert'] === true) {
+    if (isset($rule_extra['invert']) && $rule_extra['invert'] === true) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
