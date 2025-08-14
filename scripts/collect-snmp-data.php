@@ -91,7 +91,6 @@ Examples:
 }
 
 Debug::set(isset($options['d']) || isset($options['debug']));
-\Log::setDefaultDriver('console');
 
 if (isset($options['m'])) {
     $modules_input = $options['m'];
