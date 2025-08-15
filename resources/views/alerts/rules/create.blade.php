@@ -4,15 +4,21 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-12">
-        <h3>{{ __('Alert Rule') }} &nbsp; <a target="_blank" href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a></h3>
+    <div class="col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
         <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    {{ __('Create Alert Rule') }}
+                    <a target="_blank" href="https://docs.librenms.org/Alerting/" class="pull-right">
+                        <i class="fa fa-book"></i> Docs
+                    </a>
+                </h3>
+            </div>
             <div class="panel-body">
                 <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">{{ __('Main') }}</a></li>
-                    <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">{{ __('Advanced') }}</a></li>
+                    <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">{{ __('Main') }}&nbsp;</a></li>
+                    <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">{{ __('Advanced') }}&nbsp;</a></li>
                 </ul>
-                <br>
                 <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                     @csrf
                     <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}">
@@ -22,7 +28,7 @@
                     <input type="hidden" name="template_id" id="template_id" value="">
                     <input type="hidden" name="builder_json" id="builder_json" value="">
 
-                    <div class="tab-content">
+                    <div class="tab-content" style="margin-top: 15px;">
                         <div role="tabpanel" class="tab-pane active" id="main">
                             <div class='form-group' title="The description of this alert rule.">
                                 <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('Rule name') }}</label>
@@ -132,7 +138,7 @@
                     </div>
 
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
+                        <div class="col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10">
                             <button id="btn-save" type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             <a href="{{ url('alert-rules') }}" class="btn btn-default">{{ __('Cancel') }}</a>
                         </div>
