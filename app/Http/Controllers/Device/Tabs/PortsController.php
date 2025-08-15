@@ -108,7 +108,7 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'page_links' => $this->pageLinks($request),
+            'dropdownLinks' => $this->pageLinks($request),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',

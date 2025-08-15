@@ -1,6 +1,7 @@
-@extends('device.index')
+@extends('layouts.librenmsv1')
 
-@section('tab')
+@section('content')
+    <x-device.page :device="$device">
     <x-option-bar name="{{ trans('stp.vlan') }}" :options="$data['vlans']" :selected="$data['vlan']"></x-option-bar>
 
     @foreach($data['stpInstances'] as $instance)
@@ -113,6 +114,7 @@
             </div>
         </x-panel>
     @endif
+</x-device.page>
 @endsection
 
 @push('scripts')
