@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
 class Openwrt extends OS implements
     OSDiscovery,
@@ -43,6 +44,8 @@ class Openwrt extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
+    private $aps = [];
+
     /**
      * Retrieve basic information about the OS / device
      */
@@ -50,6 +53,7 @@ class Openwrt extends OS implements
     {
         [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
         $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
+        $this->aps = SnmpQuery::walk('.1.3.6.1.4.1.2021.255.87.76.1')->values();
     }
 
     /**
@@ -121,6 +125,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
+        if (! empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.2.' . $index;
+                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('clients', '', true, false);
     }
 
@@ -132,6 +151,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessFrequency()
     {
+        if (! empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.3.' . $index;
+                $sensors[] = new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('frequency', '', false, false);
     }
 
@@ -143,6 +177,21 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
+        if (! empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                $oid = '.1.3.6.1.4.1.2021.255.87.76.4.' . $index;
+                $sensors[] = new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap");
+                $index += 1;
+                $count += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('noise-floor', '', false, false);
     }
 
@@ -154,6 +203,25 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessRate()
     {
+        if (! empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                foreach (['TX', 'RX'] as $dirId => $dir) {
+                    foreach (['SUM', 'AVG', 'MIN', 'MAX'] as $typeId => $type) {
+                        $oid = '.1.3.6.1.4.1.2021.255.87.76.5.' . ($dirId + 1) . '.' . ($typeId + 1) . '.' . $index;
+                        $sensors[] = new WirelessSensor('rate', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap $dir $type");
+                        $count += 1;
+                    }
+                }
+                $index += 1;
+            }
+
+            return $sensors;
+        }
+
         $txrate = $this->getSensorData('rate', '-tx', false, true);
         $rxrate = $this->getSensorData('rate', '-rx', false, true);
 
@@ -168,6 +236,23 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessSNR()
     {
+        if (! empty($this->aps)) {
+            $sensors = [];
+            $index = 1;
+            $count = 1;
+
+            foreach ($this->aps as $ap) {
+                foreach (['SUM', 'AVG', 'MIN', 'MAX'] as $typeId => $type) {
+                    $oid = '.1.3.6.1.4.1.2021.255.87.76.6.' . ($typeId + 1) . '.' . $index;
+                    $sensors[] = new WirelessSensor('snr', $this->getDeviceId(), $oid, 'openwrt', $count, "$ap $type");
+                    $count += 1;
+                }
+                $index += 1;
+            }
+
+            return $sensors;
+        }
+
         return $this->getSensorData('snr', '', false, true);
     }
 }
