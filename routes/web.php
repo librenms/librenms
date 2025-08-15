@@ -184,6 +184,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     // admin pages
     Route::middleware('can:admin')->group(function (): void {
+        Route::get('alert-rules/create', [\App\Http\Controllers\AlertRuleController::class, 'create'])->name('alert-rules.create');
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
         Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
