@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
@@ -43,6 +44,7 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
+        Log::setDefaultDriver('console');
     }
 
     /**
