@@ -95,9 +95,9 @@ echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
 if (Gate::allows('create', AlertRule::class)) {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device_id . '">Create new alert rule</button>';
+    echo '<a class="btn btn-primary btn-sm" href="/alert-rules/create?device_id=' . $device_id . '">Create new alert rule</a>';
     echo '<i> - OR - </i>';
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device_id . '">Create rule from collection</button>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
 }
 echo '</div>';
 
