@@ -9,7 +9,7 @@ class AlertRuleTemplateController extends Controller
 {
     public function template(int $template_id)
     {
-        $collection = $this->templatesCollection();
+        $collection = self::templatesCollection();
 
         if (! isset($collection[$template_id])) {
             return response()->json(['status' => 'error', 'message' => 'Template not found'], 404);
@@ -55,7 +55,7 @@ class AlertRuleTemplateController extends Controller
         return array_replace($default_extra, $extra);
     }
 
-    public function templatesCollection(): array
+    public static function templatesCollection(): array
     {
         return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
     }
