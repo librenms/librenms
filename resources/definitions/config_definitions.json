@@ -4132,7 +4132,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "I/0 Wait"
+                "descr": "I/O Wait"
             },
             "type": "graph"
         },
