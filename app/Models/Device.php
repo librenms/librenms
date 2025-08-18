@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Taggable;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
@@ -36,7 +37,7 @@ use Permissions;
  */
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory;
+    use PivotEventTrait, HasFactory, Taggable;
 
     private ?MaintenanceStatus $maintenanceStatus = null;
 
