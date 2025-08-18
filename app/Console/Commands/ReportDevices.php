@@ -161,18 +161,24 @@ class ReportDevices extends LnmsCommand
             $has_relationships = true;
         }
 
-        $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
-            ->whereDeviceSpec($this->argument('device spec'))->get();
+        // handle as array differently as it does not benefit from chunk processing and needs searched for differently
+        if ($this->option('devices-as-array')) {
+            $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
+                ->whereDeviceSpec($this->argument('device spec'))->get();
 
-        if (! $this->option('devices-as-array')) {
-            foreach ($devices as $device) {
-                $this->line(json_encode($device));
-            }
+            $this->line(json_encode($devices));
 
             return 0;
         }
 
-        $this->line(json_encode($devices));
+        /*
+         * This way if the fetch takes awhile if something is processing the output it can proceed
+         * with processing one device while we fetch the info for the next.
+         */
+        Device::when($has_relationships, fn ($q) => $q->with($relationships))
+            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device) {
+                $this->line(json_encode($device[0]));
+            });
 
         return 0;
     }
