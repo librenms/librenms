@@ -11,6 +11,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
+    $ipmi['ciphersuite'] = get_dev_attrib($device, 'ipmi_ciphersuite');
+    $ipmi['timeout'] = filter_var(get_dev_attrib($device, 'ipmi_timeout'), FILTER_VALIDATE_INT) ?: '3';
 
     $cmd = [LibrenmsConfig::get('ipmitool', 'ipmitool')];
     if (LibrenmsConfig::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
@@ -18,6 +20,12 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         } else {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-y', $ipmi['kg_key'], '-L', 'USER');
+        }
+        if (! empty($ipmi['ciphersuite'])) {
+            array_push($cmd, '-C', $ipmi['ciphersuite']);
+        }
+        if (! empty($ipmi['timeout'])) {
+            array_push($cmd, '-N', $ipmi['timeout']);
         }
     }
 
