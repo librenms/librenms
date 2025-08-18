@@ -67,7 +67,7 @@ class ReleaseTag extends LnmsCommand
             $gh->createChangelog();
             $this->info("Changelog generated for $tag");
 
-            if ($this->confirm('Do you want to view the generated Changelog?')) {
+            if ($this->confirm('Do you want to view the generated Changelog?', true)) {
                 $this->output->writeln($gh->getMarkdown());
             }
 
