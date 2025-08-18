@@ -50,8 +50,8 @@ foreach ($templates as $template) {
     $old_template = strpos($template['template'], '{/if}') !== false ? '1' : '';
     echo '<tr data-row-id="' . $template['id'] . '">
             <td>' . $template['id'] . '</td>
-            <td>' . $template['name'] . '</td>
-            <td>' . json_encode($template['alert_rules']) . '</td>
+            <td>' . htmlspecialchars($template['name']) . '</td>
+            <td>' . htmlspecialchars(json_encode($template['alert_rules'])) . '</td>
             <td>' . $old_template . '</td>
           </tr>';
 }
