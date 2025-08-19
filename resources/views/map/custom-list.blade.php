@@ -15,7 +15,7 @@
 
         <x-accordion accordionId="CustomMapGroups">
             @foreach($maps as $group_name => $group)
-                <x-accordion.item title="{{$group_name ?? 'Custom Maps'}}" id="{{uniqid()}}" open="{{($open_group == $group_name) || (count($maps) == 1)}}">
+                <x-accordion.item title="{{$group_name ?: 'Ungrouped'}}" id="{{uniqid()}}" open="{{($open_group == $group_name) || (count($maps) == 1)}}">
                 @foreach($group as $map)
                     <div id="map-{{ $map->custom_map_id }}" class="tw:even:bg-gray-50 tw:dark:even:bg-zinc-900">
                         <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">
