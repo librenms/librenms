@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -170,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
+        Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);;
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');

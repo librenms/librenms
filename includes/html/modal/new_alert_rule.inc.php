@@ -12,8 +12,8 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alerting\QueryBuilderFilter;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = LibrenmsConfig::get('alert_rule.severity');
 $default_max_alerts = LibrenmsConfig::get('alert_rule.max_alerts');
@@ -306,10 +306,8 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             if (rule_id >= 0) {
                 $.ajax({
-                    type: "POST",
-                    url: "ajax_form.php",
-                    data: { type: "parse-alert-rule", alert_id: rule_id },
-                    dataType: "json",
+                    type: "GET",
+                    url: "<?php echo route('alert-rule.show', ':alert_id') ?>".replace(':alert_id', rule_id),
                     success: function (data) {
                         loadRule(data);
                     }

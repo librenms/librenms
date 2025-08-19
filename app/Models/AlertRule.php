@@ -35,6 +35,23 @@ class AlertRule extends BaseModel
 {
     public $timestamps = false;
 
+    protected $fillable = [
+        'severity',
+        'extra',
+        'disabled',
+        'name',
+        'proc',
+        'notes',
+        'query',
+        'builder',
+        'invert_map',
+    ];
+
+    protected $casts = [
+        'builder' => 'array',
+        'extra' => 'array',
+    ];
+
     // ---- Query scopes ----
 
     /**
@@ -81,6 +98,7 @@ class AlertRule extends BaseModel
     }
 
     // ---- Define Relationships ----
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
      */
@@ -96,7 +114,6 @@ class AlertRule extends BaseModel
     {
         return $this->belongsToMany(Device::class, 'alert_device_map', 'rule_id', 'device_id');
     }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
      */
@@ -111,5 +128,25 @@ class AlertRule extends BaseModel
     public function locations(): BelongsToMany
     {
         return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransport, $this>
+     */
+    public function transportSingles(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTransport::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
+            ->withPivot('target_type')
+            ->wherePivot('target_type', 'single');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransportGroup, $this>
+     */
+    public function transportGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTransportGroup::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
+            ->withPivot('target_type')
+            ->wherePivot('target_type', 'group');
     }
 }
