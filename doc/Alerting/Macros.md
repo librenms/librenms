@@ -7,7 +7,7 @@ Macros can be defined through the `lnms` command. Using the `config.php` is disc
 Example for adding a a macro that returns the delta of a sensor:
 
 ```bash
-lnms config:set alert.macros.rule.sensor_delta_current 'ABS(%sensors.sensor_current - %sensors.sensor_prev)'
+lnms config:set alert.macros.rule.sensor_delta 'ABS(%sensors.sensor_current - %sensors.sensor_prev)'
 ```
 
 Example for adding macro through `config.php` that is a boolean test:
@@ -24,7 +24,7 @@ These rules can then be used in the alerting rules. Example:
 
 ## Writing Macros
 
-The naming of the macro determines the type of the macro. If the macro name ends with `_perc` it interpreted as integer allowing for a comparison of the value. Any other name is a boolean test that will appear as `yes` or `no` selection in the rule.
+The naming of the macro determines the type of the macro. If the macro name ends with `_perc` or '_delta' it interpreted as integer allowing for a comparison of the value. Any other name is a boolean test that will appear as `yes` or `no` selection in the rule.
 
 The macro can contain placeholders that are replaced with the actual values when the rule is evaluated. The placeholders are prefixed with `%` that represents the actual value of the sensor, port, device, etc. For example `%sensors.sensor_current` will be replaced with the actual value of the sensor. While the prefix `%` is optional, it is recommended to use it to avoid ambiguity.
 
@@ -336,7 +336,7 @@ Below are some examples of custom macros that can be be added.
 
 #### Sensor Delta Current (Decimal)
 
-Entity: `macros.sensor_delta_current`
+Entity: `macros.sensor_delta`
 
 Description: Returns the delta of a sensor.
 
