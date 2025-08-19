@@ -387,7 +387,6 @@ main () {
                                "purgeusers"
                                "bill_data"
                                "alert_log"
-                               "networks_purge"
                                "rrd_purge"
                                "ports_fdb"
                                "ports_nac"

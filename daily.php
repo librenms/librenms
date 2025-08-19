@@ -9,7 +9,6 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\Ipv4Network;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Util\Debug;
@@ -380,19 +379,6 @@ if ($options['f'] === 'recalculate_device_dependencies') {
 
             $devices->each($recurse);
         });
-        $lock->release();
-    }
-}
-
-if ($options['f'] === 'networks_purge') {
-    $lock = Cache::lock('networks_purge', 86000);
-    if ($lock->get()) {
-        if (LibrenmsConfig::get('networks_purge')) {
-            $oldNetworks = Ipv4Network::withCount('ipv4')->having('ipv4_count', 0)->pluck('ipv4_network_id');
-            if ($oldNetworks->count() > 0) {
-                Ipv4Network::whereIn('ipv4_network_id', $oldNetworks)->delete();
-            }
-        }
         $lock->release();
     }
 }

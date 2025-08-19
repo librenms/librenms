@@ -202,3 +202,8 @@ Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
     ->weeklyOn(0, '1:00')
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceCleanupNetworks::class, [])
+    ->weeklyOn(0, '2:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
