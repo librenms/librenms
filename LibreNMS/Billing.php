@@ -150,7 +150,7 @@ class Billing
         $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
         $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
         $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
+        $m_95th = $a_95th[$measurement_95th] ?? 0;
 
         return round($m_95th, 2);
     }
@@ -165,7 +165,7 @@ class Billing
         $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
         $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
         $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
+        $m_95th = $a_95th[$measurement_95th] ?? 0;
 
         return round($m_95th, 2);
     }

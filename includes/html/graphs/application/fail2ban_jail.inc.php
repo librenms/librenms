@@ -1,7 +1,7 @@
 <?php
 
 $unit_text = 'Banned IPs';
-$descr = 'Banbed';
+$descr = 'Banned';
 $ds = 'banned';
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id, $vars['jail']]);

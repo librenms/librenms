@@ -26,7 +26,6 @@ $output = [
     'name' => '',
     'title' => '',
     'title_rec' => '',
-    'type' => '',
     'rules' => $rules,
 ];
 
@@ -37,7 +36,6 @@ if ($template_edit) {
         'name' => $template['name'],
         'title' => $template['title'],
         'title_rec' => $template['title_rec'],
-        'type' => $template['type'],
     ];
 }
 

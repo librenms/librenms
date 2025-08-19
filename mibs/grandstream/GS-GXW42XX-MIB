@@ -1,0 +1,4876 @@
+GS-GXW42XX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, Integer32, NOTIFICATION-TYPE, enterprises
+            FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC;
+
+grandstream OBJECT IDENTIFIER
+    ::= { enterprises 42397 }
+
+productFamily OBJECT IDENTIFIER
+    ::= { grandstream 1 }
+
+gxw42xx OBJECT IDENTIFIER
+    ::= { productFamily 1 }
+
+gxw4216 OBJECT IDENTIFIER
+    ::= { gxw42xx 16 }
+
+gxw4224 OBJECT IDENTIFIER
+    ::= { gxw42xx 24 }
+
+gxw4232 OBJECT IDENTIFIER
+    ::= { gxw42xx 32 }
+
+gxw4248 OBJECT IDENTIFIER
+    ::= { gxw42xx 48 }
+
+gxw4296 OBJECT IDENTIFIER
+    ::= { gxw42xx 96 }
+
+partNo OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part No"
+    ::= { gxw42xx 1 }
+
+ports OBJECT IDENTIFIER 
+    ::= { gxw42xx 2 }
+
+firmware OBJECT IDENTIFIER 
+    ::= { gxw42xx 3 }
+
+network OBJECT IDENTIFIER 
+    ::= { gxw42xx 4 }
+
+gxw42xxNotifications OBJECT IDENTIFIER 
+    ::= { gxw42xx 5 }
+
+networkMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Network mode DHCP, Static or PPPoE"
+    ::= { network 1 }
+
+pppoeLink OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PPPoE link enabled/disabled"
+    ::= { network 2 }
+
+natTraversal1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 1"
+    ::= { network 3 }
+
+natTraversal2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 2"
+    ::= { network 4 }
+
+natTraversal3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 3"
+    ::= { network 5 }
+
+natTraversal4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 4"
+    ::= { network 6 }
+
+versionBoot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of boot loader."
+    ::= { firmware 1 }
+
+versionCore OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "firmware version of core."
+    ::= { firmware 2 }
+
+versionBase OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "firmware version of base."
+    ::= { firmware 3 }
+
+versionProg OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "firmware version of prog."
+    ::= { firmware 4 }
+
+hookStatus OBJECT IDENTIFIER
+    ::= { ports 1 }
+
+regStatus OBJECT IDENTIFIER
+    ::= { ports 2 }
+
+dnd OBJECT IDENTIFIER
+    ::= { ports 3 }
+
+forward OBJECT IDENTIFIER
+    ::= { ports 4 }
+
+busyForward OBJECT IDENTIFIER
+    ::= { ports 5 }
+
+delayedForward OBJECT IDENTIFIER
+    ::= { ports 6 }
+
+hookStatus1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 1 }
+
+hookStatus2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 2 }
+
+hookStatus3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 3 }
+
+hookStatus4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 4 }
+
+hookStatus5 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 5 }
+
+hookStatus6 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 6 }
+
+hookStatus7 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 7 }
+
+hookStatus8 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 8 }
+
+hookStatus9 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 9 }
+
+hookStatus10 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 10 }
+
+hookStatus11 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 11 }
+
+hookStatus12 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 12 }
+
+hookStatus13 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 13 }
+
+hookStatus14 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 14 }
+
+hookStatus15 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 15 }
+
+hookStatus16 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 16 }
+
+hookStatus17 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 17 }
+
+hookStatus18 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 18 }
+
+hookStatus19 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 19 }
+
+hookStatus20 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 20 }
+
+hookStatus21 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 21 }
+
+hookStatus22 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 22 }
+
+hookStatus23 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 23 }
+
+hookStatus24 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 24 }
+
+hookStatus25 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 25 }
+
+hookStatus26 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 26 }
+
+hookStatus27 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 27 }
+
+hookStatus28 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 28 }
+
+hookStatus29 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 29 }
+
+hookStatus30 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 30 }
+
+hookStatus31 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 31 }
+
+hookStatus32 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 32 }
+
+hookStatus33 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 33 }
+
+hookStatus34 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 34 }
+
+hookStatus35 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 35 }
+
+hookStatus36 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 36 }
+
+hookStatus37 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 37 }
+
+hookStatus38 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 38 }
+
+hookStatus39 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 39 }
+
+hookStatus40 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 40 }
+
+hookStatus41 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 41 }
+
+hookStatus42 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 42 }
+
+hookStatus43 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 43 }
+
+hookStatus44 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 44 }
+
+hookStatus45 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 45 }
+
+hookStatus46 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 46 }
+
+hookStatus47 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 47 }
+
+hookStatus48 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 48 }
+
+hookStatus49 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 49 }
+
+hookStatus50 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 50 }
+
+hookStatus51 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 51 }
+
+hookStatus52 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 52 }
+
+hookStatus53 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 53 }
+
+hookStatus54 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 54 }
+
+hookStatus55 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 55 }
+
+hookStatus56 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 56 }
+
+hookStatus57 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 57 }
+
+hookStatus58 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 58 }
+
+hookStatus59 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 59 }
+
+hookStatus60 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 60 }
+
+hookStatus61 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 61 }
+
+hookStatus62 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 62 }
+
+hookStatus63 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 63 }
+
+hookStatus64 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 64 }
+
+hookStatus65 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 65 }
+
+hookStatus66 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 66 }
+
+hookStatus67 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 67 }
+
+hookStatus68 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 68 }
+
+hookStatus69 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 69 }
+
+hookStatus70 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 70 }
+
+hookStatus71 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 71 }
+
+hookStatus72 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 72 }
+
+hookStatus73 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 73 }
+
+hookStatus74 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 74 }
+
+hookStatus75 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 75 }
+
+hookStatus76 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 76 }
+
+hookStatus77 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 77 }
+
+hookStatus78 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 78 }
+
+hookStatus79 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 79 }
+
+hookStatus80 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 80 }
+
+hookStatus81 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 81 }
+
+hookStatus82 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 82 }
+
+hookStatus83 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 83 }
+
+hookStatus84 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 84 }
+
+hookStatus85 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 85 }
+
+hookStatus86 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 86 }
+
+hookStatus87 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 87 }
+
+hookStatus88 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 88 }
+
+hookStatus89 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 89 }
+
+hookStatus90 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 90 }
+
+hookStatus91 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 91 }
+
+hookStatus92 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 92 }
+
+hookStatus93 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 93 }
+
+hookStatus94 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 94 }
+
+hookStatus95 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 95 }
+
+hookStatus96 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 96 }
+
+regStatus1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 1 }
+
+regStatus2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 2 }
+
+regStatus3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 3 }
+
+regStatus4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 4 }
+
+regStatus5 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 5 }
+
+regStatus6 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 6 }
+
+regStatus7 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 7 }
+
+regStatus8 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 8 }
+
+regStatus9 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 9 }
+
+regStatus10 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 10 }
+
+regStatus11 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 11 }
+
+regStatus12 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 12 }
+
+regStatus13 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 13 }
+
+regStatus14 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 14 }
+
+regStatus15 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 15 }
+
+regStatus16 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 16 }
+
+regStatus17 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 17 }
+
+regStatus18 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 18 }
+
+regStatus19 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 19 }
+
+regStatus20 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 20 }
+
+regStatus21 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 21 }
+
+regStatus22 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 22 }
+
+regStatus23 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 23 }
+
+regStatus24 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 24 }
+
+regStatus25 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 25 }
+
+regStatus26 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 26 }
+
+regStatus27 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 27 }
+
+regStatus28 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 28 }
+
+regStatus29 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 29 }
+
+regStatus30 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 30 }
+
+regStatus31 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 31 }
+
+regStatus32 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 32 }
+
+regStatus33 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 33 }
+
+regStatus34 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 34 }
+
+regStatus35 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 35 }
+
+regStatus36 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 36 }
+
+regStatus37 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 37 }
+
+regStatus38 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 38 }
+
+regStatus39 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 39 }
+
+regStatus40 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 40 }
+
+regStatus41 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 41 }
+
+regStatus42 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 42 }
+
+regStatus43 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 43 }
+
+regStatus44 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 44 }
+
+regStatus45 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 45 }
+
+regStatus46 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 46 }
+
+regStatus47 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 47 }
+
+regStatus48 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 48 }
+
+regStatus49 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 49 }
+
+regStatus50 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 50 }
+
+regStatus51 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 51 }
+
+regStatus52 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 52 }
+
+regStatus53 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 53 }
+
+regStatus54 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 54 }
+
+regStatus55 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 55 }
+
+regStatus56 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 56 }
+
+regStatus57 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 57 }
+
+regStatus58 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 58 }
+
+regStatus59 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 59 }
+
+regStatus60 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 60 }
+
+regStatus61 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 61 }
+
+regStatus62 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 62 }
+
+regStatus63 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 63 }
+
+regStatus64 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 64 }
+
+regStatus65 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 65 }
+
+regStatus66 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 66 }
+
+regStatus67 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 67 }
+
+regStatus68 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 68 }
+
+regStatus69 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 69 }
+
+regStatus70 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 70 }
+
+regStatus71 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 71 }
+
+regStatus72 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 72 }
+
+regStatus73 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 73 }
+
+regStatus74 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 74 }
+
+regStatus75 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 75 }
+
+regStatus76 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 76 }
+
+regStatus77 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 77 }
+
+regStatus78 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 78 }
+
+regStatus79 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 79 }
+
+regStatus80 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 80 }
+
+regStatus81 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 81 }
+
+regStatus82 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 82 }
+
+regStatus83 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 83 }
+
+regStatus84 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 84 }
+
+regStatus85 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 85 }
+
+regStatus86 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 86 }
+
+regStatus87 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 87 }
+
+regStatus88 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 88 }
+
+regStatus89 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 89 }
+
+regStatus90 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 90 }
+
+regStatus91 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 91 }
+
+regStatus92 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 92 }
+
+regStatus93 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 93 }
+
+regStatus94 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 94 }
+
+regStatus95 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 95 }
+
+regStatus96 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 96 }
+
+dnd1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 1 }
+
+dnd2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 2 }
+
+dnd3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 3 }
+
+dnd4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 4 }
+
+dnd5 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 5 }
+
+dnd6 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 6 }
+
+dnd7 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 7 }
+
+dnd8 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 8 }
+
+dnd9 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 9 }
+
+dnd10 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 10 }
+
+dnd11 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 11 }
+
+dnd12 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 12 }
+
+dnd13 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 13 }
+
+dnd14 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 14 }
+
+dnd15 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 15 }
+
+dnd16 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 16 }
+
+dnd17 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 17 }
+
+dnd18 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 18 }
+
+dnd19 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 19 }
+
+dnd20 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 20 }
+
+dnd21 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 21 }
+
+dnd22 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 22 }
+
+dnd23 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 23 }
+
+dnd24 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 24 }
+
+dnd25 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 25 }
+
+dnd26 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 26 }
+
+dnd27 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 27 }
+
+dnd28 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 28 }
+
+dnd29 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 29 }
+
+dnd30 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 30 }
+
+dnd31 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 31 }
+
+dnd32 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 32 }
+
+dnd33 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 33 }
+
+dnd34 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 34 }
+
+dnd35 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 35 }
+
+dnd36 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 36 }
+
+dnd37 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 37 }
+
+dnd38 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 38 }
+
+dnd39 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 39 }
+
+dnd40 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 40 }
+
+dnd41 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 41 }
+
+dnd42 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 42 }
+
+dnd43 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 43 }
+
+dnd44 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 44 }
+
+dnd45 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 45 }
+
+dnd46 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 46 }
+
+dnd47 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 47 }
+
+dnd48 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 48 }
+
+dnd49 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 49 }
+
+dnd50 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 50 }
+
+dnd51 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 51 }
+
+dnd52 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 52 }
+
+dnd53 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 53 }
+
+dnd54 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 54 }
+
+dnd55 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 55 }
+
+dnd56 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 56 }
+
+dnd57 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 57 }
+
+dnd58 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 58 }
+
+dnd59 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 59 }
+
+dnd60 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 60 }
+
+dnd61 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 61 }
+
+dnd62 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 62 }
+
+dnd63 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 63 }
+
+dnd64 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 64 }
+
+dnd65 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 65 }
+
+dnd66 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 66 }
+
+dnd67 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 67 }
+
+dnd68 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 68 }
+
+dnd69 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 69 }
+
+dnd70 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 70 }
+
+dnd71 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 71 }
+
+dnd72 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 72 }
+
+dnd73 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 73 }
+
+dnd74 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 74 }
+
+dnd75 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 75 }
+
+dnd76 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 76 }
+
+dnd77 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 77 }
+
+dnd78 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 78 }
+
+dnd79 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 79 }
+
+dnd80 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 80 }
+
+dnd81 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 81 }
+
+dnd82 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 82 }
+
+dnd83 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 83 }
+
+dnd84 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 84 }
+
+dnd85 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 85 }
+
+dnd86 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 86 }
+
+dnd87 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 87 }
+
+dnd88 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 88 }
+
+dnd89 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 89 }
+
+dnd90 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 90 }
+
+dnd91 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 91 }
+
+dnd92 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 92 }
+
+dnd93 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 93 }
+
+dnd94 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 94 }
+
+dnd95 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 95 }
+
+dnd96 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 96 }
+
+forward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 1 }
+
+forward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 2 }
+
+forward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 3 }
+
+forward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 4 }
+
+forward5 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 5 }
+
+forward6 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 6 }
+
+forward7 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 7 }
+
+forward8 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 8 }
+
+forward9 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 9 }
+
+forward10 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 10 }
+
+forward11 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 11 }
+
+forward12 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 12 }
+
+forward13 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 13 }
+
+forward14 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 14 }
+
+forward15 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 15 }
+
+forward16 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 16 }
+
+forward17 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 17 }
+
+forward18 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 18 }
+
+forward19 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 19 }
+
+forward20 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 20 }
+
+forward21 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 21 }
+
+forward22 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 22 }
+
+forward23 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 23 }
+
+forward24 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 24 }
+
+forward25 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 25 }
+
+forward26 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 26 }
+
+forward27 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 27 }
+
+forward28 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 28 }
+
+forward29 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 29 }
+
+forward30 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 30 }
+
+forward31 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 31 }
+
+forward32 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 32 }
+
+forward33 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 33 }
+
+forward34 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 34 }
+
+forward35 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 35 }
+
+forward36 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 36 }
+
+forward37 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 37 }
+
+forward38 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 38 }
+
+forward39 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 39 }
+
+forward40 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 40 }
+
+forward41 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 41 }
+
+forward42 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 42 }
+
+forward43 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 43 }
+
+forward44 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 44 }
+
+forward45 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 45 }
+
+forward46 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 46 }
+
+forward47 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 47 }
+
+forward48 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 48 }
+
+forward49 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 49 }
+
+forward50 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 50 }
+
+forward51 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 51 }
+
+forward52 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 52 }
+
+forward53 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 53 }
+
+forward54 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 54 }
+
+forward55 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 55 }
+
+forward56 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 56 }
+
+forward57 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 57 }
+
+forward58 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 58 }
+
+forward59 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 59 }
+
+forward60 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 60 }
+
+forward61 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 61 }
+
+forward62 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 62 }
+
+forward63 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 63 }
+
+forward64 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 64 }
+
+forward65 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 65 }
+
+forward66 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 66 }
+
+forward67 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 67 }
+
+forward68 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 68 }
+
+forward69 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 69 }
+
+forward70 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 70 }
+
+forward71 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 71 }
+
+forward72 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 72 }
+
+forward73 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 73 }
+
+forward74 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 74 }
+
+forward75 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 75 }
+
+forward76 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 76 }
+
+forward77 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 77 }
+
+forward78 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 78 }
+
+forward79 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 79 }
+
+forward80 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 80 }
+
+forward81 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 81 }
+
+forward82 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 82 }
+
+forward83 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 83 }
+
+forward84 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 84 }
+
+forward85 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 85 }
+
+forward86 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 86 }
+
+forward87 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 87 }
+
+forward88 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 88 }
+
+forward89 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 89 }
+
+forward90 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 90 }
+
+forward91 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 91 }
+
+forward92 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 92 }
+
+forward93 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 93 }
+
+forward94 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 94 }
+
+forward95 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 95 }
+
+forward96 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 96 }
+
+busyForward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 1 }
+
+busyForward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 2 }
+
+busyForward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 3 }
+
+busyForward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 4 }
+
+busyForward5 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 5 }
+
+busyForward6 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 6 }
+
+busyForward7 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 7 }
+
+busyForward8 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 8 }
+
+busyForward9 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 9 }
+
+busyForward10 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 10 }
+
+busyForward11 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 11 }
+
+busyForward12 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 12 }
+
+busyForward13 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 13 }
+
+busyForward14 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 14 }
+
+busyForward15 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 15 }
+
+busyForward16 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 16 }
+
+busyForward17 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 17 }
+
+busyForward18 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 18 }
+
+busyForward19 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 19 }
+
+busyForward20 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 20 }
+
+busyForward21 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 21 }
+
+busyForward22 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 22 }
+
+busyForward23 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 23 }
+
+busyForward24 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 24 }
+
+busyForward25 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 25 }
+
+busyForward26 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 26 }
+
+busyForward27 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 27 }
+
+busyForward28 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 28 }
+
+busyForward29 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 29 }
+
+busyForward30 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 30 }
+
+busyForward31 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 31 }
+
+busyForward32 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 32 }
+
+busyForward33 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 33 }
+
+busyForward34 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 34 }
+
+busyForward35 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 35 }
+
+busyForward36 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 36 }
+
+busyForward37 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 37 }
+
+busyForward38 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 38 }
+
+busyForward39 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 39 }
+
+busyForward40 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 40 }
+
+busyForward41 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 41 }
+
+busyForward42 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 42 }
+
+busyForward43 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 43 }
+
+busyForward44 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 44 }
+
+busyForward45 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 45 }
+
+busyForward46 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 46 }
+
+busyForward47 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 47 }
+
+busyForward48 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 48 }
+
+busyForward49 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 49 }
+
+busyForward50 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 50 }
+
+busyForward51 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 51 }
+
+busyForward52 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 52 }
+
+busyForward53 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 53 }
+
+busyForward54 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 54 }
+
+busyForward55 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 55 }
+
+busyForward56 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 56 }
+
+busyForward57 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 57 }
+
+busyForward58 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 58 }
+
+busyForward59 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 59 }
+
+busyForward60 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 60 }
+
+busyForward61 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 61 }
+
+busyForward62 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 62 }
+
+busyForward63 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 63 }
+
+busyForward64 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 64 }
+
+busyForward65 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 65 }
+
+busyForward66 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 66 }
+
+busyForward67 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 67 }
+
+busyForward68 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 68 }
+
+busyForward69 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 69 }
+
+busyForward70 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 70 }
+
+busyForward71 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 71 }
+
+busyForward72 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 72 }
+
+busyForward73 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 73 }
+
+busyForward74 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 74 }
+
+busyForward75 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 75 }
+
+busyForward76 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 76 }
+
+busyForward77 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 77 }
+
+busyForward78 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 78 }
+
+busyForward79 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 79 }
+
+busyForward80 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 80 }
+
+busyForward81 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 81 }
+
+busyForward82 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 82 }
+
+busyForward83 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 83 }
+
+busyForward84 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 84 }
+
+busyForward85 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 85 }
+
+busyForward86 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 86 }
+
+busyForward87 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 87 }
+
+busyForward88 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 88 }
+
+busyForward89 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 89 }
+
+busyForward90 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 90 }
+
+busyForward91 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 91 }
+
+busyForward92 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 92 }
+
+busyForward93 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 93 }
+
+busyForward94 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 94 }
+
+busyForward95 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 95 }
+
+busyForward96 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 96 }
+
+delayedForward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 1 }
+
+delayedForward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 2 }
+
+delayedForward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 3 }
+
+delayedForward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 4 }
+
+delayedForward5 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 5 }
+
+delayedForward6 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 6 }
+
+delayedForward7 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 7 }
+
+delayedForward8 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 8 }
+
+delayedForward9 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 9 }
+
+delayedForward10 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 10 }
+
+delayedForward11 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 11 }
+
+delayedForward12 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 12 }
+
+delayedForward13 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 13 }
+
+delayedForward14 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 14 }
+
+delayedForward15 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 15 }
+
+delayedForward16 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 16 }
+
+delayedForward17 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 17 }
+
+delayedForward18 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 18 }
+
+delayedForward19 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 19 }
+
+delayedForward20 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 20 }
+
+delayedForward21 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 21 }
+
+delayedForward22 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 22 }
+
+delayedForward23 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 23 }
+
+delayedForward24 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 24 }
+
+delayedForward25 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 25 }
+
+delayedForward26 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 26 }
+
+delayedForward27 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 27 }
+
+delayedForward28 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 28 }
+
+delayedForward29 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 29 }
+
+delayedForward30 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 30 }
+
+delayedForward31 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 31 }
+
+delayedForward32 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 32 }
+
+delayedForward33 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 33 }
+
+delayedForward34 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 34 }
+
+delayedForward35 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 35 }
+
+delayedForward36 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 36 }
+
+delayedForward37 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 37 }
+
+delayedForward38 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 38 }
+
+delayedForward39 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 39 }
+
+delayedForward40 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 40 }
+
+delayedForward41 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 41 }
+
+delayedForward42 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 42 }
+
+delayedForward43 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 43 }
+
+delayedForward44 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 44 }
+
+delayedForward45 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 45 }
+
+delayedForward46 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 46 }
+
+delayedForward47 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 47 }
+
+delayedForward48 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 48 }
+
+delayedForward49 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 49 }
+
+delayedForward50 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 50 }
+
+delayedForward51 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 51 }
+
+delayedForward52 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 52 }
+
+delayedForward53 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 53 }
+
+delayedForward54 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 54 }
+
+delayedForward55 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 55 }
+
+delayedForward56 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 56 }
+
+delayedForward57 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 57 }
+
+delayedForward58 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 58 }
+
+delayedForward59 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 59 }
+
+delayedForward60 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 60 }
+
+delayedForward61 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 61 }
+
+delayedForward62 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 62 }
+
+delayedForward63 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 63 }
+
+delayedForward64 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 64 }
+
+delayedForward65 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 65 }
+
+delayedForward66 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 66 }
+
+delayedForward67 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 67 }
+
+delayedForward68 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 68 }
+
+delayedForward69 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 69 }
+
+delayedForward70 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 70 }
+
+delayedForward71 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 71 }
+
+delayedForward72 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 72 }
+
+delayedForward73 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 73 }
+
+delayedForward74 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 74 }
+
+delayedForward75 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 75 }
+
+delayedForward76 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 76 }
+
+delayedForward77 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 77 }
+
+delayedForward78 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 78 }
+
+delayedForward79 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 79 }
+
+delayedForward80 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 80 }
+
+delayedForward81 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 81 }
+
+delayedForward82 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 82 }
+
+delayedForward83 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 83 }
+
+delayedForward84 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 84 }
+
+delayedForward85 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 85 }
+
+delayedForward86 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 86 }
+
+delayedForward87 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 87 }
+
+delayedForward88 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 88 }
+
+delayedForward89 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 89 }
+
+delayedForward90 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 90 }
+
+delayedForward91 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 91 }
+
+delayedForward92 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 92 }
+
+delayedForward93 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 93 }
+
+delayedForward94 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 94 }
+
+delayedForward95 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 95 }
+
+delayedForward96 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 96 }
+
+    timedTrap NOTIFICATION-TYPE
+    OBJECTS     { 
+                    partNo, networkMode, pppoeLink, natTraversal1, natTraversal2,
+                    natTraversal3, natTraversal4, versionBoot, versionCore, versionBase,
+                    versionProg,
+                    hookStatus1,hookStatus2,hookStatus3,hookStatus4,hookStatus5,
+                    hookStatus6,hookStatus7,hookStatus8,hookStatus9,hookStatus10,
+                    hookStatus11,hookStatus12,hookStatus13,hookStatus14,hookStatus15,
+                    hookStatus16,hookStatus17,hookStatus18,hookStatus19,hookStatus20,
+                    hookStatus21,hookStatus22,hookStatus23,hookStatus24,hookStatus25,
+                    hookStatus26,hookStatus27,hookStatus28,hookStatus29,hookStatus30,
+                    hookStatus31,hookStatus32,hookStatus33,hookStatus34,hookStatus35,
+                    hookStatus36,hookStatus37,hookStatus38,hookStatus39,hookStatus40,
+                    hookStatus41,hookStatus42,hookStatus43,hookStatus44,hookStatus45,
+                    hookStatus46,hookStatus47,hookStatus48,hookStatus49,hookStatus50,
+                    hookStatus51,hookStatus52,hookStatus53,hookStatus54,hookStatus55,
+                    hookStatus56,hookStatus57,hookStatus58,hookStatus59,hookStatus60,
+                    hookStatus61,hookStatus62,hookStatus63,hookStatus64,hookStatus65,
+                    hookStatus66,hookStatus67,hookStatus68,hookStatus69,hookStatus70,
+                    hookStatus71,hookStatus72,hookStatus73,hookStatus74,hookStatus75,
+                    hookStatus76,hookStatus77,hookStatus78,hookStatus79,hookStatus80,
+                    hookStatus81,hookStatus82,hookStatus83,hookStatus84,hookStatus85,
+                    hookStatus86,hookStatus87,hookStatus88,hookStatus89,hookStatus90,
+                    hookStatus91,hookStatus92,hookStatus93,hookStatus94,hookStatus95,
+                    hookStatus96,
+                    regStatus1,regStatus2,regStatus3,regStatus4,regStatus5,
+                    regStatus6,regStatus7,regStatus8,regStatus9,regStatus10,
+                    regStatus11,regStatus12,regStatus13,regStatus14,regStatus15,
+                    regStatus16,regStatus17,regStatus18,regStatus19,regStatus20,
+                    regStatus21,regStatus22,regStatus23,regStatus24,regStatus25,
+                    regStatus26,regStatus27,regStatus28,regStatus29,regStatus30,
+                    regStatus31,regStatus32,regStatus33,regStatus34,regStatus35,
+                    regStatus36,regStatus37,regStatus38,regStatus39,regStatus40,
+                    regStatus41,regStatus42,regStatus43,regStatus44,regStatus45,
+                    regStatus46,regStatus47,regStatus48,regStatus49,regStatus50,
+                    regStatus51,regStatus52,regStatus53,regStatus54,regStatus55,
+                    regStatus56,regStatus57,regStatus58,regStatus59,regStatus60,
+                    regStatus61,regStatus62,regStatus63,regStatus64,regStatus65,
+                    regStatus66,regStatus67,regStatus68,regStatus69,regStatus70,
+                    regStatus71,regStatus72,regStatus73,regStatus74,regStatus75,
+                    regStatus76,regStatus77,regStatus78,regStatus79,regStatus80,
+                    regStatus81,regStatus82,regStatus83,regStatus84,regStatus85,
+                    regStatus86,regStatus87,regStatus88,regStatus89,regStatus90,
+                    regStatus91,regStatus92,regStatus93,regStatus94,regStatus95,
+                    regStatus96,
+                    dnd1,dnd2,dnd3,dnd4,dnd5,dnd6,dnd7,dnd8,dnd9,dnd10,dnd11,
+                    dnd12,dnd13,dnd14,dnd15,dnd16,dnd17,dnd18,dnd19,dnd20,dnd21,dnd22,
+                    dnd23,dnd24,dnd25,dnd26,dnd27,dnd28,dnd29,dnd30,dnd31,dnd32,dnd33,
+                    dnd34,dnd35,dnd36,dnd37,dnd38,dnd39,dnd40,dnd41,dnd42,dnd43,dnd44,
+                    dnd45,dnd46,dnd47,dnd48,dnd49,dnd50,dnd51,dnd52,dnd53,dnd54,dnd55,
+                    dnd56,dnd57,dnd58,dnd59,dnd60,dnd61,dnd62,dnd63,dnd64,dnd65,dnd66,
+                    dnd67,dnd68,dnd69,dnd70,dnd71,dnd72,dnd73,dnd74,dnd75,dnd76,dnd77,
+                    dnd78,dnd79,dnd80,dnd81,dnd82,dnd83,dnd84,dnd85,dnd86,dnd87,dnd88,
+                    dnd89,dnd90,dnd91,dnd92,dnd93,dnd94,dnd95,dnd96,
+                    forward1,forward2,forward3,forward4,forward5,forward6,forward7,
+                    forward8,forward9,forward10,forward11,forward12,forward13,forward14,
+                    forward15,forward16,forward17,forward18,forward19,forward20,forward21,
+                    forward22,forward23,forward24,forward25,forward26,forward27,forward28,
+                    forward29,forward30,forward31,forward32,forward33,forward34,forward35,
+                    forward36,forward37,forward38,forward39,forward40,forward41,forward42,
+                    forward43,forward44,forward45,forward46,forward47,forward48,forward49,
+                    forward50,forward51,forward52,forward53,forward54,forward55,forward56,
+                    forward57,forward58,forward59,forward60,forward61,forward62,forward63,
+                    forward64,forward65,forward66,forward67,forward68,forward69,forward70,
+                    forward71,forward72,forward73,forward74,forward75,forward76,forward77,
+                    forward78,forward79,forward80,forward81,forward82,forward83,forward84,
+                    forward85,forward86,forward87,forward88,forward89,forward90,forward91,
+                    forward92,forward93,forward94,forward95,forward96,
+                    busyForward1,busyForward2,busyForward3,busyForward4,busyForward5,
+                    busyForward6,busyForward7,busyForward8,busyForward9,busyForward10,
+                    busyForward11,busyForward12,busyForward13,busyForward14,busyForward15,
+                    busyForward16,busyForward17,busyForward18,busyForward19,busyForward20,
+                    busyForward21,busyForward22,busyForward23,busyForward24,busyForward25,
+                    busyForward26,busyForward27,busyForward28,busyForward29,busyForward30,
+                    busyForward31,busyForward32,busyForward33,busyForward34,busyForward35,
+                    busyForward36,busyForward37,busyForward38,busyForward39,busyForward40,
+                    busyForward41,busyForward42,busyForward43,busyForward44,busyForward45,
+                    busyForward46,busyForward47,busyForward48,busyForward49,busyForward50,
+                    busyForward51,busyForward52,busyForward53,busyForward54,busyForward55,
+                    busyForward56,busyForward57,busyForward58,busyForward59,busyForward60,
+                    busyForward61,busyForward62,busyForward63,busyForward64,busyForward65,
+                    busyForward66,busyForward67,busyForward68,busyForward69,busyForward70,
+                    busyForward71,busyForward72,busyForward73,busyForward74,busyForward75,
+                    busyForward76,busyForward77,busyForward78,busyForward79,busyForward80,
+                    busyForward81,busyForward82,busyForward83,busyForward84,busyForward85,
+                    busyForward86,busyForward87,busyForward88,busyForward89,busyForward90,
+                    busyForward91,busyForward92,busyForward93,busyForward94,busyForward95,
+                    busyForward96,
+                    delayedForward1,delayedForward2,delayedForward3,delayedForward4,
+                    delayedForward5,delayedForward6,delayedForward7,delayedForward8,
+                    delayedForward9,delayedForward10,delayedForward11,delayedForward12,
+                    delayedForward13,delayedForward14,delayedForward15,delayedForward16,
+                    delayedForward17,delayedForward18,delayedForward19,delayedForward20,
+                    delayedForward21,delayedForward22,delayedForward23,delayedForward24,
+                    delayedForward25,delayedForward26,delayedForward27,delayedForward28,
+                    delayedForward29,delayedForward30,delayedForward31,delayedForward32,
+                    delayedForward33,delayedForward34,delayedForward35,delayedForward36,
+                    delayedForward37,delayedForward38,delayedForward39,delayedForward40,
+                    delayedForward41,delayedForward42,delayedForward43,delayedForward44,
+                    delayedForward45,delayedForward46,delayedForward47,delayedForward48,
+                    delayedForward49,delayedForward50,delayedForward51,delayedForward52,
+                    delayedForward53,delayedForward54,delayedForward55,delayedForward56,
+                    delayedForward57,delayedForward58,delayedForward59,delayedForward60,
+                    delayedForward61,delayedForward62,delayedForward63,delayedForward64,
+                    delayedForward65,delayedForward66,delayedForward67,delayedForward68,
+                    delayedForward69,delayedForward70,delayedForward71,delayedForward72,
+                    delayedForward73,delayedForward74,delayedForward75,delayedForward76,
+                    delayedForward77,delayedForward78,delayedForward79,delayedForward80,
+                    delayedForward81,delayedForward82,delayedForward83,delayedForward84,
+                    delayedForward85,delayedForward86,delayedForward87,delayedForward88,
+                    delayedForward89,delayedForward90,delayedForward91,delayedForward92,
+                    delayedForward93,delayedForward94,delayedForward95,delayedForward96
+                }
+    STATUS      current
+    DESCRIPTION
+    "The mib is reported with this trap."
+    ::= { gxw42xxNotifications 1 }
+END

@@ -643,8 +643,9 @@ $link_array = [
 ];
 
 $sep = '';
-$apps = LibreNMS\Util\ObjectCache::applications()->flatten();
-foreach ($apps as $app) {
+$apps = LibreNMS\Util\ObjectCache::applications();
+foreach ($apps as $app_group) {
+    $app = $app_group->first();
     $app_state = LibreNMS\Util\Html::appStateIcon($app->app_state);
     if (! empty($app_state['icon'])) {
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';

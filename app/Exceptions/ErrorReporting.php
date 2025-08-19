@@ -179,7 +179,7 @@ class ErrorReporting
             }
 
             if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
-                error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
+                //error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
             }
 
             // For notices and warnings, prevent conversion to exceptions
