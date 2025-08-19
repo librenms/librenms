@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\MaintenanceCleanupNetworks ;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
