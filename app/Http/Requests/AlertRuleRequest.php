@@ -50,11 +50,11 @@ class AlertRuleRequest extends FormRequest
             'name' => ['required', 'string', 'max:255', Rule::when($this->route()->getActionMethod() === 'store', Rule::unique((app()->environment('testing') ? 'testing.' : '') . 'alert_rules', 'name'))],
             'severity' => ['required', 'string', 'max:32'],
 
-            'override_query' => ['nullable', Rule::in(['on'])],
+            'override_query' => ['sometimes', 'boolean'],
             'builder_json' => ['required_unless:override_query,on', 'json'],
             'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
 
-            'count' => ['nullable', 'numeric'],
+            'count' => ['nullable', 'numeric', 'min:-1'],
             'delay' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
             'interval' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
 
@@ -86,7 +86,7 @@ class AlertRuleRequest extends FormRequest
         ]);
 
         // Convert checkbox values ('on' string) to boolean
-        $this->merge(collect(['mute', 'invert', 'recovery', 'acknowledgement', 'invert_map'])
+        $this->merge(collect(['mute', 'invert', 'recovery', 'acknowledgement', 'invert_map', 'override_query'])
             ->mapWithKeys(fn($field) => [$field => match ($this->input($field)) {
                 'on', '1', 1, true => true,
                 default => false

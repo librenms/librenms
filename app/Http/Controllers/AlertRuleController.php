@@ -13,22 +13,6 @@ use LibreNMS\Util\Time;
 class AlertRuleController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(AlertRuleRequest $request): JsonResponse
@@ -91,14 +75,6 @@ class AlertRuleController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(AlertRule $alertRule)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(AlertRuleRequest $request, AlertRule $alertRule): JsonResponse
@@ -132,8 +108,9 @@ class AlertRuleController extends Controller
     {
             $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
             $success = $alertRule->save();
+            url('graphs', ['id' => 42, 'type' => 'sensor_']);
 
-            return response($success ? 200 : 402)->json();
+            return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
     }
 
     /**
@@ -143,7 +120,7 @@ class AlertRuleController extends Controller
     {
         $success = $alertRule->delete();
 
-        return response($success ? 200 : 402)->json();
+        return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
     }
 
     /**
@@ -230,9 +207,10 @@ class AlertRuleController extends Controller
             'acknowledgement',
             'recovery',
         ]);
+        $extra['count'] ??= '-1';
         $extra['options'] = ['override_query' => $overrideQuery];
-        $extra['delay'] = Time::durationToSeconds($request->validated('delay', ''));
-        $extra['interval'] = Time::durationToSeconds($request->validated('interval', ''));
+        $extra['delay'] = Time::durationToSeconds($request->validated('delay') ?? '');
+        $extra['interval'] = Time::durationToSeconds($request->validated('interval') ?? '');
         $alertRule->extra = array_merge($alertRule->extra ?? [], $extra);
     }
 

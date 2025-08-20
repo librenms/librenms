@@ -239,7 +239,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             var url = '<?php echo route('alert-rule.store') ?>';
             var method = 'POST';
             var rule_id = $('#rule_id').val();
-            if  (rule_id >= 0) {
+            if  (rule_id) {
                 url = '<?php echo route('alert-rule.update', ':alert_id') ?>'.replace(':alert_id', rule_id);
                 method = 'PUT';
             }
@@ -261,8 +261,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                             toastr.error(data.message);
                         }
                     },
-                    error: function () {
-                        toastr.error('Failed to process rule');
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
                     }
                 });
             }

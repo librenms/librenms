@@ -56,7 +56,7 @@ $('#alert-rule-removal').on('click', function(event) {
     var alert_name = $("#alert_name").val();
     $.ajax({
         type: 'DELETE',
-        url: '<?php echo route('alert.rule.destroy', ':alert_id') ?>'.replace(':alert_id', alert_id),
+        url: '<?php echo route('alert-rule.destroy', ':alert_id') ?>'.replace(':alert_id', alert_id),
         success: function(msg) {
             if(msg.status === 200) {
                 $("#rule_id_"+alert_id).remove();

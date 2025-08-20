@@ -38,16 +38,10 @@ class AlertRule extends BaseModel
     protected static function booted(): void
     {
         static::deleting(function (AlertRule $rule): void {
-            // delete related hasMany first
             $rule->alerts()->delete();
-            if (method_exists($rule, 'logs')) {
-                $rule->logs()->delete();
-            }
-            if (method_exists($rule, 'templateMaps')) {
-                $rule->templateMaps()->delete();
-            }
+            $rule->logs()->delete();
+            $rule->templateMaps()->delete();
 
-            // detach pivot relations
             $rule->devices()->detach();
             $rule->groups()->detach();
             $rule->locations()->detach();
