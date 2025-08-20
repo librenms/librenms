@@ -130,6 +130,15 @@ class Ericsson6600 extends OS implements
         $data_rx = snmpwalk_cache_oid($this->getDeviceArray(), 'xfRfCurrentInputPower', [], 'XF-RADIOLINK-PTP-RADIO-MIB');
         $ifname = $this->getCacheTable('ifName', 'IF-MIB');
         foreach ($data_tx as $index => $entry) {
+
+            $status = SnmpQuery::get('proware-SNMP-MIB::siVendor.0');
+
+            // Skip if the TX is not enabled
+            if (isset($status[$index]['xfRLTStatus']) && $status[$index]['xfRLTStatus'] == 'down') {
+                continue; // Skip if the TX is not enabled
+            }
+
+            $ifname = $this->getCacheTable('xfRFTxAdminStatus', 'XF-RADIOLINK-PTP-RADIO-MIB');
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -137,6 +146,12 @@ class Ericsson6600 extends OS implements
                 'ericsson-6600',
                 $index . 'tx',
                 'Output power: ' . $ifname[$index]['ifName'],
+                null,
+                1,
+                1,
+                'sum',
+                null,
+                30
             );
         }
         foreach ($data_rx as $index => $entry) {
@@ -149,8 +164,13 @@ class Ericsson6600 extends OS implements
                 'Input power: ' . $ifname[$index]['ifName'],
                 null,
                 1,
-                10
-
+                10,
+                'sum',
+                null,
+                -20,
+                -85,
+                -25,
+                -65
             );
         }
 

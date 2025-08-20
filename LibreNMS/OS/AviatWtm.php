@@ -55,6 +55,8 @@ class AviatWtm extends OS implements
         $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
         $frequency = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRfFreqTx', [], 'AVIAT-RF-MIB:');
         foreach ($frequency as $index => $data) {
+
+            
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),

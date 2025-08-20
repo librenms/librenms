@@ -22,10 +22,10 @@ discovery_modules:
     ucd-diskio: false
     arp-table: false
     fdb-table: false
-    vlans: false
+    vlans: true
     stp: false
     processors: false
-    mempools: false
+    mempools: true
     storage: false
     ipv4-addresses: false
     ipv6-addresses: false
