@@ -20334,6 +20334,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "90:1b:0e:fa:3a:7e (901b0efa3a7e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent 1/19",
+                    "ifDescr": "Alcatel-Lucent 1/19",
+                    "ifName": "1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "ar1-ade7j0co",
                     "remote_port": "ac:a3:1e:c3:af:ac (aca31ec3afac)",
                     "remote_platform": null,
@@ -20367,6 +20378,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "1038 (2cfaa22d0fdb)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent 1/24",
+                    "ifDescr": "Alcatel-Lucent 1/24",
+                    "ifName": "1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "ltahltkaun39",
                     "remote_port": "0 (ccdb932bf904)",
                     "remote_platform": null,
@@ -20385,6 +20407,17 @@
                     "ifAlias": "Alcatel-Lucent 1/24",
                     "ifDescr": "Alcatel-Lucent 1/24",
                     "ifName": "1/24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "4c:52:62:0a:25:da (4c52620a25da)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Alcatel-Lucent 1/25",
+                    "ifDescr": "Alcatel-Lucent 1/25",
+                    "ifName": "1/25"
                 },
                 {
                     "active": 1,
@@ -20572,6 +20605,42 @@
                     "context_name": "",
                     "ipv4_network": "172.31.64.0/22",
                     "ifIndex": 13600001
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1002,
+                    "low_ifIndex": 40000010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1026,
+                    "low_ifIndex": 40000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1049,
+                    "low_ifIndex": 40000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1050,
+                    "low_ifIndex": 40000001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2002,
+                    "low_ifIndex": 40000010,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2026,
+                    "low_ifIndex": 40000001,
+                    "ifStackStatus": "active"
                 }
             ]
         }
