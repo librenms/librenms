@@ -40,7 +40,7 @@ class AlertRuleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(AlertRule $alertRule, Request $request): JsonResponse
+    public function show(AlertRule $alertRule): JsonResponse
     {
         $alertRule->load([
             'devices:device_id,hostname,sysName',
@@ -50,16 +50,6 @@ class AlertRuleController extends Controller
             'transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
         ]);
 
-        // FIXME: is this used?
-        $templateId = $request->get('template_id');
-        $builder = $alertRule->builder;
-        if ($templateId) {
-            $collection = json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
-            if (isset($collection[$templateId])) {
-                $builder = $collection[$templateId];
-            }
-        }
-
         return response()->json([
             'extra' => $alertRule->extra,
             'maps' => $this->formatDeviceMaps($alertRule),
@@ -67,7 +57,7 @@ class AlertRuleController extends Controller
             'name' => $alertRule->name,
             'proc' => $alertRule->proc,
             'notes' => $alertRule->notes,
-            'builder' => $builder,
+            'builder' => $alertRule->builder,
             'severity' => $alertRule->severity,
             'adv_query' => $alertRule->query,
             'invert_map' => $alertRule->invert_map,

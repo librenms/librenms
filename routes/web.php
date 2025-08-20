@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertRuleController;
+use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -173,6 +174,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
+        Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
+        Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');

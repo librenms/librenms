@@ -48,7 +48,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
-                        <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
