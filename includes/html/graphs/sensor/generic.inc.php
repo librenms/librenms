@@ -5,7 +5,7 @@ use LibreNMS\Util\Number;
 
 if (empty($sensor)) {
   throw new RrdGraphException('Invalid sensor')
-};
+}
 
 $sensor_descr_fixed = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 $sensor_color = session('applied_site_style') == 'dark' ? '#f2f2f2' : '#272b30';
