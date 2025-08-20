@@ -35,6 +35,27 @@ class AlertRule extends BaseModel
 {
     public $timestamps = false;
 
+    protected static function booted(): void
+    {
+        static::deleting(function (AlertRule $rule): void {
+            // delete related hasMany first
+            $rule->alerts()->delete();
+            if (method_exists($rule, 'logs')) {
+                $rule->logs()->delete();
+            }
+            if (method_exists($rule, 'templateMaps')) {
+                $rule->templateMaps()->delete();
+            }
+
+            // detach pivot relations
+            $rule->devices()->detach();
+            $rule->groups()->detach();
+            $rule->locations()->detach();
+            $rule->transportSingles()->detach();
+            $rule->transportGroups()->detach();
+        });
+    }
+
     protected $fillable = [
         'severity',
         'extra',
@@ -105,6 +126,22 @@ class AlertRule extends BaseModel
     public function alerts(): HasMany
     {
         return $this->hasMany(Alert::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTemplateMap, $this>
+     */
+    public function templateMaps(): HasMany
+    {
+        return $this->hasMany(AlertTemplateMap::class, 'alert_rule_id');
     }
 
     /**

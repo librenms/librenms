@@ -48,7 +48,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
-                        <input type="hidden" name="type" id="type" value="alert-rules">
                         <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div class="tab-content">
@@ -236,12 +235,21 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
+
+            var url = '<?php echo route('alert-rule.store') ?>';
+            var method = 'POST';
+            var rule_id = $('#rule_id').val();
+            if  (rule_id >= 0) {
+                url = '<?php echo route('alert-rule.update', ':alert_id') ?>'.replace(':alert_id', rule_id);
+                method = 'PUT';
+            }
             var result_json = $('#builder').queryBuilder('getRules');
+
             if (result_json !== null && result_json.valid) {
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
-                    type: "POST",
-                    url: "ajax_form.php",
+                    type: method,
+                    url: url,
                     data: $('form.alerts-form').serializeArray(),
                     dataType: "json",
                     success: function (data) {

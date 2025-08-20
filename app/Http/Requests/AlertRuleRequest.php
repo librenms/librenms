@@ -1,4 +1,27 @@
 <?php
+/**
+ * AlertRuleRequest.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2025 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
 
 namespace App\Http\Requests;
 
@@ -24,14 +47,12 @@ class AlertRuleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rule_id' => ['nullable', 'integer', 'min:1', 'exists:alert_rules,id'],
-
             'name' => ['required', 'string', 'max:255', Rule::when($this->route()->getActionMethod() === 'store', Rule::unique((app()->environment('testing') ? 'testing.' : '') . 'alert_rules', 'name'))],
             'severity' => ['required', 'string', 'max:32'],
 
             'override_query' => ['nullable', Rule::in(['on'])],
-            'builder_json' => ['required_unless:override_query,on', 'string'],
-            'adv_query' => ['required_if:override_query,on', 'string'],
+            'builder_json' => ['required_unless:override_query,on', 'json'],
+            'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
 
             'count' => ['nullable', 'numeric'],
             'delay' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
@@ -63,6 +84,13 @@ class AlertRuleRequest extends FormRequest
             'name' => isset($this->name) ? strip_tags((string) $this->name) : $this->name,
             'notes' => isset($this->notes) ? strip_tags((string) $this->notes) : $this->notes,
         ]);
+
+        // Convert checkbox values ('on' string) to boolean
+        $this->merge(collect(['mute', 'invert', 'recovery', 'acknowledgement', 'invert_map'])
+            ->mapWithKeys(fn($field) => [$field => match ($this->input($field)) {
+                'on', '1', 1, true => true,
+                default => false
+            }])->toArray());
 
         // Ensure maps/transports are arrays if present as empty string
         foreach (['maps', 'transports'] as $key) {

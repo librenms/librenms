@@ -128,12 +128,22 @@ class AlertRuleController extends Controller
         }
     }
 
+    public function toggle(Request $request, AlertRule $alertRule): JsonResponse
+    {
+            $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
+            $success = $alertRule->save();
+
+            return response($success ? 200 : 402)->json();
+    }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AlertRule $alertRule)
+    public function destroy(AlertRule $alertRule): JsonResponse
     {
-        //
+        $success = $alertRule->delete();
+
+        return response($success ? 200 : 402)->json();
     }
 
     /**
@@ -190,52 +200,40 @@ class AlertRuleController extends Controller
 
     private function fillAlertRule(AlertRule $alertRule, AlertRuleRequest $request): void
     {
-        $data = $request->validated();
-
-        $builderJson = $data['builder_json'] ?? '';
-        $overrideQuery = $data['override_query'] ?? null;
-        $advQuery = $data['adv_query'] ?? '';
+        $alertRule->fill($request->safe([
+            'severity',
+            'name',
+            'proc',
+            'notes',
+            'invert_map',
+        ]));
+        $alertRule->disabled ??= false;
+        $alertRule->builder = json_decode($request->validated('builder_json', '[]'), true);
+        $overrideQuery = $request->validated('override_query');
 
         // build SQL query
-        try {
-            $query = $overrideQuery === 'on'
-                ? $advQuery
-                : ($builderJson !== '' ? QueryBuilderParser::fromJson($builderJson)->toSql() : '');
-        } catch (\Throwable $e) {
-            throw new \Exception('Invalid rule builder JSON: ' . $e->getMessage());
+        if ($overrideQuery) {
+            $alertRule->query = $request->validated('adv_query');
+        } elseif($alertRule->builder) {
+            try {
+                $alertRule->query = QueryBuilderParser::fromJson($alertRule->builder)->toSql();
+            } catch (\Throwable $e) {
+                throw new \Exception('Invalid rule builder JSON: ' . $e->getMessage());
+            }
         }
 
-
-        if ($overrideQuery !== 'on' && $builderJson === '') {
-            throw new \Exception('No rule builder JSON provided');
-        }
-
-        $extra = [
-            'mute' => $request->boolean('mute'),
-            'count' => $data['count'] ?? '-1',
-            'delay' => Time::durationToSeconds($data['delay'] ?? ''),
-            'invert' => $request->boolean('invert'),
-            'interval' => Time::durationToSeconds($data['interval'] ?? ''),
-            'recovery' => $request->boolean('recovery'),
-            'acknowledgement' => $request->boolean('acknowledgement'),
-            'options' => [
-                'override_query' => $overrideQuery,
-            ],
-        ];
-
-
-        $name = $data['name'] ?? '';
-        $alertRule->fill([
-            'severity' => $data['severity'] ?? '',
-            'extra' => $extra,
-            'disabled' => false,
-            'name' => $name,
-            'proc' => $data['proc'] ?? '',
-            'notes' => $data['notes'] ?? '',
-            'query' => $query,
-            'builder' => $builderJson !== '' ? json_decode($builderJson, true) : [],
-            'invert_map' => $request->boolean('invert_map'),
+        // extra json
+        $extra = $request->safe([
+            'mute',
+            'count',
+            'invert',
+            'acknowledgement',
+            'recovery',
         ]);
+        $extra['options'] = ['override_query' => $overrideQuery];
+        $extra['delay'] = Time::durationToSeconds($request->validated('delay', ''));
+        $extra['interval'] = Time::durationToSeconds($request->validated('interval', ''));
+        $alertRule->extra = array_merge($alertRule->extra ?? [], $extra);
     }
 
     private function syncMaps(array $maps, AlertRule $alertRule): void

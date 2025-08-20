@@ -55,16 +55,13 @@ $('#alert-rule-removal').on('click', function(event) {
     var alert_id = $("#alert_id").val();
     var alert_name = $("#alert_name").val();
     $.ajax({
-        type: 'POST',
-        url: 'ajax_form.php',
-        data: { type: "delete-alert-rule", alert_id: alert_id },
-        dataType: "html",
+        type: 'DELETE',
+        url: '<?php echo route('alert.rule.destroy', ':alert_id') ?>'.replace(':alert_id', alert_id),
         success: function(msg) {
-            if(msg.indexOf("ERROR:") <= -1) {
+            if(msg.status === 200) {
                 $("#rule_id_"+alert_id).remove();
-                toastr.success(msg);
             } else {
-                toastr.error(msg);
+                toastr.error('ERROR: ajax post failed; unable to delete alert rule');
             }
             $("#confirm-delete").modal('hide');
         },

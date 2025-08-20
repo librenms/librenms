@@ -171,7 +171,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
-        Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);;
+        Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+        Route::put('alert-rule/{rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
