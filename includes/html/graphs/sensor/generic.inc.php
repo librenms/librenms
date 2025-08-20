@@ -3,16 +3,20 @@
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
 
+if (empty($sensor)) {
+  throw new RrdGraphException('Invalid sensor')
+};
+
 $sensor_descr_fixed = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 $sensor_color = session('applied_site_style') == 'dark' ? '#f2f2f2' : '#272b30';
 $background_color = session('applied_site_style') == 'dark' ? '#272b30' : '#ffffff';
 $variance_color = session('applied_site_style') == 'dark' ? '#3e444c' : '#c5c5c5';
-$unit_label = str_replace('%', '%%', $sensor?->unit() ?? '');
+$unit_label = str_replace('%', '%%', $sensor->unit());
 
 // Next line is a workaround while rrdtool --left-axis-format doesn't support %S
 // https://github.com/oetiker/rrdtool-1.x/issues/1271
 $rrd_options .= ' --left-axis-format "%5.1lf' . trim(substr(Number::formatSi($sensor->sensor_current, 0, 0, ''), -1) . $unit_label) . '"';
-$rrd_options .= ' --vertical-label "' . ($sensor?->classDescr() ?? '') . '"';
+$rrd_options .= ' --vertical-label "' . $sensor->classDescr() . '"';
 $rrd_options .= ' DEF:sensor=' . $rrd_filename . ':sensor:AVERAGE';
 $rrd_options .= ' DEF:sensor_max=' . $rrd_filename . ':sensor:MAX';
 $rrd_options .= ' DEF:sensor_min=' . $rrd_filename . ':sensor:MIN';
@@ -24,7 +28,7 @@ if ($unit_label == '°F') {
     $field = 'far';
 }
 
-if ($sensor?->hasThresholds() ?? false) {
+if ($sensor->hasThresholds()) {
     $rrd_options .= ' COMMENT:"Alert thresholds\:"';
     $rrd_options .= ($sensor->sensor_limit_low !== null) ? '  LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . $sensor->formatValue('sensor_limit_low') . '":dashes' : '';
     $rrd_options .= ($sensor->sensor_limit_low_warn !== null) ? ' LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . $sensor->formatValue('sensor_limit_low_warn') . '":dashes' : '';
@@ -35,7 +39,7 @@ if ($sensor?->hasThresholds() ?? false) {
 // Workaround because rrdtool has trouble detecting the
 // range if the sensor is constant and no thresholds are
 // defined, so it's forced to +-1% of the min/max.
-if ($sensor?->doesntHaveThresholds() ?? true) {
+if ($sensor->doesntHaveThresholds()) {
     $rrd_options .= ' CDEF:canvas_max=sensor_max,1.01,*';
     $rrd_options .= ' LINE1:canvas_max#00000000::dashes'; // Hidden for scale only
     $rrd_options .= ' CDEF:canvas_min=sensor_min,0.99,*';
