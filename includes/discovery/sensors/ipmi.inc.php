@@ -36,7 +36,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
             $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
             $results = array_values(array_filter($results, function ($line) {
-                return ! Str::contains($line, 'discrete');
+                return ! Str::contains($line, 'discrete') && trim($line) !== '';
             }));
 
             if (! empty($results)) {
@@ -87,3 +87,5 @@ $sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'current', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'load', poller_type: 'ipmi');
