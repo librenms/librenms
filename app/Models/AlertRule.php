@@ -145,6 +145,7 @@ class AlertRule extends BaseModel
     {
         return $this->belongsToMany(Device::class, 'alert_device_map', 'rule_id', 'device_id');
     }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
      */

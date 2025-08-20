@@ -96,11 +96,11 @@ class AlertRuleController extends Controller
 
     public function toggle(Request $request, AlertRule $alertRule): JsonResponse
     {
-            $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
-            $success = $alertRule->save();
-            url('graphs', ['id' => 42, 'type' => 'sensor_']);
+        $alertRule->disabled = ! $request->boolean('state', $alertRule->disabled);
+        $success = $alertRule->save();
+        url('graphs', ['id' => 42, 'type' => 'sensor_']);
 
-            return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
+        return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);
     }
 
     /**
@@ -144,8 +144,8 @@ class AlertRuleController extends Controller
         return $maps;
     }
 
-
-    private function formatTransports(AlertRule $alertRule): array {
+    private function formatTransports(AlertRule $alertRule): array
+    {
         $transports = [];
 
         foreach ($alertRule->transportSingles as $transport) {
@@ -181,7 +181,7 @@ class AlertRuleController extends Controller
         // build SQL query
         if ($overrideQuery) {
             $alertRule->query = $request->validated('adv_query');
-        } elseif($alertRule->builder) {
+        } elseif ($alertRule->builder) {
             try {
                 $alertRule->query = QueryBuilderParser::fromJson($alertRule->builder)->toSql();
             } catch (\Throwable $e) {
@@ -223,7 +223,7 @@ class AlertRuleController extends Controller
         $alertRule->locations()->sync($locationIds);
     }
 
-     private function syncTransports(array $transports, AlertRule $alertRule): void
+    private function syncTransports(array $transports, AlertRule $alertRule): void
     {
         $transportIds = [];
         $transportGroupIds = [];

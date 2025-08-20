@@ -114,7 +114,7 @@ class Time
         return (int) $carbon->diffInMinutes($date);
     }
 
-    public static function durationToSeconds( string $duration): int
+    public static function durationToSeconds(string $duration): int
     {
         if (preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
             $multipliers = [
