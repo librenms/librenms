@@ -38,6 +38,8 @@ use Throwable;
 
 class ErrorReporting
 {
+    private const MAX_PROD_ERRORS = 4;
+    private int $errorCount = 0;
     private ?bool $reportingEnabled = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
@@ -179,7 +181,12 @@ class ErrorReporting
             }
 
             if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
-                //error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
+                if ($this->errorCount++ < self::MAX_PROD_ERRORS) {
+                    // limit reported errors so php-fpm headers don't get too large
+                    $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
+
+                    error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
+                }
             }
 
             // For notices and warnings, prevent conversion to exceptions
