@@ -1,7 +1,9 @@
 <?php
 
 return [
+    'all_devices' => 'All Devices',
     'attributes' => [
+        'hostname' => 'Hostname',
         'features' => 'OS Features',
         'hardware' => 'Hardware',
         'icon' => 'Icon',
