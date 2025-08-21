@@ -165,6 +165,9 @@ return [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
+    'maintenance:cleanup-networks' => [
+        'delete' => 'Deleting :count unused networks',
+    ],
     'maintenance:fetch-ouis' => [
         'description' => 'Fetch MAC OUIs and cache them to display vendor names for MAC addresses',
         'options' => [
