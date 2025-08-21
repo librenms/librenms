@@ -15,6 +15,9 @@ if (is_array($ipmi_rows)) {
         $ipmi['user'] = DeviceCache::getPrimary()->getAttrib('ipmi_username');
         $ipmi['password'] = DeviceCache::getPrimary()->getAttrib('ipmi_password');
         $ipmi['kg_key'] = DeviceCache::getPrimary()->getAttrib('ipmi_kg_key');
+        $ipmi['ciphersuite'] = DeviceCache::getPrimary()->getAttrib('ipmi_ciphersuite');
+        $ipmi_timeout = DeviceCache::getPrimary()->getAttrib('ipmi_timeout');
+        $ipmi['timeout'] = filter_var($ipmi_timeout, FILTER_VALIDATE_INT) ? $ipmi_timeout : '3';
         $ipmi['type'] = DeviceCache::getPrimary()->getAttrib('ipmi_type');
 
         echo 'Fetching IPMI sensor data...';
@@ -26,13 +29,19 @@ if (is_array($ipmi_rows)) {
             } else {
                 array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port'], '-y', $ipmi['kg_key']);
             }
+            if (! empty($ipmi['ciphersuite'])) {
+                array_push($cmd, '-C', $ipmi['ciphersuite']);
+            }
+            if (! empty($ipmi['timeout'])) {
+                array_push($cmd, '-N', $ipmi['timeout']);
+            }
         }
 
         // Check to see if we know which IPMI interface to use
         // so we dont use wrong arguments for ipmitool
         if ($ipmi['type'] != '') {
             array_push($cmd, '-I', $ipmi['type'], '-c', 'sdr');
-            $results = external_exec($cmd);
+            $results = trim(external_exec($cmd));
             d_echo($results);
             echo " done.\n";
         } else {

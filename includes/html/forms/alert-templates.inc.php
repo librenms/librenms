@@ -21,6 +21,10 @@
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  */
+
+use App\Models\Device;
+use LibreNMS\Alert\AlertData;
+
 $status = 'error';
 
 if (! Auth::user()->hasGlobalAdmin()) {
@@ -29,10 +33,30 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit(json_encode($response));
 }
 
+$rules = explode(',', $vars['rules'] ?? '');
+
 try {
-    Blade::render($vars['template']);
-    Blade::render($vars['title']);
-    Blade::render($vars['title_rec']);
+    // create some test data to check the template
+    $test_data = [
+        'id' => 0,
+        'rule' => 'test',
+        'name' => 'Test Rule',
+        'severity' => 'critical',
+        'extra' => '',
+        'disabled' => 0,
+        'query' => '',
+        'builder' => [],
+        'proc' => '',
+        'invert_map' => 0,
+        'notes' => '',
+    ];
+    $test_device = new Device(['hostname' => 'test']);
+    $test_device->device_id = 0;
+    $test_data['alert'] = new AlertData(AlertData::testData($test_device));
+
+    Blade::render($vars['template'], $test_data);
+    Blade::render($vars['title'], $test_data);
+    Blade::render($vars['title_rec'], $test_data);
 
     $template_id = 0;
     $template_newid = 0;
@@ -68,14 +92,13 @@ try {
         if ($status == 'ok') {
             $alertRulesOk = true;
             dbDelete('alert_template_map', 'alert_templates_id = ?', [$template_id]);
-            $rules = explode(',', $vars['rules']);
-            if ($rules !== false) {
-                foreach ($rules as $rule_id) {
-                    if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
-                        $alertRulesOk = false;
-                    }
+
+            foreach ($rules as $rule_id) {
+                if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
+                    $alertRulesOk = false;
                 }
             }
+
             if ($alertRulesOk) {
                 $status = 'ok';
                 $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' and attached rules have been updated.';
@@ -92,6 +115,6 @@ try {
     $message .= $e->getMessage();
 }
 
-$response = ['status' => htmlentities($status), 'message' => htmlentities($message), 'newid' => $template_newid];
+$response = ['status' => htmlentities($status), 'message' => htmlentities($message), 'newid' => $template_newid ?? null];
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
