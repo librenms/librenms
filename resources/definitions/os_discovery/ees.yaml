@@ -147,38 +147,6 @@ modules:
           descr: 'Battery Capacity'
           skip_values: 2147483647
 
-    count:
-      data:
-        - oid: psSMACNumber
-          num_oid: '.1.3.6.1.4.1.6302.2.1.2.10.1.0'
-          index: 'psSMACNumber.0'
-          descr: 'SM AC Modules'
-          skip_values: 2147483647
-
-        - oid: psSMBATNumber
-          num_oid: '.1.3.6.1.4.1.6302.2.1.2.10.2.0'
-          index: 'psSMBATNumber.0'
-          descr: 'SM BAT Modules'
-          skip_values: 2147483647
-
-        - oid: psSMIONumber
-          num_oid: '.1.3.6.1.4.1.6302.2.1.2.10.3.0'
-          index: 'psSMIONumber.0'
-          descr: 'SM IO Modules'
-          skip_values: 2147483647
-
-        - oid: numberOfInstalledRectifiers
-          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.1.0'
-          index: 'numberOfInstalledRectifiers.0'
-          descr: 'Rectifiers Installed'
-          skip_values: 2147483647
-
-        - oid: numberOfRectifiersCommunicating
-          num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.2.0'
-          index: 'numberOfRectifiersCommunicating.0'
-          descr: 'Rectifiers Communicating'
-          skip_values: 2147483647
-
     state:
       data:
         - oid: systemStatus
@@ -237,4 +205,3 @@ modules:
           states:
             - { descr: fail,   graph: 1, value: 1, generic: 2 }
             - { descr: normal, graph: 1, value: 2, generic: 0 }
-
