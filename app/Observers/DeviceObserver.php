@@ -5,10 +5,12 @@ namespace App\Observers;
 use App;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostRenameException;
 use Log;
 
 class DeviceObserver
@@ -53,13 +55,42 @@ class DeviceObserver
         }
     }
 
+    public function updating(Device $device): void
+    {
+        // handle device renames
+        if ($device->isDirty('hostname')) {
+            $new_name = $device->hostname;
+
+            $old_name = $device->getOriginal('hostname');
+            $new_rrd_dir = Rrd::dirFromHost($new_name);
+            $old_rrd_dir = Rrd::dirFromHost($old_name);
+
+            if (is_dir($new_rrd_dir)) {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
+
+                throw new HostRenameException("Renaming of $old_name failed due to existing RRD folder for $new_name");
+            }
+
+            if (rename($old_rrd_dir, $new_rrd_dir)) {
+                $device->ip = null;
+                $source = auth()->user()?->username ?: 'console';
+                Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
+            } else {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                throw new HostRenameException("Renaming of $old_name failed");
+            }
+        }
+    }
+
     /**
      * Handle the device "deleted" event.
      */
     public function deleted(Device $device): void
     {
         // delete rrd files
-        $host_dir = \Rrd::dirFromHost($device->hostname);
+        $host_dir = Rrd::dirFromHost($device->hostname);
         try {
             $result = File::deleteDirectory($host_dir);
 

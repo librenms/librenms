@@ -43,6 +43,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -82,7 +83,15 @@ class MenuComposer
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $configDeviceTypes = Arr::keyBy(LibrenmsConfig::get('device_types'), 'type');
+        $vars['device_types'] = Device::hasAccess($user)
+            ->select('type')
+            ->distinct()
+            ->where('type', '!=', '')
+            ->orderBy('type')
+            ->pluck('type')
+            ->keyBy(fn ($type) => $type)
+            ->map(fn ($type) => $configDeviceTypes[$type]['icon'] ?? 'angle-double-right');
         $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?
