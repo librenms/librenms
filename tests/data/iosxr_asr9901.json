@@ -10034,7 +10034,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 97,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.33",
                     "processor_index": "33",
@@ -10045,18 +10044,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 96,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.65",
-                    "processor_index": "65",
-                    "processor_type": "cpm",
-                    "processor_usage": 1,
-                    "processor_descr": "0/RSP0-Virtual processor for admin",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 8289,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.33313",
                     "processor_index": "33313",
@@ -10067,13 +10054,22 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 8288,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.33345",
                     "processor_index": "33345",
                     "processor_type": "cpm",
                     "processor_usage": 1,
                     "processor_descr": "0/0-Virtual processor for admin",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.65",
+                    "processor_index": "65",
+                    "processor_type": "cpm",
+                    "processor_usage": 1,
+                    "processor_descr": "0/RSP0-Virtual processor for admin",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

@@ -4234,18 +4234,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.12356.101.4.1.3.0",
-                    "processor_index": "0",
-                    "processor_type": "fortigate-fixed",
-                    "processor_usage": 1,
-                    "processor_descr": "System Cpu Usage",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.1",
                     "processor_index": "1",
@@ -4256,7 +4244,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.2",
                     "processor_index": "2",
@@ -4267,7 +4254,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.3",
                     "processor_index": "3",
@@ -4278,13 +4264,22 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.12356.101.4.4.2.1.2.4",
                     "processor_index": "4",
                     "processor_type": "fortigate-core",
                     "processor_usage": 2,
                     "processor_descr": "CPU Core 4",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.12356.101.4.1.3.0",
+                    "processor_index": "0",
+                    "processor_type": "fortigate-fixed",
+                    "processor_usage": 1,
+                    "processor_descr": "System Cpu Usage",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

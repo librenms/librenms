@@ -4034,7 +4034,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.1",
                     "processor_index": "1",
@@ -4045,7 +4044,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 1,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.2",
                     "processor_index": "2",
@@ -4056,7 +4054,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 2,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.3",
                     "processor_index": "3",
@@ -4067,7 +4064,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 3,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.4",
                     "processor_index": "4",
@@ -4078,7 +4074,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 4,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.5",
                     "processor_index": "5",
@@ -4089,7 +4084,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 5,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.6",
                     "processor_index": "6",
@@ -4100,7 +4094,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 6,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.7",
                     "processor_index": "7",
@@ -4111,7 +4104,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.1.1.8.8",
                     "processor_index": "8",

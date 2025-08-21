@@ -24,7 +24,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.1",
                     "processor_index": "1",
@@ -35,29 +34,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.8",
-                    "processor_index": "8",
-                    "processor_type": "arubaos",
-                    "processor_usage": 0,
-                    "processor_descr": "Network Processor CPU8",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.9",
-                    "processor_index": "9",
-                    "processor_type": "arubaos",
-                    "processor_usage": 1,
-                    "processor_descr": "Network Processor CPU9",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.10",
                     "processor_index": "10",
@@ -68,7 +44,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.11",
                     "processor_index": "11",
@@ -79,7 +54,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.12",
                     "processor_index": "12",
@@ -90,7 +64,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.13",
                     "processor_index": "13",
@@ -101,7 +74,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.14",
                     "processor_index": "14",
@@ -112,13 +84,32 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.15",
                     "processor_index": "15",
                     "processor_type": "arubaos",
                     "processor_usage": 1,
                     "processor_descr": "Network Processor CPU15",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.8",
+                    "processor_index": "8",
+                    "processor_type": "arubaos",
+                    "processor_usage": 0,
+                    "processor_descr": "Network Processor CPU8",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.9",
+                    "processor_index": "9",
+                    "processor_type": "arubaos",
+                    "processor_usage": 1,
+                    "processor_descr": "Network Processor CPU9",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

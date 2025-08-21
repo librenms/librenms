@@ -1234,7 +1234,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 1,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.1",
                     "processor_index": "1",
@@ -1245,95 +1244,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 2,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
-                    "processor_index": "2",
-                    "processor_type": "hr",
-                    "processor_usage": 23,
-                    "processor_descr": "Pkg/ID/Node: 0/1/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 3,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
-                    "processor_index": "3",
-                    "processor_type": "hr",
-                    "processor_usage": 23,
-                    "processor_descr": "Pkg/ID/Node: 0/2/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 4,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
-                    "processor_index": "4",
-                    "processor_type": "hr",
-                    "processor_usage": 19,
-                    "processor_descr": "Pkg/ID/Node: 0/3/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 5,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.5",
-                    "processor_index": "5",
-                    "processor_type": "hr",
-                    "processor_usage": 20,
-                    "processor_descr": "Pkg/ID/Node: 0/4/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 6,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.6",
-                    "processor_index": "6",
-                    "processor_type": "hr",
-                    "processor_usage": 21,
-                    "processor_descr": "Pkg/ID/Node: 0/5/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 7,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.7",
-                    "processor_index": "7",
-                    "processor_type": "hr",
-                    "processor_usage": 28,
-                    "processor_descr": "Pkg/ID/Node: 0/6/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 8,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.8",
-                    "processor_index": "8",
-                    "processor_type": "hr",
-                    "processor_usage": 16,
-                    "processor_descr": "Pkg/ID/Node: 0/7/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 9,
-                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.9",
-                    "processor_index": "9",
-                    "processor_type": "hr",
-                    "processor_usage": 24,
-                    "processor_descr": "Pkg/ID/Node: 0/8/0 Intel Xeon E5-2650 0 @ 2.00GHz",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 10,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.10",
                     "processor_index": "10",
@@ -1344,7 +1254,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 11,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.11",
                     "processor_index": "11",
@@ -1355,7 +1264,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 12,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.12",
                     "processor_index": "12",
@@ -1366,7 +1274,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 13,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.13",
                     "processor_index": "13",
@@ -1377,7 +1284,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 14,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.14",
                     "processor_index": "14",
@@ -1388,7 +1294,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 15,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.15",
                     "processor_index": "15",
@@ -1399,7 +1304,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 16,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.16",
                     "processor_index": "16",
@@ -1410,7 +1314,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 17,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.17",
                     "processor_index": "17",
@@ -1421,7 +1324,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 18,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.18",
                     "processor_index": "18",
@@ -1432,7 +1334,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 19,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.19",
                     "processor_index": "19",
@@ -1443,7 +1344,16 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 2,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
+                    "processor_index": "2",
+                    "processor_type": "hr",
+                    "processor_usage": 23,
+                    "processor_descr": "Pkg/ID/Node: 0/1/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 20,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.20",
                     "processor_index": "20",
@@ -1454,7 +1364,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 21,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.21",
                     "processor_index": "21",
@@ -1465,7 +1374,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 22,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.22",
                     "processor_index": "22",
@@ -1476,7 +1384,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 23,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.23",
                     "processor_index": "23",
@@ -1487,7 +1394,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 24,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.24",
                     "processor_index": "24",
@@ -1498,7 +1404,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 25,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.25",
                     "processor_index": "25",
@@ -1509,7 +1414,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 26,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.26",
                     "processor_index": "26",
@@ -1520,7 +1424,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 27,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.27",
                     "processor_index": "27",
@@ -1531,7 +1434,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 28,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.28",
                     "processor_index": "28",
@@ -1542,7 +1444,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 29,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.29",
                     "processor_index": "29",
@@ -1553,7 +1454,16 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 3,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
+                    "processor_index": "3",
+                    "processor_type": "hr",
+                    "processor_usage": 23,
+                    "processor_descr": "Pkg/ID/Node: 0/2/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 30,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.30",
                     "processor_index": "30",
@@ -1564,7 +1474,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 31,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.31",
                     "processor_index": "31",
@@ -1575,13 +1484,72 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 32,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.32",
                     "processor_index": "32",
                     "processor_type": "hr",
                     "processor_usage": 9,
                     "processor_descr": "Pkg/ID/Node: 1/31/1 Intel Xeon E5-2650 0 @ 2.00GH",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 4,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
+                    "processor_index": "4",
+                    "processor_type": "hr",
+                    "processor_usage": 19,
+                    "processor_descr": "Pkg/ID/Node: 0/3/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 5,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.5",
+                    "processor_index": "5",
+                    "processor_type": "hr",
+                    "processor_usage": 20,
+                    "processor_descr": "Pkg/ID/Node: 0/4/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 6,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.6",
+                    "processor_index": "6",
+                    "processor_type": "hr",
+                    "processor_usage": 21,
+                    "processor_descr": "Pkg/ID/Node: 0/5/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 7,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.7",
+                    "processor_index": "7",
+                    "processor_type": "hr",
+                    "processor_usage": 28,
+                    "processor_descr": "Pkg/ID/Node: 0/6/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 8,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.8",
+                    "processor_index": "8",
+                    "processor_type": "hr",
+                    "processor_usage": 16,
+                    "processor_descr": "Pkg/ID/Node: 0/7/0 Intel Xeon E5-2650 0 @ 2.00GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 9,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.9",
+                    "processor_index": "9",
+                    "processor_type": "hr",
+                    "processor_usage": 24,
+                    "processor_descr": "Pkg/ID/Node: 0/8/0 Intel Xeon E5-2650 0 @ 2.00GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

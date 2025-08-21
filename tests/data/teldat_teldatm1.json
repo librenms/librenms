@@ -2834,7 +2834,16 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2007.4.1.2.1.2.1.1.3.0",
+                    "processor_index": "cpu300.0",
+                    "processor_type": "teldat",
+                    "processor_usage": 5,
+                    "processor_descr": "CPU Utilization 5min",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2007.4.1.2.1.2.1.1.1.0",
                     "processor_index": "cpu5.0",
@@ -2845,7 +2854,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2007.4.1.2.1.2.1.1.2.0",
                     "processor_index": "cpu60.0",
@@ -2854,7 +2862,11 @@
                     "processor_descr": "CPU Utilization 1min",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
-                },
+                }
+            ]
+        },
+        "poller": {
+            "processors": [
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
@@ -2865,11 +2877,7 @@
                     "processor_descr": "CPU Utilization 5min",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
-                }
-            ]
-        },
-        "poller": {
-            "processors": [
+                },
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
@@ -2889,17 +2897,6 @@
                     "processor_type": "teldat",
                     "processor_usage": 5,
                     "processor_descr": "CPU Utilization 1min",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2007.4.1.2.1.2.1.1.3.0",
-                    "processor_index": "cpu300.0",
-                    "processor_type": "teldat",
-                    "processor_usage": 5,
-                    "processor_descr": "CPU Utilization 5min",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

@@ -11834,7 +11834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.stack.1.1",
                     "processor_index": "dellNetCpuUtil1Min.stack.1.1",
@@ -11845,7 +11844,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.stack.1.1",
                     "processor_index": "dellNetCpuUtil5Min.stack.1.1",
