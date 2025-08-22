@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Lang;
 use LibreNMS\Util\DynamicConfig;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ConfigList extends LnmsCommand
+class ConfigListCommand extends LnmsCommand
 {
     protected $name = 'config:list';
 
@@ -39,7 +39,7 @@ class ConfigList extends LnmsCommand
             );
 
         if ($settings->isEmpty()) {
-            $this->error("No settings found matching '$search'");
+            $this->error(__('commands.config:list.not_found', ['search' => $search]));
 
             return 1;
         }
