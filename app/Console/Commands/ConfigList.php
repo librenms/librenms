@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
@@ -34,7 +36,7 @@ class ConfigList extends LnmsCommand
                 '<fg=blue>' . $this->highlight($setting, $search) . '</>',
                 $this->highlight($descr, $search),
             ]
-        );
+            );
 
         if ($settings->isEmpty()) {
             $this->error("No settings found matching '$search'");
