@@ -1,0 +1,11 @@
+os: aaron
+text: 'Aaron FM Rebroadcaster'
+type: appliance
+icon: inovonics
+group: inovonics
+over:
+    - { graph: device_dbm, text: RSSI }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.42111.640
+        - .1.3.6.1.4.1.42111.650
