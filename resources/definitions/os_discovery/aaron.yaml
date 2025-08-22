@@ -1,0 +1,123 @@
+mib: INOVONICS-MODEL640-MIB:INOVONICS-MODEL650-MIB
+modules:
+  os:
+    hardware: SNMPv2-MIB::sysName.0
+    serial: INOVONICS-MODEL640-MIB::serial.0
+    version:
+      - INOVONICS-MODEL640-MIB::version.0
+      - INOVONICS-MODEL650-MIB::version.0
+#    version_template: '{{ INOVONICS-MODEL640-MIB::serial.0 }}{{ INOVONICS-MODEL650-MIB::serial.0 }}'
+  sensors:
+    pre-cache:
+      data:
+        -
+          oid:
+            - INOVONICS-MODEL640-MIB::version.0 
+            - INOVONICS-MODEL640-MIB::date.0
+            - SNMPv2-MIB::sysObjectID
+            - audioLossThreshOn
+            - audioLossThreshOff
+            - lowSignalThreshOn
+            - lowSignalThreshOff
+            - rdsLossTimeOn
+            - rdsLossTimeOff
+            - pilotLossTimeOn
+            - pilotLossTimeOff
+    frequency:
+      data:
+        - oid: INOVONICS-MODEL640-MIB::frequency
+          num_oid: .1.3.6.1.4.1.42111.640.3.1.0
+          descr: 'Frequency'
+          index: 1
+          multiplier: 10000
+        - oid: INOVONICS-MODEL650-MIB::frequency
+          num_oid: .1.3.6.1.4.1.42111.650.3.1.0
+          descr: 'Frequency'
+          index: 1
+          multiplier: 10000
+    dbm:
+      data:
+        - oid: INOVONICS-MODEL640-MIB::rssi
+          num_oid: .1.3.6.1.4.1.42111.640.3.3.0
+          descr: RSSI
+          index: 1
+        - oid: INOVONICS-MODEL650-MIB::rssi
+          num_oid: .1.3.6.1.4.1.42111.650.3.3.0
+          descr: RSSI
+          index: 2
+    percent:
+      data:
+        - oid: INOVONICS-MODEL640-MIB::multipath
+          num_oid: .1.3.6.1.4.1.42111.640.3.5.0
+          descr: Multipath
+          index: 1
+        - oid: INOVONICS-MODEL650-MIB::multipath
+          num_oid: .1.3.6.1.4.1.42111.650.3.5.0
+          descr: Multipath
+          index: 2
+    state:
+      data:
+        - oid: INOVONICS-MODEL640-MIB::audioLossAlarm
+          num_oid: .1.3.6.1.4.1.42111.640.6.1.1.0
+          descr: Audio Loss Alarm
+          index: 1
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL650-MIB::audioLossAlarm
+          num_oid: .1.3.6.1.4.1.42111.650.6.1.1.0
+          descr: Audio Loss Alarm
+          index: 2
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL640-MIB::lowSignalAlarm
+          num_oid: .1.3.6.1.4.1.42111.640.6.1.2.0
+          descr: Low Signal Alarm
+          index: 3
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL650-MIB::lowSignalAlarm
+          num_oid: .1.3.6.1.4.1.42111.650.6.1.2.0
+          descr: Low Signal Alarm
+          index: 4
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL640-MIB::rdsErrorAlarm
+          num_oid: .1.3.6.1.4.1.42111.640.6.1.3.0
+          descr: RDS Error Alarm
+          index: 5
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL650-MIB::rdsErrorAlarm
+          num_oid: .1.3.6.1.4.1.42111.650.6.1.3.0
+          descr: RDS Error Alarm
+          index: 6
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL640-MIB::pilotLossAlarm
+          num_oid: .1.3.6.1.4.1.42111.640.6.1.4.0
+          descr: Pilot Loss Alarm
+          index: 7
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
+        - oid: INOVONICS-MODEL650-MIB::pilotLossAlarm
+          num_oid: .1.3.6.1.4.1.42111.650.6.1.4.0
+          descr: Pilot Loss Alarm
+          index: 8
+          group: Device Alarms
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: off }
+            - { value: 1, generic: 3, graph: 0, descr: on }
