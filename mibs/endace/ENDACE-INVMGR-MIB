@@ -1,0 +1,213 @@
+-- 
+-- LEGAL NOTICE:
+-- This source code:
+-- 
+-- a) is a proprietary trade secret of Endace Technology Limited or any of
+-- its related or affiliated companies, a New Zealand company, and its
+-- suppliers and licensors ('Endace'). You must keep it strictly
+-- confidential, and you must not copy, modify, disclose or distribute any
+-- part of it to anyone else, without the prior written
+-- authorisation of Endace Limited;
+-- 
+-- b) may also be part of inventions that are protected by patents and
+-- patent applications; and
+-- 
+-- c) is copyright (C) to Endace, 2018 to 2021. All rights reserved.
+--
+
+ENDACE-INVMGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    endace
+        FROM ENDACE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    ;
+
+invmgrMIB MODULE-IDENTITY
+    LAST-UPDATED  "202107210349Z" -- July 21, 2021
+    ORGANIZATION
+        "Endace Technology Ltd"
+    CONTACT-INFO
+        "postal: Endace Technology
+         6th floor
+         KPMG Centre
+         85 Alexandra Street
+         Hamilton 3204
+         New Zealand
+
+         email:   support@endace.com"
+    DESCRIPTION
+        "MIB for Investigation Manager Appliance Sources."
+    REVISION      "202107210257Z" -- July 21, 2021
+    DESCRIPTION
+        "Updated descriptions."
+    ::= { endace 15 }
+
+invmgrNotifications OBJECT IDENTIFIER ::= { invmgrMIB 0 }
+
+invmgrConnectionChanged NOTIFICATION-TYPE
+    OBJECTS
+        { invmgrApplStateName, invmgrApplStateConnected }
+    STATUS        current
+    DESCRIPTION
+        "The Investigation source Endace Appliance connection has
+         changed."
+    ::= { invmgrNotifications 1 }
+
+invmgrObjects OBJECT IDENTIFIER ::= { invmgrMIB 1 }
+
+invmgrApplStateTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF InvmgrApplStateEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "List of Endace Appliances used as Investigation Sources by the
+         Investigation Manager."
+    ::= { invmgrObjects 1 }
+
+invmgrApplStateEntry OBJECT-TYPE
+    SYNTAX        InvmgrApplStateEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Entry for one Investigation Source Endace Appliance."
+    INDEX
+        { invmgrApplStateIndex }
+    ::= { invmgrApplStateTable 1 }
+
+InvmgrApplStateEntry ::= SEQUENCE
+{
+    invmgrApplStateIndex     INTEGER,
+    invmgrApplStateName      DisplayString,
+    invmgrApplStateConnected TruthValue,
+    invmgrApplStateOK        TruthValue
+}
+
+
+invmgrApplStateIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..32767)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Synthetic numeric unique ID of an Endace Appliance."
+    ::= { invmgrApplStateEntry 1 }
+
+invmgrApplStateName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual ID/name of appliance."
+    ::= { invmgrApplStateEntry 2 }
+
+invmgrApplStateConnected OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Is Investigation Manager connected to this Endace Appliance?
+         (2=no,1=yes)"
+    ::= { invmgrApplStateEntry 3 }
+
+invmgrApplStateOK OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Did this Endace Appliance pass its most recent status check?
+         (2=no,1=yes)"
+    ::= { invmgrApplStateEntry 4 }
+
+invmgrApplConfigTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF InvmgrApplConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "List of configuration entries of Investigation Manager
+         appliances."
+    ::= { invmgrObjects 2 }
+
+invmgrApplConfigEntry OBJECT-TYPE
+    SYNTAX        InvmgrApplConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Configuration for one Investigation Manager Source Endace
+         Appliance."
+    INDEX
+        { invmgrApplConfigIndex }
+    ::= { invmgrApplConfigTable 1 }
+
+InvmgrApplConfigEntry ::= SEQUENCE
+{
+    invmgrApplConfigIndex   INTEGER,
+    invmgrApplConfigName    DisplayString,
+    invmgrApplConfigEnabled TruthValue
+}
+
+
+invmgrApplConfigIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..32767)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Synthetic numeric unique ID of Appliance."
+    ::= { invmgrApplConfigEntry 1 }
+
+invmgrApplConfigName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Textual ID/name of appliance."
+    ::= { invmgrApplConfigEntry 2 }
+
+invmgrApplConfigEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Is this Endace Appliance enabled in the Investigation Manager?
+         (1=yes, 2=no)"
+    ::= { invmgrApplConfigEntry 3 }
+
+invmgrConformance OBJECT IDENTIFIER ::= { invmgrMIB 2 }
+
+invmgrCompliances OBJECT IDENTIFIER ::= { invmgrConformance 1 }
+
+invmgrMandatory MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "Mandatory groups for Investigation Manager Appliances."
+
+    MODULE         ENDACE-INVMGR-MIB
+        MANDATORY-GROUPS
+            { invmgrBasicEvents, invmgrBasicObjects }
+    ::= { invmgrCompliances 1 }
+
+invmgrGroups OBJECT IDENTIFIER ::= { invmgrConformance 2 }
+
+invmgrBasicObjects OBJECT-GROUP
+    OBJECTS
+        { invmgrApplConfigEnabled, invmgrApplConfigName,
+        invmgrApplStateConnected, invmgrApplStateName, invmgrApplStateOK
+        }
+    STATUS        current
+    DESCRIPTION
+        "Investigation Manager basic objects."
+    ::= { invmgrGroups 1 }
+
+invmgrBasicEvents NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { invmgrConnectionChanged }
+    STATUS        current
+    DESCRIPTION
+        "Investigation Manager basic events."
+    ::= { invmgrGroups 2 }
+
+END
