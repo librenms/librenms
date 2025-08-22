@@ -13,6 +13,13 @@ return [
             'dump' => 'Output the entire config as json',
         ],
     ],
+    'config:list' => [
+        'description' => 'List and search configuration settings',
+        'arguments' => [
+            'search' => 'Search for a setting, matching config name or description',
+        ],
+        'not_found' => 'No settings found matching \':search\'',
+    ],
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
