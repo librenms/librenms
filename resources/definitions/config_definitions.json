@@ -810,6 +810,13 @@
             "order": 16,
             "type": "text"
         },
+        "auth_ldap_use_dn_autodiscovery": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 8,
+            "type": "boolean"
+        },
         "auth_ldap_userdn": {
             "default": false,
             "group": "auth",
