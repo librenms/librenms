@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
+    Route::any('alert-log', App\Http\Controllers\AlertLogController::class)->name('alert-log');
     Route::resource('port', PortController::class)->only('update');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
@@ -226,6 +227,7 @@ Route::middleware(['auth'])->group(function () {
 
         // js select2 data controllers
         Route::prefix('select')->group(function () {
+            Route::get('alert-rules', Select\AlertRuleController::class)->name('ajax.select.alert-rules');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');
@@ -254,6 +256,9 @@ Route::middleware(['auth'])->group(function () {
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function () {
             Route::post('alert-schedule', Table\AlertScheduleController::class);
+            Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
+            Route::get('alertlog/export', [Table\AlertLogController::class, 'export']);
+            Route::get('alertlog/{id}/details', [Table\AlertLogController::class, 'details'])->name('table.alertlog.details');
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
