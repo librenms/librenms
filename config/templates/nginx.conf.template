@@ -1,0 +1,111 @@
+server {
+    listen 80;
+    server_name {{FQDN}};
+    root /opt/librenms/html;
+    index index.php;
+
+    charset utf-8;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1000;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
+
+{{#if PRODUCTION}}
+    # Security headers for production
+    add_header X-Content-Type-Options nosniff;
+    add_header X-Frame-Options DENY;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy strict-origin-when-cross-origin;
+    
+    # HSTS header (added by SSL configuration if enabled)
+{{#if SSL_ENABLED}}
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+{{/if}}
+
+    # Rate limiting for production
+    limit_req_zone $binary_remote_addr zone=librenms:10m rate=10r/m;
+    limit_req zone=librenms burst=20 nodelay;
+    
+{{/if}}
+
+    # Main location block
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # PHP handler
+    location ~ [^/]\.php(/|$) {
+        fastcgi_pass unix:/run/php-fpm-librenms.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi.conf;
+        
+        # Security
+        fastcgi_param PHP_VALUE "open_basedir=/opt/librenms/:/tmp/:/usr/share/";
+        
+{{#if PRODUCTION}}
+        # Production PHP settings
+        fastcgi_param PHP_VALUE "max_execution_time=300\nmax_input_time=300\nmemory_limit=256M";
+{{else}}
+        # Development PHP settings  
+        fastcgi_param PHP_VALUE "max_execution_time=600\nmax_input_time=600\nmemory_limit=512M\ndisplay_errors=On";
+{{/if}}
+    }
+
+    # Deny access to hidden files
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    # Deny access to sensitive files
+    location ~* \.(conf|log|sql|bak|backup)$ {
+        deny all;
+    }
+
+{{#if PRODUCTION}}
+    # Cache static assets in production
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary Accept-Encoding;
+        access_log off;
+    }
+    
+    # Special handling for source maps in production (hide them)
+    location ~* \.map$ {
+        deny all;
+    }
+{{else}}
+    # Development - disable caching
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires -1;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+{{/if}}
+
+    # Block access to composer and other sensitive files
+    location ~* /(\.env|composer\.(json|lock)|package\.json|gulpfile\.js|webpack\.mix\.js)$ {
+        deny all;
+    }
+
+    # Logging
+{{#if PRODUCTION}}
+    access_log /var/log/nginx/librenms_access.log combined;
+    error_log /var/log/nginx/librenms_error.log warn;
+{{else}}
+    access_log /var/log/nginx/librenms_access.log combined;
+    error_log /var/log/nginx/librenms_error.log debug;
+{{/if}}
+}

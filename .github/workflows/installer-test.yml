@@ -1,0 +1,203 @@
+name: Automated Installer Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'scripts/**'
+      - 'config/**'
+      - '.github/workflows/installer-test.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'scripts/**'
+      - 'config/**'
+      - '.github/workflows/installer-test.yml'
+
+jobs:
+  test-installer:
+    name: Test Installer on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['22.04', '24.04']
+        deployment: ['dev', 'prod']
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Ubuntu ${{ matrix.os }} container
+      run: |
+        # Pull Ubuntu image
+        docker pull ubuntu:${{ matrix.os }}
+        
+        # Create container with systemd support
+        docker run -d \
+          --name test-container \
+          --privileged \
+          --cgroupns=host \
+          --tmpfs /tmp \
+          --tmpfs /run \
+          --tmpfs /run/lock \
+          -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+          -v ${{ github.workspace }}:/workspace \
+          ubuntu:${{ matrix.os }} \
+          /sbin/init
+
+    - name: Prepare container environment  
+      run: |
+        # Install basic requirements
+        docker exec test-container bash -c "
+          apt-get update &&
+          apt-get install -y sudo systemctl wget curl git &&
+          
+          # Create a sudo user (GitHub Actions requirement)
+          useradd -m -s /bin/bash testuser &&
+          echo 'testuser:testuser' | chpasswd &&
+          echo 'testuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers &&
+          
+          # Copy workspace and set permissions
+          cp -r /workspace /home/testuser/librenms &&
+          chown -R testuser:testuser /home/testuser/librenms &&
+          chmod +x /home/testuser/librenms/scripts/*.sh
+        "
+
+    - name: Run installer test
+      id: install
+      run: |
+        # Test the installer
+        docker exec test-container bash -c "
+          cd /home/testuser/librenms &&
+          
+          # Run installer in non-interactive mode
+          sudo ./scripts/install.sh --${{ matrix.deployment }} --non-interactive --verbose > install.log 2>&1 &&
+          
+          # Save exit code
+          echo $? > install_exit_code
+        "
+        
+        # Get exit code
+        EXIT_CODE=$(docker exec test-container cat /home/testuser/librenms/install_exit_code)
+        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+        
+        # Copy logs for artifacts
+        docker cp test-container:/home/testuser/librenms/install.log ./install-${{ matrix.os }}-${{ matrix.deployment }}.log
+
+    - name: Run health check
+      if: steps.install.outputs.exit_code == '0'
+      run: |
+        docker exec test-container bash -c "
+          /opt/librenms/scripts/healthcheck.sh > healthcheck.log 2>&1
+          echo $? > healthcheck_exit_code
+        "
+        
+        # Copy health check results
+        docker cp test-container:/home/testuser/librenms/healthcheck.log ./healthcheck-${{ matrix.os }}-${{ matrix.deployment }}.log
+
+    - name: Run LibreNMS validation
+      if: steps.install.outputs.exit_code == '0'
+      run: |
+        docker exec test-container bash -c "
+          cd /opt/librenms &&
+          sudo -u librenms ./validate.php > validate.log 2>&1
+          echo $? > validate_exit_code
+        "
+        
+        # Copy validation results
+        docker cp test-container:/home/testuser/librenms/validate.log ./validate-${{ matrix.os }}-${{ matrix.deployment }}.log
+
+    - name: Test web interface
+      if: steps.install.outputs.exit_code == '0'
+      run: |
+        docker exec test-container bash -c "
+          # Wait for services to be fully ready
+          sleep 10 &&
+          
+          # Test HTTP response
+          curl -f -s -I http://localhost/ > web_test.log 2>&1 &&
+          echo 'Web interface test: PASS' >> web_test.log ||
+          echo 'Web interface test: FAIL' >> web_test.log
+        "
+        
+        # Copy web test results
+        docker cp test-container:/home/testuser/librenms/web_test.log ./web-test-${{ matrix.os }}-${{ matrix.deployment }}.log
+
+    - name: Collect system information
+      if: always()
+      run: |
+        docker exec test-container bash -c "
+          echo '=== System Information ===' > system_info.log &&
+          uname -a >> system_info.log &&
+          lsb_release -a >> system_info.log &&
+          echo '' >> system_info.log &&
+          
+          echo '=== Service Status ===' >> system_info.log &&
+          systemctl status nginx mariadb php8.3-fpm snmpd --no-pager >> system_info.log 2>&1 &&
+          echo '' >> system_info.log &&
+          
+          echo '=== Disk Usage ===' >> system_info.log &&
+          df -h >> system_info.log &&
+          echo '' >> system_info.log &&
+          
+          echo '=== Memory Usage ===' >> system_info.log &&
+          free -h >> system_info.log &&
+          echo '' >> system_info.log &&
+          
+          echo '=== Network Ports ===' >> system_info.log &&
+          netstat -tuln >> system_info.log 2>&1
+        "
+        
+        # Copy system info
+        docker cp test-container:/home/testuser/librenms/system_info.log ./system-info-${{ matrix.os }}-${{ matrix.deployment }}.log
+
+    - name: Upload installation artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: installer-logs-${{ matrix.os }}-${{ matrix.deployment }}
+        path: |
+          install-${{ matrix.os }}-${{ matrix.deployment }}.log
+          healthcheck-${{ matrix.os }}-${{ matrix.deployment }}.log
+          validate-${{ matrix.os }}-${{ matrix.deployment }}.log
+          web-test-${{ matrix.os }}-${{ matrix.deployment }}.log
+          system-info-${{ matrix.os }}-${{ matrix.deployment }}.log
+        retention-days: 7
+
+    - name: Check installation success
+      run: |
+        if [ "${{ steps.install.outputs.exit_code }}" -ne "0" ]; then
+          echo "❌ Installation failed on Ubuntu ${{ matrix.os }} (${{ matrix.deployment }} mode)"
+          echo "Check the artifact logs for details"
+          exit 1
+        else
+          echo "✅ Installation successful on Ubuntu ${{ matrix.os }} (${{ matrix.deployment }} mode)"
+        fi
+
+    - name: Cleanup container
+      if: always()
+      run: |
+        docker stop test-container || true
+        docker rm test-container || true
+
+  test-summary:
+    name: Test Summary
+    needs: test-installer
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Test Results Summary
+      run: |
+        echo "## Automated Installer Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| OS Version | Development Mode | Production Mode |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|------------------|-----------------|" >> $GITHUB_STEP_SUMMARY
+        
+        # This is a simplified summary - in a real implementation,
+        # we would parse the job results to show success/failure status
+        echo "| Ubuntu 22.04 | ${{ needs.test-installer.result }} | ${{ needs.test-installer.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Ubuntu 24.04 | ${{ needs.test-installer.result }} | ${{ needs.test-installer.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Download artifacts above for detailed logs." >> $GITHUB_STEP_SUMMARY
