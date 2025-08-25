@@ -1,0 +1,598 @@
+-- *****************************************************************
+-- CISCO-GNSS-MIB.my: Cisco GNSS MIB
+--   
+-- July 2021, Antony Wallace
+--   
+-- Copyright (c) 2021 by Cisco Systems, Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-GNSS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    NOTIFICATION-TYPE,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    DisplayString
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoGnssMIB MODULE-IDENTITY
+    LAST-UPDATED    "201909060000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-<list>@cisco.com"
+    DESCRIPTION
+        "The MIB module for GNSS
+
+        Overview of GNSS 
+
+        GNSS (Global Navigation Satellite System) is used to describe
+        the collection of Satellite Systems that are operating or
+        planned. There are many Satellite constellation systems already
+        available. These constellations allows ground base GNSS
+        receivers to receive radio signals from these satellites and
+        recover accurate location and time. Location and Time both are
+        primary uses cases for many technologies, specifically for
+        Telecom Network Operator, Timing use case is very important.
+        Typical telecom networks synchronization works in a hierarchal
+        manner where core network is connected to stratum 1 clock and
+        the clock is distributed along the network in a tree like
+        structure. With GPS receiver however, clocking can be changed to
+        a flat architecture where access networks can directly take
+        clock from satellites in sky using on-board GPS chips.
+
+
+        MIB description
+
+        This MIB is to support the GNSS feature of Cisco System devices.
+
+        The below table specifies the object formats of the various
+        textual conventions used.
+
+        Data type mapping     Textual Convention  SYNTAX
+        --------------------  ------------------  ---------------------
+        RP state on slot    SlotState      OCTET
+        UINT(SIZE(0..1))
+        RP Slot number      SlotInfo       OCTET UINT(SIZE(0..1))
+        GNSS module lock    GnssModuleLockStatus   OCTET
+        INTEGER(1..2)
+        GNSS module presens GnssModulePresenceStatus   INTEGER(1..2)"
+    REVISION        "201905220000Z"
+    DESCRIPTION
+        "Latest version of this MIB module."
+    ::= { ciscoMgmt 862 }
+
+
+
+OpenCircuitAlarmStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "It is used as the open-ciruit alarm status identifier of the
+        GNSS module.
+        Notification generated upon the the open-circuit alarm raised
+        or cleared status
+
+
+        Open-circuit status       Value
+        --------------------------------
+        Raise                       1
+        Clear                       2"
+    SYNTAX          INTEGER {
+                        raise(1),
+                        clear(2)
+                    }
+
+ShortCircuitAlarmStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "It is used as the short-ciruit alarm status identifier of the
+        GNSS module.
+        Notification generated upon the the short-circuit alarm raised
+        or cleared status
+
+
+        Short-circuit status      Value
+        --------------------------------
+        Raise                       1
+        Clear                       2"
+    SYNTAX          INTEGER {
+                        raise(1),
+                        clear(2)
+                    }
+
+SVCnt ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Number of satellite tracked by GNSS."
+    SYNTAX          Integer32
+
+GnssSvVisibilityStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "GNSS Status (good/bad), If tracking minimum 3 satellites with
+        more than 30dBM then good, if not bad.
+        When < 3 satellites (with >= 30 dBM) are available:  GNSS
+        Status
+        is sent as BAD.
+        When > 3 satellites (with >= 30 dBM) are available:  GNSS
+        Status
+        is sent as GOOD."
+    SYNTAX          INTEGER {
+                        bad(1),
+                        good(2)
+                    }
+
+SlotState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "State of the RSP where the GNSS module is inserted.
+        It can be 0-Active or 1-StandBy"
+    SYNTAX          Unsigned32 (0..1)
+
+SlotInfo ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "RSP slot number of the node where the GNSS module is
+        inserted.
+        It can be Slot-0 or Slot-1"
+    SYNTAX          Unsigned32 (0..1)
+
+GnssModuleLockStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "It is used as the Lock status identifier of the GNSS module.
+        Notification generated upon the change detected in GNSS
+        modulelock status
+
+
+        GNSS Lockstatus          Value
+        --------------------------------
+        Down                       1
+        Up                         2"
+    SYNTAX          INTEGER  {
+                        down(1),
+                        up(2)
+                    }
+
+GnssModulePresenceStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Identifier to indicate the presence of the GNSS module on the
+        router. Notification generated upon GNSS module insertion and
+        removal
+
+        GNSS Module             Value
+        --------------------------------
+        Absent                     1
+        Present                    2"
+    SYNTAX          INTEGER  {
+                        absent(1),
+                        present(2)
+                    }
+-- Textual Conventions definition will be defined before this line
+
+ciscoGnssMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoGnssMIB 0 }
+
+ciscoGnssMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoGnssMIB 1 }
+
+ciscoGnssMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoGnssMIB 2 }
+
+
+cGnssModuleLockStatus OBJECT-TYPE
+    SYNTAX          GnssModuleLockStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies GNSS module lock status" 
+    ::= { ciscoGnssMIBObjects 1 }
+
+cGnssModulePresenceStatus OBJECT-TYPE
+    SYNTAX          GnssModulePresenceStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies GNSS module presence status" 
+    ::= { ciscoGnssMIBObjects 2 }
+
+cGnssModuleSlotInfo OBJECT-TYPE
+    SYNTAX          SlotInfo
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies slot information where the GNSS module is
+        inserted" 
+    ::= { ciscoGnssMIBObjects 3 }
+
+cGnssModuleSlotState OBJECT-TYPE
+    SYNTAX          SlotState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies state of the RSP (active/standby) where
+        the GNSS module is inserted." 
+    ::= { ciscoGnssMIBObjects 4 }
+
+cGnssSatelliteVisibilityStatus OBJECT-TYPE
+    SYNTAX          GnssSvVisibilityStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies status of the GNSS (good/bad), If
+        tracking minimum 3 satellites with more than 30dBM then good,
+        if
+        not bad."
+    DEFVAL          { 2 } 
+    ::= { ciscoGnssMIBObjects 5 }
+
+cGnssModuleSatelliteCount OBJECT-TYPE
+    SYNTAX          SVCnt
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the count of satellite tracked by GNSS
+        module"
+    DEFVAL          { 0 } 
+    ::= { ciscoGnssMIBObjects 6 }
+
+cGnssModuleSvIdSNR OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the SNR value and satellite id for each
+        visible satellite." 
+    ::= { ciscoGnssMIBObjects 7 }
+
+cGnssModuleSCAlarmStatus OBJECT-TYPE
+    SYNTAX          ShortCircuitAlarmStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies GNSS module short-circuit alarm status"
+    DEFVAL          { 2 } 
+    ::= { ciscoGnssMIBObjects 8 }
+
+cGnssModuleOCAlarmStatus OBJECT-TYPE
+    SYNTAX          OpenCircuitAlarmStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies GNSS module open-circuit alarm status"
+    DEFVAL          { 2 } 
+    ::= { ciscoGnssMIBObjects 9 }
+
+-- Default Notification Type
+
+ciscoGnssModuleLockStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleLockStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notifiation generated when the GNSS module lock status turn to
+        Down state."
+   ::= { ciscoGnssMIBNotifs 1 }
+
+ciscoGnssModuleLockClear NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleLockStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notifiation generated when the GNSS module lock status turn to
+        Up state."
+   ::= { ciscoGnssMIBNotifs 2 }
+
+ciscoGnssModulePresenceStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModulePresenceStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS module is removed."
+   ::= { ciscoGnssMIBNotifs 3 }
+
+ciscoGnssModulePresenceClear NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModulePresenceStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS module is powered up."
+   ::= { ciscoGnssMIBNotifs 4 }
+
+ciscoGnssAntennaSCAlarmStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleSCAlarmStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS antenna detect
+        short-circuit alarm"
+   ::= { ciscoGnssMIBNotifs 5 }
+
+ciscoGnssAntennaSCAlarmClear NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleSCAlarmStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS antenna  short-circuit
+        alarm is cleared"
+   ::= { ciscoGnssMIBNotifs 6 }
+
+ciscoGnssAntennaOCAlarmStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState,
+                        cGnssModuleOCAlarmStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS antenna detect
+        open-circuit alarm"
+   ::= { ciscoGnssMIBNotifs 7 }
+
+ciscoGnssAntennaOCAlarmClear NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState,
+                        cGnssModuleOCAlarmStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when the GNSS antenna  open-circuit
+        alarm is cleared"
+   ::= { ciscoGnssMIBNotifs 8 }
+
+ciscoGnssSatelliteVisibilityStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssSatelliteVisibilityStatus,
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when there are < 3 satellites visible
+        with < 30 dBM SNS"
+   ::= { ciscoGnssMIBNotifs 9 }
+
+ciscoGnssSatelliteVisibilityClear NOTIFICATION-TYPE
+    OBJECTS         {
+                        cGnssModuleSlotInfo,
+                        cGnssModuleSlotState,
+                        cGnssSatelliteVisibilityStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification generated when there are > 3 satellites visible
+        with > 30 dBM SNS"
+   ::= { ciscoGnssMIBNotifs 10 }
+ciscoGnssMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoGnssMIBConform 1 }
+
+ciscoGnssMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoGnssMIBConform 2 }
+
+
+ciscoGnssMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "This is a default module-compliance
+        containing default object groups."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoGnssMIBMainObjectGroup,
+                        ciscoGnssMIBNotificationGroup
+                    }
+    ::= { ciscoGnssMIBCompliances 1 }
+
+-- Units of Conformance
+
+ciscoGnssMIBMainObjectGroup OBJECT-GROUP
+    OBJECTS         { cGnssModuleLockStatus }
+    STATUS          current
+    DESCRIPTION
+        "The is a test group."
+    ::= { ciscoGnssMIBGroups 1 }
+
+ciscoGnssMIBNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { ciscoGnssModuleLockStatus }
+    STATUS          current
+    DESCRIPTION
+        "The is a test group."
+    ::= { ciscoGnssMIBGroups 2 }
+
+END
+
+
+-- %DNP%  MLC -Compiled MLC
+
+-- %DNP%  MRS -with approver MRS
+
+-- %DNP%  MOS -ciscoGnssMIB MOS 
+
+-- %DNP%  MOS -OpenCircuitAlarmStatus MOS 
+
+-- %DNP%  MOS -ShortCircuitAlarmStatus MOS 
+
+-- %DNP%  MOS -SVCnt MOS 
+
+-- %DNP%  MOS -GnssSvVisibilityStatus MOS 
+
+-- %DNP%  MOS -SlotState MOS 
+
+-- %DNP%  MOS -SlotInfo MOS 
+
+-- %DNP%  MOS -GnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -GnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBNotifs MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBObjects MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBConform MOS 
+
+-- %DNP%  MOS -cGnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -cGnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleSlotInfo MOS 
+
+-- %DNP%  MOS -cGnssModuleSlotState MOS 
+
+-- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleSatelliteCount MOS 
+
+-- %DNP%  MOS -cGnssModuleSvIdSNR MOS 
+
+-- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssModuleLockClear MOS 
+
+-- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssModulePresenceClear MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS 
+
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBCompliances MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBGroups MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBCompliance MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS 
+
+-- %DNP%  MOS -ciscoGnssMIB MOS 
+
+-- %DNP%  MOS -OpenCircuitAlarmStatus MOS 
+
+-- %DNP%  MOS -ShortCircuitAlarmStatus MOS 
+
+-- %DNP%  MOS -SVCnt MOS 
+
+-- %DNP%  MOS -GnssSvVisibilityStatus MOS 
+
+-- %DNP%  MOS -SlotState MOS 
+
+-- %DNP%  MOS -SlotInfo MOS 
+
+-- %DNP%  MOS -GnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -GnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBNotifs MOS 
+
+-- %DNP%  MOS -ciscoGnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssModuleLockClear MOS 
+
+-- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssModulePresenceClear MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS 
+
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBObjects MOS 
+
+-- %DNP%  MOS -cGnssModuleLockStatus MOS 
+
+-- %DNP%  MOS -cGnssModulePresenceStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleSlotInfo MOS 
+
+-- %DNP%  MOS -cGnssModuleSlotState MOS 
+
+-- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleSatelliteCount MOS 
+
+-- %DNP%  MOS -cGnssModuleSvIdSNR MOS 
+
+-- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS 
+
+-- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBConform MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBCompliances MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBCompliance MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBGroups MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS 
+
+-- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS 
+
+-- %DNP%  MRC - SlotInfo~1~ - 2019060412:06 PST - sshabeen -2.0 -UNACK
+-- %DNP%  - Remove the keyword testbed.
+-- %DNP%
+-- %DNP% -0 MRC 
+
