@@ -839,7 +839,7 @@
                     "processor_index": "196608",
                     "processor_type": "hr",
                     "processor_usage": 1,
-                    "processor_descr": "Intel Xeon      X3430 @ 2.40GHz",
+                    "processor_descr": "Intel Xeon X3430 @ 2.40GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -849,7 +849,7 @@
                     "processor_index": "196609",
                     "processor_type": "hr",
                     "processor_usage": 4,
-                    "processor_descr": "Intel Xeon      X3430 @ 2.40GHz",
+                    "processor_descr": "Intel Xeon X3430 @ 2.40GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -859,7 +859,7 @@
                     "processor_index": "196610",
                     "processor_type": "hr",
                     "processor_usage": 9,
-                    "processor_descr": "Intel Xeon      X3430 @ 2.40GHz",
+                    "processor_descr": "Intel Xeon X3430 @ 2.40GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -869,7 +869,7 @@
                     "processor_index": "196611",
                     "processor_type": "hr",
                     "processor_usage": 2,
-                    "processor_descr": "Intel Xeon      X3430 @ 2.40GHz",
+                    "processor_descr": "Intel Xeon X3430 @ 2.40GHz",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

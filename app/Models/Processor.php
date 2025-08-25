@@ -17,7 +17,6 @@ class Processor extends DeviceRelatedModel implements Keyable
     public $timestamps = false;
     protected $primaryKey = 'processor_id';
     protected $fillable = [
-        'entPhysicalIndex',
         'hrDeviceIndex',
         'processor_oid',
         'processor_index',

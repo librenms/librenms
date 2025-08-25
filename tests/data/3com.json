@@ -5,7 +5,17 @@
                 {
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.43.45.1.6.1.1.1.3.131072",
-                    "processor_index": "0",
+                    "processor_index": "131072",
+                    "processor_type": "3com",
+                    "processor_usage": 99,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.43.45.1.6.1.1.1.3.65536",
+                    "processor_index": "65536",
                     "processor_type": "3com",
                     "processor_usage": 34,
                     "processor_descr": "Processor",
@@ -14,21 +24,7 @@
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.43.45.1.6.1.1.1.3.131072",
-                    "processor_index": "0",
-                    "processor_type": "3com",
-                    "processor_usage": 99,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "os": {
         "discovery": {
