@@ -81,7 +81,7 @@
                                     <span class="input-group-btn">
                                         <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.fields.dashboard_name') }}</span></a>
                                     </span>
-                                    <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.dashboard_name_placeholder') }}" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
+                                    <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.dashboard_name') }}" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
                                     <select class="form-control" name="access" style="width:160px;">
                                     @php($accessLabels = [0 => trans('dashboard.access.private'), 1 => trans('dashboard.access.shared_read'), 2 => trans('dashboard.access.shared_admin'), 3 => trans('dashboard.access.shared')])
                                     @foreach ($accessLabels as $k => $v)
@@ -116,12 +116,12 @@
                 <div class="col-md-12">
                     <div class="col-md-12">
                         <div class="btn-group" role="group">
-                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
+                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.add') }}</span></a>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
                                 <span class="pull-right">
                                     <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
+                                    <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
                                 </span>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -143,14 +143,14 @@
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
+                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.remove') }}</span><strong class="pull-right">{{ trans('dashboard.widgets.label') }}</strong></button>
                     </div>
                 </div>
             </div>
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.labels.delete') }}</span><strong class="pull-right">{{ trans('dashboard.labels.dashboard') }}</strong></button>
                     </div>
                 </div>
             </div>
