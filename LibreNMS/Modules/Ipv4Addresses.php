@@ -86,9 +86,7 @@ class Ipv4Addresses implements Module
 
         // Fetch all networks with blank contexts
         $nets = Ipv4Network::where('context_name', '')->get()->groupBy('ipv4_network');
-        $nets->keys()->each(function (string $net) {
-            Log::debug($net);
-        });
+        Log::debug('Networks: ' . $nets->keys()->implode(','));
 
         $ips = $ips->filter(function ($data) use ($nets) {
             $addr = trim(str_replace('"', '', $data->ipv4_address ?? ''));
