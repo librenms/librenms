@@ -853,6 +853,7 @@ ipv4_addresses:
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv4_address_id], Unique: true, Type: BTREE }
+    ipv4_addresses_ipv4_network_id_index: { Name: ipv4_addresses_ipv4_network_id_index, Columns: [ipv4_network_id], Unique: false, Type: BTREE }
     ipv4_addresses_port_id_index: { Name: ipv4_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 ipv4_mac:
   Columns:
