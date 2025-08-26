@@ -84,9 +84,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                             alert_grid.find(".alert_rule_from_list").on("click", function(e) {
                                 var alert_rule_id = $(this).data("rule_id");
                                 $.ajax({
-                                    type: "POST",
-                                    url: "ajax_form.php",
-                                    data: {type: 'sql-from-alert-rules', rule_id: alert_rule_id},
+                                    type: "GET",
+                                    url: "<?php echo route('alert-rule-template.rule', ':rule_id') ?>".replace(':rule_id', alert_rule_id),
                                     dataType: "json",
                                     success: function (data) {
                                         if (data.status == 'ok') {
