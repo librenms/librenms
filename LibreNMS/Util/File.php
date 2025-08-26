@@ -1,7 +1,7 @@
 <?php
 
-/*
- * MaintenanceAlertBehavior.php
+/**
+ * File.php
  *
  * -Description-
  *
@@ -16,26 +16,31 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
+ *
+ * @copyright  2025 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Enum;
+namespace LibreNMS\Util;
 
-enum MaintenanceBehavior: int
+class File
 {
-    case SKIP_ALERTS = 1;
-    case MUTE_ALERTS = 2;
-    case RUN_ALERTS = 3;
-
-    public function descr(): string
+    /**
+     * @param  string  $directory
+     * @return array{int, int} size, count
+     */
+    public static function getFolderSize(string $directory): array
     {
-        return match ($this) {
-            self::SKIP_ALERTS => __('alerting.maintenance.behavior.options.skip_alerts') ,
-            self::MUTE_ALERTS => __('alerting.maintenance.behavior.options.mute_alerts'),
-            self::RUN_ALERTS => __('alerting.maintenance.behavior.options.run_alerts'),
-        };
+        $totalSize = 0;
+        $files = \Illuminate\Support\Facades\File::allFiles($directory);
+
+        foreach ($files as $file) {
+            $totalSize += $file->getSize();
+        }
+
+        return [$totalSize, count($files)];
     }
 }
