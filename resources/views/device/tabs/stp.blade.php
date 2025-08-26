@@ -10,7 +10,7 @@
             <table class="table table-condensed table-striped table-hover">
                 <tr>
                     <td>{{ trans('stp.root_bridge') }}</td>
-                    <td>{{ $instance['rootBridge'] ? 'Yes' : 'No' }}</td>
+                    <td>{{ $instance['rootBridge'] ? __('Yes') : __('No') }}</td>
                 </tr>
                 <tr>
                     <td>{{ trans('stp.bridge_address') }}</td>
@@ -97,17 +97,17 @@
                 <table id="stp-ports" class="table table-condensed table-hover">
                     <thead>
                     <tr>
-                        <th data-column-id="port_id">Port</th>
+                        <th data-column-id="port_id">{{ trans('stp.port') }}</th>
                         <th data-column-id="vlan" data-visible="false">{{ trans('stp.vlan') }}</th>
                         <th data-column-id="priority">{{ trans('stp.priority') }}</th>
-                        <th data-column-id="state">State</th>
-                        <th data-column-id="enable">Enable</th>
-                        <th data-column-id="pathCost">Path cost</th>
-                        <th data-column-id="designatedRoot" data-formatter="stpDevice">Designated root</th>
-                        <th data-column-id="designatedCost">Designated cost</th>
-                        <th data-column-id="designatedBridge" data-formatter="stpDevice">Designated bridge</th>
-                        <th data-column-id="designatedPort">Designated port</th>
-                        <th data-column-id="forwardTransitions">Forward transitions</th>
+                        <th data-column-id="state">{{ trans('stp.state') }}</th>
+                        <th data-column-id="enable">{{ trans('stp.enable') }}</th>
+                        <th data-column-id="pathCost">{{ trans('stp.path_cost') }}</th>
+                        <th data-column-id="designatedRoot" data-formatter="stpDevice">{{ trans('stp.designated_root_short') }}</th>
+                        <th data-column-id="designatedCost">{{ trans('stp.designated_cost') }}</th>
+                        <th data-column-id="designatedBridge" data-formatter="stpDevice">{{ trans('stp.designated_bridge') }}</th>
+                        <th data-column-id="designatedPort">{{ trans('stp.designated_port') }}</th>
+                        <th data-column-id="forwardTransitions">{{ trans('stp.forward_transitions') }}</th>
                     </tr>
                     </thead>
                 </table>
