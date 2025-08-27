@@ -25,7 +25,6 @@
                     <input type="hidden" name="device_name" id="device_name" value="{{ $deviceName }}">
                     <input type="hidden" name="rule_id" id="rule_id" value="">
                     <input type="hidden" name="type" id="type" value="alert-rules">
-                    <input type="hidden" name="template_id" id="template_id" value="">
                     <input type="hidden" name="builder_json" id="builder_json" value="">
 
                     <div class="tab-content" style="margin-top: 15px;">
@@ -129,6 +128,27 @@
                                 </div>
                             </div>
 
+                            <legend>{{ __('Templates') }}</legend>
+                            <div class="form-group" title="Select the template to use for notifications.">
+                                <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('Global Template') }}</label>
+                                <div class='col-sm-9 col-md-10'>
+                                    <select id="template_id" name="template_id" class="form-control">
+                                        <option value="">{{ __('Use default (or per-transport overrides)') }}</option>
+                                        @foreach($templates as $tpl)
+                                            <option value="{{ $tpl->id }}">{{ $tpl->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="help-block">{{ __('Optionally choose a global template for all transports. You can override per transport below.') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="per-transport-templates" title="Optionally override the template for specific transports.">
+                                <label class='col-sm-3 col-md-2 control-label'>{{ __('Per-transport overrides') }}</label>
+                                <div class='col-sm-9 col-md-10'>
+                                    <div id="transport-template-list"></div>
+                                    <span class="help-block">{{ __('After selecting transports above, choose a template for any you want to override.') }}</span>
+                                </div>
+                            </div>
+
                             <legend>{{ __('Notes & documentation') }}</legend>
                             <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
                                 <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
@@ -171,12 +191,6 @@
         </div>
     </div>
 </div>
-@endsection
-
-@section('javascript')
-    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
-    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
-    <script src="{{ asset('js/interact.min.js') }}"></script>
 @endsection
 
 {{-- Ported modals for importing rules (logic moved to controller) --}}
@@ -412,6 +426,32 @@
             }
         });
 
+        // Templates JS data
+        var templateOptions = @json($templates->toArray());
+        function renderPerTransportTemplates() {
+            var $list = $('#transport-template-list');
+            $list.empty();
+            var selected = $('#transports').val() || [];
+            if (!selected.length) { return; }
+            selected.forEach(function(key) {
+                if (String(key).startsWith('g')) {
+                    // groups are not supported for per-transport overrides (applies to individual transports only)
+                    return;
+                }
+                var row = $('<div class="form-inline" style="margin-bottom:6px;"></div>');
+                var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text('Transport #' + key);
+                var select = $('<select class="form-control" style="min-width:260px;"></select>')
+                    .attr('name', 'template_transports[' + key + ']');
+                select.append($('<option value=""></option>').text('— ' + 'Use global or default' + ' —'));
+                templateOptions.forEach(function(opt){
+                    select.append($('<option></option>').attr('value', opt.id).text(opt.name));
+                });
+                row.append(label).append(select);
+                $list.append(row);
+            });
+        }
+        $('#transports').on('change', renderPerTransportTemplates);
+
         // Initialize query builder
         var filters = {!! $filters !!};
         $('#builder').queryBuilder({
@@ -465,7 +505,7 @@
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
                     type: 'POST',
-                    url: 'ajax_form.php',
+                    url: '{{ url('alert-rule') }}',
                     data: $('form.alerts-form').serializeArray(),
                     dataType: 'json',
                     success: function (data) {
