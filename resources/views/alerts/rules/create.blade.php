@@ -30,6 +30,7 @@
 
                     <div class="tab-content" style="margin-top: 15px;">
                         <div role="tabpanel" class="tab-pane active" id="main">
+                            <legend>{{ __('Rule setup') }}</legend>
                             <div class='form-group' title="The description of this alert rule.">
                                 <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('Rule name') }}</label>
                                 <div class='col-sm-9 col-md-10'>
@@ -55,6 +56,27 @@
                                     <div id="builder"></div>
                                 </div>
                             </div>
+                            <div class='form-group form-inline'>
+                                <label for='invert' class='col-sm-3 col-md-2 control-label' title="Invert the match. If the rule matches, the alert is considered OK.">Invert match result </label>
+                                <div class='col-sm-2' title="Invert the match. If the rule matches, the alert is considered OK.">
+                                    <input type="checkbox" name="invert" id="invert">
+                                </div>
+                            </div>
+
+                            <legend>{{ __('Targeting') }}</legend>
+
+                            <div class="form-group form-inline">
+                                <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restrict this alert rule to the selected devices, groups, or locations.">Devices, groups, and locations </label>
+                                <div class="col-sm-7" style="width: 56%;">
+                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                                </div>
+                                <div>
+                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule checks will run on all devices except the selected devices and groups.">Run on all devices except selected </label>
+                                    <input type='checkbox' name='invert_map' id='invert_map'>
+                                </div>
+                            </div>
+
+                            <legend>{{ __('Notifications') }}</legend>
                             <div class="form-group" title="How to display the alert.  OK: green, Warning: yellow, Critical: red">
                                 <label for='severity' class='col-sm-3 col-md-2 control-label'>{{ __('Severity') }}</label>
                                 <div class="col-sm-2">
@@ -98,25 +120,8 @@
                                 </div>
                             </div>
 
-                            <div class='form-group form-inline'>
-                                <label for='invert' class='col-sm-3 col-md-2 control-label' title="Invert the match.  If the rule matches, the alert is considered OK.">Invert rule match </label>
-                                <div class='col-sm-2' title="Invert the match.  If the rule matches, the alert is considered OK.">
-                                    <input type="checkbox" name="invert" id="invert">
-                                </div>
-                            </div>
 
-
-                            <div class="form-group form-inline">
-                                <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list </label>
-                                <div class="col-sm-7" style="width: 56%;">
-                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                                </div>
-                                <div>
-                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
-                                    <input type='checkbox' name='invert_map' id='invert_map'>
-                                </div>
-                            </div>
-
+                            <legend>{{ __('Delivery channels') }}</legend>
                             <div class="form-group" title="Restricts this alert rule to specified transports.">
                                 <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
                                 <div class="col-sm-9 col-md-10">
@@ -124,6 +129,7 @@
                                 </div>
                             </div>
 
+                            <legend>{{ __('Notes & documentation') }}</legend>
                             <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
                                 <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
                                 <div class='col-sm-9 col-md-10'>
