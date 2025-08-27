@@ -190,6 +190,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
+        Route::get('alert/transports/{transport}', [AlertTransportController::class, 'show'])->name('alert.transports.show');
+        Route::get('alert/transport-groups/{group}', [AlertTransportController::class, 'groupMembers'])->name('alert.transport-groups.members');
+
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
