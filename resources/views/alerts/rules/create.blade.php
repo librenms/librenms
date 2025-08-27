@@ -459,18 +459,14 @@
                 if (String(key).startsWith('g')) {
                     var groupId = String(key).substring(1);
                     // fetch group members
-                    var call = $.ajax({
-                        type: 'POST',
-                        url: 'ajax_form.php',
-                        dataType: 'json',
-                        data: { type: 'show-transport-group', group_id: groupId },
-                    }).done(function(resp){
-                        if (resp && resp.members && resp.members.length) {
-                            resp.members.forEach(function(member){
-                                addRow(member.id, member.text);
-                            });
-                        }
-                    }).fail(function(){ /* ignore group load errors */ });
+                    var call = $.getJSON('{{ route('alert.transport-groups.members', ':group_id') }}'.replace(':group_id', groupId))
+                        .done(function(resp){
+                            if (resp && resp.members && resp.members.length) {
+                                resp.members.forEach(function(member){
+                                    addRow(member.id, member.text);
+                                });
+                            }
+                        }).fail(function(){ /* ignore group load errors */ });
                     ajaxCalls.push(call);
                 } else {
                     addRow(key, item.text);
