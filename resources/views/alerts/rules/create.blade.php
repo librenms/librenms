@@ -431,23 +431,55 @@
         function renderPerTransportTemplates() {
             var $list = $('#transport-template-list');
             $list.empty();
-            var selected = $('#transports').val() || [];
-            if (!selected.length) { return; }
-            selected.forEach(function(key) {
-                if (String(key).startsWith('g')) {
-                    // groups are not supported for per-transport overrides (applies to individual transports only)
-                    return;
-                }
+            var data = ($('#transports').data('select2') ? $('#transports').select2('data') : []) || [];
+            if (!data.length) { return; }
+
+            var added = {}; // transport_id => true to avoid duplicates
+            var rows = [];
+
+            function addRow(id, text) {
+                if (!id || added[id]) { return; }
+                added[id] = true;
+                var labelText = text || ('Transport #' + id);
                 var row = $('<div class="form-inline" style="margin-bottom:6px;"></div>');
-                var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text('Transport #' + key);
+                var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text(labelText);
                 var select = $('<select class="form-control" style="min-width:260px;"></select>')
-                    .attr('name', 'template_transports[' + key + ']');
+                    .attr('name', 'template_transports[' + id + ']');
                 select.append($('<option value=""></option>').text('— ' + 'Use global or default' + ' —'));
                 templateOptions.forEach(function(opt){
                     select.append($('<option></option>').attr('value', opt.id).text(opt.name));
                 });
                 row.append(label).append(select);
-                $list.append(row);
+                rows.push(row);
+            }
+
+            var ajaxCalls = [];
+            data.forEach(function(item) {
+                var key = item.id;
+                if (String(key).startsWith('g')) {
+                    var groupId = String(key).substring(1);
+                    // fetch group members
+                    var call = $.ajax({
+                        type: 'POST',
+                        url: 'ajax_form.php',
+                        dataType: 'json',
+                        data: { type: 'show-transport-group', group_id: groupId },
+                    }).done(function(resp){
+                        if (resp && resp.members && resp.members.length) {
+                            resp.members.forEach(function(member){
+                                addRow(member.id, member.text);
+                            });
+                        }
+                    }).fail(function(){ /* ignore group load errors */ });
+                    ajaxCalls.push(call);
+                } else {
+                    addRow(key, item.text);
+                }
+            });
+
+            // Once all group members are loaded, render rows
+            $.when.apply($, ajaxCalls).always(function(){
+                rows.forEach(function(r){ $list.append(r); });
             });
         }
         $('#transports').on('change', renderPerTransportTemplates);
