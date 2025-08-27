@@ -97,6 +97,12 @@ class Device extends BaseModel
             'last_polled' => 'datetime',
             'last_ping' => 'datetime',
             'status' => 'boolean',
+            'ignore' => 'boolean',
+            'ignore_status' => 'boolean',
+            'disabled' => 'boolean',
+            'snmp_disable' => 'boolean',
+            'disable_notify' => 'boolean',
+            'override_sysLocation' => 'boolean',
         ];
     }
 
@@ -475,16 +481,17 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  Location|string  $new_location  location data
+     * @param  Location|string|null  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
+     * @param  bool  $user_override  Ignore user override and update the location anyway
      */
-    public function setLocation($new_location, bool $doLookup = false)
+    public function setLocation(Location|string|null $new_location, bool $doLookup = false, bool $user_override = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
         $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        if (! $this->override_sysLocation) {
+        if ($user_override || ! $this->override_sysLocation) {
             if (! $new_location->location) { // disassociate if the location name is empty
                 $this->location()->dissociate();
 
@@ -733,7 +740,7 @@ class Device extends BaseModel
      */
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'alert_schedulable_id', 'schedule_id');
     }
 
     /**
