@@ -10,7 +10,7 @@
                 <h3 class="panel-title">
                     {{ __('Create Alert Rule') }}
                     <a target="_blank" href="https://docs.librenms.org/Alerting/" class="pull-right">
-                        <i class="fa fa-book"></i> Docs
+                        <i class="fa fa-book"></i> {{ __('Documentation') }}
                     </a>
                 </h3>
             </div>
