@@ -6,8 +6,10 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Http\Requests\AlertRuleRequest;
 use App\Models\AlertRule;
+use App\Models\AlertTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use LibreNMS\Alerting\QueryBuilderFilter;
@@ -77,6 +79,7 @@ class AlertRuleController extends Controller
             'filters' => $filters,
             'collectionRules' => $collectionRules,
             'dbRules' => $dbRules,
+            'templates' => AlertTemplate::query()->orderBy('name')->get(['id', 'name']),
         ], $defaults));
     }
 
@@ -92,6 +95,7 @@ class AlertRuleController extends Controller
 
             $this->syncMaps($request->input('maps', []), $alertRule);
             $this->syncTransports($request->input('transports', []), $alertRule);
+            $this->syncTemplates((int) $request->input('template_id'), $request->input('template_transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -149,6 +153,7 @@ class AlertRuleController extends Controller
 
             $this->syncMaps($request->input('maps', []), $alertRule);
             $this->syncTransports($request->input('transports', []), $alertRule);
+            $this->syncTemplates((int) $request->input('template_id'), $request->input('template_transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -306,4 +311,37 @@ class AlertRuleController extends Controller
         $alertRule->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
         $alertRule->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
        }
+
+    private function syncTemplates(?int $globalTemplateId, array $perTransportTemplates, AlertRule $alertRule): void
+    {
+        // Clear existing mappings for this rule
+        DB::table('alert_template_map')->where('alert_rule_id', $alertRule->id)->delete();
+
+        // Insert global template mapping (applies to all transports)
+        if (! empty($globalTemplateId)) {
+            DB::table('alert_template_map')->insert([
+                'alert_templates_id' => $globalTemplateId,
+                'alert_rule_id' => $alertRule->id,
+                'transport_id' => null,
+            ]);
+        }
+
+        // Insert per-transport mappings (only for single transports)
+        foreach ($perTransportTemplates as $key => $templateId) {
+            if (empty($templateId)) {
+                continue;
+            }
+
+            // Only accept numeric transport ids (ignore transport groups like g123)
+            if (! is_numeric($key)) {
+                continue;
+            }
+
+            DB::table('alert_template_map')->insert([
+                'alert_templates_id' => (int) $templateId,
+                'alert_rule_id' => $alertRule->id,
+                'transport_id' => (int) $key,
+            ]);
+        }
+    }
 }
