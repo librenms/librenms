@@ -91,9 +91,8 @@
 
         if (group_id > 0) {
             $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                data: { type: "show-transport-group", group_id: group_id},
+                type: "GET",
+                url: "<?php echo route('alert.transport-groups.members', ':group_id') ?>".replace(':group_id', group_id),
                 success: function (group) {
                     $("#group-name").val(group.name);
                     $.each(group.members, function(index, value) {

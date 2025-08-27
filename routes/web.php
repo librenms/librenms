@@ -241,6 +241,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('roles', RoleController::class);
 
     Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
+    Route::get('alert/transports/{transport}', [AlertTransportController::class, 'show'])->name('alert.transports.show');
+    Route::get('alert/transport-groups/{group}', [AlertTransportController::class, 'groupMembers'])->name('alert.transport-groups.members');
+
     Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
