@@ -105,33 +105,50 @@
                                 </div>
                             </div>
 
-                            <div class='form-group form-inline'>
-                                <label for='override_query' class='col-sm-3 col-md-2 control-label' title="Force the query to run even if the rule is disabled.">Override Query </label>
-                                <div class='col-sm-2' title="Force the query to run even if the rule is disabled.">
-                                    <input type="checkbox" name="override_query" id="override_query">
+
+                            <div class="form-group form-inline">
+                                <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list </label>
+                                <div class="col-sm-7" style="width: 56%;">
+                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                                </div>
+                                <div>
+                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
+                                    <input type='checkbox' name='invert_map' id='invert_map'>
                                 </div>
                             </div>
 
-                            <div class='form-group form-inline'>
-                                <label for='invert_map' class='col-sm-3 col-md-2 control-label' title="Invert the device/group/location mapping.">Invert map </label>
-                                <div class='col-sm-2' title="Invert the device/group/location mapping.">
-                                    <input type="checkbox" name="invert_map" id="invert_map">
+                            <div class="form-group" title="Restricts this alert rule to specified transports.">
+                                <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
+                                <div class="col-sm-9 col-md-10">
+                                    <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
+                                </div>
+                            </div>
+
+                            <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
+                                <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
+                                <div class='col-sm-9 col-md-10'>
+                                    <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
+                                </div>
+                            </div>
+                            <div class='form-group' title="A brief description for this alert rule">
+                                <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
+                                <div class='col-sm-9 col-md-10'>
+                                    <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
                                 </div>
                             </div>
                         </div>
                         <div role="tabpanel" class="tab-pane" id="advanced">
                             <div class='form-group'>
-                                <label for='rule' class='col-sm-3 col-md-2 control-label'>SQL</label>
+                                <label for='override_query' class='col-sm-3 col-md-2 control-label'>Override SQL</label>
                                 <div class='col-sm-9 col-md-10'>
-                                    <textarea id='rule' name='rule' class='form-control' rows="3"></textarea>
-                                    <span class="help-block">{{ __('Optional: Provide a raw SQL WHERE clause to override the builder.') }}</span>
+                                    <input type='checkbox' name='override_query' id='override_query'>
                                 </div>
                             </div>
                             <div class='form-group'>
-                                <label for='query_json' class='col-sm-3 col-md-2 control-label'>JSON</label>
+                                <label for='adv_query' class='col-sm-3 col-md-2 control-label'>SQL</label>
                                 <div class='col-sm-9 col-md-10'>
-                                    <textarea id='query_json' name='query_json' class='form-control' rows="3"></textarea>
-                                    <span class="help-block">{{ __('Optional: Provide a raw QueryBuilder JSON to override the builder.') }}</span>
+                                    <textarea id='adv_query' name='adv_query' class='form-control' rows="3"></textarea>
+                                    <span class="help-block">{{ __('Optional: Provide a raw SQL WHERE clause to override the builder.') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -243,8 +260,36 @@
             if (typeof extra.count !== 'undefined') { $('#count').val(extra.count); }
             if (typeof extra.delay !== 'undefined') { $('#delay').val(formatDuration(extra.delay)); }
             if (typeof extra.interval !== 'undefined') { $('#interval').val(formatDuration(extra.interval)); }
-            if (extra.adv_query) { $('#rule').val(extra.adv_query); }
+            if (extra.adv_query) { $('#adv_query').val(extra.adv_query); }
             if (rule.query_json) { $('#query_json').val(rule.query_json); }
+
+            // proc url and notes
+            if (typeof rule.proc !== 'undefined') { $('#proc').val(rule.proc); }
+            if (typeof rule.notes !== 'undefined') { $('#notes').val(rule.notes); }
+
+            // maps
+            var $maps = $('#maps');
+            $maps.empty();
+            $maps.val(null).trigger('change');
+            if (rule.maps == null) {
+                setRuleDevice(); // collection rule or none provided
+            } else {
+                $.each(rule.maps, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $maps.append(option).trigger('change');
+                });
+            }
+
+            // transports
+            var $transports = $('#transports');
+            $transports.empty();
+            $transports.val(null).trigger('change');
+            if (rule.transports != null) {
+                $.each(rule.transports, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $transports.append(option).trigger('change');
+                });
+            }
 
             // Set switches
             if (typeof extra.mute !== 'undefined') { $("[name='mute']").bootstrapSwitch('state', !!extra.mute); }
@@ -329,6 +374,38 @@
         $('#override_query').bootstrapSwitch();
         $('#invert_map').bootstrapSwitch();
 
+        // Initialize select2 for maps and transports
+        function setRuleDevice() {
+            var device_id = $('#device_id').val();
+            if (device_id > 0) {
+                var device_name = $('#device_name').val();
+                var option = new Option(device_name, device_id, true, true);
+                $('#maps').append(option).trigger('change');
+            }
+        }
+        $('#maps').select2({
+            width: '100%',
+            placeholder: 'Devices, Groups or Locations',
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function (params) {
+                    return { type: 'devices_groups_locations', search: params.term };
+                }
+            }
+        });
+        $('#transports').select2({
+            width: '100%',
+            placeholder: 'Transport/Group Name',
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function (params) {
+                    return { type: 'transport_groups', search: params.term };
+                }
+            }
+        });
+
         // Initialize query builder
         var filters = {!! $filters !!};
         $('#builder').queryBuilder({
@@ -367,6 +444,13 @@
         $("#acknowledgement").bootstrapSwitch('state', {{ $default_acknowledgement_alerts ? 'true' : 'false' }});
         $("#override_query").bootstrapSwitch('state', false);
         $("#invert_map").bootstrapSwitch('state', {{ $default_invert_map ? 'true' : 'false' }});
+
+        // reset text fields and selects
+        $('#proc').val('');
+        $('#notes').val('');
+        $('#maps').val(null).trigger('change');
+        $('#transports').val(null).trigger('change');
+        setRuleDevice();
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
