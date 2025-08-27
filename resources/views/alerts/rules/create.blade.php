@@ -258,6 +258,12 @@
     </div>
 </div>
 
+@section('javascript')
+    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
+    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
+    <script src="{{ asset('js/interact.min.js') }}"></script>
+@endsection
+
 @push('scripts')
 <script>
     // helper to format seconds to s/m/h/d string
@@ -338,23 +344,18 @@
     }).on("loaded.rs.jquery.bootgrid", function () {
         grid.find(".rule_from_collection").on("click", function () {
             var template_rule_id = $(this).data("rule_id");
-            $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                data: {type: 'sql-from-alert-collection', template_id: template_rule_id},
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 'ok') {
+            $.getJSON('{{ route('alert-rule-template', ':template_id') }}'.replace(':template_id', template_rule_id))
+                .done(function (data) {
+                    if (data.status === 'ok') {
                         $("#search_rule_modal").modal('hide');
                         loadRule(data);
                     } else {
-                        toastr.error(data.message);
+                        toastr.error(data.message || 'Failed to load template');
                     }
-                },
-                error: function () {
+                })
+                .fail(function () {
                     toastr.error('Failed to process template');
-                }
-            });
+                });
         }).end();
     });
 
@@ -369,19 +370,14 @@
     }).on("loaded.rs.jquery.bootgrid", function() {
         alert_grid.find(".alert_rule_from_list").on("click", function() {
             var alert_rule_id = $(this).data("rule_id");
-            $.ajax({
-                type: "POST",
-                url: "ajax_form.php",
-                data: {type: 'sql-from-alert-rules', rule_id: alert_rule_id},
-                dataType: "json",
-                success: function (data) {
-                    if (data.status == 'ok') {
+            $.getJSON('{{ route('alert-rule-template.rule', ':rule_id') }}'.replace(':rule_id', alert_rule_id))
+                .done(function (data) {
+                    if (data.status === 'ok') {
                         $("#search_alert_rule_modal").modal('hide');
                         loadRule(data);
-                    } else { toastr.error(data.message); }
-                },
-                error: function () { toastr.error('Failed to process template'); }
-            });
+                    } else { toastr.error(data.message || 'Failed to load rule'); }
+                })
+                .fail(function () { toastr.error('Failed to process template'); });
         }).end();
     });
 
@@ -395,7 +391,7 @@
         $('#invert_map').bootstrapSwitch();
 
         // Initialize select2 for maps and transports
-        function setRuleDevice() {
+        window.setRuleDevice = function() {
             var device_id = $('#device_id').val();
             if (device_id > 0) {
                 var device_name = $('#device_name').val();
