@@ -4,10 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
+use Illuminate\Http\JsonResponse;
 
 class AlertRuleTemplateController extends Controller
 {
-    public function template(int $template_id)
+    public function index(): JsonResponse
+    {
+        $collection = self::templatesCollection();
+
+        return response()->json(collect($collection)->map(function ($rule, $index) {
+            return [
+                'id' => $index,
+                'name' => $rule['name'],
+                'builder' => $rule['builder'] ?? null,
+            ];
+        })->values()->all());
+    }
+
+    public function show(int $template_id): JsonResponse
     {
         $collection = self::templatesCollection();
 
@@ -28,7 +42,7 @@ class AlertRuleTemplateController extends Controller
         ]);
     }
 
-    public function rule(AlertRule $alertRule)
+    public function rule(AlertRule $alertRule): JsonResponse
     {
         return response()->json([
             'status' => 'ok',
