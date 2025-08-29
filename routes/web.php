@@ -247,9 +247,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('alert-rule', AlertRuleController::class)->except(['index']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
-    Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
-    Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
-    Route::get('alert-rules/create', [\App\Http\Controllers\AlertRuleController::class, 'create'])->name('alert-rules.create');
+    Route::resource('alert-rule-template', AlertRuleTemplateController::class)->only('index', 'show');
+    Route::get('alert-rule-template/from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
     Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');

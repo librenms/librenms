@@ -352,7 +352,7 @@
             if (!collectionInit) {
                 $('#rule_collection').bootgrid({
                     ajax: true,
-                    url: '{{ route('alert-rule-template') }}', // returns collection list
+                    url: '{{ route('alert-rule-template.index') }}', // returns collection list
                     responseHandler: function (res) {
                         // Expecting { rows: [...], total: n }
                         var rows = (res || {}).rows || [];
@@ -363,7 +363,7 @@
                     collectionInit = true;
                     $(this).find(".rule_from_collection").on("click", function () {
                         var template_rule_id = $(this).data("rule_id");
-                        $.getJSON('{{ route('alert-rule-template', ':template_id') }}'.replace(':template_id', template_rule_id))
+                        $.getJSON('{{ route('alert-rule-template.show', ':template_id') }}'.replace(':template_id', template_rule_id))
                             .done(function (data) {
                                 if (data.status === 'ok') { $("#search_rule_modal").modal('hide'); loadRule(data); }
                                 else { toastr.error(data.message || 'Failed to load template'); }

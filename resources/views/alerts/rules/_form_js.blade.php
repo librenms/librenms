@@ -83,7 +83,7 @@
         }).on("loaded.rs.jquery.bootgrid", function () {
             grid.find(".rule_from_collection").on("click", function () {
                 var template_rule_id = $(this).data("rule_id");
-                $.getJSON({{ json_encode(route('alert-rule-template', ':template_id')) }}.replace(':template_id', template_rule_id))
+                $.getJSON({{ json_encode(route('alert-rule-template.show', ':template_id')) }}.replace(':template_id', template_rule_id))
                     .done(function (data) {
                         if (data.status === 'ok') {
                             $("#search_rule_modal").modal('hide');
