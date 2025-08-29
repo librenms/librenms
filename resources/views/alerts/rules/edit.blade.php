@@ -8,10 +8,15 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                    {{ __('Edit Alert Rule') }}
-                    <a target="_blank" href="https://docs.librenms.org/Alerting/" class="pull-right">
-                        <i class="fa fa-book"></i> {{ __('Documentation') }}
-                    </a>
+                    {{ __('Create Alert Rule') }}
+                    <div class="pull-right">
+                        <a target="_blank" href="https://docs.librenms.org/Alerting/" class="tw:mr-5">
+                            <i class="fa fa-book"></i> {{ __('Documentation') }}
+                        </a>
+                        <a href="javascript:void(0);" onclick="window.history.back();" class="tw:text-gray-700 tw:hover:text-red-600 tw:no-underline tw:text-3xl tw:transition-colors tw:duration-200" title="{{ __('Close') }}">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
                 </h3>
             </div>
             <div class="panel-body">
