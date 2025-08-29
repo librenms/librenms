@@ -330,6 +330,14 @@ Description: APC PDU over amperage
 
 Source: `sensors.sensor_class = "current" && sensors.sensor_descr = "Bank Total" && sensors.sensor_current > sensors.sensor_limit && devices.os = "apc"`
 
+#### Service (Boolean)
+
+Entity: `macros.service`
+
+Description: Only select services that aren't disabled or ignored.
+
+Source: `(services.service_disabled = 0 && services.service_ignore = 0)`
+
 ### Custom Macros
 
 Below are some examples of custom macros that can be be added.

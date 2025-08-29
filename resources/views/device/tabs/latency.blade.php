@@ -1,6 +1,7 @@
-@extends('device.index')
+@extends('layouts.librenmsv1')
 
-@section('tab')
+@section('content')
+<x-device.page :device="$device">
     @if($data['smokeping']->hasGraphs())
         <x-panel class="with-nav-tabs">
             <x-slot name="heading">
@@ -58,6 +59,7 @@
             <x-graph type="device_icmp_perf" legend="yes" :device="$device" width="600" height="240" :from="$data['from']" :to="$data['to']"></x-graph>
         </div>
     </x-panel>
+</x-device.page>
 @endsection
 
 @push('scripts')
