@@ -83,7 +83,7 @@
         }).on("loaded.rs.jquery.bootgrid", function () {
             grid.find(".rule_from_collection").on("click", function () {
                 var template_rule_id = $(this).data("rule_id");
-                $.getJSON({{ json_encode(route('alert-rule-template.show', ':template_id')) }}.replace(':template_id', template_rule_id))
+                $.getJSON('{{ route('alert-rule-template.show', ':template_id') }}'.replace(':template_id', template_rule_id))
                     .done(function (data) {
                         if (data.status === 'ok') {
                             $("#search_rule_modal").modal('hide');
@@ -108,7 +108,7 @@
         }).on("loaded.rs.jquery.bootgrid", function() {
             alert_grid.find(".alert_rule_from_list").on("click", function() {
                 var alert_rule_id = $(this).data("rule_id");
-                $.getJSON({{ json_encode(route('alert-rule-template.rule', ':rule_id')) }}.replace(':rule_id', alert_rule_id))
+                $.getJSON('{{ route('alert-rule-template.rule', ':rule_id') }}'.replace(':rule_id', alert_rule_id))
                     .done(function (data) {
                         if (data.status === 'ok') {
                             $("#search_alert_rule_modal").modal('hide');
@@ -192,7 +192,7 @@
                     var key = item.id;
                     if (String(key).startsWith('g')) {
                         var groupId = String(key).substring(1);
-                        var call = $.getJSON({{ json_encode(route('alert.transport-groups.members', ':group_id')) }}.replace(':group_id', groupId))
+                        var call = $.getJSON('{{ route('alert.transport-groups.members', ':group_id') }}'.replace(':group_id', groupId))
                             .done(function(resp){
                                 if (resp && resp.members && resp.members.length) {
                                     resp.members.forEach(function(member){
@@ -280,7 +280,7 @@
                         success: function (data) {
                             if (data.status === 'ok') {
                                 toastr.success(data.message);
-                                window.location.href = {{ json_encode(url('alert-rules')) }};
+                                window.location.href = '{{ url('alert-rules') }}';
                             } else {
                                 toastr.error(data.message);
                             }
