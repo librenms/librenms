@@ -1,0 +1,98 @@
+modules:
+  os:
+    hardware: SNMPv2-MIB::sysName.0
+    serial: DB7001-MIB::sernum.0
+    location: DB7001-MIB::alias.0
+    version: DB7001-MIB::fwrev.0
+  sensors:
+    pre-cache:
+      data:
+          -
+            oid:
+                - DB7001-MIB::alarmRfMin.0
+                - DB7001-MIB::alarmRfMax.0
+                - DB7001-MIB::alarmMpxMin.0
+                - DB7001-MIB::alarmMpxMax.0
+                - DB7001-MIB::alarmPilotMin.0
+                - DB7001-MIB::alarmPilotMax.0
+                - DB7001-MIB::alarmRdsMin.0
+                - DB7001-MIB::alarmRdsMax.0
+                - DB7001-MIB::alarmTempMin.0
+                - DB7001-MIB::alarmTempMax.0
+                - DB7001-MIB::alarmFanMin.0
+                - DB7001-MIB::alarmFanMax.0
+    frequency:
+      data:
+        - oid: DB7001-MIB::mntrFreq.0
+          value: DB7001-MIB::mntrFreq
+          num_oid: '.1.3.6.1.4.1.35833.37.3.1.{{ $index }}'
+          index: 'DB7001-MIB::mntrFreq.{{ $index }}'
+          descr: 'Frequency'
+          multiplier: 1000
+        - oid: DB7001-MIB::mntrPilotValueAvr.0
+          value: DB7001-MIB::mntrPilotValueAvr
+          num_oid: '.1.3.6.1.4.1.35833.37.3.15.{{ $index }}'
+          index: 'DB7001-MIB::mntrPilotValueAvr.{{ $index }}'
+          descr: 'Pilot Level avg.'
+          divisor: 256
+          high_limit: DB7001-MIB::alarmPilotMax
+          low_limit: DB7001-MIB::alarmPilotMin
+        - oid: DB7001-MIB::mntrMpxtValueAvr.0
+          value: DB7001-MIB::mntrMpxtValueAvr
+          num_oid: '.1.3.6.1.4.1.35833.37.3.9.{{ $index }}'
+          index: 'DB7001-MIB::mntrMpxtValueAvr.{{ $index }}'
+          descr: 'MPX Level avg.'
+          divisor: 256
+          high_limit: DB7001-MIB::alarmMpxMax
+          low_limit: DB7001-MIB::alarmMpxMin
+    dbm:
+      data:
+        - oid: DB7001-MIB::mntrRflvlValue.0
+          value: DB7001-MIB::mntrRflvlValue
+          num_oid: '.1.3.6.1.4.1.35833.37.3.2.{{ $index }}'
+          index: 'DB7001-MIB::mntrTempcValue.{{ $index }}'
+          descr: 'RF Level (dBµV)'
+          divisor: 256
+          high_limit: DB7001-MIB::alarmRfMax
+          low_limit: DB7001-MIB::alarmRfMin
+    temperature:
+      data:
+        - oid: DB7001-MIB::mntrTempcValue.0
+          value: DB7001-MIB::mntrTempcValue
+          num_oid: '.1.3.6.1.4.1.35833.37.3.39.{{ $index }}'
+          index: 'DB7001-MIB::mntrTempcValue.{{ $index }}'
+          descr: 'Temperature'
+          divisor: 256
+    fanspeed:
+      data:
+        - oid: DB7001-MIB::mntrFanrpmValue.0
+          value: DB7001-MIB::mntrFanrpmValue
+          num_oid: '.1.3.6.1.4.1.35833.37.3.42.{{ $index }}'
+          index: 'DB7001-MIB::mntrFanrpmValue.{{ $index }}'
+          descr: 'Fan Speed'
+          high_limit: DB7001-MIB::alarmFanMax
+          low_limit: DB7001-MIB::alarmFanMin
+    ber:
+      data:
+        - oid: DB7001-MIB::mntrRdsBer.0
+          value: DB7001-MIB::mntrRdsBer
+          num_oid: '.1.3.6.1.4.1.35833.37.3.35.{{ $index }}'
+          index: 'DB7001-MIB::mntrRdsBer.{{ $index }}'
+          descr: 'RDS BER'
+          divisor: 32768
+    count:
+      data:
+        - oid: DB7001-MIB::mntrRdsErrorBits.0
+          value: DB7001-MIB::mntrRdsErrorBits
+          num_oid: '.1.3.6.1.4.1.35833.37.3.37.{{ $index }}'
+          index: 'DB7001-MIB::mntrRdsErrorBits.{{ $index }}'
+          descr: 'RDS Error Bits'
+    percent:
+      data:
+        - oid: DB7001-MIB::mntrMpathValue.0
+          value: DB7001-MIB::mntrMpathValue
+          num_oid: '.1.3.6.1.4.1.35833.37.3.5.{{ $index }}'
+          index: 'DB7001-MIB::mntrMpathValue.{{ $index }}'
+          descr: 'Multipath'
+          divisor: 256
+
