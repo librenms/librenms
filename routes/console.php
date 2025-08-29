@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
@@ -200,5 +201,10 @@ Schedule::call(function () {
 $maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
 Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
     ->weeklyOn(0, '1:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceCleanupNetworks::class, [])
+    ->weeklyOn(0, '2:00')
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
