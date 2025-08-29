@@ -4738,6 +4738,13 @@
             "default": [
             ]
         },
+        "influxdbv2.attach_sysname": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 11
+        },
         "kafka.enable": {
             "default": false,
             "type": "boolean",

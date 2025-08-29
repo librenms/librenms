@@ -42,6 +42,7 @@ continue to function as normal.
     lnms config:set influxdbv2.debug false
     lnms config:set influxdbv2.log_file '/opt/librenms/logs/influxdbv2.log'
     lnms config:set influxdbv2.groups-exclude ["group_name_1","group_name_2"]
+    lnms config:set influxdbv2.attach_sysname false
     lnms config:set influxdbv2.timeout 5
     lnms config:set influxdbv2.verify false
     lnms config:set influxdbv2.batch_size 1000

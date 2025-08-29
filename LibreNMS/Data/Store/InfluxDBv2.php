@@ -132,6 +132,11 @@ class InfluxDBv2 extends BaseDatastore
         $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device->hostname;
+
+        if (LibrenmsConfig::get('influxdbv2.attach_sysname', false)) {
+            $tmp_tags['sysName'] = $device->sysName;
+        }
+
         foreach ($tags as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
