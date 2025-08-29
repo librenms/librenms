@@ -133,8 +133,8 @@
                     <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
                         @if($device_types->isNotEmpty())
                         <ul class="dropdown-menu scrollable-menu">
-                        @foreach($device_types as $type)
-                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                        @foreach($device_types as $type => $icon)
+                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-{{ $icon }} fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                         @endforeach
                         </ul>
                         @endif
