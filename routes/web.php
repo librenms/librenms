@@ -193,7 +193,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('alert/transports/{transport}', [AlertTransportController::class, 'show'])->name('alert.transports.show');
         Route::get('alert/transport-groups/{group}', [AlertTransportController::class, 'groupMembers'])->name('alert.transport-groups.members');
 
-        Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+        Route::resource('alert-rule', AlertRuleController::class)->except(['index']);
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
         Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');

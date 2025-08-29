@@ -83,6 +83,67 @@ class AlertRuleController extends Controller
         ], $defaults));
     }
 
+    public function edit(AlertRule $alertRule): View
+    {
+        $filters = json_encode(new QueryBuilderFilter('alert'));
+        $defaults = [
+            'default_severity' => LibrenmsConfig::get('alert_rule.severity'),
+            'default_max_alerts' => LibrenmsConfig::get('alert_rule.max_alerts'),
+            'default_delay' => LibrenmsConfig::get('alert_rule.delay') . 'm',
+            'default_interval' => LibrenmsConfig::get('alert_rule.interval') . 'm',
+            'default_mute_alerts' => LibrenmsConfig::get('alert_rule.mute_alerts'),
+            'default_invert_rule_match' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
+            'default_recovery_alerts' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
+            'default_acknowledgement_alerts' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
+            'default_invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
+        ];
+
+        // Alert rule collection (from definitions json)
+        $collectionRules = [];
+        $rawCollection = AlertRuleTemplateController::templatesCollection();
+        $tmpId = 0;
+        foreach ($rawCollection as $rule) {
+            try {
+                $sql = QueryBuilderParser::fromJson($rule['builder'] ?? [])->toSql(false);
+            } catch (\Throwable $e) {
+                $sql = '';
+            }
+            $collectionRules[] = [
+                'id' => $tmpId++,
+                'name' => $rule['name'] ?? ('Rule ' . $tmpId),
+                'sql' => $sql,
+            ];
+        }
+
+        // Existing DB rules for import
+        $dbRules = AlertRule::query()->orderBy('name')->get()->map(function (AlertRule $rule) {
+            $rule_display = '';
+            if (! empty($rule->extra['options']['override_query'])) {
+                $rule_display = 'Custom SQL Query';
+            } else {
+                try {
+                    $rule_display = QueryBuilderParser::fromJson($rule->builder)->toSql(false);
+                } catch (\Throwable $e) {
+                }
+            }
+
+            return [
+                'id' => $rule->id,
+                'name' => $rule->name,
+                'severity' => $rule->severity,
+                'display' => $rule_display,
+            ];
+        })->all();
+
+        return view('alerts.rules.edit', array_merge([
+            'alertRule' => $alertRule,
+            'filters' => $filters,
+            'collectionRules' => $collectionRules,
+            'dbRules' => $dbRules,
+            'templates' => AlertTemplate::query()->orderBy('name')->get(['id', 'name']),
+        ], $defaults));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
