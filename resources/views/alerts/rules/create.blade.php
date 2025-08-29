@@ -27,7 +27,12 @@
                     <input type="hidden" name="type" id="type" value="alert-rules">
                     <input type="hidden" name="builder_json" id="builder_json" value="">
 
-                    @include('alerts.rules._form')
+                    @include('alerts.rules._form', [
+                        'mode' => 'create',
+                        'saveUrl' => url('alert-rule'),
+                        'saveMethod' => 'POST',
+                        'loadUrl' => null,
+                    ])
                 </form>
             </div>
         </div>
@@ -99,18 +104,3 @@
         </div>
     </div>
 </div>
-
-@section('javascript')
-    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
-    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
-    <script src="{{ asset('js/interact.min.js') }}"></script>
-@endsection
-
-@push('scripts')
-@include('alerts.rules._form_js', [
-    'mode' => 'create',
-    'saveUrl' => url('alert-rule'),
-    'saveMethod' => 'POST',
-    'loadUrl' => null,
-])
-@endpush
