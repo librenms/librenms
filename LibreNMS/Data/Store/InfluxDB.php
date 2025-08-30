@@ -119,9 +119,9 @@ class InfluxDB extends BaseDatastore
         }
 
         try {
-            // Add timestamp to points as current time in nanoseconds
+            // Add timestamp to points as current time in seconds
             // This is important for batch writes to ensure data is ordered and aggregated correctly
-            $timestamp = (int) floor(microtime(true) * 1_000_000_000); // Convert timestamp to nanoseconds
+            $timestamp = (int) floor(microtime(true)); 
 
             $this->batchPoints[] = new \InfluxDB\Point(
                 $measurement,
@@ -155,7 +155,7 @@ class InfluxDB extends BaseDatastore
             Log::debug('Flushing InfluxDB batch of ' . count($this->batchPoints) . ' points');
         }
         try {
-            $this->connection->writePoints($this->batchPoints, \InfluxDB\Database::PRECISION_NANOSECONDS); // Added timestamps are in nanoseconds
+            $this->connection->writePoints($this->batchPoints, \InfluxDB\Database::PRECISION_SECONDS); // Added timestamps are in seconds
         } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB batch write failed: ' . $e->getMessage());
         }
