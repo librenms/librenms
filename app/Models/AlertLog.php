@@ -23,11 +23,6 @@ class AlertLog extends DeviceRelatedModel
         )->shouldCache();
     }
 
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class, 'device_id', 'device_id');
-    }
-
     public function rule(): BelongsTo
     {
         return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
