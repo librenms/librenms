@@ -6,10 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'sagan';
 
-if (! is_array($app_data['instances'])) {
-    $app_data['instances'] = [];
-}
-
 try {
     $sagan = json_app_get($device, 'sagan-stats');
 } catch (JsonAppException $e) {
@@ -80,7 +76,7 @@ foreach ($sagan['data'] as $instance => $stats) {
     app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
-$old_instances = $app->app['instances'] ?? [];
+$old_instances = $app->data['instances'] ?? [];
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));

@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
@@ -34,7 +35,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
@@ -60,7 +60,7 @@ class UserPreferencesController extends Controller
         $locales = $this->getValidLocales();
         $styles = $this->getValidStyles();
         $default_locale = \config('app.default_locale'); // always the system default
-        $default_style = Config::get('site_style');
+        $default_style = LibrenmsConfig::get('site_style');
 
         $data = [
             'user' => $user,
@@ -75,11 +75,12 @@ class UserPreferencesController extends Controller
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
             'timezone' => UserPref::getPref($user, 'timezone'),
+            'temp_units' => UserPref::getPref($user, 'temp_units'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
             'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
-        if (Config::get('twofactor')) {
+        if (LibrenmsConfig::get('twofactor')) {
             $twofactor = UserPref::getPref($user, 'twofactor');
             if ($twofactor) {
                 $data['twofactor_uri'] = TwoFactor::generateUri($user->username, $twofactor['key'], $twofactor['counter'] !== false);
@@ -117,6 +118,7 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], timezone_identifiers_list())),
             ],
+            'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
             'global_search_ctrlf_focus' => 'required|integer',
         ];

@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
@@ -261,6 +262,9 @@ class Validator
      * @param  string  $command  the command to run
      * @param  array  $output  will hold the output of the command
      * @param  int  $code  will hold the return code from the command
+     *
+     * @param-out array $output
+     * @param-out int $code
      */
     public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
@@ -297,7 +301,7 @@ class Validator
      */
     public function getBaseURL(): string
     {
-        $url = function_exists('get_url') ? get_url() : Config::get('base_url');
+        $url = function_exists('get_url') ? get_url() : LibrenmsConfig::get('base_url');
 
         return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }

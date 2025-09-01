@@ -6715,28 +6715,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2002,
                     "vlan_domain": 1,
                     "vlan_name": "dienste",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3040,
                     "vlan_domain": 1,
                     "vlan_name": "prod",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3972,
                     "vlan_domain": 1,
                     "vlan_name": "remed",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -7917,6 +7917,26 @@
                     "ifAlias": "D-Link DGS-1510-28X/ME R1.10.010 Port 27",
                     "ifDescr": "D-Link DGS-1510-28X/ME R1.10.010 Port 27",
                     "ifName": "1/27"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.121.131",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "143.160.121.128/27",
+                    "ifIndex": 5121
+                },
+                {
+                    "ipv4_address": "143.160.92.5",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "143.160.92.0/22",
+                    "ifIndex": 5121
                 }
             ]
         }

@@ -1,0 +1,453 @@
+--
+-- Rajant BreadCrumb MIB
+--
+RAJANT-CORPORATION-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Import well known definitions from standard MIBs
+--
+IMPORTS
+   MODULE-IDENTITY, OBJECT-IDENTITY, enterprises, OBJECT-TYPE, Unsigned32, TimeTicks, IpAddress, Integer32, Gauge32, Counter64
+      FROM SNMPv2-SMI;
+
+--
+-- MIB meta data
+--
+rajantCorporation MODULE-IDENTITY
+    LAST-UPDATED	"202402210000Z"
+    ORGANIZATION	"Rajant Corporation"
+    CONTACT-INFO	"support@rajant.com"
+    DESCRIPTION     "Rajant Corporation MIB"
+
+    REVISION     "202402210000Z"
+    DESCRIPTION
+	"Added GPS OBJECT and fields"
+
+    REVISION     "202202250000Z"
+    DESCRIPTION
+	"Changed OBJECT-IDENTITY to OBJECT-TYPE for container objects and set the
+    SYNTAX field to reflect the correct data type."
+
+    REVISION     "201308200000Z"
+    DESCRIPTION
+	"First revision."
+
+--
+-- Rajant's unique Enterprise ID (OID)
+--
+::= { enterprises 34861 }
+
+system OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"System status"
+    ::=  { rajantCorporation 1 }
+
+instamesh OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Instamesh status"
+    ::=  { rajantCorporation 2 }
+
+wireless OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Wireless interfaces"
+    ::=  { rajantCorporation 3 }
+
+gps OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Location"
+    ::=  { rajantCorporation 4 }
+
+serialNumber	OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hardware serial number"
+    ::= { system 1 }
+
+systemTemperature	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"System temperature"
+    ::= { system 2 }
+
+freeMemory	OBJECT-TYPE
+    SYNTAX    Gauge32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION	"Free memory"
+    ::= { system 3 }
+
+idle	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Processor Idle time. Divide by uptime to get CPU utilitzation"
+    ::= { system 4 }
+
+uptime	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Up Time"
+    ::= { system 5 }
+
+instameshArpDropped OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of dropped ARP requests"
+    ::= { instamesh 1 }
+
+instameshArpRequests	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of ARP requests"
+    ::= { instamesh 2 }
+
+instameshArpRequestsAnswered	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of answered ARP requests"
+    ::= { instamesh 3 }
+
+instameshArpRequestsUnicasted	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of unicast ARP requests"
+    ::= { instamesh 4 }
+
+instameshArpTotal		OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of all ARP requests"
+    ::= { instamesh 5 }
+
+instameshFloodsDropped		OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of dropped flood packets"
+    ::= { instamesh 6 }
+
+instameshPacketsDropped		OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION			"Number of dropped packets"
+    ::= { instamesh 7 }
+
+instameshPacketsMulticast	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of multicast packets"
+    ::= { instamesh 8 }
+
+instameshPacketsReceived	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of received packets"
+    ::= { instamesh 9 }
+
+instameshPacketsSent		OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of sent packets"
+    ::= { instamesh 10 }
+
+instameshSourceFloodsDropped	OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Number of dropped source flood packets"
+    ::= { instamesh 11 }
+
+instameshTimeWaited		OBJECT-TYPE
+    SYNTAX    Counter64
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Time spent on waiting"
+    ::= { instamesh 12 }
+
+-- Wireless interfaces
+
+wlan0 OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Wireless interface wlan0"
+    ::=  { wireless 1 }
+
+wlan0name	OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION		"Interface name"
+    ::= { wlan0 1 }
+
+wlan0frequency	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Operating frequency"
+    ::= { wlan0 2 }
+
+wlan0noise	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Noise level"
+    ::= { wlan0 3 }
+
+wlan0channelActiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel active time"
+    ::= { wlan0 4 }
+
+wlan0channelBusyTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel busy time"
+    ::= { wlan0 5 }
+
+wlan0channelReceiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel receive time"
+    ::= { wlan0 6 }
+
+wlan0channelTransmitTime	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel transmit time"
+    ::= { wlan0 7 }
+
+wlan1 OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Wireless interface wlan1"
+    ::=  { wireless 2 }
+
+wlan1name	OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION		"Interface name"
+    ::= { wlan1 1 }
+
+wlan1frequency	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Operating frequency"
+    ::= { wlan1 2 }
+
+wlan1noise	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Noise level"
+    ::= { wlan1 3 }
+
+wlan1channelActiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel active time"
+    ::= { wlan1 4 }
+
+wlan1channelBusyTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel busy time"
+    ::= { wlan1 5 }
+
+wlan1channelReceiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel receive time"
+    ::= { wlan1 6 }
+
+wlan1channelTransmitTime	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel transmit time"
+    ::= { wlan1 7 }
+
+wlan2 OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Wireless interface wlan2"
+    ::=  { wireless 3 }
+
+wlan2name	OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION		"Interface name"
+    ::= { wlan2 1 }
+
+wlan2frequency	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Operating frequency"
+    ::= { wlan2 2 }
+
+wlan2noise	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Noise level"
+    ::= { wlan2 3 }
+
+wlan2channelActiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel active time"
+    ::= { wlan2 4 }
+
+wlan2channelBusyTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel busy time"
+    ::= { wlan2 5 }
+
+wlan2channelReceiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel receive time"
+    ::= { wlan2 6 }
+
+wlan2channelTransmitTime	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel transmit time"
+    ::= { wlan2 7 }
+
+wlan3 OBJECT-IDENTITY
+    STATUS		current
+    DESCRIPTION	"Wireless interface wlan2"
+    ::=  { wireless 4 }
+
+wlan3name	OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION		"Interface name"
+    ::= { wlan3 1 }
+
+wlan3frequency	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Operating frequency"
+    ::= { wlan3 2 }
+
+wlan3noise	OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Noise level"
+    ::= { wlan3 3 }
+
+wlan3channelActiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel active time"
+    ::= { wlan3 4 }
+
+wlan3channelBusyTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel busy time"
+    ::= { wlan3 5 }
+
+wlan3channelReceiveTime		OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel receive time"
+    ::= { wlan3 6 }
+
+wlan3channelTransmitTime	OBJECT-TYPE
+    SYNTAX    TimeTicks
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION		"Channel transmit time"
+    ::= { wlan3 7 }
+
+gpsDate OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "GPS date"
+    ::= { gps 1 }
+
+gpsTime OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "GPS time"
+    ::= { gps 2 }
+
+gpsLongitude OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Longitude"
+    ::= { gps 3 }
+
+gpsLatitude OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Latitude"
+    ::= { gps 4 }
+
+gpsAltitude OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Altitude"
+    ::= { gps 5 }
+
+gpsSpeedKnots OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Speed in knots"
+    ::= { gps 6 }
+
+gpsSatellites OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "GPS Satellites in use"
+    ::= { gps 7 }
+
+gpsValid OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Position status valid"
+    ::= { gps 8 }
+
+END

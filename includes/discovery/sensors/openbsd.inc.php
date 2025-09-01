@@ -32,7 +32,7 @@ $entitysensor['temperature'] = 'temperature';
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         // echo("[" . $entry['sensorType'] . "|" . $entry['sensorValue']. "|" . $index . "] ");
-        if ($entitysensor[$entry['sensorType']] && is_numeric($entry['sensorValue']) && is_numeric($index)) {
+        if (isset($entitysensor[$entry['sensorType']]) && is_numeric($entry['sensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.4.1.30155.2.1.2.1.5.' . $index;
             $current = $entry['sensorValue'];

@@ -1,4 +1,0 @@
-modules:
-    os:
-        serial:
-            - Printer-MIB::prtGeneralSerialNumber.1

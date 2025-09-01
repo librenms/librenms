@@ -26,11 +26,11 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -106,7 +106,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 20,
             'width' => 80,
         ];
@@ -121,7 +121,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 150,
             'width' => 400,
         ];
@@ -135,5 +135,46 @@ class MempoolsController extends TableController
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Description',
+            'Used',
+            'Free',
+            'Total',
+            'Percentage',
+            'Warning Threshold',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Mempool  $mempool
+     * @return array
+     */
+    protected function formatExportRow($mempool)
+    {
+        $is_percent = $mempool->mempool_total == 100;
+
+        return [
+            'device_id' => $mempool->device_id,
+            'hostname' => $mempool->device->displayName(),
+            'description' => $mempool->mempool_descr,
+            'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
+            'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),
+            'total' => $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total),
+            'percentage' => $mempool->mempool_perc . '%',
+            'warning_threshold' => $mempool->mempool_perc_warn ?? '-',
+        ];
     }
 }

@@ -161,7 +161,7 @@ class SmOs extends OS implements
                 'sm-os',
                 "radioPtx.$index",
                 'Transmitted Power Level',
-                $entry['radioPtx']
+                $entry['radioPtx'] ?? null
             );
         }
 
@@ -246,7 +246,7 @@ class SmOs extends OS implements
                 'sm-os',
                 $index,
                 $this->getRadioLabel($index),
-                $entry['radioXpd'],
+                $entry['radioXpd'] ?? null,
                 1,
                 10
             );
@@ -265,7 +265,7 @@ class SmOs extends OS implements
                 $distance = $data['SIAE-SFP-MIB::sfpLinkLength9u'];
             } elseif ($data['SIAE-SFP-MIB::sfpLinkLength50u'] > 0) {
                 $distance = $data['SIAE-SFP-MIB::sfpLinkLength50u'];
-            } elseif ($data['SIAE-SFP-MIB::sfpLinkLength62p5u'] > 0) {
+            } elseif (isset($data['SIAE-SFP-MIB::sfpLinkLength62p5u']) && $data['SIAE-SFP-MIB::sfpLinkLength62p5u'] > 0) {
                 $distance = $data['SIAE-SFP-MIB::sfpLinkLength62p5u'];
             } elseif ($data['SIAE-SFP-MIB::sfpLinkLengthCopper'] > 0) {
                 $distance = $data['SIAE-SFP-MIB::sfpLinkLengthCopper'];

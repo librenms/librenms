@@ -26,13 +26,15 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 
 class OutagesController extends TableController
 {
+    protected $model = DeviceOutage::class;
+
     public function rules()
     {
         return [
@@ -95,14 +97,12 @@ class OutagesController extends TableController
         $day_seconds = 86400;
 
         $duration_days = (int) ($duration / $day_seconds);
-        $duration_time = $duration % $day_seconds;
 
-        $output = "<span style='display:inline;'>";
+        $output = '';
         if ($duration_days) {
             $output .= $duration_days . 'd ';
         }
-        $output .= (new Carbon($duration))->format(Config::get('dateformat.time'));
-        $output .= '</span>';
+        $output .= (new Carbon($duration))->format(LibrenmsConfig::get('dateformat.time'));
 
         return $output;
     }
@@ -113,11 +113,9 @@ class OutagesController extends TableController
             $timestamp = 0;
         }
 
-        $output = "<span style='display:inline;'>";
-        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
-        $output .= '</span>';
-
-        return $output;
+        // Convert epoch to local time
+        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
+            ->format(LibrenmsConfig::get('dateformat.compact'));
     }
 
     private function statusLabel($outage)
@@ -131,5 +129,36 @@ class OutagesController extends TableController
         $output = "<span class='alert-status " . $label . "'></span>";
 
         return $output;
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Start',
+            'End',
+            'Duration',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  DeviceOutage  $outage
+     * @return array
+     */
+    protected function formatExportRow($outage)
+    {
+        return [
+            $outage->device ? $outage->device->displayName() : '',
+            $this->formatDatetime($outage->going_down),
+            $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
+            $this->formatTime(($outage->up_again ?: time()) - $outage->going_down),
+        ];
     }
 }

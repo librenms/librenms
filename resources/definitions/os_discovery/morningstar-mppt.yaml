@@ -1,0 +1,631 @@
+mib: GENSTAR:SUNSAVER-MPPT:PROSTAR-MPPT:TRISTAR-MPPT:TRISTAR-MPPT-600V
+modules:
+    os:
+        hardware: 
+            - GENSTAR::subModel.0
+            - SUNSAVER-MPPT::subModel.0
+            - PROSTAR-MPPT::subModel.0
+            - TRISTAR-MPPT::subModel.0
+            - TRISTAR-MPPT-600V::subModel.0
+        serial:
+            - GENSTAR::serialNumber.0
+            - SUNSAVER-MPPT::serialNumber.0
+            - PROSTAR-MPPT::serialNumber.0
+            - TRISTAR-MPPT::serialNumber.0
+            - TRISTAR-MPPT-600V::serialNumber.0
+        version:
+            - GENSTAR::deviceVersion.0
+            - SUNSAVER-MPPT::deviceVersion.0
+            - PROSTAR-MPPT::deviceVersion.0
+            - TRISTAR-MPPT::deviceVersion.0
+            - TRISTAR-MPPT-600V::deviceVersion.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: TRISTAR-MPPT::arrayVoltage
+                    value: TRISTAR-MPPT::arrayVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.2.30.{{ $index }}'
+                    descr: 'Array Voltage'
+                    index: 'arrayVoltage.{{ $index }}'
+                    multiplier: 0.0054931640625
+                -
+                    oid: TRISTAR-MPPT::batteryVoltage
+                    value: TRISTAR-MPPT::batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.2.36.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    index: 'batteryVoltage.{{ $index }}'
+                    multiplier: 0.0054931640625
+                -
+                    oid: TRISTAR-MPPT::batteryVoltageSlow
+                    value: TRISTAR-MPPT::batteryVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.2.37.{{ $index }}'
+                    descr: 'Battery Voltage (Slow)'
+                    index: 'batteryVoltageSlow.{{ $index }}'
+                    multiplier: 0.0054931640625
+                -
+                    oid: TRISTAR-MPPT::batteryTerminalVoltage
+                    value: TRISTAR-MPPT::batteryTerminalVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.2.38.{{ $index }}'
+                    descr: 'Battery Terminal Voltage'
+                    index: 'batteryTerminalVoltage.{{ $index }}'
+                    multiplier: 0.0054931640625
+                -
+                    oid: TRISTAR-MPPT::batterySenseVoltage
+                    value: TRISTAR-MPPT::batterySenseVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.2.39.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'batterySenseVoltage.{{ $index }}'
+                    multiplier: 0.0054931640625
+                -
+                    oid: SUNSAVER-MPPT::batteryVoltage
+                    value: SUNSAVER-MPPT::batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.3.30.{{ $index }}'
+                    descr: 'Battery Terminal Voltage'
+                    index: 'batteryVoltage.{{ $index }}'
+                    multiplier: 0.0030517578125
+                -
+                    oid: SUNSAVER-MPPT::arrayVoltage
+                    value: SUNSAVER-MPPT::arrayVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.3.31.{{ $index }}'
+                    descr: 'Array Voltage'
+                    index: 'arrayVoltage.{{ $index }}'
+                    multiplier: 0.0030517578125
+                -
+                    oid: SUNSAVER-MPPT::loadVoltage
+                    value: SUNSAVER-MPPT::loadVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.3.32.{{ $index }}'
+                    descr: 'Load Voltage'
+                    index: 'loadVoltage.{{ $index }}'
+                    multiplier: 0.0030517578125
+                -
+                    oid: PROSTAR-MPPT::batteryTerminalVoltage
+                    value: PROSTAR-MPPT::batteryTerminalVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.5.30.{{ $index }}'
+                    descr: 'Battery Terminal Voltage'
+                    index: 'batteryTerminalVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::arrayVoltage
+                    value: PROSTAR-MPPT::arrayVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.5.31.{{ $index }}'
+                    descr: 'Array Voltage'
+                    index: 'arrayVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::loadVoltage
+                    value: PROSTAR-MPPT::loadVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.5.32.{{ $index }}'
+                    descr: 'Load Voltage'
+                    index: 'loadVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::batterySenseVoltage
+                    value: PROSTAR-MPPT::batterySenseVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.5.36.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'batterySenseVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::meterbusVoltage
+                    value: PROSTAR-MPPT::meterbusVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.5.37.{{ $index }}'
+                    descr: 'Meter Bus Voltage'
+                    index: 'meterbusVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::batteryVoltageSlow
+                    value: PROSTAR-MPPT::batteryVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.5.47.{{ $index }}'
+                    descr: 'Battery Voltage (Slow)'
+                    index: 'batteryVoltageSlow.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::targetVoltageSlow
+                    value: PROSTAR-MPPT::targetVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.5.48.{{ $index }}'
+                    descr: 'Target Voltage (Slow)'
+                    index: 'targetVoltageSlow.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::arrayVoc
+                    value: PROSTAR-MPPT::arrayVoc
+                    num_oid: '.1.3.6.1.4.1.33333.5.65.{{ $index }}'
+                    descr: 'Array Open Circuit Voltage'
+                    index: 'arrayVoc.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::batteryVoltageSlow
+                    value: SUNSAVER-MPPT::batteryVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.3.41.{{ $index }}'
+                    descr: 'Battery Voltage (Slow)'
+                    index: 'batteryVoltageSlow.{{ $index }}'
+                    multiplier: 0.0030517578125
+                -
+                    oid: SUNSAVER-MPPT::targetVoltage
+                    value: SUNSAVER-MPPT::targetVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.3.42.{{ $index }}'
+                    descr: 'Target Voltage'
+                    index: 'targetVoltage.{{ $index }}'
+                    multiplier: 0.0030517578125
+                -
+                    oid: TRISTAR-MPPT-600V::arrayVoltage
+                    value: TRISTAR-MPPT-600V::arrayVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.7.30.{{ $index }}'
+                    descr: 'Array Voltage'
+                    index: 'arrayVoltage.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batteryVoltage
+                    value: TRISTAR-MPPT-600V::batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.7.36.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    index: 'batteryVoltage.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batteryVoltageSlow
+                    value: TRISTAR-MPPT-600V::batteryVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.7.37.{{ $index }}'
+                    descr: 'Battery Voltage Slow'
+                    index: 'batteryVoltageSlow.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batteryTerminalVoltage
+                    value: TRISTAR-MPPT-600V::batteryTerminalVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.7.38.{{ $index }}'
+                    descr: 'Battery Terminal Voltage'
+                    index: 'batteryTerminalVoltage.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batterySenseVoltage
+                    value: TRISTAR-MPPT-600V::batterySenseVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.7.39.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'batterySenseVoltage.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::targetRegulationVoltage
+                    value: TRISTAR-MPPT-600V::targetRegulationVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.7.45.{{ $index }}'
+                    descr: 'Target Regulation Voltage'
+                    index: 'batterySenseVtargetRegulationVoltageoltage.{{ $index }}'
+                -
+                    oid: GENSTAR::vbterm
+                    value: GENSTAR::vbterm
+                    num_oid: '.1.3.6.1.4.1.33333.10.30.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    index: 'vbterm.{{ $index }}'
+                -
+                    oid: GENSTAR::vload
+                    value: GENSTAR::vload
+                    num_oid: '.1.3.6.1.4.1.33333.10.31.{{ $index }}'
+                    descr: 'Load Voltage'
+                    index: 'vload.{{ $index }}'
+                -
+                    oid: GENSTAR::vbsense
+                    value: GENSTAR::vbsense
+                    num_oid: '.1.3.6.1.4.1.33333.10.32.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'vbsense.{{ $index }}'
+                -
+                    oid: GENSTAR::vCoin
+                    value: GENSTAR::vCoin
+                    num_oid: '.1.3.6.1.4.1.33333.10.33.{{ $index }}'
+                    descr: 'Coincell Battery Voltage'
+                    index: 'vCoin.{{ $index }}'
+                -
+                    oid: GENSTAR::vbattRefCharge
+                    value: GENSTAR::vbattRefCharge
+                    num_oid: '.1.3.6.1.4.1.33333.10.40.{{ $index }}'
+                    descr: 'Charging Target Voltage'
+                    index: 'vbattRefCharge.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: TRISTAR-MPPT::arrayCurrent
+                    value: TRISTAR-MPPT::arrayCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.2.31.{{ $index }}'
+                    descr: 'Array Current'
+                    index: 'arrayCurrent.{{ $index }}'
+                    multiplier: 0.00244140625
+                -
+                    oid: TRISTAR-MPPT::batteryCurrent
+                    value: TRISTAR-MPPT::batteryCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.2.42.{{ $index }}'
+                    descr: 'Battery Current'
+                    index: 'batteryCurrent.{{ $index }}'
+                    multiplier: 0.00244140625
+                -
+                    oid: TRISTAR-MPPT::batteryCurrentSlow
+                    value: TRISTAR-MPPT::batteryCurrentSlow
+                    num_oid: '.1.3.6.1.4.1.33333.2.43.{{ $index }}'
+                    descr: 'Battery Current (Slow)'
+                    index: 'batteryCurrentSlow.{{ $index }}'
+                    multiplier: 0.00244140625
+                -
+                    oid: SUNSAVER-MPPT::chargeCurrent
+                    value: SUNSAVER-MPPT::chargeCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.3.33.{{ $index }}'
+                    descr: 'Charge Current'
+                    index: 'chargeCurrent.{{ $index }}'
+                    multiplier: 0.002415771484375
+                -
+                    oid: SUNSAVER-MPPT::loadCurrent
+                    value: SUNSAVER-MPPT::loadCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.3.34.{{ $index }}'
+                    descr: 'Load Current'
+                    index: 'loadCurrent.{{ $index }}'
+                    multiplier: 0.002415771484375
+                -
+                    oid: PROSTAR-MPPT::chargeCurrent
+                    value: PROSTAR-MPPT::chargeCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.5.33.{{ $index }}'
+                    descr: 'Charge Current'
+                    index: 'chargeCurrent.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::loadCurrent
+                    value: PROSTAR-MPPT::loadCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.5.34.{{ $index }}'
+                    descr: 'Load Current'
+                    index: 'loadCurrent.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::batteryCurrentNet
+                    value: PROSTAR-MPPT::batteryCurrentNet
+                    num_oid: '.1.3.6.1.4.1.33333.5.35.{{ $index }}'
+                    descr: 'Battery Current Net'
+                    index: 'batteryCurrentNet.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::arrayCurrent
+                    value: TRISTAR-MPPT-600V::arrayCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.7.31.{{ $index }}'
+                    descr: 'Array Current'
+                    index: 'arrayCurrent.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batteryCurrent
+                    value: TRISTAR-MPPT-600V::batteryCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.7.42.{{ $index }}'
+                    descr: 'Battery Current'
+                    index: 'batteryCurrent.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::batteryCurrentSlow
+                    value: TRISTAR-MPPT-600V::batteryCurrentSlow
+                    num_oid: '.1.3.6.1.4.1.33333.7.43.{{ $index }}'
+                    descr: 'Battery Current (Slow)'
+                    index: 'batteryCurrentSlow.{{ $index }}'
+                -
+                    oid: GENSTAR::systemIcharge
+                    value: GENSTAR::systemIcharge
+                    num_oid: '.1.3.6.1.4.1.33333.10.34.{{ $index }}'
+                    descr: 'System Charging Current'
+                    index: 'systemIcharge.{{ $index }}'
+                -
+                    oid: GENSTAR::systemIload
+                    value: GENSTAR::systemIload
+                    num_oid: '.1.3.6.1.4.1.33333.10.35.{{ $index }}'
+                    descr: 'System Load Current'
+                    index: 'systemIload.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: TRISTAR-MPPT::inputPower
+                    value: TRISTAR-MPPT::inputPower
+                    num_oid: '.1.3.6.1.4.1.33333.2.32.{{ $index }}'
+                    descr: 'Input Power'
+                    index: 'inputPower.{{ $index }}'
+                    multiplier: 0.10986328125
+                -
+                    oid: TRISTAR-MPPT::outputPower
+                    value: TRISTAR-MPPT::outputPower
+                    num_oid: '.1.3.6.1.4.1.33333.2.44.{{ $index }}'
+                    descr: 'Output Power'
+                    index: 'outputPower.{{ $index }}'
+                    multiplier: 0.10986328125
+                -
+                    oid: PROSTAR-MPPT::arrayPower
+                    value: PROSTAR-MPPT::arrayPower
+                    num_oid: '.1.3.6.1.4.1.33333.5.62.{{ $index }}'
+                    descr: 'Array Power'
+                    index: 'arrayPower.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::inputPower
+                    value: TRISTAR-MPPT-600V::inputPower
+                    num_oid: '.1.3.6.1.4.1.33333.7.32.{{ $index }}'
+                    descr: 'Input Power'
+                    index: 'inputPower.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::outputPower
+                    value: TRISTAR-MPPT-600V::outputPower
+                    num_oid: '.1.3.6.1.4.1.33333.7.44.{{ $index }}'
+                    descr: 'Output Power'
+                    index: 'outputPower.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: TRISTAR-MPPT::rtsTemperature
+                    value: TRISTAR-MPPT::rtsTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.2.47.{{ $index }}'
+                    descr: 'Remote Temperature Sensor'
+                    index: 'rtsTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT::batteryTemperature
+                    value: TRISTAR-MPPT::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.2.48.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT::heatsinkTemperature
+                    value: TRISTAR-MPPT::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.2.49.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::heatsinkTemperature
+                    value: SUNSAVER-MPPT::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.3.35.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::batteryTemperature
+                    value: SUNSAVER-MPPT::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.3.36.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::ambientTemperature
+                    value: SUNSAVER-MPPT::ambientTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.3.37.{{ $index }}'
+                    descr: 'Ambient Temperature'
+                    index: 'ambientTemperature.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::rtsTemperature
+                    value: SUNSAVER-MPPT::rtsTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.3.38.{{ $index }}'
+                    descr: 'RTS Temperature'
+                    index: 'rtsTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::heatsinkTemperature
+                    value: PROSTAR-MPPT::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.38.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::batteryTemperature
+                    value: PROSTAR-MPPT::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.39.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::ambientTemperature
+                    value: PROSTAR-MPPT::ambientTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.40.{{ $index }}'
+                    descr: 'Ambient Temperature'
+                    index: 'ambientTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::rtsTemperature
+                    value: PROSTAR-MPPT::rtsTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.41.{{ $index }}'
+                    descr: 'RTS Temperature'
+                    index: 'rtsTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::uInductorTemperature
+                    value: PROSTAR-MPPT::uInductorTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.42.{{ $index }}'
+                    descr: 'U Inductor Temperature'
+                    index: 'uInductorTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::vInductorTemperature
+                    value: PROSTAR-MPPT::vInductorTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.43.{{ $index }}'
+                    descr: 'V Inductor Temperature'
+                    index: 'vInductorTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::wInductorTemperature
+                    value: PROSTAR-MPPT::wInductorTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.5.44.{{ $index }}'
+                    descr: 'W Inductor Temperature'
+                    index: 'wInductorTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::rtsTemperature
+                    value: TRISTAR-MPPT::rtsTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.7.47.{{ $index }}'
+                    descr: 'RTS Temperature'
+                    index: 'rtsTemperature.{{ $index }}'
+                -
+                    oid: PROSTTRISTARAR-MPPT-600V::batteryTemperature
+                    value: TRISTAR-MPPT::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.7.48.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::heatsinkTemperature
+                    value: TRISTAR-MPPT::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.7.49.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: GENSTAR::tempBatt
+                    value: GENSTAR::tempBatt
+                    num_oid: '.1.3.6.1.4.1.33333.10.36.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'tempBatt.{{ $index }}'
+                -
+                    oid: GENSTAR::tempRts
+                    value: GENSTAR::tempRts
+                    num_oid: '.1.3.6.1.4.1.33333.10.37.{{ $index }}'
+                    descr: 'Remote Temperature Sensor'
+                    index: 'tempRts.{{ $index }}'
+                -
+                    oid: GENSTAR::tempHeatsink
+                    value: GENSTAR::tempHeatsink
+                    num_oid: '.1.3.6.1.4.1.33333.10.38.{{ $index }}'
+                    descr: 'Remote Temperature Sensor'
+                    index: 'tempHeatsink.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: TRISTAR-MPPT::chargeState
+                    value: TRISTAR-MPPT::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.2.46.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Starting }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnected' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Slave' }
+                -
+                    oid: SUNSAVER-MPPT::chargeState
+                    value: SUNSAVER-MPPT::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.3.39.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk MPPT' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                -
+                    oid: SUNSAVER-MPPT::loadState
+                    value: SUNSAVER-MPPT::loadState
+                    num_oid: '.1.3.6.1.4.1.33333.3.46.{{ $index }}'
+                    index: 'loadState.{{ $index }}'
+                    descr: 'Load State'
+                    state_name: loadState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warning' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Disconnect' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Norm Off' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Not Used' }
+                -
+                    oid: PROSTAR-MPPT::chargeState
+                    value: PROSTAR-MPPT::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.5.45.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk MPPT' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 9, generic: 3, graph: 1, descr: 'Slave' }
+                        - { value: 10, generic: 3, graph: 1, descr: 'Fixed' }
+                -
+                    oid: PROSTAR-MPPT::loadState
+                    value: PROSTAR-MPPT::loadState
+                    num_oid: '.1.3.6.1.4.1.33333.5.53.{{ $index }}'
+                    index: 'loadState.{{ $index }}'
+                    descr: 'Load State'
+                    state_name: loadState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warning' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Disconnect' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Normal Off' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Not Used' }
+                -
+                    oid: TRISTAR-MPPT-600V::chargeState
+                    value: TRISTAR-MPPT-600V::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.7.46.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'MPPT' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 9, generic: 3, graph: 1, descr: 'Slave' }
+                        - { value: 10, generic: 3, graph: 1, descr: 'Fixed' }
+                -
+                    oid: GENSTAR::chargeState
+                    value: GENSTAR::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.10.39.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Starting }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnected' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                -
+                    oid: GENSTAR::loadState
+                    value: GENSTAR::loadState
+                    num_oid: '.1.3.6.1.4.1.33333.10.46.{{ $index }}'
+                    index: 'loadState.{{ $index }}'
+                    descr: 'Load State'
+                    state_name: loadState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warn' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Disc' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'Norm Off' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
+        power_consumed:
+            data:
+                -
+                    oid: TRISTAR-MPPT::kwhChargeTotal
+                    value: TRISTAR-MPPT::kwhChargeTotal
+                    num_oid: '.1.3.6.1.4.1.33333.2.53.{{ $index }}'
+                    descr: 'kWh Charge Total'
+                    index: 'kwhChargeTotal.{{ $index }}'
+                -
+                    oid: SUNSAVER-MPPT::kwhCharge
+                    value: SUNSAVER-MPPT::kwhCharge
+                    num_oid: '.1.3.6.1.4.1.33333.3.45.{{ $index }}'
+                    descr: 'kWh Charge'
+                    index: 'kwhCharge.{{ $index }}'
+                -
+                    oid: PROSTAR-MPPT::kwhChargeTotal
+                    value: PROSTAR-MPPT::kwhChargeTotal
+                    num_oid: '.1.3.6.1.4.1.33333.5.52.{{ $index }}'
+                    descr: 'kWh Charge Total'
+                    index: 'kwhChargeTotal.{{ $index }}'
+                -
+                    oid: TRISTAR-MPPT-600V::kwhChargeTotal
+                    value: TRISTAR-MPPT-600V::kwhChargeTotal
+                    num_oid: '.1.3.6.1.4.1.33333.7.53.{{ $index }}'
+                    descr: 'kWh Charge Total'
+                    index: 'kwhChargeTotal.{{ $index }}'
+                -
+                    oid: GENSTAR::systemChargeKwhTotal10
+                    value: GENSTAR::systemChargeKwhTotal10
+                    num_oid: '.1.3.6.1.4.1.33333.10.70.{{ $index }}'
+                    descr: 'System Charge Kwh Total'
+                    index: 'systemChargeKwhTotal10.{{ $index }}'
+                    multiplier: 0.1
+                -
+                    oid: GENSTAR::internalChargeKwhTotal10
+                    value: GENSTAR::internalChargeKwhTotal10
+                    num_oid: '.1.3.6.1.4.1.33333.10.82.{{ $index }}'
+                    descr: 'Internal Charge Kwh Total'
+                    index: 'internalChargeKwhTotal10.{{ $index }}'
+                    multiplier: 0.1

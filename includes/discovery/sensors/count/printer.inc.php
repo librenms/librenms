@@ -22,7 +22,7 @@ foreach ($walk as $index => $data) {
         '.1.3.6.1.2.1.43.10.2.1.4.' . $index, // Printer-MIB::prtMarkerLifeCount.1.1
         'prtMarkerLifeCount',
         $device['os'],
-        'Life time ' . $data['prtMarkerCounterUnit'],
+        'Life time ' . ($data['prtMarkerCounterUnit'] ?? '?'),
         1,
         1,
         null,
@@ -39,7 +39,7 @@ foreach ($walk as $index => $data) {
         '.1.3.6.1.2.1.43.10.2.1.5.' . $index, // Printer-MIB::prtMarkerPowerOnCount.1.1
         'prtMarkerPowerOnCount',
         $device['os'],
-        ucfirst($data['prtMarkerCounterUnit']) . ' since powered on',
+        ucfirst($data['prtMarkerCounterUnit'] ?? '?') . ' since powered on',
         1,
         1,
         null,
@@ -70,6 +70,22 @@ if ($device['os'] == 'konica') {
             $maxKey = max(array_keys($oidArray));
             $index = str_replace(' ', '', ucwords($cntName)) . '.' . $oidArray[$maxKey - 1] . '.' . $oidArray[$maxKey];
             discover_sensor(null, 'count', $device, $oid, $index, $device['os'], $cntName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Konica MIB');
+        }
+    }
+}
+
+if ($device['os'] == 'sharp') {
+    $oids = SnmpQuery::walk('SNMPv2-SMI::enterprises.2385.1.1.19.2.1')->table();
+    $valuesData = $oids['SNMPv2-SMI::enterprises'][2385][1][1][19][2][1][3];
+    $namesData = $oids['SNMPv2-SMI::enterprises'][2385][1][1][19][2][1][4];
+    foreach ($namesData as $index1 => $nData1) {
+        foreach ($nData1 as $index2 => $nData2) {
+            foreach ($nData2 as $index3 => $sensorName) {
+                $value = $valuesData[$index1][$index2][$index3];
+                $oid = '.1.3.6.1.4.1.2385.1.1.19.2.1.3.' . $index1 . '.' . $index2 . '.' . $index3;
+                $index = $sensorName . '.' . $index3;
+                discover_sensor(null, 'count', $device, $oid, $index, $device['os'], $sensorName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Sharp MIB');
+            }
         }
     }
 }

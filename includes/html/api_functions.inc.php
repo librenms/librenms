@@ -13,6 +13,7 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -33,6 +34,7 @@ use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
+use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -45,7 +47,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
-use LibreNMS\Config;
+use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -322,7 +324,7 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+    if (is_string($order) && preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
         $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
     } else {
         $order = 'd.`hostname` ASC';
@@ -381,6 +383,9 @@ function list_devices(Illuminate\Http\Request $request)
         $param[] = $query;
     } elseif ($type == 'display') {
         $sql = '`d`.`display` LIKE ?';
+        $param[] = "%$query%";
+    } elseif (in_array($type, ['serial', 'version', 'hardware', 'features'])) {
+        $sql = "`d`.`$type` LIKE ?";
         $param[] = "%$query%";
     } else {
         $sql = '1';
@@ -500,7 +505,9 @@ function del_device(Illuminate\Http\Request $request)
 
 function maintenance_device(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -513,27 +520,31 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    if (! $request->json('duration')) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device->displayName();
+    empty($data['notes']) ? $notes = '' : $notes = $data['notes'];
+    $title = $data['title'] ?? $device->displayName();
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
@@ -545,7 +556,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         $device->save();
     }
 
-    if ($request->json('start')) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -573,9 +584,7 @@ function device_under_maintenance(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function () use ($model) {
-        $maintenance = $model->isUnderMaintenance() ?? false;
-
-        return api_success($maintenance, 'is_under_maintenance');
+        return api_success($model->isUnderMaintenance(), 'is_under_maintenance');
     });
 }
 
@@ -641,7 +650,7 @@ function get_vlans(Illuminate\Http\Request $request)
     }
 
     return check_device_permission($device_id, function ($device_id) {
-        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', [$device_id]);
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_state FROM vlans WHERE `device_id` = ?', [$device_id]);
 
         return api_success($vlans, 'vlans');
     });
@@ -978,7 +987,7 @@ function get_graphs(Illuminate\Http\Request $request)
             'name' => 'device_icmp_perf',
         ];
         foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
-            $desc = Config::get("graph_types.device.{$graph['graph']}.descr");
+            $desc = LibrenmsConfig::get("graph_types.device.{$graph['graph']}.descr");
             $graphs[] = [
                 'desc' => $desc,
                 'name' => 'device_' . $graph['graph'],
@@ -1552,7 +1561,7 @@ function ack_alert(Illuminate\Http\Request $request)
     if (! empty($note)) {
         $note .= PHP_EOL;
     }
-    $note .= date(Config::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
     $info['until_clear'] = $data['until_clear'];
     $info = json_encode($info);
 
@@ -1578,7 +1587,7 @@ function unmute_alert(Illuminate\Http\Request $request)
     if (! empty($note)) {
         $note .= PHP_EOL;
     }
-    $note .= date(Config::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+    $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
 
     if (dbUpdate(['state' => 1, 'note' => $note], 'alerts', '`id` = ? LIMIT 1', [$alert_id])) {
         return api_success_noresult(200, 'Alert has been unmuted');
@@ -1668,8 +1677,8 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->when($request->route('hostname'), function ($query, $hostname) {
                  return $query->where('hostname', $hostname);
              })
-             ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
-             ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
+             ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
              ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
              ->get();
@@ -1690,13 +1699,13 @@ function list_oxidized(Illuminate\Http\Request $request)
             $output['telnet_port'] = $custom_telnet_port;
         }
         // Pre-populate the group with the default
-        if (Config::get('oxidized.group_support') === true && ! empty(Config::get('oxidized.default_group'))) {
-            $output['group'] = Config::get('oxidized.default_group');
+        if (LibrenmsConfig::get('oxidized.group_support') === true && ! empty(LibrenmsConfig::get('oxidized.default_group'))) {
+            $output['group'] = LibrenmsConfig::get('oxidized.default_group');
         }
 
-        foreach (Config::get('oxidized.maps') as $maps_column => $maps) {
+        foreach (LibrenmsConfig::get('oxidized.maps') as $maps_column => $maps) {
             // Based on Oxidized group support we can apply groups by setting group_support to true
-            if ($maps_column == 'group' && Config::get('oxidized.group_support', true) !== true) {
+            if ($maps_column == 'group' && LibrenmsConfig::get('oxidized.group_support', true) !== true) {
                 continue;
             }
 
@@ -1710,7 +1719,7 @@ function list_oxidized(Illuminate\Http\Request $request)
                 }
 
                 foreach ($fields as $field) {
-                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', $value)) {
+                    if (isset($field['regex']) && preg_match($field['regex'] . 'i', (string) $value)) {
                         $output[$maps_column] = $field['value'] ?? $field[$maps_column];  // compatibility with old format
                         break;
                     } elseif (isset($field['match']) && $field['match'] == $value) {
@@ -1721,7 +1730,7 @@ function list_oxidized(Illuminate\Http\Request $request)
             }
         }
         //Exclude groups from being sent to Oxidized
-        if (in_array($output['group'], Config::get('oxidized.ignore_groups'))) {
+        if (in_array($output['group'], LibrenmsConfig::get('oxidized.ignore_groups'))) {
             continue;
         }
 
@@ -2511,7 +2520,9 @@ function get_device_groups(Illuminate\Http\Request $request)
 
 function maintenance_devicegroup(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
+    $data = $request->json()->all();
+
+    if (empty($data)) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
@@ -2526,35 +2537,38 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
         return api_error(404, "Device group $name not found");
     }
 
-    if (! $request->json('duration')) {
+    if (empty($data['duration'])) {
         return api_error(400, 'Duration not provided');
     }
 
-    $notes = $request->json('notes');
-    $title = $request->json('title') ?? $device_group->name;
+    $notes = $data['notes'] ?? '';
+    $title = $data['title'] ?? $device_group->name;
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
 
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
 
-    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
 
-    $duration = $request->json('duration');
+    $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
-            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
     }
 
     $alert_schedule->save();
     $alert_schedule->deviceGroups()->attach($device_group);
 
-    if ($request->json('start')) {
+    if (isset($data['start'])) {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
     } else {
         return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
@@ -2780,6 +2794,26 @@ function get_fdb(Illuminate\Http\Request $request)
     });
 }
 
+function get_nac(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device = \App\Facades\DeviceCache::get($hostname);
+    if (! $device->exists) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($device) {
+        $nac = $device->portsNac;
+
+        return api_success($nac, 'ports_nac');
+    });
+}
+
 function get_transceivers(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2829,7 +2863,7 @@ function list_fdb_detail(Illuminate\Http\Request $request)
         ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
         ->where('mac_address', $macAddress->hex())
         ->orderBy('ports_fdb.updated_at', 'desc')
-        ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at')
+        ->select('devices.hostname', 'devices.sysName', 'ports.ifName', 'ports.ifAlias', 'ports.ifDescr', 'ports_fdb.updated_at')
         ->limit(1000)->get();
 
     if ($fdb->isEmpty()) {
@@ -2844,6 +2878,23 @@ function list_fdb_detail(Illuminate\Http\Request $request)
     }
 
     return api_success($fdb, 'ports_fdb', null, 200, count($fdb), $extras);
+}
+
+function list_nac(Illuminate\Http\Request $request)
+{
+    $mac = $request->route('mac');
+
+    $nac = PortsNac::hasAccess(Auth::user())
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
+
+    if ($nac->isEmpty()) {
+        return api_error(404, ' Nac entry does not exist');
+    }
+
+    return api_success($nac, 'ports_nac');
 }
 
 function list_sensors()

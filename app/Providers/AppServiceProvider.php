@@ -3,19 +3,33 @@
 namespace App\Providers;
 
 use App\Facades\LibrenmsConfig;
+use App\Guards\ApiTokenGuard;
 use App\Models\Sensor;
+use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
+use LibreNMS\Util\Version;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The path to the "home" route for your application.
+     *
+     * This is used by Laravel authentication to redirect users after login.
+     *
+     * @var string
+     */
+    public const HOME = '/';
+
     /**
      * Register any application services.
      *
@@ -23,7 +37,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->registerFacades();
         $this->registerGeocoder();
 
         $this->app->singleton('permissions', function () {
@@ -62,6 +75,9 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
+        Version::registerAboutCommand();
+
+        $this->bootAuth();
     }
 
     private function bootCustomBladeDirectives(): void
@@ -103,10 +119,10 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function configureMorphAliases()
+    private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (Sensor::getTypes() as $sensor_type) {
+        foreach (\LibreNMS\Enum\Sensor::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([
@@ -116,10 +132,6 @@ class AppServiceProvider extends ServiceProvider
             'device_group' => \App\Models\DeviceGroup::class,
             'location' => \App\Models\Location::class,
         ], $sensor_types));
-    }
-
-    private function registerFacades()
-    {
     }
 
     private function registerGeocoder()
@@ -160,7 +172,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Storage::observe(\App\Observers\StorageObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
-        \App\Models\User::observe(\App\Observers\UserObserver::class);
+        User::observe(\App\Observers\UserObserver::class);
         \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
         \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
@@ -179,19 +191,6 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('is_regex', function ($attribute, $value) {
             return @preg_match($value, '') !== false;
-        });
-
-        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
-            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
-
-            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
-                return str_replace(
-                    [':extra', ':values'],
-                    [implode(',', $extra_keys), implode(',', $parameters)],
-                    $message);
-            });
-
-            return is_array($value) && empty($extra_keys);
         });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
@@ -220,6 +219,64 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return false;
+        });
+
+        Validator::extend('array_keys_not_empty', function ($attribute, $value): bool {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $key => $_) {
+                if (is_string($key) && strlen(trim($key)) == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    public function bootAuth(): void
+    {
+        Auth::provider('legacy', function ($app, array $config) {
+            return new LegacyUserProvider();
+        });
+
+        Auth::provider('token_provider', function ($app, array $config) {
+            return new TokenUserProvider();
+        });
+
+        Auth::extend('token_driver', function ($app, $name, array $config) {
+            $userProvider = $app->make(TokenUserProvider::class);
+            $request = $app->make('request');
+
+            return new ApiTokenGuard($userProvider, $request);
+        });
+
+        Gate::define('global-admin', function (User $user) {
+            return $user->hasAnyRole('admin', 'demo');
+        });
+        Gate::define('admin', function (User $user) {
+            return $user->hasRole('admin');
+        });
+        Gate::define('global-read', function (User $user) {
+            return $user->hasAnyRole('admin', 'global-read');
+        });
+        Gate::define('device', function (User $user, $device) {
+            return $user->canAccessDevice($device);
+        });
+
+        // define super admin and global read
+        Gate::before(function (User $user, string $ability) {
+            if ($user->hasRole('admin')) {
+                return true;  // super admin
+            }
+
+            if (in_array($ability, ['view', 'viewAny']) && $user->hasRole('global-read')) {
+                return true; // global read access
+            }
+
+            return null;
         });
     }
 }

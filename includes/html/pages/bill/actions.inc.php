@@ -1,6 +1,9 @@
 <?php
 
-if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
+$action = $_POST['action'] ?? 'none';
+$confirm = $_POST['confirm'] ?? 'none';
+
+if ($action == 'delete_bill' && $confirm == 'confirm') {
     dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
     dbDelete('bill_ports', '`bill_id` = ?', [$bill_id]);
     dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
@@ -9,49 +12,49 @@ if ($_POST['action'] == 'delete_bill' && $_POST['confirm'] == 'confirm') {
 
     echo '<div class=infobox>Bill Deleted. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo "<meta http-equiv='Refresh' content=\"2; url='" . url('bills') . "'\">";
 }
 
-if ($_POST['action'] == 'reset_bill' && ($_POST['confirm'] == 'rrd' || $_POST['confirm'] == 'mysql')) {
-    if ($_POST['confirm'] == 'mysql') {
+if ($action == 'reset_bill' && ($confirm == 'rrd' || $confirm == 'mysql')) {
+    if ($confirm == 'mysql') {
         dbDelete('bill_history', '`bill_id` = ?', [$bill_id]);
         dbDelete('bill_data', '`bill_id` = ?', [$bill_id]);
     }
 
-    if ($_POST['confirm'] == 'rrd') {
+    if ($confirm == 'rrd') {
         // Stil todo
     }
 
     echo '<div class=infobox>Bill Resetting. Redirecting to Bills list.</div>';
 
-    echo "<meta http-equiv='Refresh' content=\"2; url='bills/'\">";
+    echo "<meta http-equiv='Refresh' content=\"2; url='" . url('bills') . "'\">";
 }
 
-if ($_POST['action'] == 'add_bill_port') {
+if ($action == 'add_bill_port') {
     dbInsert(['bill_id' => $_POST['bill_id'], 'port_id' => $_POST['port_id']], 'bill_ports');
 }
 
-if ($_POST['action'] == 'delete_bill_port') {
+if ($action == 'delete_bill_port') {
     dbDelete('bill_ports', '`bill_id` =  ? AND `port_id` = ?', [$bill_id, $_POST['port_id']]);
 }
 
-if ($_POST['action'] == 'update_bill') {
+if ($action == 'update_bill') {
     if (isset($_POST['bill_quota']) or isset($_POST['bill_cdr'])) {
         if ($_POST['bill_type'] == 'quota') {
             if (isset($_POST['bill_quota_type'])) {
                 if ($_POST['bill_quota_type'] == 'MB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'GB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'TB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
-                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \LibreNMS\Config::get('billing.base') * $multiplier : 0);
+                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \App\Facades\LibrenmsConfig::get('billing.base') * $multiplier : 0);
                 $bill_cdr = 0;
             }
         }
@@ -59,15 +62,15 @@ if ($_POST['action'] == 'update_bill') {
         if ($_POST['bill_type'] == 'cdr') {
             if (isset($_POST['bill_cdr_type'])) {
                 if ($_POST['bill_cdr_type'] == 'Kbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Mbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Gbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);

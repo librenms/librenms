@@ -12,6 +12,8 @@ use LibreNMS\Util\Url;
 
 class StoragesController extends TableController
 {
+    protected $model = Storage::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
 
     protected function sortFields($request): array
@@ -36,7 +38,7 @@ class StoragesController extends TableController
     {
         return Storage::query()
             ->hasAccess($request->user())
-            ->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id')
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
             ->withAggregate('device', 'hostname');
     }
 
@@ -49,7 +51,7 @@ class StoragesController extends TableController
         $descr = $storage->storage_descr;
         $graph_array = [
             'type' => 'storage_usage',
-            'popup_title' => htmlentities(strip_tags($storage->device->displayName() . ': ' . $storage->storage_descr)),
+            'popup_title' => htmlentities(strip_tags($storage->device?->displayName() . ': ' . $storage->storage_descr)),
             'id' => $storage->storage_id,
             'from' => '-1d',
             'height' => 20,
@@ -82,5 +84,36 @@ class StoragesController extends TableController
         $bar = Html::percentageBar(400, 20, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
 
         return Url::graphPopup($graph_array, $bar);
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Storage',
+            'Used',
+            'Free',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Storage  $storage
+     * @return array
+     */
+    protected function formatExportRow($storage)
+    {
+        return [
+            $storage->device ? $storage->device->displayName() : '',
+            $storage->storage_descr,
+            Number::formatBi($storage->storage_used),
+            Number::formatBi($storage->storage_free),
+        ];
     }
 }

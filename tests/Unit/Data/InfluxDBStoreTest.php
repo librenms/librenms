@@ -25,8 +25,9 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use InfluxDB\Point;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -36,31 +37,79 @@ class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
     {
-        Config::set('influxdb.host', '');
-        Config::set('influxdb.port', 'abc');
+        LibrenmsConfig::set('influxdb.host', '');
+        LibrenmsConfig::set('influxdb.port', 'abc');
         $influx = new InfluxDB(InfluxDB::createFromConfig());
 
         \Log::shouldReceive('debug');
-        \Log::shouldReceive('error')->once()->with('InfluxDB exception: Unable to parse URI: http://:0'); // the important one
-        $influx->put(['hostname' => 'test'], 'fake', [], ['one' => 1]);
+        \Log::shouldReceive('error')->once()->with('InfluxDB batch write failed: Unable to parse URI: http://:0');
+        $influx->write('fake', ['one' => 1]);
     }
 
     public function testSimpleWrite(): void
     {
         // Create a mock of the Random Interface
         $mock = \Mockery::mock(\InfluxDB\Database::class);
-
         $mock->shouldReceive('exists')->once()->andReturn(true);
         $influx = new InfluxDB($mock);
 
-        $device = ['hostname' => 'testhost'];
+        $device = new Device(['hostname' => 'testhost']);
         $measurement = 'testmeasure';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
 
-        $expected = [new Point($measurement, null, ['hostname' => $device['hostname']] + $tags, $fields)];
+        $mock->shouldReceive('writePoints')
+            ->with(\Mockery::on(function ($points) use ($measurement, $tags, $fields, $device) {
+                if (! is_array($points) || count($points) !== 1) {
+                    return false;
+                }
+                $point = $points[0];
 
-        $mock->shouldReceive('writePoints')->withArgs([$expected])->once();
-        $influx->put($device, $measurement, $tags, $fields);
+                return $point instanceof Point
+                    && $point->getMeasurement() === $measurement
+                    && $point->getTags() == (['hostname' => $device->hostname] + $tags)
+                    && $point->getFields() == $fields;
+            }), 'ms')
+            ->once();
+        $influx->write($measurement, $fields, $tags, $meta);
+    }
+
+    public function testFilteredMeasurementsAllowed(): void
+    {
+        LibrenmsConfig::set('influxdb.measurements', ['testmeasure', 'anothermeasure']);
+
+        // Create a mock of the Random Interface
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $influx = new InfluxDB($mock);
+
+        $device = new Device(['hostname' => 'testhost']);
+        $measurement = 'testmeasure';
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
+        $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
+
+        $mock->shouldReceive('writePoints')->once();
+        $influx->write($measurement, $fields, $tags, $meta);
+    }
+
+    public function testFilteredMeasurementsRejected(): void
+    {
+        LibrenmsConfig::set('influxdb.measurements', ['anothermeasure', 'yetanothermeasure']);
+
+        // Create a mock of the Random Interface
+        $mock = \Mockery::mock(\InfluxDB\Database::class);
+        $mock->shouldReceive('exists')->once()->andReturn(true);
+        $influx = new InfluxDB($mock);
+
+        $device = new Device(['hostname' => 'testhost']);
+        $measurement = 'testmeasure';
+        $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
+        $fields = ['ifIn' => 234234.0, 'ifOut' => 53453.0];
+        $meta = ['device' => $device];
+
+        $mock->shouldReceive('writePoints')->never();
+        $influx->write($measurement, $fields, $tags, $meta);
     }
 }

@@ -34,17 +34,21 @@ namespace LibreNMS\Alert;
 
 use App\Models\Eventlog;
 use Carbon\Carbon;
-use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
-use Log;
+use PDO;
+use PDOException;
 
 class AlertRules
 {
     public function runRules($device_id)
     {
         //Check to see if under maintenance
-        if (AlertUtil::isMaintenance($device_id) > 0) {
+        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SKIP_ALERTS) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;
@@ -70,21 +74,21 @@ class AlertRules
             }
             d_echo(PHP_EOL);
             if (empty($rule['query'])) {
-                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
             }
             $sql = $rule['query'];
 
             // set fetch assoc
-            global $PDO_FETCH_ASSOC;
-            $PDO_FETCH_ASSOC = true;
             try {
-                $qry = \DB::select($sql, [$device_id]);
-            } catch (QueryException $e) {
+                $query = DB::connection()->getPdo()->prepare($sql);
+                $query->execute([$device_id]);
+
+                $qry = $query->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
                 c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
                 Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $device_id, 'alert', Severity::Error);
                 continue; // skip this rule
             }
-            $PDO_FETCH_ASSOC = false;
 
             $cnt = count($qry);
             for ($i = 0; $i < $cnt; $i++) {

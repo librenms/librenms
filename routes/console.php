@@ -1,7 +1,10 @@
 <?php
 
+use App\Console\Commands\MaintenanceCleanupNetworks;
+use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use Symfony\Component\Process\Process;
 
 /*
@@ -27,16 +30,6 @@ Artisan::command('device:rename
     ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
-Artisan::command('device:remove
-    {device spec : ' . __('Hostname, IP, or device id to remove') . '}
-', function () {
-    /** @var Illuminate\Console\Command $this */
-    (new Process([
-        base_path('delhost.php'),
-        $this->argument('device spec'),
-    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose('Remove a device');
-
 Artisan::command('update', function () {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
@@ -44,7 +37,7 @@ Artisan::command('update', function () {
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
 ', function () {
-    PingCheck::dispatch($this->argument('groups', []));
+    PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
@@ -151,7 +144,7 @@ Artisan::command('scan
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && ! LibreNMS\Config::has('nets')) {
+    if (empty($this->argument('network')) && ! \App\Facades\LibrenmsConfig::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
@@ -198,3 +191,20 @@ Artisan::command('scan
 
     return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
+
+// mark schedule working
+Schedule::call(function () {
+    Cache::put('scheduler_working', now(), now()->addMinutes(6));
+})->everyFiveMinutes();
+
+// schedule maintenance, should be after all others
+$maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
+Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
+    ->weeklyOn(0, '1:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceCleanupNetworks::class, [])
+    ->weeklyOn(0, '2:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);

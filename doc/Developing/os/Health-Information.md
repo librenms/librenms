@@ -1,4 +1,4 @@
-#### Sensors
+## Sensors
 
 This document will guide you through adding health / sensor
 information for your new device.
@@ -38,8 +38,9 @@ the values we expect to see the data in:
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
+| signal_loss                       | dB                          |
 
-#### Simple health discovery
+### Simple health discovery
 
 We have support for defining health / sensor discovery using YAML
 files so that you don't need to know how to write PHP.
@@ -48,13 +49,13 @@ files so that you don't need to know how to write PHP.
 > correct divisor / multiplier if applicable.
 
 All yaml files are located in
-`includes/definitions/discovery/$os.yaml`. Defining the information
+`resources/definitions/os_discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
 sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
 all the data you need. We will use netbotz as an example here.
 
-`includes/definitions/discovery/netbotz.yaml`
+`resources/definitions/os_discovery/netbotz.yaml`
 
 ```yaml
 mib: NETBOTZV2-MIB
@@ -150,9 +151,29 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-When referencing an oid in another table the full index will be used to match the other table.
-If this is undesirable, you may use a single sub index by appending the sub index after a colon to
-the variable name.  Example `{{ $ifName:2 }}`
+#### Fetching values from other tables/oids
+
+When referencing an oid in another table the full index will be used to match
+the other table. If the indexes of the two tables don't match, you will need
+to specify which indexes to use by their index position starting with 0. The
+data for the other table must be fetched already.
+
+`{{ IF-MIB::ifName:2 }}`
+
+This simple example shows using the 3rd (0 is the first) index value from
+the current table to fetch the IF-MIB::ifName value from the data.
+
+Additionally, you may specify multiple index values with either a
+range or list of index positions.
+
+Range: `{{ IP-MIB::ipAddressPrefixOrigin:0-3 }}`
+List: `{{ IP-MIB::ipAddressPrefixOrigin:2.3.1.4 }}`
+
+#### Skipping rows of the returned data
+
+You can filter rows of the data returned to only discover valid sensors.
+This is often useful when devices always return all sensors possible or
+mix sensor types in a single table.
 
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
@@ -220,7 +241,7 @@ Example:
 If you aren't able to use yaml to perform the sensor discovery, you
 will most likely need to use Advanced health discovery.
 
-#### Advanced health discovery
+### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
 the discovery code in php. If it is possible to create via yaml, php discovery
@@ -290,23 +311,18 @@ where possible. The value for the OID is already available as `$sensor_value`.
 Graphing is performed automatically for sensors, no custom graphing is
 required or supported.
 
-#### Adding a new sensor class
+### Adding a new sensor class
 
 You will need to add code for your new sensor class in the following existing files:
 
-- `app/Models/Sensor.php`: add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
-in the $icons array.
+- `LibreNMS/Enum/Sensor.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
-- `includes/discovery/sensors.inc.php`: add the sensor class to the $run_sensors array.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[]
-entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
 in the desired order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English, feel free to do so for other languages as well.
 
@@ -315,10 +331,8 @@ Create and populate new files for the sensor class in the following places:
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
 =======
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[] entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
 order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
 free to do so for other languages as well.
 
@@ -368,7 +382,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPR.' . $index,
@@ -387,7 +401,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPT.' . $index,
@@ -419,7 +433,7 @@ media won't have optical readings, so if the media type isn't fiber we skip disc
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
 ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
-optical monitoring (DOM) data, in the case of Adva the value of both transmit and recieve will be
+optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for
 that port. Note that while this is the case with Adva, other vendors may differ in how they handle
@@ -488,6 +502,7 @@ Ber:
 Eer:
 Waterflow:
 Percent:
+Signal_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

@@ -111,6 +111,23 @@ class Time
     {
         $carbon = new Carbon();
 
-        return $carbon->diffInMinutes($date, false);
+        return (int) $carbon->diffInMinutes($date);
+    }
+
+    public static function durationToSeconds(string $duration): int
+    {
+        if (preg_match('/(\d+)([mhd]?)/', $duration, $matches)) {
+            $multipliers = [
+                'm' => 60,
+                'h' => 3600,
+                'd' => 86400,
+            ];
+
+            $multiplier = $multipliers[$matches[2]] ?? 1;
+
+            return $matches[1] * $multiplier;
+        }
+
+        return $duration === '' ? 0 : 300;
     }
 }

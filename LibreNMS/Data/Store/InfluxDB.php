@@ -27,22 +27,27 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
 use InfluxDB\Database;
 use InfluxDB\Driver\UDP;
-use LibreNMS\Config;
 use Log;
 
 class InfluxDB extends BaseDatastore
 {
     /** @var Database */
     private $connection;
+    private $batchPoints = []; // Store points before writing
+    private $batchSize = 0; // Number of points to write at once
+    private $measurements = []; // List of measurements to write
 
     public function __construct(Database $influx)
     {
         parent::__construct();
         $this->connection = $influx;
+        $this->batchSize = LibrenmsConfig::get('influxdb.batch_size', 0);
+        $this->measurements = LibrenmsConfig::get('influxdb.measurements', []);
 
         // if the database doesn't exist, create it.
         try {
@@ -54,36 +59,35 @@ class InfluxDB extends BaseDatastore
         }
     }
 
-    public function getName()
+    public function terminate(): void
+    {
+        // Ensure any remaining points are written before the script ends
+        $this->flushBatch();
+    }
+
+    public function getName(): string
     {
         return 'InfluxDB';
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
-        return Config::get('influxdb.enable', false);
+        return LibrenmsConfig::get('influxdb.enable', false);
     }
 
     /**
-     * Datastore-independent function which should be used for all polled metrics.
-     *
-     * RRD Tags:
-     *   rrd_def     RrdDefinition
-     *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
-     *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
-     *   rrd_step             int: rrd step, defaults to 300
-     *
-     * @param  array  $device
-     * @param  string  $measurement  Name of this measurement
-     * @param  array  $tags  tags for the data (or to control rrdtool)
-     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
-     *                               single values are allowed and will be paired with $measurement
+     * @inheritDoc
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        // Check if this measurement is enabled
+        if (! empty($this->measurements) && ! in_array($measurement, $this->measurements)) {
+            return;
+        }
+
         $stat = Measurement::start('write');
         $tmp_fields = [];
-        $tmp_tags['hostname'] = $device['hostname'];
+        $tmp_tags['hostname'] = $this->getDevice($meta)->hostname;
         foreach ($tags as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
@@ -106,28 +110,57 @@ class InfluxDB extends BaseDatastore
             return;
         }
 
-        Log::debug('InfluxDB data: ', [
-            'measurement' => $measurement,
-            'tags' => $tmp_tags,
-            'fields' => $tmp_fields,
-        ]);
+        if (LibrenmsConfig::get('influxdb.debug', false) === true) {
+            Log::debug('InfluxDB data: ', [
+                'measurement' => $measurement,
+                'tags' => $tmp_tags,
+                'fields' => $tmp_fields,
+            ]);
+        }
 
         try {
-            $points = [
-                new \InfluxDB\Point(
-                    $measurement,
-                    null, // the measurement value
-                    $tmp_tags,
-                    $tmp_fields // optional additional fields
-                ),
-            ];
+            // Add timestamp to points as current time in milliseconds
+            // This is important for InfluxDB to correctly order and store the data
+            // This is especially important for batch writes to ensure data is aggregated correctly
+            $timestamp = (int) floor(microtime(true) * 1000); // Convert timestamp to milliseconds
 
-            $this->connection->writePoints($points);
+            $this->batchPoints[] = new \InfluxDB\Point(
+                $measurement,
+                null, // the measurement value
+                $tmp_tags,
+                $tmp_fields, // optional additional fields,
+                $timestamp
+            );
+
+            // Flush batch if size limit is reached
+            if (count($this->batchPoints) >= $this->batchSize) {
+                $this->flushBatch();
+            }
             $this->recordStatistic($stat->end());
         } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB exception: ' . $e->getMessage());
             Log::debug($e->getTraceAsString());
         }
+    }
+
+    /**
+     * Flush the batch to InfluxDB
+     */
+    public function flushBatch()
+    {
+        if (empty($this->batchPoints)) {
+            // No points to write, nothing to do
+            return;
+        }
+        if (LibrenmsConfig::get('influxdb.debug', false) === true) {
+            Log::debug('Flushing InfluxDB batch of ' . count($this->batchPoints) . ' points');
+        }
+        try {
+            $this->connection->writePoints($this->batchPoints, 'ms'); // Added timestamps are in milliseconds
+        } catch (\InfluxDB\Exception $e) {
+            Log::error('InfluxDB batch write failed: ' . $e->getMessage());
+        }
+        $this->batchPoints = []; // Clear the batch after writing
     }
 
     /**
@@ -137,14 +170,14 @@ class InfluxDB extends BaseDatastore
      */
     public static function createFromConfig()
     {
-        $host = Config::get('influxdb.host', 'localhost');
-        $transport = Config::get('influxdb.transport', 'http');
-        $port = Config::get('influxdb.port', 8086);
-        $db = Config::get('influxdb.db', 'librenms');
-        $username = Config::get('influxdb.username', '');
-        $password = Config::get('influxdb.password', '');
-        $timeout = Config::get('influxdb.timeout', 0);
-        $verify_ssl = Config::get('influxdb.verifySSL', false);
+        $host = LibrenmsConfig::get('influxdb.host', 'localhost');
+        $transport = LibrenmsConfig::get('influxdb.transport', 'http');
+        $port = LibrenmsConfig::get('influxdb.port', 8086);
+        $db = LibrenmsConfig::get('influxdb.db', 'librenms');
+        $username = LibrenmsConfig::get('influxdb.username', '');
+        $password = LibrenmsConfig::get('influxdb.password', '');
+        $timeout = LibrenmsConfig::get('influxdb.timeout', 0);
+        $verify_ssl = LibrenmsConfig::get('influxdb.verifySSL', false);
 
         $client = new Client($host, $port, $username, $password, $transport == 'https', $verify_ssl, $timeout, $timeout);
 
@@ -152,7 +185,8 @@ class InfluxDB extends BaseDatastore
             $client->setDriver(new UDP($host, $port));
         }
 
-        return $client->selectDB($db);
+        // Suppress InfluxDB\Database::create(): Implicitly marking parameter $retentionPolicy as nullable is deprecated
+        return @$client->selectDB($db);
     }
 
     private function forceType($data)
@@ -169,15 +203,5 @@ class InfluxDB extends BaseDatastore
         }
 
         return $data === 'U' ? null : $data;
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
-    {
-        return false;
     }
 }

@@ -59,10 +59,10 @@ if (isset($_POST['create-default'])) {
             $extra = array_replace($extra, json_decode($add_rule['extra'], true));
         }
 
-        $qb = QueryBuilderParser::fromOld($add_rule['rule']);
+        $qb = QueryBuilderParser::fromJson($add_rule['builder']);
+
         $insert = [
-            'rule' => '',
-            'builder' => json_encode($qb),
+            'builder' => json_encode($add_rule['builder']),
             'query' => $qb->toSql(),
             'severity' => 'critical',
             'extra' => json_encode($extra),
@@ -93,9 +93,10 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device['device_id'] . '">Create new alert rule</button>';
+$device_id = $device['device_id'] ?? 0;
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' .$device_id. '">Create new alert rule</button>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device['device_id'] . '">Create rule from collection</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -124,21 +125,24 @@ echo '</div>';
 echo '<br>';
 
 $param = [];
-if (isset($device['device_id']) && $device['device_id'] > 0) {
+if (isset($device_id) && $device_id > 0) {
     //device selected
 
     $global_rules = 'SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)';
 
     $device_rules = 'SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)';
-    $param[] = $device['device_id'];
+    $param[] = $device_id;
 
-    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
-    $param[] = $device['device_id'];
+    $device_group_rules = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.invert_map AND ar3.id NOT IN (SELECT agm3.rule_id FROM alert_group_map AS agm3  LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
+    $param[] = $device_id;
+
+    $device_group_rules_invert = 'SELECT ar3.* FROM alert_rules AS ar3 WHERE NOT ar3.invert_map AND ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)';
+    $param[] = $device_id;
 
     $device_location_rules = 'SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)';
-    $param[] = $device['device_id'];
+    $param[] = $device_id;
 
-    $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_location_rules . ')';
+    $full_query = '(' . $global_rules . ') UNION DISTINCT (' . $device_rules . ') UNION DISTINCT (' . $device_group_rules . ') UNION DISTINCT (' . $device_group_rules_invert . ') UNION DISTINCT (' . $device_location_rules . ')';
 } else {
     // no device selected
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
@@ -359,18 +363,16 @@ foreach ($rule_list as $rule) {
 
     // Extra
 
-    echo '<td><small>Max: ' . $rule_extra['count'] . '<br />Delay: ' . $rule_extra['delay'] . '<br />Interval: ' . $rule_extra['interval'] . '</small></td>';
+    echo '<td><small>Max: ' . ($rule_extra['count'] ?? '') . '<br />Delay: ' . ($rule_extra['delay'] ?? '') . '<br />Interval: ' . ($rule_extra['interval'] ?? '') . '</small></td>';
 
     // Rule
 
     echo "<td class='col-sm-4'>";
-    if ($rule_extra['invert'] === true) {
+    if (isset($rule_extra['invert']) && $rule_extra['invert'] === true) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
-    if (empty($rule['builder'])) {
-        $rule_display = $rule['rule'];
-    } elseif ($rule_extra['options']['override_query'] === 'on') {
+    if (isset($rule_extra['options']['override_query']) && $rule_extra['options']['override_query'] === 'on') {
         $rule_display = 'Custom SQL Query';
     } else {
         $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
@@ -385,11 +387,11 @@ foreach ($rule_list as $rule) {
     $status_popover = 'top';
 
     echo "<td><a href=" . url('alerts/rule_id='.$rule['id']) ."><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
-    if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name']) . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
+    if (isset($rule_extra['mute']) && $rule_extra['mute'] === true) {
+        echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name'] ?? '') . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }
-    if ($sub['state'] == AlertState::ACKNOWLEDGED) {
-        echo "<div data-toggle='popover' data-content='Some Alerts for " . htmlentities($rule['name']) . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
+    if (isset($sub['state']) && $sub['state'] == AlertState::ACKNOWLEDGED) {
+        echo "<div data-toggle='popover' data-content='Some Alerts for " . htmlentities($rule['name'] ?? '') . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
     }
     echo '</td>';
     // Enabled
@@ -476,40 +478,40 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_colour = $(this).data("orig_colour");
     var orig_class = $(this).data("orig_class");
     $.ajax({
-        type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: "update-alert-rule", alert_id: alert_id, state: state },
-            dataType: "html",
-            success: function(msg) {
-                if(msg.indexOf("ERROR:") <= -1) {
-                    if(state) {
-                        $('#alert-rule-'+alert_id).removeClass('fa-pause');
-                        $('#alert-rule-'+alert_id).addClass('fa-'+orig_state);
-                        $('#alert-rule-'+alert_id).removeClass('text-default');
-                        $('#alert-rule-'+alert_id).addClass('text-'+orig_colour);
-                        $('#alert-rule-'+alert_id).attr('data-content', alert_status);
-                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is ON');
-                        $('#rule_id_'+alert_id).removeClass('active');
-                        $('#rule_id_'+alert_id).addClass(orig_class);
-                    } else {
-                        $('#alert-rule-'+alert_id).removeClass('fa-'+orig_state);
-                        $('#alert-rule-'+alert_id).addClass('fa-pause');
-                        $('#alert-rule-'+alert_id).removeClass('text-'+orig_colour);
-                        $('#alert-rule-'+alert_id).addClass('text-default');
-                        $('#alert-rule-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        $('#rule_id_'+alert_id).removeClass('warning');
-                        $('#rule_id_'+alert_id).addClass('active');
-                    }
+        type: 'PUT',
+        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        data: {state: state},
+        dataType: "json",
+        success: function (msg) {
+            if (msg.status === 200) {
+                if (state) {
+                    $('#alert-rule-' + alert_id).removeClass('fa-pause');
+                    $('#alert-rule-' + alert_id).addClass('fa-' + orig_state);
+                    $('#alert-rule-' + alert_id).removeClass('text-default');
+                    $('#alert-rule-' + alert_id).addClass('text-' + orig_colour);
+                    $('#alert-rule-' + alert_id).attr('data-content', alert_status);
+                    $('#on-off-checkbox-' + alert_id).attr('data-content', alert_name + ' is ON');
+                    $('#rule_id_' + alert_id).removeClass('active');
+                    $('#rule_id_' + alert_id).addClass(orig_class);
                 } else {
-                    $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-                    $('#'+alert_id).bootstrapSwitch('toggleState',true );
+                    $('#alert-rule-' + alert_id).removeClass('fa-' + orig_state);
+                    $('#alert-rule-' + alert_id).addClass('fa-pause');
+                    $('#alert-rule-' + alert_id).removeClass('text-' + orig_colour);
+                    $('#alert-rule-' + alert_id).addClass('text-default');
+                    $('#alert-rule-' + alert_id).attr('data-content', alert_name + ' is OFF');
+                    $('#on-off-checkbox-' + alert_id).attr('data-content', alert_name + ' is OFF');
+                    $('#rule_id_' + alert_id).removeClass('warning');
+                    $('#rule_id_' + alert_id).addClass('active');
                 }
-            },
-                error: function() {
-                    $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
-                    $('#'+alert_id).bootstrapSwitch('toggleState',true );
-                }
+            } else {
+                $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
+                $('#' + alert_id).bootstrapSwitch('toggleState', true);
+            }
+        },
+        error: function () {
+            $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
+            $('#' + alert_id).bootstrapSwitch('toggleState', true);
+        }
     });
 });
 

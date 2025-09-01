@@ -1,8 +1,9 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use LibreNMS\Enum\Sensor;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
@@ -43,8 +44,8 @@ function bulk_sensor_snmpget($device, $sensors)
 function sensor_precache($device, $type)
 {
     $sensor_cache = [];
-    if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include Config::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
+    if (file_exists(LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
+        include LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
     }
 
     return $sensor_cache;
@@ -77,10 +78,10 @@ function poll_sensor($device, $class)
             $mibdir = null;
 
             $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
-            if (file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
-                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (isset($device['os_group']) && file_exists(Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
-                require Config::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
+            if (file_exists(LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
+                require LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
+            } elseif (isset($device['os_group']) && file_exists(LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+                require LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
             if ($class == 'state') {
@@ -134,42 +135,9 @@ function poll_sensor($device, $class)
  */
 function record_sensor_data($device, $all_sensors)
 {
-    $supported_sensors = [
-        'airflow' => 'cfm',
-        'ber' => '',
-        'bitrate' => 'bps',
-        'charge' => '%',
-        'chromatic_dispersion' => 'ps/nm',
-        'cooling' => 'W',
-        'count' => '',
-        'current' => 'A',
-        'delay' => 's',
-        'dbm' => 'dBm',
-        'eer' => 'eer',
-        'fanspeed' => 'rpm',
-        'frequency' => 'Hz',
-        'humidity' => '%',
-        'load' => '%',
-        'loss' => '%',
-        'percent' => '%',
-        'power' => 'W',
-        'power_consumed' => 'kWh',
-        'power_factor' => '',
-        'pressure' => 'kPa',
-        'quality_factor' => 'dB',
-        'runtime' => 'Min',
-        'signal' => 'dBm',
-        'snr' => 'SNR',
-        'state' => '#',
-        'temperature' => 'C',
-        'tv_signal' => 'dBmV',
-        'voltage' => 'V',
-        'waterflow' => 'l/m',
-    ];
-
     foreach ($all_sensors as $sensor) {
-        $class = ucfirst($sensor['sensor_class']);
-        $unit = $supported_sensors[$sensor['sensor_class']];
+        $class = trans('sensors.' . $sensor['sensor_class'] . '.short');
+        $unit = Sensor::from($sensor['sensor_class'])->unit();
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
@@ -232,7 +200,7 @@ function record_sensor_data($device, $all_sensors)
                 'state_value'
             );
 
-            Eventlog::log("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device['device_id'], $class, Severity::Notice, $sensor['sensor_id']);
+            Eventlog::log($class . ' sensor ' . ($sensor['sensor_descr'] ?? '') . ' has changed from ' . ($trans[$prev_sensor_value] ?? '#unamed state#') . "($prev_sensor_value) to " . ($trans[$sensor_value] ?? '#unamed state#') . " ($sensor_value)", $device['device_id'], $class, Severity::Notice, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
             dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);

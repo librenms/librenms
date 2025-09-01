@@ -71,7 +71,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,severity $sql";
+$sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,severity $sql";
 
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
@@ -88,7 +88,7 @@ foreach (dbFetchRows($sql, $param) as $eventlog) {
     }
 
     $response[] = [
-        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span><span style='display:inline;'>" . $eventlog['humandate'] . '</span>',
+        'datetime' => "<span class='alert-status " . eventlog_severity($severity_colour) . " eventlog-status'></span>" . $eventlog['humandate'],
         'hostname' => generate_device_link($dev, shorthost($dev['hostname'])),
         'type' => $type,
         'message' => htmlspecialchars($eventlog['message']),

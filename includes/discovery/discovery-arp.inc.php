@@ -14,8 +14,8 @@
 // License: GPLv3
 //
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 $hostname = $device['hostname'];
@@ -47,12 +47,12 @@ foreach (dbFetchRows($sql, [$deviceid]) as $entry) {
 
     // Even though match_network is done inside discover_new_device, we do it here
     // as well in order to skip unnecessary reverse DNS lookups on discovered IPs.
-    if (match_network(Config::get('autodiscovery.nets-exclude'), $ip)) {
+    if (match_network(LibrenmsConfig::get('autodiscovery.nets-exclude'), $ip)) {
         echo 'x';
         continue;
     }
 
-    if (! match_network(Config::get('nets'), $ip)) {
+    if (! match_network(LibrenmsConfig::get('nets'), $ip)) {
         echo 'i';
         Eventlog::log("Ignored $ip", $deviceid, 'interface', Severity::Notice, $if);
         continue;

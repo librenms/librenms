@@ -1,40 +1,50 @@
-# discovery.php
+# Discovery Support
 
-This document will explain how to use discovery.php to debug issues or
+This document will explain how to use discovery to debug issues or
 manually running to process data.
+
+The basic command to get started is:
+
+`lnms poller:discovery HOSTNAME`
 
 ## Command options
 
 ```bash
--h <device id> | <device hostname wildcard>  Poll single device
--h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
--h even                                      Poll even numbered devices (same as -i 2 -n 1)
--h all                                       Poll all devices
--h new                                       Poll all devices that have not had a discovery run before
---os <os_name>                               Poll devices only with specified operating system
---type <type>                                Poll devices only with specified type
--i <instances> -n <number>                   Poll as instance <number> of <instances>
-                                             Instances start at 0. 0-3 for -n 4
+Description:
+  Discover information about existing devices, defines what will be polled
 
-Debugging and testing options:
--d                                           Enable debugging output
--v                                           Enable verbose debugging output
--m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
+Usage:
+  poller:discovery [options] [--] <device spec>
+
+Arguments:
+  device spec              Device spec to discover: device_id, hostname, wildcard, odd, even, all, new
+
+Options:
+  -o, --os[=OS]            Only devices with the specified operating system
+  -t, --type[=TYPE]        Only devices with the specified type
+  -m, --modules[=MODULES]  Specify single module to be run. Comma separate modules, submodules may be added with /
+  -h, --help               Display help for the given command. When no command is given display help for the list command
+      --silent             Do not output any message
+  -q, --quiet              Only errors are displayed. All other output is suppressed
+  -V, --version            Display this application version
+      --ansi|--no-ansi     Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction     Do not ask any interactive question
+      --env[=ENV]          The environment the command should run under
+  -v|vv|vvv, --verbose     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 ```
 
-`-h` Use this to specify a device via either id or hostname (including
+`<device spec>` Use this to specify a device via either id or hostname (including
 wildcard using *). You can also specify odd and even. all will run
 discovery against all devices whilst new will poll only those devices
 that have recently been added or have been selected for rediscovery.
 
-`-i` This can be used to stagger the discovery process.
+`-v` Enables debugging output so that you can see what is happening during
+a discovery run.
 
-`-d` Enables debugging output (verbose output but with most sensitive
-data masked) so that you can see what is happening during a discovery
-run. This includes things like rrd updates, SQL queries and response
-from snmp.
+`-vv` Enables verbose debugging. This includes things like SQL queries and response
+from snmp with sensitive data masked as best as possible.
 
-`-v` Enables verbose debugging output with all data in tact.
+`-vvv` Enables full debugging output with all data in tact.
 
 `-m` This enables you to specify the module you want to run for discovery.
 
@@ -52,7 +62,7 @@ You also may use `-m` to pass a list of comma-separated modules.
 Please refer to [Command options](#command-options) of discovery.php.
 Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
 
-If you want to switch back to discovery.php then you can replace:
+If you want to switch back to discovery.php then you can replace (not recommended):
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
@@ -112,7 +122,7 @@ Modules.
 ## OS based Discovery config
 
 You can enable or disable modules for a specific OS by using
-`lnms config:set` OS based settings have preference
+`lnms config:set`. OS based settings have preference
 over global. Device based settings have preference over all others
 
 Discover performance improvement can be achieved by deactivating all
@@ -191,49 +201,46 @@ device, with history data.
 
 `services`: *Nix services support.
 
-`charge`: APC Charge detection and support.
-
 ## Running
 
 Here are some examples of running discovery from within your install directory.
 
 ```bash
-./discovery.php -h localhost
+lnms poller:discovery localhost
 
-./discovery.php -h localhost -m ports
+lnms poller:discovery localhost -m ports
 ```
 
 ## Debugging
 
 To provide debugging output you will need to run the discovery process
-with the `-d` flag. You can do this either against all modules, single
+with the `-v` flag. You can do this either against all modules, single
 or multiple modules:
 
 All Modules
 
 ```bash
-./discovery.php -h localhost -d
+lnms poller:discovery localhost -vv
 ```
 
 Single Module
 
 ```bash
-./discovery.php -h localhost -m ports -d
+lnms poller:discovery localhost -m ports -vv
 ```
 
 Multiple Modules
 
 ```bash
-./discovery.php -h localhost -m ports,entity-physical -d
+lnms poller:discovery localhost -m ports,entity-physical -vv
 ```
 
-Using `-d` shouldn't output much sensitive information, `-v` will so
+Using `-vv` shouldn't output much sensitive information, `-vvv` will so
 it is then advisable to sanitise the output before pasting it
 somewhere as the debug output will contain snmp details amongst other
 items including port descriptions.
 
 The output will contain:
 
-DB Updates
-
-SNMP Response
+- DB Updates
+- SNMP Response

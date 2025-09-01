@@ -9494,56 +9494,56 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT_VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 95,
                     "vlan_domain": 1,
                     "vlan_name": "BARRACON_8H_8L",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 252,
                     "vlan_domain": 1,
                     "vlan_name": "ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 450,
                     "vlan_domain": 1,
                     "vlan_name": "Videoapuntes",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 636,
                     "vlan_domain": 1,
                     "vlan_name": "APS-B8HLK",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "GESTION",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2044,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2081,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-BAR8H8K",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
