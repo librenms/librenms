@@ -11,7 +11,7 @@
  * Jira Webhook & API Transport
  *
  * @author Skylark <https://github.com/LoveSkylark>
- * @copyright 2023 Skylark
+ * @copyright 2025 Skylark
  * @license GPL
  */
 
@@ -32,16 +32,17 @@ class Jira extends Transport
         // Check if messsage is an alert or not
         if ($alert_data['state'] != 0) {
             $url = $this->config['jira-url'];
-            // If webhooks are not enabled, append the API info
-            if (! $webhook_on) {
+            $token = $this->config['jira-token-open'] ?? null;
+
+            if (! $webhook_enabled) {
                 $url .= '/rest/api/latest/issue';
             }
-            // Messsage is a recovery
         } else {
             if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.
             } else {
                 $url = $this->config['jira-close-url'];
+                $token = $this->config['jira-token-close'];
             }
         }
 
@@ -79,8 +80,21 @@ class Jira extends Transport
             $data['fields'] = array_merge($data['fields'], $custom);
         }
 
-        $res = Http::client()
-            ->withBasicAuth($this->config['jira-username'], $this->config['jira-password'])
+
+        $client = Http::client();
+
+        if ($webhook_on) {
+            $client = $client->withHeaders([
+                'X-Automation-Webhook-Token' => $token,
+            ]);
+        } else {
+            $client = $client->withBasicAuth(
+                $this->config['jira-username'],
+                $this->config['jira-password']
+            );
+        }
+
+        $res = $client
             ->acceptJson()
             ->post($url, $data);
 
@@ -109,15 +123,28 @@ class Jira extends Transport
                     'type' => 'text',
                 ],
                 [
-                    'title' => 'Open Ticket URL',
+                    'title' => 'Ticket URL (Open)',
                     'name' => 'jira-url',
                     'descr' => 'Create Jira Ticket',
                     'type' => 'text',
                 ],
                 [
-                    'title' => 'Close Ticket URL',
+                    'title' => 'Jira Token (Open)',
+                    'name' => 'jira-token-open',
+                    'descr' => 'Secret | Webhook Only',
+                    'type' => 'text',
+                ],
+
+                [
+                    'title' => 'Ticket URL (Close)',
                     'name' => 'jira-close-url',
                     'descr' => 'Close Jira Ticket | Webhook Only"',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Jira Token (Close)',
+                    'name' => 'jira-token-close',
+                    'descr' => 'Secret | Webhook Only',
                     'type' => 'text',
                 ],
                 [
@@ -158,8 +185,6 @@ class Jira extends Transport
                 'jira-close-url' => 'nullable|url',
                 'webhook-id' => 'nullable|string',
                 'jira-type' => 'required|string',
-                'jira-username' => 'required|string',
-                'jira-password' => 'required|string',
             ],
         ];
     }
