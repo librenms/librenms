@@ -26,6 +26,8 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Facades\File as LaravelFile;
+
 class File
 {
     /**
@@ -35,7 +37,7 @@ class File
     public static function getFolderSize(string $directory): array
     {
         $totalSize = 0;
-        $files = \Illuminate\Support\Facades\File::allFiles($directory);
+        $files = LaravelFile::isDirectory($directory) ? LaravelFile::allFiles($directory) : [];
 
         foreach ($files as $file) {
             $totalSize += $file->getSize();
