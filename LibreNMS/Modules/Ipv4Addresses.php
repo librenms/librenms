@@ -84,7 +84,11 @@ class Ipv4Addresses implements Module
             $ips = $this->discoverIpMib($os->getDevice());
         }
 
-        $ips = $ips->filter(function ($data) {
+        // Fetch all networks with blank contexts
+        $nets = Ipv4Network::where('context_name', '')->get()->groupBy('ipv4_network');
+        Log::debug('Networks: ' . $nets->keys()->implode(','));
+
+        $ips = $ips->filter(function ($data) use ($nets) {
             $addr = trim(str_replace('"', '', $data->ipv4_address ?? ''));
             $context = trim(str_replace('"', '', $data->context_name ?? ''));
             $prefix = trim($data->ipv4_prefixlen ?? '');
@@ -120,20 +124,22 @@ class Ipv4Addresses implements Module
             $data->ipv4_prefixlen = $pfxLen;
             $data->context_name = $context;
 
-            return $data;
-        });
+            if ($data->ipv4_prefixlen > 0 && $data->ipv4_prefixlen < 32) {
+                $addr = new IPv4($data->ipv4_address . '/' . $data->ipv4_prefixlen);
+                $netaddr = $addr->getNetwork();
+                if ($nets->has($netaddr)) {
+                    $data->ipv4_network_id = $nets->get($netaddr)[0]->ipv4_network_id;
+                } else {
+                    $network = Ipv4Network::firstOrCreate([
+                        'ipv4_network' => $netaddr,
+                        'context_name' => '',
+                    ]);
 
-        //create IPv4 Network
-        $ips->each(function (Ipv4Address $ip) {
-            if ($ip->ipv4_network_id === null && $ip->ipv4_prefixlen > 0 && $ip->ipv4_prefixlen < 32) {
-                $addr = new IPv4($ip->ipv4_address . '/' . $ip->ipv4_prefixlen);
-                $network = Ipv4Network::firstOrCreate([
-                    'ipv4_network' => $addr->getNetwork(),
-                    'context_name' => $ip->context_name,
-                ]);
-
-                $ip->ipv4_network_id = $network->ipv4_network_id;
+                    $data->ipv4_network_id = $network->ipv4_network_id;
+                }
             }
+
+            return $data;
         });
 
         ModuleModelObserver::observe(Ipv4Address::class);

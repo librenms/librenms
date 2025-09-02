@@ -184,8 +184,3 @@ parameters:
 			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
 			count: 2
 			path: tests/CommonFunctionsTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
-			count: 1
-			path: tests/Unit/LocationTest.php
