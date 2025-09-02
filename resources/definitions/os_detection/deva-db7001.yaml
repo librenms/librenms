@@ -1,4 +1,4 @@
-os: deva_db7001
+os: deva-db7001
 text: 'DB7001 - FM Radio Re-Broadcast Receiver'
 type: appliance
 icon: deva
