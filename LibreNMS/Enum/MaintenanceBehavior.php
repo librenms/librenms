@@ -29,4 +29,13 @@ enum MaintenanceBehavior: int
     case SKIP_ALERTS = 1;
     case MUTE_ALERTS = 2;
     case RUN_ALERTS = 3;
+
+    public function descr(): string
+    {
+        return match ($this) {
+            self::SKIP_ALERTS => __('alerting.maintenance.behavior.options.skip_alerts') ,
+            self::MUTE_ALERTS => __('alerting.maintenance.behavior.options.mute_alerts'),
+            self::RUN_ALERTS => __('alerting.maintenance.behavior.options.run_alerts'),
+        };
+    }
 }

@@ -60,7 +60,7 @@ if (isset($_POST['create-default'])) {
         }
 
         $qb = QueryBuilderParser::fromJson($add_rule['builder']);
-        
+
         $insert = [
             'builder' => json_encode($add_rule['builder']),
             'query' => $qb->toSql(),
@@ -363,12 +363,12 @@ foreach ($rule_list as $rule) {
 
     // Extra
 
-    echo '<td><small>Max: ' . $rule_extra['count'] . '<br />Delay: ' . $rule_extra['delay'] . '<br />Interval: ' . $rule_extra['interval'] . '</small></td>';
+    echo '<td><small>Max: ' . ($rule_extra['count'] ?? '') . '<br />Delay: ' . ($rule_extra['delay'] ?? '') . '<br />Interval: ' . ($rule_extra['interval'] ?? '') . '</small></td>';
 
     // Rule
 
     echo "<td class='col-sm-4'>";
-    if ($rule_extra['invert'] === true) {
+    if (isset($rule_extra['invert']) && $rule_extra['invert'] === true) {
         echo '<strong><em>Inverted</em></strong> ';
     }
 
@@ -387,11 +387,11 @@ foreach ($rule_list as $rule) {
     $status_popover = 'top';
 
     echo "<td><a href=" . url('alerts/rule_id='.$rule['id']) ."><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
-    if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name']) . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
+    if (isset($rule_extra['mute']) && $rule_extra['mute'] === true) {
+        echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name'] ?? '') . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }
     if (isset($sub['state']) && $sub['state'] == AlertState::ACKNOWLEDGED) {
-        echo "<div data-toggle='popover' data-content='Some Alerts for " . htmlentities($rule['name']) . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
+        echo "<div data-toggle='popover' data-content='Some Alerts for " . htmlentities($rule['name'] ?? '') . " are acknowledged' class='fa fa-fw fa-2x fa-sticky-note text-info' aria-hidden='true'></div>";
     }
     echo '</td>';
     // Enabled
@@ -478,40 +478,40 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_colour = $(this).data("orig_colour");
     var orig_class = $(this).data("orig_class");
     $.ajax({
-        type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: "update-alert-rule", alert_id: alert_id, state: state },
-            dataType: "html",
-            success: function(msg) {
-                if(msg.indexOf("ERROR:") <= -1) {
-                    if(state) {
-                        $('#alert-rule-'+alert_id).removeClass('fa-pause');
-                        $('#alert-rule-'+alert_id).addClass('fa-'+orig_state);
-                        $('#alert-rule-'+alert_id).removeClass('text-default');
-                        $('#alert-rule-'+alert_id).addClass('text-'+orig_colour);
-                        $('#alert-rule-'+alert_id).attr('data-content', alert_status);
-                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is ON');
-                        $('#rule_id_'+alert_id).removeClass('active');
-                        $('#rule_id_'+alert_id).addClass(orig_class);
-                    } else {
-                        $('#alert-rule-'+alert_id).removeClass('fa-'+orig_state);
-                        $('#alert-rule-'+alert_id).addClass('fa-pause');
-                        $('#alert-rule-'+alert_id).removeClass('text-'+orig_colour);
-                        $('#alert-rule-'+alert_id).addClass('text-default');
-                        $('#alert-rule-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is OFF');
-                        $('#rule_id_'+alert_id).removeClass('warning');
-                        $('#rule_id_'+alert_id).addClass('active');
-                    }
+        type: 'PUT',
+        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        data: {state: state},
+        dataType: "json",
+        success: function (msg) {
+            if (msg.status === 200) {
+                if (state) {
+                    $('#alert-rule-' + alert_id).removeClass('fa-pause');
+                    $('#alert-rule-' + alert_id).addClass('fa-' + orig_state);
+                    $('#alert-rule-' + alert_id).removeClass('text-default');
+                    $('#alert-rule-' + alert_id).addClass('text-' + orig_colour);
+                    $('#alert-rule-' + alert_id).attr('data-content', alert_status);
+                    $('#on-off-checkbox-' + alert_id).attr('data-content', alert_name + ' is ON');
+                    $('#rule_id_' + alert_id).removeClass('active');
+                    $('#rule_id_' + alert_id).addClass(orig_class);
                 } else {
-                    $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-                    $('#'+alert_id).bootstrapSwitch('toggleState',true );
+                    $('#alert-rule-' + alert_id).removeClass('fa-' + orig_state);
+                    $('#alert-rule-' + alert_id).addClass('fa-pause');
+                    $('#alert-rule-' + alert_id).removeClass('text-' + orig_colour);
+                    $('#alert-rule-' + alert_id).addClass('text-default');
+                    $('#alert-rule-' + alert_id).attr('data-content', alert_name + ' is OFF');
+                    $('#on-off-checkbox-' + alert_id).attr('data-content', alert_name + ' is OFF');
+                    $('#rule_id_' + alert_id).removeClass('warning');
+                    $('#rule_id_' + alert_id).addClass('active');
                 }
-            },
-                error: function() {
-                    $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
-                    $('#'+alert_id).bootstrapSwitch('toggleState',true );
-                }
+            } else {
+                $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
+                $('#' + alert_id).bootstrapSwitch('toggleState', true);
+            }
+        },
+        error: function () {
+            $("#message").html('<div class="alert alert-info">This alert could not be updated.</div>');
+            $('#' + alert_id).bootstrapSwitch('toggleState', true);
+        }
     });
 });
 

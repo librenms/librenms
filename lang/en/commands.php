@@ -13,6 +13,13 @@ return [
             'dump' => 'Output the entire config as json',
         ],
     ],
+    'config:list' => [
+        'description' => 'List and search configuration settings',
+        'arguments' => [
+            'search' => 'Search for a setting, matching config name or description',
+        ],
+        'not_found' => 'No settings found matching \':search\'',
+    ],
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
@@ -164,6 +171,9 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
+    ],
+    'maintenance:cleanup-networks' => [
+        'delete' => 'Deleting :count unused networks',
     ],
     'maintenance:fetch-ouis' => [
         'description' => 'Fetch MAC OUIs and cache them to display vendor names for MAC addresses',

@@ -7,6 +7,8 @@ if ($_POST['editing']) {
         $ipmi_username = $_POST['ipmi_username'];
         $ipmi_password = $_POST['ipmi_password'];
         $ipmi_kg_key = $_POST['ipmi_kg_key'];
+        $ipmi_ciphersuite = $_POST['ipmi_ciphersuite'];
+        $ipmi_timeout = $_POST['ipmi_timeout'];
 
         if ($ipmi_hostname != '') {
             set_dev_attrib($device, 'ipmi_hostname', $ipmi_hostname);
@@ -36,6 +38,18 @@ if ($_POST['editing']) {
             set_dev_attrib($device, 'ipmi_kg_key', $ipmi_kg_key);
         } else {
             del_dev_attrib($device, 'ipmi_kg_key');
+        }
+
+        if ($ipmi_ciphersuite != '') {
+            set_dev_attrib($device, 'ipmi_ciphersuite', $ipmi_ciphersuite);
+        } else {
+            del_dev_attrib($device, 'ipmi_ciphersuite');
+        }
+
+        if ($ipmi_timeout != '') {
+            set_dev_attrib($device, 'ipmi_timeout', $ipmi_timeout);
+        } else {
+            del_dev_attrib($device, 'ipmi_timeout');
         }
 
         $update_message = 'Device IPMI data updated.';
@@ -84,6 +98,18 @@ if ($updated && $update_message) {
     <label for="ipmi_kg_key" class="col-sm-2 control-label">IPMIv2 Kg key</label>
     <div class="col-sm-6">
       <input id="ipmi_kg_key" name="ipmi_kg_key" type="password" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_kg_key')); ?>" placeholder="A0FE1A760B304... (Leave blank if none)" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ipmi_ciphersuite" class="col-sm-2 control-label">IPMI Cipher suite</label>
+    <div class="col-sm-6">
+      <input id="ipmi_ciphersuite" name="ipmi_ciphersuite" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_ciphersuite')); ?>" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="ipmi_timeout" class="col-sm-2 control-label">IPMI Timeout</label>
+    <div class="col-sm-6">
+      <input id="ipmi_timeout" name="ipmi_timeout" class="form-control" value="<?php echo htmlentities(get_dev_attrib($device, 'ipmi_timeout')); ?>" placeholder="3" />
     </div>
   </div>
   <div class="row">
