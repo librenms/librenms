@@ -40,7 +40,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
-class OSModulesTest extends DBTestCase
+final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
 

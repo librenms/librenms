@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit\View;
 use App\View\SimpleTemplate;
 use PHPUnit\Framework\TestCase;
 
-class SimpleTemplateTest extends TestCase
+final class SimpleTemplateTest extends TestCase
 {
     public function testBasicVariableReplacement(): void
     {

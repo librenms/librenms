@@ -8,7 +8,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('external-dependencies')]
-class KafkaDBStoreTest extends TestCase
+final class KafkaDBStoreTest extends TestCase
 {
     protected function setUp(): void
     {

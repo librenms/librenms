@@ -26,7 +26,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
+final class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
 {
     /**
      * Test CiscoDHCPServer trap handles

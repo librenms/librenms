@@ -32,7 +32,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class RuckusSzApRadiusServerReachabilityTrapTest extends SnmpTrapTestCase
+final class RuckusSzApRadiusServerReachabilityTrapTest extends SnmpTrapTestCase
 {
     public function testRadiusUnreachableIpv4(): void
     {

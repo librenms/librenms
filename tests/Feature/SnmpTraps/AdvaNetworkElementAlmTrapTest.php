@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
+final class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
 {
     public function testElementAlarmCleared(): void
     {

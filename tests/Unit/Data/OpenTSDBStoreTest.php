@@ -35,7 +35,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class OpenTSDBStoreTest extends TestCase
+final class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 1190464400;
 

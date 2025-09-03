@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CppmServiceStartTrapTest extends SnmpTrapTestCase
+final class CppmServiceStartTrapTest extends SnmpTrapTestCase
 {
     public function testServiceStart(): void
     {

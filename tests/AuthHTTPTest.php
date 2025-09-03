@@ -32,7 +32,7 @@ use LibreNMS\Authentication\LegacyAuth;
 use function strip_tags;
 use function strip_tags as strip_tags1;
 
-class AuthHTTPTest extends TestCase
+final class AuthHTTPTest extends TestCase
 {
     private $original_auth_mech;
     private $server;
