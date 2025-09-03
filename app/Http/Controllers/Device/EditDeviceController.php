@@ -68,7 +68,7 @@ class EditDeviceController
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
-            'override_sysContact_string' => $device->getAttrib('override_sysContact_bool') ? $device->getAttrib('override_sysContact_string') : $device->sysContact,
+            'override_sysContact_string' => $device->getAttrib('override_sysContact_string'),
             'maintenance' => $isUnderMaintenance,
             'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
@@ -95,7 +95,7 @@ class EditDeviceController
         // check if sysContact is overridden
         if ($request->get('override_sysContact')) {
             $device->setAttrib('override_sysContact_bool', true);
-            $device->setAttrib('override_sysContact_string', $request->get('override_sysContact_string', ''));
+            $device->setAttrib('override_sysContact_string', (string) $request->get('override_sysContact_string'));
         } else {
             $device->forgetAttrib('override_sysContact_bool');
         }
