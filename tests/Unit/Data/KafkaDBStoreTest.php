@@ -24,7 +24,7 @@ class KafkaDBStoreTest extends TestCase
         LibrenmsConfig::set('kafka.request.required.acks', 0);
     }
 
-    public function testDataPushToKafka()
+    public function testDataPushToKafka(): void
     {
         $producer = \Mockery::mock(Kafka::getClient());
         $producer->shouldReceive('newTopic')->once();
