@@ -753,24 +753,24 @@ if (! empty($peers)) {
 
                             if ($afi == 1) { // IPv4
                                 if ($safi == 'unicast') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes'] ?? null;
+                                $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes'] ?? null;
                                 $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes'] ?? null;
-                            } elseif ($safi == 'multicast') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs'] ?? null;
-                            } elseif ($safi == 'vpn') {
-                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes'] ?? null;
+                                } elseif ($safi == 'multicast') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs'] ?? null;
+                                } elseif ($safi == 'vpn') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes'] ?? null;
                                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes'] ?? null;
                                 }
                             } elseif ($afi == 2) { // IPv6
                                 if ($safi == 'unicast') {
-                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes'] ?? null;
                                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes'] ?? null;
                                 } elseif ($safi == 'multicast') {
-                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs'] ?? null;
                                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs'] ?? null;
                                 } elseif ($safi == 'vpn') {
-                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs'] ?? null;
                                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs'] ?? null;
                                 }
                             }
