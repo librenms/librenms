@@ -35,7 +35,6 @@ class AlertRuleController extends Controller
             'default_invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
         ];
 
-
         // Alert rule collection (from definitions json)
         $collectionRules = [];
         $rawCollection = AlertRuleTemplateController::templatesCollection();
@@ -371,7 +370,7 @@ class AlertRuleController extends Controller
 
         $alertRule->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
         $alertRule->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
-       }
+    }
 
     private function syncTemplates(?int $globalTemplateId, array $perTransportTemplates, AlertRule $alertRule): void
     {

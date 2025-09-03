@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2025_08_27_124900_add_transport_id_to_alert_template_map_table.php
  *
