@@ -759,26 +759,26 @@ if (! empty($peers)) {
                                 $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs'] ?? null;
                                 $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs'] ?? null;
                             } elseif ($safi == 'vpn') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes'] ?? null;
+                                }
+                            } elseif ($afi == 2) { // IPv6
+                                if ($safi == 'unicast') {
+                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes'] ?? null;
+                                } elseif ($safi == 'multicast') {
+                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs'] ?? null;
+                                } elseif ($safi == 'vpn') {
+                                    $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs'] ?? null;
+                                }
                             }
-                        } elseif ($afi == 2) { // IPv6
-                            if ($safi == 'unicast') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes'] ?? null;
-                            } elseif ($safi == 'multicast') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs'] ?? null;
-                            } elseif ($safi == 'vpn') {
-                                $cbgpPeerAcceptedPrefixes   = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs'] ?? null;
-                            }
-                        }
 
-                    // Unused/unsupported OIDs
-                    $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
-                    $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
-                }
+                            // Unused/unsupported OIDs
+                            $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
+                            $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
+                        }
                     } else {
                         // Fallback: BGP4-MIB
                         $bgp4_peers = SnmpQuery::walk([
@@ -790,7 +790,7 @@ if (! empty($peers)) {
 
                         $peer_data = $bgp4_peers[$peer_ip->uncompressed()] ?? [];
                         if (! empty($peer_data)) {
-                            $cbgpPeerAcceptedPrefixes   = $peer_data['BGP4-MIB::bgpPeerInUpdates'] ?? null;
+                            $cbgpPeerAcceptedPrefixes = $peer_data['BGP4-MIB::bgpPeerInUpdates'] ?? null;
                             $cbgpPeerAdvertisedPrefixes = $peer_data['BGP4-MIB::bgpPeerOutUpdates'] ?? null;
 
                             $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
