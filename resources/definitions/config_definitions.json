@@ -1476,67 +1476,73 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "appliance.png",
+                    "icon": "hard-drive",
                     "text": "Appliance",
                     "type": "appliance"
                 },
                 {
-                    "icon": "collaboration.png",
+                    "icon": "people-arrows",
                     "text": "Collaboration",
                     "type": "collaboration"
                 },
                 {
-                    "icon": "environment.png",
+                    "icon": "temperature-full",
                     "text": "Environment",
                     "type": "environment"
                 },
                 {
-                    "icon": "firewall.png",
+                    "icon": "shield",
                     "text": "Firewalls",
                     "type": "firewall"
                 },
                 {
-                    "icon": "loadbalancer.png",
+                    "icon": "scale-blanaced",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
                 },
                 {
-                    "icon": "network.png",
+                    "icon": "network-wired",
                     "text": "Network",
                     "type": "network"
                 },
                 {
-                    "icon": "printer.png",
+                    "icon": "print",
                     "text": "Printers",
                     "type": "printer"
                 },
                 {
-                    "icon": "power.png",
+                    "icon": "plug",
                     "text": "Power",
                     "type": "power"
                 },
                 {
-                    "icon": "server.png",
+                    "icon": "server",
                     "text": "Servers",
                     "type": "server"
                 },
                 {
-                    "icon": "storage.png",
+                    "icon": "database",
                     "text": "Storage",
                     "type": "storage"
                 },
                 {
-                    "icon": "wireless.png",
+                    "icon": "wifi",
                     "text": "Wireless",
                     "type": "wireless"
                 },
                 {
-                    "icon": "workstation.png",
+                    "icon": "computer",
                     "text": "Workstation",
                     "type": "workstation"
                 }
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*.icon": "required|string",
+                "value.*.text": "required|string",
+                "value.*.type": "required|string"
+            }
         },
         "disabled_sensors": {
             "default": null,
@@ -5208,6 +5214,13 @@
             "group": "discovery",
             "section": "autodiscovery",
             "order": 1
+        },
+        "networks_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 10,
+            "default": false,
+            "type": "boolean"
         },
         "network_map_dependencymap_vis_options": {
             "default": null,

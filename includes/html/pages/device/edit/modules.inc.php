@@ -33,7 +33,7 @@ $poller_modules = LibrenmsConfig::get('poller_modules');
 unset($poller_modules['core']); // core cannot be toggled
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
-    $module_name = $poller_module_names[$module]['description'] ?: $module;
+    $module_name = empty($poller_module_names[$module]['description']) ? $module : $poller_module_names[$module]['description'];
     echo '
       <tr>
         <td><strong>' . $module_name . '</strong></td>
@@ -128,7 +128,7 @@ $discovery_modules = LibrenmsConfig::get('discovery_modules');
 unset($discovery_modules['core']); // core cannot be toggled
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
-    $module_name = $discovery_module_names[$module]['description'] ?: $module;
+    $module_name = empty($discovery_module_names[$module]['description']) ? $module : $discovery_module_names[$module]['description'];
     echo '
       <tr>
         <td>

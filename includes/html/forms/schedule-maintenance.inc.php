@@ -13,6 +13,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedule;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -30,7 +31,7 @@ if ($sub_type == 'new-maintenance') {
     $update = 0;
     $message = '';
 
-    $schedule_id = $_POST['schedule_id'];
+    $schedule_id = $_POST['schedule_id'] ?? 0;
     if ($schedule_id > 0) {
         $update = 1;
     }
@@ -38,13 +39,13 @@ if ($sub_type == 'new-maintenance') {
     $title = $_POST['title'];
     $notes = $_POST['notes'];
     $recurring = empty($_POST['recurring']) ? 0 : 1;
-    $start_recurring_dt = $_POST['start_recurring_dt'];
-    $end_recurring_dt = $_POST['end_recurring_dt'];
-    $start_recurring_hr = $_POST['start_recurring_hr'];
-    $end_recurring_hr = $_POST['end_recurring_hr'];
-    $start = $_POST['start'];
+    $start_recurring_dt = $_POST['start_recurring_dt'] ?? null;
+    $end_recurring_dt = $_POST['end_recurring_dt'] ?? null;
+    $start_recurring_hr = $_POST['start_recurring_hr'] ?? null;
+    $end_recurring_hr = $_POST['end_recurring_hr'] ?? null;
+    $start = $_POST['start'] ?? null;
     [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
-    $end = $_POST['end'];
+    $end = $_POST['end'] ?? null;
     $behavior = isset($_POST['behavior'])
         ? $_POST['behavior']
         : LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
@@ -126,7 +127,7 @@ if ($sub_type == 'new-maintenance') {
     }
 
     if (empty($message)) {
-        $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
+        $alert_schedule = AlertSchedule::findOrNew($schedule_id);
         $alert_schedule->title = $title;
         $alert_schedule->notes = $notes;
         $alert_schedule->behavior = $behavior;
@@ -193,9 +194,10 @@ if ($sub_type == 'new-maintenance') {
     $response = [
         'status' => $status,
         'message' => $message,
+        'schedule_id' => $alert_schedule->schedule_id ?? null,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
-    $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);
+    $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id']);
     $items = [];
 
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
@@ -218,6 +220,14 @@ if ($sub_type == 'new-maintenance') {
     $response = $alert_schedule->toArray();
     $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
+} elseif ($sub_type == 'end-maintenance') {
+    $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id'] ?? 0);
+    $alert_schedule->end = date('Y-m-d H:i:s');
+    $alert_schedule->save();
+    $response = [
+        'status' => 'ok',
+        'message' => 'Maintenance has been ended',
+    ];
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = $_POST['del_schedule_id'];
     dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
