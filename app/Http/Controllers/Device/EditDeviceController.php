@@ -95,7 +95,7 @@ class EditDeviceController
         // check if sysContact is overridden
         if ($request->get('override_sysContact')) {
             $device->setAttrib('override_sysContact_bool', true);
-            $device->setAttrib('override_sysContact_string', $request->get('override_sysContact_string'));
+            $device->setAttrib('override_sysContact_string', $request->get('override_sysContact_string', ''));
         } else {
             $device->forgetAttrib('override_sysContact_bool');
         }
