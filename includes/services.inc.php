@@ -247,7 +247,7 @@ function check_service($command)
     $response_string = implode("\n", $response_array);
 
     // Split out the response and the performance data.
-    [$response, $perf] = explode('|', $response_string);
+    [$response, $perf] = explode('|', $response_string, 2) + ['', ''];
 
     // Split performance metrics into an array
     preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
