@@ -1,0 +1,3181 @@
+-- *****************************************************************
+-- RUIJIE-FIBER-MIB.mib:  Ruijie FIBER MIB file
+--
+-- January 2012, wangyouliang
+--
+-- Copyright (c) 2012 by Ruijie Networks Co.,Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+RUIJIE-FIBER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Gauge32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        IfIndex
+                FROM RUIJIE-TC
+        ruijieMgmt
+                FROM RUIJIE-SMI
+        ifIndex,
+        ifDescr
+                FROM IF-MIB;
+
+ruijieFiberMIB MODULE-IDENTITY
+        LAST-UPDATED "201111280000Z"
+        ORGANIZATION "Ruijie Networks Co.,Ltd."
+        CONTACT-INFO
+                " 
+                Tel: 4008-111-000 
+
+                E-mail: service@ruijie.com.cn"
+        DESCRIPTION
+                "This module defines ruijie fiber module information mibs."
+        REVISION      "201111280000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { ruijieMgmt 105}
+
+ruijieFiberMIBObjects OBJECT IDENTIFIER ::= { ruijieFiberMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- A table for getting Fiber port information.
+-- ---------------------------------------------------------- -- 
+ruijieFiberTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieFiberEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for getting Fiber Module information"
+        ::= { ruijieFiberMIBObjects 1 }
+    
+ruijieFiberEntry OBJECT-TYPE
+        SYNTAX RuijieFiberEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of a Fiber Module information."
+        INDEX { ruijieFiberPortIndex }
+        ::= { ruijieFiberTable 1 }
+    
+RuijieFiberEntry ::=
+        SEQUENCE {
+                ruijieFiberPortIndex IfIndex,
+                ruijieFiberPortDescr DisplayString,
+                ruijieFiberTransceiverType INTEGER,
+                ruijieFiberConnectorType INTEGER,
+                ruijieFiberWavelength INTEGER,
+                ruijieFiberTransferDistanceSMF INTEGER,
+                ruijieFiberTransferDistance62point5umOM1 INTEGER,
+                ruijieFiberTransferDistance62point5um INTEGER,
+                ruijieFiberTransferDistance50umOM2 INTEGER,
+                ruijieFiberTransferDistance50um INTEGER,
+                ruijieFiberTransferDistance50umOM3 INTEGER,
+                ruijieFiberTransferDistanceEBW50um INTEGER,
+                ruijieFiberTransferDistanceCopper INTEGER,
+                ruijieFiberTransferDistanceCableAssembly INTEGER,
+                ruijieFiberDDMSupportStatus TruthValue,
+                ruijieFiberSerialNumber DisplayString,
+                ruijieFiberTemp INTEGER,
+                ruijieFiberTempStatus INTEGER,
+                ruijieFiberVoltage INTEGER,
+                ruijieFiberVoltageStatus INTEGER,
+                ruijieFiberBias INTEGER,
+                ruijieFiberBiasStatus INTEGER,
+                ruijieFiberChannel1Bias INTEGER,
+                ruijieFiberChannel1BiasStatus INTEGER,
+                ruijieFiberChannel2Bias INTEGER,
+                ruijieFiberChannel2BiasStatus INTEGER,
+                ruijieFiberChannel3Bias INTEGER,
+                ruijieFiberChannel3BiasStatus INTEGER,
+                ruijieFiberChannel4Bias INTEGER,
+                ruijieFiberChannel4BiasStatus INTEGER,
+                ruijieFiberRXpowerIntegerpart INTEGER,
+                ruijieFiberRXpowerDecimalpart INTEGER,
+                ruijieFiberRXpowertype INTEGER,
+                ruijieFiberRXpowerStatus INTEGER,
+                ruijieFiberChannel1RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel1RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel1RXpowertype INTEGER,
+                ruijieFiberChannel1RXpowerStatus INTEGER,
+                ruijieFiberChannel2RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel2RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel2RXpowertype INTEGER,
+                ruijieFiberChannel2RXpowerStatus INTEGER,
+                ruijieFiberChannel3RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel3RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel3RXpowertype INTEGER,
+                ruijieFiberChannel3RXpowerStatus INTEGER,
+                ruijieFiberChannel4RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel4RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel4RXpowertype INTEGER,
+                ruijieFiberChannel4RXpowerStatus INTEGER,
+                ruijieFiberTXpowerIntegerpart INTEGER,
+                ruijieFiberTXpowerDecimalpart INTEGER,
+                ruijieFiberTXpowerStatus INTEGER,
+                ruijieFiberChannel1TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel1TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel1TXpowerStatus INTEGER,
+                ruijieFiberChannel2TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel2TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel2TXpowerStatus INTEGER,
+                ruijieFiberChannel3TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel3TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel3TXpowerStatus INTEGER,
+                ruijieFiberChannel4TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel4TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel4TXpowerStatus INTEGER,
+                ruijieFiberRXpowerSign INTEGER,
+                ruijieFiberChannel1RXpowerSign INTEGER,
+                ruijieFiberChannel2RXpowerSign INTEGER,
+                ruijieFiberChannel3RXpowerSign INTEGER,
+                ruijieFiberChannel4RXpowerSign INTEGER,
+                ruijieFiberTXpowerSign INTEGER,
+                ruijieFiberChannel1TXpowerSign INTEGER,
+                ruijieFiberChannel2TXpowerSign INTEGER,
+                ruijieFiberChannel3TXpowerSign INTEGER,
+                ruijieFiberChannel4TXpowerSign INTEGER,
+                ruijieFiberRXpower INTEGER,
+                ruijieFiberChannel1RXpower INTEGER,
+                ruijieFiberChannel2RXpower INTEGER,
+                ruijieFiberChannel3RXpower INTEGER,
+                ruijieFiberChannel4RXpower INTEGER,
+                ruijieFiberTXpower INTEGER,
+                ruijieFiberChannel1TXpower INTEGER,
+                ruijieFiberChannel2TXpower INTEGER,
+                ruijieFiberChannel3TXpower INTEGER,
+                ruijieFiberChannel4TXpower INTEGER,
+                ruijieFiberWavelengthExact DisplayString,
+                ruijieFiberTransferDistance50umOM4 INTEGER,
+                ruijieFiberTransferDistanceSMFExt INTEGER,
+                ruijieFiberBandWidth INTEGER,
+                ruijieFiberFormFactor INTEGER,
+                ruijieFiberRXpowerLowWarnThreshold INTEGER,
+                ruijieFiberRXpowerHighWarnThreshold INTEGER,
+                ruijieFiberRXpowerLowAlarmThreshold INTEGER,
+                ruijieFiberRXpowerHighAlarmThreshold INTEGER,
+                ruijieFiberTXpowerLowWarnThreshold INTEGER,
+                ruijieFiberTXpowerHighWarnThreshold INTEGER,
+                ruijieFiberTXpowerLowAlarmThreshold INTEGER,
+                ruijieFiberTXpowerHighAlarmThreshold INTEGER,
+                ruijieFiberChannel5Bias INTEGER,
+                ruijieFiberChannel5BiasStatus INTEGER,
+                ruijieFiberChannel6Bias INTEGER,
+                ruijieFiberChannel6BiasStatus INTEGER,
+                ruijieFiberChannel7Bias INTEGER,
+                ruijieFiberChannel7BiasStatus INTEGER,
+                ruijieFiberChannel8Bias INTEGER,
+                ruijieFiberChannel8BiasStatus INTEGER,
+                ruijieFiberChannel5RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel5RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel5RXpowertype INTEGER,
+                ruijieFiberChannel5RXpowerStatus INTEGER,
+                ruijieFiberChannel6RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel6RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel6RXpowertype INTEGER,
+                ruijieFiberChannel6RXpowerStatus INTEGER,
+                ruijieFiberChannel7RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel7RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel7RXpowertype INTEGER,
+                ruijieFiberChannel7RXpowerStatus INTEGER,
+                ruijieFiberChannel8RXpowerIntegerpart INTEGER,
+                ruijieFiberChannel8RXpowerDecimalpart INTEGER,
+                ruijieFiberChannel8RXpowertype INTEGER,
+                ruijieFiberChannel8RXpowerStatus INTEGER,
+                ruijieFiberChannel5TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel5TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel5TXpowerStatus INTEGER,
+                ruijieFiberChannel6TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel6TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel6TXpowerStatus INTEGER,
+                ruijieFiberChannel7TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel7TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel7TXpowerStatus INTEGER,
+                ruijieFiberChannel8TXpowerIntegerpart INTEGER,
+                ruijieFiberChannel8TXpowerDecimalpart INTEGER,
+                ruijieFiberChannel8TXpowerStatus INTEGER,
+                ruijieFiberChannel5RXpowerSign INTEGER,
+                ruijieFiberChannel6RXpowerSign INTEGER,
+                ruijieFiberChannel7RXpowerSign INTEGER,
+                ruijieFiberChannel8RXpowerSign INTEGER,
+                ruijieFiberChannel5TXpowerSign INTEGER,
+                ruijieFiberChannel6TXpowerSign INTEGER,
+                ruijieFiberChannel7TXpowerSign INTEGER,
+                ruijieFiberChannel8TXpowerSign INTEGER,
+                ruijieFiberChannel5RXpower INTEGER,
+                ruijieFiberChannel6RXpower INTEGER,
+                ruijieFiberChannel7RXpower INTEGER,
+                ruijieFiberChannel8RXpower INTEGER,
+                ruijieFiberChannel5TXpower INTEGER,
+                ruijieFiberChannel6TXpower INTEGER,
+                ruijieFiberChannel7TXpower INTEGER,
+                ruijieFiberChannel8TXpower INTEGER,
+                ruijieFiberTransferDistance50umOM5 INTEGER,
+                ruijieFiberMode INTEGER,
+                ruijieFiberTempLowWarnThreshold INTEGER,
+                ruijieFiberTempHighWarnThreshold INTEGER,
+                ruijieFiberTempLowAlarmThreshold INTEGER,
+                ruijieFiberTempHighAlarmThreshold INTEGER,
+                ruijieFiberVoltageLowWarnThreshold INTEGER,
+                ruijieFiberVoltageHighWarnThreshold INTEGER,
+                ruijieFiberVoltageLowAlarmThreshold INTEGER,
+                ruijieFiberVoltageHighAlarmThreshold INTEGER,
+                ruijieFiberBiasLowWarnThreshold INTEGER,
+                ruijieFiberBiasHighWarnThreshold INTEGER,
+                ruijieFiberBiasLowAlarmThreshold INTEGER,
+                ruijieFiberBiasHighAlarmThreshold INTEGER,
+                ruijieFiberTransceiverTypeStr DisplayString,
+                ruijieFiberConnectorTypeStr DisplayString
+        }
+        
+ruijieFiberPortIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port index of the port."
+        ::= { ruijieFiberEntry 1 }
+
+ruijieFiberPortDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Discription of the port."
+        ::= { ruijieFiberEntry 2 }
+
+ruijieFiberTransceiverType OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            fiber100BASEGTSFP(2),
+            fiber100BASESXSFP(3),
+            fiber100BASELXSFP(4),
+            fiber100BASELHSFP(5),
+            fiber100BASEZXSFP(6),
+            fiber100CopperSFP(7),
+            fiber1000BASEGTSFP(8),
+            fiber1000BASESXSFP(9),
+            fiber1000BASELXSFP(10),
+            fiber1000BASELHSFP(11),
+            fiber1000BASEZXSFP(12),
+            fiber1000CopperSFP(13),
+            fiber10GCopperSFPPlus(14),
+            fiber10GBASESRSFPPlus(15),
+            fiber10GBASELRSFPPlus(16),
+            fiber10GBASEERSFPPlus(17),
+            fiber10GBASEZRSFPPlus(18),
+            fiber10GCopperXFP(19),
+            fiber10GBASESRXFP(20),
+            fiber10GBASELRXFP(21),
+            fiber10GBASEERXFP(22),
+            fiber10GBASEZRXFP(23),
+            fiber40GActiveCableQSFPPlus(24),
+            fiber40GLR4QSFPPlus(25),
+            fiber40GCopperQSFPPlus(26),
+            fiber40GSR4QSFPPlus(27),
+            fiber2500CopperSFP(28),
+            fiberFC16G(29),
+            fiberFC8G(30),
+            fiberFC4G(31),
+            fiberFC2G(32),
+            fiber10GActiveCableSFPPlus(33),
+            fiber40GER4QSFPPlus(34),
+            fiber40GZR4QSFPPlus(35),
+            fiber100GCABLEQSFP28(36),
+            fiber100GLR4QSFP28(37),
+            fiber100GSR4QSFP28(38),
+            fiber100GER4QSFP28(39),
+            fiber100GZR4QSFP28(40),
+            fiber100GCR4QSFP28(41),
+            fiber100GPSM4QSFP28(42),
+            fiber25GSRSFP28    (43),
+            fiber25GLRSFP28    (44),
+            fiber25GERSFP28    (45),
+            fiber25GZRSFP28    (46),
+            fiber25GCOPPERSFP28 (47),
+            fiber25GACTIVECABLESFP28 (48),
+            fiber100GiLR4QSFP28(49),
+            fiber10GBASELRMSFPPlus(50),
+            fiber40GLSR4QSFPPlus(51),
+            fiber40GSWDM4QSFPPlus(52),
+            fiber40GiLR4QSFPPlus(53),
+            fiber40GPSM4QSFPPlus(54),
+            fiber40GSR4BiDiQSFPPlus(55),
+            fiber100GSWDM4QSFP28(56),
+            fiber100GPAM4BiDiQSFP28(57),
+            fiber100GER4LiteQSFP28(58),
+            fiber100G4WDM40QSFP28(59),
+            fiber100GDWDM2QSFP28(60),
+            fiber40GZRQSFPPlus(61),
+            fiber100GZRQSFP28(62),
+            fiber100GCWDM4QSFP28(63),
+            fiber10GPASSIVECOPPERSFPPlus(64),
+            fiber10GACTIVECOPPERSFPPlus(65),
+            fiber10GLOOPBACKSFPPlus(66),
+            fiber40GPASSIVECOPPERQSFPPlus(67),
+            fiber40GACTIVECOPPERQSFPPlus(68),
+            fiber40GLOOPBACKQSFPPlus(69),
+            fiber100GPASSIVECOPPERQSFP28(70),
+            fiber100GACTIVECOPPERQSFP28(71),
+            fiber100GLOOPBACKQSFP28(72),
+            fiber25GPASSIVECOPPERSFP28(73),
+            fiber25GACTIVECOPPERSFP28(74),
+            fiber25GLOOPBACKSFP28(75),
+            fiber200GSR4QSFP56(76),
+            fiber200GFR4QSFP56(77),
+            fiber200GPASSIVECOPPERQSFP56(78),
+            fiber200GACTIVECOPPERQSFP56(79),
+            fiber400GSR8QSFPDD(80),
+            fiber400GDR4QSFPDD(81),
+            fiber400GFR4QSFPDD(82),
+            fiber400GPASSIVECOPPERQSFPDD(83),
+            fiber400GACTIVECABLEQSFPDD(84),
+            fiber400GLR8QSFPDD(85),
+            fiber200GLOOPBACKQSFP56(86),
+            fiber400GACTIVECOPPERQSFPDD(87),
+            fiber400GLOOPBACKQSFPDD(88),
+            fiber100GPASSIVECOPPERDSFP(89),
+            fiber100GACTIVECOPPERDSFP(90),
+            fiber100GACTIVECABLEDSFP(91),
+            fiber100GLOOPBACKDSFP(92),
+            fiber100GDR1QSFP28(93),
+            fiber100GFR1QSFP28(94),
+            fiber400GZRQSFPDD(95),
+            fiber2500BASESXSFP(96),
+            fiber2500BASELXSFP(97),
+            fiber200GACTIVECABLEQSFP56(98),
+            fiber40GLX4QSFPPlus(99),
+            fiber10GBASELR8SFX(100),
+            fiber1000BASELX8SFG(101),
+            fiber10GCOPPER8SFX(102),
+            fiber10GBASETSFPPlus(103),
+            fiber400GZRPlusQSFPDD(104),
+            fiber400GLR4TENQSFPDD(105),
+            fiber400GLR4SIXQSFPDD(106),
+            fiber400GSR4QSFPDD(107),
+            fiber100GLR1QSFP28(108),
+            fiber400GVR4QSFPDD(109),
+            fiber400GSR4QSFP112(110),
+            fiber400GDR4QSFP112(111),
+            fiber400GFR4QSFP112(112),
+            fiber400GLR4TENQSFP112(113),
+            fiber400GLR4SIXQSFP112(114),
+            fiber400GPASSIVECOPPERQSFP112(115),
+            fiber400GACTIVECOPPERQSFP112(116),
+            fiber400GACTIVECABLEQSFP112(117),
+            fiber400GLOOPBACKQSFP112(118),
+            fiber101001000BASEGTSFP(119),
+            fiber2500BASELX8SFM(120),
+            fiber1000BASELH2CHCCSFP(121),
+            fiber1000BASELH2CHCSFP(122),
+            fiber1000BASELXCSFP(123),
+            fiber10GBASELR16SFXP(124),
+            fiber2500BASELX16SFMP(125),
+            fiber1000BASELX16SFGP(126),
+            fiber400GVR4QSFP112(127),
+            fiber10GCOPPER16SFXP(128),
+            fiber400GDR4QSFP112L(129),
+            fiber400GSR8QSFP112(130),
+            fiber1000BASELXSGSFP(131),
+            fiber1000BASELXSGCSFP(132),
+            fiber800GVR8OSFP112(133),
+            fiber800G2VR4OSFP112(134),
+            fiber800GSR8OSFP112(135),
+            fiber800G2SR4OSFP112(136),
+            fiber800GDR8OSFP112(137),
+            fiber800G2DR4OSFP112(138),
+            fiber800GDR8OSFP112L(139),
+            fiber800G2DR4OSFP112L(140),
+            fiber800GDR8TWOOSFP112(141),
+            fiber800G2FR4OSFP112(142),
+            fiber800GPASSIVECOPPEROSFP112(143),
+            fiber800GACTIVECOPPEROSFP112(144),
+            fiber800GACTIVECABLEOSFP112(145),
+            fiber800GLOOPBACKOSFP112(146),
+            fiber100GPASSIVECOPPERQSFP56(147),
+            fiber100GACTIVECABLEQSFP56(148)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver type of the Fiber module insered into the port."
+        ::= { ruijieFiberEntry 3 }
+
+ruijieFiberConnectorType OBJECT-TYPE
+        SYNTAX INTEGER {
+        meaningless(0),
+            unknownorunspecified(1),
+            vendorspecific(2),
+            sc(3),
+            fiberChannelStyle1CopperConnector(4),
+            fiberChannelStyle2CopperConnector(5),
+            bncortnc(6),
+            fiberChannelCoaxialHeaders(7),
+            fiberJack(8),
+            lc(9),
+            mtrj(10),
+            mu(11),
+            sg(12),
+            opticalPigtail(13),
+            hssdcII(14),
+            copperPigtail(15),
+            mpo(16),
+            rj45(17),
+            noSeparableConnector(18),
+            mxc(19),
+            CSOpticalConnector(20),
+            SNOpticalConnector(21)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Connector type of the Fiber module insered into the port.
+         If the transceiver type of Fiber module is unknown(1), then this
+             object contains a zero value."
+        ::= { ruijieFiberEntry 4 }
+
+ruijieFiberWavelength OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+         If the transceiver type of Fiber module is either fiber100CopperSFP(7)  
+         or fiber1000CopperSFP(13) (or fiber10GCopperSFPPlus(14), 
+         or fiber10GCopperXFP(19), or fiber40GCopperQSFPPlus(26), or fiber2500CopperSFP(28), or unknown(1)), then this
+             object contains a zero value."
+        ::= { ruijieFiberEntry 5 }
+
+ruijieFiberTransferDistanceSMF OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using single mode fiber for. The value is in units of kilometers.
+         A value of zero means that the transceiver does not support single mode fiber."
+        ::= { ruijieFiberEntry 6 }
+
+ruijieFiberTransferDistance62point5umOM1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 62.5 micron multimode (200 MHz*Km at 850 nm, 500 MHz*Km 
+         at 1310 nm) fiber. The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 62.5 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { ruijieFiberEntry 7 }
+
+ruijieFiberTransferDistance62point5um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 62.5 micron core multimode (200 MHz*Km at 850 nm, 500 MHz*Km 
+         at 1310 nm) fiber. The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 62.5 micron multimode fiber or the Fiber module type is not XFP."
+        ::= { ruijieFiberEntry 8 }
+
+ruijieFiberTransferDistance50umOM2 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron multimode (500 MHz*Km at 850 nm for SFP module 
+         or at 850 nm and 1310 nm for QSFP+ module) fiber. The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { ruijieFiberEntry 9 }
+
+ruijieFiberTransferDistance50um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron core multimode (500 MHz*Km at 850 nm and 1310 nm) fiber. 
+         The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron core multimode fiber or the Fiber module type 
+         is not XFP."
+        ::= { ruijieFiberEntry 10 }
+
+ruijieFiberTransferDistance50umOM3 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron multimode OM3(2000 MHz*Km) fiber. 
+         The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { ruijieFiberEntry 11 }
+
+ruijieFiberTransferDistanceEBW50um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 2000 MHz*Km (850nm) extended bandwidth 50 
+         micron core multimode fiber. The value is in units of meters.  
+         A value of zero means that the transceiver does not support 
+         extended bandwidth 50 micron multimode fiber or the Fiber module type is not XFP."
+        ::= { ruijieFiberEntry 12 }
+
+ruijieFiberTransferDistanceCopper OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using copper cables. The value is in units of meters.
+         A value of zero means that the transceiver does not support copper cables
+         or the Fiber module type is neither SFP/SFP+ nor XFP."
+        ::= { ruijieFiberEntry 13 }
+
+ruijieFiberTransferDistanceCableAssembly OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length of the Cable assembly passive. 
+         The value is in units of meters.
+         A value of zero means that the transceiver is not a cable assemblyor
+         or the Fiber module type is not QSFP+."
+        ::= { ruijieFiberEntry 14 }
+
+ruijieFiberDDMSupportStatus OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "This object indicates that whether the Digital Diagnostic Monitors is implemeted."
+    ::= { ruijieFiberEntry 15 }
+
+ruijieFiberSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The serial number of the Fiber module insered into the port."
+        ::= { ruijieFiberEntry 16 }
+
+ruijieFiberTemp OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        If the ruijieFiberDDMSupportStatus is false, the temperature value is 0."
+        ::= { ruijieFiberEntry 17 }
+
+ruijieFiberTempStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the temperature of the Fiber module is in
+        the normal level. The status warning(3) indicates that the temperature of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the temperature of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP(or not QSFP+), the status is unknown(1)."
+        ::= { ruijieFiberEntry 18 }
+
+ruijieFiberVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        If the ruijieFiberDDMSupportStatus is false, the voltage value is 0."
+        ::= { ruijieFiberEntry 19 }
+
+ruijieFiberVoltageStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the voltage of the Fiber module is in
+        the normal level. The status warning(3) indicates that the voltage of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the voltage of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP(or not QSFP+), the status is unknown(1)."
+        ::= { ruijieFiberEntry 20 }
+
+ruijieFiberBias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias of the Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the bias value is 0."
+        ::= { ruijieFiberEntry 21 }
+
+ruijieFiberBiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias of the Fiber module is in
+        the normal level. The status warning(3) indicates that the bias of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the bias of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { ruijieFiberEntry 22 }
+
+ruijieFiberChannel1Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 1 of the QSFP+ Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the bias value in Channel 1 is 0."
+        ::= { ruijieFiberEntry 23 }
+
+ruijieFiberChannel1BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 1 of QSFP+ is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 1 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 1 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 24 }
+
+ruijieFiberChannel2Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 2 of the QSFP+ Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the bias value in Channel 2 is 0."
+        ::= { ruijieFiberEntry 25 }
+
+ruijieFiberChannel2BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 2 of QSFP+ is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 2 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 2 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 26 }
+
+ruijieFiberChannel3Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 3 of the QSFP+ Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the bias value in Channel 3 is 0."
+        ::= { ruijieFiberEntry 27 }
+
+ruijieFiberChannel3BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 3 of QSFP+ is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 3 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 3 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 28 }
+
+ruijieFiberChannel4Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 4 of the QSFP+ Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the bias value in Channel 4 is 0."
+        ::= { ruijieFiberEntry 29 }
+
+ruijieFiberChannel4BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 4 of QSFP+ is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 4 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 4 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 30 }
+
+ruijieFiberRXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power of the Fiber module insered into the port.
+        The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the integer part of Rx power value 
+        is -100(means that the value is invalid)."
+        ::= { ruijieFiberEntry 31 }
+
+ruijieFiberRXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power of the Fiber module insered into the port.
+        The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the decimal part of Rx power value 
+        is -100(means that the value is invalid)."
+        ::= { ruijieFiberEntry 32 }
+
+ruijieFiberRXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3). 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         neither SFP/SFP+ nor XFP (or not QSFP+), the value is unknown(1)."
+        ::= { ruijieFiberEntry 33 }
+
+ruijieFiberRXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power of the Fiber module is in
+        the normal level. The status warning(3) indicates that the Rx power of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Rx power of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { ruijieFiberEntry 34 }
+
+ruijieFiberChannel1RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Rx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 35 }
+
+ruijieFiberChannel1RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Rx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 36 }
+
+ruijieFiberChannel1RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3) in Channel 1 of QSFP+. 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         not QSFP+, the value is unknown(1)."
+        ::= { ruijieFiberEntry 37 }
+
+ruijieFiberChannel1RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 1 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 1 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 1 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 38 }
+
+ruijieFiberChannel2RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Rx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 39 }
+
+ruijieFiberChannel2RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Rx power value in Channel 2 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 40 }
+
+ruijieFiberChannel2RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3) in Channel 2 of QSFP+. 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         not QSFP+, the value is unknown(1)."
+        ::= { ruijieFiberEntry 41 }
+
+ruijieFiberChannel2RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 2 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 2 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 2 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 42 }
+
+ruijieFiberChannel3RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 3 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Rx power value in Channel 3 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 43 }
+
+ruijieFiberChannel3RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 3 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Rx power value in Channel 3 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 44 }
+
+ruijieFiberChannel3RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3) in Channel 3 of QSFP+. 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         not QSFP+, the value is unknown(1)."
+        ::= { ruijieFiberEntry 45 }
+
+ruijieFiberChannel3RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 3 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 3 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 3 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 46 }
+
+ruijieFiberChannel4RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 4 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Rx power value in Channel 4 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 47 }
+
+ruijieFiberChannel4RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 4 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Rx power value in Channel 4 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 48 }
+
+ruijieFiberChannel4RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3) in Channel 4 of QSFP+. 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         not QSFP+, the value is unknown(1)."
+        ::= { ruijieFiberEntry 49 }
+
+ruijieFiberChannel4RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 4 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 4 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 4 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 50 }
+
+ruijieFiberTXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power of the Fiber module insered into the port.
+        The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the integer part of Tx power value 
+        is -100(means that the value is invalid)."
+        ::= { ruijieFiberEntry 51 }
+
+ruijieFiberTXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power of the Fiber module insered into the port.
+        The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the decimal part of Tx power value 
+        is -100(means that the value is invalid)."
+        ::= { ruijieFiberEntry 52 }
+
+ruijieFiberTXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power of the Fiber module is in
+        the normal level. The status warning(3) indicates that the Tx power of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Tx power of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { ruijieFiberEntry 53 }
+
+ruijieFiberChannel1TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Tx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 54 }
+
+ruijieFiberChannel1TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Tx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 55 }
+
+ruijieFiberChannel1TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 1 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 1 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 1 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 56 }
+
+ruijieFiberChannel2TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Tx power value in Channel 1 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 57 }
+
+ruijieFiberChannel2TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 1 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Tx power value in Channel 2 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 58 }
+
+ruijieFiberChannel2TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 2 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 2 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 2 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 59 }
+
+ruijieFiberChannel3TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 3 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Tx power value in Channel 3 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 60 }
+
+ruijieFiberChannel3TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 3 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Tx power value in Channel 3 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 61 }
+
+ruijieFiberChannel3TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 3 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 3 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 3 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 62 }
+
+ruijieFiberChannel4TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 4 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the integer part of Tx power value in Channel 4 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 63 }
+
+ruijieFiberChannel4TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 4 of the QSFP+ 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the decimal part of Tx power value in Channel 4 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 64 }
+
+ruijieFiberChannel4TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 4 of QSFP+ is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 4 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 4 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP+, the status is unknown(1)."
+        ::= { ruijieFiberEntry 65 }
+
+ruijieFiberRXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 66 }
+
+ruijieFiberChannel1RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 67 }
+
+ruijieFiberChannel2RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 68 }
+
+ruijieFiberChannel3RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 69 }
+
+ruijieFiberChannel4RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 70 }
+
+ruijieFiberTXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 71 }
+
+ruijieFiberChannel1TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 72 }
+
+ruijieFiberChannel2TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 73 }
+
+ruijieFiberChannel3TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 74 }
+
+ruijieFiberChannel4TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 75 }
+
+ruijieFiberRXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 76 }
+
+ruijieFiberChannel1RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 1 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 77 }
+
+ruijieFiberChannel2RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 2 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 78 }
+
+ruijieFiberChannel3RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 3 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 79 }
+
+
+ruijieFiberChannel4RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 4 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 80 }
+
+ruijieFiberTXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 81 }
+
+ruijieFiberChannel1TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 1 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 82 }
+
+ruijieFiberChannel2TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 2 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 83 }
+
+ruijieFiberChannel3TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 3 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 84 }
+
+ruijieFiberChannel4TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 4 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 85 }
+
+ruijieFiberWavelengthExact OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+        If the transceiver type of Fiber module is either fiber100CopperSFP(7)
+        or fiber1000CopperSFP(13) (or fiber10GCopperSFPPlus(14), 
+        or fiber10GCopperXFP(19), or fiber40GCopperQSFPPlus(26), or fiber2500CopperSFP(28), or unknown(1)), then this
+             object contains a NA value."
+        ::= { ruijieFiberEntry 86 }
+
+ruijieFiberTransferDistance50umOM4 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron multimode OM4(4700 MHz*Km) fiber. 
+         The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { ruijieFiberEntry 87 }
+
+
+ruijieFiberTransferDistanceSMFExt OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using single mode fiber for. The value is in units of meters.
+         A value of zero means that the transceiver does not support single mode fiber."
+        ::= { ruijieFiberEntry 88 }
+
+ruijieFiberBandWidth OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer maximum available bandwidth of the Fiber module insered into the port.
+        The value is in units of Mbit/s.
+        A value of zero means that the transceiver does not insert or unknown type."
+        ::= { ruijieFiberEntry 89 }
+
+ruijieFiberFormFactor OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(0),
+            xfp(1),
+            sfp(2),
+            sfpPlus(3),
+            sfp28(4),
+            qsfpPlus(5),
+            qsfp28(6),
+            qsfp56(7),
+            qsfpDD(8),
+            dsfp(9),
+            qsfp112(10)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the form factor of the Fiber module insered into the port."
+        ::= { ruijieFiberEntry 90 }
+
+ruijieFiberRXpowerLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power low warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 91 }
+
+ruijieFiberRXpowerHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power high warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 92 }
+
+ruijieFiberRXpowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power low alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 93 }
+
+ruijieFiberRXpowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power high alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 94 }
+
+ruijieFiberTXpowerLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power low warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 95 }
+
+ruijieFiberTXpowerHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power high warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 96 }
+
+ruijieFiberTXpowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power low alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 97 }
+
+ruijieFiberTXpowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power high alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 98 }
+
+ruijieFiberChannel5Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 5 is 0."
+        ::= { ruijieFiberEntry 99 }
+
+ruijieFiberChannel5BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 5 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 100 }
+
+ruijieFiberChannel6Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 6 is 0."
+        ::= { ruijieFiberEntry 101 }
+
+ruijieFiberChannel6BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 6 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 102 }
+
+ruijieFiberChannel7Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 7 is 0."
+        ::= { ruijieFiberEntry 103 }
+
+ruijieFiberChannel7BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 7 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 104 }
+
+ruijieFiberChannel8Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 8 is 0."
+        ::= { ruijieFiberEntry 105 }
+
+ruijieFiberChannel8BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 8 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 106 }
+
+ruijieFiberChannel5RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 107 }
+
+ruijieFiberChannel5RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 108 }
+
+ruijieFiberChannel5RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 5 of QSFP CMIS. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { ruijieFiberEntry 109 }
+
+ruijieFiberChannel5RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 5 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 110 }
+        
+ruijieFiberChannel6RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 111 }
+
+ruijieFiberChannel6RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 112 }
+
+ruijieFiberChannel6RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 6 of QSFP CMIS. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { ruijieFiberEntry 113 }
+
+ruijieFiberChannel6RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 6 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 114 }
+        
+ruijieFiberChannel7RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 115 }
+
+ruijieFiberChannel7RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 116 }
+
+ruijieFiberChannel7RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 7 of QSFP CMIS. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { ruijieFiberEntry 117 }
+
+ruijieFiberChannel7RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 7 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 118 }
+        
+ruijieFiberChannel8RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 119 }
+
+ruijieFiberChannel8RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 120 }
+
+ruijieFiberChannel8RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 8 of QSFP CMIS. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { ruijieFiberEntry 121 }
+
+ruijieFiberChannel8RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 8 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 122 }
+
+ruijieFiberChannel5TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 123 }
+
+ruijieFiberChannel5TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 124 }
+
+ruijieFiberChannel5TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 5 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 125 }
+
+ruijieFiberChannel6TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 126 }
+
+ruijieFiberChannel6TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 127 }
+
+ruijieFiberChannel6TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 6 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 128 }
+
+ruijieFiberChannel7TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 129 }
+
+ruijieFiberChannel7TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 130 }
+
+ruijieFiberChannel7TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 7 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 131 }
+
+ruijieFiberChannel8TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 132 }
+
+ruijieFiberChannel8TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { ruijieFiberEntry 133 }
+
+ruijieFiberChannel8TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 8 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { ruijieFiberEntry 134 }
+
+ruijieFiberChannel5RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 135 }
+
+ruijieFiberChannel6RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 136 }
+
+ruijieFiberChannel7RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 137 }
+
+ruijieFiberChannel8RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 138 }
+
+ruijieFiberChannel5TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 139 }
+
+ruijieFiberChannel6TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 140 }
+
+ruijieFiberChannel7TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 141 }
+
+ruijieFiberChannel8TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { ruijieFiberEntry 142 }
+
+ruijieFiberChannel5RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 143 }
+
+ruijieFiberChannel6RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 144 }
+
+ruijieFiberChannel7RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 145 }
+
+ruijieFiberChannel8RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 146 }
+
+ruijieFiberChannel5TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 147 }
+
+ruijieFiberChannel6TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 148 }
+
+ruijieFiberChannel7TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 149 }
+
+ruijieFiberChannel8TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 150 }
+
+ruijieFiberTransferDistance50umOM5 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron multimode OM5(4700 MHz*Km at 850nm, 2470 MHz*km at 953nm) fiber. 
+         The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { ruijieFiberEntry 151 }
+
+ruijieFiberMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(0),
+            copper(1),
+            singleMode(2),
+            multiMode(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the fiber type."
+        ::= { ruijieFiberEntry 152 }
+
+ruijieFiberTempLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature low warning threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 153 }
+
+ruijieFiberTempHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature high warning threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 154 }
+
+ruijieFiberTempLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature low alarm threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 155 }
+
+ruijieFiberTempHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature high alarm threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 156 }
+
+ruijieFiberVoltageLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage low warning threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 157 }
+
+ruijieFiberVoltageHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage high warning threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 158 }
+
+ruijieFiberVoltageLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage low alarm threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 159 }
+
+ruijieFiberVoltageHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage high alarm threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 160 }
+
+ruijieFiberBiasLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias low warning threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 161 }
+
+ruijieFiberBiasHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias high warning threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 162 }
+
+ruijieFiberBiasLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias low alarm threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 163 }
+
+ruijieFiberBiasHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias high alarm threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { ruijieFiberEntry 164 }
+
+ruijieFiberTransceiverTypeStr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver type of the Fiber module inserted into the port."
+        ::= { ruijieFiberEntry 165 }
+
+ruijieFiberConnectorTypeStr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Connector type of the Fiber module inserted into the port."
+        ::= { ruijieFiberEntry 166 }
+
+ruijieFiberVendorTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RuijieFiberVendorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+               "A table of Vendor info entries."
+        ::= { ruijieFiberMIBObjects 2 }
+
+ruijieFiberVendorEntry OBJECT-TYPE
+        SYNTAX     RuijieFiberVendorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Entry contains Vendor info."  
+        INDEX { ruijieFiberVendorPortIndex }
+        ::= { ruijieFiberVendorTable 1 }
+
+       RuijieFiberVendorEntry ::=
+       SEQUENCE {
+           ruijieFiberVendorPortIndex      IfIndex,
+           ruijieFiberVendorName           DisplayString,
+           ruijieFiberVendorOUI            DisplayString,
+           ruijieFiberVendorPartNumber     DisplayString,
+           ruijieFiberVendorRev            DisplayString,
+           ruijieFiberManufacturingDate    DisplayString,
+           ruijieFiberEncoding             DisplayString
+       }
+
+       ruijieFiberVendorPortIndex OBJECT-TYPE
+       SYNTAX        IfIndex 
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The port index of Vendor info ."
+       ::= { ruijieFiberVendorEntry 1 }
+
+       ruijieFiberVendorName OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor name." 
+       ::= { ruijieFiberVendorEntry 2 }
+
+       ruijieFiberVendorOUI OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor oui." 
+       ::= { ruijieFiberVendorEntry 3 }
+
+       ruijieFiberVendorPartNumber OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor part number." 
+       ::= { ruijieFiberVendorEntry 4 }
+
+       ruijieFiberVendorRev OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor revision." 
+       ::= { ruijieFiberVendorEntry 5 }
+
+       ruijieFiberManufacturingDate OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor's manufacturing date." 
+       ::= { ruijieFiberVendorEntry 6 }
+
+       ruijieFiberEncoding OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor's encoding type." 
+       ::= { ruijieFiberVendorEntry 7 }
+       
+ruijieFiberOMCTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieFiberOMCEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of OMC fiber info entries."
+        ::= { ruijieFiberMIBObjects 3 }
+                
+ruijieFiberOMCEntry OBJECT-TYPE
+        SYNTAX RuijieFiberOMCEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry contains OMC fiber info."
+        INDEX { ruijieFiberOMCPortIndex }
+        ::= { ruijieFiberOMCTable 1 }
+                
+        RuijieFiberOMCEntry ::=
+        SEQUENCE { 
+            ruijieFiberOMCPortIndex        IfIndex,
+            ruijieFiberOMCRxpower          DisplayString,
+            ruijieFiberOMCTxpower          DisplayString,
+            ruijieFiberOMCWavelength       DisplayString,
+            ruijieFiberOMCTranslength      DisplayString,
+            ruijieFiberOMCPortType         DisplayString
+         }
+
+        ruijieFiberOMCPortIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port index of the port."
+        ::= { ruijieFiberOMCEntry 1 }
+               
+        ruijieFiberOMCRxpower OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power of the Fiber module insered into the port.
+        Use a comma to separate multiple optical power values for multiple channels,
+        fill in key-value pairs, connect the key and value with an equal sign,
+        the key is the channel name, and the value is the optical power.
+        The unit of the optical power value is dbw."
+        ::= { ruijieFiberOMCEntry 2 }
+   
+        ruijieFiberOMCTxpower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power of the Fiber module insered into the port.
+        Use a comma to separate multiple optical power values for multiple channels,
+        fill in key-value pairs, connect the key and value with an equal sign,
+        the key is the channel name, and the value is the optical power.
+        The unit of the optical power value is dbw."
+        ::= { ruijieFiberOMCEntry 3 }
+        ruijieFiberOMCWavelength OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+        The unit is nm.
+        If it is a single wavelength, report a single value, for example: 1310.
+        If it is a wavelength range, report the wavelength range, for example: 1310-1312.
+        The reported string does not include the unit."
+        ::= { ruijieFiberOMCEntry 4 }
+            
+        ruijieFiberOMCTranslength OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+        The unit is km.
+        If it is a single distance, report a single value, for example: 20
+        If there are multiple distances in fiber mode, report multiple sets of data separated by commas. 
+        The format of each group of data is a key-value pair, the key and value are connected with =, 
+        the key is the fiber grade, and the value is the corresponding distance, such as 'OM1=20, OM2=30'"
+        ::= { ruijieFiberOMCEntry 5 }
+         
+        ruijieFiberOMCPortType OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port type of the Fiber module insered into the port."
+        ::= { ruijieFiberOMCEntry 6 }
+
+ruijieFiberChannelTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RuijieFiberChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of fiber channel information entries."
+        ::= { ruijieFiberMIBObjects 4 }
+
+ruijieFiberChannelEntry OBJECT-TYPE
+        SYNTAX     RuijieFiberChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Entry contains fiber channel information."  
+        INDEX { ruijieFiberChannelPortIndex, ruijieFiberChannelIndex }
+        ::= { ruijieFiberChannelTable 1 }
+
+       RuijieFiberChannelEntry ::=
+       SEQUENCE {
+           ruijieFiberChannelPortIndex IfIndex,
+           ruijieFiberChannelIndex INTEGER,
+           ruijieFiberChannelBias INTEGER,
+           ruijieFiberChannelBiasStatus INTEGER,
+           ruijieFiberChannelRXpower INTEGER,
+           ruijieFiberChannelRXpowertype INTEGER,
+           ruijieFiberChannelRXpowerStatus INTEGER,
+           ruijieFiberChannelTXpower INTEGER,
+           ruijieFiberChannelTXpowerStatus INTEGER,
+           ruijieFiberChannelAPR INTEGER
+       }
+
+       ruijieFiberChannelPortIndex OBJECT-TYPE
+       SYNTAX        IfIndex 
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The port index of fiber channel information."
+       ::= { ruijieFiberChannelEntry 1 }
+
+       ruijieFiberChannelIndex OBJECT-TYPE
+       SYNTAX        INTEGER (1..32)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The channel index of fiber channel."
+       ::= { ruijieFiberChannelEntry 2 }
+
+       ruijieFiberChannelBias OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The bias of the Fiber module insered into the port. The value is in units of uA.
+       If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+       neither SFP/SFP+ nor XFP, the bias value is 0."
+       ::= { ruijieFiberChannelEntry 3 }
+
+       ruijieFiberChannelBiasStatus OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "The status ok(2) indicates that the bias of the Fiber module is in
+        the normal level. The status warning(3) indicates that the bias of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the bias of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)." 
+       ::= { ruijieFiberChannelEntry 4 }
+
+       ruijieFiberChannelRXpower OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The Rx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+       ::= { ruijieFiberChannelEntry 5 }
+
+       ruijieFiberChannelRXpowertype OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "The value indicates whether the received power measurement 
+         represents average input optical power(2) or oma(3). 
+         If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+         neither SFP/SFP+ nor XFP (or not QSFP+), the value is unknown(1)."
+       ::= { ruijieFiberChannelEntry 6 }
+
+       ruijieFiberChannelRXpowerStatus OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The status ok(2) indicates that the Rx power of the Fiber module is in
+        the normal level. The status warning(3) indicates that the Rx power of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Rx power of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)." 
+       ::= { ruijieFiberChannelEntry 7 }
+
+       ruijieFiberChannelTXpower OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The Tx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+       ::= { ruijieFiberChannelEntry 8 }
+
+       ruijieFiberChannelTXpowerStatus OBJECT-TYPE
+       SYNTAX        INTEGER
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The status ok(2) indicates that the Tx power of the Fiber module is in
+        the normal level. The status warning(3) indicates that the Tx power of 
+        the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Tx power of 
+        the Fiber module exceeds high alarm level or is below low alarm level. 
+        If the ruijieFiberDDMSupportStatus is false or the Fiber module type is 
+        neither SFP/SFP+ nor XFP, the status is unknown(1)." 
+       ::= { ruijieFiberChannelEntry 9 }
+       
+       ruijieFiberChannelAPR OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(0),
+            off(1),
+            on(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The transceiver automatic power reduction state. 
+            The status on(2) indicates that the transceiver is in automatic power reduction state.
+            The status off(1) indicates that the transceiver is not in automatic power reduction state."
+        ::= { ruijieFiberChannelEntry 10 }
+
+ruijieFiberAntifakeMIBTraps OBJECT IDENTIFIER ::= { ruijieFiberMIB 2 }
+
+ruijieFiberAntifakeIntfNameDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the interface."
+        ::= { ruijieFiberAntifakeMIBTraps 1 }
+
+ruijieFiberAntifakeSerialNumberDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the serial number of the fiber module." 
+        ::= { ruijieFiberAntifakeMIBTraps 2 }
+        
+ruijieFiberAntifakeTrap NOTIFICATION-TYPE
+        OBJECTS   {ruijieFiberAntifakeIntfNameDesc, ruijieFiberAntifakeSerialNumberDesc}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber module is not original ruijie fiber module, then this trap will be sent."
+        ::= { ruijieFiberAntifakeMIBTraps 3 }                    
+
+ruijieFiberMIBConformance OBJECT IDENTIFIER ::= { ruijieFiberMIB 3 }
+ruijieFiberMIBCompliances OBJECT IDENTIFIER ::= { ruijieFiberMIBConformance 1 }
+ruijieFiberMIBGroups      OBJECT IDENTIFIER ::= { ruijieFiberMIBConformance 2 }
+
+ruijieFiberEventMIBTraps OBJECT IDENTIFIER ::= { ruijieFiberMIB 4 }
+ruijieFiberEventReason OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            fiberInvalidTxHigh(2),
+            fiberInvalidTxLow(3),
+            fiberInvalidRxHigh(4),
+            fiberInvalidRxLow(5),
+            fiberInvalidI2CFail(6),
+            fiberInvalidNotSupp(7),
+            fiberInvalidTemperatureLow(8),
+            fiberInvalidTemperatureHigh(9),
+            fiberInvalidVoltageLow(10),
+            fiberInvalidVoltageHigh(11),
+            fiberInvalidTXBiasLow(12),
+            fiberInvalidTXBiasHigh(13),
+            fiberInvalidRXLossSignal(14),
+            fiberInvalidRXCDRLossLock(15),
+            fiberInvalidTXLossSignal(16),
+            fiberInvalidTXCDRLossLock(17),
+            fiberInvalidTXFault(18),
+            fiberInvalidCheckSumError(19),
+            fiberInvalidModuleNotReady(20),
+            fiberInvalidRXNotReady(21),
+            fiberInvalidTxHighWarn(22),
+            fiberInvalidTxLowWarn(23),
+            fiberInvalidRxHighWarn(24),
+            fiberInvalidRxLowWarn(25),
+            fiberInvalidTemperatureLowWarn(26),
+            fiberInvalidTemperatureHighWarn(27),
+            fiberInvalidVoltageLowWarn(28),
+            fiberInvalidVoltageHighWarn(29),
+            fiberInvalidTXBiasLowWarn(30),
+            fiberInvalidTXBiasHighWarn(31),
+            fiberInvalidRXTotalPowerLowAlarm(32),
+            fiberInvalidRXMediaPreFECBERHighAlarm(33),
+            fiberInvalidColorGrayFiberAlarm(34),
+            fiberInvalidRXTotalPowerLowWarn(35),
+            fiberInvalidRXMediaPreFECBERHighWarn(36),
+            fiberInvalidTXERHighAlarm(37),
+            fiberInvalidTXERLowAlarm(38),
+            fiberInvalidRXERHighAlarm(39),
+            fiberInvalidRXERLowAlarm(40),
+            fiberInvalidTXERHighRelativeWarn(41),
+            fiberInvalidTXERLowRelativeWarn(42),
+            fiberInvalidRXERHighRelativeWarn(43),
+            fiberInvalidRXERLowRelativeWarn(44),
+            fiberInvalidAbnormalLuminescence(45),
+            fiberInvalidInbandLinkDisconnect(46),
+            fiberInvalidPLLLossLock(47),
+            fiberInvalidMCUTemperatureLowAlarm(48),
+            fiberInvalidMCUTemperatureHighAlarm(49),
+            fiberInvalidMCUTemperatureLowWarn(50),
+            fiberInvalidMCUTemperatureHighWarn(51),
+            fiberInvalidResetByColdBoot(52),
+            fiberInvalidResetByHotBoot(53),
+            fiberInvalidResetByReinsert(54),
+            fiberInvalidResetByError(55),
+            fiberInvalidResetByCLI(56),
+            fiberInvalidUPCFault(57),
+            fiberInvalidPortNotReady(58),
+            fiberInvalidPeerOff(59),
+            fiberInvalidBFFailure(60),
+            fiberInvalidTFFailure(61)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The reason of the fiber invalid event." 
+        ::= { ruijieFiberEventMIBTraps 1 }
+
+ruijieFiberEventDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the fiber invalid event." 
+        ::= { ruijieFiberEventMIBTraps 2 }
+
+ruijieFiberRemoveEventTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber has been removed, then this trap will be sent."
+        ::= { ruijieFiberEventMIBTraps 3 }
+
+ruijieFiberInsertEventTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber has been inserted, then this trap will be sent."
+        ::= { ruijieFiberEventMIBTraps 4 }
+
+ruijieFiberInvalidTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr, ruijieFiberEventReason, ruijieFiberEventDesc, ruijieFiberAlarmValue, ruijieFiberAlarmThresholdValue}
+        STATUS     current
+        DESCRIPTION
+          "Detect the fiber invalid event."
+        ::= { ruijieFiberEventMIBTraps 5 }
+
+ruijieFiberInvalidResumeTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr, ruijieFiberEventReason, ruijieFiberEventDesc, ruijieFiberAlarmValue, ruijieFiberAlarmThresholdValue}
+        STATUS     current
+        DESCRIPTION
+          "The fiber resume from invalid event."
+        ::= { ruijieFiberEventMIBTraps 6 }
+
+ruijieFiberAlarmValue OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The realtime value of the fiber invalid event. The value of power is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+        ::= { ruijieFiberEventMIBTraps 7 }
+
+ruijieFiberAlarmThresholdValue OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The threshold value of the fiber invalid event. The value of power is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+        ::= { ruijieFiberEventMIBTraps 8 }
+
+ruijieFiberSpeedMismatch NOTIFICATION-TYPE
+        OBJECTS { ifIndex, ifDescr }
+        STATUS current
+        DESCRIPTION 
+                "When detect the fiber has been inserted and the speed of the optical module does not match
+        the speed supported by the interface, then this trap will be sent."
+        ::= { ruijieFiberEventMIBTraps 9 }
+        
+ruijieFiberUnCertified NOTIFICATION-TYPE
+        OBJECTS { ifIndex, ifDescr }
+        STATUS current
+        DESCRIPTION 
+                "When detect the optical module on interface is not within the whitelist, then this trap will be sent."
+        ::= { ruijieFiberEventMIBTraps 10 }
+
+ruijieFiberUnCertifiedClear NOTIFICATION-TYPE
+        OBJECTS { ifIndex, ifDescr }
+        STATUS current
+        DESCRIPTION 
+                "When detect the optical module which is not within the whitelist offline, then this trap will be sent."
+        ::= { ruijieFiberEventMIBTraps 11 }
+        
+-- ---------------------------------------------------------- --
+-- compliance statements
+-- ---------------------------------------------------------- --
+ruijieFiberMIBConpliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ruijie Fiber MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                        ruijieFiberMIBGroup  
+                }
+
+                GROUP      ruijieFiberAntifakeIntfNameDescGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support fiber antifake notification." 
+
+                GROUP      ruijieFiberAntifakeSerialNumberDescGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support fiber antifake notification." 
+
+         ::= { ruijieFiberMIBCompliances 1 }
+         
+ruijieFiberMIBGroup OBJECT-GROUP
+        OBJECTS {
+                ruijieFiberPortDescr,
+                ruijieFiberTransceiverType,
+                ruijieFiberConnectorType,
+                ruijieFiberWavelength,
+                ruijieFiberTransferDistanceSMF,
+                ruijieFiberTransferDistance62point5umOM1,
+                ruijieFiberTransferDistance62point5um,
+                ruijieFiberTransferDistance50umOM2,
+                ruijieFiberTransferDistance50um,
+                ruijieFiberTransferDistance50umOM3,
+                ruijieFiberTransferDistanceEBW50um,
+                ruijieFiberTransferDistanceCopper,
+                ruijieFiberTransferDistanceCableAssembly,
+                ruijieFiberDDMSupportStatus,
+                ruijieFiberSerialNumber,
+                ruijieFiberTemp,
+                ruijieFiberTempStatus,
+                ruijieFiberVoltage,
+                ruijieFiberVoltageStatus,
+                ruijieFiberBias,
+                ruijieFiberBiasStatus,
+                ruijieFiberChannel1Bias,
+                ruijieFiberChannel1BiasStatus,
+                ruijieFiberChannel2Bias,
+                ruijieFiberChannel2BiasStatus,
+                ruijieFiberChannel3Bias,
+                ruijieFiberChannel3BiasStatus,
+                ruijieFiberChannel4Bias,
+                ruijieFiberChannel4BiasStatus,
+                ruijieFiberRXpowerIntegerpart,
+                ruijieFiberRXpowerDecimalpart,
+                ruijieFiberRXpowertype,
+                ruijieFiberRXpowerStatus,
+                ruijieFiberChannel1RXpowerIntegerpart,
+                ruijieFiberChannel1RXpowerDecimalpart,
+                ruijieFiberChannel1RXpowertype,
+                ruijieFiberChannel1RXpowerStatus,
+                ruijieFiberChannel2RXpowerIntegerpart,
+                ruijieFiberChannel2RXpowerDecimalpart,
+                ruijieFiberChannel2RXpowertype,
+                ruijieFiberChannel2RXpowerStatus,
+                ruijieFiberChannel3RXpowerIntegerpart,
+                ruijieFiberChannel3RXpowerDecimalpart,
+                ruijieFiberChannel3RXpowertype,
+                ruijieFiberChannel3RXpowerStatus,
+                ruijieFiberChannel4RXpowerIntegerpart,
+                ruijieFiberChannel4RXpowerDecimalpart,
+                ruijieFiberChannel4RXpowertype,
+                ruijieFiberChannel4RXpowerStatus,
+                ruijieFiberTXpowerIntegerpart,
+                ruijieFiberTXpowerDecimalpart,
+                ruijieFiberTXpowerStatus,
+                ruijieFiberChannel1TXpowerIntegerpart,
+                ruijieFiberChannel1TXpowerDecimalpart,
+                ruijieFiberChannel1TXpowerStatus,
+                ruijieFiberChannel2TXpowerIntegerpart,
+                ruijieFiberChannel2TXpowerDecimalpart,
+                ruijieFiberChannel2TXpowerStatus,
+                ruijieFiberChannel3TXpowerIntegerpart,
+                ruijieFiberChannel3TXpowerDecimalpart,
+                ruijieFiberChannel3TXpowerStatus,
+                ruijieFiberChannel4TXpowerIntegerpart,
+                ruijieFiberChannel4TXpowerDecimalpart,
+                ruijieFiberChannel4TXpowerStatus,
+                ruijieFiberRXpowerSign,
+                ruijieFiberChannel1RXpowerSign,
+                ruijieFiberChannel2RXpowerSign,
+                ruijieFiberChannel3RXpowerSign,
+                ruijieFiberChannel4RXpowerSign,
+                ruijieFiberTXpowerSign,
+                ruijieFiberChannel1TXpowerSign,
+                ruijieFiberChannel2TXpowerSign,
+                ruijieFiberChannel3TXpowerSign,
+                ruijieFiberChannel4TXpowerSign,
+                ruijieFiberRXpower,
+                ruijieFiberChannel1RXpower,
+                ruijieFiberChannel2RXpower,
+                ruijieFiberChannel3RXpower,
+                ruijieFiberChannel4RXpower,
+                ruijieFiberTXpower,
+                ruijieFiberChannel1TXpower,
+                ruijieFiberChannel2TXpower,
+                ruijieFiberChannel3TXpower,
+                ruijieFiberChannel4TXpower,
+                ruijieFiberWavelengthExact,
+                ruijieFiberTransferDistance50umOM4,
+                ruijieFiberTransferDistanceSMFExt,
+                ruijieFiberBandWidth,
+                ruijieFiberFormFactor,
+                ruijieFiberRXpowerLowWarnThreshold,
+                ruijieFiberRXpowerHighWarnThreshold,
+                ruijieFiberRXpowerLowAlarmThreshold,
+                ruijieFiberRXpowerHighAlarmThreshold,
+                ruijieFiberTXpowerLowWarnThreshold,
+                ruijieFiberTXpowerHighWarnThreshold,
+                ruijieFiberTXpowerLowAlarmThreshold,
+                ruijieFiberTXpowerHighAlarmThreshold,
+                ruijieFiberChannel5Bias,
+                ruijieFiberChannel5BiasStatus,
+                ruijieFiberChannel6Bias,
+                ruijieFiberChannel6BiasStatus,
+                ruijieFiberChannel7Bias,
+                ruijieFiberChannel7BiasStatus,
+                ruijieFiberChannel8Bias,
+                ruijieFiberChannel8BiasStatus,
+                ruijieFiberChannel5RXpowerIntegerpart,
+                ruijieFiberChannel5RXpowerDecimalpart,
+                ruijieFiberChannel5RXpowertype,
+                ruijieFiberChannel5RXpowerStatus,
+                ruijieFiberChannel6RXpowerIntegerpart,
+                ruijieFiberChannel6RXpowerDecimalpart,
+                ruijieFiberChannel6RXpowertype,
+                ruijieFiberChannel6RXpowerStatus,
+                ruijieFiberChannel7RXpowerIntegerpart,
+                ruijieFiberChannel7RXpowerDecimalpart,
+                ruijieFiberChannel7RXpowertype,
+                ruijieFiberChannel7RXpowerStatus,
+                ruijieFiberChannel8RXpowerIntegerpart,
+                ruijieFiberChannel8RXpowerDecimalpart,
+                ruijieFiberChannel8RXpowertype,
+                ruijieFiberChannel8RXpowerStatus,
+                ruijieFiberChannel5TXpowerIntegerpart,
+                ruijieFiberChannel5TXpowerDecimalpart,
+                ruijieFiberChannel5TXpowerStatus,
+                ruijieFiberChannel6TXpowerIntegerpart,
+                ruijieFiberChannel6TXpowerDecimalpart,
+                ruijieFiberChannel6TXpowerStatus,
+                ruijieFiberChannel7TXpowerIntegerpart,
+                ruijieFiberChannel7TXpowerDecimalpart,
+                ruijieFiberChannel7TXpowerStatus,
+                ruijieFiberChannel8TXpowerIntegerpart,
+                ruijieFiberChannel8TXpowerDecimalpart,
+                ruijieFiberChannel8TXpowerStatus,
+                ruijieFiberChannel5RXpowerSign,
+                ruijieFiberChannel6RXpowerSign,
+                ruijieFiberChannel7RXpowerSign,
+                ruijieFiberChannel8RXpowerSign,
+                ruijieFiberChannel5TXpowerSign,
+                ruijieFiberChannel6TXpowerSign,
+                ruijieFiberChannel7TXpowerSign,
+                ruijieFiberChannel8TXpowerSign,
+                ruijieFiberChannel5RXpower,
+                ruijieFiberChannel6RXpower,
+                ruijieFiberChannel7RXpower,
+                ruijieFiberChannel8RXpower,
+                ruijieFiberChannel5TXpower,
+                ruijieFiberChannel6TXpower,
+                ruijieFiberChannel7TXpower,
+                ruijieFiberChannel8TXpower,
+                ruijieFiberTransferDistance50umOM5,
+                ruijieFiberMode,
+                ruijieFiberTempLowWarnThreshold,
+                ruijieFiberTempHighWarnThreshold,
+                ruijieFiberTempLowAlarmThreshold,
+                ruijieFiberTempHighAlarmThreshold,
+                ruijieFiberVoltageLowWarnThreshold,
+                ruijieFiberVoltageHighWarnThreshold,
+                ruijieFiberVoltageLowAlarmThreshold,
+                ruijieFiberVoltageHighAlarmThreshold,
+                ruijieFiberBiasLowWarnThreshold,
+                ruijieFiberBiasHighWarnThreshold,
+                ruijieFiberBiasLowAlarmThreshold,
+                ruijieFiberBiasHighAlarmThreshold,
+                ruijieFiberTransceiverTypeStr,
+                ruijieFiberConnectorTypeStr
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing Fiber managment."
+        ::= { ruijieFiberMIBGroups 1 }
+
+ruijieFiberAntifakeIntfNameDescGroup OBJECT-GROUP
+        OBJECTS {ruijieFiberAntifakeIntfNameDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of the interface."
+        ::= { ruijieFiberMIBGroups 2 } 
+    
+ruijieFiberAntifakeSerialNumberDescGroup OBJECT-GROUP
+        OBJECTS {ruijieFiberAntifakeSerialNumberDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of the fiber module serial number."
+        ::= { ruijieFiberMIBGroups 3 }
+END
