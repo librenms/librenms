@@ -3068,7 +3068,7 @@ function add_eventlog(Illuminate\Http\Request $request)
     if (array_key_exists('text', $data)) {
         Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-        return api_success_noresult(200, 'Eventlog received.');
+        return api_success_noresult(200, 'Eventlog received for $hostname.');
     }
 
     return api_error(400, 'No Eventlog text provided.');
