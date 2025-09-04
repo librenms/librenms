@@ -3062,13 +3062,13 @@ function add_eventlog(Illuminate\Http\Request $request)
     // find device matching the id
     $device = device_by_id_cache($device_id);
     if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, "Device $hostname does not exist");
+        return api_error(404, $hostname . " device does not exist");
     }
     $data = json_decode($request->getContent(), true);
     if (array_key_exists('text', $data)) {
         Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
 
-        return api_success_noresult(200, 'Eventlog received for $hostname.');
+        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
     }
 
     return api_error(400, 'No Eventlog text provided.');
