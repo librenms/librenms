@@ -3062,7 +3062,7 @@ function add_eventlog(Illuminate\Http\Request $request)
     // find device matching the id
     $device = device_by_id_cache($device_id);
     if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, $hostname . " device does not exist");
+        return api_error(404, $hostname . ' device does not exist');
     }
     $data = json_decode($request->getContent(), true);
     if (array_key_exists('text', $data)) {
