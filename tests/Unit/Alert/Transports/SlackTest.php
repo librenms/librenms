@@ -34,7 +34,7 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Tests\TestCase;
 
-class SlackTest extends TestCase
+final class SlackTest extends TestCase
 {
     public function testSlackNoConfigDelivery(): void
     {

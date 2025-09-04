@@ -36,7 +36,7 @@ use LibreNMS\Tests\TestCase;
 
 use function PHPUnit\Framework\assertEquals;
 
-class DiscordTest extends TestCase
+final class DiscordTest extends TestCase
 {
     public function testDiscordNoConfigDelivery(): void
     {

@@ -31,7 +31,7 @@ use App\Models\User;
 use Laravel\Socialite\AbstractUser;
 use LibreNMS\Tests\TestCase;
 
-class SocialiteControllerTest extends TestCase
+final class SocialiteControllerTest extends TestCase
 {
     /**
      * Helper to test setRolesFromClaim().

@@ -12,7 +12,7 @@ use LibreNMS\Tests\TestCase;
 use Mockery;
 use SnmpQuery;
 
-class ConnectivityHelperTest extends TestCase
+final class ConnectivityHelperTest extends TestCase
 {
     public function testDeviceStatus(): void
     {

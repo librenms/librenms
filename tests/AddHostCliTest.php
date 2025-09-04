@@ -29,7 +29,7 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class AddHostCliTest extends DBTestCase
+final class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 

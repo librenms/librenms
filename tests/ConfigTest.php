@@ -29,7 +29,7 @@ namespace LibreNMS\Tests;
 use App\ConfigRepository;
 use App\Facades\LibrenmsConfig;
 
-class ConfigTest extends TestCase
+final class ConfigTest extends TestCase
 {
     private \ReflectionProperty $config;
 
