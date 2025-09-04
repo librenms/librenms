@@ -3066,7 +3066,7 @@ function add_eventlog(Illuminate\Http\Request $request)
     }
     $data = json_decode($request->getContent(), true);
     if (array_key_exists('text', $data)) {
-        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? null,Severity:Info, $data['reference'] ?? null);
+        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API',Severity:Info, $data['reference'] ?? null);
 
         return api_success_noresult(200, 'Eventlog received.');
     }
