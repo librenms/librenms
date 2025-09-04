@@ -759,8 +759,8 @@ if (! empty($peers)) {
 
                             if ($afi == 1) { // IPv4
                                 if ($safi == 'unicast') {
-                                $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes'] ?? null;
-                                $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes'] ?? null;
                                 } elseif ($safi == 'multicast') {
                                     $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs'] ?? null;
                                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs'] ?? null;
