@@ -3064,14 +3064,14 @@ function add_eventlog(Illuminate\Http\Request $request)
     if (! $device || ! isset($device['device_id'])) {
         return api_error(404, "Device $hostname does not exist");
     }
-	$data = json_decode($request->getContent(), true);
-	if (array_key_exists('text', $data)) {
-		Eventlog::log($data['text'], $device, $data['type'] ?? null, $data['severity'] ?? 1, $data['reference'] ?? null);
+    $data = json_decode($request->getContent(), true);
+    if (array_key_exists('text', $data)) {
+        Eventlog::log($data['text'], $device, $data['type'] ?? null, $data['severity'] ?? 1, $data['reference'] ?? null);
 
         return api_success_noresult(200, 'Eventlog received.');
-	}
+    }
 
-	return api_error(400, 'No Eventlog text provided.');
+    return api_error(400, 'No Eventlog text provided.');
 }
 
 function list_logs(Illuminate\Http\Request $request, Router $router)
