@@ -70,7 +70,7 @@ class InfluxDBStoreTest extends TestCase
                     && $point->getMeasurement() === $measurement
                     && $point->getTags() == (['hostname' => $device->hostname] + $tags)
                     && $point->getFields() == $fields;
-            }), 'ms')
+            }), 's') // Expects second precision
             ->once();
         $influx->write($measurement, $fields, $tags, $meta);
     }
