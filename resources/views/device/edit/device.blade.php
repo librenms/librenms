@@ -112,7 +112,9 @@
                 <div class="col-sm-6">
                     <input id="override_sysContact_string" class="form-control" name="override_sysContact_string" size="32"
                            {{ old('override_sysContact', $override_sysContact_bool) ? '' : 'disabled' }}
-                           value="{{ old('override_sysContact_string', $override_sysContact_string) }}"
+                           data-override="{{ $override_sysContact_string }}"
+                           data-default="{{ $device->sysContact }}"
+                           value="{{ old('override_sysContact_string', $override_sysContact_bool ? $override_sysContact_string : $device->sysContact) }}"
                     />
                 </div>
             </div>
@@ -219,6 +221,14 @@
 @push('scripts')
     <script>
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
+        $('#override_sysContact').on('switchChange.bootstrapSwitch', function(event, state) {
+            var $input = $('#override_sysContact_string');
+            var newValue = state ? $input.data('override') : $input.data('default');
+
+            if (!state || newValue) {
+                $input.val(newValue);
+            }
+        });
         $("#rediscover").on("click", function() {
                 fetch('{{ route('device.rediscover', [$device->device_id]) }}', {
                     method: 'POST',
