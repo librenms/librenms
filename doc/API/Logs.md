@@ -106,3 +106,17 @@ curl -L -X POST 'https://sink.librenms.org/api/v0/syslogsink/' -H 'X-Auth-Token:
     }
 ]'
 ```
+### `add_eventlog`
+
+Route: `/api/v0/devices/:hostname/eventlog`
+
+Adds events to a device's eventlog.
+
+Example
+```
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Ok","severity":"1"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Info","severity":"2"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Notice","severity":"3"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Warning","severity":"4"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Error with CustomType","severity":"5","type":"CustomType"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/127.0.0.1/eventlog
+```

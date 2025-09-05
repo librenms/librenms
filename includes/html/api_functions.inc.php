@@ -3051,6 +3051,29 @@ function list_services(Illuminate\Http\Request $request)
     return api_success($services, 'services');
 }
 
+function add_eventlog(Illuminate\Http\Request $request)
+{
+    // return details of a single device
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    // find device matching the id
+    $device = device_by_id_cache($device_id);
+    if (! $device || ! isset($device['device_id'])) {
+        return api_error(404, $hostname . ' device does not exist');
+    }
+    $data = json_decode($request->getContent(), true);
+    if (array_key_exists('text', $data)) {
+        Eventlog::log($data['text'], $device['device_id'], $data['type'] ?? 'API', Severity::from($data['severity'] ?? 2), $data['reference'] ?? null);
+
+        return api_success_noresult(200, 'Eventlog received for ' . $hostname);
+    }
+
+    return api_error(400, 'No Eventlog text provided.');
+}
+
 function list_logs(Illuminate\Http\Request $request, Router $router)
 {
     $type = $router->current()->getName();
