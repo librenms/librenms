@@ -12317,6 +12317,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "28 (a8f7e01f9995)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-12",
+                    "ifName": "eth-0-12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "sw11323.f1",
                     "remote_port": "609 (5c4527b6be40)",
                     "remote_platform": null,
@@ -12339,6 +12350,28 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 00 00 00 01 00 (000000000100)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-37",
+                    "ifName": "eth-0-37"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00 00 00 00 01 01 (000000000101)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-38",
+                    "ifName": "eth-0-38"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "sw3.eqixfr5",
                     "remote_port": "eth-0-42 (649d9900b10f)",
                     "remote_platform": null,
@@ -12346,6 +12379,39 @@
                     "ifAlias": "<private>",
                     "ifDescr": "eth-0-42",
                     "ifName": "eth-0-42"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "64 9D 99 B1 13 D6 (649d99b113d6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-43",
+                    "ifName": "eth-0-43"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "64 9D 99 B1 13 BC (649d99b113bc)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-45",
+                    "ifName": "eth-0-45"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "64 9D 99 B1 13 D2 (649d99b113d2)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "<private>",
+                    "ifDescr": "eth-0-46",
+                    "ifName": "eth-0-46"
                 },
                 {
                     "active": 1,

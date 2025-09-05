@@ -14208,5 +14208,27 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 1,
+                    "hrDeviceDescr": "Management Processor",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 2,
+                    "hrDeviceDescr": "Slot-1 Data Processor",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 21
+                }
+            ]
+        }
     }
 }
