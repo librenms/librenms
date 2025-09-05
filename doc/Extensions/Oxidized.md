@@ -237,6 +237,24 @@ groups:
     username: <user>
     password: <password>
 ```
+## Have Oxidized add to LibreNMS Eventlog
+
+Oxidized can be configured to add to LibreNMS's eventlog for devices. This gives better visibility when it is having issues checking for config changes, or when it observes the configuration has changed. This uses [Oxidized's Hooks](https://github.com/ytti/oxidized/blob/master/docs/Hooks.md#hook-type-exec).
+
+Example:
+```
+hooks:
+  libre_log_fail:
+    type: exec
+    events: [node_fail]
+    async: true
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://librenms.org/api/v0/devices/${OX_NODE_NAME}/eventlog'
+  libre_log_change:
+    type: exec
+    events: [post_store]
+    async: true
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://librenms.org/api/v0/devices/${OX_NODE_NAME}/eventlog'
+```
 
 ## Miscellaneous
 
