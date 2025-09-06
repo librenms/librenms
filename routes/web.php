@@ -12,6 +12,7 @@ use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
+use App\Http\Controllers\VLANController;
 use App\Http\Middleware\AuthenticateGraph;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +45,57 @@ Route::get('graph/{path?}', GraphController::class)
 Route::middleware(['auth'])->group(function () {
     //kunal route
     //genrate file 
+
+    Route::get('/submenu1-1', [VLANController::class, 'showSubmenu']);
+
+    // Optional: If you want AJAX-based loading:
+    Route::get('/tabs/vlan-config', [VLANController::class, 'vlanConfigTab'])->name('vlan-config-page');
+    //vlan edit
+    Route::get('/vlan/edit/{id}', [VLANController::class, 'editVlan']);
+    Route::post('/vlan/update', [VLANController::class, 'updateVlan']);
+
+    //vlan add 
+     Route::get('/vlan/add', [VLANController::class, 'addVlan']);
+     Route::post('/vlan/store', [VLANController::class, 'storeVlan'])->name('vlan.store');
+
+     //for delete
+     Route::post('/vlan/delete-batch', [VLANController::class, 'deleteBatch'])->name('vlan.deleteBatch');
+
+
+
+//     Route::get('/tabs/vlan-batch', function () {
+// return "vgcbvgc";
+//     });
+
+
+    Route::get('tabs/vlan-batch', [VLANController::class, 'vlanBatchTab'])->name('vlan-batch-page');
+    Route::post('/vlan/batch/store', [VLANController::class, 'storeBatchVlan'])->name('vlan.batch.store');
+
+
+
+
+
+
+
+    Route::get('tabs/interface-vlan-attr', [VLANController::class, 'interfaceVlanAttrTab']);
+
+    //voice vlan part
+    Route::get('tabs/voice-vlan', [VLANController::class, 'voiceVlanTab']);
+    Route::get('/voice/vlan/add', [VLANController::class, 'addVoiceVlan']);
+    Route::post('/voice/vlan/store', [VLANController::class, 'storeVoiceVlan'])->name('voice.vlan.store');
+    Route::post('/voice/vlan/delete', [VLANController::class, 'deleteVoiceVlan'])->name('voice.vlan.delete');
+
+
+
+
+//interface part
+    Route::get('tabs/interface-voice-vlan', [VLANController::class, 'interfaceVoiceVlanTab']);
+    Route::get('/vlan/interface/edit', [VLANController::class, 'editVlanInterface']);
+    Route::post('/vlan-interface/save', [VLANController::class, 'runVlanAttributeinterface'])->name('vlan.interface.save');
+
+
+
+
 
 
     Route::post('/run-ansible', [alphabridgeController::class, 'runPlaybook'])->name('run.ansible');

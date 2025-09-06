@@ -209,6 +209,21 @@ class alphabridgeController implements DeviceTab
 
     // close
 
+    public function submenu1()
+    {
+        return view('device.menu.submenu1');
+    }
+
+    public function submenu2()
+    {
+        return view('device.menu.submenu2');
+    }
+
+    public function submenu3()
+    {
+        return view('device.menu.submenu3');
+    }
+
     public function visible(Device $device): bool
     {
         return $device->vlans()->exists();
@@ -231,10 +246,11 @@ class alphabridgeController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        // dd($device);
+        
         
         $ports=Port::where('device_id',$device->device_id)->get();
-        // dd($device->hostname);
+        session(['hostname' => $device->hostname]);
+        session(['tod' => $device->os]);
         return [
             'vlans' => self::getVlans($device),
             'hostname' => $device->hostname,
