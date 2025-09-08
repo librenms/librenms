@@ -116,27 +116,22 @@ trait YamlOSDiscovery
 
         $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
         $template_data = array_merge($this->getDevice()->only($this->locationFields), $data);
+        
+        $latVal = $this->findFirst($data, $lat, $numeric) ?? null;
+        $lngVal = $this->findFirst($data, $lng, $numeric) ?? null;
 
-        if (!isset($os_yaml['lat_regex']) && !isset($os_yaml['lat_template'])) {
-            $latVal = $this->findFirst($data, $lat, $numeric);
-        }else{
-            if (isset($os_yaml['lat_regex'])){
-                $latVal = $this->parseRegex($os_yaml['lat_regex'], $this->findFirst($data, $lat));
-            }
-            if (isset($os_yaml['lat_template'])){
-                $latVal = trim(SimpleTemplate::parse($os_yaml["lat_template"], $template_data));
-            }
+        if (isset($os_yaml['lat_regex'])){
+            $latVal = $this->parseRegex($os_yaml['lat_regex'], $this->findFirst($data, $lat)) ?? $latVal;
+        }
+        if (isset($os_yaml['lat_template'])){
+            $latVal = trim(SimpleTemplate::parse($os_yaml["lat_template"], $template_data)) ?? $latVal;
         }
 
-        if (!isset($os_yaml['long_regex']) && !isset($os_yaml['long_template'])) {
-            $lngVal = $this->findFirst($data, $lng, $numeric);
-        }else{
-            if (isset($os_yaml['long_regex'])){
-                $lngVal = $this->parseRegex($os_yaml['long_regex'], $this->findFirst($data, $lng));
-            }
-            if (isset($os_yaml['long_template'])){
-                $lngVal = trim(SimpleTemplate::parse($os_yaml["long_template"], $template_data));
-            }
+        if (isset($os_yaml['long_regex'])){
+            $lngVal = $this->parseRegex($os_yaml['long_regex'], $this->findFirst($data, $lng)) ?? $lngVal;
+        }
+        if (isset($os_yaml['long_template'])){
+            $lngVal = trim(SimpleTemplate::parse($os_yaml["long_template"], $template_data)) ?? $lngVal;
         }
 
         Log::debug('Parsed lat:'. $latVal);
