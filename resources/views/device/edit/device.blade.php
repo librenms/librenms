@@ -226,14 +226,18 @@
                 return option.text;
             }
             const iconClass = $(option.element).data('icon');
-            if (option.id && iconClass) {
-                let $container = $('<span>');
-                let $icon = $('<i>').addClass(`fa-solid fa-${iconClass} fa-fw fa-lg`);
-                let $text = $('<span>').text(option.text);
-
-                return $container.append($icon).append($text);
+            if (!iconClass) {
+                return option.text;
             }
-            return option.text;
+
+            return $('<span>').append(
+                $('<i>', {
+                    class: `fa-solid fa-${iconClass} fa-fw fa-lg`
+                }),
+                $('<span>', {
+                    text: option.text
+                })
+            );
         }
         $('#type').select2({
             placeholder: 'Select or enter a device type',
