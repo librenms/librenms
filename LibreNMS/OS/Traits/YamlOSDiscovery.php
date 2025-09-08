@@ -124,14 +124,14 @@ trait YamlOSDiscovery
             $latVal = $this->parseRegex($os_yaml['lat_regex'], $this->findFirst($data, $lat));
         }
         if (isset($os_yaml['lat_template'])) {
-            $latVal = trim(SimpleTemplate::parse($os_yaml["lat_template"], $template_data));
+            $latVal = trim(SimpleTemplate::parse($os_yaml['lat_template'], $template_data));
         }
 
         if (isset($os_yaml['long_regex'])) {
             $lngVal = $this->parseRegex($os_yaml['long_regex'], $this->findFirst($data, $lng));
         }
         if (isset($os_yaml['long_template'])) {
-            $lngVal = trim(SimpleTemplate::parse($os_yaml["long_template"], $template_data));
+            $lngVal = trim(SimpleTemplate::parse($os_yaml['long_template'], $template_data));
         }
 
         Log::debug('Parsed lat:' . $latVal);
