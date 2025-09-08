@@ -9,7 +9,7 @@ over:
 mib_dir: enlogic
 discovery:
     -   sysObjectID: .1.3.6.1.4.1.38446.
-        snmpget:
-          oid: ENLOGIC-PDU-MIB::pduNamePlateFirmwareVersion.1
-          op: starts
-          value: '1.0'
+        snmpget_except:
+          oid: ENLOGIC-PDU2-MIB::pduNamePlateType.1
+          op: ">="
+          value: '1'

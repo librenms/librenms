@@ -1,6 +1,7 @@
-@extends('device.index')
+@extends('layouts.librenmsv1')
 
-@section('tab')
+@section('content')
+<x-device.page :device="$device">
     <x-option-bar name="Neighbours" :options="$data['selections']" :selected="$data['selection']"></x-option-bar>
 @if($data['selection'] == 'list')
     <table class="table table-hover table-condensed" id="neighbour-table">
@@ -106,6 +107,7 @@ network.on('click', function (properties) {
 </script>
 @endpush
 @endif
+</x-device.page>
 @endsection
 
 @section('javascript')
