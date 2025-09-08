@@ -116,7 +116,7 @@ trait YamlOSDiscovery
 
         $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
         $template_data = array_merge($this->getDevice()->only($this->locationFields), $data);
-        
+
         $latVal = $this->findFirst($data, $lat, $numeric) ?? null;
         $lngVal = $this->findFirst($data, $lng, $numeric) ?? null;
 
