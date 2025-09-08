@@ -151,7 +151,7 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
             return new Transceiver([
                 'port_id' => $port_id,
                 'index' => $portIndex,
-                'type' => $data['connUnitPortModuleType'] ?? 'UnknownModuleType'. ' ' . $data['connUnitPortTransmitterType'] ?? '',
+                'type' => ($data['connUnitPortModuleType'] ?? 'UnknownModuleType') . ' ' . ($data['connUnitPortTransmitterType'] ?? ''),
                 'revision' => $data['connUnitPortRevision'] ?? null,
                 'serial' => $data['connUnitPortSn'] ?? null,
                 'vendor' => $data['connUnitPortVendor'] ?? null,
