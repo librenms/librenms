@@ -11,7 +11,7 @@ modules:
         version:
             - RUCKUS-SWINFO-MIB::ruckusSwRevision.1
             - RUCKUS-DEVICE-MIB::ruckusDeviceCountryCode.0
-        version_template: '{{ RUCKUS-SWINFO-MIB::ruckusSwRevision.1 }} ({{ RUCKUS-DEVICE-MIB::ruckusDeviceCountryCode.0|replace("US","USA") }})'
+        version_template: '{{ RUCKUS-SWINFO-MIB::ruckusSwRevision.1 }} ({{ RUCKUS-DEVICE-MIB::ruckusDeviceCountryCode.0 }})'
         lat: RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0
         long: RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0
         lat_template: '{{ RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0|explode(",",0) }}'
