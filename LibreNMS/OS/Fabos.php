@@ -28,7 +28,6 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Device;
-use App\Models\Sensors;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -128,49 +127,37 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $portCollection = $this->getDevice()->ports()->get();
         $sensorCollection = $this->getDevice()->sensors()->get();
 
-        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk('FA-EXT-MIB::swConnUnitPortTable')->table(1);
-        $snmpData = SnmpQuery::hideMib()->mibs(['FCMGMT-MIB'])->enumStrings()->walk('FCMGMT-MIB::connUnitPortTable')->table(1, $snmpData);
+        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk(['FA-EXT-MIB::swConnUnitPortTable', 'FCMGMT-MIB::connUnitPortTable']);
+
         // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
         // connUnitPortVendor['..8...K.........'][1] = "BROCADE         "
 
-        $snmpData = array_shift($snmpData); // remove 'connUnitPortUnitId'
-
         Log::info('Transceivers discovery started');
 
-        $data = $portCollection->map(function ($port) use ($sensorCollection) {
-            $ifIndex = $port->ifIndex;
+        return $snmpData->mapTable(function ($data, $unit, $portIndex) {
+            $ifIndex = $portIndex + 0x3FFFFFFF; // 0x3FFFFFFF is the const (until we find it's not) to move from portIndex to ifIndex
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+            if (is_null($port_id)) {
+                // Invalid
+                return null;
+            }
+            if (empty($data['connUnitPortModuleType']) || $data['connUnitPortModuleType'] == 'gbicNotInstalled') {
+                return null;
+            }
 
-            // Filter sensors matching this ifIndex
-            $filterSensors = $sensorCollection->filter(function ($value, $key) use ($ifIndex) {
-                return $value['entPhysicalIndex'] == $ifIndex && $value['entPhysicalIndex_measured'] == 'ports';
-            });
-
-            $port['has_sensors_attached'] = $filterSensors->count();
-
-            return $port;
-        });
-
-        $data = $data->reject(function ($value, $key) {
-            return $value['has_sensors_attached'] < 1;
-        });
-
-        return $data->map(function ($entry, $index) use ($snmpData) {
-            $ifIndex = $entry['ifIndex'] ?? null;
-            $connUnitPortIndex = $index - 5;
-
+            // Create a new Transceiver object with the retrieved data
             return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $connUnitPortIndex,
-                'type' => $snmpData['connUnitPortModuleType'][$connUnitPortIndex] ?? null,
-                'serial' => $snmpData['connUnitPortSn'][$connUnitPortIndex] ?? null,
-                'vendor' => $snmpData['connUnitPortVendor'][$connUnitPortIndex] ?? null,
-                'revision' => $snmpData['connUnitPortRevision'][$connUnitPortIndex] ?? null,
-                'cable' => $snmpData['connUnitPortTransmitterType'][$connUnitPortIndex] ?? null,
-                'entity_physical_index' => $ifIndex,
+                'port_id' => $port_id,
+                'index' => $portIndex,
+                'type' => ($data['connUnitPortModuleType'] . ' ' . $data['connUnitPortTransmitterType']) ?? null,
+                'revision' => $data['connUnitPortRevision'] ?? null,
+                'serial' => $data['connUnitPortSn'] ?? null,
+                'vendor' => $data['connUnitPortVendor'] ?? null,
+                'cable' => null,
+                'entity_physical_index' => $portIndex,
             ]);
-        });
+        })->filter();  // Filter out null values
     }
 }
