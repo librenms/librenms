@@ -43,10 +43,15 @@ class EditDeviceController
 {
     public function index(Device $device): View
     {
-        $types = array_column(LibrenmsConfig::get('device_types'), 'text', 'type');
-        if (! isset($types[$device->type])) {
-            $types[$device->type] = $device->type;
+        $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
+        if (! $types->has($device->type)) {
+            $types->put($device->type, [
+                'icon' => null,
+                'text' => ucfirst($device->type),
+                'type' => $device->type,
+            ]);
         }
+
         [$rrd_size, $rrd_num] = File::getFolderSize(Rrd::dirFromHost($device->hostname));
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
@@ -63,6 +68,7 @@ class EditDeviceController
         return view('device.edit.device', [
             'device' => $device,
             'types' => $types,
+            'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
             'parents' => $device->parents()->pluck('device_id'),
             'devices' => Device::orderBy('hostname')->whereNot('device_id', $device->device_id)->select(['device_id', 'hostname', 'sysName'])->get(),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
@@ -102,6 +108,7 @@ class EditDeviceController
 
         // check if type was overridden
         if ($device->isDirty('type')) {
+            $device->type = strtolower($device->type);
             $device->setAttrib('override_device_type', true);
         }
 
