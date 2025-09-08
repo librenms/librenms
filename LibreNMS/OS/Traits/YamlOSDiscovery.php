@@ -53,6 +53,12 @@ trait YamlOSDiscovery
         'sysName',
     ];
 
+    private $locationFields = [
+        'location',
+        'lat',
+        'lng',
+    ];
+
     public function discoverOS(Device $device): void
     {
         $os_yaml = $this->getDiscovery('os');
@@ -98,6 +104,7 @@ trait YamlOSDiscovery
     {
         $os_yaml = $this->getDiscovery('os');
         $name = $os_yaml['location'] ?? null;
+
         $lat = $os_yaml['lat'] ?? null;
         $lng = $os_yaml['long'] ?? null;
 
@@ -108,11 +115,36 @@ trait YamlOSDiscovery
         Log::debug('Yaml location data:', $data);
 
         $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+        $template_data = array_merge($this->getDevice()->only($this->locationFields), $data);
 
+        if (!isset($os_yaml['lat_regex']) && !isset($os_yaml['lat_template'])) {
+            $latVal = $this->findFirst($data, $lat, $numeric);
+        }else{
+            if (isset($os_yaml['lat_regex'])){
+                $latVal = $this->parseRegex($os_yaml['lat_regex'], $this->findFirst($data, $lat));
+            }
+            if (isset($os_yaml['lat_template'])){
+                $latVal = trim(SimpleTemplate::parse($os_yaml["lat_template"], $template_data));
+            }
+        }
+
+        if (!isset($os_yaml['long_regex']) && !isset($os_yaml['long_template'])) {
+            $lngVal = $this->findFirst($data, $lng, $numeric);
+        }else{
+            if (isset($os_yaml['long_regex'])){
+                $lngVal = $this->parseRegex($os_yaml['long_regex'], $this->findFirst($data, $lng));
+            }
+            if (isset($os_yaml['long_template'])){
+                $lngVal = trim(SimpleTemplate::parse($os_yaml["long_template"], $template_data));
+            }
+        }
+
+        Log::debug('Parsed lat:'. $latVal);
+        Log::debug('Parsed lng:'. $lngVal);
         return new Location([
             'location' => StringHelpers::inferEncoding($location),
-            'lat' => $this->findFirst($data, $lat, $numeric),
-            'lng' => $this->findFirst($data, $lng, $numeric),
+            'lat' => $latVal,
+            'lng' => $lngVal,
         ]);
     }
 
