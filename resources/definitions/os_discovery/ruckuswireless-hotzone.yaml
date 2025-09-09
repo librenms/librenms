@@ -14,8 +14,8 @@ modules:
         version_template: '{{ RUCKUS-SWINFO-MIB::ruckusSwRevision.1 }} ({{ RUCKUS-DEVICE-MIB::ruckusDeviceCountryCode.0 }})'
         lat: RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0
         long: RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0
-        lat_template: '{{ RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0|explode(",",0) }}'
-        long_template: '{{ RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0|explode(",",1) }}'
+        lat_template: '{{ RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0|split(",",0) }}'
+        long_template: '{{ RUCKUS-DEVICE-MIB::ruckusDeviceGPS.0|split(",",1) }}'
     processors:
         data:
             -

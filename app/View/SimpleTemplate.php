@@ -189,7 +189,7 @@ class SimpleTemplate
             // String manipulation
             'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
             'slice' => $this->sliceFilter($value, $args),
-            'explode' => count($args) >= 2 ? (explode($args[0], $value))[$args[1]] : $value,
+            'split' => count($args) >= 3 ? (explode($args[0], $value)[$args[1]]) : $value,
 
             // Encoding/escaping
             'escape' => $this->escapeFilter($value, $args),
