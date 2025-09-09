@@ -84,5 +84,4 @@ final class TimeUtilityTest extends TestCase
 
         $this->assertNull(Time::parseInput('not a date'));
     }
-
 }

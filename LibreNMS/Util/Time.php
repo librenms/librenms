@@ -53,6 +53,7 @@ class Time
 
         return $conversion[$description] ?? 0;
     }
+
     /**
      * Format seconds as a human readable interval.  Negative seconds will say "ago".
      */
@@ -126,7 +127,7 @@ class Time
         // adapt relative like 6h, -1d, +2m, 1y
         if (preg_match('/^([+-])?(\d+)([hdmwys]|mo)$/', $value, $matches)) {
             $sign = $matches[1] ?: '-';
-            $unit = match($matches[3]) {
+            $unit = match ($matches[3]) {
                 's' => 'second',
                 'm' => 'minute',
                 'h' => 'hour',
