@@ -31,8 +31,8 @@ use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
@@ -109,7 +109,7 @@ class OutagesController extends TableController
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
+            'device_id' => Url::modernDeviceLink($outage->device),
             'duration' => $this->asDuration($outage)->forHumans(['parts' => 2]),
         ];
     }

@@ -16,6 +16,7 @@ return [
         'type' => 'Device type',
     ],
 
+    'never_polled' => 'Never polled',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Scheduled Maintenance',
 

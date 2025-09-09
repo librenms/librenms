@@ -18,6 +18,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -273,6 +274,23 @@ class Device extends BaseModel
         $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
 
         return $this->maintenanceStatus;
+    }
+
+    public function getDeviceStatus(): DeviceStatus
+    {
+        if ($this->disabled) {
+            return DeviceStatus::DISABLED;
+        }
+
+        if ($this->ignore) {
+            return $this->status ? DeviceStatus::IGNORED_UP : DeviceStatus::IGNORED_DOWN;
+        }
+
+        if ($this->status) {
+            return DeviceStatus::UP;
+        }
+
+        return $this->last_polled ? DeviceStatus::DOWN : DeviceStatus::NEVER_POLLED;
     }
 
     /**
