@@ -1,9 +1,7 @@
 os: ruijie
-text: 'Ruijie Switch'
-ifname: true
+text: 'Ruijie Networks'
 type: network
 icon: ruijie
-group: ruijie
 over:
       - { graph: device_bits, text: 'Device Traffic' }
       - { graph: device_processor, text: 'Processor Usage' }
