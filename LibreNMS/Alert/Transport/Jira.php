@@ -34,7 +34,7 @@ class Jira extends Transport
             $url = $this->config['jira-url'];
             $token = $this->config['jira-token-open'] ?? null;
 
-            if (! $webhook_enabled) {
+            if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
         } else {
