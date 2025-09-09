@@ -127,7 +127,12 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk(['FA-EXT-MIB::swConnUnitPortTable', 'FCMGMT-MIB::connUnitPortTable']);
+        //Only used the 2 below lines to allow "collect_snmp_data" to do the collection
+        //for some reason, it does not collect the SnmpQuery
+        //$unused = snmp_walk($this->getDeviceArray(), 'swConnUnitPortTable', '-OQXUt', 'FA-EXT-MIB');
+        //$unused = snmp_walk($this->getDeviceArray(), 'connUnitPortTable', '-OQXUt', 'FCMGMT-MIB');
+
+        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB', 'FCMGMT-MIB'])->enumStrings()->walk(['connUnitPortModuleType', 'connUnitPortTransmitterType', 'connUnitPortRevision', 'connUnitPortSn', 'connUnitPortVendor']);
 
         // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
         // connUnitPortVendor['..8...K.........'][1] = "BROCADE         "
