@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Util\Time;
@@ -109,17 +110,16 @@ class OutagesController extends TableController
             'going_down' => $start,
             'up_again' => $end,
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
-            'duration' => $this->formatDuration($outage),
+            'duration' => $this->asDuration($outage)->forHumans(['parts' => 2]),
         ];
     }
 
-    private function formatDuration(DeviceOutage $outage): string
+    private function asDuration(DeviceOutage $outage): CarbonInterval
     {
         $start = Carbon::createFromTimestamp($outage->going_down);
         $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Carbon::now();
-        $duration = $end->diffAsCarbonInterval($start);
 
-        return $duration->forHumans(['parts' => 2]);
+        return $end->diffAsCarbonInterval($start);
     }
 
     private function formatDatetime(?int $timestamp): string
@@ -173,7 +173,7 @@ class OutagesController extends TableController
             $outage->device ? $outage->device->displayName() : '',
             $this->formatDatetime($outage->going_down),
             $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
-            $this->formatTime(($outage->up_again ?: time()) - $outage->going_down),
+            $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }
 
