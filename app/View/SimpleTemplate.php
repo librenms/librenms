@@ -177,10 +177,6 @@ class SimpleTemplate
      */
     private function executeFilter(string $value, string $filterName, array $args): string
     {
-        if (($value == '') or ($value == null)) {
-            return '';
-        }
-
         return match ($filterName) {
             // Basic string filters
             'trim' => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
@@ -193,7 +189,7 @@ class SimpleTemplate
             // String manipulation
             'replace' => count($args) >= 2 ? str_replace($args[0], $args[1], $value) : $value,
             'slice' => $this->sliceFilter($value, $args),
-            'split' => count($args) >= 2 ? (explode($args[0], $value)[$args[1]]) : $value,
+            'split' => count($args) >= 2 ? (explode($args[0], $value)[$args[1]] ?? $value) : $value,
 
             // Encoding/escaping
             'escape' => $this->escapeFilter($value, $args),
