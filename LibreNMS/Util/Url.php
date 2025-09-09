@@ -499,7 +499,7 @@ class Url
      */
     private static function deviceLinkDisplayClass($device)
     {
-        return match($device->getDeviceStatus()) {
+        return match ($device->getDeviceStatus()) {
             DeviceStatus::DISABLED => 'list-device-disabled',
             DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
             DeviceStatus::UP => 'list-device',
