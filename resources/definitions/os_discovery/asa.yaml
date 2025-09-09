@@ -61,6 +61,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9.9.147.1.2.2.2.1.5.{{ $index }}'
                     descr: 'Highest Connections'
                     index: high
+                -
+                    oid: ALTIGA-LBSSF-STATS-MIB::alStatsLBSSFGlobal
+                    value: ALTIGA-LBSSF-STATS-MIB::alLBSSFNumberOfPeers
+                    num_oid: '.1.3.6.1.4.1.3076.2.1.2.36.1.4{{ $noindex }}'
+                    descr: 'VPN Load-Balancing Peers'
         state:
             data:
                 -
@@ -83,3 +88,30 @@ modules:
                         - { descr: backup, value: 8, generic: 2 }
                         - { descr: active, value: 9, generic: 0 }
                         - { descr: standby, value: 10, generic: 0 }
+                -
+                    oid: ALTIGA-LBSSF-STATS-MIB::alStatsLBSSFGlobal
+                    value: ALTIGA-LBSSF-STATS-MIB::alLBSSFRole
+                    descr: 'VPN Load-Balancing Role'
+                    num_oid: '.1.3.6.1.4.1.3076.2.1.2.36.1.1{{ $noindex }}'
+                    group: LBSS
+                    state_name: alLBSSFRole
+                    states:
+                        - { value: 1, generic: 0, descr: 'master' }
+                        - { value: 2, generic: 3, descr: 'slave' }
+                -
+                    oid: ALTIGA-LBSSF-STATS-MIB::alStatsLBSSFGlobal
+                    value: ALTIGA-LBSSF-STATS-MIB::alLBSSFActive
+                    descr: 'VPN Load-Balancing Active'
+                    num_oid: '.1.3.6.1.4.1.3076.2.1.2.36.1.3{{ $noindex }}'
+                    group: LBSS
+                    state_name: alLBSSFActive
+                    states:
+                        - { value: 0, generic: 3, descr: 'disabled' }
+                        - { value: 1, generic: 0, descr: 'active' }
+        load:
+            data:
+                -
+                    oid: ALTIGA-LBSSF-STATS-MIB::alStatsLBSSFGlobal
+                    value: ALTIGA-LBSSF-STATS-MIB::alLBSSFLoad
+                    num_oid: '.1.3.6.1.4.1.3076.2.1.2.36.1.5{{ $noindex }}'
+                    descr: 'VPN Load-Balancing Load'
