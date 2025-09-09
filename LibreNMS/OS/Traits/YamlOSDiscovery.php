@@ -127,7 +127,7 @@ trait YamlOSDiscovery
         if (isset($os_yaml['long_template'])) {
             $lngVal = trim(SimpleTemplate::parse($os_yaml['long_template'], $template_data));
         }
-        
+
         Log::debug('Parsed lat:' . $latVal);
         Log::debug('Parsed lng:' . $lngVal);
 
