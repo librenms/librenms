@@ -177,6 +177,10 @@ class SimpleTemplate
      */
     private function executeFilter(string $value, string $filterName, array $args): string
     {
+        if (($value === "") or ($value === null)) {
+            return "";
+        }
+
         return match ($filterName) {
             // Basic string filters
             'trim' => trim($value, ...($args ?: [" \t\n\r\0\x0B"])),
