@@ -30,7 +30,7 @@ use Artisan;
 use Illuminate\Database\QueryException;
 use LibreNMS\Tests\TestCase;
 
-class SqliteTest extends TestCase
+final class SqliteTest extends TestCase
 {
     private $connection = 'testing_persistent';
 

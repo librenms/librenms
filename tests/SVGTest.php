@@ -37,7 +37,7 @@ use RegexIterator;
  * Class SVGTest
  */
 #[Group('os')]
-class SVGTest extends TestCase
+final class SVGTest extends TestCase
 {
     public function testSVGContainsPNG(): void
     {
