@@ -177,7 +177,7 @@ class SimpleTemplate
      */
     private function executeFilter(string $value, string $filterName, array $args): string
     {
-        if (($value == '') or ($value === null)) {
+        if (($value == '') or ($value == null)) {
             return '';
         }
 
