@@ -159,7 +159,7 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
                 'serial' => $data['connUnitPortSn'] ?? null,
                 'vendor' => $data['connUnitPortVendor'] ?? null,
                 'cable' => null,
-                'entity_physical_index' => $portIndex,
+                'entity_physical_index' => '200000' . $portIndex,
             ]);
         })->filter();  // Filter out null values
     }
