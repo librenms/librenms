@@ -1,0 +1,65 @@
+<?php
+
+// https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
+return [
+    'error_codes' => [
+        0 => '保留 (Reserved)',
+        1 => '訊息標頭錯誤 (Message Header Error)',
+        2 => 'OPEN 訊息錯誤 (OPEN Message Error)',
+        3 => 'UPDATE 訊息錯誤 (UPDATE Message Error)',
+        4 => '保持計時器逾時 (Hold Timer Expired)',
+        5 => '有限狀態機錯誤 (Finite State Machine Error)',
+        6 => '停止 (Cease)',
+        7 => 'ROUTE-REFRESH 訊息錯誤 (ROUTE-REFRESH Message Error)',
+    ],
+    'error_subcodes' => [
+        1 => [
+            0 => '未明確 (Unspecific)',
+            1 => '連線未同步 (Connection Not Synchronized)',
+            2 => '訊息長度錯誤 (Bad Message Length)',
+            3 => '訊息類型錯誤 (Bad Message Type)',
+        ],
+        2 => [
+            0 => '未明確 (Unspecific)',
+            1 => '不支援的版本號碼 (Unsupported Version Number)',
+            2 => '錯誤的對等 AS (Bad Peer AS)',
+            3 => '錯誤的 BGP 識別碼 (Bad BGP Identifier)',
+            4 => '不支援的選用參數 (Unsupported Optional Parameter)',
+            5 => '[已棄用] (Deprecated)',
+            6 => '不可接受的保持時間 (Unacceptable Hold Time)',
+            7 => '角色不符（暫時 BGP 草案）(Role Mismatch - Temporary BGP Draft)',
+        ],
+        3 => [
+            0 => '未明確 (Unspecific)',
+            1 => '屬性清單格式錯誤 (Malformed Attribute List)',
+            2 => '無法識別的知名屬性 (Unrecognized Well-known Attribute)',
+            3 => '缺少知名屬性 (Missing Well-known Attribute)',
+            4 => '屬性旗標錯誤 (Attribute Flags Error)',
+            5 => '屬性長度錯誤 (Attribute Length Error)',
+            6 => '無效的 ORIGIN 屬性 (Invalid ORIGIN Attribute)',
+            7 => '[已棄用] (Deprecated)',
+            8 => '無效的 NEXT_HOP 屬性 (Invalid NEXT_HOP Attribute)',
+            9 => '選用屬性錯誤 (Optional Attribute Error)',
+            10 => '無效的網路欄位 (Invalid Network Field)',
+            11 => 'AS_PATH 格式錯誤 (Malformed AS_PATH)',
+        ],
+        5 => [
+            0 => '未指定的錯誤 (Unspecified Error)',
+            1 => '在 OpenSent 狀態收到非預期訊息 (Receive Unexpected Message in OpenSent State)',
+            2 => '在 OpenConfirm 狀態收到非預期訊息 (Receive Unexpected Message in OpenConfirm State)',
+            3 => '在 Established 狀態收到非預期訊息 (Receive Unexpected Message in Established State)',
+        ],
+        6 => [
+            0 => '保留 (Reserved)',
+            1 => '已達前綴數量上限 (Maximum Number of Prefixes Reached)',
+            2 => '系統管理關閉 (Administrative Shutdown)',
+            3 => '對等端已移除設定 (Peer De-configured)',
+            4 => '系統管理重設 (Administrative Reset)',
+            5 => '連線遭拒 (Connection Rejected)',
+            6 => '其他設定變更 (Other Configuration Change)',
+            7 => '連線衝突解決 (Connection Collision Resolution)',
+            8 => '資源不足 (Out of Resources)',
+            9 => '強制重設 (Hard Reset)',
+        ],
+    ],
+];
