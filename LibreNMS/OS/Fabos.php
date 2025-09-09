@@ -127,8 +127,6 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        $sensorCollection = $this->getDevice()->sensors()->get();
-
         $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB'])->enumStrings()->walk(['FA-EXT-MIB::swConnUnitPortTable', 'FCMGMT-MIB::connUnitPortTable']);
 
         // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
