@@ -700,6 +700,11 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = null;
                 }//end if
 
+                $cbgpPeerAcceptedPrefixes = $cbgpPeerAdvertisedPrefixes =
+                $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit =
+                $cbgpPeerPrefixThreshold = $cbgpPeerPrefixClearThreshold =
+                $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
+
                 if ($device['os'] == 'timos') {
                     // Nokia TiMOS SAFI mappings (per AFI)
                     // AFI: 1 = IPv4, 2 = IPv6
@@ -803,6 +808,21 @@ if (! empty($peers)) {
                             $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
                         }
                     }
+
+                    $cbgp_data = [
+                        'cbgpPeerAcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                        'cbgpPeerDeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                        'cbgpPeerPrefixAdminLimit' => $cbgpPeerPrefixAdminLimit,
+                        'cbgpPeerPrefixThreshold' => $cbgpPeerPrefixThreshold,
+                        'cbgpPeerPrefixClearThreshold'=> $cbgpPeerPrefixClearThreshold,
+                        'cbgpPeerAdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                        'cbgpPeerSuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                        'cbgpPeerWithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
+                    ];
+
+                    // Debug log
+                    d_echo("TiMOS BGP peer data: ");
+                    d_echo($cbgp_data);
                 }
 
                 if ($device['os_group'] === 'arista') {
