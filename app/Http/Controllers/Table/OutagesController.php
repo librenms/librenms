@@ -80,16 +80,14 @@ class OutagesController extends TableController
 
                     // OR outage ends within range (if it has ended)
                     $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
-                        $subQuery->whereNotNull('up_again')
-                            ->where('up_again', '>', 0);
+                        $subQuery->where('up_again', '>', 0);
                         $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
                     });
                 });
             })
             ->when($request->status === 'current', function ($query) {
                 $query->where(function ($q) {
-                    $q->whereNull('up_again')
-                      ->orWhere('up_again', 0);
+                    $q->orWhere('up_again', 0);
                 });
             })
             ->when($request->status === 'previous', function ($query) {
