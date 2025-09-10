@@ -752,12 +752,10 @@ if (! empty($peers)) {
 
                     if (! empty($t_prefixes)) {
                         // TIMETRA path
-                        $peer_key_v4 = '4.' . implode('.', explode('.', $peer_ip->compressed()));
-                        $peer_key_v6 = '16.' . $peer_ip->uncompressed(); // adjust for IPv6 (hex/byte expand if needed)
+                        $afi = $peer_ip->isIpV6() ? 2 : 1; // 1 for IPv4, 2 for IPv6
+                        $peer_key = '1.' . ($afi == 1 ? 'ipv4' : 'ipv6') . '."' . $peer_ip->toString() . '"'; // Match TiMOS: 1.ipv4."ip" or 1.ipv6."ip"
 
-                        $timosPeerIndex = $timos[$peer_key_v4]['TIMETRA-BGP-MIB::tBgpPeerNgPeerIndex']
-                            ?? $timos[$peer_key_v6]['TIMETRA-BGP-MIB::tBgpPeerNgPeerIndex']
-                            ?? null;
+                        $timosPeerIndex = isset($t_prefixes[$peer_key]) ? $peer_key : null;
 
                         if ($timosPeerIndex !== null && isset($safis[$afi][$safi])) {
                             $current_peer_data = $t_prefixes[$timosPeerIndex][$afi][$safis[$afi][$safi]] ?? [];
