@@ -171,8 +171,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            $this->formatDatetime($outage->going_down),
-            $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
+            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
+            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }
