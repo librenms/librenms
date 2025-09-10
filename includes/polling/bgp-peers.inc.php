@@ -725,28 +725,28 @@ if (! empty($peers)) {
                     if (! isset($t_prefixes)) {
                         $t_prefixes = SnmpQuery::walk([
                             // IPv4 unicast
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',  // tBgpPeerNgOperReceivedPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6',  // tBgpPeerNgOperSentPrefixes
 
                             // IPv4 multicast
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', // tBgpPeerNgOperMCastV4RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38', // tBgpPeerNgOperMCastV4SentPfxs
 
                             // IPv4 VPN
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13', // tBgpPeerNgOperVpnRecvPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14', // tBgpPeerNgOperVpnSentPrefixes
 
                             // IPv6 unicast
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27', // tBgpPeerNgOperV6ReceivedPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28', // tBgpPeerNgOperV6SentPrefixes
 
                             // IPv6 multicast
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95', // tBgpPeerNgOperMcastV6RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96', // tBgpPeerNgOperMcastV6SentPfxs
 
                             // IPv6 VPN
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs',
-                            'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs',
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', // tBgpPeerNgOperVpnIpv6RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41', // tBgpPeerNgOperVpnIpv6SentPfxs
                         ])->table(3);
                     }
 
@@ -762,25 +762,25 @@ if (! empty($peers)) {
 
                             if ($afi == 1) { // IPv4
                                 if ($safi == 'unicast') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6'] ?? null;
                                 } elseif ($safi == 'multicast') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38'] ?? null;
                                 } elseif ($safi == 'vpn') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14'] ?? null;
                                 }
                             } elseif ($afi == 2) { // IPv6
                                 if ($safi == 'unicast') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28'] ?? null;
                                 } elseif ($safi == 'multicast') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96'] ?? null;
                                 } elseif ($safi == 'vpn') {
-                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs'] ?? null;
-                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs'] ?? null;
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41'] ?? null;
                                 }
                             }
 
@@ -791,16 +791,14 @@ if (! empty($peers)) {
                     } else {
                         // Fallback: BGP4-MIB
                         $bgp4_peers = SnmpQuery::walk([
-                            'BGP4-MIB::bgpPeerInUpdates',
-                            'BGP4-MIB::bgpPeerOutUpdates',
-                            'BGP4-MIB::bgpPeerInTotalMessages',
-                            'BGP4-MIB::bgpPeerOutTotalMessages',
+                            '.1.3.6.1.2.1.15.3.1.10', // bgpPeerInUpdates
+                            '.1.3.6.1.2.1.15.3.1.11', // bgpPeerOutUpdates
                         ])->table(1);
 
                         $peer_data = $bgp4_peers[$peer_ip->uncompressed()] ?? [];
                         if (! empty($peer_data)) {
-                            $cbgpPeerAcceptedPrefixes = $peer_data['BGP4-MIB::bgpPeerInUpdates'] ?? null;
-                            $cbgpPeerAdvertisedPrefixes = $peer_data['BGP4-MIB::bgpPeerOutUpdates'] ?? null;
+                            $cbgpPeerAcceptedPrefixes = $peer_data['.1.3.6.1.2.1.15.3.1.10'] ?? null;
+                            $cbgpPeerAdvertisedPrefixes = $peer_data['.1.3.6.1.2.1.15.3.1.11'] ?? null;
 
                             $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
                             $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
