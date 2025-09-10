@@ -6158,11 +6158,11 @@
         },
         "poller_modules.port-security": {
             "order": 460,
-                "group": "poller",
-                "section": "poller_modules",
-                "default": false,
-                "type": "boolean"
-            },
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",

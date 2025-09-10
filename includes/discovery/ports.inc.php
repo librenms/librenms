@@ -35,6 +35,7 @@ if ($device['os'] == 'bison') {
 // Get adva-fsp150cp
 if ($device['os'] == 'adva-fsp150cp') {
     require base_path('includes/discovery/ports/adva-fsp150cp.inc.php');
+}
 
 // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {

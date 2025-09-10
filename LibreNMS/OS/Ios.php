@@ -241,7 +241,7 @@ class Ios extends Cisco implements
         $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
         $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
         $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-
+        
         // Storing all polled data into an array using ifIndex as the index
         // Getting all ports from device. Port has to exist in ports table to be populated in port_security
         // Using ifIndex to map the port-security data to a port_id to compare/update against the correct records
@@ -250,6 +250,7 @@ class Ios extends Cisco implements
         $device_id = $device->device_id;
         $port_list = $ports->select('port_id', 'ifIndex')->where('device_id', $device_id)->get()->toArray();
         $port_key = [];
+        
         foreach ($port_list as $item) {
             $if_index = $item['ifIndex'];
             $port_id = $item['port_id'];
