@@ -814,14 +814,14 @@ if (! empty($peers)) {
                         'cbgpPeerDeniedPrefixes' => $cbgpPeerDeniedPrefixes,
                         'cbgpPeerPrefixAdminLimit' => $cbgpPeerPrefixAdminLimit,
                         'cbgpPeerPrefixThreshold' => $cbgpPeerPrefixThreshold,
-                        'cbgpPeerPrefixClearThreshold'=> $cbgpPeerPrefixClearThreshold,
+                        'cbgpPeerPrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
                         'cbgpPeerAdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
                         'cbgpPeerSuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
                         'cbgpPeerWithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
                     ];
 
                     // Debug log
-                    d_echo("TiMOS BGP peer data: ");
+                    d_echo('TiMOS BGP peer data: ');
                     d_echo($cbgp_data);
                 }
 
