@@ -820,6 +820,8 @@ if (! empty($peers)) {
                     d_echo($cbgp_data);
                 }
 
+                d_echo('checking debug');
+
                 if ($device['os_group'] === 'arista') {
                     $safis['multicast'] = 2;
                     $afis['ipv4'] = 1;
