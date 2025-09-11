@@ -743,10 +743,10 @@ if (! empty($peers)) {
                             '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', // tBgpPeerNgOperVpnIpv6RecvPfxs
                             '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41', // tBgpPeerNgOperVpnIpv6SentPfxs
                         ])->table(3);
-                    }
 
-                    d_echo("DEBUG RAW TIMOS PREFIX KEYS:\n");
-                    d_echo(array_keys($t_prefixes));
+                        d_echo("DEBUG RAW TIMOS PREFIXES FULL:\n");
+                        d_echo($t_prefixes);
+                    }
 
                     if (! empty($t_prefixes)) {
                         // TIMETRA path
