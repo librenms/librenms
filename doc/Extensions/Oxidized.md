@@ -248,7 +248,7 @@ hooks:
     type: exec
     events: [node_fail]
     async: true
-    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://librenms.org/api/v0/devices/${OX_NODE_NAME}/eventlog'
+    cmd: 'curl -k -s -X POST -d "{\"text\": \"Check for config change failed. Reason: ${OX_ERR_REASON//\"}. Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"3\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://librenms.org/api/v0/devices/${OX_NODE_NAME}/eventlog'
   libre_log_change:
     type: exec
     events: [post_store]
