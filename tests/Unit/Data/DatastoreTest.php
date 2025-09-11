@@ -31,7 +31,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class DatastoreTest extends TestCase
+final class DatastoreTest extends TestCase
 {
     protected function setUp(): void
     {

@@ -70,9 +70,9 @@
                 <label for="type" class="col-sm-2 control-label">{{ __('device.edit.type') }}</label>
                 <div class="col-sm-6">
                     <select id="type" name="type" class="form-control">
-                        @foreach($types as $type => $text)
-                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }}>
-                                {{ ucfirst($text) }}
+                        @foreach($types as $type => $type_data)
+                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $type_data['icon'] }}">
+                                {{ $type_data['text'] }}
                             </option>
                         @endforeach
                     </select>
@@ -220,6 +220,43 @@
 
 @push('scripts')
     <script>
+        const defaultType = '{{ $default_type }}';
+        function templateTypeSelection(option) {
+            if (!option.id) { // placeholder
+                return option.text;
+            }
+            const iconClass = $(option.element).data('icon');
+            if (!iconClass) {
+                return option.text;
+            }
+
+            return $('<span>').append(
+                $('<i>', {
+                    class: `fa-solid fa-${iconClass} fa-fw fa-lg`
+                }),
+                $('<span>', {
+                    text: option.text
+                })
+            );
+        }
+        $('#type').select2({
+            placeholder: 'Select or enter a device type',
+            templateResult: templateTypeSelection,
+            templateSelection: templateTypeSelection,
+            tags: true,
+            allowClear: true,
+        }).on('select2:clearing', function(e) {
+            // reset to the default value when clearing
+            e.preventDefault();
+            setTimeout(function() {
+                $('#type').val(defaultType).trigger('change');
+            }, 10);
+        }).on('change select2:select initialized', function() {
+            // hide the clear button when default is selected
+            const currentValue = $(this).val();
+            $(this).parent().find('.select2-selection__clear').toggle(currentValue !== defaultType);
+        }).trigger('initialized');
+
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
         $('#override_sysContact').on('switchChange.bootstrapSwitch', function(event, state) {
             var $input = $('#override_sysContact_string');
