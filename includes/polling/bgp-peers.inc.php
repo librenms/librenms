@@ -743,15 +743,16 @@ if (! empty($peers)) {
                             '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', // tBgpPeerNgOperVpnIpv6RecvPfxs
                             '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41', // tBgpPeerNgOperVpnIpv6SentPfxs
                         ])->table(3);
-
-                        d_echo("DEBUG RAW TIMOS PREFIXES FULL:\n");
-                        d_echo($t_prefixes);
                     }
+
+                    d_echo("DEBUG RAW TIMOS PREFIXES FULL:\n");
+                    d_echo(json_encode($t_prefixes, JSON_PRETTY_PRINT));
 
                     if (! empty($t_prefixes)) {
                         // TIMETRA path
                         $afi = $peer_ip->isIpV6() ? 2 : 1; // 1 for IPv4, 2 for IPv6
                         $peer_key = '1.' . ($afi == 1 ? 'ipv4' : 'ipv6') . '."' . $peer_ip->toString() . '"'; // Match TiMOS: 1.ipv4."ip" or 1.ipv6."ip"
+                        d_echo("EXPECTED PEER KEY: $peer_key\n");
 
                         $timosPeerIndex = isset($t_prefixes[$peer_key]) ? $peer_key : null;
 
