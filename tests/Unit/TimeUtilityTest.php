@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Time;
 
-class TimeUtilityTest extends TestCase
+final class TimeUtilityTest extends TestCase
 {
     /**
      * A basic unit test example.
