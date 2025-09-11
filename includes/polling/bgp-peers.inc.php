@@ -745,6 +745,9 @@ if (! empty($peers)) {
                         ])->table(3);
                     }
 
+                    d_echo("DEBUG RAW TIMOS PREFIX KEYS:\n");
+                    d_echo(array_keys($t_prefixes));
+
                     if (! empty($t_prefixes)) {
                         // TIMETRA path
                         $afi = $peer_ip->isIpV6() ? 2 : 1; // 1 for IPv4, 2 for IPv6
